@@ -213,6 +213,25 @@ class AsciiEffect {
 
 		// can't get a span or div to flow like an img element, but a table works?
 
+		// HTML escaping function to prevent XSS
+		function escapeHtml( text ) {
+
+			const map = {
+				'&': '&amp;',
+				'<': '&lt;',
+				'>': '&gt;',
+				'"': '&quot;',
+				'\'': '&#39;'
+			};
+
+			return text.replace( /[&<>"']/g, function ( m ) {
+
+				return map[ m ];
+
+			} );
+
+		}
+
 		// convert img element to ascii
 
 		function asciifyImage( oAscii ) {
@@ -265,16 +284,16 @@ class AsciiEffect {
 
 					let strThisChar = aCharList[ iCharIdx ];
 
-					if ( strThisChar === undefined || strThisChar == ' ' )
-						strThisChar = '&nbsp;';
+					if ( strThisChar === undefined )
+						strThisChar = ' ';
 
 					if ( bColor ) {
 
-						strChars += '<span style=\''
+						strChars += '<span style="'
 							+ 'color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');'
 							+ ( bBlock ? 'background-color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');' : '' )
 							+ ( bAlpha ? 'opacity:' + ( iAlpha / 255 ) + ';' : '' )
-							+ '\'>' + strThisChar + '</span>';
+							+ '">' + escapeHtml( strThisChar ) + '</span>';
 
 					} else {
 
