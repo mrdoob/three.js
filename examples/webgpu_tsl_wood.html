@@ -120,7 +120,7 @@
             function render() {
                 controls.update();
                 stats.update();
-                renderer.renderAsync(scene, camera);
+                return renderer.renderAsync(scene, camera);
             }
 
             window.addEventListener('resize', () => {
@@ -173,10 +173,11 @@
                     const cube = new THREE.Mesh(geometry, GenerateWoodMaterial(GetWoodPreset(WoodGenuses[x], Finishes[y])));
                     cube.position.set(position.x, position.y, position.z);
                     base.add(cube);
-
-                    // sleep
+                    
                 }
-                await new Promise(resolve => setTimeout(resolve, 0));
+
+                await new Promise(resolve => setTimeout(resolve, 10));
+                
             }
         </script>
     </body>
