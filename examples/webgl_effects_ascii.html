@@ -45,6 +45,8 @@
 				charSet: ' .:-=+*#%@',
 				fontWeight: 400,
 				charScale: 1.0,
+				doubleDensityHorizontal: true,
+				doubleDensityVertical: false
 			};
 
 			// Display parameters
@@ -175,6 +177,18 @@
 				folderEffect.add( asciiParams, 'invert' ).name( 'Invert' ).onChange( function ( value ) {
 
 					effect.updateVisualSettings( { invert: value } );
+
+				} );
+
+				folderEffect.add( asciiParams, 'doubleDensityHorizontal' ).name( 'Density Horizontal' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { doubleDensityHorizontal: value } );
+
+				} );
+
+				folderEffect.add( asciiParams, 'doubleDensityVertical' ).name( 'Density Vertical' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { doubleDensityVertical: value } );
 
 				} );
 

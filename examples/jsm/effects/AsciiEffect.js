@@ -165,6 +165,8 @@ class AsciiEffect {
 		let bAlpha = Boolean( options.alpha );
 		let bBlock = Boolean( options.block );
 		let bInvert = Boolean( options.invert );
+		let bDoubleDensityHorizontal = Boolean( options.doubleDensityHorizontal !== undefined ? options.doubleDensityHorizontal : true );
+		let bDoubleDensityVertical = Boolean( options.doubleDensityVertical );
 		let strFont = this._validateString( options.fontFamily, 'Courier New, monospace', 'fontFamily' );
 		let strCharSet = this._validateString( options.charSet, ' .:-=+*#%@', 'charSet' );
 		let iFontWeight = this._validateNumber( options.fontWeight, 400, 100, 900, 'fontWeight' );
@@ -172,8 +174,9 @@ class AsciiEffect {
 
 		// Font size and line height calculations - declared here so updateVisualSettings can modify them
 		let baseFontSize = 2 / fResolution;
+		const initialDensityScaleY = bDoubleDensityVertical ? 0.5 : 1.0;
 		let strFontSize = ( baseFontSize * fCharScale ) + 'px';
-		let fLineHeight = ( 2 / fResolution );
+		let fLineHeight = ( 2 / fResolution ) * initialDensityScaleY;
 
 		// Cache for letter spacing calculation optimization
 		let cachedLetterSpacing = null;
@@ -197,7 +200,6 @@ class AsciiEffect {
 		const stringBuffer = [];
 
 		// Performance optimization: pre-calculated values to avoid repeated calculations
-		let halfWidth = 0, halfHeight = 0;
 		let charListLength = 0;
 		let charListLengthMinus1 = 0;
 
@@ -280,8 +282,12 @@ class AsciiEffect {
 		function updateFontProperties() {
 
 			baseFontSize = 2 / fResolution;
+
+			// Adjust font size based on density settings
+			const densityScaleY = bDoubleDensityVertical ? 0.5 : 1.0;
+
 			strFontSize = ( baseFontSize * fCharScale ) + 'px';
-			fLineHeight = ( 2 / fResolution );
+			fLineHeight = ( 2 / fResolution ) * densityScaleY;
 
 		}
 
@@ -297,7 +303,9 @@ class AsciiEffect {
 				fontSize: strFontSize,
 				fontWeight: iFontWeight,
 				charScale: fCharScale,
-				lineHeight: fLineHeight
+				lineHeight: fLineHeight,
+				doubleDensityHorizontal: bDoubleDensityHorizontal,
+				doubleDensityVertical: bDoubleDensityVertical
 			};
 
 		}
@@ -308,8 +316,6 @@ class AsciiEffect {
 		 */
 		function updatePerformanceCache() {
 
-			halfWidth = Math.floor( iWidth / 2 );
-			halfHeight = Math.floor( iHeight / 2 );
 			charListLength = aCharList.length;
 			charListLengthMinus1 = charListLength - 1;
 
@@ -395,6 +401,8 @@ class AsciiEffect {
 		 * @param {boolean} [newSettings.alpha] - Enable alpha transparency.
 		 * @param {boolean} [newSettings.block] - Enable block mode.
 		 * @param {boolean} [newSettings.invert] - Invert brightness mapping.
+		 * @param {boolean} [newSettings.doubleDensityHorizontal] - Double horizontal character density.
+		 * @param {boolean} [newSettings.doubleDensityVertical] - Double vertical character density.
 		 * @param {string} [newSettings.charSet] - Character set for ASCII conversion.
 		 * @param {string} [newSettings.fontFamily] - Font family to use.
 		 * @param {number} [newSettings.fontWeight] - Font weight (100-900).
@@ -437,6 +445,31 @@ class AsciiEffect {
 			if ( newSettings.alpha !== undefined ) bAlpha = Boolean( newSettings.alpha );
 			if ( newSettings.block !== undefined ) bBlock = Boolean( newSettings.block );
 			if ( newSettings.invert !== undefined ) bInvert = Boolean( newSettings.invert );
+
+			// Handle density settings that affect font scaling
+			if ( newSettings.doubleDensityHorizontal !== undefined ) {
+
+				const newDoubleDensityHorizontal = Boolean( newSettings.doubleDensityHorizontal );
+				if ( newDoubleDensityHorizontal !== bDoubleDensityHorizontal ) {
+
+					bDoubleDensityHorizontal = newDoubleDensityHorizontal;
+					needsFontRecalculation = true;
+
+				}
+
+			}
+
+			if ( newSettings.doubleDensityVertical !== undefined ) {
+
+				const newDoubleDensityVertical = Boolean( newSettings.doubleDensityVertical );
+				if ( newDoubleDensityVertical !== bDoubleDensityVertical ) {
+
+					bDoubleDensityVertical = newDoubleDensityVertical;
+					needsFontRecalculation = true;
+
+				}
+
+			}
 
 			// Handle character set updates
 			if ( newSettings.charSet !== undefined ) {
@@ -565,7 +598,7 @@ class AsciiEffect {
 
 			// Create a configuration key for font-related parameters that affect letter spacing
 			const currentFontConfig = createFontConfig();
-			const fontConfigKey = `${currentFontConfig.fontFamily}_${currentFontConfig.fontSize}_${currentFontConfig.fontWeight}_${currentFontConfig.lineHeight}`;
+			const fontConfigKey = `${currentFontConfig.fontFamily}_${currentFontConfig.fontSize}_${currentFontConfig.fontWeight}_${currentFontConfig.lineHeight}_${currentFontConfig.doubleDensityHorizontal}_${currentFontConfig.doubleDensityVertical}`;
 
 			// Only recalculate letter spacing if font configuration changed
 			let optimalLetterSpacing;
@@ -632,8 +665,28 @@ class AsciiEffect {
 			// Clean up
 			document.body.removeChild( testElement );
 
+			// Calculate the target character width based on density settings
+			let targetCharWidth;
+
+			if ( bDoubleDensityHorizontal ) {
+
+				// When horizontal density is doubled, target width should be half of line height
+				// But we need to account for the actual line height which may be scaled by vertical density
+				const baseLineHeight = bDoubleDensityVertical ? lineHeight * 2 : lineHeight;
+				targetCharWidth = baseLineHeight / 2;
+
+			} else {
+
+				// Normal density: target width should match the base line height for square characters
+				// When vertical density is enabled, line height is halved, so we need to double it back
+				const baseLineHeight = bDoubleDensityVertical ? lineHeight * 2 : lineHeight;
+				targetCharWidth = baseLineHeight;
+
+			}
+
 			// Calculate the letter-spacing adjustment needed
-			const letterSpacingAdjustment = lineHeight - ( elementWidth / 2 );
+			const currentCharWidth = elementWidth / 2; // Width per character
+			const letterSpacingAdjustment = targetCharWidth - currentCharWidth;
 
 			// Convert to em units (relative to the current scaled font size)
 			const fontSizeValue = parseFloat( fontSize );
@@ -685,8 +738,16 @@ class AsciiEffect {
 			// Cache width calculation for pixel offset performance
 			const widthTimes4 = iWidth * 4;
 
-			// Calculate expected buffer size for optimization using cached values
-			const expectedPixels = halfHeight * ( halfWidth + 1 ); // +1 for <br/> tags
+			// Calculate step sizes based on density settings
+			const xStep = bDoubleDensityHorizontal ? 1 : 2;
+			const yStep = bDoubleDensityVertical ? 1 : 2;
+
+			// Calculate dimensions for ASCII output
+			const asciiWidth = Math.floor( iWidth / xStep );
+			const asciiHeight = Math.floor( iHeight / yStep );
+
+			// Calculate expected buffer size for optimization
+			const expectedPixels = asciiHeight * ( asciiWidth + 1 ); // +1 for <br/> tags
 
 			// Reuse string buffer to avoid massive string allocations
 			// Only resize if needed
@@ -700,9 +761,9 @@ class AsciiEffect {
 
 			// console.time('rendering');
 
-			for ( let y = 0; y < iHeight; y += 2 ) {
+			for ( let y = 0; y < iHeight; y += yStep ) {
 
-				for ( let x = 0; x < iWidth; x += 2 ) {
+				for ( let x = 0; x < iWidth; x += xStep ) {
 
 					const iOffset = y * widthTimes4 + x * 4;
 
@@ -835,6 +896,8 @@ class AsciiEffect {
  * @property {boolean} [alpha=false] - Enable alpha transparency support in color mode.
  * @property {boolean} [block=false] - Use block characters with background colors in color mode.
  * @property {boolean} [invert=false] - Invert the brightness-to-character mapping.
+ * @property {boolean} [doubleDensityHorizontal=true] - Double the character density horizontally by sampling every pixel instead of every other pixel.
+ * @property {boolean} [doubleDensityVertical=false] - Double the character density vertically by sampling every pixel instead of every other pixel.
  * @property {string} [fontFamily='Courier New, monospace'] - Font family for ASCII characters. Should be monospace.
  * @property {string} [charSet=' .:-=+*#%@'] - Character set for ASCII conversion, ordered from lightest to darkest.
  * @property {number} [fontWeight=400] - Font weight (100-900) for ASCII characters.
@@ -854,6 +917,14 @@ class AsciiEffect {
  *   charSet: ' ░▒▓█',
  *   invert: true,
  *   charScale: 1.5
+ * });
+ *
+ * @example
+ * // High density ASCII with doubled character resolution
+ * const effect = new AsciiEffect(renderer, {
+ *   doubleDensityHorizontal: true,
+ *   doubleDensityVertical: true,
+ *   resolution: 0.3
  * });
  */
 
