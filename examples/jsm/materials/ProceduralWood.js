@@ -404,9 +404,9 @@ export function GenerateWoodMaterial( params ) {
 	uniforms.cellSize = TSL.uniform( params.cellSize );
 	uniforms.darkGrainColor = TSL.uniform( new THREE.Color( params.darkGrainColor ) );
 	uniforms.lightGrainColor = TSL.uniform( new THREE.Color( params.lightGrainColor ) );
-	uniforms.clearcoat = TSL.uniform( clearcoat );
-	uniforms.clearcoatDarken = TSL.uniform( clearcoatDarken );
-	uniforms.clearcoatRoughness = TSL.uniform( TSL.clearcoatRoughness );
+	uniforms.clearcoat = TSL.uniform( params.clearcoat );
+	uniforms.clearcoatDarken = TSL.uniform( params.clearcoatDarken );
+	uniforms.clearcoatRoughness = TSL.uniform( params.clearcoatRoughness );
 
     // remember uniforms for real-time updates
     material.uniforms = uniforms;
