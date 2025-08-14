@@ -362,6 +362,9 @@ class XRManager extends EventDispatcher {
 		/**
 		 * Whether the browser supports the APIs necessary to use XRProjectionLayers.
 		 *
+		 * Note: this does not represent XRSession explicitly requesting
+		 * `'layers'` as a feature - see `_sessionUsesLayers` and #30112
+		 *
 		 * @private
 		 * @type {boolean}
 		 * @readonly
