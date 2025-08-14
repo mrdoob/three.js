@@ -248,9 +248,9 @@ class RenderContext {
  */
 export function getCacheKey( renderContext ) {
 
-	const { textures, activeCubeFace } = renderContext;
+	const { textures, activeCubeFace, activeMipmapLevel } = renderContext;
 
-	const values = [ activeCubeFace ];
+	const values = [ activeCubeFace, activeMipmapLevel ];
 
 	for ( const texture of textures ) {
 

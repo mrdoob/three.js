@@ -390,8 +390,6 @@ class WebGPUBackend extends Backend {
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
-			renderTargetData.activeMipmapLevel !== renderContext.activeMipmapLevel ||
-			renderTargetData.activeCubeFace !== renderContext.activeCubeFace ||
 			renderTargetData.samples !== renderTarget.samples
 		) {
 
