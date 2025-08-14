@@ -26,12 +26,6 @@
 			import { AsciiEffect } from 'three/addons/effects/AsciiEffect.js';
 			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-			let composer;
-
 			let camera, controls, scene, renderer, effect;
 
 			let sphere, plane;
@@ -71,21 +65,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 
-				const renderScene = new RenderPass( scene, camera );
-
-				const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 0.2, - 0.5, 0.5 );
-
-				const outputPass = new OutputPass();
-
-				composer = new EffectComposer( renderer );
-				composer.addPass( renderScene );
-				composer.addPass( bloomPass );
-				composer.addPass( outputPass );
-
-				effect = new AsciiEffect( renderer, {
-					invert: true,
-					composer: composer
-				} );
+				effect = new AsciiEffect( renderer, { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.domElement.style.color = 'white';
 				effect.domElement.style.backgroundColor = 'black';

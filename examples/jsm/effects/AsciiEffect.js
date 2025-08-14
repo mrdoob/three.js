@@ -34,9 +34,6 @@ class AsciiEffect {
 		let strFontSize = options[ 'fontSize' ] || 'Dynamically computed according to resolution';
 		let strLetterSpacing = options[ 'letterSpacing' ] || '0px';
 
-		// Store composer reference if provided
-		const composer = options[ 'composer' ] || null;
-
 		let width, height;
 
 		const domElement = document.createElement( 'div' );
@@ -74,28 +71,9 @@ class AsciiEffect {
 		 */
 		this.render = function ( scene, camera ) {
 
-			if ( composer ) {
-
-				composer.render();
-
-			} else {
-
-				renderer.render( scene, camera );
-
-			}
+			renderer.render( scene, camera );
 
 			asciifyImage( oAscii );
-
-		};
-
-		/**
-		 * Sets the composer to be used for post-processing effects.
-		 *
-		 * @param {EffectComposer} newComposer - The composer to use for rendering.
-		 */
-		this.setComposer = function ( newComposer ) {
-
-			composer = newComposer;
 
 		};
 
@@ -106,7 +84,6 @@ class AsciiEffect {
 		 * @type {HTMLDivElement}
 		 */
 		this.domElement = domElement;
-
 
 		// Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
 
@@ -164,22 +141,21 @@ class AsciiEffect {
 		}
 
 		let aCharList;
-		if ( strCharSet ) {
+		if ( options[ 'charSet' ] ) {
 
 			aCharList = ( strCharSet ).split( '' );
 
 		} else {
 
-			const aDefaultCharList = ( ' .,:;i1tfLCG08@' ).split( '' );
+			const aDefaultCharList = ( ' .:-=+*#%@' ).split( '' );
 			const aDefaultColorCharList = ( ' CGO08@' ).split( '' );
 			aCharList = ( bColor ? aDefaultColorCharList : aDefaultCharList );
 
 		}
 
-
 		// Setup dom
 
-		if ( strFontSize === 'Dynamically computed according to resolution' ) {
+		if ( ! options[ 'fontSize' ] ) {
 
 			strFontSize = ( 2 / fResolution ) * iScale + 'px';
 
@@ -189,7 +165,7 @@ class AsciiEffect {
 
 		// adjust letter-spacing for all combinations of scale and resolution to get it to fit the image width.
 
-		if ( strFont === 'Courier New, monospace' ) {
+		if ( ! options[ 'fontFamily' ] ) {
 
 			if ( strResolution == 'low' ) {
 
@@ -236,7 +212,6 @@ class AsciiEffect {
 		}
 
 		// can't get a span or div to flow like an img element, but a table works?
-
 
 		// convert img element to ascii
 
@@ -341,7 +316,6 @@ class AsciiEffect {
  * @property {number} [fontWeight=400] - The font weight used for the effect.
  * @property {string} [fontSize='Dynamically computed according to resolution'] - The font size used for the effect. Input a valid CSS font size value.
  * @property {string} [letterSpacing='0px'] - The letter spacing used for the effect. Highly recommended to tweak if you input a custom font family and/or font size.
- * @property {EffectComposer} [composer=null] - An optional EffectComposer to use for post-processing effects, that will be applied before the ASCII rendering.
  **/
 
 export { AsciiEffect };
