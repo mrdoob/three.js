@@ -1,140 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Three.js WebGPU - Procedural Wood Materials</title>
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <meta name="author" content="Logan Seeley"/>
+	<head>
+		<meta charset="utf-8">
+		<title>Three.js WebGPU - Procedural Wood Materials</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="author" content="Logan Seeley"/>
 
-        <link type="text/css" rel="stylesheet" href="main.css">
-        <style>
-            body {color:white;}
-            #info a {
-                color:#1cdfe2;
-            }
-            </style>
-    </head>
-    <body>
-        <div id="info">
-            <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - tsl procedural wood materials<br/>
-            by Logan Seeley, based on <a href="https://www.youtube.com/watch?v=n7e0vxgBS8A">Lance Phan's Blender tutorial</a>
-        </div>
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color:white;
+			}
+			#info a {
+				color:#1cdfe2;
+			}
+			</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - tsl procedural wood materials<br/>
+			by Logan Seeley, based on <a href="https://www.youtube.com/watch?v=n7e0vxgBS8A">Lance Phan's Blender tutorial</a>
+		</div>
 
-        <script type="importmap">
-            {
-                "imports": {
-                    "three": "../build/three.webgpu.js",
-                    "three/webgpu": "../build/three.webgpu.js",
-                    "three/tsl": "../build/three.tsl.js",
-                    "three/addons/": "./jsm/"
-                }
-            }
-        </script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
-        <script type="module">
-            import * as THREE from "three";
-            import * as TSL from "three/tsl";
-            import Stats from "three/addons/libs/stats.module.js";
-            import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-            import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
-            import { FontLoader } from "three/addons/loaders/FontLoader.js";
-            import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
-            import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-            import { GenerateWoodMaterial, GetWoodPreset, WoodGenuses, Finishes } from "three/addons/materials/ProceduralWood.js";
+		<script type="module">
+			import * as THREE from 'three';
+			import * as TSL from 'three/tsl';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+			import { GenerateWoodMaterial, GetWoodPreset, WoodGenuses, Finishes } from 'three/addons/materials/ProceduralWood.js';
 
-            let scene, base, camera, renderer, controls, canvas, stats, font;
+			let scene, base, camera, renderer, controls, canvas, stats, font;
 
-            async function init() {
-                scene = new THREE.Scene();
-                scene.background = new THREE.Color( 0xffffff );
-                
+			async function init() {
 
-                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.set(-0.1, 5, 0.548);
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+			
 
-                renderer = new THREE.WebGPURenderer({ antialias: true });
-                renderer.setPixelRatio(1.0); // important for performance
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                renderer.toneMapping = THREE.NeutralToneMapping;
-                renderer.toneMappingExposure = 1.0;
-                renderer.setAnimationLoop(render);
-                document.body.appendChild(renderer.domElement);
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( - 0.1, 5, 0.548 );
 
-                canvas = document.querySelector("canvas");
-                controls = new OrbitControls(camera, canvas);
-                controls.target.set(0, 0, 0.548);
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( 1.0 ); // important for performance
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 1.0;
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
 
-                stats = new Stats();
-                document.body.appendChild(stats.dom);
-                
-                font = await new FontLoader().loadAsync("./fonts/helvetiker_regular.typeface.json");
+				canvas = document.querySelector( 'canvas' );
+				controls = new OrbitControls( camera, canvas );
+				controls.target.set( 0, 0, 0.548 );
 
-                base = new THREE.Group();
-                base.rotation.set(0, 0, -Math.PI/2);
-                base.position.set(0, 0, 0.548);
-                scene.add(base);
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+			
+				font = await new FontLoader().loadAsync( './fonts/helvetiker_regular.typeface.json' );
 
-                const text_mat = new THREE.MeshStandardMaterial();
-                text_mat.colorNode = TSL.color("#000000");  
+				base = new THREE.Group();
+				base.rotation.set( 0, 0, - Math.PI / 2 );
+				base.position.set( 0, 0, 0.548 );
+				scene.add( base );
 
-
-                for (let y = 0; y < Finishes.length; y++) {
-                    const txt_geo = new TextGeometry(Finishes[y], {
-                        font: font,
-                        size: 0.1,
-                        depth: 0.001,
-                        curveSegments: 12,
-                        bevelEnabled: false
-                    });
-                    
-                    txt_geo.computeBoundingBox();
-                    const offx = -0.5 * (txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x);
-                    const offy = -0.5 * (txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y);
-                    const offz = -0.5 * (txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z);
-                    txt_geo.translate(offx, offy, offz);
-
-                    const txt = new THREE.Mesh(txt_geo, text_mat);
-                    txt.position.set(0, y - Finishes.length/2, -WoodGenuses.length/2 + 0.45 - 1);
-                    txt.rotateY(-Math.PI/2);
-                    base.add(txt);
-                }
+				const text_mat = new THREE.MeshStandardMaterial();
+				text_mat.colorNode = TSL.color( '#000000' );
 
 
-                const material = new THREE.MeshBasicNodeMaterial();
+				for ( let y = 0; y < Finishes.length; y ++ ) {
 
-				const gridXZ = TSL.Fn( ( [ gridSize = float( 1.0 ), dotWidth = float( 0.1 ), lineWidth = float( 0.02 ) ] ) => {
+					const txt_geo = new TextGeometry( Finishes[ y ], {
+						font: font,
+						size: 0.1,
+						depth: 0.001,
+						curveSegments: 12,
+						bevelEnabled: false
+					} );
+			
+					txt_geo.computeBoundingBox();
+					const offx = - 0.5 * ( txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x );
+					const offy = - 0.5 * ( txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y );
+					const offz = - 0.5 * ( txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z );
+					txt_geo.translate( offx, offy, offz );
+
+					const txt = new THREE.Mesh( txt_geo, text_mat );
+					txt.position.set( 0, y - Finishes.length / 2, - WoodGenuses.length / 2 + 0.45 - 1 );
+					txt.rotateY( - Math.PI / 2 );
+					base.add( txt );
+			
+				}
+
+
+				const material = new THREE.MeshBasicNodeMaterial();
+
+				const gridXZ = TSL.Fn( ( [ gridSize = TSL.float( 1.0 ), dotWidth = TSL.float( 0.1 ), lineWidth = TSL.float( 0.02 ) ] ) => {
 
 					const coord = TSL.positionWorld.xz.div( gridSize );
 					const grid = TSL.fract( coord );
-					
+
 					// Screen-space derivative for automatic antialiasing
 					const fw = TSL.fwidth( coord );
 					const smoothing = TSL.max( fw.x, fw.y ).mul( 0.5 );
-					
+
 					// Create squares at cell centers
 					const squareDist = TSL.max( TSL.abs( grid.x.sub( 0.5 ) ), TSL.abs( grid.y.sub( 0.5 ) ) );
 					const dots = TSL.smoothstep( dotWidth.add( smoothing ), dotWidth.sub( smoothing ), squareDist );
-					
+
 					// Create grid lines
 					const lineX = TSL.smoothstep( lineWidth.add( smoothing ), lineWidth.sub( smoothing ), TSL.abs( grid.x.sub( 0.5 ) ) );
 					const lineZ = TSL.smoothstep( lineWidth.add( smoothing ), lineWidth.sub( smoothing ), TSL.abs( grid.y.sub( 0.5 ) ) );
 					const lines = TSL.max( lineX, lineZ );
-					
+
 					return TSL.max( dots, lines );
 
 				} );
 
-				const radialGradient = TSL.Fn( ( [ radius = float( 10.0 ), falloff = float( 1.0 ) ] ) => {
+				const radialGradient = TSL.Fn( ( [ radius = TSL.float( 10.0 ), falloff = TSL.float( 1.0 ) ] ) => {
 
 					return TSL.smoothstep( radius, radius.sub( falloff ), TSL.length( TSL.positionWorld ) );
 
 				} );
-				
+
 				// Create grid pattern
 				const gridPattern = gridXZ( 1.0, 0.03, 0.005 );
 				const baseColor = TSL.vec4( 1.0, 1.0, 1.0, 0.0 );
 				const gridColor = TSL.vec4( 0.5, 0.5, 0.5, 1.0 );
-				
+
 				// Mix base color with grid lines
 				material.colorNode = gridPattern.mix( baseColor, gridColor ).mul( radialGradient( 30.0, 20.0 ) );
 				material.transparent = true;
@@ -144,81 +150,93 @@
 				plane.renderOrder = - 1;
 				scene.add( plane );
 
-                new HDRLoader()
-                    .setPath( 'textures/equirectangular/' )
-                    .load( 'san_giuseppe_bridge_2k.hdr', async ( texture ) => {
+				new HDRLoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'san_giuseppe_bridge_2k.hdr', async ( texture ) => {
 
-                    texture.mapping = THREE.EquirectangularReflectionMapping;
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
-                    scene.environment = texture;
-                    scene.environmentIntensity = 2;
-                });
+						scene.environment = texture;
+						scene.environmentIntensity = 2;
 
-                for (let x = 0; x < WoodGenuses.length; x++) {
-                    for (let y = 0; y < Finishes.length; y++) {
-                        const cube = add_wood(x, y, text_mat);
-                        base.add(cube);
-                        await new Promise(resolve => setTimeout(resolve, 0));
-                    }
-                }
-            }
+					} );
 
-            function render() {
-                controls.update();
-                stats.update();
-                return renderer.renderAsync(scene, camera);
-            }
+				for ( let x = 0; x < WoodGenuses.length; x ++ ) {
 
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
+					for ( let y = 0; y < Finishes.length; y ++ ) {
 
-            if (navigator.gpu)
-            {
-                init();
-            }
-            else
-            {
-                document.body.innerHTML = '<div id="info">WebGPU is not supported in this browser.</div>';
-            }
+						const cube = add_wood( x, y, text_mat );
+						base.add( cube );
+						await new Promise( resolve => setTimeout( resolve, 0 ) );
+			
+					}
+			
+				}
+			
+			}
 
-            function add_wood(x, y, text_mat)
-            {
-                const txt_geo = new TextGeometry(WoodGenuses[x],
-                {
-                    font: font,
-                    size: 0.1,
-                    depth: 0.001,
-                    curveSegments: 12,
-                    bevelEnabled: false
-                });
-                
-                txt_geo.computeBoundingBox();
-                const offx = -0.5 * (txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x);
-                const offy = -0.5 * (txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y);
-                const offz = -0.5 * (txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z);
-                txt_geo.translate(offx, offy, offz);
+			function render() {
 
-                const txt = new THREE.Mesh(txt_geo, text_mat);
-                txt.position.set(0, Finishes.length/2, x - WoodGenuses.length/2 + 0.45);
-                txt.rotateY(-Math.PI/2);
-                base.add(txt);
+				controls.update();
+				stats.update();
+				return renderer.renderAsync( scene, camera );
+			
+			}
 
-                const geometry = new RoundedBoxGeometry(0.125, 0.9, 0.9, 10, 0.02);
-                const position =
-                {
-                    x: 0,
-                    y: y - Finishes.length/2,
-                    z: x - WoodGenuses.length/2 + 0.45
-                };
-                
-                const cube = new THREE.Mesh(geometry, GenerateWoodMaterial(GetWoodPreset(WoodGenuses[x], Finishes[y])));
-                cube.position.set(position.x, position.y, position.z);
+			window.addEventListener( 'resize', () => {
 
-                return cube;
-            }
-        </script>
-    </body>
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			} );
+
+			if ( WebGPU.isAvailable() ) {
+
+				init();
+			
+			} else {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+			}
+
+			function add_wood( x, y, text_mat ) {
+
+				const txt_geo = new TextGeometry( WoodGenuses[ x ],
+					{
+						font: font,
+						size: 0.1,
+						depth: 0.001,
+						curveSegments: 12,
+						bevelEnabled: false
+					} );
+			
+				txt_geo.computeBoundingBox();
+				const offx = - 0.5 * ( txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x );
+				const offy = - 0.5 * ( txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y );
+				const offz = - 0.5 * ( txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z );
+				txt_geo.translate( offx, offy, offz );
+
+				const txt = new THREE.Mesh( txt_geo, text_mat );
+				txt.position.set( 0, Finishes.length / 2, x - WoodGenuses.length / 2 + 0.45 );
+				txt.rotateY( - Math.PI / 2 );
+				base.add( txt );
+
+				const geometry = new RoundedBoxGeometry( 0.125, 0.9, 0.9, 10, 0.02 );
+				const position =
+				{
+					x: 0,
+					y: y - Finishes.length / 2,
+					z: x - WoodGenuses.length / 2 + 0.45
+				};
+			
+				const cube = new THREE.Mesh( geometry, GenerateWoodMaterial( GetWoodPreset( WoodGenuses[ x ], Finishes[ y ] ) ) );
+				cube.position.set( position.x, position.y, position.z );
+
+				return cube;
+			
+			}
+		</script>
+	</body>
 </html>
