@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType } from 'three/webgpu';
+import { RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, HalfFloatType } from 'three/webgpu';
 import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -95,7 +95,7 @@ class SSRNode extends TempNode {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
+		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
 
 		/**
