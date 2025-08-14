@@ -406,30 +406,34 @@ class WebGLTextureUtils {
 	createTexture( texture, options ) {
 
 		const { gl, backend } = this;
-		const { levels, width, height, depth } = options;
+		const { levels, width, height, depth, source } = options;
 
 		const glFormat = backend.utils.convert( texture.format, texture.colorSpace );
 		const glType = backend.utils.convert( texture.type );
 		const glInternalFormat = this.getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
 
-		const textureGPU = gl.createTexture();
+		const textureGPU = source ? source : gl.createTexture();
 		const glTextureType = this.getGLTextureType( texture );
 
 		backend.state.bindTexture( glTextureType, textureGPU );
 
-		this.setTextureParameters( glTextureType, texture );
+		if ( ! source ) {
 
-		if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
+			this.setTextureParameters( glTextureType, texture );
 
-			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
+			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
-		} else if ( texture.isData3DTexture ) {
+				gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
 
-			gl.texStorage3D( gl.TEXTURE_3D, levels, glInternalFormat, width, height, depth );
+			} else if ( texture.isData3DTexture ) {
 
-		} else if ( ! texture.isVideoTexture ) {
+				gl.texStorage3D( gl.TEXTURE_3D, levels, glInternalFormat, width, height, depth );
 
-			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+			} else if ( ! texture.isVideoTexture ) {
+
+				gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+
+			}
 
 		}
 

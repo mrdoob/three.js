@@ -1026,6 +1026,12 @@ class NodeBuilder {
 
 	}
 
+	getFrag() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
 	/**
 	 * Whether to flip texture data along its vertical axis or not. WebGL needs
 	 * this method evaluate to `true`, WebGPU to `false`.
