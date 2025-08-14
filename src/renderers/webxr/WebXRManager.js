@@ -346,6 +346,12 @@ class WebXRManager extends EventDispatcher {
 		 */
 		this.getBinding = function () {
 
+			if ( glBinding === null && supportsGlBinding ) {
+
+				glBinding = new XRWebGLBinding( session, gl );
+
+			}
+
 			return glBinding;
 
 		};
@@ -463,7 +469,7 @@ class WebXRManager extends EventDispatcher {
 						scaleFactor: framebufferScaleFactor
 					};
 
-					glBinding = new XRWebGLBinding( session, gl );
+					glBinding = this.getBinding();
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
@@ -993,11 +999,7 @@ class WebXRManager extends EventDispatcher {
 
 				if ( gpuDepthSensingEnabled && supportsGlBinding ) {
 
-					if ( glBinding === null ) {
-
-						glBinding = new XRWebGLBinding( session, gl );
-
-					}
+					glBinding = scope.getBinding();
 
 					const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
@@ -1016,11 +1018,7 @@ class WebXRManager extends EventDispatcher {
 
 					renderer.state.unbindTexture();
 
-					if ( glBinding === null ) {
-
-						glBinding = new XRWebGLBinding( session, gl );
-
-					}
+					glBinding = scope.getBinding();
 
 					for ( let i = 0; i < views.length; i ++ ) {
 
