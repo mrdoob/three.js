@@ -385,62 +385,59 @@ export function GetWoodPreset( genus, finish ) {
 
 }
 
+const params = GetWoodPreset( WoodGenuses[ 0 ], Finishes[ 0 ] );
+const uniforms = {};
+
+uniforms.centerSize = TSL.uniform( params.centerSize ).onObjectUpdate( ( { material } ) => material.centerSize );
+uniforms.largeWarpScale = TSL.uniform( params.largeWarpScale ).onObjectUpdate( ( { material } ) => material.largeWarpScale );
+uniforms.largeGrainStretch = TSL.uniform( params.largeGrainStretch ).onObjectUpdate( ( { material } ) => material.largeGrainStretch );
+uniforms.smallWarpStrength = TSL.uniform( params.smallWarpStrength ).onObjectUpdate( ( { material } ) => material.smallWarpStrength );
+uniforms.smallWarpScale = TSL.uniform( params.smallWarpScale ).onObjectUpdate( ( { material } ) => material.smallWarpScale );
+uniforms.fineWarpStrength = TSL.uniform( params.fineWarpStrength ).onObjectUpdate( ( { material } ) => material.fineWarpStrength );
+uniforms.fineWarpScale = TSL.uniform( params.fineWarpScale ).onObjectUpdate( ( { material } ) => material.fineWarpScale );
+uniforms.ringCount = TSL.uniform( params.ringCount ).onObjectUpdate( ( { material } ) => material.ringCount );
+uniforms.ringBias = TSL.uniform( params.ringBias ).onObjectUpdate( ( { material } ) => material.ringBias );
+uniforms.ringSizeVariance = TSL.uniform( params.ringSizeVariance ).onObjectUpdate( ( { material } ) => material.ringSizeVariance );
+uniforms.ringVarianceScale = TSL.uniform( params.ringVarianceScale ).onObjectUpdate( ( { material } ) => material.ringVarianceScale );
+uniforms.barkThickness = TSL.uniform( params.barkThickness ).onObjectUpdate( ( { material } ) => material.barkThickness );
+uniforms.splotchScale = TSL.uniform( params.splotchScale ).onObjectUpdate( ( { material } ) => material.splotchScale );
+uniforms.splotchIntensity = TSL.uniform( params.splotchIntensity ).onObjectUpdate( ( { material } ) => material.splotchIntensity );
+uniforms.cellScale = TSL.uniform( params.cellScale ).onObjectUpdate( ( { material } ) => material.cellScale );
+uniforms.cellSize = TSL.uniform( params.cellSize ).onObjectUpdate( ( { material } ) => material.cellSize );
+uniforms.darkGrainColor = TSL.uniform( new THREE.Color( params.darkGrainColor ) ).onObjectUpdate( ( { material }, self ) => self.value.set( material.darkGrainColor ) );
+uniforms.lightGrainColor = TSL.uniform( new THREE.Color( params.lightGrainColor ) ).onObjectUpdate( ( { material }, self ) => self.value.set( material.lightGrainColor ) );
+
+const colorNode = wood(
+	TSL.positionLocal.add( TSL.vec3( params.originOffset.x, params.originOffset.y, params.originOffset.z ) ),
+	uniforms.centerSize,
+	uniforms.largeWarpScale,
+	uniforms.largeGrainStretch,
+	uniforms.smallWarpStrength,
+	uniforms.smallWarpScale,
+	uniforms.fineWarpStrength,
+	uniforms.fineWarpScale,
+	uniforms.ringCount,
+	uniforms.ringBias,
+	uniforms.ringSizeVariance,
+	uniforms.ringVarianceScale,
+	uniforms.barkThickness,
+	uniforms.splotchScale,
+	uniforms.splotchIntensity,
+	uniforms.cellScale,
+	uniforms.cellSize,
+	uniforms.darkGrainColor,
+	uniforms.lightGrainColor
+).mul( params.clearcoatDarken );
+
 export function GenerateWoodMaterial( params ) {
 
 	const material = new THREE.MeshPhysicalNodeMaterial();
 
-	const uniforms = {};
+	Object.assign( material, params );
 
-	uniforms.centerSize = TSL.uniform( params.centerSize );
-	uniforms.largeWarpScale = TSL.uniform( params.largeWarpScale );
-	uniforms.largeGrainStretch = TSL.uniform( params.largeGrainStretch );
-	uniforms.smallWarpStrength = TSL.uniform( params.smallWarpStrength );
-	uniforms.smallWarpScale = TSL.uniform( params.smallWarpScale );
-	uniforms.fineWarpStrength = TSL.uniform( params.fineWarpStrength );
-	uniforms.fineWarpScale = TSL.uniform( params.fineWarpScale );
-	uniforms.ringCount = TSL.uniform( params.ringCount );
-	uniforms.ringBias = TSL.uniform( params.ringBias );
-	uniforms.ringSizeVariance = TSL.uniform( params.ringSizeVariance );
-	uniforms.ringVarianceScale = TSL.uniform( params.ringVarianceScale );
-	uniforms.barkThickness = TSL.uniform( params.barkThickness );
-	uniforms.splotchScale = TSL.uniform( params.splotchScale );
-	uniforms.splotchIntensity = TSL.uniform( params.splotchIntensity );
-	uniforms.cellScale = TSL.uniform( params.cellScale );
-	uniforms.cellSize = TSL.uniform( params.cellSize );
-	uniforms.darkGrainColor = TSL.uniform( new THREE.Color( params.darkGrainColor ) );
-	uniforms.lightGrainColor = TSL.uniform( new THREE.Color( params.lightGrainColor ) );
-	uniforms.clearcoat = TSL.uniform( params.clearcoat );
-	uniforms.clearcoatDarken = TSL.uniform( params.clearcoatDarken );
-	uniforms.clearcoatRoughness = TSL.uniform( params.clearcoatRoughness );
-
-    // remember uniforms for real-time updates
-    material.uniforms = uniforms;
-
-	material.colorNode = wood(
-		TSL.positionLocal.add( TSL.vec3( params.originOffset.x, params.originOffset.y, params.originOffset.z ) ),
-		uniforms.centerSize,
-		uniforms.largeWarpScale,
-		uniforms.largeGrainStretch,
-		uniforms.smallWarpStrength,
-		uniforms.smallWarpScale,
-		uniforms.fineWarpStrength,
-		uniforms.fineWarpScale,
-		uniforms.ringCount,
-		uniforms.ringBias,
-		uniforms.ringSizeVariance,
-		uniforms.ringVarianceScale,
-		uniforms.barkThickness,
-		uniforms.splotchScale,
-		uniforms.splotchIntensity,
-		uniforms.cellScale,
-		uniforms.cellSize,
-		uniforms.darkGrainColor,
-		uniforms.lightGrainColor
-	).mul( uniforms.clearcoatDarken );
-
-	//material.customProgramCacheKey = () => params.genus + params.finish;
-	material.clearcoatNode = uniforms.clearcoat;
-	material.clearcoatRoughnessNode = uniforms.clearcoatRoughness;
+	material.colorNode = colorNode;
+	material.clearcoatNode = params.clearcoat;
+	material.clearcoatRoughness = params.clearcoatRoughness;
 
 	return material;
 
