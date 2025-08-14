@@ -205,9 +205,14 @@ const spaceWarp = TSL.Fn( ( [ p, warpStrength, xyScale, zScale ] ) => {
 
 const woodRings = TSL.Fn( ( [ w, ringCount, ringBias, ringSizeVariance, ringVarianceScale, barkThickness ] ) => {
 
-	const rings = noiseFbm( w.mul( ringVarianceScale ), TSL.float( 1 ), TSL.float( 0.5 ), TSL.float( 2 ), TSL.int( 1 ) ).mul( ringSizeVariance ).add( w ).mul( ringCount ).fract().mul( barkThickness );
+	const rings = noiseFbm( w.mul( ringVarianceScale ), TSL.float( 1 ), TSL.float( 0.5 ), TSL.float( 1 ), TSL.int( 1 ) ).mul( ringSizeVariance ).add( w ).mul( ringCount ).fract().mul( barkThickness );
 
-	return TSL.min( mapRange( rings, 0, ringBias, 0, 1, TSL.bool( true ) ), mapRange( rings, ringBias, 1, 1, 0, TSL.bool( true ) ) );
+	const sharpRings = TSL.min( mapRange( rings, 0, ringBias, 0, 1, TSL.bool( true ) ), mapRange( rings, ringBias, 1, 1, 0, TSL.bool( true ) ) );
+
+	const blurAmount = TSL.max(TSL.positionView.length().div(10), 1);
+	const blurredRings = TSL.smoothstep( blurAmount.negate(), blurAmount, sharpRings.sub( 0.5 ) ).mul( 0.5 ).add( 0.5 );
+
+	return blurredRings;
 
 } );
 
@@ -257,7 +262,7 @@ const wood = TSL.Fn( ( [
 	const detailWarp = spaceWarp( mainWarp, fineWarpStrength, fineWarpScale, 0.17 );
 	const rings = woodRings( detailWarp.length(), ringCount, ringBias, ringSizeVariance, ringVarianceScale, barkThickness );
 	const detail = woodDetail( detailWarp, p, detailWarp.length(), splotchScale );
-	const cells = cellStructure( mainWarp, cellScale, cellSize );
+	const cells = cellStructure( mainWarp, cellScale, cellSize.div(TSL.max(TSL.positionView.length().mul(10), 1)) );
 	const baseColor = TSL.mix( darkGrainColor, lightGrainColor, rings );
 
 	return softLightMix( splotchIntensity, softLightMix( 0.407, baseColor, cells ), detail );
