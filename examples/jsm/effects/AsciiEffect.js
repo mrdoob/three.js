@@ -19,20 +19,23 @@ class AsciiEffect {
 		// darker bolder character set from https://github.com/saw/Canvas-ASCII-Art/
 		// ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'.split('');
 
-		// Some ASCII settings
+		let fResolution = options[ 'resolution' ] || 0.15;
+		let bColor = options[ 'color' ] || false;
+		let bAlpha = options[ 'alpha' ] || false;
+		let bBlock = options[ 'block' ] || false;
+		let bInvert = options[ 'invert' ] || false;
+		let strFont = options[ 'fontFamily' ] || 'Courier New, monospace';
+		let strCharSet = options[ 'charSet' ] || ' .:-=+*#%@';
+		let iFontWeight = options[ 'fontWeight' ] || 400;
+		let fCharScale = options[ 'charScale' ] || 1.0;
 
-		const fResolution = options[ 'resolution' ] || 0.15;
-		const iScale = options[ 'scale' ] || 1;
-		const bColor = options[ 'color' ] || false;
-		const bAlpha = options[ 'alpha' ] || false;
-		const bBlock = options[ 'block' ] || false;
-		const bInvert = options[ 'invert' ] || false;
-		const strResolution = options[ 'strResolution' ] || 'low';
-		const strFont = options[ 'fontFamily' ] || 'Courier New, monospace';
-		const strCharSet = options[ 'charSet' ] || ' .:-=+*#%@';
-		const iFontWeight = options[ 'fontWeight' ] || 400;
-		let strFontSize = options[ 'fontSize' ] || 'Dynamically computed according to resolution';
-		let strLetterSpacing = options[ 'letterSpacing' ] || '0px';
+		// Cache for letter spacing calculation optimization
+		// Only recalculates when font-related parameters change
+		let cachedLetterSpacing = null;
+		let lastFontConfig = null;
+
+		// Memory management flags
+		let isDisposed = false;
 
 		let width, height;
 
@@ -45,6 +48,9 @@ class AsciiEffect {
 		let iWidth, iHeight;
 		let oImg;
 
+		// String buffer for reusing memory in ASCII generation
+		const stringBuffer = [];
+
 		/**
 		 * Resizes the effect.
 		 *
@@ -52,6 +58,8 @@ class AsciiEffect {
 		 * @param {number} h - The height of the effect in logical pixels.
 		 */
 		this.setSize = function ( w, h ) {
+
+			if ( isDisposed ) return;
 
 			width = w;
 			height = h;
@@ -72,6 +80,8 @@ class AsciiEffect {
 		 */
 		this.render = function ( scene, camera ) {
 
+			if ( isDisposed ) return;
+
 			renderer.render( scene, camera );
 
 			asciifyImage( oAscii );
@@ -86,9 +96,97 @@ class AsciiEffect {
 		 */
 		this.domElement = domElement;
 
+		/**
+		 * Updates the resolution of the ASCII effect.
+		 *
+		 * @param {number} newResolution - The new resolution value.
+		 */
+		this.updateResolution = function ( newResolution ) {
+
+			if ( isDisposed ) return;
+
+			fResolution = newResolution;
+			renderer.setPixelRatio( fResolution );
+
+			// Recalculate font size and line height
+			baseFontSize = 2 / fResolution;
+			strFontSize = ( baseFontSize * fCharScale ) + 'px';
+			fLineHeight = ( 2 / fResolution );
+
+			// Don't force letter spacing recalculation - the ratios remain valid
+			// as they're based on character scale, not resolution
+
+			initAsciiSize();
+
+		};
+
+		/**
+		 * Updates visual settings and font parameters.
+		 *
+		 * @param {Object} newSettings - Object containing the new settings.
+		 */
+
+		this.updateVisualSettings = function ( newSettings ) {
+
+			if ( isDisposed ) return;
+
+			let needsFontRecalculation = false;
+
+			if ( newSettings.color !== undefined ) bColor = newSettings.color;
+			if ( newSettings.alpha !== undefined ) bAlpha = newSettings.alpha;
+			if ( newSettings.block !== undefined ) bBlock = newSettings.block;
+			if ( newSettings.invert !== undefined ) bInvert = newSettings.invert;
+
+			if ( newSettings.charSet !== undefined ) {
+
+				strCharSet = newSettings.charSet;
+				aCharList = strCharSet.split( '' );
+
+			}
+
+			// Handle font-related parameters that require recalculation
+			if ( newSettings.charScale !== undefined ) {
+
+				fCharScale = newSettings.charScale;
+				needsFontRecalculation = true;
+
+			}
+
+			if ( newSettings.fontFamily !== undefined ) {
+
+				strFont = newSettings.fontFamily;
+				needsFontRecalculation = true;
+
+			}
+
+			if ( newSettings.fontWeight !== undefined ) {
+
+				iFontWeight = newSettings.fontWeight;
+				needsFontRecalculation = true;
+
+			}
+
+			// If any font-related parameter changed, recalculate everything
+			if ( needsFontRecalculation ) {
+
+				// Recalculate font size
+				baseFontSize = 2 / fResolution;
+				strFontSize = ( baseFontSize * fCharScale ) + 'px';
+
+				// Force recalculation of letter spacing since font parameters changed
+				cachedLetterSpacing = null;
+
+				initAsciiSize();
+
+			}
+
+		};
+
 		// Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
 
 		function initAsciiSize() {
+
+			if ( isDisposed ) return;
 
 			iWidth = Math.floor( width * fResolution );
 			iHeight = Math.floor( height * fResolution );
@@ -115,13 +213,46 @@ class AsciiEffect {
 			oStyle.whiteSpace = 'pre';
 			oStyle.margin = '0px';
 			oStyle.padding = '0px';
-			oStyle.letterSpacing = strLetterSpacing;
 			oStyle.fontFamily = strFont.toLowerCase();
 			oStyle.fontWeight = iFontWeight;
 			oStyle.fontSize = strFontSize;
 			oStyle.lineHeight = fLineHeight + 'px';
 			oStyle.textAlign = 'left';
 			oStyle.textDecoration = 'none';
+
+			// Create a configuration key for font-related parameters that affect letter spacing
+			const currentFontConfig = {
+				fontFamily: strFont.toLowerCase(),
+				fontSize: strFontSize,
+				fontWeight: iFontWeight,
+				charScale: fCharScale,
+				lineHeight: fLineHeight
+			};
+			const fontConfigKey = JSON.stringify( currentFontConfig );
+
+			// Only recalculate letter spacing if font configuration changed
+			let optimalLetterSpacing;
+			if ( cachedLetterSpacing === null || lastFontConfig === null || JSON.stringify( lastFontConfig ) !== fontConfigKey ) {
+
+				optimalLetterSpacing = calculateLetterSpacing(
+					currentFontConfig.fontFamily,
+					currentFontConfig.fontSize,
+					currentFontConfig.fontWeight,
+					currentFontConfig.lineHeight,
+					currentFontConfig.charScale
+				);
+
+				// Cache the results
+				cachedLetterSpacing = optimalLetterSpacing;
+				lastFontConfig = currentFontConfig;
+
+			} else {
+
+				optimalLetterSpacing = cachedLetterSpacing;
+
+			}
+
+			oStyle.letterSpacing = optimalLetterSpacing + 'em';
 
 		}
 
@@ -156,59 +287,59 @@ class AsciiEffect {
 
 		// Setup dom
 
-		if ( ! options[ 'fontSize' ] ) {
+		// Apply character scaling to font size (fully dynamic calculation)
+		let baseFontSize = 2 / fResolution;
+		let strFontSize = ( baseFontSize * fCharScale ) + 'px';
 
-			strFontSize = ( 2 / fResolution ) * iScale + 'px';
+		let fLineHeight = ( 2 / fResolution );
 
-		}
+		// Calculate letter spacing for monospace fonts, so that each character fits in a perfect square
+		function calculateLetterSpacing( fontFamily, fontSize, fontWeight, lineHeight ) {
 
-		const fLineHeight = ( 2 / fResolution ) * iScale;
+			// Create a temporary DOM element to measure actual rendered spacing
+			const testElement = document.createElement( 'div' );
+			testElement.style.position = 'absolute';
+			testElement.style.visibility = 'hidden';
+			testElement.style.fontFamily = fontFamily;
+			testElement.style.fontSize = fontSize;
+			testElement.style.fontWeight = fontWeight;
+			testElement.style.lineHeight = lineHeight + 'px';
+			testElement.style.margin = '0';
+			testElement.style.padding = '0';
+			testElement.style.whiteSpace = 'pre';
+			testElement.style.letterSpacing = '0px';
 
-		// adjust letter-spacing for all combinations of scale and resolution to get it to fit the image width.
+			// Test with two characters side by side to measure horizontal spacing
+			// Any character works here if the font is truly monospace
+			const testChar = 'M';
+			testElement.innerHTML = testChar + testChar;
+			document.body.appendChild( testElement );
 
-		if ( ! options[ 'fontFamily' ] ) {
+			// Get the actual dimensions using getBoundingClientRect for precise measurements
+			const rect = testElement.getBoundingClientRect();
+			const elementWidth = rect.width;
 
-			if ( strResolution == 'low' ) {
+			// Clean up
+			document.body.removeChild( testElement );
 
-				switch ( iScale ) {
+			// Calculate effective vertical spacing per character (this is our target)
+			const effectiveVerticalSpacing = lineHeight;
 
-					case 1 : strLetterSpacing = '-1px'; break;
-					case 2 :
-					case 3 : strLetterSpacing = '-2.1px'; break;
-					case 4 : strLetterSpacing = '-3.1px'; break;
-					case 5 : strLetterSpacing = '-4.15px'; break;
+			// Calculate current horizontal spacing per character
+			// Current horizontal space per character is elementWidth / 2 (for two chars)
+			const currentHorizontalSpacing = elementWidth / 2;
 
-				}
+			// We want the horizontal spacing to match the vertical line height
+			const targetHorizontalSpacing = effectiveVerticalSpacing;
 
-			}
+			// Calculate the letter-spacing adjustment needed
+			const letterSpacingAdjustment = targetHorizontalSpacing - currentHorizontalSpacing;
 
-			if ( strResolution == 'medium' ) {
+			// Convert to em units (relative to the current scaled font size)
+			const fontSizeValue = parseFloat( fontSize );
+			const letterSpacingInEm = letterSpacingAdjustment / fontSizeValue;
 
-				switch ( iScale ) {
-
-					case 1 : strLetterSpacing = '0px'; break;
-					case 2 : strLetterSpacing = '-1px'; break;
-					case 3 : strLetterSpacing = '-1.04px'; break;
-					case 4 :
-					case 5 : strLetterSpacing = '-2.1px'; break;
-
-				}
-
-			}
-
-			if ( strResolution == 'high' ) {
-
-				switch ( iScale ) {
-
-					case 1 :
-					case 2 : strLetterSpacing = '0px'; break;
-					case 3 :
-					case 4 :
-					case 5 : strLetterSpacing = '-1px'; break;
-
-				}
-
-			}
+			return letterSpacingInEm;
 
 		}
 
@@ -237,18 +368,30 @@ class AsciiEffect {
 
 		function asciifyImage( oAscii ) {
 
+			if ( isDisposed ) return;
+
 			oCtx.clearRect( 0, 0, iWidth, iHeight );
 			oCtx.drawImage( oCanvasImg, 0, 0, iWidth, iHeight );
 			const oImgData = oCtx.getImageData( 0, 0, iWidth, iHeight ).data;
 
-			// Coloring loop starts now
-			let strChars = '';
+			// Calculate expected buffer size for optimization
+			const expectedPixels = Math.floor( iHeight / 2 ) * ( Math.floor( iWidth / 2 ) + 1 ); // +1 for <br/> tags
+
+			// Reuse string buffer to avoid massive string allocations
+			// Only resize if needed
+			if ( stringBuffer.length < expectedPixels || stringBuffer.length > expectedPixels * 2 ) {
+
+				stringBuffer.length = expectedPixels;
+
+			}
+
+			let bufferIndex = 0;
 
 			// console.time('rendering');
 
 			for ( let y = 0; y < iHeight; y += 2 ) {
 
-				for ( let x = 0; x < iWidth; x ++ ) {
+				for ( let x = 0; x < iWidth; x += 2 ) {
 
 					const iOffset = ( y * iWidth + x ) * 4;
 
@@ -261,7 +404,6 @@ class AsciiEffect {
 					let fBrightness;
 
 					fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
-					// fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
 
 					if ( iAlpha == 0 ) {
 
@@ -290,7 +432,7 @@ class AsciiEffect {
 
 					if ( bColor ) {
 
-						strChars += '<span style="'
+						stringBuffer[ bufferIndex ++ ] = '<span style="'
 							+ 'color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');'
 							+ ( bBlock ? 'background-color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');' : '' )
 							+ ( bAlpha ? 'opacity:' + ( iAlpha / 255 ) + ';' : '' )
@@ -298,15 +440,18 @@ class AsciiEffect {
 
 					} else {
 
-						strChars += strThisChar;
+						stringBuffer[ bufferIndex ++ ] = strThisChar;
 
 					}
 
 				}
 
-				strChars += '<br/>';
+				stringBuffer[ bufferIndex ++ ] = '<br/>';
 
 			}
+
+			// Join only the used portion of the buffer
+			const strChars = stringBuffer.slice( 0, bufferIndex ).join( '' );
 
 			oAscii.innerHTML = `<tr><td style="display:block;width:${width}px;height:${height}px;overflow:hidden">${strChars}</td></tr>`;
 
@@ -315,6 +460,48 @@ class AsciiEffect {
 			// return oAscii;
 
 		}
+
+		/**
+		 * Disposes of the effect and cleans up all resources to prevent memory leaks.
+		 * This method should be called when the effect is no longer needed.
+		 */
+		this.dispose = function () {
+
+			if ( isDisposed ) return;
+
+			isDisposed = true;
+
+			// Clear DOM elements
+			if ( oAscii && oAscii.parentNode ) {
+
+				oAscii.parentNode.removeChild( oAscii );
+
+			}
+
+			if ( domElement && domElement.parentNode ) {
+
+				domElement.parentNode.removeChild( domElement );
+
+			}
+
+			// Clear canvas context
+			if ( oCanvas && oCtx ) {
+
+				oCtx.clearRect( 0, 0, oCanvas.width, oCanvas.height );
+
+			}
+
+			// Clear cached data
+			cachedLetterSpacing = null;
+			lastFontConfig = null;
+			stringBuffer.length = 0;
+
+			// Clear references
+			width = height = null;
+			iWidth = iHeight = null;
+			oImg = null;
+
+		};
 
 	}
 
@@ -325,17 +512,14 @@ class AsciiEffect {
  *
  * @typedef {Object} AsciiEffect~Options
  * @property {number} [resolution=0.15] - A higher value leads to more details.
- * @property {number} [scale=1] - The scale of the effect.
  * @property {boolean} [color=false] - Whether colors should be enabled or not. Better quality but slows down rendering.
  * @property {boolean} [alpha=false] - Whether transparency should be enabled or not.
  * @property {boolean} [block=false] - Whether blocked characters should be enabled or not.
  * @property {boolean} [invert=false] - Whether colors should be inverted or not.
- * @property {('low'|'medium'|'high')} [strResolution='low'] - The string resolution.
  * @property {string} [fontFamily='Courier New, monospace'] - The font family used for the effect.
  * @property {string} [charSet=' .:-=+*#%@'] - The character set used for the effect.
  * @property {number} [fontWeight=400] - The font weight used for the effect.
- * @property {string} [fontSize='Dynamically computed according to resolution'] - The font size used for the effect. Input a valid CSS font size value.
- * @property {string} [letterSpacing='0px'] - The letter spacing used for the effect. Highly recommended to tweak if you input a custom font family and/or font size.
+ * @property {number} [charScale=1.0] - The character scaling factor. Values > 1.0 make characters larger while maintaining proper spacing. Values < 1.0 make characters smaller.
  **/
 
 export { AsciiEffect };

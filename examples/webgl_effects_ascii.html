@@ -38,16 +38,13 @@
 			// ASCII effect parameters
 			const asciiParams = {
 				resolution: 0.15,
-				scale: 1,
 				color: false,
 				block: false,
 				invert: true,
-				strResolution: 'low',
 				fontFamily: 'Courier New, monospace',
 				charSet: ' .:-=+*#%@',
 				fontWeight: 400,
-				fontSize: 'auto',
-				letterSpacing: '-0.085em'
+				charScale: 1.0,
 			};
 
 			// Display parameters
@@ -129,26 +126,58 @@
 
 				const gui = new GUI();
 
-				// Display mode toggle
 				const folderDisplay = gui.addFolder( 'Display Mode' );
 				folderDisplay.add( displayParams, 'useAsciiEffect' ).name( 'ASCII Effect' ).onChange( toggleDisplayMode );
 
-				// ASCII Effect parameters
 				const folderEffect = gui.addFolder( 'ASCII Effect' );
 
-				folderEffect.add( asciiParams, 'resolution', 0.05, 0.5, 0.01 ).name( 'Resolution' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'scale', 1, 5, 1 ).name( 'Scale' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'color' ).name( 'Color' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'block' ).name( 'Block' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'invert' ).name( 'Invert' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'strResolution', [ 'low', 'medium', 'high' ] ).name( 'String Resolution' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'charSet' ).name( 'Character Set' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'fontFamily' ).name( 'Font Family' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'fontWeight', 100, 900, 100 ).name( 'Font Weight' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'fontSize' ).name( 'Font Size' ).onChange( recreateEffect );
-				folderEffect.add( asciiParams, 'letterSpacing' ).name( 'Letter Spacing' ).onChange( recreateEffect );
+				folderEffect.add( asciiParams, 'resolution', 0.05, 0.5, 0.01 ).name( 'Resolution' ).onChange( function ( value ) {
 
-				// Visual settings
+					effect.updateResolution( value );
+
+				} );
+
+				folderEffect.add( asciiParams, 'charSet' ).name( 'Character Set' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { charSet: value } );
+
+				} );
+
+				folderEffect.add( asciiParams, 'fontFamily' ).name( 'Font Family' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { fontFamily: value } );
+
+				} );
+				folderEffect.add( asciiParams, 'fontWeight', 100, 900, 100 ).name( 'Font Weight' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { fontWeight: value } );
+
+				} );
+
+				folderEffect.add( asciiParams, 'charScale', 0.1, 3.0, 0.1 ).name( 'Character Scale' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { charScale: value } );
+
+				} );
+
+				folderEffect.add( asciiParams, 'color' ).name( 'Color' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { color: value } );
+
+				} );
+
+				folderEffect.add( asciiParams, 'block' ).name( 'Block' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { block: value } );
+
+				} );
+
+				folderEffect.add( asciiParams, 'invert' ).name( 'Invert' ).onChange( function ( value ) {
+
+					effect.updateVisualSettings( { invert: value } );
+
+				} );
+
 				const folderVisual = gui.addFolder( 'Visual' );
 				const visualParams = {
 					backgroundColor: '#000000',
@@ -196,29 +225,6 @@
 					controls.domElement = renderer.domElement;
 
 				}
-
-			}
-
-			function recreateEffect() {
-
-				// Remove old effect element
-				if ( effect && effect.domElement && effect.domElement.parentNode ) {
-
-					effect.domElement.parentNode.removeChild( effect.domElement );
-
-	}
-
-				// Create new effect with updated parameters
-				effect = new AsciiEffect( renderer, asciiParams );
-				effect.setSize( window.innerWidth, window.innerHeight );
-				effect.domElement.style.color = 'white';
-				effect.domElement.style.backgroundColor = 'black';
-
-				// Add new effect element
-				document.body.appendChild( effect.domElement );
-
-				// Update controls
-				controls.domElement = effect.domElement;
 
 			}
 
