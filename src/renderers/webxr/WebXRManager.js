@@ -52,6 +52,8 @@ class WebXRManager extends EventDispatcher {
 		let glBaseLayer = null;
 		let xrFrame = null;
 
+		const supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
+
 		const depthSensing = new WebXRDepthSensing();
 		const cameraAccessTextures = {};
 		const attributes = gl.getContextAttributes();
@@ -405,17 +407,12 @@ class WebXRManager extends EventDispatcher {
 				currentPixelRatio = renderer.getPixelRatio();
 				renderer.getSize( currentSize );
 
-				if ( typeof XRWebGLBinding !== 'undefined' ) {
-
-					glBinding = new XRWebGLBinding( session, gl );
-
-				}
 
 				// Check that the browser implements the necessary APIs to use an
 				// XRProjectionLayer rather than an XRWebGLLayer
-				const useLayers = glBinding !== null && 'createProjectionLayer' in XRWebGLBinding.prototype;
+				const supportsLayers = supportsGlBinding && 'createProjectionLayer' in XRWebGLBinding.prototype;
 
-				if ( ! useLayers ) {
+				if ( ! supportsLayers ) {
 
 					const layerInit = {
 						antialias: attributes.antialias,
@@ -465,6 +462,8 @@ class WebXRManager extends EventDispatcher {
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
+
+					glBinding = new XRWebGLBinding( session, gl );
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
@@ -992,7 +991,13 @@ class WebXRManager extends EventDispatcher {
 					enabledFeatures.includes( 'depth-sensing' ) &&
 					session.depthUsage == 'gpu-optimized';
 
-				if ( gpuDepthSensingEnabled && glBinding ) {
+				if ( gpuDepthSensingEnabled && supportsGlBinding ) {
+
+					if ( glBinding === null ) {
+
+						glBinding = new XRWebGLBinding( session, gl );
+
+					}
 
 					const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
@@ -1007,31 +1012,33 @@ class WebXRManager extends EventDispatcher {
 				const cameraAccessEnabled = enabledFeatures &&
 				    enabledFeatures.includes( 'camera-access' );
 
-				if ( cameraAccessEnabled ) {
+				if ( cameraAccessEnabled && supportsGlBinding ) {
 
 					renderer.state.unbindTexture();
 
-					if ( glBinding ) {
+					if ( glBinding === null ) {
 
-						for ( let i = 0; i < views.length; i ++ ) {
+						glBinding = new XRWebGLBinding( session, gl );
 
-							const camera = views[ i ].camera;
+					}
 
-							if ( camera ) {
+					for ( let i = 0; i < views.length; i ++ ) {
 
-								let cameraTex = cameraAccessTextures[ camera ];
+						const camera = views[ i ].camera;
 
-								if ( ! cameraTex ) {
+						if ( camera ) {
 
-									cameraTex = new ExternalTexture();
-									cameraAccessTextures[ camera ] = cameraTex;
+							let cameraTex = cameraAccessTextures[ camera ];
 
-								}
+							if ( ! cameraTex ) {
 
-								const glTexture = glBinding.getCameraImage( camera );
-								cameraTex.sourceTexture = glTexture;
+								cameraTex = new ExternalTexture();
+								cameraAccessTextures[ camera ] = cameraTex;
 
 							}
+
+							const glTexture = glBinding.getCameraImage( camera );
+							cameraTex.sourceTexture = glTexture;
 
 						}
 
