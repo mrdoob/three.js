@@ -29,6 +29,11 @@ class AsciiEffect {
 		let iFontWeight = options[ 'fontWeight' ] || 400;
 		let fCharScale = options[ 'charScale' ] || 1.0;
 
+		// Font size and line height calculations - declared here so updateVisualSettings can modify them
+		let baseFontSize = 2 / fResolution;
+		let strFontSize = ( baseFontSize * fCharScale ) + 'px';
+		let fLineHeight = ( 2 / fResolution );
+
 		// Cache for letter spacing calculation optimization
 		// Only recalculates when font-related parameters change
 		let cachedLetterSpacing = null;
@@ -126,6 +131,7 @@ class AsciiEffect {
 				fResolution = newSettings.resolution;
 				renderer.setPixelRatio( fResolution );
 				needsResolutionUpdate = true;
+				needsFontRecalculation = true; // Resolution affects font size calculations
 
 			}
 
@@ -151,16 +157,22 @@ class AsciiEffect {
 
 			}
 
-			if ( needsResolutionUpdate ) {
+			// Recalculate font-dependent variables when needed
+			if ( needsFontRecalculation ) {
 
-				initAsciiSize();
+				// Recalculate font size and line height based on new parameters
+				baseFontSize = 2 / fResolution;
+				strFontSize = ( baseFontSize * fCharScale ) + 'px';
+				fLineHeight = ( 2 / fResolution );
+
+				// Force recalculation of letter spacing since font parameters changed
+				cachedLetterSpacing = null;
 
 			}
 
-			// Force recalculation of letter spacing since font parameters changed
-			if ( needsFontRecalculation ) {
+			if ( needsResolutionUpdate || needsFontRecalculation ) {
 
-				cachedLetterSpacing = null;
+				initAsciiSize();
 
 			}
 
@@ -267,12 +279,6 @@ class AsciiEffect {
 			aCharList = ( bColor ? aDefaultColorCharList : aDefaultCharList );
 
 		}
-
-		// Apply character scaling to font size (fully dynamic calculation)
-		const baseFontSize = 2 / fResolution;
-		const strFontSize = ( baseFontSize * fCharScale ) + 'px';
-
-		const fLineHeight = ( 2 / fResolution );
 
 		// Calculate letter spacing for monospace fonts, so that each character fits in a perfect square
 		function calculateLetterSpacing( fontFamily, fontSize, fontWeight, lineHeight ) {
