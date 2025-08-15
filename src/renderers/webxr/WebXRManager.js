@@ -342,7 +342,10 @@ class WebXRManager extends EventDispatcher {
 		/**
 		 * Returns the current XR binding.
 		 *
-		 * @return {?XRWebGLBinding} The XR binding.
+		 * Creates a new binding if needed and the browser is
+		 * capable of doing so.
+		 *
+		 * @return {?XRWebGLBinding} The XR binding. Returns `null` if one cannot be created.
 		 */
 		this.getBinding = function () {
 

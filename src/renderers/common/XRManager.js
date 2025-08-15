@@ -590,6 +590,27 @@ class XRManager extends EventDispatcher {
 
 	}
 
+
+	/**
+	 * Return the current XR binding.
+	 *
+	 * Creates a new binding if needed and the browser is
+	 * capable of doing so.
+	 *
+	 * @return {?XRWebGLBinding} The XR binding. Returns `null` if a binding cannot be crated.
+	 */
+	getBinding() {
+
+		if ( this._glBinding === null && this._supportsGlBinding ) {
+
+			this._glBinding = new XRWebGLBinding( this._session, this._gl );
+
+		}
+
+		return this._glBinding;
+
+	}
+
 	/**
 	 * Returns the current XR frame.
 	 *
@@ -957,8 +978,7 @@ class XRManager extends EventDispatcher {
 
 				}
 
-				const glBinding = new XRWebGLBinding( session, gl );
-				this._glBinding = glBinding;
+				this._glBinding = this.getBinding();
 				const glProjLayer = this._glBinding.createProjectionLayer( projectionlayerInit );
 				const layersArray = [ glProjLayer ];
 
