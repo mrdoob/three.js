@@ -27724,7 +27724,7 @@ class RenderObject {
 	 */
 	getMaterialCacheKey() {
 
-		const { object, material } = this;
+		const { object, material, renderer } = this;
 
 		let cacheKey = material.customProgramCacheKey();
 
@@ -27753,6 +27753,18 @@ class RenderObject {
 					if ( value.isTexture ) {
 
 						valueKey += value.mapping;
+
+						// WebGPU must honor the sampler data because they are part of the bindings
+
+						if ( renderer.backend.isWebGPUBackend === true ) {
+
+							valueKey += value.magFilter;
+							valueKey += value.minFilter;
+							valueKey += value.wrapS;
+							valueKey += value.wrapT;
+							valueKey += value.wrapR;
+
+						}
 
 					}
 
@@ -30529,9 +30541,9 @@ class RenderContext {
  */
 function getCacheKey( renderContext ) {
 
-	const { textures, activeCubeFace } = renderContext;
+	const { textures, activeCubeFace, activeMipmapLevel } = renderContext;
 
-	const values = [ activeCubeFace ];
+	const values = [ activeCubeFace, activeMipmapLevel ];
 
 	for ( const texture of textures ) {
 
@@ -30890,6 +30902,12 @@ class Textures extends DataMap {
 		options.needsMipmaps = this.needsMipmaps( texture );
 		options.levels = options.needsMipmaps ? this.getMipLevels( texture, width, height ) : 1;
 
+		// TODO: Uniformly handle mipmap definitions
+		// Normal textures and compressed cube textures define base level + mips with their mipmap array
+		// Uncompressed cube textures use their mipmap array only for mips (no base level)
+
+		if ( texture.isCubeTexture && texture.mipmaps.length > 0 ) options.levels ++;
+
 		//
 
 		if ( isRenderTarget || texture.isStorageTexture === true ) {
@@ -31066,21 +31084,25 @@ class Textures extends DataMap {
 
 		let mipLevelCount;
 
-		if ( texture.isCompressedTexture ) {
+		if ( texture.mipmaps.length > 0 ) {
 
-			if ( texture.mipmaps ) {
-
-				mipLevelCount = texture.mipmaps.length;
-
-			} else {
-
-				mipLevelCount = 1;
-
-			}
+			mipLevelCount = texture.mipmaps.length;
 
 		} else {
 
-			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+			if ( texture.isCompressedTexture === true ) {
+
+				// it is not possible to compute mipmaps for compressed textures. So
+				// when no mipmaps are defined in "texture.mipmaps", force a texture
+				// level of 1
+
+				mipLevelCount = 1;
+
+			} else {
+
+				mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+
+			}
 
 		}
 
@@ -31089,14 +31111,14 @@ class Textures extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given texture requires mipmaps.
+	 * Returns `true` if the given texture makes use of mipmapping.
 	 *
 	 * @param {Texture} texture - The texture.
 	 * @return {boolean} Whether mipmaps are required or not.
 	 */
 	needsMipmaps( texture ) {
 
-		return texture.isCompressedTexture === true || texture.generateMipmaps;
+		return texture.generateMipmaps === true || texture.mipmaps.length > 0;
 
 	}
 
@@ -38876,6 +38898,431 @@ const atomicOr = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.AT
  */
 const atomicXor = ( pointerNode, valueNode ) => atomicFunc( AtomicFunctionNode.ATOMIC_XOR, pointerNode, valueNode );
 
+/**
+ * This class represents a set of built in WGSL shader functions that sync
+ * synchronously execute an operation across a subgroup, or 'warp', of compute
+ * or fragment shader invocations within a workgroup. Typically, these functions
+ * will synchronously execute an operation using data from all active invocations
+ * within the subgroup, then broadcast that result to all active invocations. In
+ * other graphics APIs, subgroup functions are also referred to as wave intrinsics
+ * (DirectX/HLSL) or warp intrinsics (CUDA).
+ *
+ * @augments TempNode
+ */
+class SubgroupFunctionNode extends TempNode {
+
+	static get type() {
+
+		return 'SubgroupFunctionNode';
+
+	}
+
+	/**
+	 * Constructs a new function node.
+	 *
+	 * @param {string} method - The subgroup/wave intrinsic method to construct.
+	 * @param {Node} [aNode=null] - The method's first argument.
+	 * @param {Node} [bNode=null] - The method's second argument.
+	 */
+	constructor( method, aNode = null, bNode = null ) {
+
+		super();
+
+		/**
+		 * The subgroup/wave intrinsic method to construct.
+		 *
+		 * @type {String}
+		 */
+		this.method = method;
+
+		/**
+		 * The method's first argument.
+		 *
+		 * @type {Node}
+		 */
+		this.aNode = aNode;
+
+		/**
+		 * The method's second argument.
+		 *
+		 * @type {Node}
+		 */
+		this.bNode = bNode;
+
+	}
+
+	getInputType( builder ) {
+
+		const aType = this.aNode ? this.aNode.getNodeType( builder ) : null;
+		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
+
+		const aLen = builder.isMatrix( aType ) ? 0 : builder.getTypeLength( aType );
+		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
+
+		if ( aLen > bLen ) {
+
+			return aType;
+
+		} else {
+
+			return bType;
+
+		}
+
+	}
+
+	getNodeType( builder ) {
+
+		const method = this.method;
+
+		if ( method === SubgroupFunctionNode.SUBGROUP_ELECT ) {
+
+			return 'bool';
+
+		} else if ( method === SubgroupFunctionNode.SUBGROUP_BALLOT ) {
+
+			return 'uvec4';
+
+		} else {
+
+			return this.getInputType( builder );
+
+		}
+
+	}
+
+	generate( builder, output ) {
+
+		const method = this.method;
+
+		const type = this.getNodeType( builder );
+		const inputType = this.getInputType( builder );
+
+		const a = this.aNode;
+		const b = this.bNode;
+
+		const params = [];
+
+		if (
+			method === SubgroupFunctionNode.SUBGROUP_BROADCAST ||
+			method === SubgroupFunctionNode.SUBGROUP_SHUFFLE ||
+			method === SubgroupFunctionNode.QUAD_BROADCAST
+		) {
+
+			const bType = b.getNodeType( builder );
+
+			params.push(
+				a.build( builder, type ),
+				b.build( builder, bType === 'float' ? 'int' : type )
+			);
+
+		} else if (
+			method === SubgroupFunctionNode.SUBGROUP_SHUFFLE_XOR ||
+			method === SubgroupFunctionNode.SUBGROUP_SHUFFLE_DOWN ||
+			method === SubgroupFunctionNode.SUBGROUP_SHUFFLE_UP
+		) {
+
+			params.push(
+				a.build( builder, type ),
+				b.build( builder, 'uint' )
+			);
+
+		} else {
+
+			if ( a !== null ) params.push( a.build( builder, inputType ) );
+			if ( b !== null ) params.push( b.build( builder, inputType ) );
+
+		}
+
+		const paramsString = params.length === 0 ? '()' : `( ${params.join( ', ' )} )`;
+
+		return builder.format( `${ builder.getMethod( method, type ) }${paramsString}`, type, output );
+
+
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.method = this.method;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.method = data.method;
+
+	}
+
+}
+
+// 0 inputs
+SubgroupFunctionNode.SUBGROUP_ELECT = 'subgroupElect';
+
+// 1 input
+SubgroupFunctionNode.SUBGROUP_BALLOT = 'subgroupBallot';
+SubgroupFunctionNode.SUBGROUP_ADD = 'subgroupAdd';
+SubgroupFunctionNode.SUBGROUP_INCLUSIVE_ADD = 'subgroupInclusiveAdd';
+SubgroupFunctionNode.SUBGROUP_EXCLUSIVE_AND = 'subgroupExclusiveAdd';
+SubgroupFunctionNode.SUBGROUP_MUL = 'subgroupMul';
+SubgroupFunctionNode.SUBGROUP_INCLUSIVE_MUL = 'subgroupInclusiveMul';
+SubgroupFunctionNode.SUBGROUP_EXCLUSIVE_MUL = 'subgroupExclusiveMul';
+SubgroupFunctionNode.SUBGROUP_AND = 'subgroupAnd';
+SubgroupFunctionNode.SUBGROUP_OR = 'subgroupOr';
+SubgroupFunctionNode.SUBGROUP_XOR = 'subgroupXor';
+SubgroupFunctionNode.SUBGROUP_MIN = 'subgroupMin';
+SubgroupFunctionNode.SUBGROUP_MAX = 'subgroupMax';
+SubgroupFunctionNode.SUBGROUP_ALL = 'subgroupAll';
+SubgroupFunctionNode.SUBGROUP_ANY = 'subgroupAny';
+SubgroupFunctionNode.SUBGROUP_BROADCAST_FIRST = 'subgroupBroadcastFirst';
+SubgroupFunctionNode.QUAD_SWAP_X = 'quadSwapX';
+SubgroupFunctionNode.QUAD_SWAP_Y = 'quadSwapY';
+SubgroupFunctionNode.QUAD_SWAP_DIAGONAL = 'quadSwapDiagonal';
+
+// 2 inputs
+SubgroupFunctionNode.SUBGROUP_BROADCAST = 'subgroupBroadcast';
+SubgroupFunctionNode.SUBGROUP_SHUFFLE = 'subgroupShuffle';
+SubgroupFunctionNode.SUBGROUP_SHUFFLE_XOR = 'subgroupShuffleXor';
+SubgroupFunctionNode.SUBGROUP_SHUFFLE_UP = 'subgroupShuffleUp';
+SubgroupFunctionNode.SUBGROUP_SHUFFLE_DOWN = 'subgroupShuffleDown';
+SubgroupFunctionNode.QUAD_BROADCAST = 'quadBroadcast';
+
+
+
+/**
+ * Returns true if this invocation has the lowest subgroup_invocation_id
+ * among active invocations in the subgroup.
+ *
+ * @method
+ * @return {bool} The result of the computation.
+ */
+const subgroupElect = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ELECT ).setParameterLength( 0 );
+
+/**
+ * Returns a set of bitfields where the bit corresponding to subgroup_invocation_id
+ * is 1 if pred is true for that active invocation and 0 otherwise.
+ *
+ * @method
+ * @param {bool} pred - A boolean that sets the bit corresponding to the invocations subgroup invocation id.
+ * @return {vec4<u32>}- A bitfield corresponding to the pred value of each subgroup invocation.
+ */
+const subgroupBallot = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_BALLOT ).setParameterLength( 1 );
+
+/**
+ * A reduction that adds e among all active invocations and returns that result.
+ *
+ * @method
+ * @param {number} e - The value provided to the reduction by the current invocation.
+ * @return {number} The accumulated result of the reduction operation.
+ */
+const subgroupAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ADD ).setParameterLength( 1 );
+
+/**
+ * An inclusive scan returning the sum of e for all active invocations with subgroup_invocation_id less than or equal to this invocation.
+ *
+ * @method
+ * @param {number} e - The value provided to the inclusive scan by the current invocation.
+ * @return {number} The accumulated result of the inclusive scan operation.
+ */
+const subgroupInclusiveAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_INCLUSIVE_ADD ).setParameterLength( 1 );
+
+/**
+ * An exclusive scan that returns the sum of e for all active invocations with subgroup_invocation_id less than this invocation.
+ *
+ * @method
+ * @param {number} e - The value provided to the exclusive scan by the current invocation.
+ * @return {number} The accumulated result of the exclusive scan operation.
+ */
+const subgroupExclusiveAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_EXCLUSIVE_AND ).setParameterLength( 1 );
+
+/**
+ * A reduction that multiplies e among all active invocations and returns that result.
+ *
+ * @method
+ * @param {number} e - The value provided to the reduction by the current invocation.
+ * @return {number} The accumulated result of the reduction operation.
+ */
+const subgroupMul = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_MUL ).setParameterLength( 1 );
+
+/**
+ * An inclusive scan returning the product of e for all active invocations with subgroup_invocation_id less than or equal to this invocation.
+ *
+ * @method
+ * @param {number} e - The value provided to the inclusive scan by the current invocation.
+ * @return {number} The accumulated result of the inclusive scan operation.
+ */
+const subgroupInclusiveMul = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_INCLUSIVE_MUL ).setParameterLength( 1 );
+
+/**
+ * An exclusive scan that returns the product of e for all active invocations with subgroup_invocation_id less than this invocation.
+ *
+ * @method
+ * @param {number} e - The value provided to the exclusive scan by the current invocation.
+ * @return {number} The accumulated result of the exclusive scan operation.
+ */
+const subgroupExclusiveMul = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_EXCLUSIVE_MUL ).setParameterLength( 1 );
+
+/**
+ * A reduction that performs a bitwise and of e among all active invocations and returns that result.
+ *
+ * @method
+ * @param {number} e - The value provided to the reduction by the current invocation.
+ * @return {number} The result of the reduction operation.
+ */
+const subgroupAnd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_AND ).setParameterLength( 1 );
+
+/**
+ * A reduction that performs a bitwise or of e among all active invocations and returns that result.
+ *
+ * @method
+ * @param {number} e - The value provided to the reduction by the current invocation.
+ * @return {number} The result of the reduction operation.
+ */
+const subgroupOr = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_OR ).setParameterLength( 1 );
+
+/**
+ * A reduction that performs a bitwise xor of e among all active invocations and returns that result.
+ *
+ * @method
+ * @param {number} e - The value provided to the reduction by the current invocation.
+ * @return {number} The result of the reduction operation.
+ */
+const subgroupXor = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_XOR ).setParameterLength( 1 );
+
+/**
+ * A reduction that performs a min of e among all active invocations and returns that result.
+ *
+ * @method
+ * @param {number} e - The value provided to the reduction by the current invocation.
+ * @return {number} The result of the reduction operation.
+ */
+const subgroupMin = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_MIN ).setParameterLength( 1 );
+
+/**
+ * A reduction that performs a max of e among all active invocations and returns that result.
+ *
+ * @method
+ * @param {number} e - The value provided to the reduction by the current invocation.
+ * @return {number} The result of the reduction operation.
+ */
+const subgroupMax = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_MAX ).setParameterLength( 1 );
+
+/**
+ * Returns true if e is true for all active invocations in the subgroup.
+ *
+ * @method
+ * @return {bool} The result of the computation.
+ */
+const subgroupAll = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ALL ).setParameterLength( 0 );
+
+/**
+ * Returns true if e is true for any active invocation in the subgroup
+ *
+ * @method
+ * @return {bool} The result of the computation.
+ */
+const subgroupAny = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_ANY ).setParameterLength( 0 );
+
+/**
+ * Broadcasts e from the active invocation with the lowest subgroup_invocation_id in the subgroup to all other active invocations.
+ *
+ * @method
+ * @param {number} e - The value to broadcast from the lowest subgroup invocation.
+ * @param {number} id - The subgroup invocation to broadcast from.
+ * @return {number} The broadcast value.
+ */
+const subgroupBroadcastFirst = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_BROADCAST_FIRST ).setParameterLength( 2 );
+
+/**
+ * Swaps e between invocations in the quad in the X direction.
+ *
+ * @method
+ * @param {number} e - The value to swap from the current invocation.
+ * @return {number} The value received from the swap operation.
+ */
+const quadSwapX = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_SWAP_X ).setParameterLength( 1 );
+
+/**
+ * Swaps e between invocations in the quad in the Y direction.
+ *
+ * @method
+ * @param {number} e - The value to swap from the current invocation.
+ * @return {number} The value received from the swap operation.
+ */
+const quadSwapY = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_SWAP_Y ).setParameterLength( 1 );
+
+/**
+ * Swaps e between invocations in the quad diagonally.
+ *
+ * @method
+ * @param {number} e - The value to swap from the current invocation.
+ * @return {number} The value received from the swap operation.
+ */
+const quadSwapDiagonal = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_SWAP_DIAGONAL ).setParameterLength( 1 );
+
+/**
+ * Broadcasts e from the invocation whose subgroup_invocation_id matches id, to all active invocations.
+ *
+ * @method
+ * @param {number} e - The value to broadcast from subgroup invocation 'id'.
+ * @param {number} id - The subgroup invocation to broadcast from.
+ * @return {number} The broadcast value.
+ */
+const subgroupBroadcast = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_BROADCAST ).setParameterLength( 2 );
+
+/**
+ * Returns v from the active invocation whose subgroup_invocation_id matches id
+ *
+ * @method
+ * @param {number} v - The value to return from subgroup invocation id^mask.
+ * @param {number} id - The subgroup invocation which returns the value v.
+ * @return {number} The broadcast value.
+ */
+const subgroupShuffle = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_SHUFFLE ).setParameterLength( 2 );
+
+/**
+ * Returns v from the active invocation whose subgroup_invocation_id matches subgroup_invocation_id ^ mask.
+ *
+ * @method
+ * @param {number} v - The value to return from subgroup invocation id^mask.
+ * @param {number} mask - A bitmask that determines the target invocation via a XOR operation.
+ * @return {number} The broadcast value.
+ */
+const subgroupShuffleXor = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_SHUFFLE_XOR ).setParameterLength( 2 );
+
+/**
+ * Returns v from the active invocation whose subgroup_invocation_id matches subgroup_invocation_id - delta
+ *
+ * @method
+ * @param {number} v - The value to return from subgroup invocation id^mask.
+ * @param {number} delta - A value that offsets the current in.
+ * @return {number} The broadcast value.
+ */
+const subgroupShuffleUp = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_SHUFFLE_UP ).setParameterLength( 2 );
+
+/**
+ * Returns v from the active invocation whose subgroup_invocation_id matches subgroup_invocation_id + delta
+ *
+ * @method
+ * @param {number} v - The value to return from subgroup invocation id^mask.
+ * @param {number} delta - A value that offsets the current subgroup invocation.
+ * @return {number} The broadcast value.
+ */
+const subgroupShuffleDown = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.SUBGROUP_SHUFFLE_DOWN ).setParameterLength( 2 );
+
+/**
+ * Broadcasts e from the quad invocation with id equal to id.
+ *
+ * @method
+ * @param {number} e - The value to broadcast.
+ * @return {number} The broadcast value.
+ */
+const quadBroadcast = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_BROADCAST ).setParameterLength( 1 );
+
 let uniformsLib;
 
 function getLightData( light ) {
@@ -43725,6 +44172,10 @@ var TSL = /*#__PURE__*/Object.freeze({
 	pow4: pow4,
 	premultiplyAlpha: premultiplyAlpha,
 	property: property,
+	quadBroadcast: quadBroadcast,
+	quadSwapDiagonal: quadSwapDiagonal,
+	quadSwapX: quadSwapX,
+	quadSwapY: quadSwapY,
 	radians: radians,
 	rand: rand,
 	range: range,
@@ -43800,8 +44251,29 @@ var TSL = /*#__PURE__*/Object.freeze({
 	struct: struct,
 	sub: sub,
 	subBuild: subBuild,
+	subgroupAdd: subgroupAdd,
+	subgroupAll: subgroupAll,
+	subgroupAnd: subgroupAnd,
+	subgroupAny: subgroupAny,
+	subgroupBallot: subgroupBallot,
+	subgroupBroadcast: subgroupBroadcast,
+	subgroupBroadcastFirst: subgroupBroadcastFirst,
+	subgroupElect: subgroupElect,
+	subgroupExclusiveAdd: subgroupExclusiveAdd,
+	subgroupExclusiveMul: subgroupExclusiveMul,
+	subgroupInclusiveAdd: subgroupInclusiveAdd,
+	subgroupInclusiveMul: subgroupInclusiveMul,
 	subgroupIndex: subgroupIndex,
+	subgroupMax: subgroupMax,
+	subgroupMin: subgroupMin,
+	subgroupMul: subgroupMul,
+	subgroupOr: subgroupOr,
+	subgroupShuffle: subgroupShuffle,
+	subgroupShuffleDown: subgroupShuffleDown,
+	subgroupShuffleUp: subgroupShuffleUp,
+	subgroupShuffleXor: subgroupShuffleXor,
 	subgroupSize: subgroupSize,
+	subgroupXor: subgroupXor,
 	tan: tan,
 	tangentGeometry: tangentGeometry,
 	tangentLocal: tangentLocal,
@@ -61265,12 +61737,22 @@ class WebGLTextureUtils {
 		} else if ( texture.isCubeTexture ) {
 
 			const images = options.images;
+			const mipmaps = texture.mipmaps;
 
 			for ( let i = 0; i < 6; i ++ ) {
 
 				const image = getImage( images[ i ] );
 
 				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
+
+				for ( let j = 0; j < mipmaps.length; j ++ ) {
+
+					const mipmap = mipmaps[ j ];
+					const image = getImage( mipmap.images[ i ] );
+
+					gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, image.width, image.height, glFormat, glType, image );
+
+				}
 
 			}
 
@@ -61315,9 +61797,26 @@ class WebGLTextureUtils {
 
 		} else {
 
-			const image = getImage( options.image );
+			const mipmaps = texture.mipmaps;
 
-			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+			if ( mipmaps.length > 0 ) {
+
+				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					const mipmap = mipmaps[ i ];
+
+					const image = getImage( mipmap );
+					gl.texSubImage2D( glTextureType, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, image );
+
+				}
+
+			} else {
+
+				const image = getImage( options.image );
+				gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+
+			}
+
 
 		}
 
@@ -64726,8 +65225,9 @@ class WebGLBackend extends Backend {
 					const { textureGPU } = this.get( textures[ 0 ] );
 
 					const cubeFace = this.renderer._activeCubeFace;
+					const mipLevel = this.renderer._activeMipmapLevel;
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, 0 );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, mipLevel );
 
 				} else {
 
@@ -64749,8 +65249,9 @@ class WebGLBackend extends Backend {
 						} else if ( isRenderTarget3D || isRenderTargetArray ) {
 
 							const layer = this.renderer._activeCubeFace;
+							const mipLevel = this.renderer._activeMipmapLevel;
 
-							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, layer );
+							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, mipLevel, layer );
 
 						} else {
 
@@ -64760,7 +65261,9 @@ class WebGLBackend extends Backend {
 
 							} else {
 
-								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+								const mipLevel = this.renderer._activeMipmapLevel;
+
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, mipLevel );
 
 							}
 
@@ -66490,6 +66993,7 @@ class WebGPUTextureUtils {
 	updateTexture( texture, options ) {
 
 		const textureData = this.backend.get( texture );
+		const mipmaps = texture.mipmaps;
 
 		const { textureDescriptorGPU } = textureData;
 
@@ -66500,7 +67004,22 @@ class WebGPUTextureUtils {
 
 		if ( texture.isDataTexture ) {
 
-			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
+			if ( mipmaps.length > 0 ) {
+
+				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					const mipmap = mipmaps[ i ];
+
+					this._copyBufferToTexture( mipmap, textureData.texture, textureDescriptorGPU, 0, texture.flipY, 0, i );
+
+				}
+
+
+			} else {
+
+				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
+
+			}
 
 		} else if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
@@ -66516,11 +67035,26 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCubeTexture ) {
 
-			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY, texture.premultiplyAlpha );
+			this._copyCubeMapToTexture( texture, textureData.texture, textureDescriptorGPU );
 
 		} else {
 
-			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha );
+			if ( mipmaps.length > 0 ) {
+
+				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					const mipmap = mipmaps[ i ];
+
+					this._copyImageToTexture( mipmap, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha, i );
+
+				}
+
+
+			} else {
+
+				this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY, texture.premultiplyAlpha );
+
+			}
 
 		}
 
@@ -66651,27 +67185,46 @@ class WebGPUTextureUtils {
 	 * Uploads cube texture image data to the GPU memory.
 	 *
 	 * @private
-	 * @param {Array} images - The cube image data.
+	 * @param {CubeTexture} texture - The cube texture.
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
-	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
-	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
 	 */
-	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY, premultiplyAlpha ) {
+	_copyCubeMapToTexture( texture, textureGPU, textureDescriptorGPU ) {
+
+		const images = texture.images;
+		const mipmaps = texture.mipmaps;
 
 		for ( let i = 0; i < 6; i ++ ) {
 
 			const image = images[ i ];
 
-			const flipIndex = flipY === true ? _flipMap[ i ] : i;
+			const flipIndex = texture.flipY === true ? _flipMap[ i ] : i;
 
 			if ( image.isDataTexture ) {
 
-				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
+				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, flipIndex, texture.flipY );
 
 			} else {
 
-				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY, premultiplyAlpha );
+				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, texture.flipY, texture.premultiplyAlpha );
+
+			}
+
+			for ( let j = 0; j < mipmaps.length; j ++ ) {
+
+				const mipmap = mipmaps[ j ];
+				const image = mipmap.images[ i ];
+
+				if ( image.isDataTexture ) {
+
+					this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, flipIndex, texture.flipY, 0, j + 1 );
+
+				} else {
+
+					this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, texture.flipY, texture.premultiplyAlpha, j + 1 );
+
+				}
+
 
 			}
 
@@ -66689,10 +67242,14 @@ class WebGPUTextureUtils {
 	 * @param {number} originDepth - The origin depth.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
 	 * @param {boolean} premultiplyAlpha - Whether the texture should have its RGB channels premultiplied by the alpha channel or not.
+	 * @param {number} [mipLevel=0] - The mip level where the data should be copied to.
 	 */
-	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, premultiplyAlpha ) {
+	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, premultiplyAlpha, mipLevel = 0 ) {
 
 		const device = this.backend.device;
+
+		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
+		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
 		device.queue.copyExternalImageToTexture(
 			{
@@ -66700,12 +67257,12 @@ class WebGPUTextureUtils {
 				flipY: flipY
 			}, {
 				texture: textureGPU,
-				mipLevel: 0,
+				mipLevel: mipLevel,
 				origin: { x: 0, y: 0, z: originDepth },
 				premultipliedAlpha: premultiplyAlpha
 			}, {
-				width: textureDescriptorGPU.size.width,
-				height: textureDescriptorGPU.size.height,
+				width: width,
+				height: height,
 				depthOrArrayLayers: 1
 			}
 		);
@@ -66769,9 +67326,10 @@ class WebGPUTextureUtils {
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {number} originDepth - The origin depth.
 	 * @param {boolean} flipY - Whether to flip texture data along their vertical axis or not.
-	 * @param {number} [depth=0] - TODO.
+	 * @param {number} [depth=0] - The depth offset when copying array or 3D texture data.
+	 * @param {number} [mipLevel=0] - The mip level where the data should be copied to.
 	 */
-	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0 ) {
+	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0, mipLevel = 0 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
@@ -66786,7 +67344,7 @@ class WebGPUTextureUtils {
 		device.queue.writeTexture(
 			{
 				texture: textureGPU,
-				mipLevel: 0,
+				mipLevel: mipLevel,
 				origin: { x: 0, y: 0, z: originDepth }
 			},
 			data,
@@ -72398,8 +72956,6 @@ class WebGPUBackend extends Backend {
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
-			renderTargetData.activeMipmapLevel !== renderContext.activeMipmapLevel ||
-			renderTargetData.activeCubeFace !== renderContext.activeCubeFace ||
 			renderTargetData.samples !== renderTarget.samples
 		) {
 

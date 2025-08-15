@@ -2092,8 +2092,9 @@ class WebGLBackend extends Backend {
 					const { textureGPU } = this.get( textures[ 0 ] );
 
 					const cubeFace = this.renderer._activeCubeFace;
+					const mipLevel = this.renderer._activeMipmapLevel;
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, 0 );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, mipLevel );
 
 				} else {
 
@@ -2115,8 +2116,9 @@ class WebGLBackend extends Backend {
 						} else if ( isRenderTarget3D || isRenderTargetArray ) {
 
 							const layer = this.renderer._activeCubeFace;
+							const mipLevel = this.renderer._activeMipmapLevel;
 
-							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, layer );
+							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, mipLevel, layer );
 
 						} else {
 
@@ -2126,7 +2128,9 @@ class WebGLBackend extends Backend {
 
 							} else {
 
-								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+								const mipLevel = this.renderer._activeMipmapLevel;
+
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, mipLevel );
 
 							}
 
