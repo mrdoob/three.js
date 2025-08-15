@@ -1033,7 +1033,7 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG8Snorm ) return Int8Array;
 		if ( format === GPUTextureFormat.RGBA8Uint ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGBA8Sint ) return Int8Array;
-		if ( format === GPUTextureFormat.RGBA8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8UnormSRGB ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGBA8Snorm ) return Int8Array;
 
 
@@ -1058,8 +1058,7 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RGBA32Sint ) return Int32Array;
 		if ( format === GPUTextureFormat.RGBA32Float ) return Float32Array;
 
-		if ( format === GPUTextureFormat.BGRA8Unorm ) return Uint8Array;
-		if ( format === GPUTextureFormat.BGRA8UnormSRGB ) return Uint8Array;
+		if ( format === GPUTextureFormat.BGRA8Unorm || format === GPUTextureFormat.BGRA8UnormSRGB ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGB10A2Unorm ) return Uint32Array;
 		if ( format === GPUTextureFormat.RGB9E5UFloat ) return Uint32Array;
 		if ( format === GPUTextureFormat.RG11B10UFloat ) return Uint32Array;
