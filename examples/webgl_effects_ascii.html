@@ -45,8 +45,8 @@
 				charSet: ' .:-=+*#%@',
 				fontWeight: 400,
 				charScale: 1.0,
-				doubleDensityHorizontal: true,
-				doubleDensityVertical: false
+				densityHorizontal: 2.0,
+				densityVertical: 1.0
 			};
 
 			// Display parameters
@@ -180,15 +180,15 @@
 
 				} );
 
-				folderEffect.add( asciiParams, 'doubleDensityHorizontal' ).name( 'Density Horizontal' ).onChange( function ( value ) {
+				folderEffect.add( asciiParams, 'densityHorizontal', 0.1, 2.0, 0.1 ).name( 'Density Horizontal' ).onChange( function ( value ) {
 
-					effect.updateVisualSettings( { doubleDensityHorizontal: value } );
+					effect.updateVisualSettings( { densityHorizontal: value } );
 
 				} );
 
-				folderEffect.add( asciiParams, 'doubleDensityVertical' ).name( 'Density Vertical' ).onChange( function ( value ) {
+				folderEffect.add( asciiParams, 'densityVertical', 0.1, 2.0, 0.1 ).name( 'Density Vertical' ).onChange( function ( value ) {
 
-					effect.updateVisualSettings( { doubleDensityVertical: value } );
+					effect.updateVisualSettings( { densityVertical: value } );
 
 				} );
 
