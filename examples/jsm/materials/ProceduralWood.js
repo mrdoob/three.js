@@ -2,79 +2,63 @@ import * as THREE from 'three';
 import * as TSL from 'three/tsl';
 
 // some helpers below are ported from Blender
-const mapRange = TSL.wgslFn( `
-    fn map_range(x: f32, fromMin: f32, fromMax: f32, toMin: f32, toMax: f32, clmp: bool) -> f32
-    {
-        let factor = (x - fromMin) / (fromMax - fromMin);
-        var result = toMin + factor * (toMax - toMin);
 
-        if (clmp && toMin < toMax)
-        {
-            result = clamp(result, toMin, toMax);
-        }
-        else if (clmp && toMin > toMax)
-        {
-            result = clamp(result, toMax, toMin);
-        }
 
-        return result;
-    }
-` );
+const mapRange = TSL.Fn( ( [ x, fromMin, fromMax, toMin, toMax, clmp ] ) => {
 
-const voronoi3d = TSL.wgslFn( `
-    fn voronoi3d(x: vec3<f32>, smoothness: f32, randomness: f32) -> f32
-    {
-        let p = floor(x);
-        let f = fract(x);
+	const factor = x.sub( fromMin ).div( fromMax.sub( fromMin ) );
+	const result = toMin.add( factor.mul( toMax.sub( toMin ) ) );
 
-        var res = 0.0;
-        var totalWeight = 0.0;
-        
-        for (var k = -1; k <= 1; k++)
-        {
-            for (var j = -1; j <= 1; j++)
-            {
-                for (var i = -1; i <= 1; i++)
-                {
-                    let b = vec3<f32>(f32(i), f32(j), f32(k));
-                    let hashOffset = hash3d(p + b) * randomness;
-                    let r = b - f + hashOffset;
-                    let d = length(r);
-                    
-                    let weight = exp(-d * d / max(smoothness * smoothness, 0.001));
-                    res += d * weight;
-                    totalWeight += weight;
-                }
-            }
-        }
-        
-        if (totalWeight > 0.0)
-        {
-            res /= totalWeight;
-        }
-        
-        return smoothstep(0.0, 1.0, res);
-    }
+	return TSL.select(clmp, TSL.max(TSL.min(result, toMax), toMin), result);
 
-    fn hash3d(p: vec3<f32>) -> vec3<f32>
-    {
-        var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));
-        p3 += dot(p3, p3.yzx + 33.33);
-        return fract((p3.xxy + p3.yzz) * p3.zyx);
-    }
-` );
+} );
 
-const softLightMix = TSL.wgslFn( `
-    fn node_mix_soft(t: f32, col1: vec3<f32>, col2: vec3<f32>) -> vec3<f32>
-    {
-        let tm = 1.0 - t;
+const hash3d = TSL.Fn( ( [ p ] ) => {
 
-        let one = vec3<f32>(1.0);
-        let scr = one - (one - col2) * (one - col1);
+	const p3 = p.mul( TSL.vec3( 0.1031, 0.1030, 0.0973 ) ).fract();
+	const dotProduct = p3.dot( p3.yzx.add( 33.33 ) );
+	p3.addAssign( dotProduct );
+	
+	return p3.xxy.add( p3.yzz ).mul( p3.zyx ).fract();
 
-        return tm * col1 + t * ((one - col1) * col2 * col1 + col1 * scr);
-    }
-` );
+} );
+
+const voronoi3d = TSL.Fn( ( [ x, smoothness, randomness ] ) => {
+
+	const p = x.floor();
+	const f = x.fract();
+
+	const res = TSL.float( 0.0 ).toVar();
+	const totalWeight = TSL.float( 0.0 ).toVar();
+
+	TSL.Loop( 3, 3, 3, ( { k, j, i } ) => {
+		const b = TSL.vec3( TSL.float( i ).sub(1), TSL.float( j ).sub(1), TSL.float( k ).sub(1) );
+		const hashOffset = hash3d( p.add( b ) ).mul( randomness );
+		const r = b.sub( f ).add( hashOffset );
+		const d = r.length();
+
+		const weight = d.mul( d ).div( TSL.max( smoothness.mul( smoothness ), 0.001 ) ).negate().exp();
+		res.addAssign( d.mul( weight ) );
+		totalWeight.addAssign( weight );
+
+	} );
+
+	const normalizedRes = TSL.select( totalWeight.greaterThan( 0.0 ), res.div( totalWeight ), res );
+
+	return TSL.smoothstep( 0.0, 1.0, normalizedRes );
+
+} );
+
+const softLightMix = TSL.Fn( ( [ t, col1, col2 ] ) => {
+
+	const tm = TSL.float( 1.0 ).sub( t );
+	
+	const one = TSL.vec3( 1.0 );
+	const scr = one.sub( one.sub( col2 ).mul( one.sub( col1 ) ) );
+	
+	return tm.mul( col1 ).add( t.mul( one.sub( col1 ).mul( col2 ).mul( col1 ).add( col1.mul( scr ) ) ) );
+
+} );
 
 const noiseFbm = TSL.Fn( ( [ p, detail, roughness, lacunarity, useNormalize ] ) => {
 
@@ -132,6 +116,7 @@ const noiseFbm = TSL.Fn( ( [ p, detail, roughness, lacunarity, useNormalize ] ) 
 const noiseFbm3d = TSL.Fn( ( [ p, detail, roughness, lacunarity, useNormalize ] ) => {
 
 	const fscale = TSL.float( 1.0 ).toVar();
+
 	const amp = TSL.float( 1.0 ).toVar();
 	const maxamp = TSL.float( 0.0 ).toVar();
 	const sum = TSL.vec3( 0.0 ).toVar();
