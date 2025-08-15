@@ -15,7 +15,7 @@ class ExternalTexture extends Texture {
 	/**
 	 * Creates a new raw texture.
 	 *
-	 * @param {?WebGLTexture} [sourceTexture=null] - The external texture.
+	 * @param {?(WebGLTexture|GPUTexture)} [sourceTexture=null] - The external texture.
 	 */
 	constructor( sourceTexture = null ) {
 
@@ -24,7 +24,7 @@ class ExternalTexture extends Texture {
 		/**
 		 * The external source texture.
 		 *
-		 * @type {?WebGLTexture}
+		 * @type {?(WebGLTexture|GPUTexture)}
 		 * @default null
 		 */
 		this.sourceTexture = sourceTexture;

@@ -250,7 +250,7 @@ class Textures extends DataMap {
 
 		//
 
-		if ( isRenderTarget || texture.isStorageTexture === true ) {
+		if ( isRenderTarget || texture.isStorageTexture === true || texture.isExternalTexture === true ) {
 
 			backend.createSampler( texture );
 			backend.createTexture( texture, options );

@@ -187,6 +187,15 @@ class WebGPUTextureUtils {
 
 		}
 
+		if ( texture.isExternalTexture ) {
+
+			textureData.texture = texture.sourceTexture;
+			textureData.initialized = true;
+
+			return;
+
+		}
+
 		if ( options.needsMipmaps === undefined ) options.needsMipmaps = false;
 		if ( options.levels === undefined ) options.levels = 1;
 		if ( options.depth === undefined ) options.depth = 1;
