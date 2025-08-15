@@ -51744,12 +51744,12 @@ class XRManager extends EventDispatcher {
 		this._layers = [];
 
 		/**
-		 * Whether the device has support for all layer types.
+		 * Whether the XR session uses layers.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this._supportsLayers = false;
+		this._sessionUsesLayers = false;
 
 		/**
 		 * Whether the device supports binding gl objects.
@@ -51940,13 +51940,16 @@ class XRManager extends EventDispatcher {
 		this._xrFrame = null;
 
 		/**
-		 * Whether to use the WebXR Layers API or not.
+		 * Whether the browser supports the APIs necessary to use XRProjectionLayers.
+		 *
+		 * Note: this does not represent XRSession explicitly requesting
+		 * `'layers'` as a feature - see `_sessionUsesLayers` and #30112
 		 *
 		 * @private
 		 * @type {boolean}
 		 * @readonly
 		 */
-		this._useLayers = ( this._supportsGlBinding && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
+		this._supportsLayers = ( this._supportsGlBinding && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
 
 		/**
 		 * Whether the usage of multiview has been requested by the application or not.
@@ -52164,6 +52167,27 @@ class XRManager extends EventDispatcher {
 			return this._session.environmentBlendMode;
 
 		}
+
+	}
+
+
+	/**
+	 * Returns the current XR binding.
+	 *
+	 * Creates a new binding if needed and the browser is
+	 * capable of doing so.
+	 *
+	 * @return {?XRWebGLBinding} The XR binding. Returns `null` if one cannot be created.
+	 */
+	getBinding() {
+
+		if ( this._glBinding === null && this._supportsGlBinding ) {
+
+			this._glBinding = new XRWebGLBinding( this._session, this._gl );
+
+		}
+
+		return this._glBinding;
 
 	}
 
@@ -52397,7 +52421,7 @@ class XRManager extends EventDispatcher {
 			layer.renderTarget.isXRRenderTarget = this._session !== null;
 			layer.renderTarget._hasExternalTextures = layer.renderTarget.isXRRenderTarget;
 
-			if ( layer.renderTarget.isXRRenderTarget && this._supportsLayers ) {
+			if ( layer.renderTarget.isXRRenderTarget && this._sessionUsesLayers ) {
 
 				layer.xrlayer.transform = new XRRigidTransform( layer.plane.getWorldPosition( translationObject ), layer.plane.getWorldQuaternion( quaternionObject ) );
 
@@ -52504,16 +52528,7 @@ class XRManager extends EventDispatcher {
 
 			//
 
-			if ( this._supportsGlBinding ) {
-
-				const glBinding = new XRWebGLBinding( session, gl );
-				this._glBinding = glBinding;
-
-			}
-
-			//
-
-			if ( this._useLayers === true ) {
+			if ( this._supportsLayers === true ) {
 
 				// default path using XRProjectionLayer
 
@@ -52543,6 +52558,7 @@ class XRManager extends EventDispatcher {
 
 				}
 
+				this._glBinding = this.getBinding();
 				const glProjLayer = this._glBinding.createProjectionLayer( projectionlayerInit );
 				const layersArray = [ glProjLayer ];
 
@@ -52573,11 +52589,11 @@ class XRManager extends EventDispatcher {
 				this._xrRenderTarget._hasExternalTextures = true;
 				this._xrRenderTarget.depth = this._useMultiview ? 2 : 1;
 
-				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
+				this._sessionUsesLayers = session.enabledFeatures.includes( 'layers' );
 
 				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
-				if ( this._supportsLayers ) {
+				if ( this._sessionUsesLayers ) {
 
 					// switch layers to native
 					for ( const layer of this._layers ) {
@@ -52946,7 +52962,7 @@ function onSessionEnd() {
 	this._xrRenderTarget = null;
 
 	// switch layers back to emulated
-	if ( this._supportsLayers === true ) {
+	if ( this._sessionUsesLayers === true ) {
 
 		for ( const layer of this._layers ) {
 
@@ -53148,7 +53164,7 @@ function onAnimationFrame( time, frame ) {
 
 			let viewport;
 
-			if ( this._useLayers === true ) {
+			if ( this._supportsLayers === true ) {
 
 				const glSubImage = this._glBinding.getViewSubImage( this._glProjLayer, view );
 				viewport = glSubImage.viewport;
@@ -67592,7 +67608,7 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG8Snorm ) return Int8Array;
 		if ( format === GPUTextureFormat.RGBA8Uint ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGBA8Sint ) return Int8Array;
-		if ( format === GPUTextureFormat.RGBA8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8UnormSRGB ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGBA8Snorm ) return Int8Array;
 
 
@@ -67617,8 +67633,7 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RGBA32Sint ) return Int32Array;
 		if ( format === GPUTextureFormat.RGBA32Float ) return Float32Array;
 
-		if ( format === GPUTextureFormat.BGRA8Unorm ) return Uint8Array;
-		if ( format === GPUTextureFormat.BGRA8UnormSRGB ) return Uint8Array;
+		if ( format === GPUTextureFormat.BGRA8Unorm || format === GPUTextureFormat.BGRA8UnormSRGB ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGB10A2Unorm ) return Uint32Array;
 		if ( format === GPUTextureFormat.RGB9E5UFloat ) return Uint32Array;
 		if ( format === GPUTextureFormat.RG11B10UFloat ) return Uint32Array;
