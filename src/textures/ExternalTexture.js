@@ -1,12 +1,13 @@
 import { Texture } from './Texture.js';
 
 /**
- * Represents a texture created externally from the renderer context.
+ * Represents a texture created externally with the same renderer context.
  *
  * This may be a texture from a protected media stream, device camera feed,
  * or other data feeds like a depth sensor.
  *
- * Note that this class is only supported in {@link WebGLRenderer} right now.
+ * Note that this class is only supported in {@link WebGLRenderer}, and in
+ * the {@link WebGPURenderer} WebGPU backend.
  *
  * @augments Texture
  */
