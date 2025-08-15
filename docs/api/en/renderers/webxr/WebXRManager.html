@@ -37,6 +37,24 @@
 		</p>
 
 		<h2>Methods</h2>
+		
+		<h3>[method:XRWebGLLayer getBaseLayer]()</h3>
+		<p>
+			Returns the current base layer. This is an 
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/XRProjectionLayer XRProjectionLayer]
+			when the targeted XR device supports the
+			[link:https://www.w3.org/TR/webxrlayers-1/ WebXR Layers API], or an
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/XRWebGLLayer XRWebGLLayer]
+			if it doesn't.
+		</p>
+
+		<h3>[method:XRWebGLBinding getBinding]()</h3>
+		<p>
+			Return the current 
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/XRWebGLBinding XRWebGLBinding].<br /><br />
+			
+			This method will create a new `XRWebGLBinding` if the browser is able to and one hasn't yet been created.
+		</p>
 
 		<h3>[method:ArrayCamera getCamera]()</h3>
 		<p>
@@ -48,6 +66,18 @@
 			The camera's `fov` is currently not used and does not reflect the fov of
 			the XR camera. If you need the fov on app level, you have to compute in
 			manually from the XR camera's projection matrices.
+		</p>
+
+		<h3>[method:Texture getCameraTexture]( [param:XRCamera xrCamera] )</h3>
+		<p>
+			[page:XRCamera xrCamera] — The 
+			[link:https://immersive-web.github.io/raw-camera-access/#xr-camera-section XRCamera]
+			to query.<br /><br />
+
+			Returns an opaque texture from the queried `XRCamera`. 
+			Only available during the current animation loop.<br /><br />
+
+			See the [example:webxr_ar_camera_access webxr / ar / camera_access] example.
 		</p>
 
 		<h3>[method:Group getController]( [param:Integer index] )</h3>
@@ -76,11 +106,29 @@
 			different groups in two different coordinate spaces for the same WebXR
 			controller.
 		</p>
+		
+		<h3>[method:Mesh getDepthSensingMesh]()</h3>
+		<p>
+			Returns a plane mesh that visualizes the depth sensing texture
+			if one is available, and `null` otherwise.
+		</p>
+
+		<h3>[method:ExternalTexture getDepthTexture]()</h3>
+		<p>
+			Returns a texture representing the computed depth of the
+			user's environment if available, and `null` otherwise.
+		</p>
 
 		<h3>[method:Float getFoveation]()</h3>
 		<p>
 			Returns the amount of foveation used by the XR compositor for the
 			projection layer.
+		</p>
+
+		<h3>[method:XRFrame getFrame]()</h3>
+		<p>
+			Returns the current [link:https://developer.mozilla.org/en-US/docs/Web/API/XRFrame XRFrame].
+			Will return `null` if used without an ongoing XR session.
 		</p>
 
 		<h3>[method:Group getHand]( [param:Integer index] )</h3>
@@ -99,6 +147,11 @@
 		<p>
 			Returns the `XRSession` object which allows a more fine-grained management
 			of active WebXR sessions on application level.
+		</p>
+
+		<h3>[method:Boolean hasDepthSensing]()</h3>
+		<p>
+			Returns `true` if depth sensing data has been provided by the XR device.
 		</p>
 
 		<h3>[method:undefined setFoveation]( [param:Float foveation] )</h3>
