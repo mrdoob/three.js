@@ -331,6 +331,9 @@ class WebXRManager extends EventDispatcher {
 		/**
 		 * Returns the current base layer.
 		 *
+		 * This is an `XRProjectionLayer` when the targeted XR device supports the
+		 * WebXR Layers API, or an `XRWebGLLayer` otherwise.
+		 *
 		 * @return {?(XRWebGLLayer|XRProjectionLayer)} The XR base layer.
 		 */
 		this.getBaseLayer = function () {
@@ -533,6 +536,8 @@ class WebXRManager extends EventDispatcher {
 		/**
 		 * Returns the current depth texture computed via depth sensing.
 		 *
+		 * See {@link WebXRDepthSensing#getDepthTexture}.
+		 *
 		 * @return {?Texture} The depth texture.
 		 */
 		this.getDepthTexture = function () {
@@ -703,7 +708,7 @@ class WebXRManager extends EventDispatcher {
 
 		/**
 		 * Updates the state of the XR camera. Use this method on app level if you
-		 * set cameraAutoUpdate` to `false`. The method requires the non-XR
+		 * set `cameraAutoUpdate` to `false`. The method requires the non-XR
 		 * camera of the scene as a parameter. The passed in camera's transformation
 		 * is automatically adjusted to the position of the XR camera when calling
 		 * this method.
@@ -879,6 +884,8 @@ class WebXRManager extends EventDispatcher {
 
 		/**
 		 * Returns the depth sensing mesh.
+		 *
+		 * See {@link WebXRDepthSensing#getMesh}.
 		 *
 		 * @return {Mesh} The depth sensing mesh.
 		 */
