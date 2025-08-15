@@ -274,9 +274,9 @@ const woodParams = {
         originOffset: { x: -0.4, y: 0, z: 0 },
 		centerSize: 1.11, largeWarpScale: 0.32, largeGrainStretch: 0.24, smallWarpStrength: 0.059,
 		smallWarpScale: 2, fineWarpStrength: 0.006, fineWarpScale: 32.8, ringCount: 34,
-		ringBias: 0.59, ringSizeVariance: 0.16, ringVarianceScale: 1.4, barkThickness: 0.61,
+		ringBias: 0.03, ringSizeVariance: 0.03, ringVarianceScale: 4.4, barkThickness: 0.3,
 		splotchScale: 0.2, splotchIntensity: 0.541, cellScale: 910, cellSize: 0.1,
-		darkGrainColor: '#0c0504', lightGrainColor: '#533319'
+		darkGrainColor: '#0c0504', lightGrainColor: '#926c50'
 	},
 	walnut: {
         originOffset: { x: -0.4, y: 0, z: 0 },
