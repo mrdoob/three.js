@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - USDZ export -> import</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+		 	body {
+				background-color: #eee;
+				color: #444;
+			}
+			a {
+				color: #08f;
+			}
+			.container {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+			}
+			.slider {
+				position: absolute;
+				cursor: ew-resize;
+				width: 40px;
+				height: 40px;
+				background-color: #F32196;
+				opacity: 0.7;
+				border-radius: 50%;
+				top: calc(50% - 20px);
+				left: calc(50% - 20px);
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - USDZ export -> import<br />
+			Battle Damaged Sci-fi Helmet by
+			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a>
+		</div>
+
+		<div class="container">
+			<div class="slider"></div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { USDLoader } from 'three/addons/loaders/USDLoader.js';
+			import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let container, camera, renderer, controls;
+			let sceneL, sceneR;
+			let originalModel, importedModel;
+
+			let sliderPos = window.innerWidth / 2;
+
+			const params = {
+				export: exportAndImport,
+				maxTextureSize: null
+			};
+
+			init();
+
+			function init() {
+
+				container = document.querySelector( '.container' );
+
+				sceneL = new THREE.Scene();
+				sceneL.background = new THREE.Color( 0xf0f0f0 );
+
+				sceneR = new THREE.Scene();
+				sceneR.background = new THREE.Color( 0xe0e8f0 );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 2.5, 0.6, 3.0 );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setScissorTest( true );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, container );
+				controls.minDistance = 1.5;
+				controls.maxDistance = 10;
+				controls.target.set( 0, - 0.15, - 0.2 );
+				controls.update();
+
+				setupEnvironment();
+
+				loadOriginalModel();
+
+				initSlider();
+
+				setupGUI();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function setupEnvironment() {
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+				sceneL.environment = environment;
+				sceneR.environment = environment;
+
+			}
+
+			function loadOriginalModel() {
+
+				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+				loader.load( 'DamagedHelmet.gltf', async function ( gltf ) {
+
+					originalModel = gltf.scene.clone();
+					sceneL.add( originalModel );
+
+					const shadowMesh = createSpotShadowMesh();
+					shadowMesh.position.y = - 1.1;
+					shadowMesh.position.z = - 0.25;
+					shadowMesh.scale.setScalar( 2 );
+					sceneL.add( shadowMesh );
+
+					await exportAndImport();
+
+				} );
+
+			}
+
+			async function exportAndImport() {
+
+				if ( ! originalModel ) return;
+
+				try {
+
+					const exporter = new USDZExporter();
+					const options = {};
+
+					if ( params.maxTextureSize !== null ) {
+
+						options.maxTextureSize = params.maxTextureSize;
+
+		}
+
+					const arraybuffer = await exporter.parseAsync( originalModel, options );
+
+					const usdLoader = new USDLoader();
+					importedModel = usdLoader.parse( arraybuffer );
+
+					sceneR.clear();
+
+					setupEnvironment();
+
+					sceneR.add( importedModel );
+
+					const shadowMesh = createSpotShadowMesh();
+					shadowMesh.position.y = - 1.1;
+					shadowMesh.position.z = - 0.25;
+					shadowMesh.scale.setScalar( 2 );
+					sceneR.add( shadowMesh );
+
+				} catch ( error ) {
+
+					console.error( 'Export/Import failed:', error );
+
+				}
+
+			}
+
+			function setupGUI() {
+
+				const gui = new GUI();
+
+				const textureSizeOptions = {
+					'Default': null,
+					'256': 256,
+					'512': 512,
+					'1024': 1024,
+					'2048': 2048,
+					'No Maximum': Infinity
+				};
+
+				gui.add( params, 'maxTextureSize', textureSizeOptions ).name( 'Max Texture Size' ).onChange( () => {
+
+					exportAndImport();
+
+	} );
+
+				gui.add( params, 'export' ).name( 'Export USDZ' );
+				gui.open();
+
+			}
+
+			function createSpotShadowMesh() {
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				const context = canvas.getContext( '2d' );
+				const gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(130,130,130,1)' );
+				gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				const shadowTexture = new THREE.CanvasTexture( canvas );
+
+				const geometry = new THREE.PlaneGeometry();
+				const material = new THREE.MeshBasicMaterial( {
+					map: shadowTexture, blending: THREE.MultiplyBlending, toneMapped: false, premultipliedAlpha: true
+				} );
+
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.x = - Math.PI / 2;
+
+				return mesh;
+
+			}
+
+			function initSlider() {
+
+				const slider = document.querySelector( '.slider' );
+
+				function onPointerDown( event ) {
+
+					if ( event.isPrimary === false ) return;
+
+					controls.enabled = false;
+
+					window.addEventListener( 'pointermove', onPointerMove );
+					window.addEventListener( 'pointerup', onPointerUp );
+
+				}
+
+				function onPointerUp() {
+
+					controls.enabled = true;
+
+					window.removeEventListener( 'pointermove', onPointerMove );
+					window.removeEventListener( 'pointerup', onPointerUp );
+
+				}
+
+				function onPointerMove( e ) {
+
+					if ( e.isPrimary === false ) return;
+
+					sliderPos = Math.max( 0, Math.min( window.innerWidth, e.pageX ) );
+
+					slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + 'px';
+
+				}
+
+				slider.style.touchAction = 'none'; // disable touch scroll
+				slider.addEventListener( 'pointerdown', onPointerDown );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setScissor( 0, 0, sliderPos, window.innerHeight );
+				renderer.render( sceneL, camera );
+
+				renderer.setScissor( sliderPos, 0, window.innerWidth, window.innerHeight );
+				renderer.render( sceneR, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
