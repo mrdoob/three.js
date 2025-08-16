@@ -140,15 +140,27 @@
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
 			metalRoughTexture.type = THREE.UnsignedByteType;
 
-			const customNormal = sample( ( uv ) => {
+			const sceneNormal = sample( ( uv ) => {
 
 				return colorToDirection( scenePassNormal.sample( uv ) );
 
 			} );
 
+			const sceneMetalness = sample( ( uv ) => {
+
+				return scenePassMetalRough.sample( uv ).r;
+
+			} );
+
+			const sceneRoughness = sample( ( uv ) => {
+
+				return scenePassMetalRough.sample( uv ).g;
+
+			} );
+
 			//
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, scenePassMetalRough, camera, true );
+			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, sceneMetalness, camera, sceneRoughness );
 
 			// blend SSR over beauty
 
