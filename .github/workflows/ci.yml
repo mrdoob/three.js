@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   test:
-    name: Lint, Unit, Circular dependencies & Examples testing
+    name: Lint, Unit, Unit addons, Circular dependencies & Examples testing
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
@@ -30,6 +30,9 @@ jobs:
 
       - name: === Unit testing ===
         run: npm run test-unit
+
+      - name: === Unit addons testing ===
+        run: npm run test-unit-addons
 
       - name: === Circular dependencies testing ===
         run: npm run test-circular-deps
