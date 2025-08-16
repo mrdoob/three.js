@@ -146,15 +146,15 @@
 
 			} );
 
-			const sceneMetalness = sample( ( uv ) => {
+			const sceneMetalness = sample( () => {
 
-				return scenePassMetalRough.sample( uv ).r;
+				return scenePassMetalRough.r;
 
 			} );
 
-			const sceneRoughness = sample( ( uv ) => {
+			const sceneRoughness = sample( () => {
 
-				return scenePassMetalRough.sample( uv ).g;
+				return scenePassMetalRough.g;
 
 			} );
 
