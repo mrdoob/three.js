@@ -425,7 +425,6 @@ class SSRNode extends TempNode {
 
 		const ssr = Fn( () => {
 
-			const metalness = this.metalnessNode.sample( uvNode ).r;
 
 			// fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();

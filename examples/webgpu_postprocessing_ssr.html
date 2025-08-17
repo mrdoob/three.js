@@ -146,21 +146,9 @@
 
 			} );
 
-			const sceneMetalness = sample( () => {
-
-				return scenePassMetalRough.r;
-
-			} );
-
-			const sceneRoughness = sample( () => {
-
-				return scenePassMetalRough.g;
-
-			} );
-
 			//
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, sceneMetalness, camera, sceneRoughness );
+			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, scenePassMetalRough.r, camera, scenePassMetalRough.g );
 
 			// blend SSR over beauty
 
