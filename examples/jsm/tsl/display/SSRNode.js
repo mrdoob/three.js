@@ -29,10 +29,10 @@ class SSRNode extends TempNode {
 	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
 	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
 	 * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
-	 * @param {Camera} camera - The camera the scene is rendered with.
 	 * @param {?Node<float>} [roughnessNode=null] - A node that represents the beauty pass's roughness.
+	 * @param {?Camera} [camera=null] - The camera the scene is rendered with.
 	 */
-	constructor( colorNode, depthNode, normalNode, metalnessNode, camera, roughnessNode = null ) {
+	constructor( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) {
 
 		super( 'vec4' );
 
@@ -63,13 +63,6 @@ class SSRNode extends TempNode {
 		 * @type {Node<float>}
 		 */
 		this.metalnessNode = metalnessNode;
-
-		/**
-		 * The camera the scene is rendered with.
-		 *
-		 * @type {Camera}
-		 */
-		this.camera = camera;
 
 		/**
 		 * Whether the SSR reflections should be blurred or not. Blurring is a costly
@@ -143,6 +136,29 @@ class SSRNode extends TempNode {
 		 * @type {UniformNode<int>}
 		 */
 		this.blurQuality = uniform( 2 );
+
+		//
+
+		if ( camera === null ) {
+
+			if ( this.colorNode.passNode && this.colorNode.passNode.isPassNode === true ) {
+
+				camera = this.colorNode.passNode.camera;
+
+			} else {
+
+				console.error( 'THREE.TSL: No camera found. ssr() requires a camera.' );
+
+			}
+
+		}
+
+		/**
+		 * The camera the scene is rendered with.
+		 *
+		 * @type {Camera}
+		 */
+		this.camera = camera;
 
 		/**
 		 * The spread of the blur. Automatically set when generating mips.
@@ -631,8 +647,8 @@ export default SSRNode;
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
  * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
  * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
- * @param {Camera} camera - The camera the scene is rendered with.
- * @param {Node<float>} roughnessNode - A node that represents the beauty pass's roughness.
+ * @param {?Node<float>} [roughnessNode=null] - A node that represents the beauty pass's roughness.
+ * @param {?Camera} [camera=null] - The camera the scene is rendered with.
  * @returns {SSRNode}
  */
-export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, camera, roughnessNode ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), camera, nodeObject( roughnessNode ) ) );
+export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), nodeObject( roughnessNode ), camera ) );
