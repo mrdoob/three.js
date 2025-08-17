@@ -418,7 +418,21 @@ export function GenerateWoodMaterial( params ) {
 
 	const material = new THREE.MeshPhysicalNodeMaterial();
 
-	Object.assign( material, params );
+	for ( const key in params ) {
+
+		if ( key === 'genus' || key === 'finish' ) continue;
+
+		if ( typeof params[ key ] === 'string' ) {
+
+			material[ key ] = new THREE.Color( params[ key ] );
+
+		} else {
+
+			material[ key ] = params[ key ];
+
+		}
+
+	}
 
 	material.colorNode = colorNode;
 	material.clearcoatNode = params.clearcoat;
