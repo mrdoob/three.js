@@ -259,7 +259,7 @@ class SSRNode extends TempNode {
 		if ( this.roughnessNode !== null ) {
 
 			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-			const lod = this.roughnessNode.mul( mips ).clamp( 0, mips );
+			const lod = float( this.roughnessNode ).mul( mips ).clamp( 0, mips );
 
 			blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
 
@@ -425,7 +425,7 @@ class SSRNode extends TempNode {
 
 		const ssr = Fn( () => {
 
-			const metalness = this.metalnessNode;
+			const metalness = float( this.metalnessNode );
 
 			// fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();
