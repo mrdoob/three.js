@@ -65,14 +65,6 @@ export default /* glsl */`
 
 	#endif
 
-	/*
-	#if NUM_RECT_AREA_LIGHTS > 0
-
-		// TODO (abelnation): create uniforms for area light shadows
-
-	#endif
-	*/
-
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 
 		float depth = unpackRGBAToDepth( texture2D( depths, uv ) );
@@ -95,7 +87,7 @@ export default /* glsl */`
 
 	}
 
-	float VSMShadow (sampler2D shadow, vec2 uv, float compare ){
+	float VSMShadow( sampler2D shadow, vec2 uv, float compare ) {
 
 		float occlusion = 1.0;
 
@@ -103,17 +95,17 @@ export default /* glsl */`
 
 		#ifdef USE_REVERSED_DEPTH_BUFFER
 
-			float hard_shadow = step( distribution.x, compare ); // Hard Shadow
+			float hard_shadow = step( distribution.x, compare );
 
 		#else
 
-			float hard_shadow = step( compare , distribution.x ); // Hard Shadow
+			float hard_shadow = step( compare, distribution.x );
 
 		#endif
 
-		if (hard_shadow != 1.0 ) {
+		if ( hard_shadow != 1.0 ) {
 
-			float distance = compare - distribution.x ;
+			float distance = compare - distribution.x;
 			float variance = max( 0.00000, distribution.y * distribution.y );
 			float softness_probability = variance / (variance + distance * distance ); // Chebeyshevs inequality
 			softness_probability = clamp( ( softness_probability - 0.3 ) / ( 0.95 - 0.3 ), 0.0, 1.0 ); // 0.3 reduces light bleed
