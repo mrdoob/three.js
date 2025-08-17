@@ -190,7 +190,7 @@ class SSRNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<bool>}
 		 */
-		this._isPerspectiveCamera = uniform( camera.isPerspectiveCamera ? 1 : 0 );
+		this._isPerspectiveCamera = uniform( camera.isPerspectiveCamera );
 
 		/**
 		 * The resolution of the pass.
@@ -448,7 +448,7 @@ class SSRNode extends TempNode {
 			const d1viewPosition = viewPosition.add( viewReflectDir.mul( maxReflectRayLen ) ).toVar();
 
 			// check if d1viewPosition lies behind the camera near plane
-			If( this._isPerspectiveCamera.equal( float( 1 ) ).and( d1viewPosition.z.greaterThan( this._cameraNear.negate() ) ), () => {
+			If( this._isPerspectiveCamera.and( d1viewPosition.z.greaterThan( this._cameraNear.negate() ) ), () => {
 
 				// if so, ensure d1viewPosition is clamped on the near plane.
 				// this prevents artifacts during the ray marching process
@@ -507,7 +507,7 @@ class SSRNode extends TempNode {
 				const s = xy.sub( d0 ).length().div( totalLen );
 
 				// depending on the camera type, we now compute the z-coordinate of the reflected ray at the current step in view space
-				If( this._isPerspectiveCamera.equal( float( 1 ) ), () => {
+				If( this._isPerspectiveCamera, () => {
 
 					const recipVPZ = float( 1 ).div( viewPosition.z ).toVar();
 					viewReflectRayZ.assign( float( 1 ).div( recipVPZ.add( s.mul( float( 1 ).div( d1viewPosition.z ).sub( recipVPZ ) ) ) ) );
