@@ -147,7 +147,7 @@ class SSRNode extends TempNode {
 
 			} else {
 
-				console.error( 'THREE.TSL: No camera found. ssr() requires a camera.' );
+				throw Error( 'THREE.TSL: No camera found. ssr() requires a camera.' );
 
 			}
 
