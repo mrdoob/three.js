@@ -63,8 +63,8 @@ class ShadowMapViewer {
 
 		const textureDimension = uniform( new Vector2() );
 
-		const shadowMapUniform = textureLoad( new DepthTexture(), uv().mul( textureDimension ) );
-		material.fragmentNode = shadowMapUniform.x;
+		const shadowMapUniform = textureLoad( new DepthTexture(), uv().flipY().mul( textureDimension ) );
+		material.fragmentNode = shadowMapUniform.x.oneMinus();
 
 		const plane = new PlaneGeometry( frame.width, frame.height );
 		const mesh = new Mesh( plane, material );
