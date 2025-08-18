@@ -171,6 +171,12 @@ class ShadowMapViewer {
 
 			if ( this.enabled ) {
 
+				//Because a light's .shadowMap is only initialised after the first render pass
+				//we have to make sure the correct map is sent into the shader, otherwise we
+				//always end up with the scene's first added shadow casting light's shadowMap
+				//in the shader
+				//See: https://github.com/mrdoob/three.js/issues/5932
+
 				const depthTexture = light.shadow.map.depthTexture;
 
 				shadowMapUniform.value = depthTexture;
