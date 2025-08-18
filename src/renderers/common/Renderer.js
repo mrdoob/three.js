@@ -2501,8 +2501,9 @@ class Renderer {
 	 * This method can only be used if the renderer has been initialized.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {Object} [options={}] - Optional configuration parameter.
 	 */
-	initTexture( texture ) {
+	initTexture( texture, options = {} ) {
 
 		if ( this._initialized === false ) {
 
@@ -2510,7 +2511,7 @@ class Renderer {
 
 		}
 
-		this._textures.updateTexture( texture );
+		this._textures.updateTexture( texture, options );
 
 	}
 

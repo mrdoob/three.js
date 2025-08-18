@@ -16,6 +16,11 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
+import { Fn, vec2, vec3 } from '../../nodes/tsl/TSLBase.js';
+import { texture3D } from '../../nodes/accessors/Texture3DNode.js';
+import { screenRaw, viewport } from '../../nodes/display/ScreenNode.js';
+import { builtin } from '../../nodes/accessors/BuiltinNode.js';
+import { Texture } from '../../textures/Texture.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -892,6 +897,67 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	applyOcclusion( scene ) {
+
+		if ( this.depthData ) {
+
+			const data = this.depthData[ 0 ];
+
+			if ( this._occlusionTexture == undefined ) {
+
+				this._occlusionTexture = new Texture( { width: data.width, height: data.height, depth: 2 } );
+				this._occlusionTexture.isTextureArray = true;
+				this._occlusionTexture.isExternalTexture = true;
+
+				this._masknode = Fn( () => {
+
+					let pixel = ( screenRaw.xyzw ).toVar( 'pixel' );
+					pixel = pixel.xy.div( vec2( viewport.zw ) );
+
+					const real_world_depth = texture3D( this._occlusionTexture, vec3( pixel, builtin( 'gl_ViewID_OVR' ) ) ).r;
+					const virtual_world_depth = screenRaw.z;
+
+					return virtual_world_depth.lessThan( real_world_depth );
+
+				} )();
+
+				this._renderer.initTexture( this._occlusionTexture, { width: data.width, height: data.height, depth: 2, source: data.texture } );
+
+				scene.traverse( ( object ) => {
+
+					if ( object.material ) {
+
+						object.material.maskNode = this._masknode;
+
+					}
+
+				} );
+
+			}
+
+		} else {
+
+			if ( this._masknode ) {
+
+				scene.traverse( ( object ) => {
+
+					if ( object.material ) {
+
+						delete object.material.maskNode;
+
+					}
+
+				} );
+
+			}
+
+			delete this._masknode;
+			delete this._occlusionTexture;
+
+		}
+
+	}
+
 
 	/**
 	 * Returns the current XR session.
@@ -1102,8 +1168,15 @@ class XRManager extends EventDispatcher {
 
 		if ( session === null ) return;
 
-		const depthNear = camera.near;
-		const depthFar = camera.far;
+		let depthNear = camera.near;
+		let depthFar = camera.far;
+
+		if ( this.depthData ) {
+
+			depthNear = this.depthData[ 0 ].depthNear;
+			depthFar = this.depthData[ 0 ].depthFar;
+
+		}
 
 		const cameraXR = this._cameraXR;
 		const cameraL = this._cameraL;
@@ -1600,6 +1673,36 @@ function onAnimationFrame( time, frame ) {
 
 				}
 
+				const enabledFeatures = this._session.enabledFeatures;
+				const gpuDepthSensingEnabled = enabledFeatures &&
+					enabledFeatures.includes( 'depth-sensing' ) &&
+					this._session.depthUsage == 'gpu-optimized';
+				let depth_data = undefined;
+
+				if ( gpuDepthSensingEnabled ) {
+
+					depth_data = this._glBinding.getDepthInformation( view );
+
+				}
+
+				if ( depth_data ) {
+
+					if ( this.depthData === undefined ) {
+
+						this.depthData = [ depth_data ];
+
+					} else {
+
+						this.depthData.push( depth_data );
+
+					}
+
+				} else {
+
+					delete this.depthData;
+
+				}
+
 			} else {
 
 				viewport = glBaseLayer.getViewport( view );
@@ -1658,6 +1761,8 @@ function onAnimationFrame( time, frame ) {
 	}
 
 	if ( this._currentAnimationLoop ) this._currentAnimationLoop( time, frame );
+
+	delete this.depthData;
 
 	if ( frame.detectedPlanes ) {
 
