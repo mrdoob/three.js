@@ -1845,28 +1845,37 @@ class WebGLBackend extends Backend {
 
 		for ( const binding of bindGroup.bindings ) {
 
+			const map = this.get( binding );
+
 			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				const data = binding.buffer;
-				const bufferGPU = gl.createBuffer();
+				let { bufferGPU } = this.get( data );
+
+				if ( bufferGPU === undefined ) {
+
+					bufferGPU = gl.createBuffer();
+					this.set( data, { bufferGPU } );
+
+				}
 
 				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
 				gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
 
-				this.set( binding, {
-					index: i ++,
-					bufferGPU
-				} );
+				map.index = i ++;
+				map.bufferGPU = bufferGPU;
+
+				this.set( binding, map );
 
 			} else if ( binding.isSampledTexture ) {
 
 				const { textureGPU, glTextureType } = this.get( binding.texture );
 
-				this.set( binding, {
-					index: t ++,
-					textureGPU,
-					glTextureType
-				} );
+				map.index = t ++;
+				map.textureGPU = textureGPU;
+				map.glTextureType = glTextureType;
+
+				this.set( binding, map );
 
 			}
 
