@@ -414,30 +414,43 @@ const colorNode = wood(
 	uniforms.lightGrainColor
 ).mul( params.clearcoatDarken );
 
-export function GenerateWoodMaterial( params ) {
+export class WoodNodeMaterial extends THREE.MeshPhysicalNodeMaterial {
 
-	const material = new THREE.MeshPhysicalNodeMaterial();
+	static get type() {
 
-	for ( const key in params ) {
-
-		if ( key === 'genus' || key === 'finish' ) continue;
-
-		if ( typeof params[ key ] === 'string' ) {
-
-			material[ key ] = new THREE.Color( params[ key ] );
-
-		} else {
-
-			material[ key ] = params[ key ];
-
-		}
+		return 'WoodNodeMaterial';
 
 	}
 
-	material.colorNode = colorNode;
-	material.clearcoatNode = params.clearcoat;
-	material.clearcoatRoughness = params.clearcoatRoughness;
+	constructor( genus = 'teak', finish = 'raw' ) {
 
-	return material;
+		super();
+
+		this.isWoodNodeMaterial = true;
+
+		const params = GetWoodPreset( genus, finish );
+
+		for ( const key in params ) {
+
+			if ( key === 'genus' || key === 'finish' ) continue;
+
+			if ( typeof params[ key ] === 'string' ) {
+
+				this[ key ] = new THREE.Color( params[ key ] );
+
+			} else {
+
+				this[ key ] = params[ key ];
+
+			}
+
+		}
+
+		this.colorNode = colorNode;
+		this.clearcoatNode = params.clearcoat;
+		this.clearcoatRoughness = params.clearcoatRoughness;
+
+	}
 
 }
+

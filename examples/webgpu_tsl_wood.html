@@ -43,7 +43,7 @@
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-			import { GenerateWoodMaterial, GetWoodPreset, WoodGenuses, Finishes } from 'three/addons/materials/ProceduralWood.js';
+			import { WoodNodeMaterial, GetWoodPreset, WoodGenuses, Finishes } from 'three/addons/materials/ProceduralWood.js';
 
 			let scene, base, camera, renderer, controls, canvas, stats, font;
 
@@ -233,7 +233,7 @@
 					z: x - WoodGenuses.length / 2 + 0.45
 				};
 			
-				const cube = new THREE.Mesh( geometry, GenerateWoodMaterial( GetWoodPreset( WoodGenuses[ x ], Finishes[ y ] ) ) );
+				const cube = new THREE.Mesh( geometry, new WoodNodeMaterial( WoodGenuses[ x ], Finishes[ y ] ) );
 				cube.position.set( position.x, position.y, position.z );
 
 				return cube;
