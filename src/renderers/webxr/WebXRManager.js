@@ -937,6 +937,16 @@ class WebXRManager extends EventDispatcher {
 					cameraXR.cameras.length = 0;
 					cameraXRNeedsUpdate = true;
 
+					if ( views.length === 2 ) {
+
+						cameraXR.perCameraCulling = false;
+
+					} else {
+
+						cameraXR.perCameraCulling = true;
+
+					}
+
 				}
 
 				for ( let i = 0; i < views.length; i ++ ) {
