@@ -29,9 +29,12 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewerGPU.js';
+
 			let camera, scene, renderer, clock;
 			let dirLight, spotLight;
 			let torusKnot, dirGroup;
+			let lightShadowMapViewer;
 
 			init();
 
@@ -75,6 +78,17 @@
 				dirLight.shadow.mapSize.height = 2048;
 				dirLight.shadow.radius = 4;
 				dirLight.shadow.bias = - 0.0005;
+
+				lightShadowMapViewer = new ShadowMapViewer( dirLight );
+				//lightShadowMapViewer.position.x = 10;
+				//lightShadowMapViewer.position.y = SCREEN_HEIGHT - ( SHADOW_MAP_HEIGHT / 4 ) - 10;
+				//lightShadowMapViewer.size.width = SHADOW_MAP_WIDTH / 4;
+				//lightShadowMapViewer.size.height = SHADOW_MAP_HEIGHT / 4;
+				lightShadowMapViewer.position.x = 10;
+				lightShadowMapViewer.position.y = 10;
+				lightShadowMapViewer.size.width = 256;
+				lightShadowMapViewer.size.height = 256;
+				lightShadowMapViewer.update();
 
 				dirGroup = new THREE.Group();
 				dirGroup.add( dirLight );
@@ -212,6 +226,8 @@
 				dirLight.position.z = 17 + Math.sin( time * 0.001 ) * 5;
 
 				renderer.render( scene, camera );
+
+				lightShadowMapViewer.render( renderer );
 
 			}
 

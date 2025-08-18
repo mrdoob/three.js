@@ -7,9 +7,10 @@ import {
 	OrthographicCamera,
 	PlaneGeometry,
 	Scene,
-	Texture
+	DepthTexture,
+	Vector2
 } from 'three';
-import { texture } from 'three/tsl';
+import { uv, uniform, textureLoad } from 'three/tsl';
 
 /**
  * This is a helper for visualising a given light's shadow map.
@@ -60,8 +61,10 @@ class ShadowMapViewer {
 
 		const material = new NodeMaterial();
 
-		const shadowMapUniform = texture( new Texture() );
-		material.fragmentNode = shadowMapUniform;
+		const textureDimension = uniform( new Vector2() );
+
+		const shadowMapUniform = textureLoad( new DepthTexture(), uv().mul( textureDimension ) );
+		material.fragmentNode = shadowMapUniform.x;
 
 		const plane = new PlaneGeometry( frame.width, frame.height );
 		const mesh = new Mesh( plane, material );
@@ -168,12 +171,10 @@ class ShadowMapViewer {
 
 			if ( this.enabled ) {
 
-				//Because a light's .shadowMap is only initialised after the first render pass
-				//we have to make sure the correct map is sent into the shader, otherwise we
-				//always end up with the scene's first added shadow casting light's shadowMap
-				//in the shader
-				//See: https://github.com/mrdoob/three.js/issues/5932
-				shadowMapUniform.value = light.shadow.map.texture;
+				const depthTexture = light.shadow.map.depthTexture;
+
+				shadowMapUniform.value = depthTexture;
+				textureDimension.value.set( depthTexture.width, depthTexture.height );
 
 				currentAutoClear = renderer.autoClear;
 				renderer.autoClear = false; // To allow render overlay
