@@ -323,6 +323,8 @@ class GTAONode extends TempNode {
 
 			const ao = float( 0 ).toVar();
 
+			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
+
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
 				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).toVar();
@@ -337,9 +339,13 @@ class GTAONode extends TempNode {
 				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent ).toVar();
 				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
 
+				// For each slice, the inner loop performs ray marching to find the horizons.
+
 				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
 					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
+
+					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
 
 					// x
 
@@ -370,6 +376,8 @@ class GTAONode extends TempNode {
 					} );
 
 				} );
+
+				// After the horizons are found for a given slice, their contribution to the total occlusion is calculated.
 
 				const sinHorizons = sqrt( sub( 1.0, cosHorizons.mul( cosHorizons ) ) ).toVar();
 				const nx = dot( normalInSlice, sliceTangent );
