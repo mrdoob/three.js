@@ -30030,6 +30030,49 @@ class DepthTexture extends Texture {
 }
 
 /**
+ * Represents a texture created externally with the same renderer context.
+ *
+ * This may be a texture from a protected media stream, device camera feed,
+ * or other data feeds like a depth sensor.
+ *
+ * Note that this class is only supported in {@link WebGLRenderer}, and in
+ * the {@link WebGPURenderer} WebGPU backend.
+ *
+ * @augments Texture
+ */
+class ExternalTexture extends Texture {
+
+	/**
+	 * Creates a new raw texture.
+	 *
+	 * @param {?(WebGLTexture|GPUTexture)} [sourceTexture=null] - The external texture.
+	 */
+	constructor( sourceTexture = null ) {
+
+		super();
+
+		/**
+		 * The external source texture.
+		 *
+		 * @type {?(WebGLTexture|GPUTexture)}
+		 * @default null
+		 */
+		this.sourceTexture = sourceTexture;
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isExternalTexture = true;
+
+	}
+
+}
+
+/**
  * A geometry class for representing a capsule.
  *
  * ```js
@@ -71398,48 +71441,6 @@ function WebGLUtils( gl, extensions ) {
 
 }
 
-/**
- * Represents a texture created externally from the renderer context.
- *
- * This may be a texture from a protected media stream, device camera feed,
- * or other data feeds like a depth sensor.
- *
- * Note that this class is only supported in {@link WebGLRenderer} right now.
- *
- * @augments Texture
- */
-class ExternalTexture extends Texture {
-
-	/**
-	 * Creates a new raw texture.
-	 *
-	 * @param {?WebGLTexture} [sourceTexture=null] - The external texture.
-	 */
-	constructor( sourceTexture = null ) {
-
-		super();
-
-		/**
-		 * The external source texture.
-		 *
-		 * @type {?WebGLTexture}
-		 * @default null
-		 */
-		this.sourceTexture = sourceTexture;
-
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isExternalTexture = true;
-
-	}
-
-}
-
 const _occlusion_vertex = `
 void main() {
 
@@ -77116,6 +77117,7 @@ exports.EquirectangularReflectionMapping = EquirectangularReflectionMapping;
 exports.EquirectangularRefractionMapping = EquirectangularRefractionMapping;
 exports.Euler = Euler;
 exports.EventDispatcher = EventDispatcher;
+exports.ExternalTexture = ExternalTexture;
 exports.ExtrudeGeometry = ExtrudeGeometry;
 exports.FileLoader = FileLoader;
 exports.Float16BufferAttribute = Float16BufferAttribute;
