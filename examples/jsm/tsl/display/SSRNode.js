@@ -28,11 +28,11 @@ class SSRNode extends TempNode {
 	 * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
 	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
 	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
-	 * @param {Node<float>} metalnessRoughnessNode - A node that represents the beauty pass's metalness and roughness.
-	 * @param {Camera} camera - The camera the scene is rendered with.
-	 * @param {boolean} [blurred=false] - Whether the SSR reflections should be blurred or not.
+	 * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
+	 * @param {?Node<float>} [roughnessNode=null] - A node that represents the beauty pass's roughness.
+	 * @param {?Camera} [camera=null] - The camera the scene is rendered with.
 	 */
-	constructor( colorNode, depthNode, normalNode, metalnessRoughnessNode, camera, blurred = false ) {
+	constructor( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) {
 
 		super( 'vec4' );
 
@@ -62,14 +62,18 @@ class SSRNode extends TempNode {
 		 *
 		 * @type {Node<float>}
 		 */
-		this.metalnessRoughnessNode = metalnessRoughnessNode;
+		this.metalnessNode = metalnessNode;
 
 		/**
-		 * The camera the scene is rendered with.
+		 * Whether the SSR reflections should be blurred or not. Blurring is a costly
+		 * operation so turn it off if you encounter performance issues on certain
+		 * devices.
 		 *
-		 * @type {Camera}
+		 * @private
+		 * @type {Node<float>}
+		 * @default false
 		 */
-		this.camera = camera;
+		this.roughnessNode = roughnessNode;
 
 		/**
 		 * The resolution scale. Valid values are in the range
@@ -133,6 +137,29 @@ class SSRNode extends TempNode {
 		 */
 		this.blurQuality = uniform( 2 );
 
+		//
+
+		if ( camera === null ) {
+
+			if ( this.colorNode.passNode && this.colorNode.passNode.isPassNode === true ) {
+
+				camera = this.colorNode.passNode.camera;
+
+			} else {
+
+				throw new Error( 'THREE.TSL: No camera found. ssr() requires a camera.' );
+
+			}
+
+		}
+
+		/**
+		 * The camera the scene is rendered with.
+		 *
+		 * @type {Camera}
+		 */
+		this.camera = camera;
+
 		/**
 		 * The spread of the blur. Automatically set when generating mips.
 		 *
@@ -140,17 +167,6 @@ class SSRNode extends TempNode {
 		 * @type {UniformNode<int>}
 		 */
 		this._blurSpread = uniform( 1 );
-
-		/**
-		 * Whether the SSR reflections should be blurred or not. Blurring is a costly
-		 * operation so turn it off if you encounter performance issues on certain
-		 * devices.
-		 *
-		 * @private
-		 * @type {boolean}
-		 * @default false
-		 */
-		this._blurred = blurred;
 
 		/**
 		 * Represents the projection matrix of the scene's camera.
@@ -190,7 +206,7 @@ class SSRNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<bool>}
 		 */
-		this._isPerspectiveCamera = uniform( camera.isPerspectiveCamera ? 1 : 0 );
+		this._isPerspectiveCamera = uniform( camera.isPerspectiveCamera );
 
 		/**
 		 * The resolution of the pass.
@@ -254,16 +270,24 @@ class SSRNode extends TempNode {
 		 */
 		this._textureNode = passTexture( this, this._ssrRenderTarget.texture );
 
-		const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
-		const lod = this.metalnessRoughnessNode.g.mul( mips ).clamp( 0, mips );
+		let blurredTextureNode = null;
+
+		if ( this.roughnessNode !== null ) {
+
+			const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
+			const lod = float( this.roughnessNode ).mul( mips ).clamp( 0, mips );
+
+			blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
+
+		}
 
 		/**
 		 * Holds the blurred SSR reflections.
 		 *
 		 * @private
-		 * @type {PassTextureNode}
+		 * @type {?PassTextureNode}
 		 */
-		this._blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
+		this._blurredTextureNode = blurredTextureNode;
 
 	}
 
@@ -274,7 +298,7 @@ class SSRNode extends TempNode {
 	 */
 	getTextureNode() {
 
-		return this._blurred ? this._blurredTextureNode : this._textureNode;
+		return this.roughnessNode !== null ? this._blurredTextureNode : this._textureNode;
 
 	}
 
@@ -327,7 +351,7 @@ class SSRNode extends TempNode {
 
 		// blur (optional)
 
-		if ( this._blurred === true ) {
+		if ( this.roughnessNode !== null ) {
 
 			// blur mips but leave the base mip unblurred
 
@@ -417,7 +441,7 @@ class SSRNode extends TempNode {
 
 		const ssr = Fn( () => {
 
-			const metalness = this.metalnessRoughnessNode.sample( uvNode ).r;
+			const metalness = float( this.metalnessNode );
 
 			// fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();
@@ -440,7 +464,7 @@ class SSRNode extends TempNode {
 			const d1viewPosition = viewPosition.add( viewReflectDir.mul( maxReflectRayLen ) ).toVar();
 
 			// check if d1viewPosition lies behind the camera near plane
-			If( this._isPerspectiveCamera.equal( float( 1 ) ).and( d1viewPosition.z.greaterThan( this._cameraNear.negate() ) ), () => {
+			If( this._isPerspectiveCamera.and( d1viewPosition.z.greaterThan( this._cameraNear.negate() ) ), () => {
 
 				// if so, ensure d1viewPosition is clamped on the near plane.
 				// this prevents artifacts during the ray marching process
@@ -499,7 +523,7 @@ class SSRNode extends TempNode {
 				const s = xy.sub( d0 ).length().div( totalLen );
 
 				// depending on the camera type, we now compute the z-coordinate of the reflected ray at the current step in view space
-				If( this._isPerspectiveCamera.equal( float( 1 ) ), () => {
+				If( this._isPerspectiveCamera, () => {
 
 					const recipVPZ = float( 1 ).div( viewPosition.z ).toVar();
 					viewReflectRayZ.assign( float( 1 ).div( recipVPZ.add( s.mul( float( 1 ).div( d1viewPosition.z ).sub( recipVPZ ) ) ) ) );
@@ -622,9 +646,9 @@ export default SSRNode;
  * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
  * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
- * @param {Node<float>} metalnessRoughnessNode - A node that represents the beauty pass's metalness and roughness.
- * @param {Camera} camera - The camera the scene is rendered with.
- * @param {boolean} [blurred=false] - Whether the SSR reflections should be blurred or not.
+ * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
+ * @param {?Node<float>} [roughnessNode=null] - A node that represents the beauty pass's roughness.
+ * @param {?Camera} [camera=null] - The camera the scene is rendered with.
  * @returns {SSRNode}
  */
-export const ssr = ( colorNode, depthNode, normalNode, metalnessRoughnessNode, camera, blurred ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessRoughnessNode ), camera, blurred ) );
+export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, roughnessNode = null, camera = null ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), nodeObject( roughnessNode ), camera ) );
