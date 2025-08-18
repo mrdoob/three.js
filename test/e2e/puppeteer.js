@@ -118,7 +118,7 @@ const exceptionList = [
 	'webgl_batch_lod_bvh',
 
 	// Intentional z-fighting in this demo makes it non-deterministic
-	'webgl_reverse_depth_buffer',
+	'webgl_reversed_depth_buffer',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
@@ -140,6 +140,7 @@ const exceptionList = [
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',
 	'webgpu_compute_sort_bitonic',
+	'webgpu_compute_reduce',
 	'webgpu_struct_drawindirect',
 
 	// WebGPURenderer: Unknown problem

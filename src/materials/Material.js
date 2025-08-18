@@ -664,6 +664,18 @@ class Material extends EventDispatcher {
 
 		}
 
+		if ( this.sheenColorMap && this.sheenColorMap.isTexture ) {
+
+			data.sheenColorMap = this.sheenColorMap.toJSON( meta ).uuid;
+
+		}
+
+		if ( this.sheenRoughnessMap && this.sheenRoughnessMap.isTexture ) {
+
+			data.sheenRoughnessMap = this.sheenRoughnessMap.toJSON( meta ).uuid;
+
+		}
+
 		if ( this.dispersion !== undefined ) data.dispersion = this.dispersion;
 
 		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;

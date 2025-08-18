@@ -2,7 +2,8 @@ import DataMap from './DataMap.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType } from '../../constants.js';
+import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, SRGBTransfer } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 const _size = /*@__PURE__*/ new Vector3();
 
@@ -178,6 +179,7 @@ class Textures extends DataMap {
 				}
 
 				this.delete( renderTarget );
+				this.backend.delete( renderTarget );
 
 			};
 
@@ -240,9 +242,15 @@ class Textures extends DataMap {
 		options.needsMipmaps = this.needsMipmaps( texture );
 		options.levels = options.needsMipmaps ? this.getMipLevels( texture, width, height ) : 1;
 
+		// TODO: Uniformly handle mipmap definitions
+		// Normal textures and compressed cube textures define base level + mips with their mipmap array
+		// Uncompressed cube textures use their mipmap array only for mips (no base level)
+
+		if ( texture.isCubeTexture && texture.mipmaps.length > 0 ) options.levels ++;
+
 		//
 
-		if ( isRenderTarget || texture.isStorageTexture === true ) {
+		if ( isRenderTarget || texture.isStorageTexture === true || texture.isExternalTexture === true ) {
 
 			backend.createSampler( texture );
 			backend.createTexture( texture, options );
@@ -326,6 +334,14 @@ class Textures extends DataMap {
 
 			this.info.memory.textures ++;
 
+			//
+
+			if ( texture.isVideoTexture && ColorManagement.getTransfer( texture.colorSpace ) !== SRGBTransfer ) {
+
+				console.warn( 'WebGPURenderer: Video textures must use a color space with a sRGB transfer function, e.g. SRGBColorSpace.' );
+
+			}
+
 			// dispose
 
 			const onDispose = () => {
@@ -366,7 +382,7 @@ class Textures extends DataMap {
 
 			if ( image.image !== undefined ) image = image.image;
 
-			if ( image instanceof HTMLVideoElement ) {
+			if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( image instanceof HTMLVideoElement ) ) {
 
 				target.width = image.videoWidth || 1;
 				target.height = image.videoHeight || 1;
@@ -408,21 +424,25 @@ class Textures extends DataMap {
 
 		let mipLevelCount;
 
-		if ( texture.isCompressedTexture ) {
+		if ( texture.mipmaps.length > 0 ) {
 
-			if ( texture.mipmaps ) {
-
-				mipLevelCount = texture.mipmaps.length;
-
-			} else {
-
-				mipLevelCount = 1;
-
-			}
+			mipLevelCount = texture.mipmaps.length;
 
 		} else {
 
-			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+			if ( texture.isCompressedTexture === true ) {
+
+				// it is not possible to compute mipmaps for compressed textures. So
+				// when no mipmaps are defined in "texture.mipmaps", force a texture
+				// level of 1
+
+				mipLevelCount = 1;
+
+			} else {
+
+				mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+
+			}
 
 		}
 
@@ -431,14 +451,14 @@ class Textures extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given texture requires mipmaps.
+	 * Returns `true` if the given texture makes use of mipmapping.
 	 *
 	 * @param {Texture} texture - The texture.
 	 * @return {boolean} Whether mipmaps are required or not.
 	 */
 	needsMipmaps( texture ) {
 
-		return texture.isCompressedTexture === true || texture.generateMipmaps;
+		return texture.generateMipmaps === true || texture.mipmaps.length > 0;
 
 	}
 

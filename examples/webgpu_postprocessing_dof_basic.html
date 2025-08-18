@@ -9,6 +9,7 @@
 			body {
 				touch-action: none;
 				color: #000000;
+				background: #90D5FF;
 			}
 			a {
 				color: #2983ff;
@@ -39,9 +40,10 @@
 
 			import * as THREE from 'three/webgpu';
 			import { mix, pass, renderOutput, smoothstep, uniform, vec3 } from 'three/tsl';
-			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+			import { boxBlur } from 'three/addons/tsl/display/boxBlur.js';
 			import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
 
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -49,7 +51,7 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
 
-			let camera, scene, timer, renderer, model, mixer, raycaster, postProcessing;
+			let camera, controls, scene, timer, renderer, model, mixer, raycaster, postProcessing;
 
 			const pointerCoords = new THREE.Vector2();
 			const focusPoint = new THREE.Vector3( 1, 1.75, - 0.4 );
@@ -60,8 +62,12 @@
 			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( - 5, 4, 5 );
-				camera.lookAt( 0, 1.5, 0 );
+				camera.position.set( - 6, 5, 6 );
+
+				controls = new OrbitControls( camera );
+				controls.target.set( 0, 2, 0 );
+				controls.enableDamping = true;
+				controls.update();
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x90D5FF );
@@ -109,20 +115,23 @@
 
 				// DOF uniforms
 
-				const maxBlur = uniform( 2 ); // maximum amount of blur
+				const blurSize = uniform( 2 ); // determines the kernel size of the blur
+				const blurSpread = uniform( 4 ); // determines how far the blur is spread
 				const minDistance = uniform( 1 ); // all positions at or below minDistance will be completely in focus.
 				const maxDistance = uniform( 3 ); // all positions at or beyond maxDistance will be completely out of focus.
 
 				// beauty and blur/out-of-focus pass
 
 				const scenePass = pass( scene, camera );
+			
+				const scenePassColor = scenePass.getTextureNode();
 				const scenePassViewZ = scenePass.getViewZNode();
-				const scenePassBlurred = gaussianBlur( scenePass, maxBlur );
+				const scenePassBlurred = boxBlur( scenePassColor, { size: blurSize, separation: blurSpread } );
 
 				// simple DOF from https://lettier.github.io/3d-game-shaders-for-beginners/depth-of-field.html
 
 				const blur = smoothstep( minDistance, maxDistance, scenePassViewZ.sub( focusPointView.z ).abs() );
-				const dofPass = mix( scenePass, scenePassBlurred, blur );
+				const dofPass = mix( scenePassColor, scenePassBlurred, blur );
 
 				const outputPass = renderOutput( dofPass );
 				const fxaaPass = fxaa( outputPass );
@@ -134,9 +143,12 @@
 				const gui = new GUI();
 				gui.add( minDistance, 'value', 0, 3 ).name( 'min distance' );
 				gui.add( maxDistance, 'value', 0, 5 ).name( 'max distance' );
-				gui.add( maxBlur, 'value', 0, 5 ).name( 'max blur' );
+				gui.add( blurSize, 'value', 1, 3, 1 ).name( 'blur size' );
+				gui.add( blurSpread, 'value', 1, 7, 1 ).name( 'blur spread' );
 
 				//
+
+				controls.connect( renderer.domElement );
 
 				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
 
@@ -180,6 +192,8 @@
 			function animate() {
 
 				TWEEN.update();
+
+				controls.update();
 
 				timer.update();
 

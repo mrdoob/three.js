@@ -109,7 +109,9 @@ class InstanceNode extends Node {
 	 */
 	setup( builder ) {
 
-		const { count, instanceMatrix, instanceColor } = this;
+		const { instanceMatrix, instanceColor } = this;
+
+		const { count } = instanceMatrix;
 
 		let { instanceMatrixNode, instanceColorNode } = this;
 

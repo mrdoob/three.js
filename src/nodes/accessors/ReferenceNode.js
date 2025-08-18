@@ -282,7 +282,7 @@ class ReferenceNode extends Node {
 
 		}
 
-		if ( this.name !== null ) node.label( this.name );
+		if ( this.name !== null ) node.setName( this.name );
 
 		this.node = node.getSelf();
 

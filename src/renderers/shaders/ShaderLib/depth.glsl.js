@@ -82,7 +82,7 @@ void main() {
 
 	// Higher precision equivalent of gl_FragCoord.z
 
-	#ifdef USE_REVERSEDEPTHBUF
+	#ifdef USE_REVERSED_DEPTH_BUFFER
 
 		float fragCoordZ = vHighPrecisionZW[ 0 ] / vHighPrecisionZW[ 1 ];
 

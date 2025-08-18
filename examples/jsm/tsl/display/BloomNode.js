@@ -364,7 +364,9 @@ class BloomNode extends TempNode {
 
 		// gaussian blur materials
 
-		const kernelSizeArray = [ 3, 5, 7, 9, 11 ];
+		// These sizes have been changed to account for the altered coefficents-calculation to avoid blockiness,
+		// while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
+		const kernelSizeArray = [ 6, 10, 14, 18, 22 ];
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
@@ -449,10 +451,11 @@ class BloomNode extends TempNode {
 	_getSeparableBlurMaterial( builder, kernelRadius ) {
 
 		const coefficients = [];
+		const sigma = kernelRadius / 3;
 
 		for ( let i = 0; i < kernelRadius; i ++ ) {
 
-			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( kernelRadius * kernelRadius ) ) / kernelRadius );
+			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
 
 		}
 
@@ -468,8 +471,7 @@ class BloomNode extends TempNode {
 
 		const separableBlurPass = Fn( () => {
 
-			const weightSum = gaussianCoefficients.element( 0 ).toVar();
-			const diffuseSum = sampleTexel( uvNode ).rgb.mul( weightSum ).toVar();
+			const diffuseSum = sampleTexel( uvNode ).rgb.mul( gaussianCoefficients.element( 0 ) ).toVar();
 
 			Loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -479,11 +481,10 @@ class BloomNode extends TempNode {
 				const sample1 = sampleTexel( uvNode.add( uvOffset ) ).rgb;
 				const sample2 = sampleTexel( uvNode.sub( uvOffset ) ).rgb;
 				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );
-				weightSum.addAssign( float( 2.0 ).mul( w ) );
 
 			} );
 
-			return vec4( diffuseSum.div( weightSum ), 1.0 );
+			return vec4( diffuseSum, 1.0 );
 
 		} );
 

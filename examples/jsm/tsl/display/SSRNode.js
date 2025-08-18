@@ -1,5 +1,6 @@
-import { NearestFilter, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType } from 'three/webgpu';
-import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { HalfFloatType, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, LinearFilter, LinearMipmapLinearFilter } from 'three/webgpu';
+import { texture, reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { boxBlur } from './boxBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -27,10 +28,11 @@ class SSRNode extends TempNode {
 	 * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
 	 * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
 	 * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
-	 * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
+	 * @param {Node<float>} metalnessRoughnessNode - A node that represents the beauty pass's metalness and roughness.
 	 * @param {Camera} camera - The camera the scene is rendered with.
+	 * @param {boolean} [blurred=false] - Whether the SSR reflections should be blurred or not.
 	 */
-	constructor( colorNode, depthNode, normalNode, metalnessNode, camera ) {
+	constructor( colorNode, depthNode, normalNode, metalnessRoughnessNode, camera, blurred = false ) {
 
 		super( 'vec4' );
 
@@ -60,7 +62,7 @@ class SSRNode extends TempNode {
 		 *
 		 * @type {Node<float>}
 		 */
-		this.metalnessNode = metalnessNode;
+		this.metalnessRoughnessNode = metalnessRoughnessNode;
 
 		/**
 		 * The camera the scene is rendered with.
@@ -70,15 +72,15 @@ class SSRNode extends TempNode {
 		this.camera = camera;
 
 		/**
-		 * The resolution scale. By default SSR reflections
-		 * are computed in half resolutions. Setting the value
-		 * to `1` improves quality but also results in more
-		 * computational overhead.
+		 * The resolution scale. Valid values are in the range
+		 * `[0,1]`. `1` means best quality but also results in
+		 * more computational overhead. Setting to `0.5` means
+		 * the effect is computed in half-resolution.
 		 *
 		 * @type {number}
-		 * @default 0.5
+		 * @default 1
 		 */
-		this.resolutionScale = 0.5;
+		this.resolutionScale = 1;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -90,17 +92,8 @@ class SSRNode extends TempNode {
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
-		 * The render target the SSR is rendered into.
-		 *
-		 * @private
-		 * @type {RenderTarget}
-		 */
-		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, minFilter: NearestFilter, magFilter: NearestFilter } );
-		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
-
-		/**
-		 * Controls how far a fragment can reflect.
-		 *
+		 * Controls how far a fragment can reflect. Increasing this value result in more
+		 * computational overhead but also increases the reflection distance.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -114,11 +107,50 @@ class SSRNode extends TempNode {
 		this.thickness = uniform( 0.1 );
 
 		/**
-		 * Controls the transparency of the reflected colors.
+		 * Controls how the SSR reflections are blended with the beauty pass.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.opacity = uniform( 1 );
+
+		/**
+		 * This parameter controls how detailed the raymarching process works.
+		 * The value ranges is `[0,1]` where `1` means best quality (the maximum number
+		 * of raymarching iterations/samples) and `0` means no samples at all.
+		 *
+		 * A quality of `0.5` is usually sufficient for most use cases. Try to keep
+		 * this parameter as low as possible. Larger values result in noticable more
+		 * overhead.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.quality = uniform( 0.5 );
+
+		/**
+		 * The quality of the blur. Must be an integer in the range `[1,3]`.
+		 *
+		 * @type {UniformNode<int>}
+		 */
+		this.blurQuality = uniform( 2 );
+
+		/**
+		 * The spread of the blur. Automatically set when generating mips.
+		 *
+		 * @private
+		 * @type {UniformNode<int>}
+		 */
+		this._blurSpread = uniform( 1 );
+
+		/**
+		 * Whether the SSR reflections should be blurred or not. Blurring is a costly
+		 * operation so turn it off if you encounter performance issues on certain
+		 * devices.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._blurred = blurred;
 
 		/**
 		 * Represents the projection matrix of the scene's camera.
@@ -169,13 +201,23 @@ class SSRNode extends TempNode {
 		this._resolution = uniform( new Vector2() );
 
 		/**
-		 * This value is derived from the resolution and restricts
-		 * the maximum raymarching steps in the fragment shader.
+		 * The render target the SSR is rendered into.
 		 *
 		 * @private
-		 * @type {UniformNode<float>}
+		 * @type {RenderTarget}
 		 */
-		this._maxStep = uniform( 0 );
+		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
+		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
+
+		/**
+		 * The render target for the blurred SSR reflections.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
+		this._blurRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter } );
+		this._blurRenderTarget.texture.name = 'SSRNode.Blur';
+		this._blurRenderTarget.texture.mipmaps.push( {}, {}, {}, {}, {} );
 
 		/**
 		 * The material that is used to render the effect.
@@ -183,8 +225,26 @@ class SSRNode extends TempNode {
 		 * @private
 		 * @type {NodeMaterial}
 		 */
-		this._material = new NodeMaterial();
-		this._material.name = 'SSRNode.SSR';
+		this._ssrMaterial = new NodeMaterial();
+		this._ssrMaterial.name = 'SSRNode.SSR';
+
+		/**
+		 * The blur material.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
+		this._blurMaterial = new NodeMaterial();
+		this._blurMaterial.name = 'SSRNode.Blur';
+
+		/**
+		 * The copy material.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
+		this._copyMaterial = new NodeMaterial();
+		this._copyMaterial.name = 'SSRNode.Copy';
 
 		/**
 		 * The result of the effect is represented as a separate texture node.
@@ -193,6 +253,17 @@ class SSRNode extends TempNode {
 		 * @type {PassTextureNode}
 		 */
 		this._textureNode = passTexture( this, this._ssrRenderTarget.texture );
+
+		const mips = this._blurRenderTarget.texture.mipmaps.length - 1;
+		const lod = this.metalnessRoughnessNode.g.mul( mips ).clamp( 0, mips );
+
+		/**
+		 * Holds the blurred SSR reflections.
+		 *
+		 * @private
+		 * @type {PassTextureNode}
+		 */
+		this._blurredTextureNode = passTexture( this, this._blurRenderTarget.texture ).level( lod );
 
 	}
 
@@ -203,7 +274,7 @@ class SSRNode extends TempNode {
 	 */
 	getTextureNode() {
 
-		return this._textureNode;
+		return this._blurred ? this._blurredTextureNode : this._textureNode;
 
 	}
 
@@ -219,9 +290,8 @@ class SSRNode extends TempNode {
 		height = Math.round( this.resolutionScale * height );
 
 		this._resolution.value.set( width, height );
-		this._maxStep.value = Math.round( Math.sqrt( width * width + height * height ) );
-
 		this._ssrRenderTarget.setSize( width, height );
+		this._blurRenderTarget.setSize( width, height );
 
 	}
 
@@ -236,9 +306,12 @@ class SSRNode extends TempNode {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
+		const ssrRenderTarget = this._ssrRenderTarget;
+		const blurRenderTarget = this._blurRenderTarget;
+
 		const size = renderer.getDrawingBufferSize( _size );
 
-		_quadMesh.material = this._material;
+		_quadMesh.material = this._ssrMaterial;
 
 		this.setSize( size.width, size.height );
 
@@ -249,8 +322,26 @@ class SSRNode extends TempNode {
 
 		// ssr
 
-		renderer.setRenderTarget( this._ssrRenderTarget );
+		renderer.setRenderTarget( ssrRenderTarget );
 		_quadMesh.render( renderer );
+
+		// blur (optional)
+
+		if ( this._blurred === true ) {
+
+			// blur mips but leave the base mip unblurred
+
+			for ( let i = 0; i < blurRenderTarget.texture.mipmaps.length; i ++ ) {
+
+				_quadMesh.material = ( i === 0 ) ? this._copyMaterial : this._blurMaterial;
+
+				this._blurSpread.value = i;
+				renderer.setRenderTarget( blurRenderTarget, 0, i );
+				_quadMesh.render( renderer );
+
+			}
+
+		}
 
 		// restore
 
@@ -326,7 +417,7 @@ class SSRNode extends TempNode {
 
 		const ssr = Fn( () => {
 
-			const metalness = this.metalnessNode.sample( uvNode ).r;
+			const metalness = this.metalnessRoughnessNode.sample( uvNode ).r;
 
 			// fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();
@@ -374,7 +465,7 @@ class SSRNode extends TempNode {
 			// determine the larger delta
 			// The larger difference will help to determine how much to travel in the X and Y direction each iteration and
 			// how many iterations are needed to travel the entire ray
-			const totalStep = max( abs( xLen ), abs( yLen ) ).toVar();
+			const totalStep = int( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).toConst();
 
 			// step sizes in the x and y directions
 			const xSpan = xLen.div( totalStep ).toVar();
@@ -385,23 +476,9 @@ class SSRNode extends TempNode {
 			// the actual ray marching loop
 			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry.
 			// it does not exceed d1 (the maximum ray extend)
-			Loop( { start: int( 0 ), end: int( this._maxStep ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( totalStep, ( { i } ) => {
 
-				// TODO: Remove this when Chrome is fixed, see https://issues.chromium.org/issues/372714384#comment14
-				If( metalness.equal( 0 ), () => {
-
-					Break();
-
-				} );
-
-				// stop if the maximum number of steps is reached for this specific ray
-				If( float( i ).greaterThanEqual( totalStep ), () => {
-
-					Break();
-
-				} );
-
-				// advance on the ray by computing a new position in screen space
+				// advance on the ray by computing a new position in screen coordinates
 				const xy = vec2( d0.x.add( xSpan.mul( float( i ) ) ), d0.y.add( ySpan.mul( float( i ) ) ) ).toVar();
 
 				// stop processing if the new position lies outside of the screen
@@ -411,11 +488,10 @@ class SSRNode extends TempNode {
 
 				} );
 
-				// compute new uv, depth, viewZ and viewPosition for the new location on the ray
+				// compute new uv, depth and viewZ for the next fragment
 				const uvNode = xy.div( this._resolution );
 				const d = sampleDepth( uvNode ).toVar();
 				const vZ = getViewZ( d ).toVar();
-				const vP = getViewPosition( uvNode, d, this._cameraProjectionMatrixInverse ).toVar();
 
 				const viewReflectRayZ = float( 0 ).toVar();
 
@@ -439,6 +515,7 @@ class SSRNode extends TempNode {
 
 					// compute the distance of the new location to the ray in view space
 					// to clarify vP is the fragment's view position which is not an exact point on the ray
+					const vP = getViewPosition( uvNode, d, this._cameraProjectionMatrixInverse ).toVar();
 					const away = pointToLineDistance( vP, viewPosition, d1viewPosition ).toVar();
 
 					// compute the minimum thickness between the current fragment and its neighbor in the x-direction.
@@ -499,12 +576,22 @@ class SSRNode extends TempNode {
 
 		} );
 
-		this._material.fragmentNode = ssr().context( builder.getSharedContext() );
-		this._material.needsUpdate = true;
+		this._ssrMaterial.fragmentNode = ssr().context( builder.getSharedContext() );
+		this._ssrMaterial.needsUpdate = true;
+
+		// below materials are used for blurring
+
+		const reflectionBuffer = texture( this._ssrRenderTarget.texture );
+
+		this._blurMaterial.fragmentNode = boxBlur( reflectionBuffer, { size: this.blurQuality, separation: this._blurSpread } );
+		this._blurMaterial.needsUpdate = true;
+
+		this._copyMaterial.fragmentNode = reflectionBuffer;
+		this._copyMaterial.needsUpdate = true;
 
 		//
 
-		return this._textureNode;
+		return this.getTextureNode();
 
 	}
 
@@ -515,8 +602,11 @@ class SSRNode extends TempNode {
 	dispose() {
 
 		this._ssrRenderTarget.dispose();
+		this._blurRenderTarget.dispose();
 
-		this._material.dispose();
+		this._ssrMaterial.dispose();
+		this._blurMaterial.dispose();
+		this._copyMaterial.dispose();
 
 	}
 
@@ -532,8 +622,9 @@ export default SSRNode;
  * @param {Node<vec4>} colorNode - The node that represents the beauty pass.
  * @param {Node<float>} depthNode - A node that represents the beauty pass's depth.
  * @param {Node<vec3>} normalNode - A node that represents the beauty pass's normals.
- * @param {Node<float>} metalnessNode - A node that represents the beauty pass's metalness.
+ * @param {Node<float>} metalnessRoughnessNode - A node that represents the beauty pass's metalness and roughness.
  * @param {Camera} camera - The camera the scene is rendered with.
+ * @param {boolean} [blurred=false] - Whether the SSR reflections should be blurred or not.
  * @returns {SSRNode}
  */
-export const ssr = ( colorNode, depthNode, normalNode, metalnessNode, camera ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessNode ), camera ) );
+export const ssr = ( colorNode, depthNode, normalNode, metalnessRoughnessNode, camera, blurred ) => nodeObject( new SSRNode( nodeObject( colorNode ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( metalnessRoughnessNode ), camera, blurred ) );

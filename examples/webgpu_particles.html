@@ -53,6 +53,7 @@
 				camera.position.set( 1300, 500, 0 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				// textures
 
@@ -133,7 +134,7 @@
 
 				//
 
-				const helper = new THREE.GridHelper( 3000, 40, 0x303030, 0x303030 );
+				const helper = new THREE.GridHelper( 3000, 40, 0x444444, 0x444444 );
 				helper.position.y = - 75;
 				scene.add( helper );
 

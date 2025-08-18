@@ -1,7 +1,7 @@
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
-import { RawTexture } from '../../textures/RawTexture.js';
+import { ExternalTexture } from '../../textures/ExternalTexture.js';
 
 const _occlusion_vertex = `
 void main() {
@@ -44,7 +44,7 @@ class WebXRDepthSensing {
 		/**
 		 * An opaque texture representing the depth of the user's environment.
 		 *
-		 * @type {?RawTexture}
+		 * @type {?ExternalTexture}
 		 */
 		this.texture = null;
 
@@ -81,7 +81,7 @@ class WebXRDepthSensing {
 
 		if ( this.texture === null ) {
 
-			const texture = new RawTexture( depthData.texture );
+			const texture = new ExternalTexture( depthData.texture );
 
 			if ( ( depthData.depthNear !== renderState.depthNear ) || ( depthData.depthFar !== renderState.depthFar ) ) {
 
@@ -142,7 +142,7 @@ class WebXRDepthSensing {
 	/**
 	 * Returns a texture representing the depth of the user's environment.
 	 *
-	 * @return {?RawTexture} The depth texture.
+	 * @return {?ExternalTexture} The depth texture.
 	 */
 	getDepthTexture() {
 

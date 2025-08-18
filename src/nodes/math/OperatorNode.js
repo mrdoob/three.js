@@ -103,9 +103,10 @@ class OperatorNode extends TempNode {
 	 * and the input node types.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {?string} [output=null] - The output type.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	getNodeType( builder, output = null ) {
 
 		const op = this.op;
 
@@ -117,7 +118,7 @@ class OperatorNode extends TempNode {
 
 		if ( typeA === 'void' || typeB === 'void' ) {
 
-			return 'void';
+			return output || 'void';
 
 		} else if ( op === '%' ) {
 
@@ -193,7 +194,7 @@ class OperatorNode extends TempNode {
 
 		const { aNode, bNode } = this;
 
-		const type = this.getNodeType( builder );
+		const type = this.getNodeType( builder, output );
 
 		let typeA = null;
 		let typeB = null;

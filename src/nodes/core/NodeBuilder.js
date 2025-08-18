@@ -260,6 +260,13 @@ class NodeBuilder {
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 
 		/**
+		 * This dictionary holds the types of the builder.
+		 *
+		 * @type {Object}
+		 */
+		this.types = { vertex: [], fragment: [], compute: [], index: 0 };
+
+		/**
 		 * This dictionary holds the bindings for each shader stage.
 		 *
 		 * @type {Object}
@@ -827,6 +834,22 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the native snippet for a ternary operation. E.g. GLSL would output
+	 * a ternary op as `cond ? x : y` whereas WGSL would output it as `select(y, x, cond)`
+	 *
+	 * @abstract
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( /* condSnippet, ifSnippet, elseSnippet*/ ) {
+
+		return null;
+
+	}
+
+	/**
 	 * Returns a node for the given hash, see {@link NodeBuilder#setHashNode}.
 	 *
 	 * @param {number} hash - The hash of the node.
@@ -1143,7 +1166,6 @@ class NodeBuilder {
 		return type + '( ' + snippets.join( ', ' ) + ' )';
 
 	}
-
 
 	/**
 	 * Generates the shader string for the given type and value.
@@ -1666,6 +1688,20 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns an instance of {@link StructType} for the given struct name and shader stage
+	 * or null if not found.
+	 *
+	 * @param {string} name - The name of the struct.
+	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
+	 * @return {?StructType} The struct type or null if not found.
+	 */
+	getStructTypeNode( name, shaderStage = this.shaderStage ) {
+
+		return this.types[ shaderStage ][ name ] || null;
+
+	}
+
+	/**
 	 * Returns an instance of {@link StructType} for the given output struct node.
 	 *
 	 * @param {OutputStructNode} node - The output struct node.
@@ -1689,6 +1725,7 @@ class NodeBuilder {
 			structType = new StructType( name, membersLayout );
 
 			this.structs[ shaderStage ].push( structType );
+			this.types[ shaderStage ][ name ] = node;
 
 			nodeData.structType = structType;
 
@@ -2748,7 +2785,7 @@ class NodeBuilder {
 
 		}
 
-		// setup() -> stage 1: create possible new nodes and returns an output reference node
+		// setup() -> stage 1: create possible new nodes and/or return an output reference node
 		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
 		// generate()  -> stage 3: generate shader
 
@@ -2922,11 +2959,6 @@ class NodeBuilder {
 		return `// Three.js r${ REVISION } - Node System\n`;
 
 	}
-
-	/**
-	 * Prevents the node builder from being used as an iterable in TSL.Fn(), avoiding potential runtime errors.
-	 */
-	*[ Symbol.iterator ]() { }
 
 }
 

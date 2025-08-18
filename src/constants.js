@@ -1,4 +1,4 @@
-export const REVISION = '179dev';
+export const REVISION = '180dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -720,6 +720,14 @@ export const UnsignedInt248Type = 1020;
  * @constant
  */
 export const UnsignedInt5999Type = 35902;
+
+/**
+ * An unsigned int 10_11_11 (packed) data type for textures.
+ *
+ * @type {number}
+ * @constant
+ */
+export const UnsignedInt101111Type = 35899;
 
 /**
  * Discards the red, green and blue components and reads just the alpha component.

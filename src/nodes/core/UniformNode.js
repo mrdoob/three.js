@@ -1,6 +1,7 @@
 import InputNode from './InputNode.js';
 import { objectGroup } from './UniformGroupNode.js';
 import { nodeObject, getConstNodeType } from '../tsl/TSLCore.js';
+import { getValueFromType } from './NodeUtils.js';
 
 /**
  * Class for representing a uniform.
@@ -172,10 +173,10 @@ class UniformNode extends InputNode {
 
 		const sharedNodeType = sharedNode.getInputType( builder );
 
-		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.label );
+		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.nodeName );
 		const uniformName = builder.getPropertyName( nodeUniform );
 
-		if ( builder.context.label !== undefined ) delete builder.context.label;
+		if ( builder.context.nodeName !== undefined ) delete builder.context.nodeName;
 
 		//
 
@@ -219,16 +220,24 @@ export default UniformNode;
  *
  * @tsl
  * @function
- * @param {any} arg1 - The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).
- * @param {string} [arg2] - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+ * @param {any|string} value - The value of this uniform or your type. Usually a JS primitive or three.js object (vector, matrix, color, texture).
+ * @param {string} [type] - The node type. If no explicit type is defined, the node tries to derive the type from its value.
  * @returns {UniformNode}
  */
-export const uniform = ( arg1, arg2 ) => {
+export const uniform = ( value, type ) => {
 
-	const nodeType = getConstNodeType( arg2 || arg1 );
+	const nodeType = getConstNodeType( type || value );
+
+	if ( nodeType === value ) {
+
+		// if the value is a type but no having a value
+
+		value = getValueFromType( nodeType );
+
+	}
 
 	// @TODO: get ConstNode from .traverse() in the future
-	const value = ( arg1 && arg1.isNode === true ) ? ( arg1.node && arg1.node.value ) || arg1.value : arg1;
+	value = ( value && value.isNode === true ) ? ( value.node && value.node.value ) || value.value : value;
 
 	return nodeObject( new UniformNode( value, nodeType ) );
 
