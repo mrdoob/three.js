@@ -35,9 +35,11 @@ class WebGPUBindingUtils {
 		/**
 		 * A cache for managing bind group layouts.
 		 *
-		 * @type {WeakMap<Array<Binding>,GPUBindGroupLayout>}
+		 * @type {WeakMap<string,GPUBindGroupLayout>}
 		 */
-		this.bindGroupLayoutCache = new WeakMap();
+		this.bindGroupLayoutCache = new Map();
+
+		this.layoutEntryCache = new WeakMap();
 
 	}
 
@@ -236,13 +238,25 @@ class WebGPUBindingUtils {
 
 		for ( const binding of bindGroup.bindings ) {
 
-			const bindingGPU = this.createBindingsLayoutEntry( binding, index );
-			entries.push( bindingGPU );
+			let layoutEntry = this.layoutEntryCache.get( binding );
+
+			if ( layoutEntry === undefined ) {
+
+				layoutEntry = this.createBindingsLayoutEntry( binding );
+				this.layoutEntryCache.set( binding, layoutEntry );
+
+			}
+
+			layoutEntry.binding = index;
+
+			entries.push( layoutEntry );
 			index ++;
 
 		}
 
-		return device.createBindGroupLayout( { entries } );
+		return entries;
+
+		//return device.createBindGroupLayout( { entries } );
 
 	}
 
@@ -261,12 +275,15 @@ class WebGPUBindingUtils {
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		let bindLayoutGPU = bindGroupLayoutCache.get( bindGroup.bindingsReference );
+		const bindGroupLayoutEntries = this.createBindingsLayout( bindGroup );
+		const entriesKey = JSON.stringify( bindGroupLayoutEntries );
+
+		let bindLayoutGPU = bindGroupLayoutCache.get( entriesKey );
 
 		if ( bindLayoutGPU === undefined ) {
 
-			bindLayoutGPU = this.createBindingsLayout( bindGroup );
-			bindGroupLayoutCache.set( bindGroup.bindingsReference, bindLayoutGPU );
+			bindLayoutGPU = this.backend.device.createBindGroupLayout( { entries: bindGroupLayoutEntries } );
+			bindGroupLayoutCache.set( entriesKey, bindLayoutGPU );
 
 		}
 
