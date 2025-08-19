@@ -117,17 +117,17 @@
 				const materialFolder = gui.addFolder( 'material' );
 				materialFolder.addColor( API, 'color' ).onChange( function ( color ) {
 
-		clothMaterial.color.setHex( color );
+					clothMaterial.color.setHex( color );
 
-	} );
+				} );
 				materialFolder.add( clothMaterial, 'roughness', 0.0, 1, 0.01 );
 				materialFolder.add( clothMaterial, 'sheen', 0.0, 1, 0.01 );
 				materialFolder.add( clothMaterial, 'sheenRoughness', 0.0, 1, 0.01 );
 				materialFolder.addColor( API, 'sheenColor' ).onChange( function ( color ) {
 
-		clothMaterial.sheenColor.setHex( color );
+					clothMaterial.sheenColor.setHex( color );
 
-	} );
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
