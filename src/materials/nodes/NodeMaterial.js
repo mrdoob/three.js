@@ -1071,7 +1071,7 @@ class NodeMaterial extends Material {
 
 			output.assign( outputNode );
 
-			outputNode = vec4( fogNode );
+			outputNode = vec4( fogNode.toVar() );
 
 		}
 

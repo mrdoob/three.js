@@ -196,7 +196,7 @@ class NodeBuilder {
 		/**
 		 * A reference to the current fog node.
 		 *
-		 * @type {?FogNode}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.fogNode = null;
@@ -258,6 +258,13 @@ class NodeBuilder {
 		 * @type {Object}
 		 */
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
+
+		/**
+		 * This dictionary holds the types of the builder.
+		 *
+		 * @type {Object}
+		 */
+		this.types = { vertex: [], fragment: [], compute: [], index: 0 };
 
 		/**
 		 * This dictionary holds the bindings for each shader stage.
@@ -827,6 +834,22 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns the native snippet for a ternary operation. E.g. GLSL would output
+	 * a ternary op as `cond ? x : y` whereas WGSL would output it as `select(y, x, cond)`
+	 *
+	 * @abstract
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( /* condSnippet, ifSnippet, elseSnippet*/ ) {
+
+		return null;
+
+	}
+
+	/**
 	 * Returns a node for the given hash, see {@link NodeBuilder#setHashNode}.
 	 *
 	 * @param {number} hash - The hash of the node.
@@ -1143,7 +1166,6 @@ class NodeBuilder {
 		return type + '( ' + snippets.join( ', ' ) + ' )';
 
 	}
-
 
 	/**
 	 * Generates the shader string for the given type and value.
@@ -1666,6 +1688,20 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns an instance of {@link StructType} for the given struct name and shader stage
+	 * or null if not found.
+	 *
+	 * @param {string} name - The name of the struct.
+	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
+	 * @return {?StructType} The struct type or null if not found.
+	 */
+	getStructTypeNode( name, shaderStage = this.shaderStage ) {
+
+		return this.types[ shaderStage ][ name ] || null;
+
+	}
+
+	/**
 	 * Returns an instance of {@link StructType} for the given output struct node.
 	 *
 	 * @param {OutputStructNode} node - The output struct node.
@@ -1689,6 +1725,7 @@ class NodeBuilder {
 			structType = new StructType( name, membersLayout );
 
 			this.structs[ shaderStage ].push( structType );
+			this.types[ shaderStage ][ name ] = node;
 
 			nodeData.structType = structType;
 
@@ -1748,23 +1785,6 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the array length.
-	 *
-	 * @param {Node} node - The node.
-	 * @return {?number} The array length.
-	 */
-	getArrayCount( node ) {
-
-		let count = null;
-
-		if ( node.isArrayNode ) count = node.count;
-		else if ( node.isVarNode && node.node.isArrayNode ) count = node.node.count;
-
-		return count;
-
-	}
-
-	/**
 	 * Returns an instance of {@link NodeVar} for the given variable node.
 	 *
 	 * @param {VarNode} node - The variable node.
@@ -1807,7 +1827,7 @@ class NodeBuilder {
 
 			//
 
-			const count = this.getArrayCount( node );
+			const count = node.getArrayCount( this );
 
 			nodeVar = new NodeVar( name, type, readOnly, count );
 
@@ -2230,6 +2250,28 @@ class NodeBuilder {
 		shaderNode.layout = layout;
 
 		return flowData;
+
+	}
+
+	/**
+	 * Executes the node in a specific build stage.
+	 *
+	 * @param {Node} node - The node to execute.
+	 * @param {string} buildStage - The build stage to execute the node in.
+	 * @param {Node|string|null} output - Expected output type. For example 'vec3'.
+	 * @return {Node|string|null} The result of the node build.
+	 */
+	flowBuildStage( node, buildStage, output = null ) {
+
+		const previousBuildStage = this.getBuildStage();
+
+		this.setBuildStage( buildStage );
+
+		const result = node.build( this, output );
+
+		this.setBuildStage( previousBuildStage );
+
+		return result;
 
 	}
 
@@ -2743,7 +2785,7 @@ class NodeBuilder {
 
 		}
 
-		// setup() -> stage 1: create possible new nodes and returns an output reference node
+		// setup() -> stage 1: create possible new nodes and/or return an output reference node
 		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
 		// generate()  -> stage 3: generate shader
 
@@ -2917,11 +2959,6 @@ class NodeBuilder {
 		return `// Three.js r${ REVISION } - Node System\n`;
 
 	}
-
-	/**
-	 * Prevents the node builder from being used as an iterable in TSL.Fn(), avoiding potential runtime errors.
-	 */
-	*[ Symbol.iterator ]() { }
 
 }
 

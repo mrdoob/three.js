@@ -56,7 +56,7 @@
 				materials.preload();
 
 				const objLoader = new OBJLoader().setPath( 'models/obj/male02/' );
-				objLoader.setMaterials( materials ); // optional since OBJ asstes can be loaded without an accompanying MTL file
+				objLoader.setMaterials( materials ); // optional since OBJ assets can be loaded without an accompanying MTL file
 
 				const object = await objLoader.loadAsync( 'male02.obj' );
 

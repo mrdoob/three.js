@@ -54,6 +54,25 @@ class StorageTexture extends Texture {
 
 	}
 
+	/**
+	 * Sets the size of the storage texture.
+	 *
+	 * @param {number} width - The new width of the storage texture.
+	 * @param {number} height - The new height of the storage texture.
+	 */
+	setSize( width, height ) {
+
+		if ( this.image.width !== width || this.image.height !== height ) {
+
+			this.image.width = width;
+			this.image.height = height;
+
+			this.dispose();
+
+		}
+
+	}
+
 }
 
 export default StorageTexture;

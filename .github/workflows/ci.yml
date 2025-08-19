@@ -12,15 +12,15 @@ permissions:
 
 jobs:
   test:
-    name: Lint, Unit, Circular dependencies & Examples testing
+    name: Lint, Unit, Unit addons, Circular dependencies & Examples testing
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - name: Install Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
@@ -30,6 +30,9 @@ jobs:
 
       - name: === Unit testing ===
         run: npm run test-unit
+
+      - name: === Unit addons testing ===
+        run: npm run test-unit-addons
 
       - name: === Circular dependencies testing ===
         run: npm run test-circular-deps
@@ -50,11 +53,11 @@ jobs:
       CI: ${{ matrix.CI }}
     steps:
       - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - name: Install Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
       - name: Install dependencies
         run: npm ci

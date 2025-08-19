@@ -41,7 +41,8 @@ class FileLoader extends Loader {
 		super( manager );
 
 		/**
-		 * The expected mime type.
+		 * The expected mime type. Valid values can be found
+		 * [here]{@link hhttps://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype}
 		 *
 		 * @type {string}
 		 */

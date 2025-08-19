@@ -712,7 +712,7 @@ class WebGPUPipelineUtils {
 	 *
 	 * @private
 	 * @param {Material} material - The material.
-	 * @return {string} The GPU color write mask.
+	 * @return {number} The GPU color write mask.
 	 */
 	_getColorWriteMask( material ) {
 

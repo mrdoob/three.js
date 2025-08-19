@@ -73,7 +73,7 @@ class ConditionalNode extends Node {
 
 			// fallback setup
 
-			this.setup( builder );
+			builder.flowBuildStage( this, 'setup' );
 
 			return this.getNodeType( builder );
 
@@ -112,10 +112,12 @@ class ConditionalNode extends Node {
 
 		//
 
+		const isUniformFlow = builder.context.uniformFlow;
+
 		const properties = builder.getNodeProperties( this );
 		properties.condNode = condNode;
-		properties.ifNode = ifNode.context( { nodeBlock: ifNode } );
-		properties.elseNode = elseNode ? elseNode.context( { nodeBlock: elseNode } ) : null;
+		properties.ifNode = isUniformFlow ? ifNode : ifNode.context( { nodeBlock: ifNode } );
+		properties.elseNode = elseNode ? ( isUniformFlow ? elseNode : elseNode.context( { nodeBlock: elseNode } ) ) : null;
 
 	}
 
@@ -140,6 +142,20 @@ class ConditionalNode extends Node {
 		nodeData.nodeProperty = nodeProperty;
 
 		const nodeSnippet = condNode.build( builder, 'bool' );
+		const isUniformFlow = builder.context.uniformFlow;
+
+		if ( isUniformFlow && elseNode !== null ) {
+
+			const ifSnippet = ifNode.build( builder, type );
+			const elseSnippet = elseNode.build( builder, type );
+
+			const mathSnippet = builder.getTernary( nodeSnippet, ifSnippet, elseSnippet );
+
+			// TODO: If node property already exists return something else
+
+			return builder.format( mathSnippet, type, output );
+
+		}
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 

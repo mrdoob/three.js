@@ -25,8 +25,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { Fn, vec4, fract, abs, uniform, pow, color, max, length, rangeFogFactor, sub, reflector, normalWorld, hue, time, mix, positionWorld } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { Fn, vec4, fract, sample, abs, uniform, pow, color, max, length, rangeFogFactor, sub, reflector, normalWorld, hue, time, mix, positionWorld } from 'three/tsl';
 
 			import { hashBlur } from 'three/addons/tsl/display/hashBlur.js';
 
@@ -138,20 +138,30 @@
 					const radiusRange = mix( 0.01, 0.1, radius ); // range [ 0.01, 0.1 ]
 					const roughnessRange = mix( 0.3, 0.03, roughness ); // range [ 0.03, 0.3 ]
 
+					// mask the sample
+
+					const maskReflection = sample( ( uv ) => {
+
+						const sample = reflection.sample( uv );
+						const mask = reflectionDepth.sample( uv );
+
+						return vec4( sample.rgb, sample.a.mul( mask.r ) );
+
+					}, reflection.uvNode );
+
 					// blur the reflection
 
-					const reflectionBlurred = hashBlur( reflection, radiusRange, {
+					const reflectionBlurred = hashBlur( maskReflection, radiusRange, {
 						repeats: 40,
-						mask: reflectionDepth,
 						premultipliedAlpha: true
 					} );
 
 					// reflection composite
 
 					const reflectionMask = reflectionBlurred.a.mul( reflectionDepth ).remapClamp( 0, roughnessRange );
-					const reflectionItensity = .1;
+					const reflectionIntensity = .1;
 					const reflectionMixFactor = reflectionMask.mul( roughness.mul( 2 ).min( 1 ) );
-					const reflectionFinal = mix( reflection.rgb, reflectionBlurred.rgb, reflectionMixFactor ).mul( reflectionItensity );
+					const reflectionFinal = mix( reflection.rgb, reflectionBlurred.rgb, reflectionMixFactor ).mul( reflectionIntensity );
 
 					// mix reflection with animated circle
 

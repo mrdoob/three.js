@@ -801,8 +801,19 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	getNodeAccess( node, shaderStage ) {
 
-		if ( shaderStage !== 'compute' )
+		if ( shaderStage !== 'compute' ) {
+
+			if ( node.isAtomic === true ) {
+
+				console.warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+
+				return NodeAccess.READ_WRITE;
+
+			}
+
 			return NodeAccess.READ_ONLY;
+
+		}
 
 		return node.access;
 
@@ -1887,6 +1898,21 @@ ${ flowData.code }
 		return wgslMethod || method;
 
 	}
+
+	/**
+	 * Returns the native snippet for a ternary operation.
+	 *
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( condSnippet, ifSnippet, elseSnippet ) {
+
+		return `select( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
+
+	}
+
 
 	/**
 	 * Returns the WGSL type of the given node data type.

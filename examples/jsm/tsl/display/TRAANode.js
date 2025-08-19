@@ -14,7 +14,7 @@ let _rendererState;
  * - {@link https://alextardif.com/TAA.html}
  * - {@link https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/}
  *
- * @augments PassNode
+ * @augments TempNode
  * @three_import import { traa } from 'three/addons/tsl/display/TRAANode.js';
  */
 class TRAANode extends TempNode {
@@ -79,7 +79,7 @@ class TRAANode extends TempNode {
 		/**
 		 *  The camera the scene is rendered with.
 		 *
-		 * @type {TextureNode}
+		 * @type {Camera}
 		 */
 		this.camera = camera;
 
@@ -456,6 +456,6 @@ const _JitterVectors = [
  * @param {TextureNode} depthNode - A node that represents the scene's depth.
  * @param {TextureNode} velocityNode - A node that represents the scene's velocity.
  * @param {Camera} camera - The camera the scene is rendered with.
- * @returns {TRAAPassNode}
+ * @returns {TRAANode}
  */
 export const traa = ( beautyNode, depthNode, velocityNode, camera ) => nodeObject( new TRAANode( convertToTexture( beautyNode ), depthNode, velocityNode, camera ) );

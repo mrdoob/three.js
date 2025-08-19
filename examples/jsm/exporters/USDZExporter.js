@@ -196,11 +196,14 @@ class USDZExporter {
 					planeAnchoring: { alignment: 'horizontal' },
 				},
 				includeAnchoringProperties: true,
+				onlyVisible: true,
 				quickLookCompatible: false,
 				maxTextureSize: 1024,
 			},
 			options
 		);
+
+		const usedNames = new Set();
 
 		const files = {};
 		const modelFileName = 'model.usda';
@@ -238,54 +241,7 @@ class USDZExporter {
 		const materials = {};
 		const textures = {};
 
-		scene.traverseVisible( ( object ) => {
-
-			if ( object.isMesh ) {
-
-				const geometry = object.geometry;
-				const material = object.material;
-
-				if ( material.isMeshStandardMaterial ) {
-
-					const geometryFileName =
-						'geometries/Geometry_' + geometry.id + '.usda';
-
-					if ( ! ( geometryFileName in files ) ) {
-
-						const meshObject = buildMeshObject( geometry );
-						files[ geometryFileName ] = strToU8(
-							buildHeader() + '\n' + meshObject.toString()
-						);
-
-					}
-
-					if ( ! ( material.uuid in materials ) ) {
-
-						materials[ material.uuid ] = material;
-
-					}
-
-					const node = buildXform( object, geometry, materials[ material.uuid ] );
-					sceneNode.addChild( node );
-
-				} else {
-
-					console.warn(
-						'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)',
-						object
-					);
-
-				}
-
-			} else if ( object.isCamera ) {
-
-				const cameraNode = buildCamera( object );
-
-				sceneNode.addChild( cameraNode );
-
-			}
-
-		} );
+		buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
 
 		const materialsNode = buildMaterials(
 			materials,
@@ -371,6 +327,42 @@ class USDZExporter {
 
 }
 
+function getName( object, namesSet ) {
+
+	let name = object.name;
+	name = name.replace( /[^A-Za-z0-9_]/g, '' );
+	if ( /^[0-9]/.test( name ) ) {
+
+		name = '_' + name;
+
+	}
+
+	if ( name === '' ) {
+
+		if ( object.isCamera ) {
+
+			name = 'Camera';
+
+		} else {
+
+			name = 'Object';
+
+		}
+
+	}
+
+	if ( namesSet.has( name ) ) {
+
+		name = name + '_' + object.id;
+
+	}
+
+	namesSet.add( name );
+
+	return name;
+
+}
+
 function imageToCanvas( image, flipY, maxTextureSize ) {
 
 	if (
@@ -435,12 +427,83 @@ function buildHeader() {
 
 // Xform
 
-function buildXform( object, geometry, material ) {
+function buildHierarchy( object, parentNode, materials, usedNames, files, options ) {
 
-	const name = 'Object_' + object.id;
-	const transform = buildMatrix( object.matrixWorld );
+	for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-	if ( object.matrixWorld.determinant() < 0 ) {
+		const child = object.children[ i ];
+
+		if ( child.visible === false && options.onlyVisible === true ) continue;
+
+		let childNode;
+
+		if ( child.isMesh ) {
+
+			const geometry = child.geometry;
+			const material = child.material;
+
+			if ( material.isMeshStandardMaterial ) {
+
+				const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
+
+				if ( ! ( geometryFileName in files ) ) {
+
+					const meshObject = buildMeshObject( geometry );
+					files[ geometryFileName ] = strToU8(
+						buildHeader() + '\n' + meshObject.toString()
+					);
+
+				}
+
+				if ( ! ( material.uuid in materials ) ) {
+
+					materials[ material.uuid ] = material;
+
+				}
+
+				childNode = buildMesh(
+					child,
+					geometry,
+					materials[ material.uuid ],
+					usedNames
+				);
+
+			} else {
+
+				console.warn(
+					'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)',
+					child
+				);
+
+			}
+
+		} else if ( child.isCamera ) {
+
+			childNode = buildCamera( child, usedNames );
+
+		} else {
+
+			childNode = buildXform( child, usedNames );
+
+		}
+
+		if ( childNode ) {
+
+			parentNode.addChild( childNode );
+			buildHierarchy( child, childNode, materials, usedNames, files, options );
+
+		}
+
+	}
+
+}
+
+function buildXform( object, usedNames ) {
+
+	const name = getName( object, usedNames );
+	const transform = buildMatrix( object.matrix );
+
+	if ( object.matrix.determinant() < 0 ) {
 
 		console.warn(
 			'THREE.USDZExporter: USDZ does not support negative scales',
@@ -451,14 +514,22 @@ function buildXform( object, geometry, material ) {
 
 	const node = new USDNode( name, 'Xform' );
 
+	node.addProperty( `matrix4d xformOp:transform = ${transform}` );
+	node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:transform"]' );
+
+	return node;
+
+}
+
+function buildMesh( object, geometry, material, usedNames ) {
+
+	const node = buildXform( object, usedNames );
+
 	node.addMetadata(
 		'prepend references',
 		`@./geometries/Geometry_${geometry.id}.usda@</Geometry>`
 	);
 	node.addMetadata( 'prepend apiSchemas', '["MaterialBindingAPI"]' );
-
-	node.addProperty( `matrix4d xformOp:transform = ${transform}` );
-	node.addProperty( 'uniform token[] xformOpOrder = ["xformOp:transform"]' );
 
 	node.addProperty(
 		`rel material:binding = </Materials/Material_${material.id}>`
@@ -836,7 +907,6 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	// Handle emissive
 	if ( material.emissiveMap !== null ) {
 
 		previewSurfaceNode.addProperty(
@@ -863,7 +933,6 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	// Handle normal
 	if ( material.normalMap !== null ) {
 
 		previewSurfaceNode.addProperty(
@@ -875,7 +944,6 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	// Handle ambient occlusion
 	if ( material.aoMap !== null ) {
 
 		previewSurfaceNode.addProperty(
@@ -1055,13 +1123,13 @@ function buildVector2( vector ) {
 
 }
 
-function buildCamera( camera ) {
+function buildCamera( camera, usedNames ) {
 
-	const name = camera.name ? camera.name : 'Camera_' + camera.id;
+	const name = getName( camera, usedNames );
 
-	const transform = buildMatrix( camera.matrixWorld );
+	const transform = buildMatrix( camera.matrix );
 
-	if ( camera.matrixWorld.determinant() < 0 ) {
+	if ( camera.matrix.determinant() < 0 ) {
 
 		console.warn(
 			'THREE.USDZExporter: USDZ does not support negative scales',
@@ -1136,6 +1204,7 @@ function buildCamera( camera ) {
  * @typedef {Object} USDZExporter~Options
  * @property {number} [maxTextureSize=1024] - The maximum texture size that is going to be exported.
  * @property {boolean} [includeAnchoringProperties=true] - Whether to include anchoring properties or not.
+ * @property {boolean} [onlyVisible=true] - Export only visible 3D objects.
  * @property {Object} [ar] - If `includeAnchoringProperties` is set to `true`, the anchoring type and alignment
  * can be configured via `ar.anchoring.type` and `ar.planeAnchoring.alignment`.
  * @property {boolean} [quickLookCompatible=false] - Whether to make the exported USDZ compatible to QuickLook

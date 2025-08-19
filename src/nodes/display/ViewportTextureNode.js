@@ -80,27 +80,49 @@ class ViewportTextureNode extends TextureNode {
 		this.isOutputTextureNode = true;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node renders the
-		 * scene once per render in its {@link ViewportTextureNode#updateBefore} method.
+		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders the
+		 * scene once per frame in its {@link ViewportTextureNode#updateBefore} method.
 		 *
 		 * @type {string}
 		 * @default 'frame'
 		 */
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
 		 * The framebuffer texture for the current renderer context.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<RenderTarget, FramebufferTexture>}
 		 * @private
 		 */
-		this._textures = new WeakMap();
+		this._cacheTextures = new WeakMap();
 
 	}
 
-	getFrameBufferTexture( reference = null ) {
+	/**
+	 * This methods returns a texture for the given render target reference.
+	 *
+	 * To avoid rendering errors, `ViewportTextureNode` must use unique framebuffer textures
+	 * for different render contexts.
+	 *
+	 * @param {?RenderTarget} [reference=null] - The render target reference.
+	 * @return {Texture} The framebuffer texture.
+	 */
+	getTextureForReference( reference = null ) {
 
-		const defaultFramebuffer = this.referenceNode ? this.referenceNode.defaultFramebuffer : this.defaultFramebuffer;
+		let defaultFramebuffer;
+		let cacheTextures;
+
+		if ( this.referenceNode ) {
+
+			defaultFramebuffer = this.referenceNode.defaultFramebuffer;
+			cacheTextures = this.referenceNode._cacheTextures;
+
+		} else {
+
+			defaultFramebuffer = this.defaultFramebuffer;
+			cacheTextures = this._cacheTextures;
+
+		}
 
 		if ( reference === null ) {
 
@@ -108,15 +130,25 @@ class ViewportTextureNode extends TextureNode {
 
 		}
 
-		if ( this._textures.has( reference ) === false ) {
+		if ( cacheTextures.has( reference ) === false ) {
 
 			const framebufferTexture = defaultFramebuffer.clone();
 
-			this._textures.set( reference, framebufferTexture );
+			cacheTextures.set( reference, framebufferTexture );
 
 		}
 
-		return this._textures.get( reference );
+		return cacheTextures.get( reference );
+
+	}
+
+	updateReference( frame ) {
+
+		const renderTarget = frame.renderer.getRenderTarget();
+
+		this.value = this.getTextureForReference( renderTarget );
+
+		return this.value;
 
 	}
 
@@ -137,7 +169,7 @@ class ViewportTextureNode extends TextureNode {
 
 		//
 
-		const framebufferTexture = this.getFrameBufferTexture( renderTarget );
+		const framebufferTexture = this.getTextureForReference( renderTarget );
 
 		if ( framebufferTexture.image.width !== _size.width || framebufferTexture.image.height !== _size.height ) {
 
@@ -155,8 +187,6 @@ class ViewportTextureNode extends TextureNode {
 		renderer.copyFramebufferToTexture( framebufferTexture );
 
 		framebufferTexture.generateMipmaps = currentGenerateMipmaps;
-
-		this.value = framebufferTexture;
 
 	}
 

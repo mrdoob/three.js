@@ -43,6 +43,7 @@ export * from './utils/ReflectorNode.js';
 export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
 export * from './utils/SampleNode.js';
+export * from './utils/EventNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';
@@ -128,6 +129,7 @@ export * from './gpgpu/ComputeBuiltinNode.js';
 export * from './gpgpu/BarrierNode.js';
 export * from './gpgpu/WorkgroupInfoNode.js';
 export * from './gpgpu/AtomicFunctionNode.js';
+export * from './gpgpu/SubgroupFunctionNode.js';
 
 // lighting
 export * from './accessors/Lights.js';

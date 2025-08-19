@@ -282,17 +282,17 @@ async function RapierPhysics() {
 	function addHeightfield( mesh, width, depth, heights, scale ) {
 
 		const shape = RAPIER.ColliderDesc.heightfield( width, depth, heights, scale );
-		
+
 		const bodyDesc = RAPIER.RigidBodyDesc.fixed();
 		bodyDesc.setTranslation( mesh.position.x, mesh.position.y, mesh.position.z );
 		bodyDesc.setRotation( mesh.quaternion );
-		
+
 		const body = world.createRigidBody( bodyDesc );
 		world.createCollider( shape, body );
-		
+
 		if ( ! mesh.userData.physics ) mesh.userData.physics = {};
 		mesh.userData.physics.body = body;
-		
+
 		return body;
 
 	}

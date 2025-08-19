@@ -22,7 +22,7 @@ const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
  */
 export const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
 
-	let basic = texture( depthTexture, shadowCoord.xy ).label( 't_basic' );
+	let basic = texture( depthTexture, shadowCoord.xy ).setName( 't_basic' );
 
 	if ( depthTexture.isArrayTexture ) {
 

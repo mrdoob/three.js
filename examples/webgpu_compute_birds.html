@@ -36,7 +36,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -210,9 +210,9 @@
 				// Labels applied to storage nodes and uniform nodes are reflected within the shader output,
 				// and are useful for debugging purposes.
 
-				const positionStorage = instancedArray( positionArray, 'vec3' ).label( 'positionStorage' );
-				const velocityStorage = instancedArray( velocityArray, 'vec3' ).label( 'velocityStorage' );
-				const phaseStorage = instancedArray( phaseArray, 'float' ).label( 'phaseStorage' );
+				const positionStorage = instancedArray( positionArray, 'vec3' ).setName( 'positionStorage' );
+				const velocityStorage = instancedArray( velocityArray, 'vec3' ).setName( 'velocityStorage' );
+				const phaseStorage = instancedArray( phaseArray, 'float' ).setName( 'phaseStorage' );
 
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data in the WebGL2 fallback.
 
@@ -223,14 +223,14 @@
 				// Define Uniforms. Uniforms only need to be defined once rather than per shader.
 
 				effectController = {
-					separation: uniform( 15.0 ).label( 'separation' ),
-					alignment: uniform( 20.0 ).label( 'alignment' ),
-					cohesion: uniform( 20.0 ).label( 'cohesion' ),
-					freedom: uniform( 0.75 ).label( 'freedom' ),
+					separation: uniform( 15.0 ).setName( 'separation' ),
+					alignment: uniform( 20.0 ).setName( 'alignment' ),
+					cohesion: uniform( 20.0 ).setName( 'cohesion' ),
+					freedom: uniform( 0.75 ).setName( 'freedom' ),
 					now: uniform( 0.0 ),
-					deltaTime: uniform( 0.0 ).label( 'deltaTime' ),
-					rayOrigin: uniform( new THREE.Vector3() ).label( 'rayOrigin' ),
-					rayDirection: uniform( new THREE.Vector3() ).label( 'rayDirection' )
+					deltaTime: uniform( 0.0 ).setName( 'deltaTime' ),
+					rayOrigin: uniform( new THREE.Vector3() ).setName( 'rayOrigin' ),
+					rayDirection: uniform( new THREE.Vector3() ).setName( 'rayDirection' )
 				};
 
 				// Create geometry

@@ -21,10 +21,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { normalWorldGeometry, uniform, normalView, positionViewDirection, cameraViewMatrix, pmremTexture } from 'three/tsl';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -61,7 +61,7 @@
 				controls.maxDistance = 10;
 				controls.update();
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( map ) {
 

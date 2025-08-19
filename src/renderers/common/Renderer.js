@@ -21,13 +21,14 @@ import XRManager from './XRManager.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Scene } from '../../scenes/Scene.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 import { Frustum } from '../../math/Frustum.js';
 import { FrustumArray } from '../../math/FrustumArray.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
 
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 
@@ -1210,7 +1211,7 @@ class Renderer {
 		const { currentToneMapping, currentColorSpace } = this;
 
 		const useToneMapping = currentToneMapping !== NoToneMapping;
-		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace;
+		const useColorSpace = currentColorSpace !== ColorManagement.workingColorSpace;
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
@@ -1226,7 +1227,7 @@ class Renderer {
 				stencilBuffer: stencil,
 				type: this._colorBufferType,
 				format: RGBAFormat,
-				colorSpace: LinearSRGBColorSpace,
+				colorSpace: ColorManagement.workingColorSpace,
 				generateMipmaps: false,
 				minFilter: LinearFilter,
 				magFilter: LinearFilter,
@@ -1412,7 +1413,7 @@ class Renderer {
 		if ( ! camera.isArrayCamera ) {
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
+			frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 		}
 
@@ -2130,8 +2131,8 @@ class Renderer {
 	}
 
 	/**
-	 * The current output tone mapping of the renderer. When a render target is set,
-	 * the output tone mapping is always `NoToneMapping`.
+	 * The current tone mapping of the renderer. When not producing screen output,
+	 * the tone mapping is always `NoToneMapping`.
 	 *
 	 * @type {number}
 	 */
@@ -2142,14 +2143,14 @@ class Renderer {
 	}
 
 	/**
-	 * The current output color space of the renderer. When a render target is set,
-	 * the output color space is always `LinearSRGBColorSpace`.
+	 * The current color space of the renderer. When not producing screen output,
+	 * the color space is always the working color space.
 	 *
 	 * @type {string}
 	 */
 	get currentColorSpace() {
 
-		return this.isOutputTarget ? this.outputColorSpace : LinearSRGBColorSpace;
+		return this.isOutputTarget ? this.outputColorSpace : ColorManagement.workingColorSpace;
 
 	}
 
@@ -2170,25 +2171,29 @@ class Renderer {
 	 */
 	dispose() {
 
-		this.info.dispose();
-		this.backend.dispose();
+		if ( this._initialized === true ) {
 
-		this._animation.dispose();
-		this._objects.dispose();
-		this._pipelines.dispose();
-		this._nodes.dispose();
-		this._bindings.dispose();
-		this._renderLists.dispose();
-		this._renderContexts.dispose();
-		this._textures.dispose();
+			this.info.dispose();
+			this.backend.dispose();
 
-		if ( this._frameBufferTarget !== null ) this._frameBufferTarget.dispose();
+			this._animation.dispose();
+			this._objects.dispose();
+			this._pipelines.dispose();
+			this._nodes.dispose();
+			this._bindings.dispose();
+			this._renderLists.dispose();
+			this._renderContexts.dispose();
+			this._textures.dispose();
 
-		Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
+			if ( this._frameBufferTarget !== null ) this._frameBufferTarget.dispose();
 
-			if ( queryPool !== null ) queryPool.dispose();
+			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
 
-		} );
+				if ( queryPool !== null ) queryPool.dispose();
+
+			} );
+
+		}
 
 		this.setRenderTarget( null );
 		this.setAnimationLoop( null );
@@ -2963,7 +2968,7 @@ class Renderer {
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
+	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 */
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
@@ -3018,7 +3023,7 @@ class Renderer {
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
+	 * @param {string} [passId] - An optional ID for identifying the pass.
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 

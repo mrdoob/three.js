@@ -548,9 +548,21 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.uvNode = nodeObject( uvNode );
-		textureNode.referenceNode = this.getSelf();
+		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
+
+	}
+
+	/**
+	 * TSL function for creating a texture node that fetches/loads texels without interpolation.
+	 *
+	 * @param {Node<uvec2>} uvNode - The uv node.
+	 * @returns {TextureNode} A texture node representing the texture load.
+	 */
+	load( uvNode ) {
+
+		return this.sample( uvNode ).setSampler( false );
 
 	}
 
@@ -564,7 +576,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.biasNode = nodeObject( amountNode ).mul( maxMipLevel( textureNode ) );
-		textureNode.referenceNode = this.getSelf();
+		textureNode.referenceNode = this.getBase();
 
 		const map = textureNode.value;
 
@@ -590,7 +602,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.levelNode = nodeObject( levelNode );
-		textureNode.referenceNode = this.getSelf();
+		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
 
@@ -618,9 +630,19 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.biasNode = nodeObject( biasNode );
-		textureNode.referenceNode = this.getSelf();
+		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
+
+	}
+
+	/**
+	 * Returns the base texture of this node.
+	 * @return {TextureNode} The base texture node.
+	 */
+	getBase() {
+
+		return this.referenceNode ? this.referenceNode.getBase() : this.getSelf();
 
 	}
 
@@ -634,7 +656,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.compareNode = nodeObject( compareNode );
-		textureNode.referenceNode = this.getSelf();
+		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
 
@@ -651,7 +673,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.gradNode = [ nodeObject( gradNodeX ), nodeObject( gradNodeY ) ];
-		textureNode.referenceNode = this.getSelf();
+		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
 
@@ -667,7 +689,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.depthNode = nodeObject( depthNode );
-		textureNode.referenceNode = this.getSelf();
+		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
 
@@ -767,7 +789,7 @@ export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, 
 	if ( value && value.isTextureNode === true ) {
 
 		textureNode = nodeObject( value.clone() );
-		textureNode.referenceNode = value.getSelf(); // Ensure the reference is set to the original node
+		textureNode.referenceNode = value.getBase(); // Ensure the reference is set to the original node
 
 		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
 		if ( levelNode !== null ) textureNode.levelNode = nodeObject( levelNode );

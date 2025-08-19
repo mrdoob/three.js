@@ -84,7 +84,17 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		// Set GL state for depth map.
 		_state.setBlending( NoBlending );
-		_state.buffers.color.setClear( 1, 1, 1, 1 );
+
+		if ( _state.buffers.depth.getReversed() === true ) {
+
+			_state.buffers.color.setClear( 0, 0, 0, 0 );
+
+		} else {
+
+			_state.buffers.color.setClear( 1, 1, 1, 1 );
+
+		}
+
 		_state.buffers.depth.setTest( true );
 		_state.setScissorTest( false );
 
@@ -149,17 +159,6 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 				shadow.map.texture.name = light.name + '.shadowMap';
-
-				// @deprecated, r179
-				if ( capabilities.reversedDepthBuffer === true && camera.reversedDepth === false ) {
-
-					shadow.camera.reversedDepth = true;
-
-				} else {
-
-					shadow.camera.reversedDepth = camera.reversedDepth;
-
-				}
 
 				shadow.camera.updateProjectionMatrix();
 

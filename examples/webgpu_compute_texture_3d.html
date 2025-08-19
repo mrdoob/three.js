@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { time, mx_noise_vec3, instanceIndex, textureStore, float, vec3, vec4, If, Break, Fn, smoothstep, texture3D, uniform } from 'three/tsl';
 
 			import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
@@ -110,7 +110,7 @@
 				storageTexture.generateMipmaps = false;
 				storageTexture.name = 'cloud';
 			
-				computeNode = computeCloud( { storageTexture } ).compute( size * size * size ).label( 'computeCloud' );
+				computeNode = computeCloud( { storageTexture } ).compute( size * size * size ).setName( 'computeCloud' );
 
 				// Shader
 

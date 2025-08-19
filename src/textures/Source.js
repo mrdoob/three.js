@@ -83,7 +83,7 @@ class Source {
 
 		const data = this.data;
 
-		if ( data instanceof HTMLVideoElement ) {
+		if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( data instanceof HTMLVideoElement ) ) {
 
 			target.set( data.videoWidth, data.videoHeight, 0 );
 

@@ -635,6 +635,32 @@ class PassNode extends TempNode {
 
 	}
 
+	/**
+	 * Precompiles the pass.
+	 *
+	 * Note that this method must be called after the pass configuartion is complete.
+	 * So calls like `setMRT()` and `getTextureNode()` must proceed the precompilation.
+	 *
+	 * @async
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the compile has been finished.
+	 * @see {@link Renderer#compileAsync}
+	 */
+	async compileAsync( renderer ) {
+
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
+
+		renderer.setRenderTarget( this.renderTarget );
+		renderer.setMRT( this._mrt );
+
+		await renderer.compileAsync( this.scene, this.camera );
+
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
+
+	}
+
 	setup( { renderer } ) {
 
 		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;

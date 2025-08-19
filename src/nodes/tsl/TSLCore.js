@@ -61,6 +61,10 @@ const shaderNodeHandler = {
 
 				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
 
+			} else if ( prop === 'toVarIntent' ) {
+
+				return () => nodeObj;
+
 			} else if ( prop === 'self' ) {
 
 				return node;
@@ -211,7 +215,28 @@ const ShaderNodeArray = function ( array, altType = null ) {
 
 const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, settings = null ) {
 
-	const assignNode = ( node ) => nodeObject( settings !== null ? Object.assign( node, settings ) : node );
+	function assignNode( node ) {
+
+		if ( settings !== null ) {
+
+			node = nodeObject( Object.assign( node, settings ) );
+
+			if ( settings.intent === true ) {
+
+				node = node.toVarIntent();
+
+			}
+
+		} else {
+
+			node = nodeObject( node );
+
+		}
+
+		return node;
+
+
+	}
 
 	let fn, name = scope, minParams, maxParams;
 
@@ -297,12 +322,12 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 class ShaderCallNodeInternal extends Node {
 
-	constructor( shaderNode, inputNodes ) {
+	constructor( shaderNode, rawInputs ) {
 
 		super();
 
 		this.shaderNode = shaderNode;
-		this.inputNodes = inputNodes;
+		this.rawInputs = rawInputs;
 
 		this.isShaderCallNodeInternal = true;
 
@@ -322,7 +347,7 @@ class ShaderCallNodeInternal extends Node {
 
 	call( builder ) {
 
-		const { shaderNode, inputNodes } = this;
+		const { shaderNode, rawInputs } = this;
 
 		const properties = builder.getNodeProperties( shaderNode );
 
@@ -367,12 +392,48 @@ class ShaderCallNodeInternal extends Node {
 
 			builder.addInclude( functionNode );
 
-			result = nodeObject( functionNode.call( inputNodes ) );
+			//
+
+			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
+
+			result = nodeObject( functionNode.call( inputs ) );
 
 		} else {
 
+			const secureNodeBuilder = new Proxy( builder, {
+
+				get: ( target, property, receiver ) => {
+
+					let value;
+
+					if ( Symbol.iterator === property ) {
+
+						value = function* () {
+
+							yield undefined;
+
+						};
+
+					} else {
+
+						value = Reflect.get( target, property, receiver );
+
+					}
+
+					return value;
+
+				}
+
+			} );
+
+			//
+
+			const inputs = rawInputs ? getProxyParameters( rawInputs ) : null;
+
+			const hasParameters = Array.isArray( rawInputs ) ? rawInputs.length > 0 : rawInputs !== null;
+
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputNodes !== null || jsFunc.length > 1 ? jsFunc( inputNodes || [], builder ) : jsFunc( builder );
+			const outputNode = hasParameters || jsFunc.length > 1 ? jsFunc( inputs, secureNodeBuilder ) : jsFunc( secureNodeBuilder );
 
 			result = nodeObject( outputNode );
 
@@ -475,6 +536,110 @@ class ShaderCallNodeInternal extends Node {
 
 }
 
+function getLayoutParameters( params ) {
+
+	let output;
+
+	nodeObjects( params );
+
+	const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+	if ( isArrayAsParameter ) {
+
+		output = [ ...params ];
+
+	} else {
+
+		output = params[ 0 ];
+
+	}
+
+	return output;
+
+}
+
+function getProxyParameters( params ) {
+
+	let index = 0;
+
+	nodeObjects( params );
+
+	return new Proxy( params, {
+
+		get: ( target, property, receiver ) => {
+
+			let value;
+
+			if ( property === 'length' ) {
+
+				value = params.length;
+
+				return value;
+
+			}
+
+			if ( Symbol.iterator === property ) {
+
+				value = function* () {
+
+					for ( const inputNode of params ) {
+
+						yield nodeObject( inputNode );
+
+					}
+
+				};
+
+			} else {
+
+				if ( params.length > 0 ) {
+
+					if ( Object.getPrototypeOf( params[ 0 ] ) === Object.prototype ) {
+
+						const objectTarget = params[ 0 ];
+
+						if ( objectTarget[ property ] === undefined ) {
+
+							value = objectTarget[ index ++ ];
+
+						} else {
+
+							value = Reflect.get( objectTarget, property, receiver );
+
+						}
+
+					} else if ( params[ 0 ] instanceof Node ) {
+
+						if ( params[ property ] === undefined ) {
+
+							value = params[ index ++ ];
+
+						} else {
+
+							value = Reflect.get( params, property, receiver );
+
+						}
+
+					}
+
+				} else {
+
+					value = Reflect.get( target, property, receiver );
+
+				}
+
+				value = nodeObject( value );
+
+			}
+
+			return value;
+
+		}
+
+	} );
+
+}
+
 class ShaderNodeInternal extends Node {
 
 	constructor( jsFunc, nodeType ) {
@@ -498,11 +663,9 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	call( inputs = null ) {
+	call( rawInputs = null ) {
 
-		nodeObjects( inputs );
-
-		return nodeObject( new ShaderCallNodeInternal( this, inputs ) );
+		return nodeObject( new ShaderCallNodeInternal( this, rawInputs ) );
 
 	}
 
@@ -558,7 +721,25 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
-		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => typeof param !== 'object' ) ) ) {
+		for ( const param of params ) {
+
+			if ( param === undefined ) {
+
+				console.error( `THREE.TSL: Invalid parameter for the type "${ type }".` );
+
+				return nodeObject( new ConstNode( 0, type ) );
+
+			}
+
+		}
+
+		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => {
+
+			const paramType = typeof param;
+
+			return paramType !== 'object' && paramType !== 'function';
+
+		} ) ) ) {
 
 			params = [ getValueFromType( type, ...params ) ];
 
@@ -566,20 +747,20 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-			return nodeObject( cacheMap.get( params[ 0 ] ) );
+			return nodeObjectIntent( cacheMap.get( params[ 0 ] ) );
 
 		}
 
 		if ( params.length === 1 ) {
 
 			const node = getConstNode( params[ 0 ], type );
-			if ( node.nodeType === type ) return nodeObject( node );
-			return nodeObject( new ConvertNode( node, type ) );
+			if ( node.nodeType === type ) return nodeObjectIntent( node );
+			return nodeObjectIntent( new ConvertNode( node, type ) );
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return nodeObject( new JoinNode( nodes, type ) );
+		return nodeObjectIntent( new JoinNode( nodes, type ) );
 
 	};
 
@@ -602,95 +783,62 @@ export function ShaderNode( jsFunc, nodeType ) {
 }
 
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
+export const nodeObjectIntent = ( val, altType = null ) => /* new */ nodeObject( val, altType ).toVarIntent();
 export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
-export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
-export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
+export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
+export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
+export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { intent: true, ...settings } );
 
 let fnId = 0;
 
-export const Fn = ( jsFunc, layout = null ) => {
+class FnNode extends Node {
 
-	let nodeType = null;
+	constructor( jsFunc, layout = null ) {
 
-	if ( layout !== null ) {
+		super();
 
-		if ( typeof layout === 'object' ) {
+		let nodeType = null;
 
-			nodeType = layout.return;
+		if ( layout !== null ) {
 
-		} else {
+			if ( typeof layout === 'object' ) {
 
-			if ( typeof layout === 'string' ) {
-
-				nodeType = layout;
+				nodeType = layout.return;
 
 			} else {
 
-				console.error( 'THREE.TSL: Invalid layout type.' );
+				if ( typeof layout === 'string' ) {
+
+					nodeType = layout;
+
+				} else {
+
+					console.error( 'THREE.TSL: Invalid layout type.' );
+
+				}
+
+				layout = null;
 
 			}
 
-			layout = null;
+		}
+
+		this.shaderNode = new ShaderNode( jsFunc, nodeType );
+
+		if ( layout !== null ) {
+
+			this.setLayout( layout );
 
 		}
+
+		this.isFn = true;
 
 	}
 
-	const shaderNode = new ShaderNode( jsFunc, nodeType );
+	setLayout( layout ) {
 
-	const fn = ( ...params ) => {
-
-		let inputs;
-
-		nodeObjects( params );
-
-		const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
-
-		if ( isArrayAsParameter ) {
-
-			inputs = [ ...params ];
-
-		} else {
-
-			inputs = params[ 0 ];
-
-		}
-
-		const fnCall = shaderNode.call( inputs );
-
-		if ( nodeType === 'void' ) fnCall.toStack();
-
-		return fnCall;
-
-	};
-
-	fn.shaderNode = shaderNode;
-	fn.id = shaderNode.id;
-
-	fn.isFn = true;
-
-	fn.getNodeType = ( ...params ) => shaderNode.getNodeType( ...params );
-	fn.getCacheKey = ( ...params ) => shaderNode.getCacheKey( ...params );
-
-	fn.setLayout = ( layout ) => {
-
-		shaderNode.setLayout( layout );
-
-		return fn;
-
-	};
-
-	fn.once = ( subBuilds = null ) => {
-
-		shaderNode.once = true;
-		shaderNode.subBuilds = subBuilds;
-
-		return fn;
-
-	};
-
-	if ( layout !== null ) {
+		const nodeType = this.shaderNode.nodeType;
 
 		if ( typeof layout.inputs !== 'object' ) {
 
@@ -715,13 +863,76 @@ export const Fn = ( jsFunc, layout = null ) => {
 
 		}
 
-		fn.setLayout( layout );
+		this.shaderNode.setLayout( layout );
+
+		return this;
 
 	}
 
-	return fn;
+	getNodeType( builder ) {
 
-};
+		return this.shaderNode.getNodeType( builder ) || 'float';
+
+	}
+
+	call( ...params ) {
+
+		const fnCall = this.shaderNode.call( params );
+
+		if ( this.shaderNode.nodeType === 'void' ) fnCall.toStack();
+
+		return fnCall.toVarIntent();
+
+	}
+
+	once( subBuilds = null ) {
+
+		this.shaderNode.once = true;
+		this.shaderNode.subBuilds = subBuilds;
+
+		return this;
+
+	}
+
+	generate( builder ) {
+
+		const type = this.getNodeType( builder );
+
+		console.error( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+
+		return builder.generateConst( type );
+
+	}
+
+}
+
+export function Fn( jsFunc, layout = null ) {
+
+	const instance = new FnNode( jsFunc, layout );
+
+	return new Proxy( () => {}, {
+
+		apply( target, thisArg, params ) {
+
+			return instance.call( ...params );
+
+		},
+
+		get( target, prop, receiver ) {
+
+			return Reflect.get( instance, prop, receiver );
+
+		},
+
+		set( target, prop, value, receiver ) {
+
+			return Reflect.set( instance, prop, value, receiver );
+
+		}
+
+	} );
+
+}
 
 //
 

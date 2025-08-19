@@ -216,16 +216,31 @@ class ReferenceNode extends Node {
 	}
 
 	/**
+	 * Sets the name for the internal uniform.
+	 *
+	 * @param {string} name - The label to set.
+	 * @return {ReferenceNode} A reference to this node.
+	 */
+	setName( name ) {
+
+		this.name = name;
+
+		return this;
+
+	}
+
+	/**
 	 * Sets the label for the internal uniform.
 	 *
+	 * @deprecated
 	 * @param {string} name - The label to set.
 	 * @return {ReferenceNode} A reference to this node.
 	 */
 	label( name ) {
 
-		this.name = name;
+		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
-		return this;
+		return this.setName( name );
 
 	}
 
@@ -267,7 +282,7 @@ class ReferenceNode extends Node {
 
 		}
 
-		if ( this.name !== null ) node.label( this.name );
+		if ( this.name !== null ) node.setName( this.name );
 
 		this.node = node.getSelf();
 

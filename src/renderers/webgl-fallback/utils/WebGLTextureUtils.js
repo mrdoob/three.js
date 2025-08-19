@@ -1,5 +1,6 @@
 import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, NoColorSpace, LinearTransfer, SRGBTransfer } from '../../../constants.js';
 import { ColorManagement } from '../../../math/ColorManagement.js';
+import { getByteLength } from '../../../extras/TextureUtils.js';
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
@@ -221,6 +222,7 @@ class WebGLTextureUtils {
 			if ( glType === gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = gl.RGB5_A1;
 			if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = gl.RGB4;
 			if ( glType === gl.UNSIGNED_INT_5_9_9_9_REV ) internalFormat = gl.RGB9_E5;
+			if ( glType === gl.UNSIGNED_INT_10F_11F_11F_REV ) internalFormat = gl.R11F_G11F_B10F;
 
 		}
 
@@ -551,6 +553,7 @@ class WebGLTextureUtils {
 		} else if ( texture.isCubeTexture ) {
 
 			const images = options.images;
+			const mipmaps = texture.mipmaps;
 
 			for ( let i = 0; i < 6; i ++ ) {
 
@@ -558,13 +561,42 @@ class WebGLTextureUtils {
 
 				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
 
+				for ( let j = 0; j < mipmaps.length; j ++ ) {
+
+					const mipmap = mipmaps[ j ];
+					const image = getImage( mipmap.images[ i ] );
+
+					gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, image.width, image.height, glFormat, glType, image );
+
+				}
+
 			}
 
 		} else if ( texture.isDataArrayTexture || texture.isArrayTexture ) {
 
 			const image = options.image;
 
-			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+			if ( texture.layerUpdates.size > 0 ) {
+
+				const layerByteLength = getByteLength( image.width, image.height, texture.format, texture.type );
+
+				for ( const layerIndex of texture.layerUpdates ) {
+
+					const layerData = image.data.subarray(
+						layerIndex * layerByteLength / image.data.BYTES_PER_ELEMENT,
+						( layerIndex + 1 ) * layerByteLength / image.data.BYTES_PER_ELEMENT
+					);
+					gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, layerIndex, image.width, image.height, 1, glFormat, glType, layerData );
+
+				}
+
+				texture.clearLayerUpdates();
+
+			} else {
+
+				gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+			}
 
 		} else if ( texture.isData3DTexture ) {
 
@@ -581,9 +613,26 @@ class WebGLTextureUtils {
 
 		} else {
 
-			const image = getImage( options.image );
+			const mipmaps = texture.mipmaps;
 
-			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+			if ( mipmaps.length > 0 ) {
+
+				for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					const mipmap = mipmaps[ i ];
+
+					const image = getImage( mipmap );
+					gl.texSubImage2D( glTextureType, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, image );
+
+				}
+
+			} else {
+
+				const image = getImage( options.image );
+				gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+
+			}
+
 
 		}
 

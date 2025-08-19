@@ -26,12 +26,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView } from 'three/tsl';
 
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
  			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -60,11 +60,11 @@
 			let frame = 0;
 
 			const effectController = {
-				mousePos: uniform( new THREE.Vector2() ).label( 'mousePos' ),
-				mouseSpeed: uniform( new THREE.Vector2() ).label( 'mouseSpeed' ),
-				mouseDeep: uniform( .5 ).label( 'mouseDeep' ),
-				mouseSize: uniform( 0.12 ).label( 'mouseSize' ),
-				viscosity: uniform( 0.96 ).label( 'viscosity' ),
+				mousePos: uniform( new THREE.Vector2() ).setName( 'mousePos' ),
+				mouseSpeed: uniform( new THREE.Vector2() ).setName( 'mouseSpeed' ),
+				mouseDeep: uniform( .5 ).setName( 'mouseDeep' ),
+				mouseSize: uniform( 0.12 ).setName( 'mouseSize' ),
+				viscosity: uniform( 0.96 ).setName( 'viscosity' ),
 				ducksEnabled: true,
 				wireframe: false,
 				speed: 5,
@@ -140,8 +140,8 @@
 
 				}
 
-				const heightStorage = instancedArray( heightArray ).label( 'Height' );
-				const prevHeightStorage = instancedArray( prevHeightArray ).label( 'PrevHeight' );
+				const heightStorage = instancedArray( heightArray ).setName( 'Height' );
+				const prevHeightStorage = instancedArray( prevHeightArray ).setName( 'PrevHeight' );
 
 				// Get Indices of Neighbor Values of an Index in the Simulation Grid
 				const getNeighborIndicesTSL = ( index ) => {
@@ -151,7 +151,7 @@
 					// Get 2-D compute coordinate from one-dimensional instanceIndex. The calculation will
 					// still work even if you dispatch your compute shader 2-dimensionally, since within a compute
 					// context, instanceIndex is a 1-dimensional value derived from the workgroup dimensions.
-			
+
 					// Cast to int to prevent unintended index overflow upon subtraction.
 					const x = int( index.mod( WIDTH ) );
 					const y = int( index.div( WIDTH ) );
@@ -168,7 +168,7 @@
 
 					const westIndex = y.mul( width ).add( leftX );
 					const eastIndex = y.mul( width ).add( rightX );
-			
+
 					const southIndex = bottomY.mul( width ).add( x );
 					const northIndex = topY.mul( width ).add( x );
 
@@ -283,7 +283,7 @@
 				meshRay.matrixAutoUpdate = false;
 				meshRay.updateMatrix();
 				scene.add( meshRay );
-			
+
 				// Initialize sphere mesh instance position and velocity.
 				// position<vec3> + velocity<vec2> + unused<vec3> = 8 floats per sphere.
 				// for structs arrays must be enclosed in multiple of 4
@@ -309,7 +309,7 @@
 
 				// Duck instance data storage
 
-				const duckInstanceDataStorage = instancedArray( duckInstanceDataArray, DuckStruct ).label( 'DuckInstanceData' );
+				const duckInstanceDataStorage = instancedArray( duckInstanceDataArray, DuckStruct ).setName( 'DuckInstanceData' );
 
 				computeDucks = Fn( () => {
 
@@ -339,7 +339,7 @@
 					const targetY = waterHeight.add( yOffset );
 
 					const deltaY = targetY.sub( instancePosition.y );
-					instancePosition.y.addAssign( deltaY.mul( verticalResponseFactor ) ); // Atualiza Y gradualmente
+					instancePosition.y.addAssign( deltaY.mul( verticalResponseFactor ) ); // Gradually update position
 
 					// Get the normal of the water surface at the duck's position
 					const pushX = normalX.mul( waterPushFactor );
@@ -373,7 +373,7 @@
 					If( instancePosition.z.lessThan( - limit ), () => {
 
 						instancePosition.z = - limit;
-						velocity.y.mulAssign( bounceDamping ); // Inverte e amortece vz (velocity.y)
+						velocity.y.mulAssign( bounceDamping ); // Invert and damp vz (velocity.y)
 
 					} ).ElseIf( instancePosition.z.greaterThan( limit ), () => {
 
@@ -391,11 +391,11 @@
 
 				// Models / Textures
 
-				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
+				const hdrLoader = new HDRLoader().setPath( './textures/equirectangular/' );
  				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
  				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
 
- 				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
+ 				const [ env, model ] = await Promise.all( [ hdrLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
  				env.mapping = THREE.EquirectangularReflectionMapping;
  				scene.environment = env;
  				scene.background = env;
@@ -448,18 +448,18 @@
 				gui.add( effectController.viscosity, 'value', 0.9, 0.96, 0.001 ).name( 'viscosity' );
 				gui.add( effectController, 'speed', 1, 6, 1 );
 				gui.add( effectController, 'ducksEnabled' ).onChange( () => {
-			
+
 					duckMesh.visible = effectController.ducksEnabled;
-			
+
 				} );
 				gui.add( effectController, 'wireframe' ).onChange( () => {
-			
+
 					waterMesh.material.wireframe = ! waterMesh.material.wireframe;
 					poolBorder.material.wireframe = ! poolBorder.material.wireframe;
 					duckModel.material.wireframe = ! duckModel.material.wireframe;
 					waterMesh.material.needsUpdate = true;
 					poolBorder.material.needsUpdate = true;
-			
+
 				} );
 
 			}
@@ -484,7 +484,7 @@
 				mouseDown = true;
 				firstClick = true;
 				updateOriginMouseDown = true;
-			
+
 			}
 
 			function onPointerUp() {
@@ -529,7 +529,7 @@
 							effectController.mousePos.value.set( point.x, point.z );
 
 							updateOriginMouseDown = false;
-			
+
 						}
 
 						effectController.mouseSpeed.value.set(
@@ -554,7 +554,7 @@
 					}
 
 					firstClick = false;
-			
+
 				} else {
 
 					updateOriginMouseDown = true;
@@ -582,7 +582,7 @@
 					}
 
 					frame = 0;
-			
+
 				}
 
 				renderer.render( scene, camera );

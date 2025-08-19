@@ -1109,6 +1109,7 @@ class Matrix4 {
 	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
+
 		const x = 2 * near / ( right - left );
 		const y = 2 * near / ( top - bottom );
 
@@ -1168,31 +1169,31 @@ class Matrix4 {
 	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
-		const w = 1.0 / ( right - left );
-		const h = 1.0 / ( top - bottom );
-		const p = 1.0 / ( far - near );
 
-		const x = ( right + left ) * w;
-		const y = ( top + bottom ) * h;
+		const x = 2 / ( right - left );
+		const y = 2 / ( top - bottom );
 
-		let z, zInv;
+		const a = - ( right + left ) / ( right - left );
+		const b = - ( top + bottom ) / ( top - bottom );
+
+		let c, d;
 
 		if ( reversedDepth ) {
 
-			z = - near * p - 1;
-			zInv = 1 * p;
+			c = 1 / ( far - near );
+			d = far / ( far - near );
 
 		} else {
 
 			if ( coordinateSystem === WebGLCoordinateSystem ) {
 
-				z = ( far + near ) * p;
-				zInv = - 2 * p;
+				c = - 2 / ( far - near );
+				d = - ( far + near ) / ( far - near );
 
 			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
 
-				z = near * p;
-				zInv = - 1 * p;
+				c = - 1 / ( far - near );
+				d = - near / ( far - near );
 
 			} else {
 
@@ -1202,9 +1203,9 @@ class Matrix4 {
 
 		}
 
-		te[ 0 ] = 2 * w;	te[ 4 ] = 0;		te[ 8 ] = 0; 		te[ 12 ] = - x;
-		te[ 1 ] = 0; 		te[ 5 ] = 2 * h;	te[ 9 ] = 0; 		te[ 13 ] = - y;
-		te[ 2 ] = 0; 		te[ 6 ] = 0;		te[ 10 ] = zInv;	te[ 14 ] = - z;
+		te[ 0 ] = x;		te[ 4 ] = 0;		te[ 8 ] = 0; 		te[ 12 ] = a;
+		te[ 1 ] = 0; 		te[ 5 ] = y;		te[ 9 ] = 0; 		te[ 13 ] = b;
+		te[ 2 ] = 0; 		te[ 6 ] = 0;		te[ 10 ] = c;		te[ 14 ] = d;
 		te[ 3 ] = 0; 		te[ 7 ] = 0;		te[ 11 ] = 0;		te[ 15 ] = 1;
 
 		return this;

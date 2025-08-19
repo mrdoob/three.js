@@ -322,7 +322,7 @@ class TiledLightsNode extends LightsNode {
 		const lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
 
 		const lightIndexesArray = new Int32Array( count * 4 * 2 );
-		const lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).label( 'lightIndexes' );
+		const lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).setName( 'lightIndexes' );
 
 		// compute
 

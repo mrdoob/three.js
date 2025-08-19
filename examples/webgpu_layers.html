@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -46,7 +46,7 @@
 				camera.position.z = 10;
 
 				scene = new THREE.Scene();
-			
+
 				const horizontalEffect = screenUV.x.mix( color( 0xf996ae ), color( 0xf6f0a3 ) );
 				const lightEffect = screenUV.distance( vec2( 0.5, 1.0 ) ).oneMinus().mul( color( 0xd9b6fd ) );
 
@@ -137,7 +137,7 @@
 				const v = new THREE.Vector3();
 
 				for ( let i = 0; i < count; i ++ ) {
-			
+
 					positions.push(
 						THREE.MathUtils.randFloat( - 25, - 20 ),
 						THREE.MathUtils.randFloat( - 10, 50 ),
@@ -179,8 +179,8 @@
 				const localTime = instancedBufferAttribute( timeAttribute ).add( time.mul( 0.02 ) );
 				const modTime = mod( localTime, 1.0 );
 
-				const rotatedPositon = rotate( positionLocal, instanceRotation.mul( modTime.mul( 20 ) ) );
-				material.positionNode = rotatedPositon.add( instancePosition ).add( instanceDirection.mul( modTime.mul( 50 ) ) );
+				const rotatedPosition = rotate( positionLocal, instanceRotation.mul( modTime.mul( 20 ) ) );
+				material.positionNode = rotatedPosition.add( instancePosition ).add( instanceDirection.mul( modTime.mul( 50 ) ) );
 
 				return material;
 

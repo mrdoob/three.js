@@ -1,5 +1,5 @@
 import SpriteNodeMaterial from './SpriteNodeMaterial.js';
-import { viewport } from '../../nodes/display/ScreenNode.js';
+import { viewportSize, screenSize } from '../../nodes/display/ScreenNode.js';
 import { positionGeometry, positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { materialPointSize } from '../../nodes/accessors/MaterialNode.js';
@@ -35,6 +35,11 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 		/**
 		 * This node property provides an additional way to set the point size.
 		 *
+		 * Note that WebGPU only supports point primitives with 1 pixel size. Consequently,
+		 * this node has no effect when the material is used with {@link Points} and a WebGPU
+		 * backend. If an application wants to render points with a size larger than 1 pixel,
+		 * the material should be used with {@link Sprite} and instancing.
+		 *
 		 * @type {?Node<vec2>}
 		 * @default null
 		 */
@@ -65,30 +70,17 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 	setupVertex( builder ) {
 
-		const mvp = super.setupVertex( builder );
+		const { material, camera } = builder;
+
+		const { rotationNode, scaleNode, sizeNode, sizeAttenuation } = this;
+
+		let mvp = super.setupVertex( builder );
 
 		// skip further processing if the material is not a node material
 
-		if ( builder.material.isNodeMaterial !== true ) {
+		if ( material.isNodeMaterial !== true ) {
 
 			return mvp;
-
-		}
-
-		// ndc space
-
-		const { rotationNode, scaleNode, sizeNode } = this;
-
-		const alignedPosition = positionGeometry.xy.toVar();
-		const aspect = viewport.z.div( viewport.w );
-
-		// rotation
-
-		if ( rotationNode && rotationNode.isNode ) {
-
-			const rotation = float( rotationNode );
-
-			alignedPosition.assign( rotate( alignedPosition, rotation ) );
 
 		}
 
@@ -96,9 +88,18 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 		let pointSize = sizeNode !== null ? vec2( sizeNode ) : materialPointSize;
 
-		if ( this.sizeAttenuation === true ) {
+		const dpr = builder.renderer.getPixelRatio();
 
-			pointSize = pointSize.mul( pointSize.div( positionView.z.negate() ) );
+		pointSize = pointSize.mul( dpr );
+
+		// size attenuation
+
+		if ( camera.isPerspectiveCamera && sizeAttenuation === true ) {
+
+			// follow WebGLRenderer's implementation, and scale by half the canvas height in logical units
+			const scale = float( 0.5 ).mul( screenSize.y ).div( dpr );
+
+			pointSize = pointSize.mul( scale.div( positionView.z.negate() ) );
 
 		}
 
@@ -110,16 +111,35 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 		}
 
-		alignedPosition.mulAssign( pointSize.mul( 2 ) );
+		// compute offset
 
-		alignedPosition.assign( alignedPosition.div( viewport.z ) );
-		alignedPosition.y.assign( alignedPosition.y.mul( aspect ) );
+		let offset = positionGeometry.xy;
 
-		// back to clip space
-		alignedPosition.assign( alignedPosition.mul( mvp.w ) );
+		// apply rotation
 
-		//clipPos.xy += offset;
-		mvp.addAssign( vec4( alignedPosition, 0, 0 ) );
+		if ( rotationNode && rotationNode.isNode ) {
+
+			const rotation = float( rotationNode );
+
+			offset = rotate( offset, rotation );
+
+		}
+
+		// account for point size
+
+		offset = offset.mul( pointSize );
+
+		// scale by viewport size
+
+		offset = offset.div( viewportSize.div( 2 ) );
+
+		// compensate for the perspective divide
+
+		offset = offset.mul( mvp.w );
+
+		// add offset
+
+		mvp = mvp.add( vec4( offset, 0, 0 ) );
 
 		return mvp;
 

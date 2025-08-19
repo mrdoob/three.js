@@ -29,7 +29,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import Stats from 'stats-gl';
 
@@ -39,7 +39,7 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let camera, scene, renderer, stats;
 			let model;
@@ -93,7 +93,7 @@
 
 				document.body.appendChild( stats.dom );
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 

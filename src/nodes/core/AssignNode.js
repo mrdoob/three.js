@@ -97,6 +97,11 @@ class AssignNode extends TempNode {
 
 		const { targetNode, sourceNode } = this;
 
+		const scope = targetNode.getScope();
+
+		const targetProperties = builder.getNodeProperties( scope );
+		targetProperties.assign = true;
+
 		const properties = builder.getNodeProperties( this );
 		properties.sourceNode = sourceNode;
 		properties.targetNode = targetNode.context( { assign: true } );
@@ -109,11 +114,10 @@ class AssignNode extends TempNode {
 
 		const needsSplitAssign = this.needsSplitAssign( builder );
 
+		const target = targetNode.build( builder );
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder );
 		const source = sourceNode.build( builder, targetType );
-
 		const sourceType = sourceNode.getNodeType( builder );
 
 		const nodeData = builder.getDataFromNode( this );

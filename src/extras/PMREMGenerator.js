@@ -347,6 +347,17 @@ class PMREMGenerator {
 		renderer.toneMapping = NoToneMapping;
 		renderer.autoClear = false;
 
+		// https://github.com/mrdoob/three.js/issues/31413#issuecomment-3095966812
+		const reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
+
+		if ( reversedDepthBuffer ) {
+
+			renderer.setRenderTarget( cubeUVRenderTarget );
+			renderer.clearDepth();
+			renderer.setRenderTarget( null );
+
+		}
+
 		const backgroundMaterial = new MeshBasicMaterial( {
 			name: 'PMREM.Background',
 			side: BackSide,

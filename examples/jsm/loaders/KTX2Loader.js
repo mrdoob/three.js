@@ -9,6 +9,8 @@ import {
 	HalfFloatType,
 	LinearFilter,
 	LinearMipmapLinearFilter,
+	NearestFilter,
+	NearestMipmapNearestFilter,
 	LinearSRGBColorSpace,
 	Loader,
 	NoColorSpace,
@@ -26,10 +28,13 @@ import {
 	RGB_ETC2_Format,
 	RGB_PVRTC_4BPPV1_Format,
 	RGB_S3TC_DXT1_Format,
+	RGBFormat,
 	RGFormat,
 	RedFormat,
 	SRGBColorSpace,
-	UnsignedByteType
+	UnsignedByteType,
+	UnsignedInt5999Type,
+	UnsignedInt101111Type
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
@@ -70,6 +75,8 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8_SRGB,
 	VK_FORMAT_R8_UNORM,
+	VK_FORMAT_E5B9G9R9_UFLOAT_PACK32,
+	VK_FORMAT_B10G11R11_UFLOAT_PACK32,
 	VK_FORMAT_UNDEFINED
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
@@ -918,7 +925,7 @@ KTX2Loader.BasisWorker = function () {
 // Parsing for non-Basis textures. These textures may have supercompression
 // like Zstd, but they do not require transcoding.
 
-const UNCOMPRESSED_FORMATS = new Set( [ RGBAFormat, RGFormat, RedFormat ] );
+const UNCOMPRESSED_FORMATS = new Set( [ RGBAFormat, RGBFormat, RGFormat, RedFormat ] );
 
 const FORMAT_MAP = {
 
@@ -936,6 +943,9 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R16_SFLOAT ]: RedFormat,
 	[ VK_FORMAT_R8_SRGB ]: RedFormat,
 	[ VK_FORMAT_R8_UNORM ]: RedFormat,
+
+	[ VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 ]: RGBFormat,
+	[ VK_FORMAT_B10G11R11_UFLOAT_PACK32 ]: RGBFormat,
 
 	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: RGB_ETC2_Format,
 	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: RGBA_ETC2_EAC_Format,
@@ -978,6 +988,9 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R16_SFLOAT ]: HalfFloatType,
 	[ VK_FORMAT_R8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8_UNORM ]: UnsignedByteType,
+
+	[ VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 ]: UnsignedInt5999Type,
+	[ VK_FORMAT_B10G11R11_UFLOAT_PACK32 ]: UnsignedInt101111Type,
 
 	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: UnsignedByteType,
 	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: UnsignedByteType,
@@ -1023,7 +1036,6 @@ async function createRawTexture( container ) {
 	//
 
 	const mipmaps = [];
-
 
 	for ( let levelIndex = 0; levelIndex < container.levels.length; levelIndex ++ ) {
 
@@ -1071,6 +1083,16 @@ async function createRawTexture( container ) {
 
 			);
 
+		} else if ( TYPE_MAP[ vkFormat ] === UnsignedInt5999Type || TYPE_MAP[ vkFormat ] === UnsignedInt101111Type ) {
+
+			data = new Uint32Array(
+
+				levelData.buffer,
+				levelData.byteOffset,
+				levelData.byteLength / Uint32Array.BYTES_PER_ELEMENT
+
+			);
+
 		} else {
 
 			data = levelData;
@@ -1088,6 +1110,9 @@ async function createRawTexture( container ) {
 
 	}
 
+	// levelCount = 0 implies runtime-generated mipmaps.
+	const useMipmaps = container.levelCount === 0 || mipmaps.length > 1
+
 	let texture;
 
 	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
@@ -1095,14 +1120,16 @@ async function createRawTexture( container ) {
 		texture = container.pixelDepth === 0
 			? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
 			: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		texture.minFilter = useMipmaps ? NearestMipmapNearestFilter : NearestFilter;
+		texture.magFilter = NearestFilter;
+		texture.generateMipmaps = container.levelCount === 0;
 
 	} else {
 
 		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
 
 		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
-
-		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+		texture.minFilter = useMipmaps ? LinearMipmapLinearFilter : LinearFilter;
 		texture.magFilter = LinearFilter;
 
 	}

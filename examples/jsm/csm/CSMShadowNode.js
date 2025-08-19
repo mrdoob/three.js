@@ -374,9 +374,9 @@ class CSMShadowNode extends ShadowBaseNode {
 	_setupFade() {
 
 		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
-		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cascades' );
+		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).setName( 'cascades' );
 
-		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
+		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).setName( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
 		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'linearDepth' );
@@ -456,9 +456,9 @@ class CSMShadowNode extends ShadowBaseNode {
 	_setupStandard() {
 
 		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
-		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cascades' );
+		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).setName( 'cascades' );
 
-		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
+		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).setName( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
 		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'linearDepth' );

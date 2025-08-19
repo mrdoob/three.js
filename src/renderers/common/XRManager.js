@@ -177,12 +177,21 @@ class XRManager extends EventDispatcher {
 		this._layers = [];
 
 		/**
-		 * Whether the device has support for all layer types.
+		 * Whether the XR session uses layers.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this._supportsLayers = false;
+		this._sessionUsesLayers = false;
+
+		/**
+		 * Whether the device supports binding gl objects.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @readonly
+		 */
+		this._supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
 
 		this._frameBufferTargets = null;
 
@@ -364,13 +373,16 @@ class XRManager extends EventDispatcher {
 		this._xrFrame = null;
 
 		/**
-		 * Whether to use the WebXR Layers API or not.
+		 * Whether the browser supports the APIs necessary to use XRProjectionLayers.
+		 *
+		 * Note: this does not represent XRSession explicitly requesting
+		 * `'layers'` as a feature - see `_sessionUsesLayers` and #30112
 		 *
 		 * @private
 		 * @type {boolean}
 		 * @readonly
 		 */
-		this._useLayers = ( typeof XRWebGLBinding !== 'undefined' && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
+		this._supportsLayers = ( this._supportsGlBinding && 'createProjectionLayer' in XRWebGLBinding.prototype ); // eslint-disable-line compat/compat
 
 		/**
 		 * Whether the usage of multiview has been requested by the application or not.
@@ -604,6 +616,27 @@ class XRManager extends EventDispatcher {
 			return this._session.environmentBlendMode;
 
 		}
+
+	}
+
+
+	/**
+	 * Returns the current XR binding.
+	 *
+	 * Creates a new binding if needed and the browser is
+	 * capable of doing so.
+	 *
+	 * @return {?XRWebGLBinding} The XR binding. Returns `null` if one cannot be created.
+	 */
+	getBinding() {
+
+		if ( this._glBinding === null && this._supportsGlBinding ) {
+
+			this._glBinding = new XRWebGLBinding( this._session, this._gl );
+
+		}
+
+		return this._glBinding;
 
 	}
 
@@ -1032,7 +1065,7 @@ class XRManager extends EventDispatcher {
 			layer.renderTarget.isXRRenderTarget = this._session !== null;
 			layer.renderTarget._hasExternalTextures = layer.renderTarget.isXRRenderTarget;
 
-			if ( layer.renderTarget.isXRRenderTarget && this._supportsLayers ) {
+			if ( layer.renderTarget.isXRRenderTarget && this._sessionUsesLayers ) {
 
 				layer.xrlayer.transform = new XRRigidTransform( layer.plane.getWorldPosition( translationObject ), layer.plane.getWorldQuaternion( quaternionObject ) );
 
@@ -1139,9 +1172,9 @@ class XRManager extends EventDispatcher {
 
 			//
 
-			if ( this._useLayers === true ) {
+			if ( this._supportsLayers === true ) {
 
-				// default path using XRWebGLBinding/XRProjectionLayer
+				// default path using XRProjectionLayer
 
 				let depthFormat = null;
 				let depthType = null;
@@ -1169,11 +1202,10 @@ class XRManager extends EventDispatcher {
 
 				}
 
-				const glBinding = new XRWebGLBinding( session, gl );
-				const glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
+				this._glBinding = this.getBinding();
+				const glProjLayer = this._glBinding.createProjectionLayer( projectionlayerInit );
 				const layersArray = [ glProjLayer ];
 
-				this._glBinding = glBinding;
 				this._glProjLayer = glProjLayer;
 
 				renderer.setPixelRatio( 1 );
@@ -1201,11 +1233,11 @@ class XRManager extends EventDispatcher {
 				this._xrRenderTarget._hasExternalTextures = true;
 				this._xrRenderTarget.depth = this._useMultiview ? 2 : 1;
 
-				this._supportsLayers = session.enabledFeatures.includes( 'layers' );
+				this._sessionUsesLayers = session.enabledFeatures.includes( 'layers' );
 
 				this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
-				if ( this._supportsLayers ) {
+				if ( this._sessionUsesLayers ) {
 
 					// switch layers to native
 					for ( const layer of this._layers ) {
@@ -1341,9 +1373,11 @@ class XRManager extends EventDispatcher {
 
 		}
 
-		cameraL.layers.mask = camera.layers.mask | 0b010;
-		cameraR.layers.mask = camera.layers.mask | 0b100;
-		cameraXR.layers.mask = cameraL.layers.mask | cameraR.layers.mask;
+		// inherit camera layers and enable eye layers (1 = left, 2 = right)
+		cameraXR.layers.mask = camera.layers.mask | 0b110;
+		cameraL.layers.mask = cameraXR.layers.mask & 0b011;
+		cameraR.layers.mask = cameraXR.layers.mask & 0b101;
+
 
 		const parent = camera.parent;
 		const cameras = cameraXR.cameras;
@@ -1594,7 +1628,7 @@ function onSessionEnd() {
 	this._xrRenderTarget = null;
 
 	// switch layers back to emulated
-	if ( this._supportsLayers === true ) {
+	if ( this._sessionUsesLayers === true ) {
 
 		for ( const layer of this._layers ) {
 
@@ -1820,7 +1854,7 @@ function onAnimationFrame( time, frame ) {
 
 			let viewport;
 
-			if ( this._useLayers === true ) {
+			if ( this._supportsLayers === true ) {
 
 				const glSubImage = this._glBinding.getViewSubImage( this._glProjLayer, view );
 				viewport = glSubImage.viewport;

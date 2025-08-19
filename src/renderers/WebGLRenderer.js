@@ -1556,7 +1556,7 @@ class WebGLRenderer {
 			renderStateStack.push( currentRenderState );
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			_frustum.setFromProjectionMatrix( _projScreenMatrix );
+			_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth );
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
@@ -2383,7 +2383,7 @@ class WebGLRenderer {
 
 				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
 
-					camera.reversedDepth = true;
+					camera._reversedDepth = true;
 					camera.updateProjectionMatrix();
 
 				}
@@ -2811,9 +2811,15 @@ class WebGLRenderer {
 
 			} else if ( isRenderTarget3D ) {
 
-				const textureProperties = properties.get( renderTarget.texture );
 				const layer = activeCubeFace;
-				_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureProperties.__webglTexture, activeMipmapLevel, layer );
+
+				for ( let i = 0; i < renderTarget.textures.length; i ++ ) {
+
+					const textureProperties = properties.get( renderTarget.textures[ i ] );
+
+					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, textureProperties.__webglTexture, activeMipmapLevel, layer );
+
+				}
 
 			} else if ( renderTarget !== null && activeMipmapLevel !== 0 ) {
 
@@ -2965,7 +2971,7 @@ class WebGLRenderer {
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
 					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
 
-					// when using MRT, select the corect color buffer for the subsequent read command
+					// when using MRT, select the correct color buffer for the subsequent read command
 
 					if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
 
@@ -3289,15 +3295,6 @@ class WebGLRenderer {
 			}
 
 			state.unbindTexture();
-
-		};
-
-		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
-
-			// @deprecated, r170
-			warnOnce( 'WebGLRenderer: copyTextureToTexture3D function has been deprecated. Use "copyTextureToTexture" instead.' );
-
-			return this.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
 
 		};
 

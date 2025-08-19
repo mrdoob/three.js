@@ -55,6 +55,7 @@ export { default as ReflectorNode } from './utils/ReflectorNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
 export { default as MemberNode } from './utils/MemberNode.js';
 export { default as DebugNode } from './utils/DebugNode.js';
+export { default as EventNode } from './utils/EventNode.js';
 
 // accessors
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';

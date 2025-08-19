@@ -1,6 +1,7 @@
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 import { vec4, renderOutput } from '../../nodes/TSL.js';
-import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
+import { NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 /**
@@ -110,7 +111,7 @@ class PostProcessing {
 		const outputColorSpace = renderer.outputColorSpace;
 
 		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = LinearSRGBColorSpace;
+		renderer.outputColorSpace = ColorManagement.workingColorSpace;
 
 		//
 
@@ -219,7 +220,7 @@ class PostProcessing {
 		const outputColorSpace = renderer.outputColorSpace;
 
 		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = LinearSRGBColorSpace;
+		renderer.outputColorSpace = ColorManagement.workingColorSpace;
 
 		//
 

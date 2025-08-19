@@ -59,6 +59,18 @@ class ArrayNode extends TempNode {
 	}
 
 	/**
+	 * Returns the number of elements in the node array.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {number} The number of elements in the node array.
+	 */
+	getArrayCount( /*builder*/ ) {
+
+		return this.count;
+
+	}
+
+	/**
 	 * Returns the node's type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

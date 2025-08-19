@@ -25,7 +25,7 @@
 			align-items: center;
 		}
 
-		#antialising-disabled {
+		#antialiasing-disabled {
 			border-right: 1px solid black;
 		}
 
@@ -36,11 +36,11 @@
 	</style>
 	<body>
 		<div id="demo">
-			<div id="antialising-disabled" class="renderer-wrapper">
-				<div>antialising disabled</div>
+			<div id="antialiasing-disabled" class="renderer-wrapper">
+				<div>antialiasing disabled</div>
 			</div>
-			<div id="antialising-enabled" class="renderer-wrapper">
-				<div>antialising enabled</div>
+			<div id="antialiasing-enabled" class="renderer-wrapper">
+				<div>antialiasing enabled</div>
 			</div>
 		</div>
 
@@ -57,7 +57,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { varying, uv, texture, Fn } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -140,7 +140,7 @@
 					);
 
 					return geometry;
-			
+
 				};
 
 				const material = new THREE.MeshBasicNodeMaterial();
@@ -197,9 +197,9 @@
 						mesh.position.set( x * 2, y * 2, 0 );
 						faceMeshes.push( mesh );
 						scene.add( mesh );
-			
+
 					}
-			
+
 				}
 
 				// Create Standard Renderer
@@ -218,13 +218,13 @@
 					forceWebGL: forceWebGL
 				} );
 
-				document.body.querySelector( '#antialising-enabled' ).appendChild( rendererAntialiasingEnabled.domElement );
+				document.body.querySelector( '#antialiasing-enabled' ).appendChild( rendererAntialiasingEnabled.domElement );
 				rendererAntialiasingEnabled.setPixelRatio( window.devicePixelRatio );
 				rendererAntialiasingEnabled.setSize( window.innerWidth / 2, window.innerHeight );
 				rendererAntialiasingEnabled.setAnimationLoop( animateAliased );
-			
-				document.body.querySelector( '#antialising-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
-				document.body.querySelector( '#antialising-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
+
+				document.body.querySelector( '#antialiasing-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
+				document.body.querySelector( '#antialiasing-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
 
 				onWindowResize();
 
@@ -256,7 +256,7 @@
 
 					}
 
-			
+
 				} );
 
 			}
@@ -267,7 +267,7 @@
 				rendererAntialiasingDisabled.setSize( halfWidth, window.innerHeight );
 				rendererAntialiasingEnabled.setSize( halfWidth, window.innerHeight );
 				const aspect = ( halfWidth ) / window.innerHeight;
-			
+
 				camera.aspect = aspect;
 				camera.updateProjectionMatrix();
 
@@ -276,13 +276,13 @@
 			function animateStandard() {
 
 				rendererAntialiasingDisabled.render( scene, camera );
-			
+
 			}
 
 			function animateAliased() {
 
 				rendererAntialiasingEnabled.render( scene, camera );
-			
+
 			}
 
 		</script>

@@ -13,10 +13,7 @@ import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { warnOnce } from '../../utils.js';
 import { WebGLCoordinateSystem } from '../../constants.js';
-import { Vector2 } from '../../math/Vector2.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
-
-const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 
 /**
  * A backend implementation targeting WebGL 2.
@@ -183,7 +180,7 @@ class WebGLBackend extends Backend {
 		 * A unique collection of bindings.
 		 *
 		 * @private
-		 * @type {WeakSet}
+		 * @type {WeakSet<Array<BindGroup>>}
 		 */
 		this._knownBindings = new WeakSet();
 
@@ -455,7 +452,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+			const { width, height } = this.getDrawingBufferSize();
 			state.viewport( 0, 0, width, height );
 
 		}
@@ -655,7 +652,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+				const { width, height } = this.getDrawingBufferSize();
 				state.viewport( 0, 0, width, height );
 
 			}
@@ -2095,8 +2092,9 @@ class WebGLBackend extends Backend {
 					const { textureGPU } = this.get( textures[ 0 ] );
 
 					const cubeFace = this.renderer._activeCubeFace;
+					const mipLevel = this.renderer._activeMipmapLevel;
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, 0 );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, mipLevel );
 
 				} else {
 
@@ -2118,8 +2116,9 @@ class WebGLBackend extends Backend {
 						} else if ( isRenderTarget3D || isRenderTargetArray ) {
 
 							const layer = this.renderer._activeCubeFace;
+							const mipLevel = this.renderer._activeMipmapLevel;
 
-							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, 0, layer );
+							gl.framebufferTextureLayer( gl.FRAMEBUFFER, attachment, textureData.textureGPU, mipLevel, layer );
 
 						} else {
 
@@ -2129,7 +2128,9 @@ class WebGLBackend extends Backend {
 
 							} else {
 
-								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+								const mipLevel = this.renderer._activeMipmapLevel;
+
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, mipLevel );
 
 							}
 

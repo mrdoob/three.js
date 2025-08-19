@@ -45,19 +45,15 @@ const UnpackDepthRGBAShader = {
 
 			float depth = unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );
 
-			#ifdef USE_REVERSEDEPTHBUF
+			#ifdef USE_REVERSED_DEPTH_BUFFER
 
-				if ( depth == 1.0 ) depth = 0.0; // wrong clear value?
+				gl_FragColor = vec4( vec3( depth ), opacity );
 
-				// [0, 1] -> [-1, 1]
-				depth = depth * 2.0 - 1.0;
+			#else
 
-				// Reverse to forward depth (precision is already destroyed at this point)
-				depth = 1.0 - depth;
+				gl_FragColor = vec4( vec3( 1.0 - depth ), opacity );
 
 			#endif
-
-			gl_FragColor = vec4( vec3( 1.0 - depth ), opacity );
 
 		}`
 
