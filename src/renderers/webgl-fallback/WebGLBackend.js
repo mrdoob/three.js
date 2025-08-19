@@ -1854,13 +1854,22 @@ class WebGLBackend extends Backend {
 
 				if ( bufferGPU === undefined ) {
 
+					// create
+
 					bufferGPU = gl.createBuffer();
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+
 					this.set( data, { bufferGPU } );
 
-				}
+				} else {
 
-				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-				gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+					// update
+
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferSubData( gl.UNIFORM_BUFFER, 0, data );
+
+				}
 
 				map.index = i ++;
 				map.bufferGPU = bufferGPU;
