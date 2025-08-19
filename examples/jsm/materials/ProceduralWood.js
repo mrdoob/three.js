@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 import * as TSL from 'three/tsl';
 
-// some helpers below are ported from Blender
-
+// some helpers below are ported from Blender and converted to TSL
 
 const mapRange = TSL.Fn( ( [ x, fromMin, fromMax, toMin, toMax, clmp ] ) => {
 
@@ -13,41 +12,81 @@ const mapRange = TSL.Fn( ( [ x, fromMin, fromMax, toMin, toMax, clmp ] ) => {
 
 } );
 
-const hash3d = TSL.Fn( ( [ p ] ) => {
+const voronoi3d = TSL.wgslFn( `
+    fn voronoi3d(x: vec3<f32>, smoothness: f32, randomness: f32) -> f32
+    {
+        let p = floor(x);
+        let f = fract(x);
 
-	const p3 = p.mul( TSL.vec3( 0.1031, 0.1030, 0.0973 ) ).fract();
-	const dotProduct = p3.dot( p3.yzx.add( 33.33 ) );
-	p3.addAssign( dotProduct );
+        var res = 0.0;
+        var totalWeight = 0.0;
+        
+        for (var k = -1; k <= 1; k++)
+        {
+            for (var j = -1; j <= 1; j++)
+            {
+                for (var i = -1; i <= 1; i++)
+                {
+                    let b = vec3<f32>(f32(i), f32(j), f32(k));
+                    let hashOffset = hash3d(p + b) * randomness;
+                    let r = b - f + hashOffset;
+                    let d = length(r);
+                    
+                    let weight = exp(-d * d / max(smoothness * smoothness, 0.001));
+                    res += d * weight;
+                    totalWeight += weight;
+                }
+            }
+        }
+        
+        if (totalWeight > 0.0)
+        {
+            res /= totalWeight;
+        }
+        
+        return smoothstep(0.0, 1.0, res);
+    }
+
+    fn hash3d(p: vec3<f32>) -> vec3<f32>
+    {
+        var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));
+        p3 += dot(p3, p3.yzx + 33.33);
+        return fract((p3.xxy + p3.yzz) * p3.zyx);
+    }
+` );
+
+// const hash3d = TSL.Fn( ( [ p ] ) => {
+
+// 	const p3 = p.mul( TSL.vec3( 0.1031, 0.1030, 0.0973 ) ).fract();
+// 	const dotProduct = p3.dot( p3.yzx.add( 33.33 ) );
+// 	p3.addAssign( dotProduct );
 	
-	return p3.xxy.add( p3.yzz ).mul( p3.zyx ).fract();
+// 	return p3.xxy.add( p3.yzz ).mul( p3.zyx ).fract();
 
-} );
+// } );
 
-const voronoi3d = TSL.Fn( ( [ x, smoothness, randomness ] ) => {
+// const voronoi3d = TSL.Fn( ( [ x, smoothness, randomness ] ) => {
+// 	let p = TSL.floor(x);
+// 	let f = TSL.fract(x);
 
-	const p = x.floor();
-	const f = x.fract();
+// 	var res = TSL.float(0.0);
+// 	var totalWeight = TSL.float(0.0);
 
-	const res = TSL.float( 0.0 ).toVar();
-	const totalWeight = TSL.float( 0.0 ).toVar();
+// 	TSL.Loop( 3, 3, 3, ( { k, j, i } ) => {
+// 		let b = TSL.vec3(TSL.float(i).sub(1), TSL.float(j).sub(1), TSL.float(k).sub(1));
+// 		let hashOffset = hash3d(p.add(b)).mul(randomness);
+// 		let r = b.sub(f).add(hashOffset);
+// 		let d = TSL.length(r);
+	
+// 		let weight = TSL.exp(d.negate().mul(d).div(TSL.max(smoothness.mul(smoothness), 0.001)));
+// 		res.addAssign(d.mul(weight));
+// 		totalWeight.addAssign(weight);
+// 	} );
 
-	TSL.Loop( 3, 3, 3, ( { k, j, i } ) => {
-		const b = TSL.vec3( TSL.float( i ).sub(1), TSL.float( j ).sub(1), TSL.float( k ).sub(1) );
-		const hashOffset = hash3d( p.add( b ) ).mul( randomness );
-		const r = b.sub( f ).add( hashOffset );
-		const d = r.length();
+// 	res.assign(TSL.select(totalWeight.greaterThan(0.0), res.div(totalWeight), res));
 
-		const weight = d.mul( d ).div( TSL.max( smoothness.mul( smoothness ), 0.001 ) ).negate().exp();
-		res.addAssign( d.mul( weight ) );
-		totalWeight.addAssign( weight );
-
-	} );
-
-	const normalizedRes = TSL.select( totalWeight.greaterThan( 0.0 ), res.div( totalWeight ), res );
-
-	return TSL.smoothstep( 0.0, 1.0, normalizedRes );
-
-} );
+// 	return TSL.smoothstep(0.0, 1.0, res);
+// } );
 
 const softLightMix = TSL.Fn( ( [ t, col1, col2 ] ) => {
 
