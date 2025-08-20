@@ -284,7 +284,7 @@ class ReferenceNode extends Node {
 
 		if ( this.name !== null ) node.setName( this.name );
 
-		this.node = node.getSelf();
+		this.node = node;
 
 	}
 

@@ -88,7 +88,6 @@ export function getCacheKey( object, force = false ) {
 	if ( object.isNode === true ) {
 
 		values.push( object.id );
-		object = object.getSelf();
 
 	}
 
