@@ -44752,7 +44752,7 @@ class NodeBuilderState {
 
 			if ( shared !== true ) {
 
-				const bindingsGroup = new BindGroup( instanceGroup.name, [], instanceGroup.index, instanceGroup );
+				const bindingsGroup = new BindGroup( instanceGroup.name, [], instanceGroup.index, instanceGroup.bindingsReference );
 				bindings.push( bindingsGroup );
 
 				for ( const instanceBinding of instanceGroup.bindings ) {
@@ -55401,25 +55401,29 @@ class Renderer {
 	 */
 	dispose() {
 
-		this.info.dispose();
-		this.backend.dispose();
+		if ( this._initialized === true ) {
 
-		this._animation.dispose();
-		this._objects.dispose();
-		this._pipelines.dispose();
-		this._nodes.dispose();
-		this._bindings.dispose();
-		this._renderLists.dispose();
-		this._renderContexts.dispose();
-		this._textures.dispose();
+			this.info.dispose();
+			this.backend.dispose();
 
-		if ( this._frameBufferTarget !== null ) this._frameBufferTarget.dispose();
+			this._animation.dispose();
+			this._objects.dispose();
+			this._pipelines.dispose();
+			this._nodes.dispose();
+			this._bindings.dispose();
+			this._renderLists.dispose();
+			this._renderContexts.dispose();
+			this._textures.dispose();
 
-		Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
+			if ( this._frameBufferTarget !== null ) this._frameBufferTarget.dispose();
 
-			if ( queryPool !== null ) queryPool.dispose();
+			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
 
-		} );
+				if ( queryPool !== null ) queryPool.dispose();
+
+			} );
+
+		}
 
 		this.setRenderTarget( null );
 		this.setAnimationLoop( null );
@@ -65007,28 +65011,46 @@ class WebGLBackend extends Backend {
 
 		for ( const binding of bindGroup.bindings ) {
 
+			const map = this.get( binding );
+
 			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				const data = binding.buffer;
-				const bufferGPU = gl.createBuffer();
+				let { bufferGPU } = this.get( data );
 
-				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-				gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+				if ( bufferGPU === undefined ) {
 
-				this.set( binding, {
-					index: i ++,
-					bufferGPU
-				} );
+					// create
+
+					bufferGPU = gl.createBuffer();
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+
+					this.set( data, { bufferGPU } );
+
+				} else {
+
+					// update
+
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferSubData( gl.UNIFORM_BUFFER, 0, data );
+
+				}
+
+				map.index = i ++;
+				map.bufferGPU = bufferGPU;
+
+				this.set( binding, map );
 
 			} else if ( binding.isSampledTexture ) {
 
 				const { textureGPU, glTextureType } = this.get( binding.texture );
 
-				this.set( binding, {
-					index: t ++,
-					textureGPU,
-					glTextureType
-				} );
+				map.index = t ++;
+				map.textureGPU = textureGPU;
+				map.glTextureType = glTextureType;
+
+				this.set( binding, map );
 
 			}
 
