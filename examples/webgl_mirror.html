@@ -44,7 +44,9 @@
 
 			let groundMirror, verticalMirror;
 
-			const resolution = 1; // render target scale factor
+			const size = new THREE.Vector2();
+
+			const resolutionScale = 0.5; // render target scale factor in [ 0, 1 ]
 
 			init();
 
@@ -80,11 +82,14 @@
 
 				let geometry, material;
 
+				renderer.getDrawingBufferSize( size );
+				size.multiplyScalar( resolutionScale );
+
 				geometry = new THREE.CircleGeometry( 40, 64 );
 				groundMirror = new Reflector( geometry, {
 					clipBias: 0.003,
-					textureWidth: window.innerWidth * resolution,
-					textureHeight: window.innerHeight * resolution,
+					textureWidth: size.width,
+					textureHeight: size.heignt,
 					color: 0xb5b5b5
 				} );
 				groundMirror.position.y = 0.5;
@@ -94,8 +99,8 @@
 				geometry = new THREE.PlaneGeometry( 100, 100 );
 				verticalMirror = new Reflector( geometry, {
 					clipBias: 0.003,
-					textureWidth: window.innerWidth * resolution,
-					textureHeight: window.innerHeight * resolution,
+					textureWidth: size.width,
+					textureHeight: size.heignt,
 					color: 0xc1cbcb
 				} );
 				verticalMirror.position.y = 50;
@@ -182,14 +187,11 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				groundMirror.getRenderTarget().setSize(
-					window.innerWidth * resolution,
-					window.innerHeight * resolution
-				);
-				verticalMirror.getRenderTarget().setSize(
-					window.innerWidth * resolution,
-					window.innerHeight * resolution
-				);
+				renderer.getDrawingBufferSize( size );
+				size.multiplyScalar( resolutionScale );
+
+				groundMirror.getRenderTarget().setSize( size.width, size.height );
+				verticalMirror.getRenderTarget().setSize( size.width, size.height );
 
 			}
 
