@@ -13,6 +13,8 @@ let currentStack = null;
 
 const NodeElements = new Map();
 
+// Extend Node Class for TSL using prototype
+
 export function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
@@ -28,6 +30,8 @@ export function addMethodChaining( name, nodeElement ) {
 
 	if ( name !== 'assign' ) {
 
+		// Changing Node prototype to add method chaining
+
 		Node.prototype[ name ] = function ( ...params ) {
 
 			//if ( name === 'toVarIntent' ) return this;
@@ -36,15 +40,13 @@ export function addMethodChaining( name, nodeElement ) {
 
 		};
 
+		// Adding assign method chaining
+
 		Node.prototype[ name + 'Assign' ] = function ( ...params ) {
 
 			return this.isStackNode ? this.assign( params[ 0 ], nodeElement( ...params ) ) : this.assign( nodeElement( this, ...params ) );
 
 		};
-
-	} else {
-
-		console.log( name );
 
 	}
 
@@ -52,8 +54,6 @@ export function addMethodChaining( name, nodeElement ) {
 
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
 const parseSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
-
-// Extend Node Class for TSL
 
 Node.prototype.assign = function ( ...params ) {
 
@@ -85,13 +85,11 @@ Node.prototype.get = function ( value ) {
 
 };
 
-//
-
-const swizzleA = [ 'x', 'y', 'z', 'w' ];
-const swizzleB = [ 'r', 'g', 'b', 'a' ];
-const swizzleC = [ 's', 't', 'p', 'q' ];
+// Cache prototype for TSL
 
 const proto = {};
+
+// Set swizzle properties for xyzw, rgba, and stpq.
 
 function setProtoSwizzle( property, altA, altB ) {
 
@@ -133,6 +131,8 @@ function setProtoSwizzle( property, altA, altB ) {
 	const altAUpper = altA.toUpperCase();
 	const altBUpper = altB.toUpperCase();
 
+	// Set methods for swizzle properties
+
 	Node.prototype[ 'set' + propUpper ] = Node.prototype[ 'set' + altAUpper ] = Node.prototype[ 'set' + altBUpper ] = function ( value ) {
 
 		const swizzle = parseSwizzleAndSort( property );
@@ -140,6 +140,8 @@ function setProtoSwizzle( property, altA, altB ) {
 		return new SetNode( this, swizzle, nodeObject( value ) );
 
 	};
+
+	// Set methods for flip properties
 
 	Node.prototype[ 'flip' + propUpper ] = Node.prototype[ 'flip' + altAUpper ] = Node.prototype[ 'flip' + altBUpper ] = function () {
 
@@ -151,39 +153,9 @@ function setProtoSwizzle( property, altA, altB ) {
 
 }
 
-function setProtoProperty( property, target ) {
-
-	proto[ property ] = {
-
-		get() {
-
-			this._cache = this._cache || {};
-
-			//
-
-			let split = this._cache[ target ];
-
-			if ( split === undefined ) {
-
-				split = new SplitNode( this, target );
-
-				this._cache[ target ] = split;
-
-			}
-
-			return split;
-
-		},
-
-		set( value ) {
-
-			this[ target ].assign( nodeObject( value ) );
-
-		}
-
-	};
-
-}
+const swizzleA = [ 'x', 'y', 'z', 'w' ];
+const swizzleB = [ 'r', 'g', 'b', 'a' ];
+const swizzleC = [ 's', 't', 'p', 'q' ];
 
 for ( let a = 0; a < 4; a ++ ) {
 
@@ -225,6 +197,8 @@ for ( let a = 0; a < 4; a ++ ) {
 
 }
 
+// Set/get static properties for array elements (0-31).
+
 for ( let i = 0; i < 32; i ++ ) {
 
 	proto[ i ] = {
@@ -259,111 +233,51 @@ for ( let i = 0; i < 32; i ++ ) {
 
 }
 
-//setProtoProperty( 'width', 'x' );
-//setProtoProperty( 'height', 'y' );
-//setProtoProperty( 'depth', 'z' );
+/*
+// Set properties for width, height, and depth.
+
+function setProtoProperty( property, target ) {
+
+	proto[ property ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let split = this._cache[ target ];
+
+			if ( split === undefined ) {
+
+				split = new SplitNode( this, target );
+
+				this._cache[ target ] = split;
+
+			}
+
+			return split;
+
+		},
+
+		set( value ) {
+
+			this[ target ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+}
+
+setProtoProperty( 'width', 'x' );
+setProtoProperty( 'height', 'y' );
+setProtoProperty( 'depth', 'z' );
+*/
 
 Object.defineProperties( Node.prototype, proto );
 
-//
-
-const shaderNodeHandler = {
-
-	setup( NodeClosure, params ) {
-
-		const inputs = params.shift();
-
-		return NodeClosure( nodeObjects( inputs ), ...params );
-
-	},
-
-	get( node, prop, nodeObj ) {
-
-		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
-
-			if ( prop.endsWith( 'Assign' ) && NodeElements.has( prop.slice( 0, prop.length - 'Assign'.length ) ) ) {
-
-				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
-
-				return node.isStackNode ? ( ...params ) => nodeObj.assign( params[ 0 ], nodeElement( ...params ) ) : ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
-
-			} else if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
-
-				// accessing properties ( swizzle )
-
-				prop = parseSwizzle( prop );
-
-				return nodeObject( new SplitNode( nodeObj, prop ) );
-
-			} else if ( /^set[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
-
-				// set properties ( swizzle ) and sort to xyzw sequence
-
-				prop = parseSwizzleAndSort( prop.slice( 3 ).toLowerCase() );
-
-				return ( value ) => nodeObject( new SetNode( node, prop, nodeObject( value ) ) );
-
-			} else if ( /^flip[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
-
-				// set properties ( swizzle ) and sort to xyzw sequence
-
-				prop = parseSwizzleAndSort( prop.slice( 4 ).toLowerCase() );
-
-				return () => nodeObject( new FlipNode( nodeObject( node ), prop ) );
-
-			} else if ( prop === 'width' || prop === 'height' || prop === 'depth' ) {
-
-				// accessing property
-
-				if ( prop === 'width' ) prop = 'x';
-				else if ( prop === 'height' ) prop = 'y';
-				else if ( prop === 'depth' ) prop = 'z';
-
-				return nodeObject( new SplitNode( node, prop ) );
-
-			} else if ( /^\d+$/.test( prop ) === true ) {
-
-				// accessing array
-
-				return nodeObject( new ArrayElementNode( nodeObj, new ConstNode( Number( prop ), 'uint' ) ) );
-
-			} else if ( /^get$/.test( prop ) === true ) {
-
-				// accessing properties
-
-				console.log( prop );
-
-				return ( value ) => nodeObject( new MemberNode( nodeObj, value ) );
-
-			}
-
-		}
-
-		return Reflect.get( node, prop, nodeObj );
-
-	},
-
-	set( node, prop, value, nodeObj ) {
-
-		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
-
-			// setting properties
-
-			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || prop === 'depth' || /^\d+$/.test( prop ) === true ) {
-
-				nodeObj[ prop ].assign( value );
-
-				return true;
-
-			}
-
-		}
-
-		return Reflect.set( node, prop, value, nodeObj );
-
-	}
-
-};
+// --- FINISH ---
 
 const nodeBuilderFunctionsCacheMap = new WeakMap();
 
