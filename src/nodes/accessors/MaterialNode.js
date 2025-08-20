@@ -235,6 +235,12 @@ class MaterialNode extends Node {
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
 				node.normalMapType = material.normalMapType;
 
+				if ( material.normalMap.projectZ ) {
+
+					node.projectZ = true;
+
+				}
+
 			} else if ( material.bumpMap ) {
 
 				node = bumpMap( this.getTexture( 'bump' ).r, this.getFloat( 'bumpScale' ) );
