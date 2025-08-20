@@ -44,6 +44,8 @@
 
 			let groundMirror, verticalMirror;
 
+			const resolution = 1; // render target scale factor
+
 			init();
 
 			function init() {
@@ -81,8 +83,8 @@
 				geometry = new THREE.CircleGeometry( 40, 64 );
 				groundMirror = new Reflector( geometry, {
 					clipBias: 0.003,
-					textureWidth: window.innerWidth * window.devicePixelRatio,
-					textureHeight: window.innerHeight * window.devicePixelRatio,
+					textureWidth: window.innerWidth * resolution,
+					textureHeight: window.innerHeight * resolution,
 					color: 0xb5b5b5
 				} );
 				groundMirror.position.y = 0.5;
@@ -92,8 +94,8 @@
 				geometry = new THREE.PlaneGeometry( 100, 100 );
 				verticalMirror = new Reflector( geometry, {
 					clipBias: 0.003,
-					textureWidth: window.innerWidth * window.devicePixelRatio,
-					textureHeight: window.innerHeight * window.devicePixelRatio,
+					textureWidth: window.innerWidth * resolution,
+					textureHeight: window.innerHeight * resolution,
 					color: 0xc1cbcb
 				} );
 				verticalMirror.position.y = 50;
@@ -181,12 +183,12 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				groundMirror.getRenderTarget().setSize(
-					window.innerWidth * window.devicePixelRatio,
-					window.innerHeight * window.devicePixelRatio
+					window.innerWidth * resolution,
+					window.innerHeight * resolution
 				);
 				verticalMirror.getRenderTarget().setSize(
-					window.innerWidth * window.devicePixelRatio,
-					window.innerHeight * window.devicePixelRatio
+					window.innerWidth * resolution,
+					window.innerHeight * resolution
 				);
 
 			}
