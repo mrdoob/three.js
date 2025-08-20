@@ -30,11 +30,11 @@ class StructNode extends Node {
 
 	}
 
-	constructor( structLayoutNode, values ) {
+	constructor( structTypeNode, values ) {
 
 		super( 'vec3' );
 
-		this.structLayoutNode = structLayoutNode;
+		this.structTypeNode = structTypeNode;
 		this.values = values;
 
 		this.isStructNode = true;
@@ -43,13 +43,13 @@ class StructNode extends Node {
 
 	getNodeType( builder ) {
 
-		return this.structLayoutNode.getNodeType( builder );
+		return this.structTypeNode.getNodeType( builder );
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.structLayoutNode.getMemberType( builder, name );
+		return this.structTypeNode.getMemberType( builder, name );
 
 	}
 
@@ -59,7 +59,7 @@ class StructNode extends Node {
 		const structType = nodeVar.type;
 		const propertyName = builder.getPropertyName( nodeVar );
 
-		builder.addLineFlowCode( `${ propertyName } = ${ builder.generateStruct( structType, this.structLayoutNode.membersLayout, this.values ) }`, this );
+		builder.addLineFlowCode( `${ propertyName } = ${ builder.generateStruct( structType, this.structTypeNode.membersLayout, this.values ) }`, this );
 
 		return nodeVar.name;
 
