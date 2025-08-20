@@ -124,7 +124,7 @@
 				const roughness = uniform( .9 );
 				const radius = uniform( 0.2 );
 
-				const reflection = reflector( { resolution: .5, depth: true, bounces: false } ); // 0.5 is half of the rendering view
+				const reflection = reflector( { resolutionScale: .5, depth: true, bounces: false } ); // 0.5 is half of the rendering view
 				const reflectionDepth = reflection.getDepthNode();
 				reflection.target.rotateX( - Math.PI / 2 );
 				scene.add( reflection.target );
@@ -194,7 +194,7 @@
 				gui = new GUI();
 				gui.add( roughness, 'value', 0, 1 ).name( 'roughness' );
 				gui.add( radius, 'value', 0, 1 ).name( 'radius' );
-				gui.add( reflection.reflector, 'resolution', .25, 1 ).name( 'resolution' );
+				gui.add( reflection.reflector, 'resolutionScale', .25, 1 ).name( 'resolution scale' );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
