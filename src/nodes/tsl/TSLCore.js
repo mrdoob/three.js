@@ -67,7 +67,7 @@ Node.prototype.assign = function ( ...params ) {
 
 		const nodeElement = NodeElements.get( 'assign' );
 
-		return this.isStackNode ? this.add( nodeElement( ...params ) ) : nodeElement( this, ...params );
+		return this.add( nodeElement( ...params ) );
 
 	}
 
