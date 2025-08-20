@@ -26,10 +26,246 @@ export function addMethodChaining( name, nodeElement ) {
 
 	NodeElements.set( name, nodeElement );
 
+	if ( name !== 'assign' ) {
+
+		Node.prototype[ name ] = function ( ...params ) {
+
+			//if ( name === 'toVarIntent' ) return this;
+
+			return this.isStackNode ? this.add( nodeElement( ...params ) ) : nodeElement( this, ...params );
+
+		};
+
+		Node.prototype[ name + 'Assign' ] = function ( ...params ) {
+
+			return this.isStackNode ? this.assign( params[ 0 ], nodeElement( ...params ) ) : this.assign( nodeElement( this, ...params ) );
+
+		};
+
+	} else {
+
+		console.log( name );
+
+	}
+
 }
 
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
 const parseSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
+
+// Extend Node Class for TSL
+
+Node.prototype.assign = function ( ...params ) {
+
+	if ( this.isStackNode !== true ) {
+
+		currentStack.assign( this, ...params );
+
+		return this;
+
+	} else {
+
+		const nodeElement = NodeElements.get( 'assign' );
+
+		return this.isStackNode ? this.add( nodeElement( ...params ) ) : nodeElement( this, ...params );
+
+	}
+
+};
+
+Node.prototype.toVarIntent = function () {
+
+	return this;
+
+};
+
+Node.prototype.get = function ( value ) {
+
+	return new MemberNode( this, value );
+
+};
+
+//
+
+const swizzleA = [ 'x', 'y', 'z', 'w' ];
+const swizzleB = [ 'r', 'g', 'b', 'a' ];
+const swizzleC = [ 's', 't', 'p', 'q' ];
+
+const proto = {};
+
+function setProtoSwizzle( property, altA, altB ) {
+
+	// swizzle properties
+
+	proto[ property ] = proto[ altA ] = proto[ altB ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let split = this._cache[ property ];
+
+			if ( split === undefined ) {
+
+				split = new SplitNode( this, property );
+
+				this._cache[ property ] = split;
+
+			}
+
+			return split;
+
+		},
+
+		set( value ) {
+
+			this[ property ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+	// set properties ( swizzle ) and sort to xyzw sequence
+
+	const propUpper = property.toUpperCase();
+	const altAUpper = altA.toUpperCase();
+	const altBUpper = altB.toUpperCase();
+
+	Node.prototype[ 'set' + propUpper ] = Node.prototype[ 'set' + altAUpper ] = Node.prototype[ 'set' + altBUpper ] = function ( value ) {
+
+		const swizzle = parseSwizzleAndSort( property );
+
+		return new SetNode( this, swizzle, nodeObject( value ) );
+
+	};
+
+	Node.prototype[ 'flip' + propUpper ] = Node.prototype[ 'flip' + altAUpper ] = Node.prototype[ 'flip' + altBUpper ] = function () {
+
+		const swizzle = parseSwizzleAndSort( property );
+
+		return new FlipNode( this, swizzle );
+
+	};
+
+}
+
+function setProtoProperty( property, target ) {
+
+	proto[ property ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let split = this._cache[ target ];
+
+			if ( split === undefined ) {
+
+				split = new SplitNode( this, target );
+
+				this._cache[ target ] = split;
+
+			}
+
+			return split;
+
+		},
+
+		set( value ) {
+
+			this[ target ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+}
+
+for ( let a = 0; a < 4; a ++ ) {
+
+	let prop = swizzleA[ a ];
+	let altA = swizzleB[ a ];
+	let altB = swizzleC[ a ];
+
+	setProtoSwizzle( prop, altA, altB );
+
+	for ( let b = 0; b < 4; b ++ ) {
+
+		prop = swizzleA[ a ] + swizzleA[ b ];
+		altA = swizzleB[ a ] + swizzleB[ b ];
+		altB = swizzleC[ a ] + swizzleC[ b ];
+
+		setProtoSwizzle( prop, altA, altB );
+
+		for ( let c = 0; c < 4; c ++ ) {
+
+			prop = swizzleA[ a ] + swizzleA[ b ] + swizzleA[ c ];
+			altA = swizzleB[ a ] + swizzleB[ b ] + swizzleB[ c ];
+			altB = swizzleC[ a ] + swizzleC[ b ] + swizzleC[ c ];
+
+			setProtoSwizzle( prop, altA, altB );
+
+			for ( let d = 0; d < 4; d ++ ) {
+
+				prop = swizzleA[ a ] + swizzleA[ b ] + swizzleA[ c ] + swizzleA[ d ];
+				altA = swizzleB[ a ] + swizzleB[ b ] + swizzleB[ c ] + swizzleB[ d ];
+				altB = swizzleC[ a ] + swizzleC[ b ] + swizzleC[ c ] + swizzleC[ d ];
+
+				setProtoSwizzle( prop, altA, altB );
+
+			}
+
+		}
+
+	}
+
+}
+
+for ( let i = 0; i < 32; i ++ ) {
+
+	proto[ i ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let element = this._cache[ i ];
+
+			if ( element === undefined ) {
+
+				element = new ArrayElementNode( this, new ConstNode( i, 'uint' ) );
+
+				this._cache[ i ] = element;
+
+			}
+
+			return element;
+
+		},
+
+		set( value ) {
+
+			this[ i ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+}
+
+//setProtoProperty( 'width', 'x' );
+//setProtoProperty( 'height', 'y' );
+//setProtoProperty( 'depth', 'z' );
+
+Object.defineProperties( Node.prototype, proto );
+
+//
 
 const shaderNodeHandler = {
 
@@ -45,31 +281,7 @@ const shaderNodeHandler = {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
-			if ( node.isStackNode !== true && prop === 'assign' ) {
-
-				return ( ...params ) => {
-
-					currentStack.assign( nodeObj, ...params );
-
-					return nodeObj;
-
-				};
-
-			} else if ( NodeElements.has( prop ) ) {
-
-				const nodeElement = NodeElements.get( prop );
-
-				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
-
-			} else if ( prop === 'toVarIntent' ) {
-
-				return () => nodeObj;
-
-			} else if ( prop === 'self' ) {
-
-				return node;
-
-			} else if ( prop.endsWith( 'Assign' ) && NodeElements.has( prop.slice( 0, prop.length - 'Assign'.length ) ) ) {
+			if ( prop.endsWith( 'Assign' ) && NodeElements.has( prop.slice( 0, prop.length - 'Assign'.length ) ) ) {
 
 				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
 
@@ -119,6 +331,8 @@ const shaderNodeHandler = {
 
 				// accessing properties
 
+				console.log( prop );
+
 				return ( value ) => nodeObject( new MemberNode( nodeObj, value ) );
 
 			}
@@ -151,7 +365,6 @@ const shaderNodeHandler = {
 
 };
 
-const nodeObjectsCacheMap = new WeakMap();
 const nodeBuilderFunctionsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj, altType = null ) {
@@ -160,18 +373,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	if ( type === 'node' ) {
 
-		let nodeObject = nodeObjectsCacheMap.get( obj );
-
-		if ( nodeObject === undefined ) {
-
-			nodeObject = new Proxy( obj, shaderNodeHandler );
-
-			nodeObjectsCacheMap.set( obj, nodeObject );
-			nodeObjectsCacheMap.set( nodeObject, nodeObject );
-
-		}
-
-		return nodeObject;
+		return obj;
 
 	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
@@ -778,7 +980,7 @@ export const getConstNodeType = ( value ) => ( value !== undefined && value !== 
 
 export function ShaderNode( jsFunc, nodeType ) {
 
-	return new Proxy( new ShaderNodeInternal( jsFunc, nodeType ), shaderNodeHandler );
+	return new ShaderNodeInternal( jsFunc, nodeType );
 
 }
 

@@ -113,7 +113,7 @@ export function getCacheKey( object, force = false ) {
  */
 export function* getNodeChildren( node, toJSON = false ) {
 
-	for ( const property in node ) {
+	for ( const property of Object.getOwnPropertyNames( node ) ) {
 
 		// Ignore private properties.
 		if ( property.startsWith( '_' ) === true ) continue;
