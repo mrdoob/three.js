@@ -231,7 +231,7 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( texture.isCompressedTexture !== true && texture.isCompressedArrayTexture !== true ) {
+		if ( texture.isCompressedTexture !== true && texture.isCompressedArrayTexture !== true && format !== GPUTextureFormat.RGB9E5UFloat ) {
 
 			usage |= GPUTextureUsage.RENDER_ATTACHMENT;
 
