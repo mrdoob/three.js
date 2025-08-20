@@ -47,6 +47,7 @@ import {
 	KHR_SUPERCOMPRESSION_NONE,
 	KHR_SUPERCOMPRESSION_ZSTD,
 	VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT,
+	VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT,
 	VK_FORMAT_ASTC_4x4_SRGB_BLOCK,
 	VK_FORMAT_ASTC_4x4_UNORM_BLOCK,
 	VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
@@ -953,6 +954,7 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: RGBA_ASTC_4x4_Format,
 	[ VK_FORMAT_ASTC_4x4_SRGB_BLOCK ]: RGBA_ASTC_4x4_Format,
 	[ VK_FORMAT_ASTC_4x4_UNORM_BLOCK ]: RGBA_ASTC_4x4_Format,
+	[ VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT ]: RGBA_ASTC_6x6_Format,
 	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: RGBA_ASTC_6x6_Format,
 	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: RGBA_ASTC_6x6_Format,
 
@@ -996,6 +998,7 @@ const TYPE_MAP = {
 	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: UnsignedByteType,
 
 	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: HalfFloatType,
+	[ VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT ]: HalfFloatType,
 	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: UnsignedByteType,
 	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: UnsignedByteType,
 
@@ -1007,7 +1010,7 @@ async function createRawTexture( container ) {
 
 	if ( FORMAT_MAP[ vkFormat ] === undefined ) {
 
-		throw new Error( 'THREE.KTX2Loader: Unsupported vkFormat.' );
+		throw new Error( 'THREE.KTX2Loader: Unsupported vkFormat: ' + vkFormat );
 
 	}
 
