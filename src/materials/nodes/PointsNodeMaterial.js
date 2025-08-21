@@ -15,6 +15,22 @@ const _size = /*@__PURE__*/ new Vector2();
 /**
  * Node material version of {@link PointsMaterial}.
  *
+ * This material can be used in two ways:
+ *
+ * - By rendering point primitives with {@link Points}. Since WebGPU only supports point primitives
+ * with a pixel size of `1`, it's not possible to define a size.
+ *
+ * ```js
+ * const pointCloud = new THREE.Points( geometry, new THREE.PointsNodeMaterial() );
+ * ```
+ *
+ * - By rendering point primitives with {@link Sprites}. In this case, size is honored,
+ * see {@link PointsNodeMaterial#sizeNode}.
+ *
+ * ```js
+ * const instancedPoints = new THREE.Sprite( new THREE.PointsNodeMaterial( { positionNode: instancedBufferAttribute( positionAttribute ) } ) );
+ * ```
+ *
  * @augments SpriteNodeMaterial
  */
 class PointsNodeMaterial extends SpriteNodeMaterial {
