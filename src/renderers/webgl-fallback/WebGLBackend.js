@@ -540,107 +540,8 @@ class WebGLBackend extends Backend {
 		}
 
 		this._currentContext = previousContext;
-		const renderTarget = renderContext.renderTarget;
 
-		if ( renderContext.textures !== null && renderTarget ) {
-
-			const renderTargetContextData = this.get( renderTarget );
-
-			if ( renderTarget.samples > 0 && this._useMultisampledExtension( renderTarget ) === false ) {
-
-				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
-
-				let mask = gl.COLOR_BUFFER_BIT;
-
-				if ( renderTarget.resolveDepthBuffer ) {
-
-					if ( renderTarget.depthBuffer ) mask |= gl.DEPTH_BUFFER_BIT;
-					if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= gl.STENCIL_BUFFER_BIT;
-
-				}
-
-				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
-				const msaaRenderbuffers = renderTargetContextData.msaaRenderbuffers;
-
-				const textures = renderContext.textures;
-				const isMRT = textures.length > 1;
-
-				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
-				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
-
-				if ( isMRT ) {
-
-					// blitFramebuffer() can only copy/resolve the first color attachment of a framebuffer. When using MRT,
-					// the engine temporarily removes all attachments and then configures each attachment for the resolve.
-
-					for ( let i = 0; i < textures.length; i ++ ) {
-
-						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, null );
-						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, null, 0 );
-
-					}
-
-				}
-
-				for ( let i = 0; i < textures.length; i ++ ) {
-
-					if ( isMRT ) {
-
-						// configure attachment for resolve
-
-						const { textureGPU } = this.get( textures[ i ] );
-
-						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
-						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureGPU, 0 );
-
-					}
-
-					if ( renderContext.scissor ) {
-
-						const { x, y, width, height } = renderContext.scissorValue;
-
-						const viewY = renderContext.height - height - y;
-
-						gl.blitFramebuffer( x, viewY, x + width, viewY + height, x, viewY, x + width, viewY + height, mask, gl.NEAREST );
-
-					} else {
-
-						gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
-
-					}
-
-				}
-
-				if ( isMRT ) {
-
-					// restore attachments
-
-					for ( let i = 0; i < textures.length; i ++ ) {
-
-						const { textureGPU } = this.get( textures[ i ] );
-
-						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
-						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
-
-					}
-
-				}
-
-				if ( this._supportsInvalidateFramebuffer === true ) {
-
-					gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
-
-				}
-
-			} else if ( renderTarget.resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
-
-				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
-				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
-				gl.invalidateFramebuffer( gl.DRAW_FRAMEBUFFER, renderTargetContextData.depthInvalidationArray );
-
-			}
-
-		}
+		this._resolveRenderTarget( renderContext );
 
 		if ( previousContext !== null ) {
 
@@ -799,9 +700,11 @@ class WebGLBackend extends Backend {
 	 * @param {boolean} depth - Whether the depth buffer should be cleared or not.
 	 * @param {boolean} stencil - Whether the stencil buffer should be cleared or not.
 	 * @param {?Object} [descriptor=null] - The render context of the current set render target.
-	 * @param {boolean} [setFrameBuffer=true] - TODO.
+	 * @param {boolean} [setFrameBuffer=true] - Controls whether the intermediate framebuffer should be set or not.
+	 * @param {boolean} [resolveRenderTarget=true] - Controls whether an active render target should be resolved
+	 * or not. Only relevant for explicit clears.
 	 */
-	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true ) {
+	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true, resolveRenderTarget = true ) {
 
 		const { gl, renderer } = this;
 
@@ -883,6 +786,8 @@ class WebGLBackend extends Backend {
 					gl.clearBufferiv( gl.STENCIL, 0, [ clearStencil ] );
 
 				}
+
+				if ( setFrameBuffer && resolveRenderTarget ) this._resolveRenderTarget( descriptor );
 
 			}
 
@@ -1246,7 +1151,7 @@ class WebGLBackend extends Backend {
 						this._currentContext.activeCubeFace = i;
 
 						this._setFramebuffer( this._currentContext );
-						this.clear( false, true, stencilBuffer, this._currentContext, false );
+						this.clear( false, true, stencilBuffer, this._currentContext, false, false );
 
 					}
 
@@ -2558,6 +2463,120 @@ class WebGLBackend extends Backend {
 					state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
 
 				}
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * The method ensures multisampled render targets are resolved.
+	 *
+	 * @private
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	_resolveRenderTarget( renderContext ) {
+
+		const { gl, state } = this;
+
+		const renderTarget = renderContext.renderTarget;
+
+		if ( renderContext.textures !== null && renderTarget ) {
+
+			const renderTargetContextData = this.get( renderTarget );
+
+			if ( renderTarget.samples > 0 && this._useMultisampledExtension( renderTarget ) === false ) {
+
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+
+				let mask = gl.COLOR_BUFFER_BIT;
+
+				if ( renderTarget.resolveDepthBuffer ) {
+
+					if ( renderTarget.depthBuffer ) mask |= gl.DEPTH_BUFFER_BIT;
+					if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= gl.STENCIL_BUFFER_BIT;
+
+				}
+
+				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
+				const msaaRenderbuffers = renderTargetContextData.msaaRenderbuffers;
+
+				const textures = renderContext.textures;
+				const isMRT = textures.length > 1;
+
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+				if ( isMRT ) {
+
+					// blitFramebuffer() can only copy/resolve the first color attachment of a framebuffer. When using MRT,
+					// the engine temporarily removes all attachments and then configures each attachment for the resolve.
+
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, null );
+						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, null, 0 );
+
+					}
+
+				}
+
+				for ( let i = 0; i < textures.length; i ++ ) {
+
+					if ( isMRT ) {
+
+						// configure attachment for resolve
+
+						const { textureGPU } = this.get( textures[ i ] );
+
+						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureGPU, 0 );
+
+					}
+
+					if ( renderContext.scissor ) {
+
+						const { x, y, width, height } = renderContext.scissorValue;
+
+						const viewY = renderContext.height - height - y;
+
+						gl.blitFramebuffer( x, viewY, x + width, viewY + height, x, viewY, x + width, viewY + height, mask, gl.NEAREST );
+
+					} else {
+
+						gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
+
+					}
+
+				}
+
+				if ( isMRT ) {
+
+					// restore attachments
+
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						const { textureGPU } = this.get( textures[ i ] );
+
+						gl.framebufferRenderbuffer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+						gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
+
+					}
+
+				}
+
+				if ( this._supportsInvalidateFramebuffer === true ) {
+
+					gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+
+				}
+
+			} else if ( renderTarget.resolveDepthBuffer === false && renderTargetContextData.framebuffers ) {
+
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+				gl.invalidateFramebuffer( gl.DRAW_FRAMEBUFFER, renderTargetContextData.depthInvalidationArray );
 
 			}
 
