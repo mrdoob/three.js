@@ -202,10 +202,9 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 const scale = /*@__PURE__*/ uniform( 1 ).onFrameUpdate( function ( { renderer } ) {
 
-	const dpr = renderer.getPixelRatio();
-	const size = renderer.getSize( _size );
+	const size = renderer.getSize( _size ); // logical units
 
-	this.value = 0.5 * size.y * dpr;
+	this.value = 0.5 * size.y;
 
 } );
 
