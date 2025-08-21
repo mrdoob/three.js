@@ -26,7 +26,7 @@ class ScreenNode extends Node {
 	/**
 	 * Constructs a new screen node.
 	 *
-	 * @param {('coordinate'|'viewport'|'size'|'uv')} scope - The node's scope.
+	 * @param {('coordinate'|'viewport'|'size'|'uv'|'dpr')} scope - The node's scope.
 	 */
 	constructor( scope ) {
 
@@ -39,8 +39,9 @@ class ScreenNode extends Node {
 		 * - `ScreenNode.VIEWPORT`: The current viewport defined as a four-dimensional vector.
 		 * - `ScreenNode.SIZE`: The dimensions of the current bound framebuffer.
 		 * - `ScreenNode.UV`: Normalized coordinates.
+		 * - `ScreenNode.DPR`: Device pixel ratio.
 		 *
-		 * @type {('coordinate'|'viewport'|'size'|'uv')}
+		 * @type {('coordinate'|'viewport'|'size'|'uv'|'dpr')}
 		 */
 		this.scope = scope;
 
@@ -70,6 +71,7 @@ class ScreenNode extends Node {
 	 */
 	getNodeType() {
 
+		if ( this.scope === ScreenNode.DPR ) return 'float';
 		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';
 		else return 'vec2';
 
@@ -84,7 +86,7 @@ class ScreenNode extends Node {
 
 		let updateType = NodeUpdateType.NONE;
 
-		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT ) {
+		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT || this.scope === ScreenNode.DPR ) {
 
 			updateType = NodeUpdateType.RENDER;
 
@@ -211,7 +213,7 @@ export default ScreenNode;
  * TSL object that represents the current DPR.
  *
  * @tsl
- * @type {ScreenNode<vec2>}
+ * @type {ScreenNode<float>}
  */
 export const screenDPR = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.DPR );
 
