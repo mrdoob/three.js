@@ -6,7 +6,7 @@ import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-let screenSizeVec, viewportVec;
+let _screenSizeVec, _viewportVec;
 
 /**
  * This node provides a collection of screen related metrics.
@@ -43,6 +43,14 @@ class ScreenNode extends Node {
 		 * @type {('coordinate'|'viewport'|'size'|'uv')}
 		 */
 		this.scope = scope;
+
+		/**
+		 * This output node.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this._output = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -102,26 +110,30 @@ class ScreenNode extends Node {
 
 			if ( renderTarget !== null ) {
 
-				viewportVec.copy( renderTarget.viewport );
+				_viewportVec.copy( renderTarget.viewport );
 
 			} else {
 
-				renderer.getViewport( viewportVec );
+				renderer.getViewport( _viewportVec );
 
-				viewportVec.multiplyScalar( renderer.getPixelRatio() );
+				_viewportVec.multiplyScalar( renderer.getPixelRatio() );
 
 			}
+
+		} else if ( this.scope === ScreenNode.DPR ) {
+
+			this._output.value = renderer.getPixelRatio();
 
 		} else {
 
 			if ( renderTarget !== null ) {
 
-				screenSizeVec.width = renderTarget.width;
-				screenSizeVec.height = renderTarget.height;
+				_screenSizeVec.width = renderTarget.width;
+				_screenSizeVec.height = renderTarget.height;
 
 			} else {
 
-				renderer.getDrawingBufferSize( screenSizeVec );
+				renderer.getDrawingBufferSize( _screenSizeVec );
 
 			}
 
@@ -137,17 +149,23 @@ class ScreenNode extends Node {
 
 		if ( scope === ScreenNode.SIZE ) {
 
-			output = uniform( screenSizeVec || ( screenSizeVec = new Vector2() ) );
+			output = uniform( _screenSizeVec || ( _screenSizeVec = new Vector2() ) );
 
 		} else if ( scope === ScreenNode.VIEWPORT ) {
 
-			output = uniform( viewportVec || ( viewportVec = new Vector4() ) );
+			output = uniform( _viewportVec || ( _viewportVec = new Vector4() ) );
+
+		} else if ( scope === ScreenNode.DPR ) {
+
+			output = uniform( 1 );
 
 		} else {
 
 			output = vec2( screenCoordinate.div( screenSize ) );
 
 		}
+
+		this._output = output;
 
 		return output;
 
@@ -183,10 +201,19 @@ ScreenNode.COORDINATE = 'coordinate';
 ScreenNode.VIEWPORT = 'viewport';
 ScreenNode.SIZE = 'size';
 ScreenNode.UV = 'uv';
+ScreenNode.DPR = 'dpr';
 
 export default ScreenNode;
 
 // Screen
+
+/**
+ * TSL object that represents the current DPR.
+ *
+ * @tsl
+ * @type {ScreenNode<vec2>}
+ */
+export const screenDPR = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.DPR );
 
 /**
  * TSL object that represents normalized screen coordinates, unitless in `[0, 1]`.

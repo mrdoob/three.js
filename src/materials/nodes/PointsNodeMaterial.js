@@ -1,14 +1,16 @@
 import SpriteNodeMaterial from './SpriteNodeMaterial.js';
-import { viewportSize, screenSize } from '../../nodes/display/ScreenNode.js';
+import { viewportSize, screenDPR } from '../../nodes/display/ScreenNode.js';
 import { positionGeometry, positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { materialPointSize } from '../../nodes/accessors/MaterialNode.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
-import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, uniform, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { PointsMaterial } from '../PointsMaterial.js';
+import { Vector2 } from '../../math/Vector2.js';
 
 const _defaultValues = /*@__PURE__*/ new PointsMaterial();
+const _size = /*@__PURE__*/ new Vector2();
 
 /**
  * Node material version of {@link PointsMaterial}.
@@ -68,7 +70,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 	}
 
-	setupVertex( builder ) {
+	setupVertexSprite( builder ) {
 
 		const { material, camera } = builder;
 
@@ -88,16 +90,13 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 		let pointSize = sizeNode !== null ? vec2( sizeNode ) : materialPointSize;
 
-		const dpr = builder.renderer.getPixelRatio();
-
-		pointSize = pointSize.mul( dpr );
+		pointSize = pointSize.mul( screenDPR );
 
 		// size attenuation
 
 		if ( camera.isPerspectiveCamera && sizeAttenuation === true ) {
 
 			// follow WebGLRenderer's implementation, and scale by half the canvas height in logical units
-			const scale = float( 0.5 ).mul( screenSize.y ).div( dpr );
 
 			pointSize = pointSize.mul( scale.div( positionView.z.negate() ) );
 
@@ -145,6 +144,21 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 	}
 
+	setupVertex( builder ) {
+
+		if ( builder.object.isPoints ) {
+
+			return super.setupVertex( builder );
+
+
+		} else {
+
+			return this.setupVertexSprite( builder );
+
+		}
+
+	}
+
 	/**
 	 * Whether alpha to coverage should be used or not.
 	 *
@@ -169,5 +183,14 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 	}
 
 }
+
+const scale = /*@__PURE__*/ uniform( 1 ).onFrameUpdate( function ( { renderer } ) {
+
+	const dpr = renderer.getPixelRatio();
+	const size = renderer.getSize( _size );
+
+	this.value = 0.5 * size.y * dpr;
+
+} );
 
 export default PointsNodeMaterial;
