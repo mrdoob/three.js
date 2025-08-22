@@ -465,7 +465,7 @@ const colorNode = wood(
 	uniforms.lightGrainColor
 ).mul( params.clearcoatDarken );
 
-export class WoodNodeMaterial extends THREE.MeshPhysicalMaterial {
+export class WoodNodeMaterial extends THREE.MeshPhysicalNodeMaterial {
 
 	static get type() {
 
