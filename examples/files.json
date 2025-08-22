@@ -358,6 +358,7 @@
 		"webgpu_loader_gltf_sheen",
 		"webgpu_loader_gltf_transmission",
 		"webgpu_loader_materialx",
+		"webgpu_loader_texture_ktx2",
 		"webgpu_materials",
 		"webgpu_materials_alphahash",
 		"webgpu_materials_arrays",
