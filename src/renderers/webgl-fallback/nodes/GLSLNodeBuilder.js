@@ -350,7 +350,7 @@ ${ flowData.code }
 			const channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
 			const uvSnippet = `ivec2(${indexSnippet} % ${ propertySizeName }, ${indexSnippet} / ${ propertySizeName })`;
 
-			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, '0' );
+			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, null, '0' );
 
 			//
 
@@ -384,16 +384,29 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [levelSnippet='0u'] - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0' ) {
 
 		if ( depthSnippet ) {
+
+			if ( offsetSnippet ) {
+
+				return `texelFetchOffset( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet } )`;
 
 		} else {
+
+			if ( offsetSnippet ) {
+
+				return `texelFetchOffset( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
 
@@ -408,19 +421,32 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet -  A GLSL snippet that represents the 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTexture( texture, textureProperty, uvSnippet, depthSnippet ) {
+	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet ) {
 
 		if ( texture.isDepthTexture ) {
 
 			if ( depthSnippet ) uvSnippet = `vec4( ${ uvSnippet }, ${ depthSnippet } )`;
+
+			if ( offsetSnippet ) {
+
+				return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } ).x`;
+
+			}
 
 			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
 		} else {
 
 			if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+
+			if ( offsetSnippet ) {
+
+				return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `texture( ${ textureProperty }, ${ uvSnippet } )`;
 
@@ -435,9 +461,16 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} levelSnippet - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet ) {
+	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+		}
 
 		return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } )`;
 
@@ -450,9 +483,16 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} biasSnippet - A GLSL snippet that represents the bias to apply to the mip level before sampling.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
+	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ biasSnippet } )`;
+
+		}
 
 		return `texture( ${ textureProperty }, ${ uvSnippet }, ${ biasSnippet } )`;
 
@@ -465,9 +505,16 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {Array<string>} gradSnippet - An array holding both gradient GLSL snippets.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet ) {
+	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureGradOffset( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] }, ${ offsetSnippet } )`;
+
+		}
 
 		return `textureGrad( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
 
@@ -482,16 +529,29 @@ ${ flowData.code }
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} compareSnippet -  A GLSL snippet that represents the reference value.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
 			if ( depthSnippet ) {
 
+				if ( offsetSnippet ) {
+
+					return `textureOffset( ${ textureProperty }, vec4( ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } ), ${ offsetSnippet } )`;
+
+				}
+
 				return `texture( ${ textureProperty }, vec4( ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } ) )`;
+
+			}
+
+			if ( offsetSnippet ) {
+
+				return `textureOffset( ${ textureProperty }, vec3( ${ uvSnippet }, ${ compareSnippet } ), ${ offsetSnippet } )`;
 
 			}
 
