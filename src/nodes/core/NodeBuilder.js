@@ -1575,7 +1575,9 @@ class NodeBuilder {
 
 		this.stack = stack( this.stack );
 
-		this.stacks.push( getCurrentStack() || this.stack );
+		const previousStack = getCurrentStack();
+
+		this.stacks.push( previousStack );
 		setCurrentStack( this.stack );
 
 		return this.stack;
