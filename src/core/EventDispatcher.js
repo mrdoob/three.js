@@ -22,12 +22,27 @@
  */
 class EventDispatcher {
 
+	/**
+	 * Constructs a new event dispatcher.
+	 */
 	constructor() {
 
-		// Use a Map here (not a plain object) because we
-		// need to query for its size in some places.
-		/** @type {Map<string,Function[]>} */
-		this._listeners = new Map();
+		/**
+		 * This property is for internal use only.
+		 * It serves as a container for properties
+		 * that must be mutable even if the
+		 * {@link EventDispatcher} has been
+		 * frozen via Object.freeze().
+		 *
+		 * @type {Record<string,any>}
+		 */
+		this._internal = {};
+
+	}
+
+	get _listeners() {
+
+		return this._internal.listeners;
 
 	}
 
@@ -39,25 +54,19 @@ class EventDispatcher {
 	 */
 	addEventListener( type, listener ) {
 
-		if ( typeof listener !== 'function' ) {
-
-			throw new Error( 'listener must be a function' );
-
-		}
+		if ( this._listeners === undefined ) this._internal.listeners = {};
 
 		const listeners = this._listeners;
 
-		let listenerArray = listeners.get( type );
+		if ( listeners[ type ] === undefined ) {
 
-		if ( listenerArray === undefined ) {
-
-			listeners.set( type, listenerArray = [] );
+			listeners[ type ] = [];
 
 		}
 
-		if ( listenerArray.indexOf( listener ) === - 1 ) {
+		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
 
-			listenerArray.push( listener );
+			listeners[ type ].push( listener );
 
 		}
 
@@ -74,11 +83,9 @@ class EventDispatcher {
 
 		const listeners = this._listeners;
 
-		if ( listeners.size === 0 ) return false;
+		if ( listeners === undefined ) return false;
 
-		const listenerArray = listeners.get( type );
-
-		return listenerArray !== undefined && listenerArray.indexOf( listener ) !== - 1;
+		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
 	}
 
@@ -92,9 +99,9 @@ class EventDispatcher {
 
 		const listeners = this._listeners;
 
-		if ( listeners.size === 0 ) return;
+		if ( listeners === undefined ) return;
 
-		const listenerArray = listeners.get( type );
+		const listenerArray = listeners[ type ];
 
 		if ( listenerArray !== undefined ) {
 
@@ -119,9 +126,9 @@ class EventDispatcher {
 
 		const listeners = this._listeners;
 
-		if ( listeners.size === 0 ) return;
+		if ( listeners === undefined ) return;
 
-		const listenerArray = listeners.get( event.type );
+		const listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
 
