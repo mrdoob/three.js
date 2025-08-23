@@ -45,66 +45,21 @@
 			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 			import { WoodNodeMaterial, WoodGenuses, Finishes } from 'three/addons/materials/ProceduralWood.js';
 
-			let scene, base, camera, renderer, controls, canvas, stats, font;
+			let scene, base, camera, renderer, controls, stats, font, blockGeometry;
 
-			async function init() {
+			// Helper function to get grid position
+			function getGridPosition( woodIndex, finishIndex ) {
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-			
+				return {
+					x: 0,
+					y: ( finishIndex - Finishes.length / 2 ) * 1.0,
+					z: ( woodIndex - WoodGenuses.length / 2 + 0.45 ) * 1.0
+				};
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-				camera.position.set( - 0.1, 5, 0.548 );
+			}
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( 1.0 ); // important for performance
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.NeutralToneMapping;
-				renderer.toneMappingExposure = 1.0;
-				renderer.setAnimationLoop( render );
-				document.body.appendChild( renderer.domElement );
-
-				canvas = document.querySelector( 'canvas' );
-				controls = new OrbitControls( camera, canvas );
-				controls.target.set( 0, 0, 0.548 );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-			
-				font = await new FontLoader().loadAsync( './fonts/helvetiker_regular.typeface.json' );
-
-				base = new THREE.Group();
-				base.rotation.set( 0, 0, - Math.PI / 2 );
-				base.position.set( 0, 0, 0.548 );
-				scene.add( base );
-
-				const text_mat = new THREE.MeshStandardMaterial();
-				text_mat.colorNode = TSL.color( '#000000' );
-
-
-				for ( let y = 0; y < Finishes.length; y ++ ) {
-
-					const txt_geo = new TextGeometry( Finishes[ y ], {
-						font: font,
-						size: 0.1,
-						depth: 0.001,
-						curveSegments: 12,
-						bevelEnabled: false
-					} );
-			
-					txt_geo.computeBoundingBox();
-					const offx = - 0.5 * ( txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x );
-					const offy = - 0.5 * ( txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y );
-					const offz = - 0.5 * ( txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z );
-					txt_geo.translate( offx, offy, offz );
-
-					const txt = new THREE.Mesh( txt_geo, text_mat );
-					txt.position.set( 0, y - Finishes.length / 2, - WoodGenuses.length / 2 + 0.45 - 1 );
-					txt.rotateY( - Math.PI / 2 );
-					base.add( txt );
-			
-				}
-
+			// Helper function to create the grid plane
+			function createGridPlane() {
 
 				const material = new THREE.MeshBasicNodeMaterial();
 
@@ -148,35 +103,123 @@
 				const plane = new THREE.Mesh( new THREE.CircleGeometry( 40 ), material );
 				plane.rotation.x = - Math.PI / 2;
 				plane.renderOrder = - 1;
+
+				return plane;
+
+			}
+
+			// Helper function to create and position labels
+			function createLabel( text, font, material, position ) {
+
+				const txt_geo = new TextGeometry( text, {
+					font: font,
+					size: 0.1,
+					depth: 0.001,
+					curveSegments: 12,
+					bevelEnabled: false
+				} );
+
+				txt_geo.computeBoundingBox();
+				const offx = - 0.5 * ( txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x );
+				const offy = - 0.5 * ( txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y );
+				const offz = - 0.5 * ( txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z );
+				txt_geo.translate( offx, offy, offz );
+
+				const label = new THREE.Group();
+				const mesh = new THREE.Mesh( txt_geo );
+				label.add( mesh );
+
+				// Apply default rotation for labels
+				label.rotateY( - Math.PI / 2 );
+
+				label.children[ 0 ].material = material;
+				label.position.copy( position );
+				base.add( label );
+			
+			}
+
+			async function init() {
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+			
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( - 0.1, 5, 0.548 );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( 1.0 ); // important for performance
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 1.0;
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0.548 );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+			
+				font = await new FontLoader().loadAsync( './fonts/helvetiker_regular.typeface.json' );
+
+				// Create shared block geometry
+				blockGeometry = new RoundedBoxGeometry( 0.125, 0.9, 0.9, 10, 0.02 );
+
+				base = new THREE.Group();
+				base.rotation.set( 0, 0, - Math.PI / 2 );
+				base.position.set( 0, 0, 0.548 );
+				scene.add( base );
+
+				const text_mat = new THREE.MeshStandardMaterial();
+				text_mat.colorNode = TSL.color( '#000000' );
+
+				// Create finish labels (using negative wood index for left column)
+				for ( let y = 0; y < Finishes.length; y ++ ) {
+
+					createLabel( Finishes[ y ], font, text_mat, getGridPosition( - 1, y ) );
+
+				}
+
+				// Create and add the grid plane
+				const plane = createGridPlane();
 				scene.add( plane );
 
-				new HDRLoader()
+				await new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'san_giuseppe_bridge_2k.hdr', async ( texture ) => {
+					.loadAsync( 'san_giuseppe_bridge_2k.hdr' ).then( ( texture ) => {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
 						scene.environment = texture;
 						scene.environmentIntensity = 2;
 
-						for ( let x = 0; x < WoodGenuses.length; x ++ ) {
-
-							for ( let y = 0; y < Finishes.length; y ++ ) {
-
-								const cube = add_wood( x, y, text_mat );
-								base.add( cube );
-
-								await new Promise( resolve => setTimeout( resolve, 0 ) );
-
-							}
-
-						}
-
-						// Add custom wood example
-						const customCube = add_custom_wood( text_mat );
-						base.add( customCube );
-
 					} );
+
+				// Create wood labels (using negative finish index for top row)
+				for ( let x = 0; x < WoodGenuses.length; x ++ ) {
+
+					createLabel( WoodGenuses[ x ], font, text_mat, getGridPosition( x, - 1 ) );
+
+				}
+
+				// Create wood blocks
+				for ( let x = 0; x < WoodGenuses.length; x ++ ) {
+
+					for ( let y = 0; y < Finishes.length; y ++ ) {
+
+						const material = WoodNodeMaterial.fromPreset( WoodGenuses[ x ], Finishes[ y ] );
+						const cube = new THREE.Mesh( blockGeometry, material );
+						cube.position.copy( getGridPosition( x, y ) );
+						base.add( cube );
+
+						await new Promise( resolve => setTimeout( resolve, 0 ) );
+
+					}
+
+				}
+
+				 add_custom_wood( text_mat );
 
 			}
 
@@ -207,68 +250,15 @@
 
 			}
 
-			function add_wood( x, y, text_mat ) {
 
-				const txt_geo = new TextGeometry( WoodGenuses[ x ],
-					{
-						font: font,
-						size: 0.1,
-						depth: 0.001,
-						curveSegments: 12,
-						bevelEnabled: false
-					} );
-			
-				txt_geo.computeBoundingBox();
-				const offx = - 0.5 * ( txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x );
-				const offy = - 0.5 * ( txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y );
-				const offz = - 0.5 * ( txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z );
-				txt_geo.translate( offx, offy, offz );
-
-				const txt = new THREE.Mesh( txt_geo, text_mat );
-				txt.position.set( 0, Finishes.length / 2, x - WoodGenuses.length / 2 + 0.45 );
-				txt.rotateY( - Math.PI / 2 );
-				base.add( txt );
-
-				const geometry = new RoundedBoxGeometry( 0.125, 0.9, 0.9, 10, 0.02 );
-				const position =
-				{
-					x: 0,
-					y: y - Finishes.length / 2,
-					z: x - WoodGenuses.length / 2 + 0.45
-				};
-			
-				const cube = new THREE.Mesh( geometry, WoodNodeMaterial.fromPreset( WoodGenuses[ x ], Finishes[ y ] ) );
-				cube.position.set( position.x, position.y, position.z );
-
-				return cube;
-			
-			}
 
 			function add_custom_wood( text_mat ) {
 
-				// Add "Custom" label
-				const txt_geo = new TextGeometry( 'Custom',
-					{
-						font: font,
-						size: 0.1,
-						depth: 0.001,
-						curveSegments: 12,
-						bevelEnabled: false
-					} );
-			
-				txt_geo.computeBoundingBox();
-				const offx = - 0.5 * ( txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x );
-				const offy = - 0.5 * ( txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y );
-				const offz = - 0.5 * ( txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z );
-				txt_geo.translate( offx, offy, offz );
-
-				const txt = new THREE.Mesh( txt_geo, text_mat );
-				txt.position.set( 0, - Finishes.length / 2 - 0.75, 0 );
-				txt.rotateY( - Math.PI / 2 );
-				base.add( txt );
+				// Add "Custom" label (positioned at the end of the grid)
+				createLabel( 'custom', font, text_mat, getGridPosition( Math.round( WoodGenuses.length / 2 - 1 ), 5 ) );
 
 				// Create custom wood material with unique parameters
-				const customMaterial = new WoodNodeMaterial({
+				const customMaterial = new WoodNodeMaterial( {
 					centerSize: 1.8,
 					largeWarpScale: 0.5,
 					ringCount: 45,
@@ -278,24 +268,17 @@
 					splotchIntensity: 1.8,
 					cellScale: 1200,
 					cellSize: 0.05,
-					darkGrainColor: new THREE.Color('#0a0a0a'),
-					lightGrainColor: new THREE.Color('#8b4513'),
+					darkGrainColor: new THREE.Color( '#0a0a0a' ),
+					lightGrainColor: new THREE.Color( '#8b4513' ),
 					clearcoat: 1,
 					clearcoatRoughness: 0.2
-				});
+				} );
 
-				const geometry = new RoundedBoxGeometry( 0.125, 0.9, 0.9, 10, 0.02 );
-				const position = {
-					x: 0,
-					y: - Finishes.length / 2 - 1.5, // Below the matrix
-					z: 0 // Center horizontally
-				};
-			
-				const cube = new THREE.Mesh( geometry, customMaterial );
-				cube.position.set( position.x, position.y, position.z );
+				const cube = new THREE.Mesh( blockGeometry, customMaterial );
+				cube.position.copy( getGridPosition( Math.round( WoodGenuses.length / 2 ), 5 ) );
 
-				return cube;
-			
+				base.add( cube );
+
 			}
 		</script>
 	</body>
