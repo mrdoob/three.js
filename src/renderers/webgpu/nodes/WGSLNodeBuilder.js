@@ -131,22 +131,6 @@ const wgslMethods = {
 	bitcast: 'bitcast<f32>'
 };
 
-// WebGPU issue: does not support pow() with negative base on Windows
-
-if ( typeof navigator !== 'undefined' && /Windows/g.test( navigator.userAgent ) ) {
-
-	wgslPolyfill.pow_float = new CodeNode( 'fn tsl_pow_float( a : f32, b : f32 ) -> f32 { return select( -pow( -a, b ), pow( a, b ), a > 0.0 ); }' );
-	wgslPolyfill.pow_vec2 = new CodeNode( 'fn tsl_pow_vec2( a : vec2f, b : vec2f ) -> vec2f { return vec2f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ) ); }', [ wgslPolyfill.pow_float ] );
-	wgslPolyfill.pow_vec3 = new CodeNode( 'fn tsl_pow_vec3( a : vec3f, b : vec3f ) -> vec3f { return vec3f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ), tsl_pow_float( a.z, b.z ) ); }', [ wgslPolyfill.pow_float ] );
-	wgslPolyfill.pow_vec4 = new CodeNode( 'fn tsl_pow_vec4( a : vec4f, b : vec4f ) -> vec4f { return vec4f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ), tsl_pow_float( a.z, b.z ), tsl_pow_float( a.w, b.w ) ); }', [ wgslPolyfill.pow_float ] );
-
-	wgslMethods.pow_float = 'tsl_pow_float';
-	wgslMethods.pow_vec2 = 'tsl_pow_vec2';
-	wgslMethods.pow_vec3 = 'tsl_pow_vec3';
-	wgslMethods.pow_vec4 = 'tsl_pow_vec4';
-
-}
-
 //
 
 let diagnostics = '';
