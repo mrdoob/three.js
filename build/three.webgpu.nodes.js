@@ -699,7 +699,6 @@ function getCacheKey$1( object, force = false ) {
 	if ( object.isNode === true ) {
 
 		values.push( object.id );
-		object = object.getSelf();
 
 	}
 
@@ -724,7 +723,7 @@ function getCacheKey$1( object, force = false ) {
  */
 function* getNodeChildren( node, toJSON = false ) {
 
-	for ( const property in node ) {
+	for ( const property of Object.getOwnPropertyNames( node ) ) {
 
 		// Ignore private properties.
 		if ( property.startsWith( '_' ) === true ) continue;
@@ -1346,7 +1345,7 @@ class Node extends EventDispatcher {
 	onUpdate( callback, updateType ) {
 
 		this.updateType = updateType;
-		this.update = callback.bind( this.getSelf() );
+		this.update = callback.bind( this );
 
 		return this;
 
@@ -1399,23 +1398,9 @@ class Node extends EventDispatcher {
 	 */
 	onReference( callback ) {
 
-		this.updateReference = callback.bind( this.getSelf() );
+		this.updateReference = callback.bind( this );
 
 		return this;
-
-	}
-
-	/**
-	 * The `this` reference might point to a Proxy so this method can be used
-	 * to get the reference to the actual node instance.
-	 *
-	 * @return {Node} A reference to the node.
-	 */
-	getSelf() {
-
-		// Returns non-node object.
-
-		return this.self || this;
 
 	}
 
@@ -3206,6 +3191,8 @@ let currentStack = null;
 
 const NodeElements = new Map();
 
+// Extend Node Class for TSL using prototype
+
 function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
@@ -3219,132 +3206,257 @@ function addMethodChaining( name, nodeElement ) {
 
 	NodeElements.set( name, nodeElement );
 
+	if ( name !== 'assign' ) {
+
+		// Changing Node prototype to add method chaining
+
+		Node.prototype[ name ] = function ( ...params ) {
+
+			//if ( name === 'toVarIntent' ) return this;
+
+			return this.isStackNode ? this.add( nodeElement( ...params ) ) : nodeElement( this, ...params );
+
+		};
+
+		// Adding assign method chaining
+
+		Node.prototype[ name + 'Assign' ] = function ( ...params ) {
+
+			return this.isStackNode ? this.assign( params[ 0 ], nodeElement( ...params ) ) : this.assign( nodeElement( this, ...params ) );
+
+		};
+
+	}
+
 }
 
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
 const parseSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
 
-const shaderNodeHandler = {
+Node.prototype.assign = function ( ...params ) {
 
-	setup( NodeClosure, params ) {
+	if ( this.isStackNode !== true ) {
 
-		const inputs = params.shift();
+		currentStack.assign( this, ...params );
 
-		return NodeClosure( nodeObjects( inputs ), ...params );
+		return this;
 
-	},
+	} else {
 
-	get( node, prop, nodeObj ) {
+		const nodeElement = NodeElements.get( 'assign' );
 
-		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
-
-			if ( node.isStackNode !== true && prop === 'assign' ) {
-
-				return ( ...params ) => {
-
-					currentStack.assign( nodeObj, ...params );
-
-					return nodeObj;
-
-				};
-
-			} else if ( NodeElements.has( prop ) ) {
-
-				const nodeElement = NodeElements.get( prop );
-
-				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
-
-			} else if ( prop === 'toVarIntent' ) {
-
-				return () => nodeObj;
-
-			} else if ( prop === 'self' ) {
-
-				return node;
-
-			} else if ( prop.endsWith( 'Assign' ) && NodeElements.has( prop.slice( 0, prop.length - 'Assign'.length ) ) ) {
-
-				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
-
-				return node.isStackNode ? ( ...params ) => nodeObj.assign( params[ 0 ], nodeElement( ...params ) ) : ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
-
-			} else if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
-
-				// accessing properties ( swizzle )
-
-				prop = parseSwizzle( prop );
-
-				return nodeObject( new SplitNode( nodeObj, prop ) );
-
-			} else if ( /^set[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
-
-				// set properties ( swizzle ) and sort to xyzw sequence
-
-				prop = parseSwizzleAndSort( prop.slice( 3 ).toLowerCase() );
-
-				return ( value ) => nodeObject( new SetNode( node, prop, nodeObject( value ) ) );
-
-			} else if ( /^flip[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
-
-				// set properties ( swizzle ) and sort to xyzw sequence
-
-				prop = parseSwizzleAndSort( prop.slice( 4 ).toLowerCase() );
-
-				return () => nodeObject( new FlipNode( nodeObject( node ), prop ) );
-
-			} else if ( prop === 'width' || prop === 'height' || prop === 'depth' ) {
-
-				// accessing property
-
-				if ( prop === 'width' ) prop = 'x';
-				else if ( prop === 'height' ) prop = 'y';
-				else if ( prop === 'depth' ) prop = 'z';
-
-				return nodeObject( new SplitNode( node, prop ) );
-
-			} else if ( /^\d+$/.test( prop ) === true ) {
-
-				// accessing array
-
-				return nodeObject( new ArrayElementNode( nodeObj, new ConstNode( Number( prop ), 'uint' ) ) );
-
-			} else if ( /^get$/.test( prop ) === true ) {
-
-				// accessing properties
-
-				return ( value ) => nodeObject( new MemberNode( nodeObj, value ) );
-
-			}
-
-		}
-
-		return Reflect.get( node, prop, nodeObj );
-
-	},
-
-	set( node, prop, value, nodeObj ) {
-
-		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
-
-			// setting properties
-
-			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || prop === 'depth' || /^\d+$/.test( prop ) === true ) {
-
-				nodeObj[ prop ].assign( value );
-
-				return true;
-
-			}
-
-		}
-
-		return Reflect.set( node, prop, value, nodeObj );
+		return this.add( nodeElement( ...params ) );
 
 	}
 
 };
 
-const nodeObjectsCacheMap = new WeakMap();
+Node.prototype.toVarIntent = function () {
+
+	return this;
+
+};
+
+Node.prototype.get = function ( value ) {
+
+	return new MemberNode( this, value );
+
+};
+
+// Cache prototype for TSL
+
+const proto = {};
+
+// Set swizzle properties for xyzw, rgba, and stpq.
+
+function setProtoSwizzle( property, altA, altB ) {
+
+	// swizzle properties
+
+	proto[ property ] = proto[ altA ] = proto[ altB ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let split = this._cache[ property ];
+
+			if ( split === undefined ) {
+
+				split = new SplitNode( this, property );
+
+				this._cache[ property ] = split;
+
+			}
+
+			return split;
+
+		},
+
+		set( value ) {
+
+			this[ property ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+	// set properties ( swizzle ) and sort to xyzw sequence
+
+	const propUpper = property.toUpperCase();
+	const altAUpper = altA.toUpperCase();
+	const altBUpper = altB.toUpperCase();
+
+	// Set methods for swizzle properties
+
+	Node.prototype[ 'set' + propUpper ] = Node.prototype[ 'set' + altAUpper ] = Node.prototype[ 'set' + altBUpper ] = function ( value ) {
+
+		const swizzle = parseSwizzleAndSort( property );
+
+		return new SetNode( this, swizzle, nodeObject( value ) );
+
+	};
+
+	// Set methods for flip properties
+
+	Node.prototype[ 'flip' + propUpper ] = Node.prototype[ 'flip' + altAUpper ] = Node.prototype[ 'flip' + altBUpper ] = function () {
+
+		const swizzle = parseSwizzleAndSort( property );
+
+		return new FlipNode( this, swizzle );
+
+	};
+
+}
+
+const swizzleA = [ 'x', 'y', 'z', 'w' ];
+const swizzleB = [ 'r', 'g', 'b', 'a' ];
+const swizzleC = [ 's', 't', 'p', 'q' ];
+
+for ( let a = 0; a < 4; a ++ ) {
+
+	let prop = swizzleA[ a ];
+	let altA = swizzleB[ a ];
+	let altB = swizzleC[ a ];
+
+	setProtoSwizzle( prop, altA, altB );
+
+	for ( let b = 0; b < 4; b ++ ) {
+
+		prop = swizzleA[ a ] + swizzleA[ b ];
+		altA = swizzleB[ a ] + swizzleB[ b ];
+		altB = swizzleC[ a ] + swizzleC[ b ];
+
+		setProtoSwizzle( prop, altA, altB );
+
+		for ( let c = 0; c < 4; c ++ ) {
+
+			prop = swizzleA[ a ] + swizzleA[ b ] + swizzleA[ c ];
+			altA = swizzleB[ a ] + swizzleB[ b ] + swizzleB[ c ];
+			altB = swizzleC[ a ] + swizzleC[ b ] + swizzleC[ c ];
+
+			setProtoSwizzle( prop, altA, altB );
+
+			for ( let d = 0; d < 4; d ++ ) {
+
+				prop = swizzleA[ a ] + swizzleA[ b ] + swizzleA[ c ] + swizzleA[ d ];
+				altA = swizzleB[ a ] + swizzleB[ b ] + swizzleB[ c ] + swizzleB[ d ];
+				altB = swizzleC[ a ] + swizzleC[ b ] + swizzleC[ c ] + swizzleC[ d ];
+
+				setProtoSwizzle( prop, altA, altB );
+
+			}
+
+		}
+
+	}
+
+}
+
+// Set/get static properties for array elements (0-31).
+
+for ( let i = 0; i < 32; i ++ ) {
+
+	proto[ i ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let element = this._cache[ i ];
+
+			if ( element === undefined ) {
+
+				element = new ArrayElementNode( this, new ConstNode( i, 'uint' ) );
+
+				this._cache[ i ] = element;
+
+			}
+
+			return element;
+
+		},
+
+		set( value ) {
+
+			this[ i ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+}
+
+/*
+// Set properties for width, height, and depth.
+
+function setProtoProperty( property, target ) {
+
+	proto[ property ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let split = this._cache[ target ];
+
+			if ( split === undefined ) {
+
+				split = new SplitNode( this, target );
+
+				this._cache[ target ] = split;
+
+			}
+
+			return split;
+
+		},
+
+		set( value ) {
+
+			this[ target ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+}
+
+setProtoProperty( 'width', 'x' );
+setProtoProperty( 'height', 'y' );
+setProtoProperty( 'depth', 'z' );
+*/
+
+Object.defineProperties( Node.prototype, proto );
+
+// --- FINISH ---
+
 const nodeBuilderFunctionsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj, altType = null ) {
@@ -3353,18 +3465,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	if ( type === 'node' ) {
 
-		let nodeObject = nodeObjectsCacheMap.get( obj );
-
-		if ( nodeObject === undefined ) {
-
-			nodeObject = new Proxy( obj, shaderNodeHandler );
-
-			nodeObjectsCacheMap.set( obj, nodeObject );
-			nodeObjectsCacheMap.set( nodeObject, nodeObject );
-
-		}
-
-		return nodeObject;
+		return obj;
 
 	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
@@ -3971,7 +4072,7 @@ const getConstNodeType = ( value ) => ( value !== undefined && value !== null ) 
 
 function ShaderNode( jsFunc, nodeType ) {
 
-	return new Proxy( new ShaderNodeInternal( jsFunc, nodeType ), shaderNodeHandler );
+	return new ShaderNodeInternal( jsFunc, nodeType );
 
 }
 
@@ -4863,13 +4964,11 @@ class UniformNode extends InputNode {
 
 	onUpdate( callback, updateType ) {
 
-		const self = this.getSelf();
-
-		callback = callback.bind( self );
+		callback = callback.bind( this );
 
 		return super.onUpdate( ( frame ) => {
 
-			const value = callback( frame, self );
+			const value = callback( frame, this );
 
 			if ( value !== undefined ) {
 
@@ -8829,7 +8928,7 @@ class ReferenceBaseNode extends Node {
 	 */
 	setNodeType( uniformType ) {
 
-		const node = uniform( null, uniformType ).getSelf();
+		const node = uniform( null, uniformType );
 
 		if ( this.group !== null ) {
 
@@ -10767,6 +10866,15 @@ class TextureNode extends UniformNode {
 		this.gradNode = null;
 
 		/**
+		 * Represents the optional texel offset applied to the unnormalized texture
+		 * coordinate before sampling the texture.
+		 *
+		 * @type {?Node<ivec2|ivec3>}
+		 * @default null
+		 */
+		this.offsetNode = null;
+
+		/**
 		 * Whether texture values should be sampled or fetched.
 		 *
 		 * @type {boolean}
@@ -11035,6 +11143,7 @@ class TextureNode extends UniformNode {
 		properties.compareNode = this.compareNode;
 		properties.gradNode = this.gradNode;
 		properties.depthNode = this.depthNode;
+		properties.offsetNode = this.offsetNode;
 
 	}
 
@@ -11052,6 +11161,19 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
+	 * Generates the offset code snippet.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} offsetNode - The offset node to generate code for.
+	 * @return {string} The generated code snippet.
+	 */
+	generateOffset( builder, offsetNode ) {
+
+		return offsetNode.build( builder, 'ivec2' );
+
+	}
+
+	/**
 	 * Generates the snippet for the texture sampling.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -11062,9 +11184,10 @@ class TextureNode extends UniformNode {
 	 * @param {?string} depthSnippet - The depth snippet.
 	 * @param {?string} compareSnippet - The compare snippet.
 	 * @param {?Array<string>} gradSnippet - The grad snippet.
+	 * @param {?string} offsetSnippet - The offset snippet.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet ) {
 
 		const texture = this.value;
 
@@ -11072,27 +11195,27 @@ class TextureNode extends UniformNode {
 
 		if ( levelSnippet ) {
 
-			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet );
+			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
 
 		} else if ( biasSnippet ) {
 
-			snippet = builder.generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet );
+			snippet = builder.generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, offsetSnippet );
 
 		} else if ( gradSnippet ) {
 
-			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet );
+			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, offsetSnippet );
 
 		} else if ( compareSnippet ) {
 
-			snippet = builder.generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet );
+			snippet = builder.generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet );
 
 		} else if ( this.sampler === false ) {
 
-			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet );
+			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet );
 
 		} else {
 
-			snippet = builder.generateTexture( texture, textureProperty, uvSnippet, depthSnippet );
+			snippet = builder.generateTexture( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet );
 
 		}
 
@@ -11130,7 +11253,7 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, depthNode, gradNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, depthNode, gradNode, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -11138,12 +11261,13 @@ class TextureNode extends UniformNode {
 				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
+				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
 
 				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet );
+				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet );
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
 
@@ -11313,7 +11437,7 @@ class TextureNode extends UniformNode {
 	 */
 	getBase() {
 
-		return this.referenceNode ? this.referenceNode.getBase() : this.getSelf();
+		return this.referenceNode ? this.referenceNode.getBase() : this;
 
 	}
 
@@ -11360,6 +11484,22 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.depthNode = nodeObject( depthNode );
+		textureNode.referenceNode = this.getBase();
+
+		return nodeObject( textureNode );
+
+	}
+
+	/**
+	 * Samples the texture by defining an offset node.
+	 *
+	 * @param {Node<ivec2>} offsetNode - The offset node.
+	 * @return {TextureNode} A texture node representing the texture sample.
+	 */
+	offset( offsetNode ) {
+
+		const textureNode = this.clone();
+		textureNode.offsetNode = nodeObject( offsetNode );
 		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
@@ -11420,6 +11560,7 @@ class TextureNode extends UniformNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
 
@@ -13654,7 +13795,7 @@ const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = null, bia
 	if ( value && value.isCubeTextureNode === true ) {
 
 		textureNode = nodeObject( value.clone() );
-		textureNode.referenceNode = value.getSelf(); // Ensure the reference is set to the original node
+		textureNode.referenceNode = value; // Ensure the reference is set to the original node
 
 		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
 		if ( levelNode !== null ) textureNode.levelNode = nodeObject( levelNode );
@@ -13956,7 +14097,7 @@ class ReferenceNode extends Node {
 
 		if ( this.name !== null ) node.setName( this.name );
 
-		this.node = node.getSelf();
+		this.node = node;
 
 	}
 
@@ -18339,7 +18480,7 @@ class ClippingNode extends Node {
 
 			if ( this.hardwareClipping === false && numUnionPlanes > 0 ) {
 
-				const clippingPlanes = uniformArray( unionPlanes );
+				const clippingPlanes = uniformArray( unionPlanes ).setGroup( renderGroup );
 
 				Loop( numUnionPlanes, ( { i } ) => {
 
@@ -18358,7 +18499,7 @@ class ClippingNode extends Node {
 
 			if ( numIntersectionPlanes > 0 ) {
 
-				const clippingPlanes = uniformArray( intersectionPlanes );
+				const clippingPlanes = uniformArray( intersectionPlanes ).setGroup( renderGroup );
 				const intersectionClipOpacity = float( 1 ).toVar( 'intersectionClipOpacity' );
 
 				Loop( numIntersectionPlanes, ( { i } ) => {
@@ -18399,7 +18540,7 @@ class ClippingNode extends Node {
 
 			if ( this.hardwareClipping === false && numUnionPlanes > 0 ) {
 
-				const clippingPlanes = uniformArray( unionPlanes );
+				const clippingPlanes = uniformArray( unionPlanes ).setGroup( renderGroup );
 
 				Loop( numUnionPlanes, ( { i } ) => {
 
@@ -18414,7 +18555,7 @@ class ClippingNode extends Node {
 
 			if ( numIntersectionPlanes > 0 ) {
 
-				const clippingPlanes = uniformArray( intersectionPlanes );
+				const clippingPlanes = uniformArray( intersectionPlanes ).setGroup( renderGroup );
 				const clipped = bool( true ).toVar( 'clipped' );
 
 				Loop( numIntersectionPlanes, ( { i } ) => {
@@ -18447,7 +18588,7 @@ class ClippingNode extends Node {
 
 		return Fn( () => {
 
-			const clippingPlanes = uniformArray( unionPlanes );
+			const clippingPlanes = uniformArray( unionPlanes ).setGroup( renderGroup );
 			const hw_clip_distances = builtin( builder.getClipDistance() );
 
 			Loop( numUnionPlanes, ( { i } ) => {
@@ -34849,6 +34990,19 @@ class Texture3DNode extends TextureNode {
 	}
 
 	/**
+	 * Generates the offset code snippet.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} offsetNode - The offset node to generate code for.
+	 * @return {string} The generated code snippet.
+	 */
+	generateOffset( builder, offsetNode ) {
+
+		return offsetNode.build( builder, 'ivec3' );
+
+	}
+
+	/**
 	 * TODO.
 	 *
 	 * @param {Node<vec3>} uvNode - The uv node .
@@ -39755,7 +39909,7 @@ class LightsNode extends Node {
 
 			for ( const lightNode of this._lightNodes ) {
 
-				hash.push( lightNode.getSelf().getHash() );
+				hash.push( lightNode.getHash() );
 
 			}
 
@@ -45011,7 +45165,7 @@ class NodeUniform {
 		 *
 		 * @type {UniformNode}
 		 */
-		this.node = node.getSelf();
+		this.node = node;
 
 	}
 
@@ -46766,7 +46920,7 @@ class NodeBuilder {
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
-				this.updateNodes.push( node.getSelf() );
+				this.updateNodes.push( node );
 
 			}
 
@@ -46779,13 +46933,13 @@ class NodeBuilder {
 
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
-				this.updateBeforeNodes.push( node.getSelf() );
+				this.updateBeforeNodes.push( node );
 
 			}
 
 			if ( updateAfterType !== NodeUpdateType.NONE ) {
 
-				this.updateAfterNodes.push( node.getSelf() );
+				this.updateAfterNodes.push( node );
 
 			}
 
@@ -47610,7 +47764,9 @@ class NodeBuilder {
 
 		this.stack = stack( this.stack );
 
-		this.stacks.push( getCurrentStack() || this.stack );
+		const previousStack = getCurrentStack();
+
+		this.stacks.push( previousStack );
 		setCurrentStack( this.stack );
 
 		return this.stack;
@@ -57852,7 +58008,7 @@ ${ flowData.code }
 			const channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
 			const uvSnippet = `ivec2(${indexSnippet} % ${ propertySizeName }, ${indexSnippet} / ${ propertySizeName })`;
 
-			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, '0' );
+			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, null, '0' );
 
 			//
 
@@ -57886,16 +58042,29 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [levelSnippet='0u'] - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0' ) {
 
 		if ( depthSnippet ) {
+
+			if ( offsetSnippet ) {
+
+				return `texelFetchOffset( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet } )`;
 
 		} else {
+
+			if ( offsetSnippet ) {
+
+				return `texelFetchOffset( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
 
@@ -57910,19 +58079,32 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet -  A GLSL snippet that represents the 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTexture( texture, textureProperty, uvSnippet, depthSnippet ) {
+	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet ) {
 
 		if ( texture.isDepthTexture ) {
 
 			if ( depthSnippet ) uvSnippet = `vec4( ${ uvSnippet }, ${ depthSnippet } )`;
+
+			if ( offsetSnippet ) {
+
+				return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } ).x`;
+
+			}
 
 			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
 		} else {
 
 			if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+
+			if ( offsetSnippet ) {
+
+				return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `texture( ${ textureProperty }, ${ uvSnippet } )`;
 
@@ -57937,9 +58119,16 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} levelSnippet - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet ) {
+	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+		}
 
 		return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } )`;
 
@@ -57952,9 +58141,16 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} biasSnippet - A GLSL snippet that represents the bias to apply to the mip level before sampling.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
+	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ biasSnippet } )`;
+
+		}
 
 		return `texture( ${ textureProperty }, ${ uvSnippet }, ${ biasSnippet } )`;
 
@@ -57967,9 +58163,16 @@ ${ flowData.code }
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {Array<string>} gradSnippet - An array holding both gradient GLSL snippets.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet ) {
+	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureGradOffset( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] }, ${ offsetSnippet } )`;
+
+		}
 
 		return `textureGrad( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
 
@@ -57984,16 +58187,29 @@ ${ flowData.code }
 	 * @param {string} uvSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} compareSnippet -  A GLSL snippet that represents the reference value.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
 			if ( depthSnippet ) {
 
+				if ( offsetSnippet ) {
+
+					return `textureOffset( ${ textureProperty }, vec4( ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } ), ${ offsetSnippet } )`;
+
+				}
+
 				return `texture( ${ textureProperty }, vec4( ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } ) )`;
+
+			}
+
+			if ( offsetSnippet ) {
+
+				return `textureOffset( ${ textureProperty }, vec3( ${ uvSnippet }, ${ compareSnippet } ), ${ offsetSnippet } )`;
 
 			}
 
@@ -68654,18 +68870,31 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
-	_generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	_generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
 			if ( depthSnippet ) {
 
+				if ( offsetSnippet ) {
+
+					return `textureSample( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ offsetSnippet } )`;
+
+				}
+
 				return `textureSample( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet } )`;
 
 			} else {
+
+				if ( offsetSnippet ) {
+
+					return `textureSample( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+				}
 
 				return `textureSample( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet } )`;
 
@@ -68688,21 +68917,28 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
+	generateTextureSampleLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
 		if ( this.isUnfilterable( texture ) === false ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
 		} else if ( this.isFilteredTexture( texture ) ) {
 
-			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet );
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet );
 
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, levelSnippet );
 
 		}
 
@@ -68880,15 +69116,22 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
-	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0u' ) {
+	generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet = '0u' ) {
 
 		this._include( 'biquadraticTexture' );
 
 		const wrapFunction = this.generateWrapFunction( texture );
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
+
+		if ( offsetSnippet ) {
+
+			uvSnippet = `${ uvSnippet } + vec2<f32>(${ offsetSnippet }) / ${ textureDimension }`;
+
+		}
 
 		return `tsl_biquadraticTexture( ${ textureProperty }, ${ wrapFunction }( ${ uvSnippet } ), ${ textureDimension }, u32( ${ levelSnippet } ) )`;
 
@@ -68902,18 +69145,26 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet = '0u' ) {
+	generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, levelSnippet = '0u' ) {
 
 		const wrapFunction = this.generateWrapFunction( texture );
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
 
 		const vecType = texture.isData3DTexture ? 'vec3' : 'vec2';
+
+		if ( offsetSnippet ) {
+
+			uvSnippet = `${ uvSnippet } + ${ vecType }<f32>(${ offsetSnippet }) / ${ vecType }<f32>( ${ textureDimension } )`;
+
+		}
+
 		const coordSnippet = `${ vecType }<u32>( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } ) )`;
 
-		return this.generateTextureLoad( texture, textureProperty, coordSnippet, depthSnippet, levelSnippet );
+		return this.generateTextureLoad( texture, textureProperty, coordSnippet, depthSnippet, null, levelSnippet );
 
 	}
 
@@ -68924,12 +69175,19 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0u' ) {
 
 		let snippet;
+
+		if ( offsetSnippet ) {
+
+			uvIndexSnippet = `${ uvIndexSnippet } + ${ offsetSnippet }`;
+
+		}
 
 		if ( depthSnippet ) {
 
@@ -69013,20 +69271,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, shaderStage = this.shaderStage ) {
 
 		let snippet = null;
 
 		if ( this.isUnfilterable( texture ) ) {
 
-			snippet = this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, '0', shaderStage );
+			snippet = this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, '0', shaderStage );
 
 		} else {
 
-			snippet = this._generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, shaderStage );
+			snippet = this._generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, shaderStage );
 
 		}
 
@@ -69042,14 +69301,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {Array<string>} gradSnippet - An array holding both gradient WGSL snippets.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, offsetSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
 			// TODO handle i32 or u32 --> uvSnippet, array_index: A, ddx, ddy
+			if ( offsetSnippet ) {
+
+				return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet },  ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] }, ${ offsetSnippet } )`;
+
+			}
+
 			return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet },  ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
 
 		} else {
@@ -69069,16 +69335,29 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} compareSnippet -  A WGSL snippet that represents the reference value.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
 			if ( texture.isDepthTexture === true && texture.isArrayTexture === true ) {
 
+				if ( offsetSnippet ) {
+
+					return `textureSampleCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+				}
+
 				return `textureSampleCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ depthSnippet }, ${ compareSnippet } )`;
+
+			}
+
+			if ( offsetSnippet ) {
+
+				return `textureSampleCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
 
 			}
 
@@ -69100,22 +69379,29 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet ) {
+	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
 		if ( this.isUnfilterable( texture ) === false ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
 		} else if ( this.isFilteredTexture( texture ) ) {
 
-			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet );
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, offsetSnippet, levelSnippet );
 
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, levelSnippet );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, levelSnippet );
 
 		}
 
@@ -69129,12 +69415,19 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
 	 * @param {string} biasSnippet - A WGSL snippet that represents the bias to apply to the mip level before sampling.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, offsetSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ biasSnippet }, ${ offsetSnippet } )`;
+
+			}
 
 			return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ biasSnippet } )`;
 
