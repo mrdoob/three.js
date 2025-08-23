@@ -418,15 +418,6 @@ class NodeMaterial extends Material {
 	}
 
 	/**
-	 * @param {boolean} enable
-	 */
-	_setHardwareClipping( enable ) {
-
-		this._internal.hardwareClipping = enable;
-
-	}
-
-	/**
 	 * Allows to define a custom cache key that influence the material key computation
 	 * for render objects.
 	 *
@@ -635,7 +626,9 @@ class NodeMaterial extends Material {
 	 */
 	setupHardwareClipping( builder ) {
 
-		this._setHardwareClipping( false );
+		const internal = this._internal;
+
+		internal.hardwareClipping = false;
 
 		if ( builder.clippingContext === null ) return;
 
@@ -647,7 +640,7 @@ class NodeMaterial extends Material {
 
 			builder.stack.add( hardwareClipping() );
 
-			this._setHardwareClipping( true );
+			internal.hardwareClipping = true;
 
 		}
 
