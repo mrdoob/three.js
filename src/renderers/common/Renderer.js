@@ -1399,6 +1399,20 @@ class Renderer {
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
+		renderContext.scissorValue.max( _vector4.set( 0, 0, 0, 0 ) );
+
+		if ( renderContext.scissorValue.x + renderContext.scissorValue.width > _drawingBufferSize.width ) {
+
+			renderContext.scissorValue.width = _drawingBufferSize.width - renderContext.scissorValue.x;
+
+		}
+
+		if ( renderContext.scissorValue.y + renderContext.scissorValue.height > _drawingBufferSize.height ) {
+
+			renderContext.scissorValue.height = _drawingBufferSize.height - renderContext.scissorValue.y;
+
+		}
+
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
 		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
