@@ -172,6 +172,10 @@
 
 						}
 
+						// Add custom wood example
+						const customCube = add_custom_wood( text_mat );
+						base.add( customCube );
+
 					} );
 
 			}
@@ -233,7 +237,61 @@
 					z: x - WoodGenuses.length / 2 + 0.45
 				};
 			
-				const cube = new THREE.Mesh( geometry, new WoodNodeMaterial( WoodGenuses[ x ], Finishes[ y ] ) );
+				const cube = new THREE.Mesh( geometry, WoodNodeMaterial.fromPreset( WoodGenuses[ x ], Finishes[ y ] ) );
+				cube.position.set( position.x, position.y, position.z );
+
+				return cube;
+			
+			}
+
+			function add_custom_wood( text_mat ) {
+
+				// Add "Custom" label
+				const txt_geo = new TextGeometry( 'Custom',
+					{
+						font: font,
+						size: 0.1,
+						depth: 0.001,
+						curveSegments: 12,
+						bevelEnabled: false
+					} );
+			
+				txt_geo.computeBoundingBox();
+				const offx = - 0.5 * ( txt_geo.boundingBox.max.x - txt_geo.boundingBox.min.x );
+				const offy = - 0.5 * ( txt_geo.boundingBox.max.y - txt_geo.boundingBox.min.y );
+				const offz = - 0.5 * ( txt_geo.boundingBox.max.z - txt_geo.boundingBox.min.z );
+				txt_geo.translate( offx, offy, offz );
+
+				const txt = new THREE.Mesh( txt_geo, text_mat );
+				txt.position.set( 0, - Finishes.length / 2 - 0.75, 0 );
+				txt.rotateY( - Math.PI / 2 );
+				base.add( txt );
+
+				// Create custom wood material with unique parameters
+				const customMaterial = new WoodNodeMaterial({
+					centerSize: 1.8,
+					largeWarpScale: 0.5,
+					ringCount: 45,
+					ringBias: 0.15,
+					barkThickness: 0.8,
+					splotchScale: 2.5,
+					splotchIntensity: 1.8,
+					cellScale: 1200,
+					cellSize: 0.05,
+					darkGrainColor: new THREE.Color('#0a0a0a'),
+					lightGrainColor: new THREE.Color('#8b4513'),
+					clearcoat: 1,
+					clearcoatRoughness: 0.2
+				});
+
+				const geometry = new RoundedBoxGeometry( 0.125, 0.9, 0.9, 10, 0.02 );
+				const position = {
+					x: 0,
+					y: - Finishes.length / 2 - 1.5, // Below the matrix
+					z: 0 // Center horizontally
+				};
+			
+				const cube = new THREE.Mesh( geometry, customMaterial );
 				cube.position.set( position.x, position.y, position.z );
 
 				return cube;

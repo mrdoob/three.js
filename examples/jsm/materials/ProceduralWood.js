@@ -8,7 +8,7 @@ const mapRange = TSL.Fn( ( [ x, fromMin, fromMax, toMin, toMax, clmp ] ) => {
 	const factor = x.sub( fromMin ).div( fromMax.sub( fromMin ) );
 	const result = toMin.add( factor.mul( toMax.sub( toMin ) ) );
 
-	return TSL.select(clmp, TSL.max(TSL.min(result, toMax), toMin), result);
+	return TSL.select( clmp, TSL.max( TSL.min( result, toMax ), toMin ), result );
 
 } );
 
@@ -60,7 +60,7 @@ const voronoi3d = TSL.wgslFn( `
 // 	const p3 = p.mul( TSL.vec3( 0.1031, 0.1030, 0.0973 ) ).fract();
 // 	const dotProduct = p3.dot( p3.yzx.add( 33.33 ) );
 // 	p3.addAssign( dotProduct );
-	
+
 // 	return p3.xxy.add( p3.yzz ).mul( p3.zyx ).fract();
 
 // } );
@@ -77,7 +77,7 @@ const voronoi3d = TSL.wgslFn( `
 // 		let hashOffset = hash3d(p.add(b)).mul(randomness);
 // 		let r = b.sub(f).add(hashOffset);
 // 		let d = TSL.length(r);
-	
+
 // 		let weight = TSL.exp(d.negate().mul(d).div(TSL.max(smoothness.mul(smoothness), 0.001)));
 // 		res.addAssign(d.mul(weight));
 // 		totalWeight.addAssign(weight);
@@ -91,10 +91,10 @@ const voronoi3d = TSL.wgslFn( `
 const softLightMix = TSL.Fn( ( [ t, col1, col2 ] ) => {
 
 	const tm = TSL.float( 1.0 ).sub( t );
-	
+
 	const one = TSL.vec3( 1.0 );
 	const scr = one.sub( one.sub( col2 ).mul( one.sub( col1 ) ) );
-	
+
 	return tm.mul( col1 ).add( t.mul( one.sub( col1 ).mul( col2 ).mul( col1 ).add( col1.mul( scr ) ) ) );
 
 } );
@@ -233,7 +233,7 @@ const woodRings = TSL.Fn( ( [ w, ringCount, ringBias, ringSizeVariance, ringVari
 
 	const sharpRings = TSL.min( mapRange( rings, 0, ringBias, 0, 1, TSL.bool( true ) ), mapRange( rings, ringBias, 1, 1, 0, TSL.bool( true ) ) );
 
-	const blurAmount = TSL.max(TSL.positionView.length().div(10), 1);
+	const blurAmount = TSL.max( TSL.positionView.length().div( 10 ), 1 );
 	const blurredRings = TSL.smoothstep( blurAmount.negate(), blurAmount, sharpRings.sub( 0.5 ) ).mul( 0.5 ).add( 0.5 );
 
 	return blurredRings;
@@ -280,13 +280,13 @@ const wood = TSL.Fn( ( [
 	darkGrainColor,
 	lightGrainColor
 ] ) => {
-	
+
 	const center = woodCenter( p, centerSize );
 	const mainWarp = spaceWarp( spaceWarp( p, center, largeWarpScale, largeGrainStretch ), smallWarpStrength, smallWarpScale, 0.17 );
 	const detailWarp = spaceWarp( mainWarp, fineWarpStrength, fineWarpScale, 0.17 );
 	const rings = woodRings( detailWarp.length(), ringCount, ringBias, ringSizeVariance, ringVarianceScale, barkThickness );
 	const detail = woodDetail( detailWarp, p, detailWarp.length(), splotchScale );
-	const cells = cellStructure( mainWarp, cellScale, cellSize.div(TSL.max(TSL.positionView.length().mul(10), 1)) );
+	const cells = cellStructure( mainWarp, cellScale, cellSize.div( TSL.max( TSL.positionView.length().mul( 10 ), 1 ) ) );
 	const baseColor = TSL.mix( darkGrainColor, lightGrainColor, rings );
 
 	return softLightMix( splotchIntensity, softLightMix( 0.407, baseColor, cells ), detail );
@@ -465,6 +465,32 @@ const colorNode = wood(
 	uniforms.lightGrainColor
 ).mul( params.clearcoatDarken );
 
+/**
+ * Procedural wood material using TSL (Three.js Shading Language).
+ *
+ * Usage examples:
+ *
+ * // Using presets (recommended for common wood types)
+ * const material = WoodNodeMaterial.fromPreset('walnut', 'gloss');
+ *
+ * // Using custom parameters (for advanced customization)
+ * const material = new WoodNodeMaterial({
+ *   centerSize: 1.2,
+ *   ringCount: 40,
+ *   darkGrainColor: new THREE.Color('#2a1a0a'),
+ *   lightGrainColor: new THREE.Color('#8b4513'),
+ *   clearcoat: 1,
+ *   clearcoatRoughness: 0.3
+ * });
+ *
+ * // Mixing presets with custom overrides
+ * const walnutParams = GetWoodPreset('walnut', 'raw');
+ * const material = new WoodNodeMaterial({
+ *   ...walnutParams,
+ *   ringCount: 50,  // Override specific parameter
+ *   clearcoat: 1    // Add finish
+ * });
+ */
 export class WoodNodeMaterial extends THREE.MeshPhysicalNodeMaterial {
 
 	static get type() {
@@ -473,33 +499,45 @@ export class WoodNodeMaterial extends THREE.MeshPhysicalNodeMaterial {
 
 	}
 
-	constructor( genus = 'teak', finish = 'raw' ) {
+	constructor( params = {} ) {
 
 		super();
 
 		this.isWoodNodeMaterial = true;
 
-		const params = GetWoodPreset( genus, finish );
+		// Get default parameters from teak/raw preset
+		const defaultParams = GetWoodPreset( 'teak', 'raw' );
 
-		for ( const key in params ) {
+		// Merge default params with provided params
+		const finalParams = { ...defaultParams, ...params };
+
+		for ( const key in finalParams ) {
 
 			if ( key === 'genus' || key === 'finish' ) continue;
 
-			if ( typeof params[ key ] === 'string' ) {
+			if ( typeof finalParams[ key ] === 'string' ) {
 
-				this[ key ] = new THREE.Color( params[ key ] );
+				this[ key ] = new THREE.Color( finalParams[ key ] );
 
 			} else {
 
-				this[ key ] = params[ key ];
+				this[ key ] = finalParams[ key ];
 
 			}
 
 		}
 
 		this.colorNode = colorNode;
-		this.clearcoatNode = params.clearcoat;
-		this.clearcoatRoughness = params.clearcoatRoughness;
+		this.clearcoatNode = finalParams.clearcoat;
+		this.clearcoatRoughness = finalParams.clearcoatRoughness;
+
+	}
+
+	// Static method to create material from preset
+	static fromPreset( genus = 'teak', finish = 'raw' ) {
+
+		const params = GetWoodPreset( genus, finish );
+		return new WoodNodeMaterial( params );
 
 	}
 
