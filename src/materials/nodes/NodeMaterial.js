@@ -67,7 +67,9 @@ class NodeMaterial extends Material {
 		 *
 		 * @type {Record<string,any>}
 		 */
-		this._internal = [];
+		this._internal = {
+			hardwareClipping: false,
+		};
 
 		/**
 		 * This flag can be used for type testing.
@@ -405,15 +407,7 @@ class NodeMaterial extends Material {
 	 */
 	get hardwareClipping() {
 
-		const val = this._internal.hardwareClipping;
-
-		if ( val === undefined ) {
-
-			return false;
-
-		}
-
-		return val;
+		return this._internal.hardwareClipping;
 
 	}
 
