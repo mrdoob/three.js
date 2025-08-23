@@ -119,6 +119,8 @@
 	"webxr_xr_ballshooter": [ "physics" ],
 	"webgpu_clearcoat": [ "anisotropy" ],
 	"webgpu_clipping": [ "solid" ],
+	"webgpu_clipping_hardware": ["solid"],
+	"webgpu_clipping_intersection": ["solid"],
 	"webgpu_compute_audio": [ "gpgpu" ],
 	"webgpu_compute_birds": [ "gpgpu" ],
 	"webgpu_compute_geometry": [ "gpgpu" ],
