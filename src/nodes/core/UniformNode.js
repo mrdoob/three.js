@@ -123,13 +123,11 @@ class UniformNode extends InputNode {
 
 	onUpdate( callback, updateType ) {
 
-		const self = this.getSelf();
-
-		callback = callback.bind( self );
+		callback = callback.bind( this );
 
 		return super.onUpdate( ( frame ) => {
 
-			const value = callback( frame, self );
+			const value = callback( frame, this );
 
 			if ( value !== undefined ) {
 

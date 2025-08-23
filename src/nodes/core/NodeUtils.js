@@ -88,7 +88,6 @@ export function getCacheKey( object, force = false ) {
 	if ( object.isNode === true ) {
 
 		values.push( object.id );
-		object = object.getSelf();
 
 	}
 
@@ -113,7 +112,7 @@ export function getCacheKey( object, force = false ) {
  */
 export function* getNodeChildren( node, toJSON = false ) {
 
-	for ( const property in node ) {
+	for ( const property of Object.getOwnPropertyNames( node ) ) {
 
 		// Ignore private properties.
 		if ( property.startsWith( '_' ) === true ) continue;

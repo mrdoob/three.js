@@ -667,7 +667,7 @@ class TextureNode extends UniformNode {
 	 */
 	getBase() {
 
-		return this.referenceNode ? this.referenceNode.getBase() : this.getSelf();
+		return this.referenceNode ? this.referenceNode.getBase() : this;
 
 	}
 
