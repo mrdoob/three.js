@@ -158,6 +158,19 @@ class Texture3DNode extends TextureNode {
 	}
 
 	/**
+	 * Generates the offset code snippet.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} offsetNode - The offset node to generate code for.
+	 * @return {string} The generated code snippet.
+	 */
+	generateOffset( builder, offsetNode ) {
+
+		return offsetNode.build( builder, 'ivec3' );
+
+	}
+
+	/**
 	 * TODO.
 	 *
 	 * @param {Node<vec3>} uvNode - The uv node .
