@@ -28,10 +28,8 @@ class EventDispatcher {
 	constructor() {
 
 		/**
-		 * This property is for internal use only. It serves as
-		 * a container for properties that must be mutable even
-		 * if the {@link EventDispatcher} has been frozen via
-		 * Object.freeze().
+		 * This property is a container for
+		 * internal key/values.
 		 *
 		 * @type {Record<string,any>}
 		 */

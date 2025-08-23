@@ -59,10 +59,8 @@ class NodeMaterial extends Material {
 		super();
 
 		/**
-		 * This property is for internal use only. It serves as
-		 * a container for properties that must be mutable even
-		 * if the {@link NodeMaterial} has been frozen via
-		 * Object.freeze().
+		 * This property is a container for
+		 * internal key/values.
 		 *
 		 * @type {Record<string,any>}
 		 */
