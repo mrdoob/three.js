@@ -620,9 +620,7 @@ class NodeMaterial extends Material {
 	 */
 	setupHardwareClipping( builder ) {
 
-		const internal = this._internal;
-
-		internal.hardwareClipping = false;
+		this._internal.hardwareClipping = false;
 
 		if ( builder.clippingContext === null ) return;
 
@@ -634,7 +632,7 @@ class NodeMaterial extends Material {
 
 			builder.stack.add( hardwareClipping() );
 
-			internal.hardwareClipping = true;
+			this._internal.hardwareClipping = true;
 
 		}
 
