@@ -158,7 +158,7 @@ export const GPUTextureFormat = {
 	BC6HRGBUFloat: 'bc6h-rgb-ufloat',
 	BC6HRGBFloat: 'bc6h-rgb-float',
 	BC7RGBAUnorm: 'bc7-rgba-unorm',
-	BC7RGBAUnormSRGB: 'bc7-rgba-srgb',
+	BC7RGBAUnormSRGB: 'bc7-rgba-unorm-srgb',
 
 	// ETC2 compressed formats usable if 'texture-compression-etc2' is both
 	// supported by the device/user agent and enabled in requestDevice.

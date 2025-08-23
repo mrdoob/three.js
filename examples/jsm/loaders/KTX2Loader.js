@@ -191,10 +191,10 @@ class KTX2Loader extends Loader {
 		this.workerConfig = {
 			astcSupported: await renderer.hasFeatureAsync( 'texture-compression-astc' ),
 			astcHDRSupported: false, // https://github.com/gpuweb/gpuweb/issues/3856
-			etc1Supported: await renderer.hasFeatureAsync( 'texture-compression-etc1' ),
+			etc1Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
 			etc2Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
 			dxtSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
-			bptcSupported: await renderer.hasFeatureAsync( 'texture-compression-bptc' ),
+			bptcSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
 			pvrtcSupported: await renderer.hasFeatureAsync( 'texture-compression-pvrtc' )
 		};
 
@@ -216,10 +216,10 @@ class KTX2Loader extends Loader {
 			this.workerConfig = {
 				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
 				astcHDRSupported: false, // https://github.com/gpuweb/gpuweb/issues/3856
-				etc1Supported: renderer.hasFeature( 'texture-compression-etc1' ),
+				etc1Supported: renderer.hasFeature( 'texture-compression-etc2' ),
 				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
 				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
-				bptcSupported: renderer.hasFeature( 'texture-compression-bptc' ),
+				bptcSupported: renderer.hasFeature( 'texture-compression-bc' ),
 				pvrtcSupported: renderer.hasFeature( 'texture-compression-pvrtc' )
 			};
 
@@ -1114,7 +1114,7 @@ async function createRawTexture( container ) {
 	}
 
 	// levelCount = 0 implies runtime-generated mipmaps.
-	const useMipmaps = container.levelCount === 0 || mipmaps.length > 1
+	const useMipmaps = container.levelCount === 0 || mipmaps.length > 1;
 
 	let texture;
 
