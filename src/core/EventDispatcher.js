@@ -22,6 +22,15 @@
  */
 class EventDispatcher {
 
+	constructor() {
+
+		// Use a Map here (not a plain object) because we
+		// need to query for its size in some places.
+		/** @type {Map<string,Function[]>} */
+		this._listeners = new Map();
+
+	}
+
 	/**
 	 * Adds the given event listener to the given event type.
 	 *
@@ -30,19 +39,25 @@ class EventDispatcher {
 	 */
 	addEventListener( type, listener ) {
 
-		if ( this._listeners === undefined ) this._listeners = {};
+		if ( typeof listener !== 'function' ) {
 
-		const listeners = this._listeners;
-
-		if ( listeners[ type ] === undefined ) {
-
-			listeners[ type ] = [];
+			throw new Error( 'listener must be a function' );
 
 		}
 
-		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
+		const listeners = this._listeners;
 
-			listeners[ type ].push( listener );
+		let listenerArray = listeners.get( type );
+
+		if ( listenerArray === undefined ) {
+
+			listeners.set( type, listenerArray = [] );
+
+		}
+
+		if ( listenerArray.indexOf( listener ) === - 1 ) {
+
+			listenerArray.push( listener );
 
 		}
 
@@ -59,9 +74,11 @@ class EventDispatcher {
 
 		const listeners = this._listeners;
 
-		if ( listeners === undefined ) return false;
+		if ( listeners.size === 0 ) return false;
 
-		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
+		const listenerArray = listeners.get( type );
+
+		return listenerArray !== undefined && listenerArray.indexOf( listener ) !== - 1;
 
 	}
 
@@ -75,9 +92,9 @@ class EventDispatcher {
 
 		const listeners = this._listeners;
 
-		if ( listeners === undefined ) return;
+		if ( listeners.size === 0 ) return;
 
-		const listenerArray = listeners[ type ];
+		const listenerArray = listeners.get( type );
 
 		if ( listenerArray !== undefined ) {
 
@@ -102,9 +119,9 @@ class EventDispatcher {
 
 		const listeners = this._listeners;
 
-		if ( listeners === undefined ) return;
+		if ( listeners.size === 0 ) return;
 
-		const listenerArray = listeners[ event.type ];
+		const listenerArray = listeners.get( event.type );
 
 		if ( listenerArray !== undefined ) {
 

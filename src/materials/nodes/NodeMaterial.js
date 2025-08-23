@@ -59,6 +59,17 @@ class NodeMaterial extends Material {
 		super();
 
 		/**
+		 * This property is for internal use only.
+		 * It serves as a container for properties
+		 * that must be mutable even if the
+		 * {@link NodeMaterial} has been
+		 * frozen via Object.freeze().
+		 *
+		 * @type {Record<string,any>}
+		 */
+		this._internal = [];
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -82,16 +93,6 @@ class NodeMaterial extends Material {
 		 * @default false
 		 */
 		this.lights = false;
-
-		/**
-		 * Whether this material uses hardware clipping or not.
-		 * This property is managed by the engine and should not be
-		 * modified by apps.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this.hardwareClipping = false;
 
 		/**
 		 * Node materials which set their `lights` property to `true`
@@ -394,6 +395,38 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Whether this material uses hardware clipping or not.
+	 * This property is managed by the engine and should not be
+	 * modified by apps.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 * @readonly
+	 */
+	get hardwareClipping() {
+
+		const val = this._internal.hardwareClipping;
+
+		if ( val === undefined ) {
+
+			return false;
+
+		}
+
+		return val;
+
+	}
+
+	/**
+	 * @param {boolean} enable
+	 */
+	_setHardwareClipping( enable ) {
+
+		this._internal.hardwareClipping = enable;
+
+	}
+
+	/**
 	 * Allows to define a custom cache key that influence the material key computation
 	 * for render objects.
 	 *
@@ -602,7 +635,7 @@ class NodeMaterial extends Material {
 	 */
 	setupHardwareClipping( builder ) {
 
-		this.hardwareClipping = false;
+		this._setHardwareClipping( false );
 
 		if ( builder.clippingContext === null ) return;
 
@@ -614,7 +647,7 @@ class NodeMaterial extends Material {
 
 			builder.stack.add( hardwareClipping() );
 
-			this.hardwareClipping = true;
+			this._setHardwareClipping( true );
 
 		}
 

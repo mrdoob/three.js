@@ -19,16 +19,16 @@ export default QUnit.module( 'Core', () => {
 
 			const eventDispatcher = new EventDispatcher();
 
-			const listener = {};
+			const listener = () => undefined;
 			eventDispatcher.addEventListener( 'anyType', listener );
 
-			assert.ok( eventDispatcher._listeners.anyType.length === 1, 'listener with unknown type was added' );
-			assert.ok( eventDispatcher._listeners.anyType[ 0 ] === listener, 'listener with unknown type was added' );
+			assert.ok( eventDispatcher._listeners.get( 'anyType' ).length === 1, 'listener with unknown type was added' );
+			assert.ok( eventDispatcher._listeners.get( 'anyType' )[ 0 ] === listener, 'listener with unknown type was added' );
 
 			eventDispatcher.addEventListener( 'anyType', listener );
 
-			assert.ok( eventDispatcher._listeners.anyType.length === 1, 'can\'t add one listener twice to same type' );
-			assert.ok( eventDispatcher._listeners.anyType[ 0 ] === listener, 'listener is still there' );
+			assert.ok( eventDispatcher._listeners.get( 'anyType' ).length === 1, 'can\'t add one listener twice to same type' );
+			assert.ok( eventDispatcher._listeners.get( 'anyType' )[ 0 ] === listener, 'listener is still there' );
 
 		} );
 
@@ -36,7 +36,7 @@ export default QUnit.module( 'Core', () => {
 
 			const eventDispatcher = new EventDispatcher();
 
-			const listener = {};
+			const listener = () => undefined;
 			eventDispatcher.addEventListener( 'anyType', listener );
 
 			assert.ok( eventDispatcher.hasEventListener( 'anyType', listener ), 'listener was found' );
@@ -48,22 +48,22 @@ export default QUnit.module( 'Core', () => {
 
 			const eventDispatcher = new EventDispatcher();
 
-			const listener = {};
+			const listener = () => undefined;
 
-			assert.ok( eventDispatcher._listeners === undefined, 'there are no listeners by default' );
+			assert.ok( eventDispatcher._listeners.size === 0, 'there are no listeners by default' );
 
 			eventDispatcher.addEventListener( 'anyType', listener );
-			assert.ok( Object.keys( eventDispatcher._listeners ).length === 1 &&
-				eventDispatcher._listeners.anyType.length === 1, 'if a listener was added, there is a new key' );
+			assert.ok( eventDispatcher._listeners.size === 1 &&
+				eventDispatcher._listeners.get( 'anyType' ).length === 1, 'if a listener was added, there is a new key' );
 
 			eventDispatcher.removeEventListener( 'anyType', listener );
-			assert.ok( eventDispatcher._listeners.anyType.length === 0, 'listener was deleted' );
+			assert.ok( eventDispatcher._listeners.get( 'anyType' ).length === 0, 'listener was deleted' );
 
 			eventDispatcher.removeEventListener( 'unknownType', listener );
-			assert.ok( eventDispatcher._listeners.unknownType === undefined, 'unknown types will be ignored' );
+			assert.ok( eventDispatcher._listeners.get( 'unknownType' ) === undefined, 'unknown types will be ignored' );
 
 			eventDispatcher.removeEventListener( 'anyType', undefined );
-			assert.ok( eventDispatcher._listeners.anyType.length === 0, 'undefined listeners are ignored' );
+			assert.ok( eventDispatcher._listeners.get( 'anyType' ).length === 0, 'undefined listeners are ignored' );
 
 		} );
 
