@@ -29,7 +29,7 @@ class EventDispatcher {
 
 		/**
 		 * This property is a container for
-		 * internal key/values.
+		 * internal key-value pairs.
 		 *
 		 * @type {Record<string,any>}
 		 */
