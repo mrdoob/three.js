@@ -1,0 +1,42 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [released]  # only triggers for actual releases, not drafts or pre-releases
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: release
+
+    permissions:
+      id-token: write  # for workflow identification in provenance
+
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3
+        with:
+          node-version: "18"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      - name: Verify version
+        run: |
+          # Ensure versions in package.json and GitHub Release's name match
+          pkg_json_version=$(jq '.version' package.json -r | sed 's/[0.]//g')
+          release_version=$(echo "${{ github.event.release.name }}" | sed 's/r//')
+
+          [ $pkg_json_version = $release_version ] || exit 1
+
+      - name: Update npm, install dependencies
+        run: |
+          npm install -g npm@latest
+          npm ci
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
