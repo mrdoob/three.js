@@ -19,6 +19,7 @@ export { default as NodeLoader } from './loaders/nodes/NodeLoader.js';
 export { default as NodeObjectLoader } from './loaders/nodes/NodeObjectLoader.js';
 export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoader.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
+export { CanvasRenderTarget } from './core/CanvasRenderTarget.js';
 export * from './nodes/Nodes.js';
 import * as TSL from './nodes/TSL.js';
 export { TSL };

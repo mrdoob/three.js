@@ -202,24 +202,35 @@ class WebGPUTextureUtils {
 
 		const { width, height, depth, levels } = options;
 
+		let format;
+
 		if ( texture.isFramebufferTexture ) {
 
 			if ( options.renderTarget ) {
 
-				options.format = this.backend.utils.getCurrentColorFormat( options.renderTarget );
+				format = this.backend.utils.getCurrentColorFormat( options.renderTarget );
 
 			} else {
 
-				options.format = this.backend.utils.getPreferredCanvasFormat();
+				format = this.backend.utils.getPreferredCanvasFormat();
 
 			}
 
 		}
 
+		if ( texture.renderTarget && texture.renderTarget.isCanvasRenderTarget ) {
+
+			format = this.backend.utils.getPreferredCanvasFormat();
+
+		}
+
 		const dimension = this._getDimension( texture );
-		const format = texture.internalFormat || options.format || getFormat( texture, backend.device );
+
+		format = texture.internalFormat || format || getFormat( texture, backend.device );
 
 		textureData.format = format;
+
+		//
 
 		const { samples, primarySamples, isMSAA } = backend.utils.getTextureSampleData( texture );
 

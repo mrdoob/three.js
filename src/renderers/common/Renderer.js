@@ -1244,6 +1244,7 @@ class Renderer {
 
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
+
 		if ( outputRenderTarget !== null ) {
 
 			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, outputRenderTarget.depth );
@@ -1289,6 +1290,7 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
+		const previousRenderTarget = this._renderTarget;
 
 		//
 
@@ -1312,6 +1314,12 @@ class Renderer {
 		} else {
 
 			renderTarget = outputRenderTarget;
+
+			if ( outputRenderTarget && outputRenderTarget.isCanvasRenderTarget ) {
+
+				outputRenderTarget.samples = this.samples;
+
+			}
 
 		}
 
@@ -1519,6 +1527,8 @@ class Renderer {
 
 			this._renderOutput( renderTarget );
 
+			this.setRenderTarget( previousRenderTarget, activeCubeFace, activeMipmapLevel );
+
 		}
 
 		//
@@ -1569,7 +1579,6 @@ class Renderer {
 
 		this.autoClear = currentAutoClear;
 		this.xr.enabled = currentXR;
-
 
 	}
 
@@ -2175,7 +2184,7 @@ class Renderer {
 	 */
 	get isOutputTarget() {
 
-		return this._renderTarget === this._outputRenderTarget || this._renderTarget === null;
+		return this._outputRenderTarget !== null || this._renderTarget === null;
 
 	}
 

@@ -154,6 +154,13 @@ class WebGPUBackend extends Backend {
 		 */
 		this.occludedResolveCache = new Map();
 
+		/**
+		 * A map that manages the WebGPU contexts for CanvasRenderTarget.
+		 *
+		 * @type {WeakMap<CanvasRenderTarget,GPUCanvasContext>}
+		 */
+		this.canvasRTContexts = new WeakMap();
+
 	}
 
 	/**
@@ -465,7 +472,13 @@ class WebGPUBackend extends Backend {
 
 				if ( isRenderCameraDepthArray !== true ) {
 
-					const textureView = textureData.texture.createView( viewDescriptor );
+					let textureView;
+
+					if ( renderTarget.isCanvasRenderTarget !== true ) {
+
+						textureView = textureData.texture.createView( viewDescriptor );
+
+					}
 
 					let view, resolveTarget;
 
@@ -543,6 +556,26 @@ class WebGPUBackend extends Backend {
 				storeOp: colorAttachmentsConfig.storeOp || GPUStoreOp.Store,
 				clearValue: clearValue
 			} );
+
+		}
+
+		if ( renderTarget.isCanvasRenderTarget ) {
+
+			const colorAttachment = descriptor.colorAttachments[ 0 ];
+			const context = this.getContextFromCanvasRenderTarget( renderTarget );
+			const view = context.getCurrentTexture().createView();
+
+			const textureData = this.get( renderTarget.textures[ 0 ] );
+
+			if ( textureData.msaaTexture ) {
+
+				colorAttachment.resolveTarget = view;
+
+			} else {
+
+				colorAttachment.view = view;
+
+			}
 
 		}
 
@@ -766,6 +799,49 @@ class WebGPUBackend extends Backend {
 		renderContextData.encoder = encoder;
 		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.renderBundles = [];
+
+	}
+
+	/**
+	 * Gets the WebGPU context from a CanvasRenderTarget.
+	 *
+	 * @param {CanvasRenderTarget} canvasRT - The canvas render target.
+	 * @returns {GPUCanvasContext} The WebGPU context.
+	 */
+	getContextFromCanvasRenderTarget( canvasRT ) {
+
+		let contextData = this.canvasRTContexts.get( canvasRT );
+
+		if ( contextData === undefined ) {
+
+			const context = canvasRT.canvas.getContext( 'webgpu' );
+
+			const alphaMode = this.parameters.alpha ? 'premultiplied' : 'opaque';
+			const colorSpace = this.renderer.outputColorSpace;
+
+			const toneMappingMode = ColorManagement.getToneMappingMode( colorSpace );
+
+			context.configure( {
+				device: this.device,
+				format: this.utils.getPreferredCanvasFormat(),
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+				alphaMode: alphaMode,
+				toneMapping: {
+					mode: toneMappingMode
+				}
+			} );
+
+			contextData = {
+				context,
+				alphaMode,
+				colorSpace
+			};
+
+			this.canvasRTContexts.set( canvasRT, contextData );
+
+		}
+
+		return contextData.context;
 
 	}
 
