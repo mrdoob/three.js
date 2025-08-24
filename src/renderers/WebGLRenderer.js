@@ -1096,7 +1096,10 @@ class WebGLRenderer {
 
 			if ( scene === null ) scene = _emptyScene; // renderBufferDirect second parameter used to be fog (could be null)
 
-			const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+			const objectFlipped = object.matrixWorld.determinant() < 0;
+			const viewFlipped = camera.matrixWorld.determinant() < 0;
+			const projectionFlipped = camera.projectionMatrix.determinant() > 0; // A standard projection's determinant is negative; a positive determinant will flip face culling
+			const frontFaceCW = object.isMesh ? ( objectFlipped ^ viewFlipped ^ projectionFlipped ) : false;
 
 			const program = setProgram( camera, scene, geometry, material, object );
 
