@@ -2184,7 +2184,7 @@ class Renderer {
 	 */
 	get isOutputTarget() {
 
-		return this._outputRenderTarget !== null || this._renderTarget === null;
+		return this._renderTarget === this._outputRenderTarget || this._renderTarget === null;
 
 	}
 
