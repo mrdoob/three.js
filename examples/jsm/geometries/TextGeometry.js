@@ -43,7 +43,7 @@ class TextGeometry extends ExtrudeGeometry {
 
 		} else {
 
-			const shapes = font.generateShapes( text, parameters.size );
+			const shapes = font.generateShapes( text, parameters.size, parameters.direction );
 
 			// defaults
 
