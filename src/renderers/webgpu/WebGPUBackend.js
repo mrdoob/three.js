@@ -350,14 +350,15 @@ class WebGPUBackend extends Backend {
 		}
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
+		const contextView = this.context.getCurrentTexture().createView();
 
 		if ( this.renderer.samples > 0 ) {
 
-			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
+			colorAttachment.resolveTarget = contextView;
 
 		} else {
 
-			colorAttachment.view = this.context.getCurrentTexture().createView();
+			colorAttachment.view = contextView;
 
 		}
 
