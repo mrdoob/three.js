@@ -2515,7 +2515,7 @@ class EXRLoader extends DataTextureLoader {
 						EXRDecoder.outputChannels = 1;
 						EXRDecoder.decodeChannels = { R: 0 };
 
-					} else  {
+					} else {
 
 						invalidOutput = true;
 
@@ -2549,7 +2549,7 @@ class EXRLoader extends DataTextureLoader {
 						EXRDecoder.outputChannels = 1;
 						EXRDecoder.decodeChannels = { Y: 0 };
 
-					} else  {
+					} else {
 
 						invalidOutput = true;
 
@@ -2563,7 +2563,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if (invalidOutput) throw new Error( 'EXRLoader.parse: invalid output format for specified file.' );
+			if ( invalidOutput ) throw new Error( 'EXRLoader.parse: invalid output format for specified file.' );
 
 			if ( EXRDecoder.type == 1 ) {
 
@@ -2712,12 +2712,12 @@ class EXRLoader extends DataTextureLoader {
 			if ( this.outputFormat == RGBAFormat ) {
 
 				for ( let i = 0; i < byteArray.length; i += 4 )
-					byteArray [i + 2 ] = ( byteArray [ i + 1 ] = byteArray[ i ] );
+					byteArray[ i + 2 ] = ( byteArray[ i + 1 ] = byteArray[ i ] );
 
 			} else if ( this.outputFormat == RGFormat ) {
 
 				for ( let i = 0; i < byteArray.length; i += 2 )
-					byteArray [ i + 1 ] = byteArray[ i ] ;
+					byteArray[ i + 1 ] = byteArray[ i ];
 
 			}
 
