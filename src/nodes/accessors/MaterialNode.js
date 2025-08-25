@@ -235,9 +235,9 @@ class MaterialNode extends Node {
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
 				node.normalMapType = material.normalMapType;
 
-				if ( material.normalMap.projectZ ) {
+				if ( material.normalMap.userData?.unpackNormal ) {
 
-					node.projectZ = true;
+					node.unpackNormal = material.normalMap.userData.unpackNormal;
 
 				}
 
