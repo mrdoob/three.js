@@ -153,7 +153,7 @@
 
 				const oscillator = listener.context.createOscillator();
 				oscillator.type = 'sine';
-				oscillator.start()
+				oscillator.start();
 
 				const audio = new THREE.PositionalAudio( listener );
 				audio.setNodeSource( oscillator );
@@ -172,7 +172,7 @@
 
 				const audio = this.userData.audio;
 				audio.source.stop();
-				
+
 				this.remove( audio );
 
 			}
