@@ -59,24 +59,44 @@ class NormalMapNode extends TempNode {
 		this.normalMapType = TangentSpaceNormalMap;
 
 		/**
-		 * Controls whether the Z component of the normal map is reconstructed projecting it to the hemisphere.
+		 * Controls how to unpack the sampled normal map values.
 		 *
-		 * @type {bool}
-		 * @default false
+		 * @type {string}
+		 * @default NoNormalPacking
 		 */
-		this.projectZ = false;
+		this.unpackNormal = NoNormalPacking;
 
 	}
 
 	setup( { material } ) {
 
-		const { normalMapType, scaleNode, projectZ } = this;
+		const { normalMapType, scaleNode, unpackNormal } = this;
 
 		let normalMap = this.node.mul( 2.0 ).sub( 1.0 );
 
-		if ( projectZ ) {
+		if ( normalMapType === TangentSpaceNormalMap ) {
 
-			normalMap = vec3( normalMap.xy, sqrt( saturate( float( 1.0 ).sub( dot( normalMap.xy, normalMap.xy ) ) ) ) );
+			if ( unpackNormal == NormalRGPacking ) {
+
+				normalMap = unpackRGNormal( normalMap );
+
+			} else if ( unpackNormal == NormalGAPacking ) {
+
+				normalMap = unpackGANormal( normalMap );
+
+			} else if ( unpackNormal != NoNormalPacking ) {
+
+				console.error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormal }` );
+
+			}
+
+		} else {
+
+			if ( unpackNormal != NoNormalPacking ) {
+
+				console.error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormal }'` );
+
+			}
 
 		}
 
