@@ -818,7 +818,7 @@ const textureBase = /*@__PURE__*/ nodeProxy( TextureNode ).setParameterLength( 1
  *
  * @tsl
  * @function
- * @param {?Texture|TextureNode} [value=EmptyTexture] - The texture.
+ * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
  * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.
@@ -862,7 +862,7 @@ export const uniformTexture = ( value = EmptyTexture ) => texture( value );
  *
  * @tsl
  * @function
- * @param {?Texture|TextureNode} [value=EmptyTexture] - The texture.
+ * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
  * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.

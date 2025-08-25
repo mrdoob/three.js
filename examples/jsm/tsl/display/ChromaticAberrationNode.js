@@ -189,7 +189,7 @@ export default ChromaticAberrationNode;
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node|number} [strength=1.0] - The strength of the chromatic aberration effect as a node or value.
- * @param {?Node|Vector2} [center=null] - The center point of the effect as a node or value. If null, uses screen center (0.5, 0.5).
+ * @param {?(Node|Vector2)} [center=null] - The center point of the effect as a node or value. If null, uses screen center (0.5, 0.5).
  * @param {Node|number} [scale=1.1] - The scale factor for stepped scaling from center as a node or value.
  * @returns {ChromaticAberrationNode}
  */
