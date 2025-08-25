@@ -461,6 +461,7 @@
 		"webgpu_tsl_vfx_flames",
 		"webgpu_tsl_vfx_linkedparticles",
 		"webgpu_tsl_vfx_tornado",
+		"webgpu_tsl_wood",
 		"webgpu_video_frame",
 		"webgpu_video_panorama",
 		"webgpu_volume_caustics",
