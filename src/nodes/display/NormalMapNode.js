@@ -2,7 +2,8 @@ import TempNode from '../core/TempNode.js';
 
 import { normalView, transformNormalToView } from '../accessors/Normal.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
-import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3, float } from '../tsl/TSLBase.js';
+import { dot, sqrt, saturate } from '../math/MathNode.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../../constants.js';
 import { directionToFaceDirection } from './FrontFacingNode.js';
@@ -57,13 +58,27 @@ class NormalMapNode extends TempNode {
 		 */
 		this.normalMapType = TangentSpaceNormalMap;
 
+		/**
+		 * Controls whether the Z component of the normal map is reconstructed projecting it to the hemisphere.
+		 *
+		 * @type {bool}
+		 * @default false
+		 */
+		this.projectZ = false;
+
 	}
 
 	setup( { material } ) {
 
-		const { normalMapType, scaleNode } = this;
+		const { normalMapType, scaleNode, projectZ } = this;
 
 		let normalMap = this.node.mul( 2.0 ).sub( 1.0 );
+
+		if ( projectZ ) {
+
+			normalMap = vec3( normalMap.xy, sqrt( saturate( float( 1.0 ).sub( dot( normalMap.xy, normalMap.xy ) ) ) ) );
+
+		}
 
 		if ( scaleNode !== null ) {
 
