@@ -158,36 +158,6 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 
 	}
 
-	function syncCameras() { syncFrom( 'main' ); }
-
-	function resetMirrored() {
-
-		mirroredCamera.scale.set( 1, 1, 1 );
-		mirroredCamera.updateMatrixWorld();
-		mirroredCamera.updateProjectionMatrix();
-		applyProjectionState( mirroredCamera );
-
-	}
-
-	function flipProjectionAxis( axis ) {
-
-		// toggle state then apply
-		if ( axis === 'x' ) params.projection.x = ! params.projection.x;
-		if ( axis === 'y' ) params.projection.y = ! params.projection.y;
-		if ( axis === 'z' ) params.projection.z = ! params.projection.z;
-		applyProjectionState( mirroredCamera );
-
-	}
-
-	function flipViewAxis( axis ) {
-
-		if ( axis === 'x' ) params.view.x = ! params.view.x;
-		if ( axis === 'y' ) params.view.y = ! params.view.y;
-		if ( axis === 'z' ) params.view.z = ! params.view.z;
-		applyViewState( mirroredCamera );
-
-	}
-
 	// auto-sync on OrbitControls changes (GUI-only flow: always on)
 	mainControls.addEventListener( 'change', () => { syncFrom( 'main' ); } );
 	mirroredControls.addEventListener( 'change', () => { syncFrom( 'mirrored' ); } );
@@ -239,12 +209,11 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	viewFolder.open();
 
 	// scene content
-	let testGroup;
 	async function setupScene() {
 
-		testGroup = await createPrimitivesGroup( 0x00ff00 );
-		testGroup.position.x = 0;
-		scene.add( testGroup );
+		const group = await createPrimitivesGroup( 0x00ff00 );
+		group.position.x = 0;
+		scene.add( group );
 
 	}
 
@@ -273,7 +242,6 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	function updateDebug() {
 
 		const cams = [ mainCamera, mirroredCamera ];
-		let out = '';
 		for ( const cam of cams ) {
 			const mDet = cam.matrixWorld.determinant();
 			const pDet = cam.projectionMatrix.determinant();
@@ -285,12 +253,6 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 			target.scale = formatVec3( cam.scale );
 			target.worldScale = formatVec3( worldScale );
 			target.projDiag = formatVec3( diag );
-			out += `${cam.name}\n`;
-			out += `  matrixWorld.determinant: ${mDet.toFixed( 6 )}\n`;
-			out += `  projectionMatrix.determinant: ${pDet.toFixed( 6 )}\n`;
-			out += `  camera.scale: ${formatVec3( cam.scale )}\n`;
-			out += `  world scale (from matrixWorld): ${formatVec3( worldScale )}\n`;
-			out += `  projection diag [m00,m11,m22]: ${formatVec3( diag )}\n\n`;
 		}
 
 		// scene info
@@ -298,9 +260,6 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 		const sceneDet = scene.matrixWorld.determinant();
 		debugState.scene.mwDet = sceneDet.toFixed( 6 );
 		debugState.scene.scale = formatVec3( scene.scale );
-		out += `scene\n`;
-		out += `  matrixWorld.determinant: ${sceneDet.toFixed( 6 )}\n`;
-		out += `  scene.scale: ${formatVec3( scene.scale )}\n\n`;
 
 	}
 
