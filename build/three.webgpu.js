@@ -7245,7 +7245,7 @@ const pow = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW ).setParameter
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-const pow2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 2 ).setParameterLength( 1 );
+const pow2 = ( x ) => mul( x, x );
 
 /**
  * Returns the cube of the parameter.
@@ -7255,7 +7255,7 @@ const pow2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 2 ).setParam
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-const pow3 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 3 ).setParameterLength( 1 );
+const pow3 = ( x ) => mul( x, x, x );
 
 /**
  * Returns the fourth power of the parameter.
@@ -7265,7 +7265,7 @@ const pow3 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 3 ).setParam
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-const pow4 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 4 ).setParameterLength( 1 );
+const pow4 = ( x ) => mul( x, x, x, x );
 
 /**
  * Transforms the direction of a vector by a matrix and then normalizes the result.
@@ -36136,7 +36136,7 @@ class PassNode extends TempNode {
 	/**
 	 * Precompiles the pass.
 	 *
-	 * Note that this method must be called after the pass configuartion is complete.
+	 * Note that this method must be called after the pass configuration is complete.
 	 * So calls like `setMRT()` and `getTextureNode()` must proceed the precompilation.
 	 *
 	 * @async
@@ -54924,6 +54924,20 @@ class Renderer {
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
+		renderContext.scissorValue.max( _vector4.set( 0, 0, 0, 0 ) );
+
+		if ( renderContext.scissorValue.x + renderContext.scissorValue.width > _drawingBufferSize.width ) {
+
+			renderContext.scissorValue.width = _drawingBufferSize.width - renderContext.scissorValue.x;
+
+		}
+
+		if ( renderContext.scissorValue.y + renderContext.scissorValue.height > _drawingBufferSize.height ) {
+
+			renderContext.scissorValue.height = _drawingBufferSize.height - renderContext.scissorValue.y;
+
+		}
+
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
 		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
@@ -66259,7 +66273,7 @@ const GPUTextureFormat = {
 	BC6HRGBUFloat: 'bc6h-rgb-ufloat',
 	BC6HRGBFloat: 'bc6h-rgb-float',
 	BC7RGBAUnorm: 'bc7-rgba-unorm',
-	BC7RGBAUnormSRGB: 'bc7-rgba-srgb',
+	BC7RGBAUnormSRGB: 'bc7-rgba-unorm-srgb',
 
 	// ETC2 compressed formats usable if 'texture-compression-etc2' is both
 	// supported by the device/user agent and enabled in requestDevice.
@@ -68111,6 +68125,7 @@ function getFormat( texture, device = null ) {
 
 		switch ( format ) {
 
+			case RGB_S3TC_DXT1_Format:
 			case RGBA_S3TC_DXT1_Format:
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm;
 				break;
@@ -68123,7 +68138,12 @@ function getFormat( texture, device = null ) {
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
 				break;
 
+			case RGBA_BPTC_Format:
+				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.BC7RGBAUnormSRGB : GPUTextureFormat.BC7RGBAUnorm;
+				break;
+
 			case RGB_ETC2_Format:
+			case RGB_ETC1_Format:
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.ETC2RGB8UnormSRGB : GPUTextureFormat.ETC2RGB8Unorm;
 				break;
 
@@ -68781,22 +68801,6 @@ const wgslMethods = {
 	inversesqrt: 'inverseSqrt',
 	bitcast: 'bitcast<f32>'
 };
-
-// WebGPU issue: does not support pow() with negative base on Windows
-
-if ( typeof navigator !== 'undefined' && /Windows/g.test( navigator.userAgent ) ) {
-
-	wgslPolyfill.pow_float = new CodeNode( 'fn tsl_pow_float( a : f32, b : f32 ) -> f32 { return select( -pow( -a, b ), pow( a, b ), a > 0.0 ); }' );
-	wgslPolyfill.pow_vec2 = new CodeNode( 'fn tsl_pow_vec2( a : vec2f, b : vec2f ) -> vec2f { return vec2f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ) ); }', [ wgslPolyfill.pow_float ] );
-	wgslPolyfill.pow_vec3 = new CodeNode( 'fn tsl_pow_vec3( a : vec3f, b : vec3f ) -> vec3f { return vec3f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ), tsl_pow_float( a.z, b.z ) ); }', [ wgslPolyfill.pow_float ] );
-	wgslPolyfill.pow_vec4 = new CodeNode( 'fn tsl_pow_vec4( a : vec4f, b : vec4f ) -> vec4f { return vec4f( tsl_pow_float( a.x, b.x ), tsl_pow_float( a.y, b.y ), tsl_pow_float( a.z, b.z ), tsl_pow_float( a.w, b.w ) ); }', [ wgslPolyfill.pow_float ] );
-
-	wgslMethods.pow_float = 'tsl_pow_float';
-	wgslMethods.pow_vec2 = 'tsl_pow_vec2';
-	wgslMethods.pow_vec3 = 'tsl_pow_vec3';
-	wgslMethods.pow_vec4 = 'tsl_pow_vec4';
-
-}
 
 //
 
