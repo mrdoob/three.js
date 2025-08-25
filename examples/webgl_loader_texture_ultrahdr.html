@@ -83,6 +83,8 @@
 
 					loader.load( `textures/equirectangular/spruit_sunrise_${resolution}.hdr.jpg`, function ( texture ) {
 
+						texture.colorSpace = THREE.LinearSRGBColorSpace;
+
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 						texture.needsUpdate = true;
 
