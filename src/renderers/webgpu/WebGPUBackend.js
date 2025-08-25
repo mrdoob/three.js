@@ -1432,7 +1432,7 @@ class WebGPUBackend extends Backend {
 	 */
 	draw( renderObject, info ) {
 
-		const { object, material, context, pipeline } = renderObject;
+		const { object, material, context } = renderObject;
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
 
