@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mirrored Camera Culling Test (WebGPU)</title>
+    <link rel="stylesheet" href="main.css">
+    <style>
+        #ui { position: absolute; z-index: 1; top: 8px; left: 8px; font-family: sans-serif; }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../build/three.webgpu.js",
+                "three/webgpu": "../build/three.webgpu.js",
+                "three/tsl": "../build/three.tsl.js",
+                "three/addons/": "./jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="ui"></div>
+    <script type="module">
+    /* eslint-disable */
+    import * as THREE from 'three/webgpu';
+    import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+    import { initMirroredCullingApp } from '/examples/jsm/mirrored/MirroredCullingApp.js';
+
+    // Initialize renderer + shared app
+    ( async () => {
+        const forceWebGL = new URLSearchParams( location.search ).has( 'forceWebGL' );
+
+        // Renderer toggle GUI (switches WebGPU <-> WebGL fallback)
+        const uiContainer = document.getElementById( 'ui' );
+        const gui = new GUI( { title: 'Renderer' } );
+        if ( uiContainer ) uiContainer.appendChild( gui.domElement );
+        const params = { useWebGLFallback: forceWebGL };
+        gui.add( params, 'useWebGLFallback' ).name( 'Use WebGL fallback' ).onChange( ( v ) => {
+            const url = new URL( location.href );
+            if ( v ) url.searchParams.set( 'forceWebGL', '1' ); else url.searchParams.delete( 'forceWebGL' );
+            location.href = url.toString();
+        } );
+        const renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
+        await renderer.init();
+        await initMirroredCullingApp( THREE, renderer, { gui } );
+    } )();
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mirrored Camera Culling Test</title>
+    <link rel="stylesheet" href="main.css">
+    <style>
+        #ui { position: absolute; z-index: 1; top: 8px; left: 8px; font-family: sans-serif; }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../build/three.module.js",
+                "three/addons/": "./jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="ui"></div>
+    <script type="module">
+    /* eslint-disable */
+    import * as THREE from 'three';
+    import { initMirroredCullingApp } from '/examples/jsm/mirrored/MirroredCullingApp.js';
+
+    const renderer = new THREE.WebGLRenderer( { antialias: true } );
+    ( async () => { await initMirroredCullingApp( THREE, renderer ); } )();
+    </script>
+</body>
+</html>
+
+

@@ -959,7 +959,17 @@ class WebGLBackend extends Backend {
 
 		this._bindUniforms( renderObject.getBindings() );
 
-		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+		const computeFrontFaceCW = ( cam ) => {
+
+			if ( object.isMesh !== true ) return false;
+			const objectFlipped = object.matrixWorld.determinant() < 0;
+			const viewFlipped = cam.matrixWorld.determinant() < 0;
+			const projectionFlipped = cam.projectionMatrix.determinant() > 0; // A standard projection's determinant is negative; a positive determinant will flip face culling
+			return ( ( objectFlipped ^ viewFlipped ^ projectionFlipped ) !== 0 );
+
+		};
+
+		let frontFaceCW = computeFrontFaceCW( renderObject.camera );
 
 		state.setMaterial( material, frontFaceCW, hardwareClippingPlanes );
 
@@ -1197,6 +1207,10 @@ class WebGLBackend extends Backend {
 					}
 
 					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexData.index, cameraData.indexesGPU[ i ] );
+
+					// Recompute and set front-face orientation for this sub-camera
+					frontFaceCW = computeFrontFaceCW( subCamera );
+					state.setMaterial( material, frontFaceCW, hardwareClippingPlanes );
 
 					draw();
 
