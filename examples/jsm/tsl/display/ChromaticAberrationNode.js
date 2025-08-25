@@ -203,4 +203,5 @@ export const chromaticAberration = ( node, strength = 1.0, center = null, scale 
 			nodeObject( scale )
 		)
 	);
+
 };
