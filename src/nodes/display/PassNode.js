@@ -663,7 +663,7 @@ class PassNode extends TempNode {
 
 	setup( { renderer } ) {
 
-		this.renderTarget.samples = this.options.samples === undefined ? renderer.currentSamples : this.options.samples;
+		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
 
 		this.renderTarget.texture.type = renderer.getColorBufferType();
 
