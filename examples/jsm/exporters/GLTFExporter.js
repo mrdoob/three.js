@@ -1559,7 +1559,7 @@ class GLTFWriter {
 	/**
 	 * Process material
 	 * @param {THREE.Material} material Material to process
-	 * @return {Promise<number|null>} Index of the processed material in the "materials" array
+	 * @return {Promise<?number>} Index of the processed material in the "materials" array
 	 */
 	async processMaterialAsync( material ) {
 
@@ -1735,7 +1735,7 @@ class GLTFWriter {
 	/**
 	 * Process mesh
 	 * @param {THREE.Mesh} mesh Mesh to process
-	 * @return {Promise<number|null>} Index of the processed mesh in the "meshes" array
+	 * @return {Promise<?number>} Index of the processed mesh in the "meshes" array
 	 */
 	async processMeshAsync( mesh ) {
 
@@ -2189,7 +2189,7 @@ class GLTFWriter {
 	 *
 	 * @param {THREE.AnimationClip} clip
 	 * @param {THREE.Object3D} root
-	 * @return {number|null}
+	 * @return {?number}
 	 */
 	processAnimation( clip, root ) {
 
@@ -2299,7 +2299,7 @@ class GLTFWriter {
 
 	/**
 	 * @param {THREE.Object3D} object
-	 * @return {number|null}
+	 * @return {?number}
 	 */
 	 processSkin( object ) {
 
