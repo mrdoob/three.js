@@ -2,11 +2,11 @@ import TempNode from '../core/TempNode.js';
 
 import { normalView, transformNormalToView } from '../accessors/Normal.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
-import { nodeProxy, vec3, float } from '../tsl/TSLBase.js';
-import { dot, sqrt, saturate } from '../math/MathNode.js';
+import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
 import { directionToFaceDirection } from './FrontFacingNode.js';
+import { unpackRGNormal, unpackGANormal } from '../utils/Packing.js';
 
 /**
  * This class can be used for applying normals maps to materials.
