@@ -145,7 +145,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 
 				const loader = new KTX2Loader()
-					.setTranscoderPath( 'jsm/libs/basis/' )
+					.setTranscoderPath( {
+						js: 'jsm/libs/basis/basis_transcoder.js',
+						wasm: 'jsm/libs/basis/basis_transcoder.wasm'
+					} )
 					.setPath( 'textures/ktx2/' )
 					.detectSupport( renderer );
 
