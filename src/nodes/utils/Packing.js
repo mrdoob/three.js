@@ -19,3 +19,25 @@ export const directionToColor = ( node ) => nodeObject( node ).mul( 0.5 ).add( 0
  * @return {Node<vec3>} The direction.
  */
 export const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
+
+/**
+ * Unpacks RG-packed normals by reconstructing their Z component by projecting it to the hemisphere.
+ * The XY coordinates of the input normal are expected to be in the [-1, 1] range.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} node - The packed normal to unpack.
+ * @return {Node<vec3>} The unpacked normal.
+ */
+export const unpackRGNormal = ( normal ) => vec3( normal.xy, sqrt( saturate( float( 1.0 ).sub( dot( normal.xy, normal.xy ) ) ) ) );
+
+/**
+ * Unpacks GA-packed normals by reconstructing their Z component by projecting it to the hemisphere. 
+ * The XY coordinates of the input normal are expected to be in the [-1, 1] range.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} node - The packed normal to unpack.
+ * @return {Node<vec3>} The unpacked normal.
+ */
+export const unpackGANormal = ( normal ) => vec3( normal.yw, sqrt( saturate( float( 1.0 ).sub( dot( normal.yw, normal.yw ) ) ) ) );
