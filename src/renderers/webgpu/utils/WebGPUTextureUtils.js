@@ -202,17 +202,15 @@ class WebGPUTextureUtils {
 
 		const { width, height, depth, levels } = options;
 
-		let format;
-
 		if ( texture.isFramebufferTexture ) {
 
 			if ( options.renderTarget ) {
 
-				format = this.backend.utils.getCurrentColorFormat( options.renderTarget );
+				options.format = this.backend.utils.getCurrentColorFormat( options.renderTarget );
 
 			} else {
 
-				format = this.backend.utils.getPreferredCanvasFormat();
+				options.format = this.backend.utils.getPreferredCanvasFormat();
 
 			}
 
@@ -220,13 +218,12 @@ class WebGPUTextureUtils {
 
 		if ( texture.renderTarget && texture.renderTarget.isCanvasRenderTarget ) {
 
-			format = this.backend.utils.getPreferredCanvasFormat();
+			texture.internalFormat = this.backend.utils.getPreferredCanvasFormat();
 
 		}
 
 		const dimension = this._getDimension( texture );
-
-		format = texture.internalFormat || format || getFormat( texture, backend.device );
+		const format = texture.internalFormat || options.format || getFormat( texture, backend.device );
 
 		textureData.format = format;
 
