@@ -41,6 +41,16 @@ class ExternalTexture extends Texture {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.sourceTexture = source.sourceTexture;
+
+		return this;
+
+	}
+
 }
 
 export { ExternalTexture };

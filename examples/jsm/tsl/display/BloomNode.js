@@ -364,7 +364,7 @@ class BloomNode extends TempNode {
 
 		// gaussian blur materials
 
-		// These sizes have been changed to account for the altered coefficents-calculation to avoid blockiness,
+		// These sizes have been changed to account for the altered coefficients-calculation to avoid blockiness,
 		// while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
 		const kernelSizeArray = [ 6, 10, 14, 18, 22 ];
 

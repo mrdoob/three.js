@@ -320,7 +320,7 @@ class GaussianBlurNode extends TempNode {
 	 * The resolution scale.
 	 *
 	 * @deprecated
-	 * @type {vec2}
+	 * @type {Vector2}
 	 * @default {(1,1)}
 	 */
 	get resolution() {
