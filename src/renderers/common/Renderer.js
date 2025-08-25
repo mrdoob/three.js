@@ -2166,7 +2166,7 @@ class Renderer {
 
 	get currentSamples() {
 
-		let samples = this._samples;		
+		let samples = this._samples;
 
 		if ( this._renderTarget !== null ) {
 

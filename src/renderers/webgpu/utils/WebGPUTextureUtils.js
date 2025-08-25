@@ -418,11 +418,11 @@ class WebGPUTextureUtils {
 		const frameBufferDepth = this.frameBufferData.depth;
 		const depthTexture = frameBufferDepth.texture;
 
-		if ( depthTexture.width === width && 
-			 depthTexture.height === height && 
-			 depthTexture.samples === samples && 
-			 depthTexture.depth === depth && 
-			 depthTexture.stencil === stencil ) {
+		if ( depthTexture.width === width &&
+			depthTexture.height === height &&
+			depthTexture.samples === samples &&
+			depthTexture.depth === depth &&
+			depthTexture.stencil === stencil ) {
 
 			return backend.get( depthTexture ).texture;
 
