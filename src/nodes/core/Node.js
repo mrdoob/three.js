@@ -549,7 +549,7 @@ class Node extends EventDispatcher {
 	 * This state builds the output node and returns the resulting shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {?string} output - Can be used to define the output type.
+	 * @param {?string} [output] - Can be used to define the output type.
 	 * @return {?string} The generated shader string.
 	 */
 	generate( builder, output ) {
@@ -613,8 +613,8 @@ class Node extends EventDispatcher {
 	 * - **generate**: Generates the shader code for the node. Returns the generated shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {string|Node|null} [output=null] - Can be used to define the output type.
-	 * @return {Node|string|null} The result of the build process, depending on the build stage.
+	 * @param {?(string|Node)} [output=null] - Can be used to define the output type.
+	 * @return {?(Node|string)} The result of the build process, depending on the build stage.
 	 */
 	build( builder, output = null ) {
 
@@ -773,7 +773,7 @@ class Node extends EventDispatcher {
 	/**
 	 * Returns the child nodes as a JSON object.
 	 *
-	 * @return {Array<Object>} An iterable list of serialized child objects as JSON.
+	 * @return {Generator<Object>} An iterable list of serialized child objects as JSON.
 	 */
 	getSerializeChildren() {
 
