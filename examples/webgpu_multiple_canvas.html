@@ -115,6 +115,8 @@
 					element.className = 'list-item';
 
 					const sceneCanvas = document.createElement( 'canvas' );
+					sceneCanvas.width = Math.floor( 200 * window.devicePixelRatio );
+					sceneCanvas.height = Math.floor( 200 * window.devicePixelRatio );
 					element.appendChild( sceneCanvas );
 
 					const descriptionElement = document.createElement( 'div' );
@@ -172,7 +174,7 @@
 				scenes.forEach( function ( scene ) {
 
 					// so something moves
-					scene.children[ 0 ].rotation.y = Date.now() * 0.001;
+					//scene.children[ 0 ].rotation.y = Date.now() * 0.001;
 
 					// get the canvas render target
 					const canvasRenderTarget = scene.userData.canvasRenderTarget;
