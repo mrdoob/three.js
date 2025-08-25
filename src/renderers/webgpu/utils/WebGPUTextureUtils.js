@@ -427,7 +427,7 @@ class WebGPUTextureUtils {
 			return backend.get( depthTexture ).texture;
 
 		}
-		
+
 		//
 
 		const depthTextureGPU = backend.get( depthTexture ).texture;
