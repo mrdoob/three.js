@@ -46,7 +46,7 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const particleCount = 200_000;
+			const particleCount = 200000;
 
 			const gravity = uniform( - .00098 );
 			const bounce = uniform( .8 );
@@ -231,11 +231,19 @@
 				controls.enableDamping = true;
 				controls.minDistance = 5;
 				controls.maxDistance = 200;
-				controls.target.set( 0, -8, 0 );
+				controls.target.set( 0, - 8, 0 );
 				controls.update();
 
-				controls.addEventListener( 'start', () => { isOrbitControlsActive = true; } );
-				controls.addEventListener( 'end', () => { isOrbitControlsActive = false; } );
+				controls.addEventListener( 'start', () => {
+
+					isOrbitControlsActive = true;
+
+				} );
+				controls.addEventListener( 'end', () => {
+
+					isOrbitControlsActive = false;
+
+				} );
 
 				controls.touches = {
 					ONE: null,
