@@ -5,7 +5,7 @@ import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import { nodeProxy, vec3, float } from '../tsl/TSLBase.js';
 import { dot, sqrt, saturate } from '../math/MathNode.js';
 
-import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../../constants.js';
+import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
 import { directionToFaceDirection } from './FrontFacingNode.js';
 
 /**
