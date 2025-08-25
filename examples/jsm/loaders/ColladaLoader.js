@@ -113,7 +113,7 @@ class ColladaLoader extends Loader {
 	 *
 	 * @param {string} text - The raw Collada data as a string.
 	 * @param {string} path - The asset path.
-	 * @return {{scene:Group,animations:Array<AnimationClip>,kinematics:Object}} An object representing the parsed asset.
+	 * @return {?{scene:Group,animations:Array<AnimationClip>,kinematics:Object}} An object representing the parsed asset.
 	 */
 	parse( text, path ) {
 

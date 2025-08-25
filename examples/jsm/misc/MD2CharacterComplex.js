@@ -121,7 +121,7 @@ class MD2CharacterComplex {
 		/**
 		 * The movement controls.
 		 *
-		 * @type {Object}
+		 * @type {?Object}
 		 * @default null
 		 */
 		this.controls = null;

@@ -446,7 +446,7 @@ function deepCloneAttribute( attribute ) {
  * single {@link InterleavedBuffer} instance. All attributes must have compatible types.
  *
  * @param {Array<BufferAttribute>} attributes - The attributes to interleave.
- * @return {Array<InterleavedBufferAttribute>} An array of interleaved attributes. If interleave does not succeed, the method returns `null`.
+ * @return {?Array<InterleavedBufferAttribute>} An array of interleaved attributes. If interleave does not succeed, the method returns `null`.
  */
 function interleaveAttributes( attributes ) {
 

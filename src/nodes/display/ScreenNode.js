@@ -67,7 +67,7 @@ class ScreenNode extends Node {
 	/**
 	 * This method is overwritten since the node type depends on the selected scope.
 	 *
-	 * @return {('vec2'|'vec4')} The node type.
+	 * @return {('float'|'vec2'|'vec4')} The node type.
 	 */
 	getNodeType() {
 

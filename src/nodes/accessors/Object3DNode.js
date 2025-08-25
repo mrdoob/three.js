@@ -73,7 +73,7 @@ class Object3DNode extends Node {
 	/**
 	 * Overwritten since the node type is inferred from the scope.
 	 *
-	 * @return {string} The node type.
+	 * @return {('mat4'|'vec3'|'float')} The node type.
 	 */
 	getNodeType() {
 

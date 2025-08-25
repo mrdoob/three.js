@@ -7,7 +7,7 @@ import { nodeObject } from '../tsl/TSLCore.js';
  * @augments Node
  * @param {Node} node - The node to be built in the sub-build.
  * @param {string} name - The name of the sub-build.
- * @param {string|null} [nodeType=null] - The type of the node, if known.
+ * @param {?string} [nodeType=null] - The type of the node, if known.
  */
 class SubBuildNode extends Node {
 
@@ -83,7 +83,7 @@ export default SubBuildNode;
  * @function
  * @param {Node} node - The node to be built in the sub-build.
  * @param {string} name - The name of the sub-build.
- * @param {string|null} [type=null] - The type of the node, if known.
+ * @param {?string} [type=null] - The type of the node, if known.
  * @returns {Node} A node object wrapping the SubBuildNode instance.
  */
 export const subBuild = ( node, name, type = null ) => nodeObject( new SubBuildNode( nodeObject( node ), name, type ) );

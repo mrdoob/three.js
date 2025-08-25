@@ -6,7 +6,7 @@ let _id = 0;
  * Represents a sampled texture binding type.
  *
  * @private
- * @augments Binding
+ * @augments Sampler
  */
 class SampledTexture extends Sampler {
 
