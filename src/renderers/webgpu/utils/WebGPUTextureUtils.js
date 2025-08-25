@@ -216,10 +216,18 @@ class WebGPUTextureUtils {
 
 		}
 
+		if ( texture.renderTarget && texture.renderTarget.isCanvasRenderTarget ) {
+
+			texture.internalFormat = this.backend.utils.getPreferredCanvasFormat();
+
+		}
+
 		const dimension = this._getDimension( texture );
 		const format = texture.internalFormat || options.format || getFormat( texture, backend.device );
 
 		textureData.format = format;
+
+		//
 
 		const { samples, primarySamples, isMSAA } = backend.utils.getTextureSampleData( texture );
 
