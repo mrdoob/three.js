@@ -101,7 +101,19 @@ class MathNode extends TempNode {
 	getInputType( builder ) {
 
 		const aType = this.aNode.getNodeType( builder );
-		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
+		let bType;
+
+		// bType is the node itself for bitcast
+		if ( this.method === MathNode.BITCAST ) {
+
+			bType = null;
+
+		} else {
+
+			bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
+
+		}
+
 		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
 
 		const aLen = builder.isMatrix( aType ) ? 0 : builder.getTypeLength( aType );
@@ -151,6 +163,10 @@ class MathNode extends TempNode {
 		} else if ( method === MathNode.EQUALS ) {
 
 			return builder.changeComponentType( this.aNode.getNodeType( builder ), 'bool' );
+
+		} else if ( method === MathNode.BITCAST ) {
+
+			return this.bNode;
 
 		} else {
 
@@ -239,6 +255,23 @@ class MathNode extends TempNode {
 
 			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
 
+
+		} else if ( method === MathNode.BITCAST ) {
+
+			const params = [];
+
+			params.push(
+				a.build( builder, inputType ),
+			);
+
+			console.log( type );
+			console.log( inputType );
+
+			const text = builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, inputType, output );
+			console.log( text );
+
+			return text;
+
 		} else {
 
 			const params = [];
@@ -248,6 +281,12 @@ class MathNode extends TempNode {
 				params.push(
 					a.build( builder, type ),
 					b.build( builder, type )
+				);
+
+			} else if ( method === MathNode.BITCAST ) {
+
+				params.push(
+					a.build( builder, inputType ),
 				);
 
 			} else if ( coordinateSystem === WebGLCoordinateSystem && method === MathNode.STEP ) {

@@ -128,7 +128,18 @@ const wgslMethods = {
 	equals_bvec3: 'tsl_equals_bvec3',
 	equals_bvec4: 'tsl_equals_bvec4',
 	inversesqrt: 'inverseSqrt',
-	bitcast: 'bitcast<f32>'
+	bitcast_float: 'bitcast<f32>',
+	bitcast_uint: 'bitcast<u32>',
+	bitcast_int: 'bitcast<i32>',
+	bitcast_vec2: 'bitcast<vec2<f32>>',
+	bitcast_ivec2: 'bitcast<vec2<i32>>',
+	bitcast_uvec2: 'bitcast<vec2<u32>>',
+	bitcast_vec3: 'bitcast<vec3<f32>>',
+	bitcast_ivec3: 'bitcast<vec3<i32>>',
+	bitcast_uvec3: 'bitcast<vec3<u32>>',
+	bitcast_vec4: 'bitcast<vec4<f32>>',
+	bitcast_ivec4: 'bitcast<vec4<i32>>',
+	bitcast_uvec4: 'bitcast<vec4<u32>>'
 };
 
 // WebGPU issue: does not support pow() with negative base on Windows
@@ -1867,6 +1878,8 @@ ${ flowData.code }
 			const workgroupSize = this.object.workgroupSize;
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
+
+			console.log( this.computeShader );
 
 		}
 
