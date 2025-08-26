@@ -267,6 +267,8 @@ class Bindings extends DataMap {
 
 						needsBindingsUpdate = true;
 
+						cacheBindings = false;
+
 					}
 
 				}
