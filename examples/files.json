@@ -141,6 +141,7 @@
 		"webgl_materials_envmaps_exr",
 		"webgl_materials_envmaps_groundprojected",
 		"webgl_materials_envmaps_hdr",
+		"webgl_materials_envmaps_fasthdr",
 		"webgl_materials_matcap",
 		"webgl_materials_normalmap",
 		"webgl_materials_normalmap_object_space",
