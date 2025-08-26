@@ -277,12 +277,6 @@ class MathNode extends TempNode {
 					b.build( builder, type )
 				);
 
-			} else if ( method === MathNode.BITCAST ) {
-
-				params.push(
-					a.build( builder, inputType ),
-				);
-
 			} else if ( coordinateSystem === WebGLCoordinateSystem && method === MathNode.STEP ) {
 
 				params.push(
