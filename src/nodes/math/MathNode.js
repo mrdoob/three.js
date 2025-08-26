@@ -264,13 +264,7 @@ class MathNode extends TempNode {
 				a.build( builder, inputType ),
 			);
 
-			console.log( type );
-			console.log( inputType );
-
-			const text = builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, inputType, output );
-			console.log( text );
-
-			return text;
+			return builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, inputType, output );
 
 		} else {
 
