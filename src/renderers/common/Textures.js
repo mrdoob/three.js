@@ -308,6 +308,8 @@ class Textures extends DataMap {
 
 					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
 
+					if ( texture.onUpdate ) texture.onUpdate( texture );
+
 				}
 
 			} else {

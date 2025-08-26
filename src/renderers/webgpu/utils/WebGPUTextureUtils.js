@@ -512,8 +512,6 @@ class WebGPUTextureUtils {
 
 		textureData.version = texture.version;
 
-		if ( texture.onUpdate ) texture.onUpdate( texture );
-
 	}
 
 	/**
