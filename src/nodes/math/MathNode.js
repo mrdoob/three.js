@@ -101,20 +101,8 @@ class MathNode extends TempNode {
 	getInputType( builder ) {
 
 		const aType = this.aNode.getNodeType( builder );
-		let bType;
-
-		// bType is the node itself for bitcast
-		if ( this.method === MathNode.BITCAST ) {
-
-			bType = null;
-
-		} else {
-
-			bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
-
-		}
-
-		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
+		const bType = ( this.bNode && this.bNode.isNode ) ? this.bNode.getNodeType( builder ) : null;
+		const cType = ( this.cNode && this.cNode.isNode ) ? this.cNode.getNodeType( builder ) : null;
 
 		const aLen = builder.isMatrix( aType ) ? 0 : builder.getTypeLength( aType );
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
