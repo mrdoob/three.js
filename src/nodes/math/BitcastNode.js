@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeProxy, nodeProxyIntent } from '../tsl/TSLCore.js';
+import { nodeProxyIntent } from '../tsl/TSLCore.js';
 /**
  * This node represents an operation that reinterprets the bit representation of a value
  * in one type as a value in another type.
@@ -51,18 +51,6 @@ class BitcastNode extends TempNode {
 	}
 
 	/**
-	 * The input type is inferred from the node types of the input node.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The input type.
-	 */
-	getInputType( builder ) {
-
-		return this.valueNode.getNodeType( builder );
-
-	}
-
-	/**
 	 * The node's type is defined by the conversion type.
 	 *
 	 * @return {string} The node type.
@@ -74,25 +62,10 @@ class BitcastNode extends TempNode {
 	}
 
 
-	setup( builder ) {
-
-		return super.setup( builder );
-
-	}
-
-
-	generate( builder, output ) {
-
-		const properties = builder.getNodeProperties( this );
-
-		if ( properties.outputNode ) {
-
-			return super.generate( builder, output );
-
-		}
+	generate( builder ) {
 
 		const type = this.getNodeType( builder );
-		const inputType = this.getInputType( builder );
+		const inputType = this.valueNode.getNodeType( builder );
 
 		const params = [];
 
@@ -100,25 +73,8 @@ class BitcastNode extends TempNode {
 			this.valueNode.build( builder, inputType ),
 		);
 
-		return builder.format( `bitcast<${ builder.getType( type ) }>( ${ params.join( ', ' ) } )`, inputType, output );
+		return `bitcast<${ builder.getType( type ) }>( ${ params.join( ', ' ) } )`;
 
-
-
-	}
-
-	serialize( data ) {
-
-		super.serialize( data );
-
-		data.method = this.method;
-
-	}
-
-	deserialize( data ) {
-
-		super.deserialize( data );
-
-		this.method = data.method;
 
 	}
 
