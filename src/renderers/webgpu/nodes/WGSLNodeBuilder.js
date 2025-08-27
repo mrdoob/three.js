@@ -127,7 +127,8 @@ const wgslMethods = {
 	equals_bvec2: 'tsl_equals_bvec2',
 	equals_bvec3: 'tsl_equals_bvec3',
 	equals_bvec4: 'tsl_equals_bvec4',
-	inversesqrt: 'inverseSqrt'
+	inversesqrt: 'inverseSqrt',
+	bitcast: 'bitcast<f32>'
 };
 
 // WebGPU issue: does not support pow() with negative base on Windows

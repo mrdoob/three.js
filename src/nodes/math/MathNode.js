@@ -366,7 +366,6 @@ MathNode.INVERSE = 'inverse';
 
 // 2 inputs
 
-MathNode.BITCAST = 'bitcast';
 MathNode.EQUALS = 'equals';
 MathNode.MIN = 'min';
 MathNode.MAX = 'max';
@@ -766,17 +765,6 @@ export const determinant = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DET
 export const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE ).setParameterLength( 1 );
 
 // 2 inputs
-
-/**
- * Reinterpret the bit representation of a value in one type as a value in another type.
- *
- * @tsl
- * @function
- * @param {Node | number} x - The parameter.
- * @param {string} y - The new type.
- * @returns {Node}
- */
-export const bitcast = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.BITCAST ).setParameterLength( 2 );
 
 /**
  * Returns `true` if `x` equals `y`.

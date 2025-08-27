@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeProxyIntent } from '../tsl/TSLCore.js';
+import { nodeProxy } from '../tsl/TSLCore.js';
 /**
  * This node represents an operation that reinterprets the bit representation of a value
  * in one type as a value in another type.
@@ -58,7 +58,7 @@ class BitcastNode extends TempNode {
 	 */
 	getInputType( builder ) {
 
-		return this.aNode.getNodeType( builder );
+		return this.valueNode.getNodeType( builder );
 
 	}
 
@@ -70,6 +70,13 @@ class BitcastNode extends TempNode {
 	getNodeType() {
 
 		return this.conversionType;
+
+	}
+
+
+	setup( builder ) {
+
+		return super.setup( builder );
 
 	}
 
@@ -90,7 +97,7 @@ class BitcastNode extends TempNode {
 		const params = [];
 
 		params.push(
-			this.aNode.build( builder, inputType ),
+			this.valueNode.build( builder, inputType ),
 		);
 
 		return builder.format( `bitcast<${ builder.getType( type ) }>( ${ params.join( ', ' ) } )`, inputType, output );
@@ -128,4 +135,4 @@ export default BitcastNode;
  * @param {string} y - The new type.
  * @returns {Node}
  */
-export const bitcast = /*@__PURE__*/ nodeProxyIntent( BitcastNode ).setParameterLength( 2 );
+export const bitcast = /*@__PURE__*/ nodeProxy( BitcastNode ).setParameterLength( 2 );
