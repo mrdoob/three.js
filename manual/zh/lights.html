@@ -37,16 +37,16 @@ const near = 0.1;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
-<p>然后我们添加一个 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>。<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 让我们可以围绕某一个点旋转控制相机。<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 是 three.js 的可选模块，所以我们首先需要引入这个模块。</p>
+<p>然后我们添加一个 <a href="/docs/#examples/zh/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>。<a href="/docs/#examples/zh/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 让我们可以围绕某一个点旋转控制相机。<a href="/docs/#examples/zh/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 是 three.js 的可选模块，所以我们首先需要引入这个模块。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
-<p>然后我们就可以使用了。创建 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 时传入两个参数，一个是要控制的相机对象，第二个是检测事件的 DOM 元素。</p>
+<p>然后我们就可以使用了。创建 <a href="/docs/#examples/zh/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 时传入两个参数，一个是要控制的相机对象，第二个是检测事件的 DOM 元素。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
 </pre>
-<p>我们还将 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 的观察点设置为 (0, 5, 0) 的位置，设置完需要调用一下 <code class="notranslate" translate="no">controls.update</code>，这样才真正更新观察点位置。</p>
+<p>我们还将 <a href="/docs/#examples/zh/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 的观察点设置为 (0, 5, 0) 的位置，设置完需要调用一下 <code class="notranslate" translate="no">controls.update</code>，这样才真正更新观察点位置。</p>
 <p>下面我们创建一些东西来打光。首先，创建一个地平面，并用下方展示的 2x2 像素的黑白格图片来作为纹理。</p>
 <div class="threejs_center">
   <img src="../examples/resources/images/checker.png" class="border" style="
