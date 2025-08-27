@@ -440,27 +440,31 @@ ${ flowData.code }
 	 */
 	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet ) {
 
-		let snippet;
+		if ( texture.isDepthTexture ) {
 
-		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+			if ( depthSnippet ) uvSnippet = `vec4( ${ uvSnippet }, ${ depthSnippet } )`;
 
-		if ( offsetSnippet ) {
+			if ( offsetSnippet ) {
 
-			snippet = `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
+				return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } ).x`;
+
+			}
+
+			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
 		} else {
 
-			snippet = `texture( ${ textureProperty }, ${ uvSnippet } )`;
+			if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+
+			if ( offsetSnippet ) {
+
+				return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+			}
+
+			return `texture( ${ textureProperty }, ${ uvSnippet } )`;
 
 		}
-
-		if ( texture.isDepthTexture ) {
-
-			snippet += '.x';
-
-		}
-
-		return snippet;
 
 	}
 
