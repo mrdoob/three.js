@@ -67,13 +67,7 @@ class BitcastNode extends TempNode {
 		const type = this.getNodeType( builder );
 		const inputType = this.valueNode.getNodeType( builder );
 
-		const params = [];
-
-		params.push(
-			this.valueNode.build( builder, inputType ),
-		);
-
-		return `bitcast<${ builder.getType( type ) }>( ${ params.join( ', ' ) } )`;
+		return `${builder.getBitcastMethod( type, inputType )}( ${ this.valueNode.build( builder, inputType ) } )`;
 
 
 	}
