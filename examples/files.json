@@ -1,5 +1,6 @@
 {
 	"webgl": [
+		"webgl_animation_animation-pointer",
 		"webgl_animation_keyframes",
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_additive_blending",
