@@ -101,8 +101,8 @@ class MathNode extends TempNode {
 	getInputType( builder ) {
 
 		const aType = this.aNode.getNodeType( builder );
-		const bType = ( this.bNode && this.bNode.isNode ) ? this.bNode.getNodeType( builder ) : null;
-		const cType = ( this.cNode && this.cNode.isNode ) ? this.cNode.getNodeType( builder ) : null;
+		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
+		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
 
 		const aLen = builder.isMatrix( aType ) ? 0 : builder.getTypeLength( aType );
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
@@ -151,10 +151,6 @@ class MathNode extends TempNode {
 		} else if ( method === MathNode.EQUALS ) {
 
 			return builder.changeComponentType( this.aNode.getNodeType( builder ), 'bool' );
-
-		} else if ( method === MathNode.BITCAST ) {
-
-			return this.bNode;
 
 		} else {
 
@@ -243,17 +239,6 @@ class MathNode extends TempNode {
 
 			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
 
-
-		} else if ( method === MathNode.BITCAST ) {
-
-			const params = [];
-
-			params.push(
-				a.build( builder, inputType ),
-			);
-
-			return builder.format( `${ builder.getMethod( method ) }<${ builder.getType( type ) }>( ${ params.join( ', ' ) } )`, inputType, output );
-
 		} else {
 
 			const params = [];
@@ -317,7 +302,7 @@ class MathNode extends TempNode {
 
 			}
 
-			return builder.format( `${ builder.getMethod( method, type ) }( ${ params.join( ', ' ) } )`, type, output );
+			return builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, type, output );
 
 		}
 
