@@ -13,7 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { TimestampQuery, WebGPUCoordinateSystem } from '../../constants.js';
+import { WebGPUCoordinateSystem, TimestampQuery } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
