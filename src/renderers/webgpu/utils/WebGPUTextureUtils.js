@@ -540,7 +540,7 @@ class WebGPUTextureUtils {
 
 		const readBuffer = device.createBuffer(
 			{
-				size: width * height * bytesPerTexel,
+				size: ( height - 1 ) * bytesPerRow + width * bytesPerTexel, // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			}
 		);
