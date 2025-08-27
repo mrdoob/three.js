@@ -380,7 +380,7 @@ ${ flowData.code }
 	/**
 	 * Generates the GLSL snippet that reads a single texel from a texture without sampling or filtering.
 	 *
-	 * @param {Texture} texture - The texture.
+	 * @param {?Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
@@ -418,7 +418,7 @@ ${ flowData.code }
 
 		}
 
-		if ( texture.isDepthTexture ) {
+		if ( texture !== null && texture.isDepthTexture ) {
 
 			snippet += '.x';
 
