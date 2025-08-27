@@ -13,6 +13,7 @@ import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { warnOnce } from '../../utils.js';
 import { WebGLCoordinateSystem } from '../../constants.js';
+import { TimestampQuery } from '../../constants.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
 
 /**
@@ -376,13 +377,12 @@ class WebGLBackend extends Backend {
 	/**
 	 * Inits a time stamp query for the given render context.
 	 *
-	 * @param {RenderContext} renderContext - The render context.
+	 * @param {string} type - The type of the timestamp query.
+	 * @param {string} uid - A unique identifier for the timestamp query.
 	 */
-	initTimestampQuery( renderContext ) {
+	initTimestampQuery( type, uid ) {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
-
-		const type = renderContext.isComputeNode ? 'compute' : 'render';
 
 		if ( ! this.timestampQueryPool[ type ] ) {
 
@@ -393,11 +393,11 @@ class WebGLBackend extends Backend {
 
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( renderContext );
+		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
 		if ( baseOffset !== null ) {
 
-			timestampQueryPool.beginQuery( renderContext );
+			timestampQueryPool.beginQuery( uid );
 
 		}
 
@@ -410,14 +410,13 @@ class WebGLBackend extends Backend {
 	 *
 	 * @param {RenderContext} renderContext - The render context.
 	 */
-	prepareTimestampBuffer( renderContext ) {
+	prepareTimestampBuffer( type, uid ) {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
 
-		const type = renderContext.isComputeNode ? 'compute' : 'render';
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		timestampQueryPool.endQuery( renderContext );
+		timestampQueryPool.endQuery( uid );
 
 	}
 
@@ -446,6 +445,10 @@ class WebGLBackend extends Backend {
 
 		//
 
+		renderContextData.frameCalls = this.renderer.info.render.frameCalls;
+
+		//
+
 		if ( renderContext.viewport ) {
 
 			this.updateViewport( renderContext );
@@ -467,7 +470,7 @@ class WebGLBackend extends Backend {
 
 		//
 
-		this.initTimestampQuery( renderContext );
+		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
@@ -560,7 +563,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		this.prepareTimestampBuffer( renderContext );
+		this.prepareTimestampBuffer( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
 
 	}
 
@@ -804,9 +807,16 @@ class WebGLBackend extends Backend {
 	beginCompute( computeGroup ) {
 
 		const { state, gl } = this;
+		const computeGroupData = this.get( computeGroup );
+
+		//
+
+		computeGroupData.frameCalls = this.renderer.info.compute.frameCalls;
+
+		//
 
 		state.bindFramebuffer( gl.FRAMEBUFFER, null );
-		this.initTimestampQuery( computeGroup );
+		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
 	}
 
@@ -912,7 +922,7 @@ class WebGLBackend extends Backend {
 
 		gl.disable( gl.RASTERIZER_DISCARD );
 
-		this.prepareTimestampBuffer( computeGroup );
+		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
 		if ( this._currentContext ) {
 
