@@ -10,7 +10,11 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 
 const glslMethods = {
 	textureDimensions: 'textureSize',
-	equals: 'equal'
+	equals: 'equal',
+	bitcast_float_int: 'floatBitsToInt',
+	bitcast_int_float: 'intBitsToFloat',
+	bitcast_uint_float: 'uintBitsToFloat',
+	bitcast_float_uint: 'floatBitsToUint',
 };
 
 const precisionLib = {
@@ -131,6 +135,19 @@ class GLSLNodeBuilder extends NodeBuilder {
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
+
+	}
+
+	/**
+	 * Returns the bitcast method name for a given input and outputType.
+	 *
+	 * @param {string} type - The output type to bitcast to.
+	 * @param {string} inputType - The input type of the.
+	 * @return {string} The resolved WGSL bitcast invocation.
+	 */
+	getBitcastMethod( type, inputType ) {
+
+		return glslMethods[ `bitcast_${ inputType }_${ type }` ];
 
 	}
 
