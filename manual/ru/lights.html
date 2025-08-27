@@ -42,14 +42,14 @@ const near = 0.1;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
-<p>Далее давайте добавим <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> позволить пользователю вращать
-или <em>поворачивать</em> камеру вокруг некоторой точки. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> - это
+<p>Далее давайте добавим <a href="/docs/#examples/ru/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. <a href="/docs/#examples/ru/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> позволить пользователю вращать
+или <em>поворачивать</em> камеру вокруг некоторой точки. <a href="/docs/#examples/ru/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> - это
 дополнительные функции three.js, поэтому сначала нам нужно
 включить их в нашу страницу.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
-<p>Теперь мы можем использовать их. Мы передаем в <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> камеру для
+<p>Теперь мы можем использовать их. Мы передаем в <a href="/docs/#examples/ru/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> камеру для
 управления и элемент DOM для получения входных событий</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
