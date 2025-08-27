@@ -137,6 +137,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 		return glslMethods[ method ] || method;
 
 	}
+
 	/**
 	 * Returns the bitcast method name for a given input and outputType.
 	 *
