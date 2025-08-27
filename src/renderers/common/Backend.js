@@ -449,7 +449,7 @@ class Backend {
 	getTimestampUID( abstractRenderContext ) {
 
 		const contextData = this.get( abstractRenderContext );
- 
+
 		let uid = abstractRenderContext.isComputeNode === true ? 'c' : 'r';
 		uid += ':' + contextData.frameCalls + ':' + abstractRenderContext.id;
 

@@ -12,8 +12,7 @@ import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 import { warnOnce } from '../../utils.js';
-import { WebGLCoordinateSystem } from '../../constants.js';
-import { TimestampQuery } from '../../constants.js';
+import { WebGLCoordinateSystem, TimestampQuery } from '../../constants.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
 
 /**
@@ -408,7 +407,8 @@ class WebGLBackend extends Backend {
 	/**
 	 * Prepares the timestamp buffer.
 	 *
-	 * @param {RenderContext} renderContext - The render context.
+	 * @param {string} type - The type of the timestamp query.
+	 * @param {string} uid - A unique identifier for the timestamp query.
 	 */
 	prepareTimestampBuffer( type, uid ) {
 
