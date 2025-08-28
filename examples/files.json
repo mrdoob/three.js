@@ -1,6 +1,5 @@
 {
 	"webgl": [
-		"webgl_animation_animation-pointer",
 		"webgl_animation_keyframes",
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_additive_blending",
@@ -83,6 +82,7 @@
 		"webgl_loader_fbx_nurbs",
 		"webgl_loader_gcode",
 		"webgl_loader_gltf",
+		"webgl_loader_gltf_animation_pointer",
 		"webgl_loader_gltf_progressive_lod",
 		"webgl_loader_gltf_avif",
 		"webgl_loader_gltf_compressed",

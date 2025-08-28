@@ -22,8 +22,8 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - animation-pointer - <a href="https://www.npmjs.com/package/@needle-tools/three-animation-pointer" target="_blank" rel="noopener">@needle-tools/three-animation-pointer</a><br/>
-			Model: <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DragonDispersion" target="_blank" rel="noopener">DragonDispersion</a> from Khronos Sample Assets, CC Attribution.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> + <a href="https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_animation_pointer" target="_blank" rel="noopener">KHR_animation_pointer</a> using <a href="https://www.npmjs.com/package/@needle-tools/three-animation-pointer" target="_blank" rel="noopener">@needle-tools/three-animation-pointer</a><br/>
+			DragonDispersion from <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DragonDispersion" target="_blank" rel="noopener">glTF-Sample-Assets</a>
 		</div>
 
 		<script type="importmap">
@@ -70,7 +70,7 @@
 			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
 			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, .2, 100 );
-			camera.position.set( -4, 2, 8 );
+			camera.position.set( -3, 2, 6 );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
@@ -94,7 +94,7 @@
 				return new GLTFAnimationPointerExtension(p);
 			});
 
-			loader.load( 'https://cloud.needle.tools/-/assets/Z23hmXB27L6Db/file', function ( gltf ) {
+			loader.load( 'https://cloud.needle.tools/-/assets/Z23hmXB27L6Db-optimized/file', function ( gltf ) {
 
 				const model = gltf.scene;
 				scene.add( model );
