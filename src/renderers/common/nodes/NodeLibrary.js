@@ -146,9 +146,9 @@ class NodeLibrary {
 	/**
 	 * Adds a node class definition for the given type to the provided type library.
 	 *
-	 * @param {any} nodeClass - The node class definition.
+	 * @param {Node.constructor} nodeClass - The node class definition.
 	 * @param {number|string} type - The object type.
-	 * @param {Map} library - The type library.
+	 * @param {Map<number|string,Node.constructor>} library - The type library.
 	 */
 	addType( nodeClass, type, library ) {
 
@@ -169,9 +169,9 @@ class NodeLibrary {
 	/**
 	 * Adds a node class definition for the given class definition to the provided type library.
 	 *
-	 * @param {any} nodeClass - The node class definition.
-	 * @param {any} baseClass - The class definition.
-	 * @param {WeakMap} library - The type library.
+	 * @param {Node.constructor} nodeClass - The node class definition.
+	 * @param {Node.constructor} baseClass - The class definition.
+	 * @param {WeakMap<Node.constructor, Node.constructor>} library - The type library.
 	 */
 	addClass( nodeClass, baseClass, library ) {
 
