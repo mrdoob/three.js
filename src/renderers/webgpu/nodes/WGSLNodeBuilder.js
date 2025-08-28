@@ -497,7 +497,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		const coordSnippet = `${ vecType }<u32>( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } ) )`;
 
-		return this.generateTextureLoad( texture, textureProperty, coordSnippet, depthSnippet, null, levelSnippet );
+		return this.generateTextureLoad( texture, textureProperty, coordSnippet, levelSnippet, depthSnippet, null );
 
 	}
 
@@ -507,20 +507,22 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0u' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
-		let snippet;
+		if ( levelSnippet === null ) levelSnippet = '0u';
 
 		if ( offsetSnippet ) {
 
 			uvIndexSnippet = `${ uvIndexSnippet } + ${ offsetSnippet }`;
 
 		}
+
+		let snippet;
 
 		if ( depthSnippet ) {
 
