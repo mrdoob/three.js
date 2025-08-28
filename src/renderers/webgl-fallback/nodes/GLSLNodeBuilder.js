@@ -459,7 +459,7 @@ ${ flowData.code }
 
 		if ( texture.isDepthTexture ) {
 
-			if ( depthSnippet ) uvSnippet = `vec4( ${ uvSnippet }, ${ depthSnippet } )`;
+			if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
 
 			if ( offsetSnippet ) {
 
