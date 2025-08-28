@@ -528,6 +528,7 @@
 
 			}
 
+			autoDefaultLinkAttribute(iframe);
 			document.body.replaceChild( iframe, oldIframe );
 
 		}
@@ -556,6 +557,28 @@
 			}
 
 			return parts;
+
+		}
+
+		function autoDefaultLinkAttribute( iframe ) {
+
+			// To set default attribute _blank to prevent link open inside the iFrame viewer
+
+			iframe.addEventListener( 'load', function () {
+
+				const links = iframe.contentDocument.querySelectorAll( 'a' );
+
+				links.forEach( function ( link ) {
+
+					if ( link.target !== undefined && link.target.trim() === "" ) {
+
+						link.setAttribute( 'target', '_blank' );
+
+					}
+
+				} );
+
+			} );
 
 		}
 
