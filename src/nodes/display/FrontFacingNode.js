@@ -40,15 +40,11 @@ class FrontFacingNode extends Node {
 
 		//
 
-		const { renderer, material } = builder;
+		const { material } = builder;
 
-		if ( renderer.coordinateSystem === WebGLCoordinateSystem ) {
+		if ( material.side === BackSide ) {
 
-			if ( material.side === BackSide ) {
-
-				return 'false';
-
-			}
+			return 'false';
 
 		}
 
