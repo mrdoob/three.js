@@ -5,7 +5,7 @@ import {
 } from './WebGPUConstants.js';
 
 import {
-	BackSide, DoubleSide,
+	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
 	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstColorFactor,
@@ -672,8 +672,6 @@ class WebGPUPipelineUtils {
 		const descriptor = {};
 		const utils = this.backend.utils;
 
-		//
-
 		descriptor.topology = utils.getPrimitiveTopology( object, material );
 
 		if ( geometry.index !== null && object.isLine === true && object.isLineSegments !== true ) {
@@ -682,17 +680,28 @@ class WebGPUPipelineUtils {
 
 		}
 
-		//
+		switch ( material.side ) {
 
-		let flipSided = ( material.side === BackSide );
+			case FrontSide:
+				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.cullMode = GPUCullMode.Back;
+				break;
 
-		if ( object.isMesh && object.matrixWorld.determinant() < 0 ) flipSided = ! flipSided;
+			case BackSide:
+				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.cullMode = GPUCullMode.Front;
+				break;
 
-		descriptor.frontFace = ( flipSided === true ) ? GPUFrontFace.CW : GPUFrontFace.CCW;
+			case DoubleSide:
+				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.cullMode = GPUCullMode.None;
+				break;
 
-		//
+			default:
+				console.error( 'THREE.WebGPUPipelineUtils: Unknown material.side value.', material.side );
+				break;
 
-		descriptor.cullMode = ( material.side === DoubleSide ) ? GPUCullMode.None : GPUCullMode.Back;
+		}
 
 		return descriptor;
 
