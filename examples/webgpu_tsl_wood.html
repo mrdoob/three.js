@@ -45,10 +45,11 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 			import { WoodNodeMaterial, WoodGenuses, Finishes } from 'three/addons/materials/WoodNodeMaterial.js';
 
-			let scene, base, camera, renderer, controls, stats, font, blockGeometry;
+			let scene, base, camera, renderer, controls, stats, font, blockGeometry, gui;
 
 			// Helper function to get grid position
 			function getGridPosition( woodIndex, finishIndex ) {
@@ -163,6 +164,8 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+
+				gui = new GUI();
 			
 				font = await new FontLoader().loadAsync( './fonts/helvetiker_regular.typeface.json' );
 
@@ -213,7 +216,9 @@
 
 						const material = WoodNodeMaterial.fromPreset( WoodGenuses[ x ], Finishes[ y ] );
 						const cube = new THREE.Mesh( blockGeometry, material );
+
 						cube.position.copy( getGridPosition( x, y ) );
+						material.transformationMatrix = new THREE.Matrix4().setPosition( new THREE.Vector3( -0.1, 0, Math.random() ) );
 						base.add( cube );
 
 						await new Promise( resolve => setTimeout( resolve, 0 ) );
@@ -222,7 +227,7 @@
 
 				}
 
-				 add_custom_wood( text_mat );
+				add_custom_wood( text_mat );
 
 			}
 
@@ -262,22 +267,52 @@
 
 				// Create custom wood material with unique parameters
 				const customMaterial = new WoodNodeMaterial( {
-					centerSize: 1.8,
-					largeWarpScale: 0.5,
-					ringCount: 45,
-					ringBias: 0.15,
-					barkThickness: 0.8,
-					splotchScale: 2.5,
-					splotchIntensity: 1.8,
-					cellScale: 1200,
-					cellSize: 0.05,
-					darkGrainColor: new THREE.Color( '#0a0a0a' ),
-					lightGrainColor: new THREE.Color( '#8b4513' ),
+					centerSize: 1.11,
+					largeWarpScale: 0.32,
+					largeGrainStretch: 0.24,
+					smallWarpStrength: 0.059,
+					smallWarpScale: 2,
+					fineWarpStrength: 0.006,
+					fineWarpScale: 32.8,
+					ringThickness: 1/34,
+					ringBias: 0.03,
+					ringSizeVariance: 0.03,
+					ringVarianceScale: 4.4,
+					barkThickness: 0.3,
+					splotchScale: 0.2,
+					splotchIntensity: 0.541,
+					cellScale: 910,
+					cellSize: 0.1,
+					darkGrainColor: new THREE.Color( '#0c0504') ,
+					lightGrainColor: new THREE.Color( '#926c50' ),
 					clearcoat: 1,
 					clearcoatRoughness: 0.2
 				} );
 
+				gui.add( customMaterial, 'centerSize', 0.0, 2.0, 0.01 ).name( 'centerSize' );
+				gui.add( customMaterial, 'largeWarpScale', 0.0, 1.0, 0.001 ).name( 'largeWarpScale' );
+				gui.add( customMaterial, 'largeGrainStretch', 0.0, 1.0, 0.001 ).name( 'largeGrainStretch' );
+				gui.add( customMaterial, 'smallWarpStrength', 0.0, 0.2, 0.001 ).name( 'smallWarpStrength' );
+				gui.add( customMaterial, 'smallWarpScale', 0.0, 5.0, 0.01 ).name( 'smallWarpScale' );
+				gui.add( customMaterial, 'fineWarpStrength', 0.0, 0.05, 0.001 ).name( 'fineWarpStrength' );
+				gui.add( customMaterial, 'fineWarpScale', 0.0, 50.0, 0.1 ).name( 'fineWarpScale' );
+				gui.add( customMaterial, 'ringThickness', 0.0, 0.1, 0.001 ).name( 'ringThickness' );
+				gui.add( customMaterial, 'ringBias', -0.2, 0.2, 0.001 ).name( 'ringBias' );
+				gui.add( customMaterial, 'ringSizeVariance', 0.0, 0.2, 0.001 ).name( 'ringSizeVariance' );
+				gui.add( customMaterial, 'ringVarianceScale', 0.0, 10.0, 0.1 ).name( 'ringVarianceScale' );
+				gui.add( customMaterial, 'barkThickness', 0.0, 1.0, 0.01 ).name( 'barkThickness' );
+				gui.add( customMaterial, 'splotchScale', 0.0, 1.0, 0.01 ).name( 'splotchScale' );
+				gui.add( customMaterial, 'splotchIntensity', 0.0, 1.0, 0.01 ).name( 'splotchIntensity' );
+				gui.add( customMaterial, 'cellScale', 100, 2000, 1 ).name( 'cellScale' );
+				gui.add( customMaterial, 'cellSize', 0.01, 0.5, 0.001 ).name( 'cellSize' );
+				gui.addColor( { darkGrainColor: '#0c0504' }, 'darkGrainColor' ).onChange( v => customMaterial.darkGrainColor.set( v ) );
+				gui.addColor( { lightGrainColor: '#926c50' }, 'lightGrainColor' ).onChange( v => customMaterial.lightGrainColor.set( v ) );
+				gui.add( customMaterial, 'clearcoat', 0.0, 1.0, 0.01 ).name( 'clearcoat' );
+				gui.add( customMaterial, 'clearcoatRoughness', 0.0, 1.0, 0.01 ).name( 'clearcoatRoughness' );
+
 				const cube = new THREE.Mesh( blockGeometry, customMaterial );
+
+				customMaterial.transformationMatrix = new THREE.Matrix4().setPosition( new THREE.Vector3( -0.1, 0, Math.random() ) );
 				cube.position.copy( getGridPosition( Math.round( WoodGenuses.length / 2 ), 5 ) );
 
 				base.add( cube );
