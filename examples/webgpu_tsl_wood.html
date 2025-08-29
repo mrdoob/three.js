@@ -9,7 +9,7 @@
 		<style>
 
 			body {
-				color:white;
+				color:rgb(81, 81, 81);
 			}
 
 			#info a {
@@ -45,10 +45,11 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 			import { WoodNodeMaterial, WoodGenuses, Finishes } from 'three/addons/materials/WoodNodeMaterial.js';
 
-			let scene, base, camera, renderer, controls, stats, font, blockGeometry;
+			let scene, base, camera, renderer, controls, stats, font, blockGeometry, gui;
 
 			// Helper function to get grid position
 			function getGridPosition( woodIndex, finishIndex ) {
@@ -163,6 +164,8 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+
+				gui = new GUI();
 			
 				font = await new FontLoader().loadAsync( './fonts/helvetiker_regular.typeface.json' );
 
@@ -222,7 +225,7 @@
 
 				}
 
-				 add_custom_wood( text_mat );
+				add_custom_wood( text_mat );
 
 			}
 
@@ -276,6 +279,27 @@
 					clearcoat: 1,
 					clearcoatRoughness: 0.2
 				} );
+
+				gui.add( customMaterial, 'centerSize', 0.0, 2.0, 0.01 ).name( 'centerSize' );
+				gui.add( customMaterial, 'largeWarpScale', 0.0, 1.0, 0.001 ).name( 'largeWarpScale' );
+				gui.add( customMaterial, 'largeGrainStretch', 0.0, 1.0, 0.001 ).name( 'largeGrainStretch' );
+				gui.add( customMaterial, 'smallWarpStrength', 0.0, 0.2, 0.001 ).name( 'smallWarpStrength' );
+				gui.add( customMaterial, 'smallWarpScale', 0.0, 5.0, 0.01 ).name( 'smallWarpScale' );
+				gui.add( customMaterial, 'fineWarpStrength', 0.0, 0.05, 0.001 ).name( 'fineWarpStrength' );
+				gui.add( customMaterial, 'fineWarpScale', 0.0, 50.0, 0.1 ).name( 'fineWarpScale' );
+				gui.add( customMaterial, 'ringCount', 0.0, 100, 1 ).name( 'ringCount' );
+				gui.add( customMaterial, 'ringBias', -0.2, 0.2, 0.001 ).name( 'ringBias' );
+				gui.add( customMaterial, 'ringSizeVariance', 0.0, 0.2, 0.001 ).name( 'ringSizeVariance' );
+				gui.add( customMaterial, 'ringVarianceScale', 0.0, 10.0, 0.1 ).name( 'ringVarianceScale' );
+				gui.add( customMaterial, 'barkThickness', 0.0, 1.0, 0.01 ).name( 'barkThickness' );
+				gui.add( customMaterial, 'splotchScale', 0.0, 1.0, 0.01 ).name( 'splotchScale' );
+				gui.add( customMaterial, 'splotchIntensity', 0.0, 1.0, 0.01 ).name( 'splotchIntensity' );
+				gui.add( customMaterial, 'cellScale', 100, 2000, 1 ).name( 'cellScale' );
+				gui.add( customMaterial, 'cellSize', 0.01, 0.5, 0.001 ).name( 'cellSize' );
+				gui.addColor( { darkGrainColor: '#0c0504' }, 'darkGrainColor' ).onChange( v => customMaterial.darkGrainColor.set( v ) );
+				gui.addColor( { lightGrainColor: '#926c50' }, 'lightGrainColor' ).onChange( v => customMaterial.lightGrainColor.set( v ) );
+				gui.add( customMaterial, 'clearcoat', 0.0, 1.0, 0.01 ).name( 'clearcoat' );
+				gui.add( customMaterial, 'clearcoatRoughness', 0.0, 1.0, 0.01 ).name( 'clearcoatRoughness' );
 
 				const cube = new THREE.Mesh( blockGeometry, customMaterial );
 				cube.position.copy( getGridPosition( Math.round( WoodGenuses.length / 2 ), 5 ) );
