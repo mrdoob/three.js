@@ -38,7 +38,7 @@ class Backend {
 		 * This weak map holds backend-specific data of objects
 		 * like textures, attributes or render targets.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<Object, Object>}
 		 */
 		this.data = new WeakMap();
 
