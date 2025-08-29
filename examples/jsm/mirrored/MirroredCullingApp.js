@@ -9,6 +9,7 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 
 	// UI state for projection/view/scene flips
 	const params = {
+		camera: { type: 'Perspective', fov: 75, orthoSize: 10, near: 0.1, far: 100 },
 		projection: { x: true, y: false, z: false }, // default mirror X
 		view: { x: false, y: false, z: false },
 		scene: { x: false, y: false, z: false }
@@ -23,11 +24,11 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	scene.background = new THREE.Color( 0x333333 );
 
 	// cameras
-	const mainCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / 2 / window.innerHeight, 0.1, 100 );
+	let mainCamera = new THREE.PerspectiveCamera( params.camera.fov, (window.innerWidth / 2) / window.innerHeight, params.camera.near, params.camera.far );
 	mainCamera.name = 'mainCamera';
 	mainCamera.position.z = 8;
 
-	const mirroredCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / 2 / window.innerHeight, 0.1, 100 );
+	let mirroredCamera = new THREE.PerspectiveCamera( params.camera.fov, (window.innerWidth / 2) / window.innerHeight, params.camera.near, params.camera.far );
 	mirroredCamera.name = 'mirroredCamera';
 	mirroredCamera.position.z = 8;
 
@@ -90,6 +91,52 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	// mouse split control
 	let mouseX = 0;
 	window.addEventListener( 'mousemove', ( event ) => { mouseX = event.clientX; } );
+
+	// camera helpers for switching and resizing
+	function createCameraByType( type, aspect ) {
+
+		let cam;
+		if ( type === 'Orthographic' ) {
+			const halfH = params.camera.orthoSize / 2;
+			const halfW = halfH * aspect;
+			cam = new THREE.OrthographicCamera( - halfW, halfW, halfH, - halfH, params.camera.near, params.camera.far );
+		} else {
+			cam = new THREE.PerspectiveCamera( params.camera.fov, aspect, params.camera.near, params.camera.far );
+		}
+
+		cam.position.z = 8;
+
+		cam.updateProjectionMatrix();
+		return cam;
+
+	}
+
+	function updateCameraOnResize( cam ) {
+
+		const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+		if ( cam.isPerspectiveCamera ) {
+			cam.aspect = aspect;
+		} else if ( cam.isOrthographicCamera ) {
+			const halfH = params.camera.orthoSize / 2;
+			const halfW = halfH * aspect;
+			cam.left = - halfW;
+			cam.right = halfW;
+			cam.top = halfH;
+			cam.bottom = - halfH;
+		}
+		cam.updateProjectionMatrix();
+
+	}
+
+	function resizeCameras() {
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		updateCameraOnResize( mainCamera );
+		updateCameraOnResize( mirroredCamera );
+		// Reapply projection flip state after any projection changes
+		applyProjectionState( mirroredCamera );
+
+	}
 
 	// helpers applying state
 	function applyProjectionState( cam ) {
@@ -162,6 +209,32 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	mainControls.addEventListener( 'change', () => { syncFrom( 'main' ); } );
 	mirroredControls.addEventListener( 'change', () => { syncFrom( 'mirrored' ); } );
 
+	function rebuildCameras() {
+
+		const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+
+		// Create new cameras according to selection
+		mainCamera = createCameraByType( params.camera.type, aspect );
+		mainCamera.name = 'mainCamera';
+		mirroredCamera = createCameraByType( params.camera.type, aspect );
+		mirroredCamera.name = 'mirroredCamera';
+
+		// Rebuild controls
+		if ( mainControls ) mainControls.dispose();
+		if ( mirroredControls ) mirroredControls.dispose();
+		mainControls = new OrbitControls( mainCamera, renderer.domElement );
+		mirroredControls = new OrbitControls( mirroredCamera, renderer.domElement );
+		mainControls.addEventListener( 'change', () => { syncFrom( 'main' ); } );
+		mirroredControls.addEventListener( 'change', () => { syncFrom( 'mirrored' ); } );
+
+		// Ensure states are re-applied
+		applyViewState( mirroredCamera );
+		updateCameraOnResize( mainCamera );
+		updateCameraOnResize( mirroredCamera );
+		applyProjectionState( mirroredCamera );
+
+	}
+
 	// GUI (reuse injected GUI if provided)
 	const uiContainer = document.getElementById( 'ui' );
 	const gui = options.gui || new GUI( { title: 'Mirrored Camera Culling' } );
@@ -175,10 +248,21 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	viewFolder.add( params.view, 'x' ).name( 'X' ).onChange( () => applyViewState( mirroredCamera ) );
 	viewFolder.add( params.view, 'y' ).name( 'Y' ).onChange( () => applyViewState( mirroredCamera ) );
 	viewFolder.add( params.view, 'z' ).name( 'Z' ).onChange( () => applyViewState( mirroredCamera ) );
-    const sceneFolder = gui.addFolder( 'Scene Flip' );
-    sceneFolder.add( params.scene, 'x' ).name( 'X' ).onChange( applySceneState );
-    sceneFolder.add( params.scene, 'y' ).name( 'Y' ).onChange( applySceneState );
-    sceneFolder.add( params.scene, 'z' ).name( 'Z' ).onChange( applySceneState );
+
+	const sceneFolder = gui.addFolder( 'Scene Flip' );
+	sceneFolder.add( params.scene, 'x' ).name( 'X' ).onChange( applySceneState );
+	sceneFolder.add( params.scene, 'y' ).name( 'Y' ).onChange( applySceneState );
+	sceneFolder.add( params.scene, 'z' ).name( 'Z' ).onChange( applySceneState );
+
+	const cameraFolder = gui.addFolder( 'Camera' );
+	cameraFolder.add( params.camera, 'type', [ 'Perspective', 'Orthographic' ] ).name( 'Type' ).onChange( rebuildCameras );
+	cameraFolder.add( params.camera, 'fov', 10, 120, 1 ).name( 'Perspective FOV' ).onChange( () => {
+		if ( mainCamera.isPerspectiveCamera ) { mainCamera.fov = params.camera.fov; mainCamera.updateProjectionMatrix(); }
+		if ( mirroredCamera.isPerspectiveCamera ) { mirroredCamera.fov = params.camera.fov; mirroredCamera.updateProjectionMatrix(); applyProjectionState( mirroredCamera ); }
+	} );
+	cameraFolder.add( params.camera, 'orthoSize', 1, 50, 0.1 ).name( 'Ortho Size' ).onChange( () => {
+		if ( mainCamera.isOrthographicCamera || mirroredCamera.isOrthographicCamera ) { resizeCameras(); }
+	} );
 
 	// Debug info under GUI
 	const debugState = {
@@ -266,7 +350,8 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	await setupScene();
 	// apply initial state (mirror X on projection)
 	applyProjectionState( mirroredCamera );
-    applySceneState();
+applySceneState();
+	resizeCameras();
 
 	function animate() {
 
@@ -303,18 +388,10 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 
 	window.addEventListener( 'resize', () => {
 
-		renderer.setSize( window.innerWidth, window.outerHeight || window.innerHeight );
-		mainCamera.aspect = ( window.innerWidth / 2 ) / window.innerHeight;
-		mainCamera.updateProjectionMatrix();
-		mirroredCamera.aspect = ( window.innerWidth / 2 ) / window.innerHeight;
-		mirroredCamera.updateProjectionMatrix();
-		// Reapply projection flip state after aspect change
-		applyProjectionState( mirroredCamera );
+		resizeCameras();
 
 	} );
 
 	return { scene, mainCamera, mirroredCamera, renderer };
 
 }
-
-
