@@ -40,14 +40,14 @@ const near = 0.1;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
-<p>次に <a href="/docs/#examples/ja/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。
-<a href="/docs/#examples/ja/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> は、カメラをある点を中心に<em>軌道</em>を回転できます。
-<a href="/docs/#examples/ja/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> はthree.jsのオプション機能なので、importする必要があります。</p>
+<p>次に <a href="/docs/#examples/ja/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。
+<a href="/docs/#examples/ja/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a> は、カメラをある点を中心に<em>軌道</em>を回転できます。
+<a href="/docs/#examples/ja/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a> はthree.jsのオプション機能なので、importする必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
 <p>これでOrbitControlsを利用できます。
-<a href="/docs/#examples/ja/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> にカメラと入力イベントを取得するDOM要素を渡します。</p>
+<a href="/docs/#examples/ja/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a> にカメラと入力イベントを取得するDOM要素を渡します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();

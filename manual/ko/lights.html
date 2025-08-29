@@ -41,20 +41,20 @@ const near = 0.1;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
-<p>다음으로 <a href="/docs/#examples/ko/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가합니다. <a href="/docs/#examples/ko/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 특정 좌표를
-중심으로 카메라를 자전 또는 <em>공전(orbit)</em>하도록 해줍니다. <a href="/docs/#examples/ko/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는
+<p>다음으로 <a href="/docs/#examples/ko/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가합니다. <a href="/docs/#examples/ko/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a>는 특정 좌표를
+중심으로 카메라를 자전 또는 <em>공전(orbit)</em>하도록 해줍니다. <a href="/docs/#examples/ko/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a>는
 별도 모듈이므로, 먼저 페이지에 로드해야 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 </pre>
-<p>이제 <a href="/docs/#examples/ko/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 카메라와, DOM 이벤트를 감지할 수 있도록
+<p>이제 <a href="/docs/#examples/ko/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a>에 카메라와, DOM 이벤트를 감지할 수 있도록
 canvas 요소를 넘겨줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
 </pre>
 <p>또한 시점을 중점에서 위로 5칸 올린 후 <code class="notranslate" translate="no">controls.update</code> 메서드를
-호출해 <a href="/docs/#examples/ko/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 새로운 시점을 바라보게 합니다.</p>
+호출해 <a href="/docs/#examples/ko/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a>가 새로운 시점을 바라보게 합니다.</p>
 <p>다음으로 빛을 받을 무언가를 만들어보겠습니다. 먼저 땅의 역할을 할
 평면을 만들고, 평면에 2x2 픽셀의 체크판 텍스처를 씌우겠습니다.</p>
 <div class="threejs_center">
