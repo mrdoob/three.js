@@ -70,13 +70,13 @@ class TimestampQueryPool {
 	}
 
 	/**
-	 * Allocate queries for a specific renderContext.
+	 * Allocate queries for a specific uid.
 	 *
 	 * @abstract
-	 * @param {Object} renderContext - The render context to allocate queries for.
+	 * @param {string} uid - A unique identifier for the render context.
 	 * @returns {?number}
 	 */
-	allocateQueriesForContext( /* renderContext */ ) {}
+	allocateQueriesForContext( /* uid */ ) {}
 
 	/**
 	 * Resolve all timestamps and return data (or process them).

@@ -137,6 +137,7 @@ const exceptionList = [
 	'webgpu_postprocessing_bloom_emissive',
 	'webgpu_lights_tiled',
 	'webgpu_postprocessing_traa',
+	'webgpu_tsl_wood',
 
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',

@@ -13,7 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem } from '../../constants.js';
+import { WebGPUCoordinateSystem, TimestampQuery } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
@@ -568,6 +568,12 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
+		//
+
+		renderContextData.frameCalls = this.renderer.info.render.frameCalls;
+
+		//
+
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
@@ -608,7 +614,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.initTimestampQuery( renderContext, descriptor );
+		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ), descriptor );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
@@ -1285,11 +1291,17 @@ class WebGPUBackend extends Backend {
 
 		const groupGPU = this.get( computeGroup );
 
+		//
+
+		groupGPU.frameCalls = this.renderer.info.compute.frameCalls;
+
+		//
+
 		const descriptor = {
 			label: 'computeGroup_' + computeGroup.id
 		};
 
-		this.initTimestampQuery( computeGroup, descriptor );
+		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), descriptor );
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( { label: 'computeGroup_' + computeGroup.id } );
 
@@ -1304,7 +1316,7 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, dispatchSizeOrCount = null ) {
 
@@ -1928,14 +1940,13 @@ class WebGPUBackend extends Backend {
 	/**
 	 * Inits a time stamp query for the given render context.
 	 *
-	 * @param {RenderContext} renderContext - The render context.
+	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
+	 * @param {number} uid - Unique id for the context (e.g. render context id).
 	 * @param {Object} descriptor - The query descriptor.
 	 */
-	initTimestampQuery( renderContext, descriptor ) {
+	initTimestampQuery( type, uid, descriptor ) {
 
 		if ( ! this.trackTimestamp ) return;
-
-		const type = renderContext.isComputeNode ? 'compute' : 'render';
 
 		if ( ! this.timestampQueryPool[ type ] ) {
 
@@ -1946,7 +1957,7 @@ class WebGPUBackend extends Backend {
 
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( renderContext );
+		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
 		descriptor.timestampWrites = {
 			querySet: timestampQueryPool.querySet,

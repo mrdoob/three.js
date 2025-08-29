@@ -59,7 +59,15 @@ Node.prototype.assign = function ( ...params ) {
 
 	if ( this.isStackNode !== true ) {
 
-		currentStack.assign( this, ...params );
+		if ( currentStack !== null ) {
+
+			currentStack.assign( this, ...params );
+
+		} else {
+
+			console.error( 'THREE.TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().' );
+
+		}
 
 		return this;
 

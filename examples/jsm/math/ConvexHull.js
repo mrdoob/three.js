@@ -152,7 +152,7 @@ class ConvexHull {
 	 *
 	 * @param {Ray} ray - The ray to test.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3|null} The intersection point. Returns `null` if not intersection was detected.
+	 * @return {?Vector3} The intersection point. Returns `null` if not intersection was detected.
 	 */
 	intersectRay( ray, target ) {
 
@@ -1298,7 +1298,7 @@ class HalfEdge {
 	 * Returns the origin vertex.
 	 *
 	 * @private
-	 * @return {VertexNode} The destination vertex.
+	 * @return {?VertexNode} The destination vertex.
 	 */
 	tail() {
 

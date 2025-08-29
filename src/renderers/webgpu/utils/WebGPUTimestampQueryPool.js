@@ -46,10 +46,10 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 	/**
 	 * Allocates a pair of queries for a given render context.
 	 *
-	 * @param {Object} renderContext - The render context to allocate queries for.
+	 * @param {string} uid - A unique identifier for the render context.
 	 * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
 	 */
-	allocateQueriesForContext( renderContext ) {
+	allocateQueriesForContext( uid ) {
 
 		if ( ! this.trackTimestamp || this.isDisposed ) return null;
 
@@ -63,7 +63,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		const baseOffset = this.currentQueryIndex;
 		this.currentQueryIndex += 2;
 
-		this.queryOffsets.set( renderContext.id, baseOffset );
+		this.queryOffsets.set( uid, baseOffset );
 		return baseOffset;
 
 	}

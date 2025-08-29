@@ -10,7 +10,11 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 
 const glslMethods = {
 	textureDimensions: 'textureSize',
-	equals: 'equal'
+	equals: 'equal',
+	bitcast_float_int: 'floatBitsToInt',
+	bitcast_int_float: 'intBitsToFloat',
+	bitcast_uint_float: 'uintBitsToFloat',
+	bitcast_float_uint: 'floatBitsToUint',
 };
 
 const precisionLib = {
@@ -131,6 +135,19 @@ class GLSLNodeBuilder extends NodeBuilder {
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
+
+	}
+
+	/**
+	 * Returns the bitcast method name for a given input and outputType.
+	 *
+	 * @param {string} type - The output type to bitcast to.
+	 * @param {string} inputType - The input type of the.
+	 * @return {string} The resolved WGSL bitcast invocation.
+	 */
+	getBitcastMethod( type, inputType ) {
+
+		return glslMethods[ `bitcast_${ inputType }_${ type }` ];
 
 	}
 
@@ -380,7 +397,7 @@ ${ flowData.code }
 	/**
 	 * Generates the GLSL snippet that reads a single texel from a texture without sampling or filtering.
 	 *
-	 * @param {Texture} texture - The texture.
+	 * @param {?Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
@@ -390,27 +407,41 @@ ${ flowData.code }
 	 */
 	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0' ) {
 
+		let snippet;
+
 		if ( depthSnippet ) {
 
 			if ( offsetSnippet ) {
 
-				return `texelFetchOffset( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet }, ${ offsetSnippet } )`;
+				snippet = `texelFetchOffset( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet }, ${ offsetSnippet } )`;
+
+			} else {
+
+				snippet = `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet } )`;
 
 			}
-
-			return `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet } )`;
 
 		} else {
 
 			if ( offsetSnippet ) {
 
-				return `texelFetchOffset( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+				snippet = `texelFetchOffset( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+			} else {
+
+				snippet = `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
 
 			}
 
-			return `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
+		}
+
+		if ( texture !== null && texture.isDepthTexture ) {
+
+			snippet += '.x';
 
 		}
+
+		return snippet;
 
 	}
 
@@ -426,31 +457,19 @@ ${ flowData.code }
 	 */
 	generateTexture( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet ) {
 
+		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+
 		if ( texture.isDepthTexture ) {
 
-			if ( depthSnippet ) uvSnippet = `vec4( ${ uvSnippet }, ${ depthSnippet } )`;
-
-			if ( offsetSnippet ) {
-
-				return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } ).x`;
-
-			}
+			if ( offsetSnippet ) return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } ).x`;
 
 			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
-		} else {
-
-			if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
-
-			if ( offsetSnippet ) {
-
-				return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
-
-			}
-
-			return `texture( ${ textureProperty }, ${ uvSnippet } )`;
-
 		}
+
+		if ( offsetSnippet ) return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+		return `texture( ${ textureProperty }, ${ uvSnippet } )`;
 
 	}
 

@@ -1961,6 +1961,20 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns the bitcast method name for a given input and outputType.
+	 *
+	 * @param {string} type - The output type to bitcast to.
+	 * @return {string} The resolved WGSL bitcast invocation.
+	 */
+	getBitcastMethod( type ) {
+
+		const dataType = this.getType( type );
+
+		return `bitcast<${ dataType }>`;
+
+	}
+
+	/**
 	 * Returns the native snippet for a ternary operation.
 	 *
 	 * @param {string} condSnippet - The condition determining which expression gets resolved.
