@@ -82,6 +82,7 @@
 		"webgl_loader_fbx_nurbs",
 		"webgl_loader_gcode",
 		"webgl_loader_gltf",
+		"webgl_loader_gltf_animation_pointer",
 		"webgl_loader_gltf_progressive_lod",
 		"webgl_loader_gltf_avif",
 		"webgl_loader_gltf_compressed",
