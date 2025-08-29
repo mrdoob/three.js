@@ -1399,20 +1399,6 @@ class Renderer {
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
-		renderContext.scissorValue.max( _vector4.set( 0, 0, 0, 0 ) );
-
-		if ( renderContext.scissorValue.x + renderContext.scissorValue.width > _drawingBufferSize.width ) {
-
-			renderContext.scissorValue.width = _drawingBufferSize.width - renderContext.scissorValue.x;
-
-		}
-
-		if ( renderContext.scissorValue.y + renderContext.scissorValue.height > _drawingBufferSize.height ) {
-
-			renderContext.scissorValue.height = _drawingBufferSize.height - renderContext.scissorValue.y;
-
-		}
-
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
 		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
@@ -1464,8 +1450,8 @@ class Renderer {
 
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
-			renderContext.width = this.domElement.width;
-			renderContext.height = this.domElement.height;
+			renderContext.width = _drawingBufferSize.width;
+			renderContext.height = _drawingBufferSize.height;
 			renderContext.depth = this.depth;
 			renderContext.stencil = this.stencil;
 
@@ -1476,6 +1462,22 @@ class Renderer {
 		renderContext.activeCubeFace = activeCubeFace;
 		renderContext.activeMipmapLevel = activeMipmapLevel;
 		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
+
+		//
+
+		renderContext.scissorValue.max( _vector4.set( 0, 0, 0, 0 ) );
+
+		if ( renderContext.scissorValue.x + renderContext.scissorValue.width > renderContext.width ) {
+
+			renderContext.scissorValue.width = Math.max( renderContext.width - renderContext.scissorValue.x, 0 );
+
+		}
+
+		if ( renderContext.scissorValue.y + renderContext.scissorValue.height > renderContext.height ) {
+
+			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
+
+		}
 
 		//
 
