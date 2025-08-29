@@ -25,6 +25,7 @@
     /* eslint-disable */
     import * as THREE from 'three/webgpu';
     import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+    import { color, select, frontFacing, float } from 'three/tsl';
     import { initMirroredCullingApp } from '/examples/jsm/mirrored/MirroredCullingApp.js';
 
     // Initialize renderer + shared app
@@ -43,7 +44,7 @@
         } );
         const renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
         await renderer.init();
-        await initMirroredCullingApp( THREE, renderer, { gui } );
+        await initMirroredCullingApp( THREE, renderer, { gui, tsl: { color, select, frontFacing, float } } );
     } )();
     </script>
 </body>

@@ -53,37 +53,6 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	// loaders
 	const gltfLoader = new GLTFLoader();
 
-	async function createPrimitivesGroup( color ) {
-
-		const group = new THREE.Group();
-		const material = new THREE.MeshStandardMaterial( { color } );
-
-		const helmetPath = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf';
-		const gltf = await gltfLoader.loadAsync( helmetPath );
-		const helmet = gltf.scene;
-		helmet.scale.set( 1.5, 1.5, 1.5 );
-		group.add( helmet );
-
-		const coneGeo = new THREE.ConeGeometry( 1, 2, 32 );
-		const cone = new THREE.Mesh( coneGeo, material );
-		cone.position.set( 3, 1, 0 );
-		group.add( cone );
-
-		const torusGeo = new THREE.TorusGeometry( 1, 0.4, 16, 100 );
-		const torus = new THREE.Mesh( torusGeo, material );
-		torus.position.set( - 3, 1, 0 );
-		torus.rotation.x = Math.PI / 2;
-		group.add( torus );
-
-		const normalMaterial = new THREE.MeshNormalMaterial();
-		const cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), normalMaterial );
-		cube.position.set( 0, 0, 5 );
-		group.add( cube );
-
-		return group;
-
-	}
-
 	// controls
 	let mainControls = new OrbitControls( mainCamera, renderer.domElement );
 	let mirroredControls = new OrbitControls( mirroredCamera, renderer.domElement );
@@ -235,6 +204,75 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 
 	}
 
+	function openUpGeometry( geometry ) {
+
+		// Convert to non-indexed for easy triangle removal
+		const g = geometry.toNonIndexed();
+		const posAttr = g.getAttribute( 'position' );
+		const normAttr = g.getAttribute( 'normal' );
+		const uvAttr = g.getAttribute( 'uv' );
+
+		const pos = posAttr.array;
+		const norm = normAttr ? normAttr.array : null;
+		const uv = uvAttr ? uvAttr.array : null;
+
+		const keptPos = [];
+		const keptNorm = norm ? [] : null;
+		const keptUV = uv ? [] : null;
+
+		const triCount = pos.length / 9;
+		for ( let t = 0; t < triCount; t ++ ) {
+
+			const base = t * 9;
+			const x0 = pos[ base + 0 ], y0 = pos[ base + 1 ], z0 = pos[ base + 2 ];
+			const x1 = pos[ base + 3 ], y1 = pos[ base + 4 ], z1 = pos[ base + 5 ];
+			const x2 = pos[ base + 6 ], y2 = pos[ base + 7 ], z2 = pos[ base + 8 ];
+
+			const cx = ( x0 + x1 + x2 ) / 3;
+			const cz = ( z0 + z1 + z2 ) / 3;
+
+			// Remove triangles in the +X +Z quadrant to open the mesh
+			if ( cx > 0 && cz > 0 ) continue;
+
+			keptPos.push(
+				x0, y0, z0,
+				x1, y1, z1,
+				x2, y2, z2
+			);
+
+			if ( keptNorm ) {
+				const nb = base;
+				keptNorm.push(
+					norm[ nb + 0 ], norm[ nb + 1 ], norm[ nb + 2 ],
+					norm[ nb + 3 ], norm[ nb + 4 ], norm[ nb + 5 ],
+					norm[ nb + 6 ], norm[ nb + 7 ], norm[ nb + 8 ]
+				);
+			}
+
+			if ( keptUV ) {
+				const ub = ( t * 6 );
+				keptUV.push(
+					uv[ ub + 0 ], uv[ ub + 1 ],
+					uv[ ub + 2 ], uv[ ub + 3 ],
+					uv[ ub + 4 ], uv[ ub + 5 ]
+				);
+			}
+
+		}
+
+		const out = new THREE.BufferGeometry();
+		out.setAttribute( 'position', new THREE.Float32BufferAttribute( keptPos, 3 ) );
+		if ( keptNorm ) out.setAttribute( 'normal', new THREE.Float32BufferAttribute( keptNorm, 3 ) );
+		if ( keptUV ) out.setAttribute( 'uv', new THREE.Float32BufferAttribute( keptUV, 2 ) );
+
+		out.computeVertexNormals();
+		out.computeBoundingBox();
+		out.computeBoundingSphere();
+
+		return out;
+
+	}
+
 	// GUI (reuse injected GUI if provided)
 	const uiContainer = document.getElementById( 'ui' );
 	const gui = options.gui || new GUI( { title: 'Mirrored Camera Culling' } );
@@ -295,10 +333,75 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	// scene content
 	async function setupScene() {
 
-		const group = await createPrimitivesGroup( 0x00ff00 );
+		const step = 4;
+
+		// primitives group (inlined from createPrimitivesGroup)
+		const group = new THREE.Group();
+		const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+
+		const helmetPath = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf';
+		const gltf = await gltfLoader.loadAsync( helmetPath );
+		const helmet = gltf.scene;
+		helmet.scale.set( 1.5, 1.5, 1.5 );
+		helmet.position.set( - step, 0, - step );
+		group.add( helmet );
+
+		const coneGeo = new THREE.ConeGeometry( 1, 2, 32 );
+		const cone = new THREE.Mesh( coneGeo, material );
+		cone.position.set( 0, 1, - step );
+		group.add( cone );
+
+		const torusGeo = new THREE.TorusGeometry( 1, 0.4, 16, 100 );
+		const torus = new THREE.Mesh( torusGeo, material );
+		torus.position.set( step, 1, - step );
+		torus.rotation.x = Math.PI / 2;
+		group.add( torus );
+
+		const normalMaterial = new THREE.MeshNormalMaterial();
+		const cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), normalMaterial );
+		cube.position.set( - step, 0, 0 );
+		group.add( cube );
+
 		group.position.x = 0;
 		scene.add( group );
 
+		// Add open geometry test mesh. Use TSL when running with WebGPU; fallback shader tweak for WebGL.
+		let testGeometry = new THREE.SphereGeometry( 2, 32, 32 );
+		testGeometry = openUpGeometry( testGeometry );
+
+		let testMaterial;
+		if ( renderer.isWebGPURenderer && options.tsl ) {
+
+			const { color, select, frontFacing, float } = options.tsl;
+			testMaterial = new THREE.MeshStandardNodeMaterial( { metalness: 0, roughness: 0.45 } );
+			testMaterial.side = THREE.DoubleSide;
+			testMaterial.transparent = true;
+			testMaterial.depthWrite = false;
+			testMaterial.colorNode = select( frontFacing, color( 0xff0000 ), color( 0x0000ff ) );
+			testMaterial.opacityNode = float( 0.6 );
+
+			const mesh = new THREE.Mesh( testGeometry, testMaterial );
+			mesh.position.set( step, 0, 0 );
+			scene.add( mesh );
+
+		} else {
+
+			// WebGL fallback: use two meshes, one FrontSide (red), one BackSide (blue), drawn in order
+			const frontMat = new THREE.MeshStandardMaterial( { color: 0xff0000, metalness: 0, roughness: 0.45, side: THREE.FrontSide, transparent: true, opacity: 0.6 } );
+			frontMat.depthWrite = false;
+			const backMat = new THREE.MeshStandardMaterial( { color: 0x0000ff, metalness: 0, roughness: 0.45, side: THREE.BackSide, transparent: true, opacity: 0.6 } );
+			backMat.depthWrite = false;
+
+			const backMesh = new THREE.Mesh( testGeometry, backMat );
+			const frontMesh = new THREE.Mesh( testGeometry, frontMat );
+			backMesh.position.set( step, 0, 0 );
+			frontMesh.position.set( step, 0, 0 );
+			backMesh.renderOrder = 0;
+			frontMesh.renderOrder = 1;
+			scene.add( backMesh );
+			scene.add( frontMesh );
+
+		}
 	}
 
 	function formatVec3( v ) {
