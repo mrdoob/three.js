@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeProxyIntent } from '../tsl/TSLCore.js';
+import { nodeObject, nodeProxyIntent } from '../tsl/TSLCore.js';
 /**
  * This node represents an operation that reinterprets the bit representation of a value
  * in one type as a value in another type.
@@ -19,8 +19,9 @@ class BitcastNode extends TempNode {
 	 *
 	 * @param {Node} valueNode - The value to convert.
 	 * @param {string} conversionType - The type to convert to.
+	 * @param {?string} [inputType = null] - The expected input data type of the bitcast operation.
 	 */
-	constructor( valueNode, conversionType ) {
+	constructor( valueNode, conversionType, inputType = null ) {
 
 		super();
 
@@ -35,9 +36,18 @@ class BitcastNode extends TempNode {
 		 * The type the value will be converted to.
 		 *
 		 * @type {string}
-		 * @default null
 		 */
 		this.conversionType = conversionType;
+
+
+		/**
+		 * The expected input data type of the bitcast operation.
+		 *
+		 *
+		 * @type {string}
+		 * @default null
+		 */
+		this.inputType = inputType;
 
 		/**
 		 * This flag can be used for type testing.
@@ -65,7 +75,7 @@ class BitcastNode extends TempNode {
 	generate( builder ) {
 
 		const type = this.getNodeType( builder );
-		const inputType = this.valueNode.getNodeType( builder );
+		const inputType = this.inputType !== null ? this.inputType : this.valueNode.getNodeType( builder );
 
 		return `${builder.getBitcastMethod( type, inputType )}( ${ this.valueNode.build( builder, inputType ) } )`;
 
@@ -86,3 +96,8 @@ export default BitcastNode;
  * @returns {Node}
  */
 export const bitcast = /*@__PURE__*/ nodeProxyIntent( BitcastNode ).setParameterLength( 2 );
+
+export const floatBitsToInt = ( value ) => nodeObject( new BitcastNode( value, 'int', 'float' ) );
+export const floatBitsToUint = ( value ) => nodeObject( new BitcastNode( value, 'uint', 'float' ) );
+export const intBitsToFloat = ( value ) => nodeObject( new BitcastNode( value, 'float', 'int' ) );
+export const uintBitsToFloat = ( value ) => nodeObject( new BitcastNode( value, 'float', 'uint' ) );

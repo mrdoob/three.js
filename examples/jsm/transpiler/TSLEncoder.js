@@ -47,7 +47,6 @@ const unaryLib = {
 };
 
 const textureLookupFunctions = [ 'texture', 'texture2D', 'texture3D', 'textureCube', 'textureLod', 'texelFetch', 'textureGrad' ];
-const bitcastFunctions = [ 'floatBitsToInt', 'floatBitsToUint', 'intBitsToFloat', 'uintBitsToFloat' ];
 
 class TSLEncoder {
 
@@ -216,16 +215,6 @@ class TSLEncoder {
 					code += '.setSampler( false )';
 
 				}
-
-			} else if ( bitcastFunctions.includes( node.name ) ) {
-
-				this.addImport( 'bitcast' );
-
-				const conversionType = node.name.split( 'To' )[ 1 ].toLowerCase();
-
-				params.push( `'${conversionType}'` );
-
-				code = `bitcast(${ ' ' + params.join( ', ' ) + ' ' })`;
 
 			} else {
 
