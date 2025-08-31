@@ -94,13 +94,15 @@ function getConsoleFunction() {
 
 function log( ...params ) {
 
+	const message = 'THREE.' + params.shift();
+
 	if ( _setConsoleFunction ) {
 
-		_setConsoleFunction( 'log', ...params );
+		_setConsoleFunction( 'log', message, ...params );
 
 	} else {
 
-		console.log( ...params );
+		console.log( message, ...params );
 
 	}
 
@@ -108,13 +110,15 @@ function log( ...params ) {
 
 function warn( ...params ) {
 
+	const message = 'THREE.' + params.shift();
+
 	if ( _setConsoleFunction ) {
 
-		_setConsoleFunction( 'warn', ...params );
+		_setConsoleFunction( 'warn', message, ...params );
 
 	} else {
 
-		console.warn( ...params );
+		console.warn( message, ...params );
 
 	}
 
@@ -122,13 +126,15 @@ function warn( ...params ) {
 
 function error( ...params ) {
 
+	const message = 'THREE.' + params.shift();
+
 	if ( _setConsoleFunction ) {
 
-		_setConsoleFunction( 'error', ...params );
+		_setConsoleFunction( 'error', message, ...params );
 
 	} else {
 
-		console.error( ...params );
+		console.error( message, ...params );
 
 	}
 
