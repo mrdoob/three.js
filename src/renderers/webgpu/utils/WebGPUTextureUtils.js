@@ -217,7 +217,7 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( texture.renderTarget && texture.renderTarget.isCanvasRenderTarget ) {
+		if ( texture.renderTarget && texture.renderTarget.isCanvasRenderTarget === true && texture.isDepthTexture !== true ) {
 
 			texture.internalFormat = this.backend.utils.getPreferredCanvasFormat();
 
