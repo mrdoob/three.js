@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, nodeProxyIntent } from '../tsl/TSLCore.js';
+import { nodeProxyIntent } from '../tsl/TSLCore.js';
 /**
  * This node represents an operation that reinterprets the bit representation of a value
  * in one type as a value in another type.
@@ -95,7 +95,7 @@ class BitcastNode extends TempNode {
 
 		}
 
-		return `${builder.getBitcastMethod( type, inputType )}( ${ this.valueNode.build( builder, inputType ) } )`;
+		return `${ builder.getBitcastMethod( type, inputType ) }( ${ this.valueNode.build( builder, inputType ) } )`;
 
 
 	}
