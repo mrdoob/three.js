@@ -1045,7 +1045,7 @@ async function createRawTexture( container ) {
 	// TODO: Merge the TYPE_MAP warning into the thrown error above, after r190.
 	if ( TYPE_MAP[ vkFormat ] === undefined ) {
 
-		console.warn( 'THREE.KTX2Loader: Missing ".type" for vkFormat: ' + vkFormat  );
+		console.warn( 'THREE.KTX2Loader: Missing ".type" for vkFormat: ' + vkFormat );
 
 	}
 

@@ -132,7 +132,7 @@
 						{ path: '2d_uastc_hdr4x4.ktx2' },
 					]
 				},
-			]
+			];
 
 			init();
 
@@ -192,14 +192,14 @@
 						try {
 
 							const texture = await loader.loadAsync( supported === false ? 'fail_load.ktx2' : path );
-							const mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({ map: texture }) );
+							const mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 
 							labelElement.innerText += '\ncolorSpace: ' + texture.colorSpace;
 
 							scene.add( mesh );
 							scenes.push( scene );
 
-						} catch (e) {
+						} catch ( e ) {
 
 							console.error( `Failed to load ${path}`, e );
 

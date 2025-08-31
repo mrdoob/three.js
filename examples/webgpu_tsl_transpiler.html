@@ -244,17 +244,21 @@ float pNoise(vec2 p, int res){
 					const encoderSelect = document.getElementById( 'encoder-select' );
 
 					decoderSelect.addEventListener( 'change', () => {
+
 						options.decoder = decoderSelect.value;
 						build();
+
 					} );
 
 					encoderSelect.addEventListener( 'change', () => {
+
 						options.encoder = encoderSelect.value;
-						
+
 						const language = encoderLanguages[ encoderSelect.value ];
 						window.monaco.editor.setModelLanguage( result.getModel(), language );
 
 						build();
+
 					} );
 
 				} );
