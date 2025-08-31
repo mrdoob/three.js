@@ -9,6 +9,8 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 
 	// UI state for projection/view/scene flips
 	const params = {
+		arrayCameraEnabled: false, // enable/disable array camera mode
+		flipMode: 'all', // all, odd, even, mod3
 		camera: { type: 'Perspective', fov: 75, orthoSize: 10, near: 0.1, far: 100 },
 		projection: { x: true, y: false, z: false }, // default mirror X
 		view: { x: false, y: false, z: false },
@@ -31,6 +33,11 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	let mirroredCamera = new THREE.PerspectiveCamera( params.camera.fov, (window.innerWidth / 2) / window.innerHeight, params.camera.near, params.camera.far );
 	mirroredCamera.name = 'mirroredCamera';
 	mirroredCamera.position.z = 8;
+
+	// Array camera variables
+	let mirroredCameras = [];
+	let mirroredCameraArray = null;
+	const ARRAY_SIZE = 2; // grid
 
 	// lights
 	scene.add( new THREE.AmbientLight( 0xffffff, 1.5 ) );
@@ -105,6 +112,23 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 		// Reapply projection flip state after any projection changes
 		applyProjectionState( mirroredCamera );
 
+		// Update camera array viewports if enabled
+		if ( params.arrayCameraEnabled && mirroredCameras.length ) {
+			const viewportWidth = window.innerWidth / 2 / ARRAY_SIZE;
+			const viewportHeight = window.innerHeight / ARRAY_SIZE;
+
+			for ( let y = 0; y < ARRAY_SIZE; y ++ ) {
+				for ( let x = 0; x < ARRAY_SIZE; x ++ ) {
+					const index = y * ARRAY_SIZE + x;
+					const camera = mirroredCameras[ index ];
+
+					const viewportX = window.innerWidth / 2 + x * viewportWidth;
+					const viewportY = y * viewportHeight;
+					camera.viewport.set( viewportX, viewportY, viewportWidth, viewportHeight );
+				}
+			}
+		}
+
 	}
 
 	// helpers applying state
@@ -138,6 +162,97 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 
 	}
 
+	// Camera array functions
+	function createMirroredCameraArray() {
+
+		mirroredCameras = [];
+		const aspect = (window.innerWidth / 2) / window.innerHeight;
+		const viewportWidth = window.innerWidth / 2 / ARRAY_SIZE;
+		const viewportHeight = window.innerHeight / ARRAY_SIZE;
+
+		for ( let y = 0; y < ARRAY_SIZE; y ++ ) {
+			for ( let x = 0; x < ARRAY_SIZE; x ++ ) {
+
+				const index = y * ARRAY_SIZE + x;
+				const camera = new THREE.PerspectiveCamera( params.camera.fov, aspect, params.camera.near, params.camera.far );
+				camera.name = `mirroredCamera_${index}`;
+
+				// Set viewport for this camera
+				const viewportX = window.innerWidth / 2 + x * viewportWidth;
+				const viewportY = y * viewportHeight;
+				camera.viewport = new THREE.Vector4( viewportX, viewportY, viewportWidth, viewportHeight );
+
+				// Position camera with slight rotation variation for demonstration
+				const angleOffset = (index / (ARRAY_SIZE * ARRAY_SIZE)) * Math.PI * 2;
+				const radius = 8;
+				const height = 2;
+
+				camera.position.x = Math.cos(angleOffset) * radius;
+				camera.position.z = Math.sin(angleOffset) * radius;
+				camera.position.y = height + Math.sin(angleOffset * 2) * 2;
+
+				// Look at center with slight tilt
+				const lookAt = new THREE.Vector3(0, 0, 0);
+				lookAt.y += Math.sin(angleOffset * 3) * 1;
+				camera.lookAt(lookAt);
+
+				mirroredCameras.push(camera);
+
+			}
+		}
+
+		mirroredCameraArray = new THREE.ArrayCamera(mirroredCameras);
+		updateMirroredCameraArray();
+
+	}
+
+	function updateMirroredCameraArray() {
+
+		if ( ! mirroredCameras.length ) return;
+
+		// Sync all array cameras with the main mirrored camera
+		for ( let i = 0; i < mirroredCameras.length; i ++ ) {
+
+			const cam = mirroredCameras[ i ];
+			cam.position.copy( mirroredCamera.position );
+			cam.quaternion.copy( mirroredCamera.quaternion );
+			cam.zoom = mirroredCamera.zoom;
+			cam.updateMatrixWorld();
+			cam.updateProjectionMatrix();
+
+			// Apply selective flipping based on flip mode
+			if ( shouldFlipCamera( i ) ) {
+				applyViewState( cam );
+				applyProjectionState( cam );
+			}
+
+		}
+
+	}
+
+	function shouldFlipCamera( index ) {
+
+		switch ( params.flipMode ) {
+			case 'all': return true;
+			case 'odd': return index % 2 === 1;
+			case 'even': return index % 2 === 0;
+			case 'mod3': return index % 3 === 0;
+			default: return false;
+		}
+
+	}
+
+	function toggleArrayCameraMode() {
+
+		if ( params.arrayCameraEnabled ) {
+			createMirroredCameraArray();
+		} else {
+			mirroredCameras = [];
+			mirroredCameraArray = null;
+		}
+
+	}
+
 	// actions
 	let _syncing = false;
 	function syncFrom( source ) {
@@ -158,6 +273,11 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 			applyProjectionState( mirroredCamera );
 			mirroredControls.update();
 
+			// Update camera array if enabled
+			if ( params.arrayCameraEnabled ) {
+				updateMirroredCameraArray();
+			}
+
 		} else {
 
 			mainCamera.position.copy( mirroredCamera.position );
@@ -167,6 +287,11 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 			mainCamera.updateProjectionMatrix();
 			mainControls.target.copy( mirroredControls.target );
 			mainControls.update();
+
+			// Update camera array if enabled
+			if ( params.arrayCameraEnabled ) {
+				updateMirroredCameraArray();
+			}
 
 		}
 
@@ -277,15 +402,40 @@ export async function initMirroredCullingApp( THREE, renderer, options = {} ) {
 	const uiContainer = document.getElementById( 'ui' );
 	const gui = options.gui || new GUI( { title: 'Mirrored Camera Culling' } );
 	if ( ! options.gui && uiContainer ) uiContainer.appendChild( gui.domElement );
+
+	// Array Camera Controls
+	const arrayFolder = gui.addFolder( 'Array Camera' );
+	arrayFolder.add( params, 'arrayCameraEnabled' ).name( 'Enable Array' ).onChange( toggleArrayCameraMode );
+	arrayFolder.add( params, 'flipMode', [ 'all', 'odd', 'even', 'mod3' ] ).name( 'Flip Mode' ).onChange( () => {
+		if ( params.arrayCameraEnabled ) updateMirroredCameraArray();
+	});
 	const projFolder = gui.addFolder( 'Projection Flip' );
-	projFolder.add( params.projection, 'x' ).name( 'X' ).onChange( () => applyProjectionState( mirroredCamera ) );
-	projFolder.add( params.projection, 'y' ).name( 'Y' ).onChange( () => applyProjectionState( mirroredCamera ) );
-	projFolder.add( params.projection, 'z' ).name( 'Z' ).onChange( () => applyProjectionState( mirroredCamera ) );
+	projFolder.add( params.projection, 'x' ).name( 'X' ).onChange( () => {
+		applyProjectionState( mirroredCamera );
+		if ( params.arrayCameraEnabled ) updateMirroredCameraArray();
+	});
+	projFolder.add( params.projection, 'y' ).name( 'Y' ).onChange( () => {
+		applyProjectionState( mirroredCamera );
+		if ( params.arrayCameraEnabled ) updateMirroredCameraArray();
+	});
+	projFolder.add( params.projection, 'z' ).name( 'Z' ).onChange( () => {
+		applyProjectionState( mirroredCamera );
+		if ( params.arrayCameraEnabled ) updateMirroredCameraArray();
+	});
 
 	const viewFolder = gui.addFolder( 'View Scale Flip' );
-	viewFolder.add( params.view, 'x' ).name( 'X' ).onChange( () => applyViewState( mirroredCamera ) );
-	viewFolder.add( params.view, 'y' ).name( 'Y' ).onChange( () => applyViewState( mirroredCamera ) );
-	viewFolder.add( params.view, 'z' ).name( 'Z' ).onChange( () => applyViewState( mirroredCamera ) );
+	viewFolder.add( params.view, 'x' ).name( 'X' ).onChange( () => {
+		applyViewState( mirroredCamera );
+		if ( params.arrayCameraEnabled ) updateMirroredCameraArray();
+	});
+	viewFolder.add( params.view, 'y' ).name( 'Y' ).onChange( () => {
+		applyViewState( mirroredCamera );
+		if ( params.arrayCameraEnabled ) updateMirroredCameraArray();
+	});
+	viewFolder.add( params.view, 'z' ).name( 'Z' ).onChange( () => {
+		applyViewState( mirroredCamera );
+		if ( params.arrayCameraEnabled ) updateMirroredCameraArray();
+	});
 
 	const sceneFolder = gui.addFolder( 'Scene Flip' );
 	sceneFolder.add( params.scene, 'x' ).name( 'X' ).onChange( applySceneState );
@@ -478,9 +628,18 @@ applySceneState();
 		renderer.setScissor( 0, 0, halfW, h );
 		renderer.setViewport( 0, 0, halfW, h );
 		renderer.render( scene, mainCamera );
-		renderer.setScissor( halfW, 0, halfW, h );
-		renderer.setViewport( halfW, 0, halfW, h );
-		renderer.render( scene, mirroredCamera );
+
+		// Render right side - either single camera or array
+		if ( params.arrayCameraEnabled && mirroredCameraArray ) {
+			renderer.setScissor( halfW, 0, halfW, h );
+			renderer.setViewport( halfW, 0, halfW, h );
+			renderer.render( scene, mirroredCameraArray );
+		} else {
+			renderer.setScissor( halfW, 0, halfW, h );
+			renderer.setViewport( halfW, 0, halfW, h );
+			renderer.render( scene, mirroredCamera );
+		}
+
 		renderer.setScissorTest( false );
 
 		updateDebug();
