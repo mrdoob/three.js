@@ -14,6 +14,7 @@ import {
 	KeepStencilOp, ZeroStencilOp, ReplaceStencilOp, InvertStencilOp, IncrementStencilOp, DecrementStencilOp, IncrementWrapStencilOp, DecrementWrapStencilOp,
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
+import { error } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -407,11 +408,11 @@ class WebGPUPipelineUtils {
 						break;
 
 					case SubtractiveBlending:
-						console.error( 'THREE.WebGPURenderer: SubtractiveBlending requires material.premultipliedAlpha = true' );
+						error( 'THREE.WebGPURenderer: SubtractiveBlending requires material.premultipliedAlpha = true' );
 						break;
 
 					case MultiplyBlending:
-						console.error( 'THREE.WebGPURenderer: MultiplyBlending requires material.premultipliedAlpha = true' );
+						error( 'THREE.WebGPURenderer: MultiplyBlending requires material.premultipliedAlpha = true' );
 						break;
 
 				}
@@ -426,7 +427,7 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			console.error( 'THREE.WebGPURenderer: Invalid blending: ', blending );
+			error( 'THREE.WebGPURenderer: Invalid blending: ', blending );
 
 		}
 
@@ -497,7 +498,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Blend factor not supported.', blend );
+				error( 'THREE.WebGPURenderer: Blend factor not supported.', blend );
 
 		}
 
@@ -553,7 +554,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Invalid stencil function.', stencilFunc );
+				error( 'THREE.WebGPURenderer: Invalid stencil function.', stencilFunc );
 
 		}
 
@@ -607,7 +608,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Invalid stencil operation.', stencilOperation );
+				error( 'THREE.WebGPURenderer: Invalid stencil operation.', stencilOperation );
 
 		}
 
@@ -649,7 +650,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPUPipelineUtils: Blend equation not supported.', blendEquation );
+				error( 'THREE.WebGPUPipelineUtils: Blend equation not supported.', blendEquation );
 
 		}
 
@@ -698,7 +699,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPUPipelineUtils: Unknown material.side value.', material.side );
+				error( 'THREE.WebGPUPipelineUtils: Unknown material.side value.', material.side );
 				break;
 
 		}
@@ -774,7 +775,7 @@ class WebGPUPipelineUtils {
 					break;
 
 				default:
-					console.error( 'THREE.WebGPUPipelineUtils: Invalid depth function.', depthFunc );
+					error( 'THREE.WebGPUPipelineUtils: Invalid depth function.', depthFunc );
 
 			}
 

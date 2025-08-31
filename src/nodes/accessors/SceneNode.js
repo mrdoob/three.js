@@ -5,6 +5,7 @@ import Node from '../core/Node.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { nodeImmutable, uniform } from '../tsl/TSLBase.js';
 import { reference } from './ReferenceNode.js';
+import { error } from '../../utils.js';
 
 const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
@@ -103,7 +104,7 @@ class SceneNode extends Node {
 
 		} else {
 
-			console.error( 'THREE.SceneNode: Unknown scope:', scope );
+			error( 'THREE.SceneNode: Unknown scope:', scope );
 
 		}
 

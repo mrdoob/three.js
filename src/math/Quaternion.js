@@ -1,4 +1,5 @@
 import { clamp } from './MathUtils.js';
+import { warn } from '../utils.js';
 
 /**
  * Class for representing a Quaternion. Quaternions are used in three.js to represent rotations.
@@ -370,7 +371,7 @@ class Quaternion {
 				break;
 
 			default:
-				console.warn( 'THREE.Quaternion: .setFromEuler() encountered an unknown order: ' + order );
+				warn( 'THREE.Quaternion: .setFromEuler() encountered an unknown order: ' + order );
 
 		}
 

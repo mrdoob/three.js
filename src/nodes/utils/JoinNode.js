@@ -1,4 +1,5 @@
 import TempNode from '../core/TempNode.js';
+import { error } from '../../utils.js';
 
 /**
  * This module is part of the TSL core and usually not used in app level code.
@@ -70,7 +71,7 @@ class JoinNode extends TempNode {
 
 			if ( length >= maxLength ) {
 
-				console.error( `THREE.TSL: Length of parameters exceeds maximum length of function '${ type }()' type.` );
+				error( `THREE.TSL: Length of parameters exceeds maximum length of function '${ type }()' type.` );
 				break;
 
 			}
@@ -81,7 +82,7 @@ class JoinNode extends TempNode {
 
 			if ( length + inputTypeLength > maxLength ) {
 
-				console.error( `THREE.TSL: Length of '${ type }()' data exceeds maximum length of output type.` );
+				error( `THREE.TSL: Length of '${ type }()' data exceeds maximum length of output type.` );
 
 				inputTypeLength = maxLength - length;
 				inputType = builder.getTypeFromLength( inputTypeLength );

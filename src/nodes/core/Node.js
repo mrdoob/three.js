@@ -3,6 +3,7 @@ import { getNodeChildren, getCacheKey, hash } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
+import { warn, error } from '../../utils.js';
 
 const _parentBuildStage = {
 	analyze: 'setup',
@@ -574,7 +575,7 @@ class Node extends EventDispatcher {
 	 */
 	updateBefore( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -588,7 +589,7 @@ class Node extends EventDispatcher {
 	 */
 	updateAfter( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -602,7 +603,7 @@ class Node extends EventDispatcher {
 	 */
 	update( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -731,7 +732,7 @@ class Node extends EventDispatcher {
 
 					} else {
 
-						console.warn( 'THREE.Node: Recursion detected.', this );
+						warn( 'THREE.Node: Recursion detected.', this );
 
 						result = '/* Recursion detected. */';
 
@@ -755,7 +756,7 @@ class Node extends EventDispatcher {
 
 				// if no snippet is generated, return a default value
 
-				console.error( `THREE.TSL: Invalid generated code, expected a "${ output }".` );
+				error( `THREE.TSL: Invalid generated code, expected a "${ output }".` );
 
 				result = builder.generateConst( output );
 

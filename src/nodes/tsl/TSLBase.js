@@ -1,3 +1,5 @@
+import { warn } from '../../utils.js';
+
 // Non-PURE exports list, side-effects are required here.
 // TSL Base Syntax
 
@@ -28,6 +30,6 @@ export * from '../core/SubBuildNode.js'; // subBuild()
 
 export function addNodeElement( name/*, nodeElement*/ ) {
 
-	console.warn( 'THREE.TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
+	warn( 'THREE.TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
 
 }

@@ -1,3 +1,5 @@
+import { error } from '../../utils.js';
+
 /**
  * This renderer module provides a series of statistical information
  * about the GPU memory and the rendering process. Useful for debugging
@@ -123,7 +125,7 @@ class Info {
 
 		} else {
 
-			console.error( 'THREE.WebGPUInfo: Unknown object type.' );
+			error( 'THREE.WebGPUInfo: Unknown object type.' );
 
 		}
 

@@ -6,6 +6,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { SphereGeometry } from '../../geometries/SphereGeometry.js';
 import { BackSide } from '../../constants.js';
+import { error } from '../../utils.js';
 
 const _clearColor = /*@__PURE__*/ new Color4();
 
@@ -148,7 +149,7 @@ class Background extends DataMap {
 
 		} else {
 
-			console.error( 'THREE.Renderer: Unsupported background configuration.', background );
+			error( 'THREE.Renderer: Unsupported background configuration.', background );
 
 		}
 

@@ -5,6 +5,7 @@ import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { warn } from '../../utils.js';
 
 let _screenSizeVec, _viewportVec;
 
@@ -282,7 +283,7 @@ export const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
  */
 export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
-	console.warn( 'THREE.TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
+	warn( 'THREE.TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
 
 	return screenSize;
 

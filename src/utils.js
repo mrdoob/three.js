@@ -78,13 +78,71 @@ function createCanvasElement() {
 
 const _cache = {};
 
-function warnOnce( message ) {
+let _setConsoleFunction = null;
+
+function setConsoleFunction( fn ) {
+
+	_setConsoleFunction = fn;
+
+}
+
+function getConsoleFunction() {
+
+	return _setConsoleFunction;
+
+}
+
+function log( ...params ) {
+
+	if ( _setConsoleFunction ) {
+
+		_setConsoleFunction( 'log', ...params );
+
+	} else {
+
+		console.log( ...params );
+
+	}
+
+}
+
+function warn( ...params ) {
+
+	if ( _setConsoleFunction ) {
+
+		_setConsoleFunction( 'warn', ...params );
+
+	} else {
+
+		console.warn( ...params );
+
+	}
+
+}
+
+function error( ...params ) {
+
+	if ( _setConsoleFunction ) {
+
+		_setConsoleFunction( 'error', ...params );
+
+	} else {
+
+		console.error( ...params );
+
+	}
+
+}
+
+function warnOnce( ...params ) {
+
+	const message = params.join( ' ' );
 
 	if ( message in _cache ) return;
 
 	_cache[ message ] = true;
 
-	console.warn( message );
+	warn( ...params );
 
 }
 
@@ -149,4 +207,4 @@ function toReversedProjectionMatrix( projectionMatrix ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, warnOnce, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix };
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, setConsoleFunction, getConsoleFunction, log, warn, error, warnOnce, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix };
