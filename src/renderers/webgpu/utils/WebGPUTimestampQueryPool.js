@@ -1,4 +1,4 @@
-import { warnOnce, error } from '../../../utils.js';
+import { warnOnce } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 /**
