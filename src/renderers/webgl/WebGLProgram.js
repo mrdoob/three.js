@@ -5,7 +5,7 @@ import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefra
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Matrix3 } from '../../math/Matrix3.js';
-import { warn, log, error } from '../../utils.js';
+import { warn, error } from '../../utils.js';
 
 // From https://www.khronos.org/registry/webgl/extensions/KHR_parallel_shader_compile/
 const COMPLETION_STATUS_KHR = 0x91B1;

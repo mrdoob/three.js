@@ -2,7 +2,7 @@ import Renderer from '../common/Renderer.js';
 import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
-import { log, warn } from '../../utils.js';
+import { warn } from '../../utils.js';
 /*
 const debugHandler = {
 
