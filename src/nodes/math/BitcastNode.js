@@ -60,12 +60,17 @@ class BitcastNode extends TempNode {
 
 	}
 
-	/**
-	 * The node's type is defined by the conversion type.
-	 *
-	 * @return {string} The node type.
-	 */
-	getNodeType() {
+	getNodeType( builder ) {
+
+		// GLSL aliasing
+		if ( this.inputType !== null ) {
+
+			const valueType = this.valueNode.getNodeType( builder );
+			const valueLength = builder.getTypeLength( valueType );
+
+			return builder.getTypeFromLength( valueLength, this.conversionType );
+
+		}
 
 		return this.conversionType;
 
@@ -75,7 +80,20 @@ class BitcastNode extends TempNode {
 	generate( builder ) {
 
 		const type = this.getNodeType( builder );
-		const inputType = this.inputType !== null ? this.inputType : this.valueNode.getNodeType( builder );
+		let inputType = '';
+
+		if ( this.inputType !== null ) {
+
+			const valueType = this.valueNode.getNodeType( builder );
+			const valueTypeLength = builder.getTypeLength( valueType );
+
+			inputType = valueTypeLength === 1 ? this.inputType : builder.changeComponentType( valueType, this.inputType );
+
+		} else {
+
+			inputType = this.valueNode.getNodeType( builder );
+
+		}
 
 		return `${builder.getBitcastMethod( type, inputType )}( ${ this.valueNode.build( builder, inputType ) } )`;
 
@@ -97,7 +115,7 @@ export default BitcastNode;
  */
 export const bitcast = /*@__PURE__*/ nodeProxyIntent( BitcastNode ).setParameterLength( 2 );
 
-export const floatBitsToInt = ( value ) => nodeObject( new BitcastNode( value, 'int', 'float' ) );
-export const floatBitsToUint = ( value ) => nodeObject( new BitcastNode( value, 'uint', 'float' ) );
-export const intBitsToFloat = ( value ) => nodeObject( new BitcastNode( value, 'float', 'int' ) );
-export const uintBitsToFloat = ( value ) => nodeObject( new BitcastNode( value, 'float', 'uint' ) );
+export const floatBitsToInt = ( value ) => new BitcastNode( value, 'int', 'float' );
+export const floatBitsToUint = ( value ) => new BitcastNode( value, 'uint', 'float' );
+export const intBitsToFloat = ( value ) => new BitcastNode( value, 'float', 'int' );
+export const uintBitsToFloat = ( value ) => new BitcastNode( value, 'float', 'uint' );
