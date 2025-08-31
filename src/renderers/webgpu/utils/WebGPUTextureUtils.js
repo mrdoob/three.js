@@ -86,21 +86,22 @@ class WebGPUTextureUtils {
 		 */
 		this.defaultVideoFrame = null;
 
-		/**
-		 * Represents the color attachment of the default framebuffer.
-		 *
-		 * @type {?GPUTexture}
-		 * @default null
-		 */
-		this.colorBuffer = null;
-
-		/**
-		 * Represents the depth attachment of the default framebuffer.
-		 *
-		 * @type {DepthTexture}
-		 */
-		this.depthTexture = new DepthTexture();
-		this.depthTexture.name = 'depthBuffer';
+		this.frameBufferData = {
+			color: {
+				buffer: null, // TODO: Move to Texture
+				width: 0,
+				height: 0,
+				samples: 0
+			},
+			depth: {
+				texture: new DepthTexture(),
+				width: 0,
+				height: 0,
+				samples: 0,
+				depth: false,
+				stencil: false
+			}
+		};
 
 	}
 
@@ -367,24 +368,44 @@ class WebGPUTextureUtils {
 	 */
 	getColorBuffer() {
 
-		if ( this.colorBuffer ) this.colorBuffer.destroy();
-
 		const backend = this.backend;
 		const { width, height } = backend.getDrawingBufferSize();
+		const samples = backend.renderer.currentSamples;
 
-		this.colorBuffer = backend.device.createTexture( {
+		const frameBufferColor = this.frameBufferData.color;
+
+		if ( frameBufferColor.width === width && frameBufferColor.height === height && frameBufferColor.samples === samples ) {
+
+			return frameBufferColor.buffer;
+
+		}
+
+		// recreate
+
+		let colorBuffer = frameBufferColor.buffer;
+
+		if ( colorBuffer ) colorBuffer.destroy();
+
+		colorBuffer = backend.device.createTexture( {
 			label: 'colorBuffer',
 			size: {
 				width: width,
 				height: height,
 				depthOrArrayLayers: 1
 			},
-			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
+			sampleCount: backend.utils.getSampleCount( backend.renderer.currentSamples ),
 			format: backend.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
 
-		return this.colorBuffer;
+		//
+
+		frameBufferColor.buffer = colorBuffer;
+		frameBufferColor.width = width;
+		frameBufferColor.height = height;
+		frameBufferColor.samples = samples;
+
+		return colorBuffer;
 
 	}
 
@@ -400,8 +421,23 @@ class WebGPUTextureUtils {
 
 		const backend = this.backend;
 		const { width, height } = backend.getDrawingBufferSize();
+		const samples = backend.renderer.currentSamples;
 
-		const depthTexture = this.depthTexture;
+		const frameBufferDepth = this.frameBufferData.depth;
+		const depthTexture = frameBufferDepth.texture;
+
+		if ( depthTexture.width === width &&
+			depthTexture.height === height &&
+			depthTexture.samples === samples &&
+			depthTexture.depth === depth &&
+			depthTexture.stencil === stencil ) {
+
+			return backend.get( depthTexture ).texture;
+
+		}
+
+		//
+
 		const depthTextureGPU = backend.get( depthTexture ).texture;
 
 		let format, type;
@@ -429,6 +465,8 @@ class WebGPUTextureUtils {
 			this.destroyTexture( depthTexture );
 
 		}
+
+		// recreate
 
 		depthTexture.name = 'depthBuffer';
 		depthTexture.format = format;

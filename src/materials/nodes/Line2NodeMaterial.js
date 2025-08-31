@@ -378,7 +378,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				if ( ! useDash ) {
 
-					if ( useAlphaToCoverage && renderer.samples > 1 ) {
+					if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
 
 						const dnorm = norm.fwidth();
 						alpha.assign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
@@ -395,7 +395,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				// round endcaps
 
-				if ( useAlphaToCoverage && renderer.samples > 1 ) {
+				if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
 
 					const a = vUv.x;
 					const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );

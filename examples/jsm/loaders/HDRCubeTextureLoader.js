@@ -42,7 +42,7 @@ class HDRCubeTextureLoader extends Loader {
 		 *
          * @type {HDRLoader}
 		 */
-        this.hdrLoader = new HDRLoader();
+		this.hdrLoader = new HDRLoader();
 
 		/**
 		 * The texture type.

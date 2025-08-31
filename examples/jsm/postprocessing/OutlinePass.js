@@ -510,7 +510,7 @@ class OutlinePass extends Pass {
 
 				}
 
-			} else if ( object.isMesh || object.isSprite) {
+			} else if ( object.isMesh || object.isSprite ) {
 
 				// only meshes and sprites are supported by OutlinePass
 

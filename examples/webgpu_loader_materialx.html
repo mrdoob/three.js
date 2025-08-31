@@ -125,20 +125,20 @@
 
 					const coord = positionWorld.xz.div( gridSize );
 					const grid = fract( coord );
-					
+
 					// Screen-space derivative for automatic antialiasing
 					const fw = fwidth( coord );
 					const smoothing = max( fw.x, fw.y ).mul( 0.5 );
-					
+
 					// Create squares at cell centers
 					const squareDist = max( abs( grid.x.sub( 0.5 ) ), abs( grid.y.sub( 0.5 ) ) );
 					const dots = smoothstep( dotWidth.add( smoothing ), dotWidth.sub( smoothing ), squareDist );
-					
+
 					// Create grid lines
 					const lineX = smoothstep( lineWidth.add( smoothing ), lineWidth.sub( smoothing ), abs( grid.x.sub( 0.5 ) ) );
 					const lineZ = smoothstep( lineWidth.add( smoothing ), lineWidth.sub( smoothing ), abs( grid.y.sub( 0.5 ) ) );
 					const lines = max( lineX, lineZ );
-					
+
 					return max( dots, lines );
 
 				} );
@@ -148,12 +148,12 @@
 					return smoothstep( radius, radius.sub( falloff ), length( positionWorld ) );
 
 				} );
-				
+
 				// Create grid pattern
 				const gridPattern = gridXZ( 1.0, 0.03, 0.005 );
 				const baseColor = vec4( 1.0, 1.0, 1.0, 0.0 );
 				const gridColor = vec4( 0.5, 0.5, 0.5, 1.0 );
-				
+
 				// Mix base color with grid lines
 				material.colorNode = gridPattern.mix( baseColor, gridColor ).mul( radialGradient( 30.0, 20.0 ) );
 				material.transparent = true;
@@ -241,7 +241,7 @@
 					.setPath( path )
 					.loadAsync( sample )
 					.then( ( { materials } ) => Object.values( materials ).pop() );
-			
+
 				const calibrationMesh = model.getObjectByName( 'Calibration_Mesh' );
 				calibrationMesh.material = material;
 
@@ -269,18 +269,26 @@
 				const folder = gui.addFolder( 'SHOW' );
 
 				folder.add( API, 'showCalibrationMesh' )
-					.name( 'Calibration Mesh')
-					.onChange( function( value ) { setVisibility( 'Calibration_Mesh', value ) } );
+					.name( 'Calibration Mesh' )
+					.onChange( function ( value ) {
+
+						setVisibility( 'Calibration_Mesh', value );
+
+					} );
 
 				folder.add( API, 'showPreviewMesh' )
-					.name( 'Preview Mesh')
-					.onChange( function( value ) { setVisibility( 'Preview_Mesh', value ) } );
+					.name( 'Preview Mesh' )
+					.onChange( function ( value ) {
+
+						setVisibility( 'Preview_Mesh', value );
+
+					} );
 
 			}
 
 			function setVisibility( name, visible ) {
 
-				scene.traverse( function( node ) {
+				scene.traverse( function ( node ) {
 
 					if ( node.isMesh ) {
 

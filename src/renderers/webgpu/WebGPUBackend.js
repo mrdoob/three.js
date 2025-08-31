@@ -93,14 +93,6 @@ class WebGPUBackend extends Backend {
 		this.context = null;
 
 		/**
-		 * A reference to the color attachment of the default framebuffer.
-		 *
-		 * @type {?GPUTexture}
-		 * @default null
-		 */
-		this.colorBuffer = null;
-
-		/**
 		 * A reference to the default render pass descriptor.
 		 *
 		 * @type {?Object}
@@ -335,9 +327,9 @@ class WebGPUBackend extends Backend {
 
 			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-			if ( this.renderer.samples > 0 ) {
+			if ( this.renderer.currentSamples > 0 ) {
 
-				colorAttachment.view = this.colorBuffer.createView();
+				colorAttachment.view = this.textureUtils.getColorBuffer().createView();
 
 			} else {
 
@@ -351,7 +343,7 @@ class WebGPUBackend extends Backend {
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-		if ( this.renderer.samples > 0 ) {
+		if ( this.renderer.currentSamples > 0 ) {
 
 			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
 
@@ -2268,7 +2260,6 @@ class WebGPUBackend extends Backend {
 	 */
 	updateSize() {
 
-		this.colorBuffer = this.textureUtils.getColorBuffer();
 		this.defaultRenderPassdescriptor = null;
 
 	}
