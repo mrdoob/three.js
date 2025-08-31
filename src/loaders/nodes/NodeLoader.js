@@ -180,7 +180,7 @@ class NodeLoader extends Loader {
 
 		if ( this.nodes[ type ] === undefined ) {
 
-			error( 'THREE.NodeLoader: Node type not found:', type );
+			error( 'NodeLoader: Node type not found:', type );
 			return float();
 
 		}

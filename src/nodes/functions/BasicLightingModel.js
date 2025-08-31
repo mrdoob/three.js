@@ -86,7 +86,7 @@ class BasicLightingModel extends LightingModel {
 					break;
 
 				default:
-					warn( 'THREE.BasicLightingModel: Unsupported .combine value:', material.combine );
+					warn( 'BasicLightingModel: Unsupported .combine value:', material.combine );
 					break;
 
 			}

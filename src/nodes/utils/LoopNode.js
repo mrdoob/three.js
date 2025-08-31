@@ -268,7 +268,7 @@ class LoopNode extends Node {
 
 							} else {
 
-								error( 'THREE.TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
 
 								updateSnippet = 'break /* invalid update */';
 

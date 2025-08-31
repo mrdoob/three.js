@@ -407,7 +407,7 @@ class WebGPUAttributeUtils {
 
 		if ( ! format ) {
 
-			error( 'THREE.WebGPUAttributeUtils: Vertex format not supported yet.' );
+			error( 'WebGPUAttributeUtils: Vertex format not supported yet.' );
 
 		}
 

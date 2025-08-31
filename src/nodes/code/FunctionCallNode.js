@@ -122,13 +122,13 @@ class FunctionCallNode extends TempNode {
 
 			if ( parameters.length > inputs.length ) {
 
-				error( 'THREE.TSL: The number of provided parameters exceeds the expected number of inputs in \'Fn()\'.' );
+				error( 'TSL: The number of provided parameters exceeds the expected number of inputs in \'Fn()\'.' );
 
 				parameters.length = inputs.length;
 
 			} else if ( parameters.length < inputs.length ) {
 
-				error( 'THREE.TSL: The number of provided parameters is less than the expected number of inputs in \'Fn()\'.' );
+				error( 'TSL: The number of provided parameters is less than the expected number of inputs in \'Fn()\'.' );
 
 				while ( parameters.length < inputs.length ) {
 
@@ -156,7 +156,7 @@ class FunctionCallNode extends TempNode {
 
 				} else {
 
-					error( `THREE.TSL: Input '${ inputNode.name }' not found in \'Fn()\'.` );
+					error( `TSL: Input '${ inputNode.name }' not found in \'Fn()\'.` );
 
 					params.push( generateInput( float( 0 ), inputNode ) );
 

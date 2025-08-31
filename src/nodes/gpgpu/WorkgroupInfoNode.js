@@ -150,7 +150,7 @@ class WorkgroupInfoNode extends Node {
 	 */
 	label( name ) {
 
-		warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 		return this.setName( name );
 

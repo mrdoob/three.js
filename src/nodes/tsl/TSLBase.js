@@ -30,6 +30,6 @@ export * from '../core/SubBuildNode.js'; // subBuild()
 
 export function addNodeElement( name/*, nodeElement*/ ) {
 
-	warn( 'THREE.TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
+	warn( 'TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
 
 }

@@ -152,7 +152,7 @@ class WebGLTextureUtils {
 
 			if ( gl[ internalFormatName ] !== undefined ) return gl[ internalFormatName ];
 
-			warn( 'THREE.WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
+			warn( 'WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
 
 		}
 
@@ -524,7 +524,7 @@ class WebGLTextureUtils {
 
 						} else {
 
-							warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+							warn( 'WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 						}
 

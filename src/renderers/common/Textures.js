@@ -270,11 +270,11 @@ class Textures extends DataMap {
 
 				if ( image === undefined ) {
 
-					warn( 'THREE.Renderer: Texture marked for update but image is undefined.' );
+					warn( 'Renderer: Texture marked for update but image is undefined.' );
 
 				} else if ( image.complete === false ) {
 
-					warn( 'THREE.Renderer: Texture marked for update but image is incomplete.' );
+					warn( 'Renderer: Texture marked for update but image is incomplete.' );
 
 				} else {
 

@@ -522,7 +522,7 @@ class Texture extends EventDispatcher {
 
 			if ( newValue === undefined ) {
 
-				warn( `THREE.Texture.setValues(): parameter '${ key }' has value of undefined.` );
+				warn( `Texture.setValues(): parameter '${ key }' has value of undefined.` );
 				continue;
 
 			}
@@ -531,7 +531,7 @@ class Texture extends EventDispatcher {
 
 			if ( currentValue === undefined ) {
 
-				warn( `THREE.Texture.setValues(): property '${ key }' does not exist.` );
+				warn( `Texture.setValues(): property '${ key }' does not exist.` );
 				continue;
 
 			}

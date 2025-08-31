@@ -149,7 +149,7 @@ class Background extends DataMap {
 
 		} else {
 
-			error( 'THREE.Renderer: Unsupported background configuration.', background );
+			error( 'Renderer: Unsupported background configuration.', background );
 
 		}
 

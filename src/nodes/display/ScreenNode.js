@@ -283,7 +283,7 @@ export const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
  */
 export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
-	warn( 'THREE.TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
+	warn( 'TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
 
 	return screenSize;
 

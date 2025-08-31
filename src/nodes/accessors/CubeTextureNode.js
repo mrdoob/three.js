@@ -77,7 +77,7 @@ class CubeTextureNode extends TextureNode {
 
 		} else {
 
-			error( 'THREE.CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
+			error( 'CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
 
 			return vec3( 0, 0, 0 );
 

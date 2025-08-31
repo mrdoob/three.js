@@ -82,7 +82,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		}
 
-		error( 'THREE.WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.' );
+		error( 'WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.' );
 
 		return 0;
 
@@ -337,11 +337,11 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		} else if ( value.isTexture ) {
 
-			warn( 'THREE.WebGLRenderer: Texture samplers can not be part of an uniforms group.' );
+			warn( 'WebGLRenderer: Texture samplers can not be part of an uniforms group.' );
 
 		} else {
 
-			warn( 'THREE.WebGLRenderer: Unsupported uniform value type.', value );
+			warn( 'WebGLRenderer: Unsupported uniform value type.', value );
 
 		}
 

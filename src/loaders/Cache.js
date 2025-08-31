@@ -35,7 +35,7 @@ const Cache = {
 
 		if ( this.enabled === false ) return;
 
-		// log( 'THREE.Cache', 'Adding key:', key );
+		// log( 'Cache', 'Adding key:', key );
 
 		this.files[ key ] = file;
 
@@ -52,7 +52,7 @@ const Cache = {
 
 		if ( this.enabled === false ) return;
 
-		// log( 'THREE.Cache', 'Checking key:', key );
+		// log( 'Cache', 'Checking key:', key );
 
 		return this.files[ key ];
 

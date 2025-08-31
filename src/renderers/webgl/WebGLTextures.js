@@ -83,7 +83,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const context = canvas.getContext( '2d' );
 				context.drawImage( image, 0, 0, width, height );
 
-				warn( 'THREE.WebGLRenderer: Texture has been resized from (' + dimensions.width + 'x' + dimensions.height + ') to (' + width + 'x' + height + ').' );
+				warn( 'WebGLRenderer: Texture has been resized from (' + dimensions.width + 'x' + dimensions.height + ') to (' + width + 'x' + height + ').' );
 
 				return canvas;
 
@@ -91,7 +91,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( 'data' in image ) {
 
-					warn( 'THREE.WebGLRenderer: Image in DataTexture is too big (' + dimensions.width + 'x' + dimensions.height + ').' );
+					warn( 'WebGLRenderer: Image in DataTexture is too big (' + dimensions.width + 'x' + dimensions.height + ').' );
 
 				}
 
@@ -132,7 +132,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( _gl[ internalFormatName ] !== undefined ) return _gl[ internalFormatName ];
 
-			warn( 'THREE.WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
+			warn( 'WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
 
 		}
 
@@ -475,7 +475,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( textureUnit >= capabilities.maxTextures ) {
 
-			warn( 'THREE.WebGLTextures: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
+			warn( 'WebGLTextures: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
 
 		}
 
@@ -522,11 +522,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( image === null ) {
 
-				warn( 'THREE.WebGLRenderer: Texture marked for update but no image data found.' );
+				warn( 'WebGLRenderer: Texture marked for update but no image data found.' );
 
 			} else if ( image.complete === false ) {
 
-				warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete' );
+				warn( 'WebGLRenderer: Texture marked for update but image is incomplete' );
 
 			} else {
 
@@ -623,7 +623,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			( texture.magFilter === LinearFilter || texture.magFilter === LinearMipmapNearestFilter || texture.magFilter === NearestMipmapLinearFilter || texture.magFilter === LinearMipmapLinearFilter ||
 			texture.minFilter === LinearFilter || texture.minFilter === LinearMipmapNearestFilter || texture.minFilter === NearestMipmapLinearFilter || texture.minFilter === LinearMipmapLinearFilter ) ) {
 
-			warn( 'THREE.WebGLRenderer: Unable to use linear filtering with floating point textures. OES_texture_float_linear not supported on this device.' );
+			warn( 'WebGLRenderer: Unable to use linear filtering with floating point textures. OES_texture_float_linear not supported on this device.' );
 
 		}
 
@@ -1032,7 +1032,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							} else {
 
-								warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+								warn( 'WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 							}
 
@@ -1088,7 +1088,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							} else {
 
-								warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+								warn( 'WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 							}
 
@@ -1382,7 +1382,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							} else {
 
-								warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()' );
+								warn( 'WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()' );
 
 							}
 
@@ -2275,13 +2275,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( format !== RGBAFormat || type !== UnsignedByteType ) {
 
-					warn( 'THREE.WebGLTextures: sRGB encoded textures have to use RGBAFormat and UnsignedByteType.' );
+					warn( 'WebGLTextures: sRGB encoded textures have to use RGBAFormat and UnsignedByteType.' );
 
 				}
 
 			} else {
 
-				error( 'THREE.WebGLTextures: Unsupported texture color space:', colorSpace );
+				error( 'WebGLTextures: Unsupported texture color space:', colorSpace );
 
 			}
 

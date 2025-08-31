@@ -1972,7 +1972,7 @@ class NodeBuilder {
 
 			node.name = name;
 
-			warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
+			warn( `TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
 
 		}
 

@@ -315,14 +315,14 @@ class Audio extends Object3D {
 
 		if ( this.isPlaying === true ) {
 
-			warn( 'THREE.Audio: Audio is already playing.' );
+			warn( 'Audio: Audio is already playing.' );
 			return;
 
 		}
 
 		if ( this.hasPlaybackControl === false ) {
 
-			warn( 'THREE.Audio: this Audio has no playback control.' );
+			warn( 'Audio: this Audio has no playback control.' );
 			return;
 
 		}
@@ -359,7 +359,7 @@ class Audio extends Object3D {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			warn( 'THREE.Audio: this Audio has no playback control.' );
+			warn( 'Audio: this Audio has no playback control.' );
 			return;
 
 		}
@@ -401,7 +401,7 @@ class Audio extends Object3D {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			warn( 'THREE.Audio: this Audio has no playback control.' );
+			warn( 'Audio: this Audio has no playback control.' );
 			return;
 
 		}
@@ -594,7 +594,7 @@ class Audio extends Object3D {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			warn( 'THREE.Audio: this Audio has no playback control.' );
+			warn( 'Audio: this Audio has no playback control.' );
 			return;
 
 		}
@@ -643,7 +643,7 @@ class Audio extends Object3D {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			warn( 'THREE.Audio: this Audio has no playback control.' );
+			warn( 'Audio: this Audio has no playback control.' );
 			return false;
 
 		}
@@ -664,7 +664,7 @@ class Audio extends Object3D {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			warn( 'THREE.Audio: this Audio has no playback control.' );
+			warn( 'Audio: this Audio has no playback control.' );
 			return;
 
 		}
@@ -742,7 +742,7 @@ class Audio extends Object3D {
 
 		if ( source.sourceType !== 'buffer' ) {
 
-			warn( 'THREE.Audio: Audio source type cannot be copied.' );
+			warn( 'Audio: Audio source type cannot be copied.' );
 
 			return this;
 

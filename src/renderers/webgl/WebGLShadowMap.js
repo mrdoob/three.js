@@ -113,7 +113,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			if ( shadow === undefined ) {
 
-				warn( 'THREE.WebGLShadowMap:', light, 'has no shadow.' );
+				warn( 'WebGLShadowMap:', light, 'has no shadow.' );
 				continue;
 
 			}

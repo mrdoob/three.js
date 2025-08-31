@@ -279,7 +279,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( scope.isPresenting === true ) {
 
-				warn( 'THREE.WebXRManager: Cannot change framebuffer scale while presenting.' );
+				warn( 'WebXRManager: Cannot change framebuffer scale while presenting.' );
 
 			}
 
@@ -301,7 +301,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( scope.isPresenting === true ) {
 
-				warn( 'THREE.WebXRManager: Cannot change reference space type while presenting.' );
+				warn( 'WebXRManager: Cannot change reference space type while presenting.' );
 
 			}
 

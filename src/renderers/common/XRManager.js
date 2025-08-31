@@ -507,7 +507,7 @@ class XRManager extends EventDispatcher {
 
 		if ( this.isPresenting === true ) {
 
-			warn( 'THREE.XRManager: Cannot change framebuffer scale while presenting.' );
+			warn( 'XRManager: Cannot change framebuffer scale while presenting.' );
 
 		}
 
@@ -537,7 +537,7 @@ class XRManager extends EventDispatcher {
 
 		if ( this.isPresenting === true ) {
 
-			warn( 'THREE.XRManager: Cannot change reference space type while presenting.' );
+			warn( 'XRManager: Cannot change reference space type while presenting.' );
 
 		}
 

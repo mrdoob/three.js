@@ -306,11 +306,11 @@ class AnimationClip {
 	 */
 	static parseAnimation( animation, bones ) {
 
-		warn( 'THREE.AnimationClip: parseAnimation() is deprecated and will be removed with r185' );
+		warn( 'AnimationClip: parseAnimation() is deprecated and will be removed with r185' );
 
 		if ( ! animation ) {
 
-			error( 'THREE.AnimationClip: No animation in JSONLoader data.' );
+			error( 'AnimationClip: No animation in JSONLoader data.' );
 			return null;
 
 		}

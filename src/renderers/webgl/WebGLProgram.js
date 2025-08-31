@@ -48,7 +48,7 @@ function getEncodingComponents( colorSpace ) {
 			return [ encodingMatrix, 'sRGBTransferOETF' ];
 
 		default:
-			warn( 'THREE.WebGLProgram: Unsupported color space: ', colorSpace );
+			warn( 'WebGLProgram: Unsupported color space: ', colorSpace );
 			return [ encodingMatrix, 'LinearTransferOETF' ];
 
 	}
@@ -132,7 +132,7 @@ function getToneMappingFunction( functionName, toneMapping ) {
 			break;
 
 		default:
-			warn( 'THREE.WebGLProgram: Unsupported toneMapping:', toneMapping );
+			warn( 'WebGLProgram: Unsupported toneMapping:', toneMapping );
 			toneMappingName = 'Linear';
 
 	}
@@ -210,7 +210,7 @@ function fetchAttributeLocations( gl, program ) {
 		if ( info.type === gl.FLOAT_MAT3 ) locationSize = 3;
 		if ( info.type === gl.FLOAT_MAT4 ) locationSize = 4;
 
-		// log( 'THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:', name, i );
+		// log( 'WebGLProgram: ACTIVE VERTEX ATTRIBUTE:', name, i );
 
 		attributes[ name ] = {
 			type: info.type,
@@ -280,7 +280,7 @@ function includeReplacer( match, include ) {
 		if ( newInclude !== undefined ) {
 
 			string = ShaderChunk[ newInclude ];
-			warn( 'THREE.WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
+			warn( 'WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
 
 		} else {
 
@@ -961,7 +961,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			} else if ( programLog !== '' ) {
 
-				warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
+				warn( 'WebGLProgram: Program Info Log:', programLog );
 
 			} else if ( vertexLog === '' || fragmentLog === '' ) {
 

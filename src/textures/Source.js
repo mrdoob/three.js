@@ -218,7 +218,7 @@ function serializeImage( image ) {
 
 		} else {
 
-			warn( 'THREE.Texture: Unable to serialize Texture.' );
+			warn( 'Texture: Unable to serialize Texture.' );
 			return {};
 
 		}

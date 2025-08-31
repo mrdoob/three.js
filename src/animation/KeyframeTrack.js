@@ -192,7 +192,7 @@ class KeyframeTrack {
 
 			}
 
-			warn( 'THREE.KeyframeTrack:', message );
+			warn( 'KeyframeTrack:', message );
 			return this;
 
 		}
@@ -352,7 +352,7 @@ class KeyframeTrack {
 		const valueSize = this.getValueSize();
 		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-			error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
+			error( 'KeyframeTrack: Invalid value size in track.', this );
 			valid = false;
 
 		}
@@ -364,7 +364,7 @@ class KeyframeTrack {
 
 		if ( nKeys === 0 ) {
 
-			error( 'THREE.KeyframeTrack: Track is empty.', this );
+			error( 'KeyframeTrack: Track is empty.', this );
 			valid = false;
 
 		}
@@ -377,7 +377,7 @@ class KeyframeTrack {
 
 			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
-				error( 'THREE.KeyframeTrack: Time is not a valid number.', this, i, currTime );
+				error( 'KeyframeTrack: Time is not a valid number.', this, i, currTime );
 				valid = false;
 				break;
 
@@ -385,7 +385,7 @@ class KeyframeTrack {
 
 			if ( prevTime !== null && prevTime > currTime ) {
 
-				error( 'THREE.KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
+				error( 'KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
 				valid = false;
 				break;
 
@@ -405,7 +405,7 @@ class KeyframeTrack {
 
 					if ( isNaN( value ) ) {
 
-						error( 'THREE.KeyframeTrack: Value is not a valid number.', this, i, value );
+						error( 'KeyframeTrack: Value is not a valid number.', this, i, value );
 						valid = false;
 						break;
 

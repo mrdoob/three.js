@@ -572,7 +572,7 @@ class Nodes extends DataMap {
 
 					} else {
 
-						error( 'THREE.Renderer: Unsupported fog configuration.', sceneFog );
+						error( 'Renderer: Unsupported fog configuration.', sceneFog );
 
 					}
 

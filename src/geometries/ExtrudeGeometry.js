@@ -220,7 +220,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			function scalePt2( pt, vec, size ) {
 
-				if ( ! vec ) error( 'THREE.ExtrudeGeometry: vec does not exist' );
+				if ( ! vec ) error( 'ExtrudeGeometry: vec does not exist' );
 
 				return pt.clone().addScaledVector( vec, size );
 

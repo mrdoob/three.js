@@ -235,7 +235,7 @@ export function getLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 9;
 	if ( /mat4/.test( type ) ) return 16;
 
-	error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 
@@ -256,7 +256,7 @@ export function getMemoryLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 12;
 	if ( /mat4/.test( type ) ) return 16;
 
-	error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 
@@ -277,7 +277,7 @@ export function getByteBoundaryFromType( type ) {
 	if ( /mat3/.test( type ) ) return 48;
 	if ( /mat4/.test( type ) ) return 64;
 
-	error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 

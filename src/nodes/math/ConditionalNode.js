@@ -174,7 +174,7 @@ class ConditionalNode extends Node {
 
 				if ( functionNode === null ) {
 
-					warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+					warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
 
 					ifSnippet = '// ' + ifSnippet;
 
@@ -204,7 +204,7 @@ class ConditionalNode extends Node {
 
 					if ( functionNode === null ) {
 
-						warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+						warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
 
 						elseSnippet = '// ' + elseSnippet;
 

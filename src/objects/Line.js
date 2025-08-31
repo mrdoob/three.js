@@ -143,7 +143,7 @@ class Line extends Object3D {
 
 		} else {
 
-			warn( 'THREE.Line.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
+			warn( 'Line.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
 
 		}
 

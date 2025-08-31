@@ -395,7 +395,7 @@ class NodeMaterial extends Material {
 
 			set: ( value ) => {
 
-				warn( 'THREE.NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
+				warn( 'NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
 
 				this.receivedShadowPositionNode = value;
 

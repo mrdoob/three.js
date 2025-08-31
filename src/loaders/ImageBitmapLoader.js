@@ -49,13 +49,13 @@ class ImageBitmapLoader extends Loader {
 
 		if ( typeof createImageBitmap === 'undefined' ) {
 
-			warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+			warn( 'ImageBitmapLoader: createImageBitmap() not supported.' );
 
 		}
 
 		if ( typeof fetch === 'undefined' ) {
 
-			warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
+			warn( 'ImageBitmapLoader: fetch() not supported.' );
 
 		}
 

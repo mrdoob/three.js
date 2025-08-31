@@ -101,7 +101,7 @@ class StackNode extends Node {
 
 		if ( node.isNode !== true ) {
 
-			error( 'THREE.TSL: Invalid node added to stack.' );
+			error( 'TSL: Invalid node added to stack.' );
 			return this;
 
 		}
@@ -199,7 +199,7 @@ class StackNode extends Node {
 
 		} else {
 
-			error( 'THREE.TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
 
 		}
 

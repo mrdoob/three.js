@@ -363,7 +363,7 @@ class WebGLBackend extends Backend {
 			// are midframe flushes and an external depth texture.
 			if ( ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) && renderTarget._autoAllocateDepthBuffer === true && renderTarget.multiview === false ) {
 
-				warn( 'THREE.WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
+				warn( 'WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
 
 			}
 
@@ -1084,12 +1084,12 @@ class WebGLBackend extends Backend {
 				if ( object._multiDrawInstances !== null ) {
 
 					// @deprecated, r174
-					warnOnce( 'THREE.WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+					warnOnce( 'WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
 					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
 				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
 
-					warnOnce( 'THREE.WebGLRenderer: WEBGL_multi_draw not supported.' );
+					warnOnce( 'WebGLRenderer: WEBGL_multi_draw not supported.' );
 
 				} else {
 
@@ -1559,7 +1559,7 @@ class WebGLBackend extends Backend {
 
 			} else if ( programLog !== '' ) {
 
-				warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
+				warn( 'WebGLProgram: Program Info Log:', programLog );
 
 			}
 

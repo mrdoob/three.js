@@ -734,7 +734,7 @@ class Object3D extends EventDispatcher {
 
 		if ( object === this ) {
 
-			error( 'THREE.Object3D.add: object can\'t be added as a child of itself.', object );
+			error( 'Object3D.add: object can\'t be added as a child of itself.', object );
 			return this;
 
 		}
@@ -753,7 +753,7 @@ class Object3D extends EventDispatcher {
 
 		} else {
 
-			error( 'THREE.Object3D.add: object not an instance of THREE.Object3D.', object );
+			error( 'Object3D.add: object not an instance of THREE.Object3D.', object );
 
 		}
 

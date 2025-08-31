@@ -132,7 +132,7 @@ class Raycaster {
 
 		} else {
 
-			error( 'THREE.Raycaster: Unsupported camera type: ' + camera.type );
+			error( 'Raycaster: Unsupported camera type: ' + camera.type );
 
 		}
 

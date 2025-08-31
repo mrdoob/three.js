@@ -135,7 +135,7 @@ class ObjectLoader extends Loader {
 
 				if ( onError !== undefined ) onError( new Error( 'THREE.ObjectLoader: Can\'t load ' + url ) );
 
-				error( 'THREE.ObjectLoader: Can\'t load ' + url );
+				error( 'ObjectLoader: Can\'t load ' + url );
 				return;
 
 			}
@@ -345,7 +345,7 @@ class ObjectLoader extends Loader {
 
 						} else {
 
-							warn( `THREE.ObjectLoader: Unsupported geometry type "${ data.type }"` );
+							warn( `ObjectLoader: Unsupported geometry type "${ data.type }"` );
 
 						}
 
@@ -636,7 +636,7 @@ class ObjectLoader extends Loader {
 
 			if ( typeof value === 'number' ) return value;
 
-			warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
+			warn( 'ObjectLoader.parseTexture: Constant should be in numeric form.', value );
 
 			return type[ value ];
 
@@ -652,13 +652,13 @@ class ObjectLoader extends Loader {
 
 				if ( data.image === undefined ) {
 
-					warn( 'THREE.ObjectLoader: No "image" specified for', data.uuid );
+					warn( 'ObjectLoader: No "image" specified for', data.uuid );
 
 				}
 
 				if ( images[ data.image ] === undefined ) {
 
-					warn( 'THREE.ObjectLoader: Undefined image', data.image );
+					warn( 'ObjectLoader: Undefined image', data.image );
 
 				}
 
@@ -746,7 +746,7 @@ class ObjectLoader extends Loader {
 
 			if ( geometries[ name ] === undefined ) {
 
-				warn( 'THREE.ObjectLoader: Undefined geometry', name );
+				warn( 'ObjectLoader: Undefined geometry', name );
 
 			}
 
@@ -768,7 +768,7 @@ class ObjectLoader extends Loader {
 
 					if ( materials[ uuid ] === undefined ) {
 
-						warn( 'THREE.ObjectLoader: Undefined material', uuid );
+						warn( 'ObjectLoader: Undefined material', uuid );
 
 					}
 
@@ -782,7 +782,7 @@ class ObjectLoader extends Loader {
 
 			if ( materials[ name ] === undefined ) {
 
-				warn( 'THREE.ObjectLoader: Undefined material', name );
+				warn( 'ObjectLoader: Undefined material', name );
 
 			}
 
@@ -794,7 +794,7 @@ class ObjectLoader extends Loader {
 
 			if ( textures[ uuid ] === undefined ) {
 
-				warn( 'THREE.ObjectLoader: Undefined texture', uuid );
+				warn( 'ObjectLoader: Undefined texture', uuid );
 
 			}
 
@@ -1195,7 +1195,7 @@ class ObjectLoader extends Loader {
 
 				if ( skeleton === undefined ) {
 
-					warn( 'THREE.ObjectLoader: No skeleton found with UUID:', child.skeleton );
+					warn( 'ObjectLoader: No skeleton found with UUID:', child.skeleton );
 
 				} else {
 

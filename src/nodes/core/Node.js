@@ -732,7 +732,7 @@ class Node extends EventDispatcher {
 
 					} else {
 
-						warn( 'THREE.Node: Recursion detected.', this );
+						warn( 'Node: Recursion detected.', this );
 
 						result = '/* Recursion detected. */';
 
@@ -756,7 +756,7 @@ class Node extends EventDispatcher {
 
 				// if no snippet is generated, return a default value
 
-				error( `THREE.TSL: Invalid generated code, expected a "${ output }".` );
+				error( `TSL: Invalid generated code, expected a "${ output }".` );
 
 				result = builder.generateConst( output );
 

@@ -372,7 +372,7 @@ function setQuaternionFromProperEuler( q, a, b, c, order ) {
 			break;
 
 		default:
-			warn( 'THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order: ' + order );
+			warn( 'MathUtils: .setQuaternionFromProperEuler() encountered an unknown order: ' + order );
 
 	}
 

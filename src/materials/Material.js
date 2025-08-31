@@ -562,7 +562,7 @@ class Material extends EventDispatcher {
 
 			if ( newValue === undefined ) {
 
-				warn( `THREE.Material: parameter '${ key }' has value of undefined.` );
+				warn( `Material: parameter '${ key }' has value of undefined.` );
 				continue;
 
 			}
@@ -571,7 +571,7 @@ class Material extends EventDispatcher {
 
 			if ( currentValue === undefined ) {
 
-				warn( `THREE.Material: '${ key }' is not a property of THREE.${ this.type }.` );
+				warn( `Material: '${ key }' is not a property of THREE.${ this.type }.` );
 				continue;
 
 			}

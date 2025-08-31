@@ -371,7 +371,7 @@ class Quaternion {
 				break;
 
 			default:
-				warn( 'THREE.Quaternion: .setFromEuler() encountered an unknown order: ' + order );
+				warn( 'Quaternion: .setFromEuler() encountered an unknown order: ' + order );
 
 		}
 

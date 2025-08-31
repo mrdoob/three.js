@@ -107,7 +107,7 @@ class Skeleton {
 
 			if ( bones.length !== boneInverses.length ) {
 
-				warn( 'THREE.Skeleton: Number of inverse bone matrices does not match amount of bones.' );
+				warn( 'Skeleton: Number of inverse bone matrices does not match amount of bones.' );
 
 				this.boneInverses = [];
 
@@ -325,7 +325,7 @@ class Skeleton {
 
 			if ( bone === undefined ) {
 
-				warn( 'THREE.Skeleton: No bone found with UUID:', uuid );
+				warn( 'Skeleton: No bone found with UUID:', uuid );
 				bone = new Bone();
 
 			}

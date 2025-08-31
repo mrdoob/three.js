@@ -176,7 +176,7 @@ class AnimationObjectGroup {
 
 			} else if ( objects[ index ] !== knownObject ) {
 
-				error( 'THREE.AnimationObjectGroup: Different objects with the same UUID ' +
+				error( 'AnimationObjectGroup: Different objects with the same UUID ' +
 					'detected. Clean the caches or recreate your infrastructure when reloading scenes.' );
 
 			} // else the object is already where we want it to be

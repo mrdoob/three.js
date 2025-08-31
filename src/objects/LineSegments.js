@@ -61,7 +61,7 @@ class LineSegments extends Line {
 
 		} else {
 
-			warn( 'THREE.LineSegments.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
+			warn( 'LineSegments.computeLineDistances(): Computation only possible with non-indexed BufferGeometry.' );
 
 		}
 

@@ -149,7 +149,7 @@ function _generateTables() {
  */
 function toHalfFloat( val ) {
 
-	if ( Math.abs( val ) > 65504 ) warn( 'THREE.DataUtils.toHalfFloat(): Value out of range.' );
+	if ( Math.abs( val ) > 65504 ) warn( 'DataUtils.toHalfFloat(): Value out of range.' );
 
 	val = clamp( val, - 65504, 65504 );
 

@@ -291,7 +291,7 @@ class Color {
 
 			if ( parseFloat( string ) < 1 ) {
 
-				warn( 'THREE.Color: Alpha component of ' + style + ' will be ignored.' );
+				warn( 'Color: Alpha component of ' + style + ' will be ignored.' );
 
 			}
 
@@ -367,7 +367,7 @@ class Color {
 
 				default:
 
-					warn( 'THREE.Color: Unknown color model ' + style );
+					warn( 'Color: Unknown color model ' + style );
 
 			}
 
@@ -395,7 +395,7 @@ class Color {
 
 			} else {
 
-				warn( 'THREE.Color: Invalid hex color ' + style );
+				warn( 'Color: Invalid hex color ' + style );
 
 			}
 
@@ -435,7 +435,7 @@ class Color {
 		} else {
 
 			// unknown color
-			warn( 'THREE.Color: Unknown color ' + style );
+			warn( 'Color: Unknown color ' + style );
 
 		}
 

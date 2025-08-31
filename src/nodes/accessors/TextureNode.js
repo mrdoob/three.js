@@ -558,7 +558,7 @@ class TextureNode extends UniformNode {
 	 */
 	uv( uvNode ) { // @deprecated, r172
 
-		warn( 'THREE.TextureNode: .uv() has been renamed. Use .sample() instead.' );
+		warn( 'TextureNode: .uv() has been renamed. Use .sample() instead.' );
 
 		return this.sample( uvNode );
 
@@ -608,7 +608,7 @@ class TextureNode extends UniformNode {
 
 		if ( textureNode.generateMipmaps === false && ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) ) {
 
-			warn( 'THREE.TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
+			warn( 'TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
 
 			textureNode.biasNode = null;
 

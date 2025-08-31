@@ -67,7 +67,7 @@ class Curve {
 	 */
 	getPoint( /* t, optionalTarget */ ) {
 
-		warn( 'THREE.Curve: .getPoint() not implemented.' );
+		warn( 'Curve: .getPoint() not implemented.' );
 
 	}
 

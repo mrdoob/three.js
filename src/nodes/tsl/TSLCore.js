@@ -20,7 +20,7 @@ export function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
 
-		warn( `THREE.TSL: Redefinition of method chaining '${ name }'.` );
+		warn( `TSL: Redefinition of method chaining '${ name }'.` );
 		return;
 
 	}
@@ -66,7 +66,7 @@ Node.prototype.assign = function ( ...params ) {
 
 		} else {
 
-			error( 'THREE.TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().' );
+			error( 'TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().' );
 
 		}
 
@@ -374,13 +374,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( minParams !== undefined && params.length < minParams ) {
 
-			error( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
+			error( `TSL: "${ tslName }" parameter length is less than minimum required.` );
 
 			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
 
 		} else if ( maxParams !== undefined && params.length > maxParams ) {
 
-			error( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
+			error( `TSL: "${ tslName }" parameter length exceeds limit.` );
 
 			return params.slice( 0, maxParams );
 
@@ -850,7 +850,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( param === undefined ) {
 
-				error( `THREE.TSL: Invalid parameter for the type "${ type }".` );
+				error( `TSL: Invalid parameter for the type "${ type }".` );
 
 				return nodeObject( new ConstNode( 0, type ) );
 
@@ -939,7 +939,7 @@ class FnNode extends Node {
 
 				} else {
 
-					error( 'THREE.TSL: Invalid layout type.' );
+					error( 'TSL: Invalid layout type.' );
 
 				}
 
@@ -1023,7 +1023,7 @@ class FnNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		error( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+		error( 'TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
 
 		return builder.generateConst( type );
 
@@ -1195,14 +1195,14 @@ addMethodChaining( 'convert', convert );
  */
 export const append = ( node ) => { // @deprecated, r176
 
-	warn( 'THREE.TSL: append() has been renamed to Stack().' );
+	warn( 'TSL: append() has been renamed to Stack().' );
 	return Stack( node );
 
 };
 
 addMethodChaining( 'append', ( node ) => { // @deprecated, r176
 
-	warn( 'THREE.TSL: .append() has been renamed to .toStack().' );
+	warn( 'TSL: .append() has been renamed to .toStack().' );
 	return Stack( node );
 
 } );

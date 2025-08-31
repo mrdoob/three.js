@@ -87,7 +87,7 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 	if ( maxPrecision !== precision ) {
 
-		warn( 'THREE.WebGLRenderer:', precision, 'not supported, using', maxPrecision, 'instead.' );
+		warn( 'WebGLRenderer:', precision, 'not supported, using', maxPrecision, 'instead.' );
 		precision = maxPrecision;
 
 	}

@@ -42,7 +42,7 @@ function WebGLInfo( gl ) {
 				break;
 
 			default:
-				error( 'THREE.WebGLInfo: Unknown draw mode:', mode );
+				error( 'WebGLInfo: Unknown draw mode:', mode );
 				break;
 
 		}

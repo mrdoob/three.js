@@ -92,7 +92,7 @@ class NormalMapNode extends TempNode {
 
 		} else {
 
-			error( `THREE.NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
+			error( `NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
 
 			output = normalView; // Fallback to default normal view
 

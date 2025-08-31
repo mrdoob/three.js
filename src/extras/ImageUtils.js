@@ -125,7 +125,7 @@ class ImageUtils {
 
 		} else {
 
-			warn( 'THREE.ImageUtils.sRGBToLinear(): Unsupported image type. No color space conversion applied.' );
+			warn( 'ImageUtils.sRGBToLinear(): Unsupported image type. No color space conversion applied.' );
 			return image;
 
 		}

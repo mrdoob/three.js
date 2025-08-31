@@ -85,7 +85,7 @@ class Controls extends EventDispatcher {
 
 		if ( element === undefined ) {
 
-			warn( 'THREE.Controls: connect() now requires an element.' ); // @deprecated, the warning can be removed with r185
+			warn( 'Controls: connect() now requires an element.' ); // @deprecated, the warning can be removed with r185
 			return;
 
 		}

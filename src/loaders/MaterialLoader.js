@@ -116,7 +116,7 @@ class MaterialLoader extends Loader {
 
 			if ( textures[ name ] === undefined ) {
 
-				warn( 'THREE.MaterialLoader: Undefined texture', name );
+				warn( 'MaterialLoader: Undefined texture', name );
 
 			}
 

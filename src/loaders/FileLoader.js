@@ -149,7 +149,7 @@ class FileLoader extends Loader {
 
 					if ( response.status === 0 ) {
 
-						warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+						warn( 'FileLoader: HTTP Status 0 received.' );
 
 					}
 

@@ -440,7 +440,7 @@ class InterleavedBufferAttribute {
 
 		if ( data === undefined ) {
 
-			log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will de-interleave buffer data.' );
+			log( 'InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will de-interleave buffer data.' );
 
 			const array = [];
 
@@ -490,7 +490,7 @@ class InterleavedBufferAttribute {
 
 		if ( data === undefined ) {
 
-			log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.' );
+			log( 'InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.' );
 
 			const array = [];
 

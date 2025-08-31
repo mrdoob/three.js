@@ -125,7 +125,7 @@ class Info {
 
 		} else {
 
-			error( 'THREE.WebGPUInfo: Unknown object type.' );
+			error( 'WebGPUInfo: Unknown object type.' );
 
 		}
 

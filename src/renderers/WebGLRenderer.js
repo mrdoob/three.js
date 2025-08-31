@@ -384,7 +384,7 @@ class WebGLRenderer {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLRenderer: ' + error.message );
+			error( 'WebGLRenderer: ' + error.message );
 			throw error;
 
 		}
@@ -621,7 +621,7 @@ class WebGLRenderer {
 
 			if ( xr.isPresenting ) {
 
-				warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
+				warn( 'WebGLRenderer: Can\'t change size while VR device is presenting.' );
 				return;
 
 			}
@@ -1013,7 +1013,7 @@ class WebGLRenderer {
 
 			event.preventDefault();
 
-			log( 'THREE.WebGLRenderer: Context Lost.' );
+			log( 'WebGLRenderer: Context Lost.' );
 
 			_isContextLost = true;
 
@@ -1021,7 +1021,7 @@ class WebGLRenderer {
 
 		function onContextRestore( /* event */ ) {
 
-			log( 'THREE.WebGLRenderer: Context Restored.' );
+			log( 'WebGLRenderer: Context Restored.' );
 
 			_isContextLost = false;
 
@@ -1043,7 +1043,7 @@ class WebGLRenderer {
 
 		function onContextCreationError( event ) {
 
-			error( 'THREE.WebGLRenderer: A WebGL context could not be created. Reason: ', event.statusMessage );
+			error( 'WebGLRenderer: A WebGL context could not be created. Reason: ', event.statusMessage );
 
 		}
 
@@ -1216,7 +1216,7 @@ class WebGLRenderer {
 				if ( object._multiDrawInstances !== null ) {
 
 					// @deprecated, r174
-					warnOnce( 'THREE.WebGLRenderer: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+					warnOnce( 'WebGLRenderer: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
 					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
 				} else {
@@ -1524,7 +1524,7 @@ class WebGLRenderer {
 
 			if ( camera !== undefined && camera.isCamera !== true ) {
 
-				error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
+				error( 'WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 				return;
 
 			}
@@ -2850,7 +2850,7 @@ class WebGLRenderer {
 
 			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
-				error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+				error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 				return;
 
 			}
@@ -2875,14 +2875,14 @@ class WebGLRenderer {
 
 					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
-						error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
+						error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 						return;
 
 					}
 
 					if ( ! capabilities.textureTypeReadable( textureType ) ) {
 
-						error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
+						error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 						return;
 
 					}

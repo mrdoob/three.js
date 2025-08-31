@@ -1189,7 +1189,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'THREE.Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
+			warn( 'Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
 
 			return this.renderAsync( scene, camera );
 
@@ -2017,7 +2017,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'THREE.Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
+			warn( 'Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
 
 			return this.clearAsync( color, depth, stencil );
 
@@ -2339,7 +2339,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'THREE.Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
+			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
 
 			return this.computeAsync( computeNodes );
 
@@ -2474,7 +2474,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'THREE.Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
+			warn( 'Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
 
 			return false;
 
@@ -2523,7 +2523,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'THREE.Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
+			warn( 'Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
 
 		}
 
@@ -2551,7 +2551,7 @@ class Renderer {
 
 			} else {
 
-				error( 'THREE.Renderer.copyFramebufferToTexture: Invalid rectangle.' );
+				error( 'Renderer.copyFramebufferToTexture: Invalid rectangle.' );
 
 				return;
 
@@ -2688,7 +2688,7 @@ class Renderer {
 
 			} else if ( object.isLineLoop ) {
 
-				error( 'THREE.Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
+				error( 'Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 

@@ -291,7 +291,7 @@ class MathNode extends TempNode {
 
 				if ( builder.shaderStage !== 'fragment' && ( method === MathNode.DFDX || method === MathNode.DFDY ) ) {
 
-					warn( `THREE.TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
+					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
 
 					method = '/*' + method + '*/';
 
@@ -779,7 +779,7 @@ export const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE
  */
 export const equals = ( x, y ) => { // @deprecated, r172
 
-	warn( 'THREE.TSL: "equals" is deprecated. Use "equal" inside a vector instead, like: "bvec*( equal( ... ) )"' );
+	warn( 'TSL: "equals" is deprecated. Use "equal" inside a vector instead, like: "bvec*( equal( ... ) )"' );
 	return equal( x, y );
 
 };
@@ -1077,7 +1077,7 @@ export const stepElement = ( x, edge ) => step( edge, x );
  */
 export const atan2 = ( y, x ) => { // @deprecated, r172
 
-	warn( 'THREE.TSL: "atan2" is overloaded. Use "atan" instead.' );
+	warn( 'TSL: "atan2" is overloaded. Use "atan" instead.' );
 	return atan( y, x );
 
 };

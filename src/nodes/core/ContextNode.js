@@ -178,7 +178,7 @@ export const setName = ( node, name ) => context( node, { nodeName: name } );
  */
 export function label( node, name ) {
 
-	warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+	warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 	return setName( node, name );
 

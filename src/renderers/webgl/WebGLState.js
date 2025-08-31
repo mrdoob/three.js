@@ -672,7 +672,7 @@ function WebGLState( gl, extensions ) {
 							break;
 
 						default:
-							error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -690,15 +690,15 @@ function WebGLState( gl, extensions ) {
 							break;
 
 						case SubtractiveBlending:
-							error( 'THREE.WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
+							error( 'WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						case MultiplyBlending:
-							error( 'THREE.WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
+							error( 'WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						default:
-							error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -985,7 +985,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -999,7 +999,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -1013,7 +1013,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -1027,7 +1027,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -1041,7 +1041,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -1055,7 +1055,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -1069,7 +1069,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -1083,7 +1083,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -1097,7 +1097,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 
@@ -1111,7 +1111,7 @@ function WebGLState( gl, extensions ) {
 
 		} catch ( error ) {
 
-			error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', error );
 
 		}
 

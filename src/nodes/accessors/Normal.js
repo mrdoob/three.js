@@ -24,7 +24,7 @@ export const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'normal' ) === false ) {
 
-		warn( 'THREE.TSL: Vertex attribute "normal" not found on geometry.' );
+		warn( 'TSL: Vertex attribute "normal" not found on geometry.' );
 
 		return vec3( 0, 1, 0 );
 
@@ -209,7 +209,7 @@ export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) =
  */
 export const transformedNormalView = ( Fn( () => { // @deprecated, r177
 
-	warn( 'THREE.TSL: "transformedNormalView" is deprecated. Use "normalView" instead.' );
+	warn( 'TSL: "transformedNormalView" is deprecated. Use "normalView" instead.' );
 	return normalView;
 
 } ).once( [ 'NORMAL', 'VERTEX' ] ) )();
@@ -223,7 +223,7 @@ export const transformedNormalView = ( Fn( () => { // @deprecated, r177
  */
 export const transformedNormalWorld = ( Fn( () => { // @deprecated, r177
 
-	warn( 'THREE.TSL: "transformedNormalWorld" is deprecated. Use "normalWorld" instead.' );
+	warn( 'TSL: "transformedNormalWorld" is deprecated. Use "normalWorld" instead.' );
 	return normalWorld;
 
 } ).once( [ 'NORMAL', 'VERTEX' ] ) )();
@@ -237,7 +237,7 @@ export const transformedNormalWorld = ( Fn( () => { // @deprecated, r177
  */
 export const transformedClearcoatNormalView = ( Fn( () => { // @deprecated, r177
 
-	warn( 'THREE.TSL: "transformedClearcoatNormalView" is deprecated. Use "clearcoatNormalView" instead.' );
+	warn( 'TSL: "transformedClearcoatNormalView" is deprecated. Use "clearcoatNormalView" instead.' );
 	return clearcoatNormalView;
 
 } ).once( [ 'NORMAL', 'VERTEX' ] ) )();

@@ -305,7 +305,7 @@ class Euler {
 
 			default:
 
-				warn( 'THREE.Euler: .setFromRotationMatrix() encountered an unknown order: ' + order );
+				warn( 'Euler: .setFromRotationMatrix() encountered an unknown order: ' + order );
 
 		}
 

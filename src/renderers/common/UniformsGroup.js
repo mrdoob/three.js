@@ -209,7 +209,7 @@ class UniformsGroup extends UniformBuffer {
 		if ( uniform.isMatrix3Uniform ) return this.updateMatrix3( uniform );
 		if ( uniform.isMatrix4Uniform ) return this.updateMatrix4( uniform );
 
-		error( 'THREE.WebGPUUniformsGroup: Unsupported uniform type.', uniform );
+		error( 'WebGPUUniformsGroup: Unsupported uniform type.', uniform );
 
 	}
 

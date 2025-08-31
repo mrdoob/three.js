@@ -743,7 +743,7 @@ addMethodChaining( 'decrement', decrement );
  */
 export const modInt = ( a, b ) => { // @deprecated, r175
 
-	warn( 'THREE.TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
 	return mod( int( a ), int( b ) );
 
 };

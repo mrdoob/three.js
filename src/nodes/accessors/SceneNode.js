@@ -104,7 +104,7 @@ class SceneNode extends Node {
 
 		} else {
 
-			error( 'THREE.SceneNode: Unknown scope:', scope );
+			error( 'SceneNode: Unknown scope:', scope );
 
 		}
 

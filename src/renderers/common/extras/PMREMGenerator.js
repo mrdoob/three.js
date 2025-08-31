@@ -160,7 +160,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
+			warn( 'PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
 
 			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
 
@@ -237,7 +237,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
+			warn( 'PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
 
 			this._setSizeFromTexture( equirectangular );
 
@@ -285,7 +285,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
+			warn( 'PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
 
 			this._setSizeFromTexture( cubemap );
 
