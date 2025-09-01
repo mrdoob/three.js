@@ -31,7 +31,7 @@
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
 			const params = {
-				'hdri': 'ballroom',
+				'image': 'ballroom',
 				'fov': 40,
 				'exposure': 1.0,
 				'backgroundBlurriness': 0.0
@@ -132,7 +132,7 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'hdri', {
+				gui.add( params, 'image', {
 					'ballroom': 'https://cdn.needle.tools/static/hdris/ballroom_2k.pmrem.ktx2',
 					'brown photostudio': 'https://cdn.needle.tools/static/hdris/brown_photostudio_02_2k.pmrem.ktx2',
 					'cape hill': 'https://cdn.needle.tools/static/hdris/cape_hill_2k.pmrem.ktx2',
@@ -143,7 +143,7 @@
 					'wide street 01': 'https://cdn.needle.tools/static/hdris/wide_street_01_2k.pmrem.ktx2'
 				} ).onChange( () => {
 
-					loadTexture( params.hdri );
+					loadTexture( params.image );
 
 				} );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
