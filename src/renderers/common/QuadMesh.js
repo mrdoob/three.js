@@ -33,6 +33,9 @@ class QuadGeometry extends BufferGeometry {
 
 }
 
+const _geometry = /*@__PURE__*/ new QuadGeometry();
+
+
 /**
  * This module is a helper for passes which need to render a full
  * screen effect which is quite common in context of post processing.
@@ -53,7 +56,7 @@ class QuadMesh extends Mesh {
 	 */
 	constructor( material = null ) {
 
-		super( new QuadGeometry(), material );
+		super( _geometry, material );
 
 		/**
 		 * The camera to render the quad mesh with.
