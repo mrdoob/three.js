@@ -19,8 +19,9 @@ class BitcastNode extends TempNode {
 	 *
 	 * @param {Node} valueNode - The value to convert.
 	 * @param {string} conversionType - The type to convert to.
+	 * @param {?string} [inputType = null] - The expected input data type of the bitcast operation.
 	 */
-	constructor( valueNode, conversionType ) {
+	constructor( valueNode, conversionType, inputType = null ) {
 
 		super();
 
@@ -35,9 +36,18 @@ class BitcastNode extends TempNode {
 		 * The type the value will be converted to.
 		 *
 		 * @type {string}
-		 * @default null
 		 */
 		this.conversionType = conversionType;
+
+
+		/**
+		 * The expected input data type of the bitcast operation.
+		 *
+		 *
+		 * @type {string}
+		 * @default null
+		 */
+		this.inputType = inputType;
 
 		/**
 		 * This flag can be used for type testing.
@@ -50,12 +60,17 @@ class BitcastNode extends TempNode {
 
 	}
 
-	/**
-	 * The node's type is defined by the conversion type.
-	 *
-	 * @return {string} The node type.
-	 */
-	getNodeType() {
+	getNodeType( builder ) {
+
+		// GLSL aliasing
+		if ( this.inputType !== null ) {
+
+			const valueType = this.valueNode.getNodeType( builder );
+			const valueLength = builder.getTypeLength( valueType );
+
+			return builder.getTypeFromLength( valueLength, this.conversionType );
+
+		}
 
 		return this.conversionType;
 
@@ -65,9 +80,22 @@ class BitcastNode extends TempNode {
 	generate( builder ) {
 
 		const type = this.getNodeType( builder );
-		const inputType = this.valueNode.getNodeType( builder );
+		let inputType = '';
 
-		return `${builder.getBitcastMethod( type, inputType )}( ${ this.valueNode.build( builder, inputType ) } )`;
+		if ( this.inputType !== null ) {
+
+			const valueType = this.valueNode.getNodeType( builder );
+			const valueTypeLength = builder.getTypeLength( valueType );
+
+			inputType = valueTypeLength === 1 ? this.inputType : builder.changeComponentType( valueType, this.inputType );
+
+		} else {
+
+			inputType = this.valueNode.getNodeType( builder );
+
+		}
+
+		return `${ builder.getBitcastMethod( type, inputType ) }( ${ this.valueNode.build( builder, inputType ) } )`;
 
 
 	}
@@ -86,3 +114,43 @@ export default BitcastNode;
  * @returns {Node}
  */
 export const bitcast = /*@__PURE__*/ nodeProxyIntent( BitcastNode ).setParameterLength( 2 );
+
+/**
+ * Bitcasts a float or a vector of floats to a corresponding integer type with the same element size.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} value - The float or vector of floats to bitcast.
+ * @returns {BitcastNode}
+ */
+export const floatBitsToInt = ( value ) => new BitcastNode( value, 'int', 'float' );
+
+/**
+ * Bitcasts a float or a vector of floats to a corresponding unsigned integer type with the same element size.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} value - The float or vector of floats to bitcast.
+ * @returns {BitcastNode}
+ */
+export const floatBitsToUint = ( value ) => new BitcastNode( value, 'uint', 'float' );
+
+/**
+ * Bitcasts an integer or a vector of integers to a corresponding float type with the same element size.
+ *
+ * @tsl
+ * @function
+ * @param {Node<int>} value - The integer or vector of integers to bitcast.
+ * @returns {BitcastNode}
+ */
+export const intBitsToFloat = ( value ) => new BitcastNode( value, 'float', 'int' );
+
+/**
+ * Bitcast an unsigned integer or a vector of unsigned integers to a corresponding float type with the same element size.
+ *
+ * @tsl
+ * @function
+ * @param {Node<uint>} value - The unsigned integer or vector of unsigned integers to bitcast.
+ * @returns {BitcastNode}
+ */
+export const uintBitsToFloat = ( value ) => new BitcastNode( value, 'float', 'uint' );
