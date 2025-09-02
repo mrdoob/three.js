@@ -2911,34 +2911,34 @@ class Renderer {
 
 					overrideColorNode = overrideMaterial.colorNode;
 
-					let colorRGB;
-					let colorA;
+					let shadowRGB;
+					let shadowAlpha;
 
 					if ( hasCastShadowNode ) {
 
-						colorRGB = material.castShadowNode.rgb;
-						colorA = material.castShadowNode.a;
+						shadowRGB = material.castShadowNode.rgb;
+						shadowAlpha = material.castShadowNode.a;
 
 					} else {
 
-						colorRGB = vec3( 0 );
-						colorA = float( 1 );
+						shadowRGB = vec3( 0 );
+						shadowAlpha = float( 1 );
 
 					}
 
 					if ( hasMap ) {
 
-						colorA = colorA.mul( reference( 'map', 'texture', material ).a );
+						shadowAlpha = shadowAlpha.mul( reference( 'map', 'texture', material ).a );
 
 					}
 
 					if ( hasColorNode ) {
 
-						colorA = colorA.mul( material.colorNode.a );
+						shadowAlpha = shadowAlpha.mul( material.colorNode.a );
 
 					}
 
-					overrideMaterial.colorNode = vec4( colorRGB, colorA );
+					overrideMaterial.colorNode = vec4( shadowRGB, shadowAlpha );
 
 				}
 
