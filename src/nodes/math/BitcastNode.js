@@ -115,7 +115,42 @@ export default BitcastNode;
  */
 export const bitcast = /*@__PURE__*/ nodeProxyIntent( BitcastNode ).setParameterLength( 2 );
 
+/**
+ * Bitcasts a float or a vector of floats to a corresponding integer type with the same element size.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} value - The float or vector of floats to bitcast.
+ * @returns {BitcastNode}
+ */
 export const floatBitsToInt = ( value ) => new BitcastNode( value, 'int', 'float' );
+
+/**
+ * Bitcasts a float or a vector of floats to a corresponding unsigned integer type with the same element size.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} value - The float or vector of floats to bitcast.
+ * @returns {BitcastNode}
+ */
 export const floatBitsToUint = ( value ) => new BitcastNode( value, 'uint', 'float' );
+
+/**
+ * Bitcasts an integer or a vector of integers to a corresponding float type with the same element size.
+ *
+ * @tsl
+ * @function
+ * @param {Node<int>} value - The integer or vector of integers to bitcast.
+ * @returns {BitcastNode}
+ */
 export const intBitsToFloat = ( value ) => new BitcastNode( value, 'float', 'int' );
+
+/**
+ * Bitcast an unsigned integer or a vector of unsigned integers to a corresponding float type with the same element size.
+ *
+ * @tsl
+ * @function
+ * @param {Node<uint>} value - The unsigned integer or vector of unsigned integers to bitcast.
+ * @returns {BitcastNode}
+ */
 export const uintBitsToFloat = ( value ) => new BitcastNode( value, 'float', 'uint' );
