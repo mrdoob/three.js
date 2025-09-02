@@ -101,6 +101,12 @@ class ProgressiveLightMap {
 
 			}
 
+			if ( !object.material.flatShading && !object.geometry.hasAttribute( 'normal' ) ) {
+
+				console.warn( 'THREE.ProgressiveLightMap: All lightmap objects need vertex normals or flatShading.' ); continue;
+
+			}
+
 			if ( this._blurringPlane === null ) {
 
 				this._initializeBlurPlane();
@@ -198,6 +204,10 @@ class ProgressiveLightMap {
 
 		// Set each object's material to the UV Unwrapped Surface Mapping Version
 		for ( let l = 0; l < this._lightMapContainers.length; l ++ ) {
+
+			// Ensure the object has correct flatShading
+			const flatShading = this._lightMapContainers[ l ].basicMat.flatShading;
+			this._uvMat.flatShading = flatShading;
 
 			this._averagingWindow.value = blendWindow;
 			this._lightMapContainers[ l ].object.material = this._uvMat;
