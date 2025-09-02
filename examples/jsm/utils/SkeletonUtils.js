@@ -447,7 +447,10 @@ function getBones( skeleton ) {
 
 function getHelperFromSkeleton( skeleton ) {
 
-	return new SkeletonHelper( skeleton.bones[ 0 ] );
+	const source = new SkeletonHelper( skeleton.bones[ 0 ] );
+	source.skeleton = skeleton;
+
+	return source;
 
 }
 
