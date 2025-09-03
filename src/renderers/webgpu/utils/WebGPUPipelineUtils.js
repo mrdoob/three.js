@@ -690,8 +690,8 @@ class WebGPUPipelineUtils {
 		if ( object.isMesh && object.matrixWorld.determinant() < 0 ) flipSided = ! flipSided;
 
 		descriptor.frontFace = ( flipSided === true ) ? GPUFrontFace.CW : GPUFrontFace.CCW;
-    
-    //
+
+		//
 
 		descriptor.cullMode = ( material.side === DoubleSide ) ? GPUCullMode.None : GPUCullMode.Back;
 
