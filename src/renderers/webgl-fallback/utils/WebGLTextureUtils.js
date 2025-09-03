@@ -774,7 +774,7 @@ class WebGLTextureUtils {
 			width = Math.floor( image.width * levelScale );
 			height = Math.floor( image.height * levelScale );
 
-			if ( srcTexture.isDataArrayTexture ) {
+			if ( srcTexture.isDataArrayTexture || srcTexture.isArrayTexture ) {
 
 				depth = image.depth;
 
