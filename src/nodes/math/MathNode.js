@@ -423,6 +423,14 @@ export const PI = /*@__PURE__*/ float( Math.PI );
 export const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
 
 /**
+ * Represents PI / 2.
+ *
+ * @tsl
+ * @type {Node<float>}
+ */
+export const PI_HALF = /*@__PURE__*/ float( Math.PI * 0.5 );
+
+/**
  * Returns `true` if all components of `x` are `true`.
  *
  * @tsl

@@ -24,6 +24,7 @@ export const PCFShadowFilter = TSL.PCFShadowFilter;
 export const PCFSoftShadowFilter = TSL.PCFSoftShadowFilter;
 export const PI = TSL.PI;
 export const PI2 = TSL.PI2;
+export const PI_HALF = TSL.PI_HALF;
 export const PointShadowFilter = TSL.PointShadowFilter;
 export const Return = TSL.Return;
 export const Schlick_to_F0 = TSL.Schlick_to_F0;
