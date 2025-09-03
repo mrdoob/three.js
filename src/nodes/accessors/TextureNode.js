@@ -423,11 +423,7 @@ class TextureNode extends UniformNode {
 
 		let snippet;
 
-		if ( levelSnippet ) {
-
-			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
-
-		} else if ( biasSnippet ) {
+		if ( biasSnippet ) {
 
 			snippet = builder.generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, offsetSnippet );
 
@@ -441,7 +437,11 @@ class TextureNode extends UniformNode {
 
 		} else if ( this.sampler === false ) {
 
-			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet );
+			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
+
+		} else if ( levelSnippet ) {
+
+			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
 
 		} else {
 

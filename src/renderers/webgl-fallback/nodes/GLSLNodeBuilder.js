@@ -367,7 +367,7 @@ ${ flowData.code }
 			const channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
 			const uvSnippet = `ivec2(${indexSnippet} % ${ propertySizeName }, ${indexSnippet} / ${ propertySizeName })`;
 
-			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, null, '0' );
+			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, '0', null, null );
 
 			//
 
@@ -400,12 +400,14 @@ ${ flowData.code }
 	 * @param {?Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} levelSnippet - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {string} [levelSnippet='0u'] - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( levelSnippet === null ) levelSnippet = '0';
 
 		let snippet;
 

@@ -123,7 +123,7 @@ class CubeTextureNode extends TextureNode {
 	 */
 	generateUV( builder, cubeUV ) {
 
-		return cubeUV.build( builder, 'vec3' );
+		return cubeUV.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
 
 	}
 
