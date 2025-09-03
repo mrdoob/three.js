@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { atan, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform, step } from 'three/tsl';
+			import { atan, cos, float, max, min, mix, PI, TWO_PI, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform, step } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -142,7 +142,7 @@
 					const life = particlePositions.toAttribute().w;
 					const modLife = pcurve( life.oneMinus(), 8.0, 1.0 );
 					const pulse = pcurve(
-						sin( hash( instanceIndex ).mul( PI2 ).add( time.mul( 0.5 ).mul( PI2 ) ) ).mul( 0.5 ).add( 0.5 ),
+						sin( hash( instanceIndex ).mul( TWO_PI ).add( time.mul( 0.5 ).mul( TWO_PI ) ) ).mul( 0.5 ).add( 0.5 ),
 						0.25,
 						0.25
 					).mul( 10.0 ).add( 1.0 );
@@ -318,7 +318,7 @@
 
 					// random spherical direction
 					const rRange = float( 0.01 );
-					const rTheta = hash( particleIndex ).mul( PI2 );
+					const rTheta = hash( particleIndex ).mul( TWO_PI );
 					const rPhi = hash( particleIndex.add( 1 ) ).mul( PI );
 					const rx = sin( rTheta ).mul( cos( rPhi ) );
 					const ry = sin( rTheta ).mul( sin( rPhi ) );

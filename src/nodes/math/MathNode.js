@@ -415,12 +415,21 @@ export const INFINITY = /*@__PURE__*/ float( 1e6 );
 export const PI = /*@__PURE__*/ float( Math.PI );
 
 /**
+ * Represents PI * 2. Please use the non-deprecated version `TWO_PI`.
+ *
+ * @tsl
+ * @deprecated
+ * @type {Node<float>}
+ */
+export const PI2 = /*@__PURE__*/ float( Math.PI * 2 ); // @deprecated r181
+
+/**
  * Represents PI * 2.
  *
  * @tsl
  * @type {Node<float>}
  */
-export const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
+export const TWO_PI = /*@__PURE__*/ float( Math.PI * 2 );
 
 /**
  * Represents PI / 2.
@@ -428,7 +437,7 @@ export const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
  * @tsl
  * @type {Node<float>}
  */
-export const PI_HALF = /*@__PURE__*/ float( Math.PI * 0.5 );
+export const HALF_PI = /*@__PURE__*/ float( Math.PI * 0.5 );
 
 /**
  * Returns `true` if all components of `x` are `true`.
