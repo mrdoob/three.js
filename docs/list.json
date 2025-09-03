@@ -1045,7 +1045,8 @@
 
 			"线段": {
 				"Line2": "examples/zh/lines/Line2",
-				"LineGeometry": "examples/en/lines/LineGeometry"
+				"LineGeometry": "examples/en/lines/LineGeometry",
+				"LineMaterial": "examples/en/lines/LineMaterial"
 			},
 
 			"加载器": {
