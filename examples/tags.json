@@ -61,7 +61,7 @@
 	"webgl_materials_channels": [ "normal", "depth", "rgba packing" ],
 	"webgl_materials_cubemap_mipmaps": [ "envmap" ],
 	"webgl_materials_cubemap_render_to_mipmaps": [ "envmap", "renderTarget", "mipmap" ],
-	"webgl_materials_envmaps_fasthdr": [ "external", "envmap", "hdr", "fast", "ktx2", "basis" ],
+	"webgl_materials_envmaps_fasthdr": [ "envmap", "hdr", "fast", "ktx2", "basis" ],
 	"webgl_materials_physical_clearcoat": [ "anisotropy" ],
 	"webgl_materials_physical_transmission": [ "alpha" ],
 	"webgl_materials_texture_canvas": [ "paint" ],
