@@ -470,6 +470,7 @@ export const saturate = TSL.saturate;
 export const saturation = TSL.saturation;
 export const screen = TSL.screen;
 export const screenCoordinate = TSL.screenCoordinate;
+export const screenDPR = TSL.screenDPR;
 export const screenSize = TSL.screenSize;
 export const screenUV = TSL.screenUV;
 export const scriptable = TSL.scriptable;
