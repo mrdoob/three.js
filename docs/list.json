@@ -1043,6 +1043,12 @@
 				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
 			},
 
+			"线段": {
+				"Line2": "examples/zh/lines/Line2",
+				"LineGeometry": "examples/en/lines/LineGeometry",
+				"LineMaterial": "examples/en/lines/LineMaterial"
+			},
+
 			"加载器": {
 				"3DMLoader": "examples/zh/loaders/3DMLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",

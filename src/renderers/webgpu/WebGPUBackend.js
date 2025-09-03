@@ -1806,6 +1806,11 @@ class WebGPUBackend extends Backend {
 		const utils = this.utils;
 		const renderContext = renderObject.context;
 
+		// meshes with negative scale have a different frontFace render pipeline
+		// descriptor value so the following must be honored in the cache key
+
+		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
 		return [
 			material.transparent, material.blending, material.premultipliedAlpha,
 			material.blendSrc, material.blendDst, material.blendEquation,
@@ -1816,6 +1821,7 @@ class WebGPUBackend extends Backend {
 			material.stencilFail, material.stencilZFail, material.stencilZPass,
 			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
+			frontFaceCW,
 			utils.getSampleCountRenderContext( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ),

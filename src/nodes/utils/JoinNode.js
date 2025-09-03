@@ -96,7 +96,9 @@ class JoinNode extends TempNode {
 
 			if ( inputPrimitiveType !== primitiveType ) {
 
-				inputSnippet = builder.format( inputSnippet, inputPrimitiveType, primitiveType );
+				const targetType = builder.getTypeFromLength( inputTypeLength, primitiveType );
+
+				inputSnippet = builder.format( inputSnippet, inputType, targetType );
 
 			}
 
