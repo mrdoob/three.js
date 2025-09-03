@@ -1281,6 +1281,30 @@ export const LinearTransfer = 'linear';
 export const SRGBTransfer = 'srgb';
 
 /**
+ * No normal map packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NoNormalPacking = '';
+
+/**
+ * Normal RG packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NormalRGPacking = 'rg';
+
+/**
+ * Normal GA packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NormalGAPacking = 'ga';
+
+/**
  * Sets the stencil buffer value to `0`.
  *
  * @type {number}

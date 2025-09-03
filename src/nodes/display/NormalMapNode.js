@@ -4,8 +4,9 @@ import { normalView, transformNormalToView } from '../accessors/Normal.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
-import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../../constants.js';
+import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
 import { directionToFaceDirection } from './FrontFacingNode.js';
+import { unpackRGNormal, unpackGANormal } from '../utils/Packing.js';
 
 /**
  * This class can be used for applying normals maps to materials.
@@ -57,13 +58,47 @@ class NormalMapNode extends TempNode {
 		 */
 		this.normalMapType = TangentSpaceNormalMap;
 
+		/**
+		 * Controls how to unpack the sampled normal map values.
+		 *
+		 * @type {string}
+		 * @default NoNormalPacking
+		 */
+		this.unpackNormal = NoNormalPacking;
+
 	}
 
 	setup( { material } ) {
 
-		const { normalMapType, scaleNode } = this;
+		const { normalMapType, scaleNode, unpackNormal } = this;
 
 		let normalMap = this.node.mul( 2.0 ).sub( 1.0 );
+
+		if ( normalMapType === TangentSpaceNormalMap ) {
+
+			if ( unpackNormal == NormalRGPacking ) {
+
+				normalMap = unpackRGNormal( normalMap );
+
+			} else if ( unpackNormal == NormalGAPacking ) {
+
+				normalMap = unpackGANormal( normalMap );
+
+			} else if ( unpackNormal != NoNormalPacking ) {
+
+				console.error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormal }` );
+
+			}
+
+		} else {
+
+			if ( unpackNormal != NoNormalPacking ) {
+
+				console.error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormal }'` );
+
+			}
+
+		}
 
 		if ( scaleNode !== null ) {
 

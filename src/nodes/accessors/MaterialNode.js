@@ -235,6 +235,12 @@ class MaterialNode extends Node {
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
 				node.normalMapType = material.normalMapType;
 
+				if ( material.normalMap.userData && material.normalMap.userData.unpackNormal ) {
+
+					node.unpackNormal = material.normalMap.userData.unpackNormal;
+
+				}
+
 			} else if ( material.bumpMap ) {
 
 				node = bumpMap( this.getTexture( 'bump' ).r, this.getFloat( 'bumpScale' ) );
