@@ -31,7 +31,7 @@
 
 			class CustomLightingModel extends THREE.LightingModel {
 
-				direct( { lightColor, reflectedLight }, stack ) {
+				direct( { lightColor, reflectedLight }/*, builder */ ) {
 
 					reflectedLight.directDiffuse.addAssign( lightColor );
 
@@ -85,7 +85,7 @@
 
 				const points = [];
 
-				for ( let i = 0; i < 500_000; i ++ ) {
+				for ( let i = 0; i < 500000; i ++ ) {
 
 					const point = new THREE.Vector3().random().subScalar( 0.5 ).multiplyScalar( 3 );
 					points.push( point );

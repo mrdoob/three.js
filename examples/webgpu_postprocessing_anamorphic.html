@@ -31,7 +31,7 @@
 			import { pass, cubeTexture, screenUV, grayscale, uniform } from 'three/tsl';
 			import { anamorphic } from 'three/addons/tsl/display/AnamorphicNode.js';
 
-			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
+			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -40,6 +40,10 @@
 
 			let camera, scene, renderer;
 			let postProcessing;
+
+			const params = {
+				resolutionScale: 0.2
+			};
 
 			init();
 
@@ -53,11 +57,10 @@
 
 				scene = new THREE.Scene();
 
-				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				const cube1Texture = await new RGBMLoader()
-					.setMaxRange( 16 )
-					.setPath( './textures/cube/pisaRGBM16/' )
-					.loadCubemapAsync( rgbmUrls );
+				const hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				const cube1Texture = await new HDRCubeTextureLoader()
+					.setPath( './textures/cube/pisaHDR/' )
+					.loadAsync( hdrUrls );
 
 				scene.environment = cube1Texture;
 				scene.backgroundNode = grayscale( cubeTexture( cube1Texture ).mul( screenUV.distance( .5 ).oneMinus().remapClamp( .1, 4 ) ) );
@@ -92,7 +95,7 @@
 				const samples = 64;
 
 				const anamorphicPass = anamorphic( scenePass.getTextureNode(), threshold, scaleNode, samples );
-				anamorphicPass.resolution = new THREE.Vector2( .2, .2 ); // 1 = full resolution
+				anamorphicPass.resolutionScale = params.resolutionScale; // 1 = full resolution
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = scenePass.add( anamorphicPass.mul( intensity ) );
@@ -104,7 +107,7 @@
 				gui.add( intensity, 'value', 0, 4, 0.1 ).name( 'intensity' );
 				gui.add( threshold, 'value', .8, 3, .001 ).name( 'threshold' );
 				gui.add( scaleNode, 'value', 1, 10, 0.1 ).name( 'scale' );
-				gui.add( anamorphicPass.resolution, 'x', .1, 1, 0.1 ).name( 'resolution' ).onChange( ( v ) => anamorphicPass.resolution.y = v );
+				gui.add( params, 'resolutionScale', .1, 1, 0.1 ).name( 'resolution scale' ).onChange( value => anamorphicPass.resolutionScale = value );
 
 				//
 

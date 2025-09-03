@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr; [page:LineSegments2] &rarr;
+
+		<h1>线段（[name]）</h1>
+
+		<p class="desc">
+			在顶点之间绘制的多段线。
+		</p>
+
+		<p class="desc">
+			相比 [page:Line]，该类提供了更多功能，如任意线宽设置以及支持使用世界单位定义线宽。
+			它继承自 [page:LineSegments2]，简化了从点链构建线段的过程。
+		</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			查看[link:#manual/introduction/Installation Installation / Addons]。
+		</p>
+
+		<code>
+			import { Line2 } from 'three/addons/lines/Line2.js';
+		</code>
+
+		<h2>示例</h2>
+
+		<p>
+			[example:webgl_lines_fat WebGL / lines / fat ]<br />
+			[example:webgl_lines_fat_raycasting WebGL / lines / fat / raycasting ]<br />
+			[example:webgpu_lines_fat WebGPU / lines / fat / raycasting ]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LineGeometry geometry], [param:LineMaterial material] )</h3>
+		<p>
+			[page:LineGeometry geometry] — （可选）表示每个线段的顶点对。<br />
+			[page:Material material] — （可选）线段的材质。默认为具有随机颜色的 [page:LineMaterial]。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性，请参见基类 [page:LineSegments2]。</p>
+
+		<h3>[property:Boolean isLine2]</h3>
+		<p>只读标志，用于检查给定对象是否为 [name] 类型。</p>
+
+		<h2>方法</h2>
+		<p>共有方法，请参见基类 [page:LineSegments2]。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/lines/Line2.js examples/jsm/lines/Line2.js]
+		</p>
+	</body>
+</html>

@@ -68,7 +68,7 @@
 					sin( angle )
 				).mul( radius );
 
-				const randomOffset = range( vec3( - 1 ), vec3( 1 ) ).pow( 3 ).mul( radiusRatio ).add( 0.2 );
+				const randomOffset = range( vec3( - 1 ), vec3( 1 ) ).pow3().mul( radiusRatio ).add( 0.2 );
 
 				material.positionNode = position.add( randomOffset );
 

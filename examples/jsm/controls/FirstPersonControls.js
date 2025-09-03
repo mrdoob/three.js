@@ -194,8 +194,8 @@ class FirstPersonControls extends Controls {
 		window.removeEventListener( 'keydown', this._onKeyDown );
 		window.removeEventListener( 'keyup', this._onKeyUp );
 
-		this.domElement.removeEventListener( 'pointerdown', this._onPointerMove );
-		this.domElement.removeEventListener( 'pointermove', this._onPointerDown );
+		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
+		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
 

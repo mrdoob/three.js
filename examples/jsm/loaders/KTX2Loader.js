@@ -9,6 +9,8 @@ import {
 	HalfFloatType,
 	LinearFilter,
 	LinearMipmapLinearFilter,
+	NearestFilter,
+	NearestMipmapNearestFilter,
 	LinearSRGBColorSpace,
 	Loader,
 	NoColorSpace,
@@ -19,6 +21,7 @@ import {
 	RGBA_S3TC_DXT3_Format,
 	RGBA_ETC2_EAC_Format,
 	RGBA_PVRTC_4BPPV1_Format,
+	RGBA_PVRTC_2BPPV1_Format,
 	RGBA_S3TC_DXT1_Format,
 	RGBA_S3TC_DXT5_Format,
 	RGB_BPTC_UNSIGNED_Format,
@@ -26,10 +29,17 @@ import {
 	RGB_ETC2_Format,
 	RGB_PVRTC_4BPPV1_Format,
 	RGB_S3TC_DXT1_Format,
+	SIGNED_RED_GREEN_RGTC2_Format,
+	SIGNED_RED_RGTC1_Format,
+	RED_GREEN_RGTC2_Format,
+	RED_RGTC1_Format,
+	RGBFormat,
 	RGFormat,
 	RedFormat,
 	SRGBColorSpace,
-	UnsignedByteType
+	UnsignedByteType,
+	UnsignedInt5999Type,
+	UnsignedInt101111Type
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
@@ -42,6 +52,7 @@ import {
 	KHR_SUPERCOMPRESSION_NONE,
 	KHR_SUPERCOMPRESSION_ZSTD,
 	VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT,
+	VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT,
 	VK_FORMAT_ASTC_4x4_SRGB_BLOCK,
 	VK_FORMAT_ASTC_4x4_UNORM_BLOCK,
 	VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
@@ -52,12 +63,18 @@ import {
 	VK_FORMAT_BC1_RGB_UNORM_BLOCK,
 	VK_FORMAT_BC3_SRGB_BLOCK,
 	VK_FORMAT_BC3_UNORM_BLOCK,
+	VK_FORMAT_BC4_SNORM_BLOCK,
+	VK_FORMAT_BC4_UNORM_BLOCK,
 	VK_FORMAT_BC5_SNORM_BLOCK,
 	VK_FORMAT_BC5_UNORM_BLOCK,
 	VK_FORMAT_BC7_SRGB_BLOCK,
 	VK_FORMAT_BC7_UNORM_BLOCK,
 	VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK,
 	VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK,
+	VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG,
+	VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG,
+	VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG,
+	VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG,
 	VK_FORMAT_R16G16B16A16_SFLOAT,
 	VK_FORMAT_R16G16_SFLOAT,
 	VK_FORMAT_R16_SFLOAT,
@@ -70,6 +87,8 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8_SRGB,
 	VK_FORMAT_R8_UNORM,
+	VK_FORMAT_E5B9G9R9_UFLOAT_PACK32,
+	VK_FORMAT_B10G11R11_UFLOAT_PACK32,
 	VK_FORMAT_UNDEFINED
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
@@ -183,10 +202,10 @@ class KTX2Loader extends Loader {
 		this.workerConfig = {
 			astcSupported: await renderer.hasFeatureAsync( 'texture-compression-astc' ),
 			astcHDRSupported: false, // https://github.com/gpuweb/gpuweb/issues/3856
-			etc1Supported: await renderer.hasFeatureAsync( 'texture-compression-etc1' ),
+			etc1Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
 			etc2Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
 			dxtSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
-			bptcSupported: await renderer.hasFeatureAsync( 'texture-compression-bptc' ),
+			bptcSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
 			pvrtcSupported: await renderer.hasFeatureAsync( 'texture-compression-pvrtc' )
 		};
 
@@ -208,10 +227,10 @@ class KTX2Loader extends Loader {
 			this.workerConfig = {
 				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
 				astcHDRSupported: false, // https://github.com/gpuweb/gpuweb/issues/3856
-				etc1Supported: renderer.hasFeature( 'texture-compression-etc1' ),
+				etc1Supported: renderer.hasFeature( 'texture-compression-etc2' ),
 				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
 				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
-				bptcSupported: renderer.hasFeature( 'texture-compression-bptc' ),
+				bptcSupported: renderer.hasFeature( 'texture-compression-bc' ),
 				pvrtcSupported: renderer.hasFeature( 'texture-compression-pvrtc' )
 			};
 
@@ -918,73 +937,113 @@ KTX2Loader.BasisWorker = function () {
 // Parsing for non-Basis textures. These textures may have supercompression
 // like Zstd, but they do not require transcoding.
 
-const UNCOMPRESSED_FORMATS = new Set( [ RGBAFormat, RGFormat, RedFormat ] );
+const UNCOMPRESSED_FORMATS = new Set( [ RGBAFormat, RGBFormat, RGFormat, RedFormat ] );
 
 const FORMAT_MAP = {
 
 	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: RGBAFormat,
-	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: RGBAFormat,
-	[ VK_FORMAT_R8G8B8A8_UNORM ]: RGBAFormat,
-	[ VK_FORMAT_R8G8B8A8_SRGB ]: RGBAFormat,
-
 	[ VK_FORMAT_R32G32_SFLOAT ]: RGFormat,
-	[ VK_FORMAT_R16G16_SFLOAT ]: RGFormat,
-	[ VK_FORMAT_R8G8_UNORM ]: RGFormat,
-	[ VK_FORMAT_R8G8_SRGB ]: RGFormat,
-
 	[ VK_FORMAT_R32_SFLOAT ]: RedFormat,
+
+	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: RGBAFormat,
+	[ VK_FORMAT_R16G16_SFLOAT ]: RGFormat,
 	[ VK_FORMAT_R16_SFLOAT ]: RedFormat,
+
+	[ VK_FORMAT_R8G8B8A8_SRGB ]: RGBAFormat,
+	[ VK_FORMAT_R8G8B8A8_UNORM ]: RGBAFormat,
+	[ VK_FORMAT_R8G8_SRGB ]: RGFormat,
+	[ VK_FORMAT_R8G8_UNORM ]: RGFormat,
 	[ VK_FORMAT_R8_SRGB ]: RedFormat,
 	[ VK_FORMAT_R8_UNORM ]: RedFormat,
 
-	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: RGB_ETC2_Format,
+	[ VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 ]: RGBFormat,
+	[ VK_FORMAT_B10G11R11_UFLOAT_PACK32 ]: RGBFormat,
+
 	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: RGBA_ETC2_EAC_Format,
+	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: RGB_ETC2_Format,
 
 	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: RGBA_ASTC_4x4_Format,
 	[ VK_FORMAT_ASTC_4x4_SRGB_BLOCK ]: RGBA_ASTC_4x4_Format,
 	[ VK_FORMAT_ASTC_4x4_UNORM_BLOCK ]: RGBA_ASTC_4x4_Format,
+	[ VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT ]: RGBA_ASTC_6x6_Format,
 	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: RGBA_ASTC_6x6_Format,
 	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: RGBA_ASTC_6x6_Format,
 
-	[ VK_FORMAT_BC1_RGBA_UNORM_BLOCK ]: RGBA_S3TC_DXT1_Format,
 	[ VK_FORMAT_BC1_RGBA_SRGB_BLOCK ]: RGBA_S3TC_DXT1_Format,
-	[ VK_FORMAT_BC1_RGB_UNORM_BLOCK ]: RGB_S3TC_DXT1_Format,
+	[ VK_FORMAT_BC1_RGBA_UNORM_BLOCK ]: RGBA_S3TC_DXT1_Format,
 	[ VK_FORMAT_BC1_RGB_SRGB_BLOCK ]: RGB_S3TC_DXT1_Format,
+	[ VK_FORMAT_BC1_RGB_UNORM_BLOCK ]: RGB_S3TC_DXT1_Format,
 
 	[ VK_FORMAT_BC3_SRGB_BLOCK ]: RGBA_S3TC_DXT3_Format,
 	[ VK_FORMAT_BC3_UNORM_BLOCK ]: RGBA_S3TC_DXT3_Format,
 
-	[ VK_FORMAT_BC5_SNORM_BLOCK ]: RGBA_S3TC_DXT5_Format,
-	[ VK_FORMAT_BC5_UNORM_BLOCK ]: RGBA_S3TC_DXT5_Format,
+	[ VK_FORMAT_BC4_SNORM_BLOCK ]: SIGNED_RED_RGTC1_Format,
+	[ VK_FORMAT_BC4_UNORM_BLOCK ]: RED_RGTC1_Format,
+
+	[ VK_FORMAT_BC5_SNORM_BLOCK ]: SIGNED_RED_GREEN_RGTC2_Format,
+	[ VK_FORMAT_BC5_UNORM_BLOCK ]: RED_GREEN_RGTC2_Format,
 
 	[ VK_FORMAT_BC7_SRGB_BLOCK ]: RGBA_BPTC_Format,
 	[ VK_FORMAT_BC7_UNORM_BLOCK ]: RGBA_BPTC_Format,
+
+	[ VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG ]: RGBA_PVRTC_4BPPV1_Format,
+	[ VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG ]: RGBA_PVRTC_4BPPV1_Format,
+	[ VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG ]: RGBA_PVRTC_2BPPV1_Format,
+	[ VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG ]: RGBA_PVRTC_2BPPV1_Format,
 
 };
 
 const TYPE_MAP = {
 
 	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: FloatType,
-	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: HalfFloatType,
-	[ VK_FORMAT_R8G8B8A8_UNORM ]: UnsignedByteType,
-	[ VK_FORMAT_R8G8B8A8_SRGB ]: UnsignedByteType,
-
 	[ VK_FORMAT_R32G32_SFLOAT ]: FloatType,
-	[ VK_FORMAT_R16G16_SFLOAT ]: HalfFloatType,
-	[ VK_FORMAT_R8G8_UNORM ]: UnsignedByteType,
-	[ VK_FORMAT_R8G8_SRGB ]: UnsignedByteType,
-
 	[ VK_FORMAT_R32_SFLOAT ]: FloatType,
+
+	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: HalfFloatType,
+	[ VK_FORMAT_R16G16_SFLOAT ]: HalfFloatType,
 	[ VK_FORMAT_R16_SFLOAT ]: HalfFloatType,
+
+	[ VK_FORMAT_R8G8B8A8_SRGB ]: UnsignedByteType,
+	[ VK_FORMAT_R8G8B8A8_UNORM ]: UnsignedByteType,
+	[ VK_FORMAT_R8G8_SRGB ]: UnsignedByteType,
+	[ VK_FORMAT_R8G8_UNORM ]: UnsignedByteType,
 	[ VK_FORMAT_R8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8_UNORM ]: UnsignedByteType,
 
-	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_E5B9G9R9_UFLOAT_PACK32 ]: UnsignedInt5999Type,
+	[ VK_FORMAT_B10G11R11_UFLOAT_PACK32 ]: UnsignedInt101111Type,
+
 	[ VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK ]: UnsignedByteType,
 
 	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: HalfFloatType,
+	[ VK_FORMAT_ASTC_4x4_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_ASTC_4x4_UNORM_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT ]: HalfFloatType,
 	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: UnsignedByteType,
 	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: UnsignedByteType,
+
+	[ VK_FORMAT_BC1_RGBA_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_BC1_RGBA_UNORM_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_BC1_RGB_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_BC1_RGB_UNORM_BLOCK ]: UnsignedByteType,
+
+	[ VK_FORMAT_BC3_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_BC3_UNORM_BLOCK ]: UnsignedByteType,
+
+	[ VK_FORMAT_BC4_SNORM_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_BC4_UNORM_BLOCK ]: UnsignedByteType,
+
+	[ VK_FORMAT_BC5_SNORM_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_BC5_UNORM_BLOCK ]: UnsignedByteType,
+
+	[ VK_FORMAT_BC7_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_BC7_UNORM_BLOCK ]: UnsignedByteType,
+
+	[ VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG ]: UnsignedByteType,
+	[ VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG ]: UnsignedByteType,
+	[ VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG ]: UnsignedByteType,
+	[ VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG ]: UnsignedByteType,
 
 };
 
@@ -994,7 +1053,14 @@ async function createRawTexture( container ) {
 
 	if ( FORMAT_MAP[ vkFormat ] === undefined ) {
 
-		throw new Error( 'THREE.KTX2Loader: Unsupported vkFormat.' );
+		throw new Error( 'THREE.KTX2Loader: Unsupported vkFormat: ' + vkFormat );
+
+	}
+
+	// TODO: Merge the TYPE_MAP warning into the thrown error above, after r190.
+	if ( TYPE_MAP[ vkFormat ] === undefined ) {
+
+		console.warn( 'THREE.KTX2Loader: Missing ".type" for vkFormat: ' + vkFormat );
 
 	}
 
@@ -1023,7 +1089,6 @@ async function createRawTexture( container ) {
 	//
 
 	const mipmaps = [];
-
 
 	for ( let levelIndex = 0; levelIndex < container.levels.length; levelIndex ++ ) {
 
@@ -1071,6 +1136,16 @@ async function createRawTexture( container ) {
 
 			);
 
+		} else if ( TYPE_MAP[ vkFormat ] === UnsignedInt5999Type || TYPE_MAP[ vkFormat ] === UnsignedInt101111Type ) {
+
+			data = new Uint32Array(
+
+				levelData.buffer,
+				levelData.byteOffset,
+				levelData.byteLength / Uint32Array.BYTES_PER_ELEMENT
+
+			);
+
 		} else {
 
 			data = levelData;
@@ -1088,6 +1163,9 @@ async function createRawTexture( container ) {
 
 	}
 
+	// levelCount = 0 implies runtime-generated mipmaps.
+	const useMipmaps = container.levelCount === 0 || mipmaps.length > 1;
+
 	let texture;
 
 	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
@@ -1095,14 +1173,16 @@ async function createRawTexture( container ) {
 		texture = container.pixelDepth === 0
 			? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
 			: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		texture.minFilter = useMipmaps ? NearestMipmapNearestFilter : NearestFilter;
+		texture.magFilter = NearestFilter;
+		texture.generateMipmaps = container.levelCount === 0;
 
 	} else {
 
 		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
 
 		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
-
-		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+		texture.minFilter = useMipmaps ? LinearMipmapLinearFilter : LinearFilter;
 		texture.magFilter = LinearFilter;
 
 	}
