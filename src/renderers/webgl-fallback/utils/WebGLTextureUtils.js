@@ -48,6 +48,24 @@ class WebGLTextureUtils {
 		 */
 		this.defaultTextures = {};
 
+		/**
+		 * A scratch framebuffer used for attaching the source texture in
+		 * {@link copyTextureToTexture}.
+		 *
+		 * @private
+		 * @type {?WebGLFramebuffer}
+		 */
+		this._srcFramebuffer = null;
+
+		/**
+		 * A scratch framebuffer used for attaching the destination texture in
+		 * {@link copyTextureToTexture}.
+		 *
+		 * @private
+		 * @type {?WebGLFramebuffer}
+		 */
+		this._dstFramebuffer = null;
+
 		if ( initialized === false ) {
 
 			this._init();
@@ -808,7 +826,6 @@ class WebGLTextureUtils {
 
 		}
 
-
 		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
 		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 		gl.pixelStorei( gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
@@ -827,8 +844,10 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
 
 		// set up the src texture
+		const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture || dstTexture.isArrayTexture;
 		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture || dstTexture.isArrayTexture;
-		if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
+
+		if ( srcTexture.isDepthTexture ) {
 
 			const srcTextureData = backend.get( srcTexture );
 			const dstTextureData = backend.get( dstTexture );
@@ -842,12 +861,76 @@ class WebGLTextureUtils {
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffer );
 			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, dstFramebuffer );
 
-			let mask = gl.COLOR_BUFFER_BIT;
+			for ( let i = 0; i < depth; i ++ ) {
 
-			if ( srcTexture.isDepthTexture ) mask = gl.DEPTH_BUFFER_BIT;
+				// if the source or destination are a 3d target then a layer needs to be bound
+				if ( isSrc3D ) {
 
-			gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, mask, gl.NEAREST );
+					gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, srcTextureData.textureGPU, srcLevel, minZ + i );
+					gl.framebufferTextureLayer( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, dstTextureGPU, dstLevel, dstZ + i );
 
+				}
+
+				gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+
+			}
+
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
+
+		} else if ( srcLevel !== 0 || srcTexture.isRenderTargetTexture || backend.has( srcTexture ) ) {
+
+			// get the appropriate frame buffers
+			const srcTextureData = backend.get( srcTexture );
+
+			if ( this._srcFramebuffer === null ) this._srcFramebuffer = gl.createFramebuffer();
+			if ( this._dstFramebuffer === null ) this._dstFramebuffer = gl.createFramebuffer();
+
+			// bind the frame buffer targets
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, this._srcFramebuffer );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, this._dstFramebuffer );
+
+			for ( let i = 0; i < depth; i ++ ) {
+
+				// assign the correct layers and mip maps to the frame buffers
+				if ( isSrc3D ) {
+
+					gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, srcTextureData.textureGPU, srcLevel, minZ + i );
+
+				} else {
+
+					gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, srcTextureData.textureGPU, srcLevel );
+
+				}
+
+				if ( isDst3D ) {
+
+					gl.framebufferTextureLayer( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, dstTextureGPU, dstLevel, dstZ + i );
+
+				} else {
+
+					gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dstTextureGPU, dstLevel );
+
+				}
+
+				// copy the data using the fastest function that can achieve the copy
+				if ( srcLevel !== 0 ) {
+
+					gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+
+				} else if ( isDst3D ) {
+
+					gl.copyTexSubImage3D( glTextureType, dstLevel, dstX, dstY, dstZ + i, minX, minY, width, height );
+
+				} else {
+
+					gl.copyTexSubImage2D( glTextureType, dstLevel, dstX, dstY, minX, minY, width, height );
+
+				}
+
+			}
+
+			// unbind read, draw buffers
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
 			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
 
@@ -875,15 +958,15 @@ class WebGLTextureUtils {
 				// copy data into the 2d texture
 				if ( srcTexture.isDataTexture ) {
 
-					gl.texSubImage2D( glTextureType, dstLevel, dstX, dstY, width, height, glFormat, glType, image.data );
+					gl.texSubImage2D( gl.TEXTURE_2D, dstLevel, dstX, dstY, width, height, glFormat, glType, image.data );
 
 				} else if ( srcTexture.isCompressedTexture ) {
 
-					gl.compressedTexSubImage2D( glTextureType, dstLevel, dstX, dstY, image.width, image.height, glFormat, image.data );
+					gl.compressedTexSubImage2D( gl.TEXTURE_2D, dstLevel, dstX, dstY, image.width, image.height, glFormat, image.data );
 
 				} else {
 
-					gl.texSubImage2D( glTextureType, dstLevel, dstX, dstY, width, height, glFormat, glType, image );
+					gl.texSubImage2D( gl.TEXTURE_2D, dstLevel, dstX, dstY, width, height, glFormat, glType, image );
 
 				}
 
@@ -1181,6 +1264,18 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.RGBA ) return bytesPerComponent * 4;
 		if ( glFormat === gl.RGB ) return bytesPerComponent * 3;
 		if ( glFormat === gl.ALPHA ) return bytesPerComponent;
+
+	}
+
+	/**
+	 * Frees the internal resources.
+	 */
+	dispose() {
+
+		const { gl } = this;
+
+		if ( this._srcFramebuffer !== null ) gl.deleteFramebuffer( this._srcFramebuffer );
+		if ( this._dstFramebuffer !== null ) gl.deleteFramebuffer( this._dstFramebuffer );
 
 	}
 
