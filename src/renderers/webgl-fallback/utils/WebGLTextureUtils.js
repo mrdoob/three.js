@@ -48,6 +48,24 @@ class WebGLTextureUtils {
 		 */
 		this.defaultTextures = {};
 
+		/**
+		 * A scratch framebuffer used for attaching the source texture in
+		 * {@link copyTextureToTexture}.
+		 *
+		 * @private
+		 * @type {?WebGLFramebuffer}
+		 */
+		this._srcFramebuffer = null;
+
+		/**
+		 * A scratch framebuffer used for attaching the destination texture in
+		 * {@link copyTextureToTexture}.
+		 *
+		 * @private
+		 * @type {?WebGLFramebuffer}
+		 */
+		this._dstFramebuffer = null;
+
 		if ( initialized === false ) {
 
 			this._init();
@@ -864,8 +882,8 @@ class WebGLTextureUtils {
 			// get the appropriate frame buffers
 			const srcTextureData = backend.get( srcTexture );
 
-			if ( this._srcFramebuffer === undefined ) this._srcFramebuffer = gl.createFramebuffer();
-			if ( this._dstFramebuffer === undefined ) this._dstFramebuffer = gl.createFramebuffer();
+			if ( this._srcFramebuffer === null ) this._srcFramebuffer = gl.createFramebuffer();
+			if ( this._dstFramebuffer === null ) this._dstFramebuffer = gl.createFramebuffer();
 
 			// bind the frame buffer targets
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, this._srcFramebuffer );
@@ -1245,6 +1263,18 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.RGBA ) return bytesPerComponent * 4;
 		if ( glFormat === gl.RGB ) return bytesPerComponent * 3;
 		if ( glFormat === gl.ALPHA ) return bytesPerComponent;
+
+	}
+
+	/**
+	 * Frees the internal resources.
+	 */
+	dispose() {
+
+		const { gl } = this;
+
+		if ( this._srcFramebuffer !== null ) gl.deleteFramebuffer( this._srcFramebuffer );
+		if ( this._dstFramebuffer !== null ) gl.deleteFramebuffer( this._dstFramebuffer );
 
 	}
 

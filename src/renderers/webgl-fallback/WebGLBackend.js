@@ -2619,6 +2619,8 @@ class WebGLBackend extends Backend {
 	 */
 	dispose() {
 
+		if ( this.textureUtils !== null ) this.textureUtils.dispose();
+
 		const extension = this.extensions.get( 'WEBGL_lose_context' );
 		if ( extension ) extension.loseContext();
 
