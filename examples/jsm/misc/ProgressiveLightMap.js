@@ -123,6 +123,12 @@ class ProgressiveLightMap {
 
 			}
 
+			if ( object.geometry.hasAttribute( 'normal' ) === false ) {
+
+				console.warn( 'THREE.ProgressiveLightMap: All lightmap objects need normals.' ); continue;
+
+			}
+
 			if ( this.blurringPlane === null ) {
 
 				this._initializeBlurPlane( this.res, this.progressiveLightMap1 );
