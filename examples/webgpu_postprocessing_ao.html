@@ -28,8 +28,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity } from 'three/tsl';
+			import { pass, mrt, output, metalness, normalView, roughness, velocity, blendColor, sample, vec2 } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
+			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -42,7 +43,7 @@
 
 			let camera, scene, renderer, postProcessing, controls, stats;
 
-			let aoPass, traaPass, blendPassAO, scenePassColor;
+			let aoPass, ssrPass;
 
 			const params = {
 				distanceExponent: 1,
@@ -50,8 +51,6 @@
 				radius: 0.25,
 				scale: 1,
 				thickness: 1,
-				denoised: false,
-				enabled: true,
 				denoiseRadius: 5,
 				lumaPhi: 5,
 				depthPhi: 5,
@@ -68,9 +67,11 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGPURenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
+				// renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 3.0;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -91,10 +92,7 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0.5, - 1 );
 				controls.update();
-				controls.enablePan = false;
 				controls.enableDamping = true;
-				controls.minDistance = 2;
-				controls.maxDistance = 8;
 
 				//
 
@@ -104,25 +102,40 @@
 				scenePass.setMRT( mrt( {
 					output: output,
 					normal: normalView,
+					metalrough: vec2( metalness, roughness ),
 					velocity: velocity
 				} ) );
 
-				scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' );
+				const scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const scenePassNormal = scenePass.getTextureNode( 'normal' );
+				const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' );
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+
+				const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+				metalRoughTexture.type = THREE.UnsignedByteType;
 
 				// ao
 
 				aoPass = ao( scenePassDepth, scenePassNormal, camera );
-				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
-				blendPassAO = aoPass.getTextureNode().mul( scenePassColor );
+				aoPass.resolutionScale = 0.5;
+			
+				// ssr
 
-				// traa
+				const customMetalness = sample( ( uv ) => {
 
-				traaPass = traa( blendPassAO, scenePassDepth, scenePassVelocity, camera );
+					const metalRough = scenePassMetalRough.sample( uv );
+					return metalRough.r.mul( metalRough.g.add( 0.25 ) );
 
-				postProcessing.outputNode = traaPass;
+				} );
+
+				ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, customMetalness, camera );
+				ssrPass.resolutionScale = 1.0;
+
+				postProcessing.outputNode = traa(
+					blendColor( scenePassColor.mul( aoPass ), ssrPass ),
+					scenePassDepth, scenePassVelocity, camera
+				);
 
 				//
 
@@ -139,18 +152,44 @@
 				model.position.set( 0, 1, 0 );
 				scene.add( model );
 
+				// Fix scene
+
+				const duvet = model.getObjectByName( 'Bedroom_Duvet_0' );
+				duvet.material.metalness = 0;
+
+				const carpet = model.getObjectByName( 'Bedroom_Carpet_0' );
+				carpet.material.metalness = 0;
+
+				const windows = model.getObjectByName( 'Bedroom_Windows_0' );
+				windows.material.emissive = new THREE.Color( 0xffffff );
+				windows.material.emissiveIntensity = 1.0;
+
 				model.traverse( ( o ) => {
 
-					// Transparent objects (e.g. loaded via GLTFLoader) might have "depthWrite" set to "false".
-					// This is wanted when rendering the beauty pass however it produces wrong results when computing
-					// AO since depth and normal data are out of sync. Computing normals from depth by not using MRT
-					// can mitigate the issue although the depth information (and thus the normals) are not correct in
-					// first place. Besides, normal estimation is computationally more expensive than just sampling a
-					// normal texture. So depending on your scene, consider to enable "depthWrite" for all transparent objects.
+					if ( o.material ) {
 
-					if ( o.material ) o.material.depthWrite = true;
+						if ( o.material.map ) o.material.map.anisotropy = 8;
+						if ( o.material.roughnessMap ) o.material.roughnessMap.anisotropy = 8;
+
+						// Remove emissive from all materials
+
+						o.material.emissive = new THREE.Color( 0x000000 );
+						o.material.emissiveMap = null;
+
+						// Transparent objects (e.g. loaded via GLTFLoader) might have "depthWrite" set to "false".
+						// This is wanted when rendering the beauty pass however it produces wrong results when computing
+						// AO since depth and normal data are out of sync. Computing normals from depth by not using MRT
+						// can mitigate the issue although the depth information (and thus the normals) are not correct in
+						// first place. Besides, normal estimation is computationally more expensive than just sampling a
+						// normal texture. So depending on your scene, consider to enable "depthWrite" for all transparent objects.
+
+						o.material.depthWrite = true;
+
+					}
 
 				} );
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
