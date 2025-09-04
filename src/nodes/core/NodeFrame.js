@@ -115,7 +115,7 @@ class NodeFrame {
 	 * @private
 	 * @param {WeakMap<Node, Object>} referenceMap - The reference weak map.
 	 * @param {Node} nodeRef - The reference to the current node.
-	 * @return {Object<string,WeakMap>} The dictionary.
+	 * @return {Object<string,WeakMap<Object, number>>} The dictionary.
 	 */
 	_getMaps( referenceMap, nodeRef ) {
 

@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { nodeObject, nodeArray, Fn } from '../tsl/TSLBase.js';
+import { error } from '../../utils.js';
 
 /**
  * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
@@ -267,7 +268,7 @@ class LoopNode extends Node {
 
 							} else {
 
-								console.error( 'THREE.TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
 
 								updateSnippet = 'break /* invalid update */';
 

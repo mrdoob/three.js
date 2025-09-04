@@ -50,13 +50,13 @@
 			justify-content: center;
 			margin-bottom: 5px;
 		}
-		
+
 		.stage-label {
 			font-size: 1.2em;
 			color: #aaa;
 			font-style: bold;
 			margin-top: 6px;
-			margin-bottom: 20px; 
+			margin-bottom: 20px;
 		}
 
 		.thread {
@@ -81,10 +81,10 @@
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			font-size: clamp(8px, 2vw, 14px); 
+			font-size: clamp(8px, 2vw, 14px);
 			text-align: center;
 		}
-		
+
 		.subgroup {
 			display: flex;
 			position: relative;
@@ -96,9 +96,9 @@
 			/* label text for each subgroup label */
 			content: "subgroupAdd()";
 			position: absolute;
-			top: -20px; 
+			top: -20px;
 			/* Hide until animation is displayed */
-			opacity: 0; 
+			opacity: 0;
 			z-index: 100;
 			transition: opacity 0.5s ease;
 			font-weight: bold;
@@ -119,7 +119,7 @@
 		.reduction-stage {
 			margin-bottom: 20px;
 		}
-		
+
 		@keyframes labelAbsorb {
 			0% {
 				opacity: 0;
@@ -149,7 +149,7 @@
 			animation-duration: 1.5s;
 			transition:
 			transform 0.6s ease-out,
-			opacity 0.3s ease-in 0.3s; 
+			opacity 0.3s ease-in 0.3s;
 		}
 
 	</style>
@@ -164,7 +164,7 @@
 			<div id="left_side_display" style="position: absolute;top: 150px;left: 0;padding: 10px;background: rgba( 0, 0, 0, 0.5 );color: #fff;font-family: monospace;font-size: 12px;line-height: 1.5;pointer-events: none;text-align: left;"></div>
 			<div id="right_side_display" style="position: absolute;top: 150px;right: 0;padding: 10px;background: rgba( 0, 0, 0, 0.5 );color: #fff;font-family: monospace;font-size: 12px;line-height: 1.5;pointer-events: none;text-align: left;"></div>
 		</div>
-		
+
 		<div id="reduction-panel">
 			<h3 id="panel-title" style="flex: 0 0 auto;">Subgroup Reduction Explanation</h3>
 			<div class="reduction-stage" id="subgroup-reduction-stage">
@@ -248,7 +248,7 @@
 					currentSubgroupDiv.setAttribute( 'data-label', `Threads ${currentSubgroupIndex * cssSubgroupSize}-${( currentSubgroupIndex + 1 ) * cssSubgroupSize - 1}` );
 					initialSubgroups.push( currentSubgroupDiv );
 					workgroupThreadsContainer.appendChild( currentSubgroupDiv );
-			
+
 				}
 
 				const data = Math.floor( Math.random() * 9 ) + 1;
@@ -257,7 +257,7 @@
 				const thread = createThreadWithData( data );
 				workgroupThreads.push( thread );
 				currentSubgroupDiv.appendChild( thread );
-			
+
 			}
 
 			const deactivateLabelAnimation = ( subgroupDiv, idx ) => {
@@ -267,7 +267,7 @@
 				const subgroupReductionBufferElement = document.getElementById( `subgroup_reduction_element_${idx}` ).querySelector( '.thread_data' );
 
 				subgroupReductionBufferElement.innerHTML = 0;
-			
+
 			};
 
 			const activateLabelAnimation = ( subgroupDiv, idx ) => {
@@ -311,7 +311,7 @@
 				initialSubgroups.forEach( ( subgroupDiv, idx ) => {
 
 					activateLabelAnimation( subgroupDiv, idx );
-			
+
 				} );
 
 			} );
@@ -321,7 +321,7 @@
 				initialSubgroups.forEach( ( subgroupDiv, idx ) => {
 
 					deactivateLabelAnimation( subgroupDiv, idx );
-			
+
 				} );
 
 				workgroupThreads.forEach( ( thread, idx ) => {
@@ -331,8 +331,8 @@
 				} );
 
 			} );
-			
-			
+
+
 			if ( WebGPU.isAvailable() === false ) {
 
 				document.body.appendChild( WebGPU.getErrorMessage() );
@@ -377,7 +377,7 @@
 				loggedBuffer: 'Input Buffer',
 				elementsReduced: size,
 			};
-			
+
 
 			const leftEffectController = {
 				// Current reduction algorithm being executed by this side
@@ -386,11 +386,11 @@
 				highlight: uniform( 0 ),
 				// Uniform that corresponds to the index of the current algorithm within the algorithms array
 				currentAlgo: uniform( 0 ),
-				// Current state of reduction (Running, validating, reseting)
+				// Current state of reduction (Running, validating, resetting)
 				state: 'Run Algo',
 				// Current display mode
 				displayMode: 'Input Log2',
-				// Reduce 0 specfic uniform
+				// Reduce 0 specific uniform
 				numThreadsDispatched: uniform( size / 2 ),
 				// The subgroup size used by this side's device
 			};
@@ -414,7 +414,7 @@
 			gui.add( leftEffectController, 'algo', algorithms ).onChange( () => {
 
 				leftEffectController.currentAlgo.value = algorithms.findIndex( val => val === leftEffectController.algo );
-			
+
 			} );
 
 			gui.add( rightEffectController, 'algo', algorithms ).onChange( () => {
@@ -524,11 +524,11 @@
 				} )().compute( dispatchSize, [ workgroupSize ] );
 
 				return fnDef;
-			
+
 			};
 
 			// REDUCE 2
-			
+
 			// For non power of 2 # of workgroups
 			const createReduce2Fn = ( createReduce2FnProps ) => {
 
@@ -620,7 +620,7 @@
 							total.addAssign( inputElement );
 
 						}
-			
+
 						// Increment up a thread
 						localThreadOffset.addAssign( 1 );
 
@@ -632,13 +632,13 @@
 				} );
 
 				// Ignoring left over check for this example, since we know ahead of time the value of leftover (2048 % 1024 === 0)
-			
+
 			};
 
 			const WorkgroupReduce = ( workgroupReduceProps ) => {
 
 				const { total, workgroupSize } = workgroupReduceProps;
-			
+
 				const subgroupSums = createSubgroupArray( 'uint', workgroupSize );
 
 				// Assign sum of all values in subgroup to total
@@ -651,7 +651,7 @@
 				Loop( float( delta ).greaterThan( 1.0 ), () => {
 
 					If( invocationSubgroupIndex.equal( 0 ), () => {
-			
+
 						// Each subgroup will populate the subgroupSums array
 						subgroupSums.element( subgroupMetaRank ).assign( total );
 
@@ -679,7 +679,7 @@
 
 					const inputSize = uint( inputBuffer.bufferCount.length );
 					const rowOffset = workgroupId.x.mul( rowSize );
-			
+
 					// If the current rows elements exceed the bounds of the input
 					// Select either 0 or number of elements left,
 					// otherwise, select existing ROW_SIZE
@@ -709,7 +709,7 @@
 					If( invocationLocalIndex.equal( 0 ), () => {
 
 						intermediateBuffer.element( workgroupId.x ).assign( total );
-			
+
 					} );
 
 				} )();
@@ -719,7 +719,7 @@
 			};
 
 			// REDUCE 4
-			
+
 			// b0nes164 inspired implementation with vec4
 			const createReduce4Fn = ( props ) => {
 
@@ -741,9 +741,9 @@
 
 					// Get the index of the subgroup within the workgroup
 					const subgroupMetaRank = invocationLocalIndex.div( subgroupSize );
-			
+
 					// Each subgroup block scans across 4 subgroups. So when we move into a new subgroup,
-					// align that subgroups' acccesses to the next 4 subgroups
+					// align that subgroups' accesses to the next 4 subgroups
 					const subgroupOffset = subgroupMetaRank.mul( subgroupSize ).mul( workPerThread );
 					subgroupOffset.addAssign( invocationSubgroupIndex );
 
@@ -751,7 +751,7 @@
 					const workgroupOffset = workgroupId.x.mul( uint( maxWorkgroupSize ).mul( workPerThread ) );
 
 					const startThread = subgroupOffset.add( workgroupOffset );
-			
+
 					const subgroupReduction = uint( 0 );
 
 					// Each thread will accumulate values from across 'workPerThread' subgroups
@@ -773,9 +773,9 @@
 
 							// Increment so thread will scan value in next subgroup
 							startThread.addAssign( subgroupSize );
-			
+
 						} );
-			
+
 					} );
 
 					// Ensure that the last workgroup does not access out of bounds indices
@@ -791,12 +791,12 @@
 
 							// Ensure index is less than number of available vectors in inputBuffer
 							const val = select( startThread.lessThan( uint( vecSize ) ), inputBuffer.element( startThread ), uvec4( 0 ) ).uniformFlow();
-			
+
 							subgroupReduction.addAssign( dot( val, uvec4( 1 ) ) );
 							startThread.addAssign( subgroupSize );
-			
+
 						} );
-			
+
 					} );
 
 					subgroupReduction.assign( subgroupAdd( subgroupReduction ) );
@@ -896,7 +896,7 @@
 				return fnDef;
 
 			};
-			
+
 
 			// INCORRECT BASELINE
 
@@ -911,7 +911,7 @@
 				} )();
 
 				return fnDef;
-			
+
 			};
 
 
@@ -940,7 +940,7 @@
 				// Represents array of data as vec4s in compute shader;
 				const inputVec4BufferAttribute = new THREE.StorageInstancedBufferAttribute( array, 4 );
 				const inputVectorizedStorage = storage( inputVec4BufferAttribute, 'uvec4', vecSize ).setPBO( true ).setName( `CurrentVectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
-			
+
 				// Reduce 3 Calculations
 				const workPerThread = 4;
 				const numRows = workPerThread * 32;
@@ -972,7 +972,7 @@
 				const computeResetBufferFn = Fn( () => {
 
 					inputStorage.element( instanceIndex ).assign( 1 );
-			
+
 				} );
 
 				const computeResetWorkgroupSumsFn = Fn( () => {
@@ -980,7 +980,7 @@
 					workgroupSumsStorage.element( instanceIndex ).assign( 0 );
 
 				} );
-			
+
 
 				// Re-initialize compute buffer
 				const computeResetBuffer = computeResetBufferFn().compute( size );
@@ -1102,7 +1102,7 @@
 						inputBuffer: inputStorage,
 					} ).compute( size ),
 				];
-			
+
 				const calls = {
 					'Reduce 0 (N/2)': reduce0Calls,
 					'Reduce 1 (Naive Accumulate)': reduce1Calls,
@@ -1168,7 +1168,7 @@
 
 					const colorChanger = uint( 0 ).toVar();
 					const color = vec3( 0 ).toVar( 'color' );
-			
+
 					colorChanger.assign( inputStorage.element( uint( 1 ).shiftLeft( newUV.x ) ) );
 					color.assign( getColor( inputStorage, colorChanger, gridElementWidth, gridElementHeight ) );
 
@@ -1187,7 +1187,7 @@
 					colorChanger.assign( clamp( inputStorage.element( 0 ), 0, size / 2 ) );
 					color.assign( getColor( inputStorage, colorChanger, gridElementWidth, gridElementHeight ) );
 					return color;
-			
+
 				} )();
 
 				displayNodes[ 'Workgroup Sum Grid' ] = Fn( () => {
@@ -1264,7 +1264,7 @@
 						const cpuTime = 0;
 
 						switch ( currentAlgorithm ) {
-			
+
 							case 'Reduce 0 (N/2)': {
 
 								let m = size / 2;
@@ -1318,7 +1318,7 @@
 
 						}
 
-			
+
 
 
 						timestamps[ leftSideDisplay ? 'left_side_display' : 'right_side_display' ].innerHTML = `

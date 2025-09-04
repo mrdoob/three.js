@@ -123,7 +123,7 @@ class SSRNode extends TempNode {
 		 * of raymarching iterations/samples) and `0` means no samples at all.
 		 *
 		 * A quality of `0.5` is usually sufficient for most use cases. Try to keep
-		 * this parameter as low as possible. Larger values result in noticable more
+		 * this parameter as low as possible. Larger values result in noticeable more
 		 * overhead.
 		 *
 		 * @type {UniformNode<float>}

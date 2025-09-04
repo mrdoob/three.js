@@ -29,7 +29,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { abs, blendOverlay, color, float, Fn, instancedBufferAttribute, materialColor, max, normalWorldGeometry, pass, positionGeometry, positionLocal, pow2, reflector, screenUV, sin, sub, texture, time, uniform, uv, vec2, vec3 } from 'three/tsl';
+			import { abs, blendOverlay, color, float, Fn, instancedBufferAttribute, max, normalWorldGeometry, pass, positionGeometry, positionLocal, pow2, reflector, screenUV, sin, sub, texture, time, uniform, uv, vec2, vec3 } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -317,7 +317,7 @@
 				const instanceNormal = instancedBufferAttribute( attributeNormal );
 				const instanceColor = instancedBufferAttribute( attributeColor );
 				const instanceData = instancedBufferAttribute( attributeData );
-			
+
 				material.positionNode = Fn( () => {
 
 					const instanceSize = instanceData.x;

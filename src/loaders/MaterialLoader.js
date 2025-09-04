@@ -26,6 +26,7 @@ import {
 	LineBasicMaterial,
 	Material,
 } from '../materials/Materials.js';
+import { error, warn } from '../utils.js';
 
 /**
  * Class for loading geometries. The files are internally
@@ -89,7 +90,7 @@ class MaterialLoader extends Loader {
 
 				} else {
 
-					console.error( e );
+					error( e );
 
 				}
 
@@ -115,7 +116,7 @@ class MaterialLoader extends Loader {
 
 			if ( textures[ name ] === undefined ) {
 
-				console.warn( 'THREE.MaterialLoader: Undefined texture', name );
+				warn( 'MaterialLoader: Undefined texture', name );
 
 			}
 
