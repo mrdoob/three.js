@@ -120,7 +120,10 @@ class UITexture extends UISpan {
 					const arrayBuffer = event.target.result;
 					const blobURL = URL.createObjectURL( new Blob( [ arrayBuffer ] ) );
 					const ktx2Loader = new KTX2Loader();
-					ktx2Loader.setTranscoderPath( '../../examples/jsm/libs/basis/' );
+					ktx2Loader.setTranscoderPath( {
+						js: 'jsm/libs/basis/basis_transcoder.js',
+						wasm: 'jsm/libs/basis/basis_transcoder.wasm'
+					} );
 					editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
 
 					ktx2Loader.load( blobURL, function ( texture ) {

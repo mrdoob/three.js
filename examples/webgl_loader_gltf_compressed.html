@@ -69,7 +69,10 @@
 				scene.add( grid );
 
 				const ktx2Loader = new KTX2Loader()
-					.setTranscoderPath( 'jsm/libs/basis/' )
+					.setTranscoderPath( {
+						js: 'jsm/libs/basis/basis_transcoder.js',
+						wasm: 'jsm/libs/basis/basis_transcoder.wasm'
+					} )
 					.detectSupport( renderer );
 
 				const loader = new GLTFLoader().setPath( 'models/gltf/' );
