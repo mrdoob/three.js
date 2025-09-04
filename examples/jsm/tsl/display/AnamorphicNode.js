@@ -69,7 +69,7 @@ class AnamorphicNode extends TempNode {
 		/**
 		 * The resolution scale.
 		 *
-		 * @type {float}
+		 * @type {number}
 		 */
 		this.resolutionScale = 1;
 
