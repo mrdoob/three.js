@@ -64,7 +64,7 @@ class PointerLockControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Camera} camera - The camera that is managed by the controls.
-	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 * @param {?HTMLElement} domElement - The HTML element used for event listeners.
 	 */
 	constructor( camera, domElement = null ) {
 
