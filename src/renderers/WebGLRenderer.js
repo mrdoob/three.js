@@ -131,7 +131,7 @@ class WebGLRenderer {
 		 * document.body.appendChild( renderer.domElement );
 		 * ```
 		 *
-		 * @type {DOMElement}
+		 * @type {HTMLCanvasElement|OffscreenCanvas}
 		 */
 		this.domElement = canvas;
 
@@ -3414,7 +3414,7 @@ class WebGLRenderer {
  * WebGLRenderer options.
  *
  * @typedef {Object} WebGLRenderer~Options
- * @property {DOMElement} [canvas=null] - A canvas element where the renderer draws its output. If not passed in here, a new canvas element will be created by the renderer.
+ * @property {HTMLCanvasElement|OffscreenCanvas} [canvas=null] - A canvas element where the renderer draws its output. If not passed in here, a new canvas element will be created by the renderer.
  * @property {WebGL2RenderingContext} [context=null] - Can be used to attach an existing rendering context to this renderer.
  * @property {('highp'|'mediump'|'lowp')} [precision='highp'] - The default shader precision. Uses `highp` if supported by the device.
  * @property {boolean} [alpha=false] - Controls the default clear alpha value. When set to`true`, the value is `0`. Otherwise it's `1`.

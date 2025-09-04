@@ -280,9 +280,9 @@ class ProgressiveLightMap {
 	 *
 	 * @private
 	 * @param {number} res - The square resolution of this object's lightMap.
-	 * @param {?WebGLRenderTarget} [lightMap] - The lightmap to initialize the plane with.
+	 * @param {WebGLRenderTarget} lightMap - The lightmap to initialize the plane with.
 	 */
-	_initializeBlurPlane( res, lightMap = null ) {
+	_initializeBlurPlane( res, lightMap ) {
 
 		const blurMaterial = new MeshBasicMaterial();
 		blurMaterial.uniforms = { previousShadowMap: { value: null },

@@ -22,7 +22,7 @@ class CSS3DObject extends Object3D {
 	/**
 	 * Constructs a new CSS3D object.
 	 *
-	 * @param {DOMElement} [element] - The DOM element.
+	 * @param {HTMLElement} [element] - The DOM element.
 	 */
 	constructor( element = document.createElement( 'div' ) ) {
 
@@ -40,7 +40,7 @@ class CSS3DObject extends Object3D {
 		/**
 		 * The DOM element which defines the appearance of this 3D object.
 		 *
-		 * @type {DOMElement}
+		 * @type {HTMLElement}
 		 * @readonly
 		 * @default true
 		 */
@@ -94,7 +94,7 @@ class CSS3DSprite extends CSS3DObject {
 	/**
 	 * Constructs a new CSS3D sprite object.
 	 *
-	 * @param {DOMElement} [element] - The DOM element.
+	 * @param {HTMLElement} [element] - The DOM element.
 	 */
 	constructor( element ) {
 
@@ -179,7 +179,7 @@ class CSS3DRenderer {
 		/**
 		 * The DOM where the renderer appends its child-elements.
 		 *
-		 * @type {DOMElement}
+		 * @type {HTMLElement}
 		 */
 		this.domElement = domElement;
 
@@ -446,7 +446,7 @@ class CSS3DRenderer {
  * Constructor parameters of `CSS3DRenderer`.
  *
  * @typedef {Object} CSS3DRenderer~Parameters
- * @property {DOMElement} [element] - A DOM element where the renderer appends its child-elements.
+ * @property {HTMLElement} [element] - A DOM element where the renderer appends its child-elements.
  * If not passed in here, a new div element will be created.
  **/
 

@@ -115,7 +115,7 @@ class ArcballControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Camera} camera - The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.
-	 * @param {?HTMLDOMElement} [domElement=null] - The HTML element used for event listeners.
+	 * @param {?HTMLElement} [domElement=null] - The HTML element used for event listeners.
 	 * @param {?Scene} [scene=null] The scene rendered by the camera. If not given, gizmos cannot be shown.
 	 */
 	constructor( camera, domElement = null, scene = null ) {
