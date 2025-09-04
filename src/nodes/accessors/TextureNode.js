@@ -10,6 +10,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { IntType, NearestFilter, UnsignedIntType } from '../../constants.js';
 
 import { Texture } from '../../textures/Texture.js';
+import { warn } from '../../utils.js';
 
 const EmptyTexture = /*@__PURE__*/ new Texture();
 
@@ -94,6 +95,15 @@ class TextureNode extends UniformNode {
 		 * @default null
 		 */
 		this.gradNode = null;
+
+		/**
+		 * Represents the optional texel offset applied to the unnormalized texture
+		 * coordinate before sampling the texture.
+		 *
+		 * @type {?Node<ivec2|ivec3>}
+		 * @default null
+		 */
+		this.offsetNode = null;
 
 		/**
 		 * Whether texture values should be sampled or fetched.
@@ -364,6 +374,7 @@ class TextureNode extends UniformNode {
 		properties.compareNode = this.compareNode;
 		properties.gradNode = this.gradNode;
 		properties.depthNode = this.depthNode;
+		properties.offsetNode = this.offsetNode;
 
 	}
 
@@ -381,6 +392,19 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
+	 * Generates the offset code snippet.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} offsetNode - The offset node to generate code for.
+	 * @return {string} The generated code snippet.
+	 */
+	generateOffset( builder, offsetNode ) {
+
+		return offsetNode.build( builder, 'ivec2' );
+
+	}
+
+	/**
 	 * Generates the snippet for the texture sampling.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -391,37 +415,38 @@ class TextureNode extends UniformNode {
 	 * @param {?string} depthSnippet - The depth snippet.
 	 * @param {?string} compareSnippet - The compare snippet.
 	 * @param {?Array<string>} gradSnippet - The grad snippet.
+	 * @param {?string} offsetSnippet - The offset snippet.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet ) {
 
 		const texture = this.value;
 
 		let snippet;
 
-		if ( levelSnippet ) {
+		if ( biasSnippet ) {
 
-			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet );
-
-		} else if ( biasSnippet ) {
-
-			snippet = builder.generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet );
+			snippet = builder.generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, offsetSnippet );
 
 		} else if ( gradSnippet ) {
 
-			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet );
+			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, offsetSnippet );
 
 		} else if ( compareSnippet ) {
 
-			snippet = builder.generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet );
+			snippet = builder.generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet );
 
 		} else if ( this.sampler === false ) {
 
-			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet );
+			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
+
+		} else if ( levelSnippet ) {
+
+			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
 
 		} else {
 
-			snippet = builder.generateTexture( texture, textureProperty, uvSnippet, depthSnippet );
+			snippet = builder.generateTexture( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet );
 
 		}
 
@@ -459,7 +484,7 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, depthNode, gradNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, depthNode, gradNode, offsetNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -467,12 +492,13 @@ class TextureNode extends UniformNode {
 				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
+				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
 
 				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet );
+				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet );
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
 
@@ -532,7 +558,7 @@ class TextureNode extends UniformNode {
 	 */
 	uv( uvNode ) { // @deprecated, r172
 
-		console.warn( 'THREE.TextureNode: .uv() has been renamed. Use .sample() instead.' );
+		warn( 'TextureNode: .uv() has been renamed. Use .sample() instead.' );
 
 		return this.sample( uvNode );
 
@@ -582,7 +608,7 @@ class TextureNode extends UniformNode {
 
 		if ( textureNode.generateMipmaps === false && ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) ) {
 
-			console.warn( 'THREE.TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
+			warn( 'TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
 
 			textureNode.biasNode = null;
 
@@ -642,7 +668,7 @@ class TextureNode extends UniformNode {
 	 */
 	getBase() {
 
-		return this.referenceNode ? this.referenceNode.getBase() : this.getSelf();
+		return this.referenceNode ? this.referenceNode.getBase() : this;
 
 	}
 
@@ -689,6 +715,22 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.depthNode = nodeObject( depthNode );
+		textureNode.referenceNode = this.getBase();
+
+		return nodeObject( textureNode );
+
+	}
+
+	/**
+	 * Samples the texture by defining an offset node.
+	 *
+	 * @param {Node<ivec2>} offsetNode - The offset node.
+	 * @return {TextureNode} A texture node representing the texture sample.
+	 */
+	offset( offsetNode ) {
+
+		const textureNode = this.clone();
+		textureNode.offsetNode = nodeObject( offsetNode );
 		textureNode.referenceNode = this.getBase();
 
 		return nodeObject( textureNode );
@@ -749,6 +791,7 @@ class TextureNode extends UniformNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
 
@@ -776,7 +819,7 @@ const textureBase = /*@__PURE__*/ nodeProxy( TextureNode ).setParameterLength( 1
  *
  * @tsl
  * @function
- * @param {?Texture|TextureNode} [value=EmptyTexture] - The texture.
+ * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
  * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.
@@ -820,7 +863,7 @@ export const uniformTexture = ( value = EmptyTexture ) => texture( value );
  *
  * @tsl
  * @function
- * @param {?Texture|TextureNode} [value=EmptyTexture] - The texture.
+ * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
  * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @param {?Node<float>} [biasNode=null] - The bias node.

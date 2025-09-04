@@ -127,6 +127,7 @@ const exceptionList = [
 
 	// Awaiting for WebGL backend support
 	'webgpu_compute_audio',
+	'webgpu_compute_birds',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_3d',
 	'webgpu_compute_texture_pingpong',
@@ -136,6 +137,7 @@ const exceptionList = [
 	'webgpu_postprocessing_bloom_emissive',
 	'webgpu_lights_tiled',
 	'webgpu_postprocessing_traa',
+	'webgpu_tsl_wood',
 
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',

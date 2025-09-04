@@ -1,4 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
+import { warn } from '../utils.js';
 
 /**
  * Abstract base class for controls.
@@ -84,7 +85,7 @@ class Controls extends EventDispatcher {
 
 		if ( element === undefined ) {
 
-			console.warn( 'THREE.Controls: connect() now requires an element.' ); // @deprecated, the warning can be removed with r185
+			warn( 'Controls: connect() now requires an element.' ); // @deprecated, the warning can be removed with r185
 			return;
 
 		}

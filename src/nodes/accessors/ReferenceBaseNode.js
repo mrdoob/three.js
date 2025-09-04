@@ -211,7 +211,7 @@ class ReferenceBaseNode extends Node {
 	 */
 	setNodeType( uniformType ) {
 
-		const node = uniform( null, uniformType ).getSelf();
+		const node = uniform( null, uniformType );
 
 		if ( this.group !== null ) {
 

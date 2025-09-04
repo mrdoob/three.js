@@ -38,7 +38,7 @@ class Backend {
 		 * This weak map holds backend-specific data of objects
 		 * like textures, attributes or render targets.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<Object, Object>}
 		 */
 		this.data = new WeakMap();
 
@@ -438,6 +438,24 @@ class Backend {
 	updateViewport( /*renderContext*/ ) {}
 
 	// utils
+
+	/**
+	 * Returns a unique identifier for the given render context that can be used
+	 * to allocate resources like occlusion queries or timestamp queries.
+	 *
+	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
+	 * @return {string} The unique identifier.
+	 */
+	getTimestampUID( abstractRenderContext ) {
+
+		const contextData = this.get( abstractRenderContext );
+
+		let uid = abstractRenderContext.isComputeNode === true ? 'c' : 'r';
+		uid += ':' + contextData.frameCalls + ':' + abstractRenderContext.id;
+
+		return uid;
+
+	}
 
 	/**
 	 * Returns `true` if the given 3D object is fully occluded by other

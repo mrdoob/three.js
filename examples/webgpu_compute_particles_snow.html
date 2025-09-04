@@ -300,10 +300,10 @@
 
 				const teapotTreePass = pass( teapotTree, camera ).getTextureNode();
 				const teapotTreePassBlurred = gaussianBlur( teapotTreePass, vec2( 1 ), 6 );
-				teapotTreePassBlurred.resolution = new THREE.Vector2( .2, .2 );
+				teapotTreePassBlurred.resolutionScale = 0.2;
 
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
-				scenePassColorBlurred.resolution = new THREE.Vector2( .5, .5 );
+				scenePassColorBlurred.resolutionScale = 0.5;
 				scenePassColorBlurred.directionNode = vec2( 1 );
 
 				// compose

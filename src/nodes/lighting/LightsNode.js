@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
 import { nodeObject, property, vec3 } from '../tsl/TSLBase.js';
 import { hashArray } from '../core/NodeUtils.js';
+import { warn } from '../../utils.js';
 
 const sortLights = ( lights ) => {
 
@@ -159,7 +160,7 @@ class LightsNode extends Node {
 
 			for ( const lightNode of this._lightNodes ) {
 
-				hash.push( lightNode.getSelf().getHash() );
+				hash.push( lightNode.getHash() );
 
 			}
 
@@ -224,7 +225,7 @@ class LightsNode extends Node {
 
 					if ( lightNodeClass === null ) {
 
-						console.warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
+						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
 						continue;
 
 					}

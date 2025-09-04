@@ -1,5 +1,6 @@
 import { ImageUtils } from '../extras/ImageUtils.js';
 import { generateUUID } from '../math/MathUtils.js';
+import { warn } from '../utils.js';
 
 let _sourceId = 0;
 
@@ -217,7 +218,7 @@ function serializeImage( image ) {
 
 		} else {
 
-			console.warn( 'THREE.Texture: Unable to serialize Texture.' );
+			warn( 'Texture: Unable to serialize Texture.' );
 			return {};
 
 		}

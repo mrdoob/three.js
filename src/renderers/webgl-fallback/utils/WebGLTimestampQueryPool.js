@@ -1,4 +1,4 @@
-import { warnOnce } from '../../../utils.js';
+import { warnOnce, warn } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 /**
@@ -29,7 +29,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		if ( ! this.ext ) {
 
-			console.warn( 'EXT_disjoint_timer_query not supported; timestamps will be disabled.' );
+			warn( 'EXT_disjoint_timer_query not supported; timestamps will be disabled.' );
 			this.trackTimestamp = false;
 			return;
 
@@ -51,10 +51,10 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	/**
 	 * Allocates a pair of queries for a given render context.
 	 *
-	 * @param {Object} renderContext - The render context to allocate queries for.
+	 * @param {string} uid - A unique identifier for the render context.
 	 * @returns {?number} The base offset for the allocated queries, or null if allocation failed.
 	 */
-	allocateQueriesForContext( renderContext ) {
+	allocateQueriesForContext( uid ) {
 
 		if ( ! this.trackTimestamp ) return null;
 
@@ -71,7 +71,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		// Initialize query states
 		this.queryStates.set( baseOffset, 'inactive' );
-		this.queryOffsets.set( renderContext.id, baseOffset );
+		this.queryOffsets.set( uid, baseOffset );
 
 		return baseOffset;
 
@@ -80,9 +80,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	/**
 	 * Begins a timestamp query for the specified render context.
 	 *
-	 * @param {Object} renderContext - The render context to begin timing for.
+	 * @param {string} uid - A unique identifier for the render context.
 	 */
-	beginQuery( renderContext ) {
+	beginQuery( uid ) {
 
 		if ( ! this.trackTimestamp || this.isDisposed ) {
 
@@ -90,7 +90,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		}
 
-		const baseOffset = this.queryOffsets.get( renderContext.id );
+		const baseOffset = this.queryOffsets.get( uid );
 		if ( baseOffset == null ) {
 
 			return;
@@ -124,7 +124,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error in beginQuery:', error );
+			error( 'Error in beginQuery:', error );
 			this.activeQuery = null;
 			this.queryStates.set( baseOffset, 'inactive' );
 
@@ -135,10 +135,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 	/**
 	 * Ends the active timestamp query for the specified render context.
 	 *
-	 * @param {Object} renderContext - The render context to end timing for.
-	 * @param {string} renderContext.id - Unique identifier for the render context.
+	 * @param {string} uid - A unique identifier for the render context.
 	 */
-	endQuery( renderContext ) {
+	endQuery( uid ) {
 
 		if ( ! this.trackTimestamp || this.isDisposed ) {
 
@@ -146,7 +145,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		}
 
-		const baseOffset = this.queryOffsets.get( renderContext.id );
+		const baseOffset = this.queryOffsets.get( uid );
 		if ( baseOffset == null ) {
 
 			return;
@@ -168,7 +167,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error in endQuery:', error );
+			error( 'Error in endQuery:', error );
 			// Reset state on error
 			this.queryStates.set( baseOffset, 'inactive' );
 			this.activeQuery = null;
@@ -231,7 +230,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error resolving queries:', error );
+			error( 'Error resolving queries:', error );
 			return this.lastValue;
 
 		} finally {
@@ -319,7 +318,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 				} catch ( error ) {
 
-					console.error( 'Error checking query:', error );
+					error( 'Error checking query:', error );
 					resolve( this.lastValue );
 
 				}

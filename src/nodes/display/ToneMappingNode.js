@@ -4,6 +4,7 @@ import { rendererReference } from '../accessors/RendererReferenceNode.js';
 
 import { NoToneMapping } from '../../constants.js';
 import { hash } from '../core/NodeUtils.js';
+import { error } from '../../utils.js';
 
 /**
  * This node represents a tone mapping operation.
@@ -83,7 +84,7 @@ class ToneMappingNode extends TempNode {
 
 		} else {
 
-			console.error( 'ToneMappingNode: Unsupported Tone Mapping configuration.', toneMapping );
+			error( 'ToneMappingNode: Unsupported Tone Mapping configuration.', toneMapping );
 
 			outputNode = colorNode;
 

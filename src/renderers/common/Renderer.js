@@ -31,6 +31,7 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
 
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
+import { error, warn } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
@@ -1082,7 +1083,7 @@ class Renderer {
 
 		}
 
-		console.error( errorMessage );
+		error( errorMessage );
 
 		this._isDeviceLost = true;
 
@@ -1188,7 +1189,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
+			warn( 'Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
 
 			return this.renderAsync( scene, camera );
 
@@ -1450,8 +1451,8 @@ class Renderer {
 
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
-			renderContext.width = this.domElement.width;
-			renderContext.height = this.domElement.height;
+			renderContext.width = _drawingBufferSize.width;
+			renderContext.height = _drawingBufferSize.height;
 			renderContext.depth = this.depth;
 			renderContext.stencil = this.stencil;
 
@@ -1462,6 +1463,22 @@ class Renderer {
 		renderContext.activeCubeFace = activeCubeFace;
 		renderContext.activeMipmapLevel = activeMipmapLevel;
 		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
+
+		//
+
+		renderContext.scissorValue.max( _vector4.set( 0, 0, 0, 0 ) );
+
+		if ( renderContext.scissorValue.x + renderContext.scissorValue.width > renderContext.width ) {
+
+			renderContext.scissorValue.width = Math.max( renderContext.width - renderContext.scissorValue.x, 0 );
+
+		}
+
+		if ( renderContext.scissorValue.y + renderContext.scissorValue.height > renderContext.height ) {
+
+			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
+
+		}
 
 		//
 
@@ -2000,7 +2017,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
+			warn( 'Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
 
 			return this.clearAsync( color, depth, stencil );
 
@@ -2313,7 +2330,7 @@ class Renderer {
 	 * if the renderer has been initialized.
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
 	compute( computeNodes, dispatchSizeOrCount = null ) {
@@ -2322,7 +2339,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
+			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
 
 			return this.computeAsync( computeNodes );
 
@@ -2412,7 +2429,7 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
 	async computeAsync( computeNodes, dispatchSizeOrCount = null ) {
@@ -2457,7 +2474,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
+			warn( 'Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
 
 			return false;
 
@@ -2506,7 +2523,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
+			warn( 'Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
 
 		}
 
@@ -2518,7 +2535,7 @@ class Renderer {
 	 * Copies the current bound framebuffer into the given texture.
 	 *
 	 * @param {FramebufferTexture} framebufferTexture - The texture.
-	 * @param {?Vector2|Vector4} [rectangle=null] - A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.
+	 * @param {?(Vector2|Vector4)} [rectangle=null] - A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.
 	 */
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
@@ -2534,7 +2551,7 @@ class Renderer {
 
 			} else {
 
-				console.error( 'THREE.Renderer.copyFramebufferToTexture: Invalid rectangle.' );
+				error( 'Renderer.copyFramebufferToTexture: Invalid rectangle.' );
 
 				return;
 
@@ -2671,7 +2688,7 @@ class Renderer {
 
 			} else if ( object.isLineLoop ) {
 
-				console.error( 'THREE.Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
+				error( 'Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 

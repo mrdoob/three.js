@@ -108,12 +108,12 @@ class GaussianBlurNode extends TempNode {
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
-		 * Controls the resolution of the effect.
+		 * The resolution scale.
 		 *
-		 * @type {Vector2}
-		 * @default (1,1)
+		 * @type {float}
+		 * @default (1)
 		 */
-		this.resolution = options.resolution || new Vector2( 1, 1 );
+		this.resolutionScale = options.resolutionScale || 1;
 
 		/**
 		 * Whether the effect should use premultiplied alpha or not. Set this to `true`
@@ -134,8 +134,8 @@ class GaussianBlurNode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		width = Math.max( Math.round( width * this.resolution.x ), 1 );
-		height = Math.max( Math.round( height * this.resolution.y ), 1 );
+		width = Math.max( Math.round( width * this.resolutionScale ), 1 );
+		height = Math.max( Math.round( height * this.resolutionScale ), 1 );
 
 		this._invSize.value.set( 1 / width, 1 / height );
 		this._horizontalRT.setSize( width, height );
@@ -313,6 +313,29 @@ class GaussianBlurNode extends TempNode {
 		}
 
 		return coefficients;
+
+	}
+
+	/**
+	 * The resolution scale.
+	 *
+	 * @deprecated
+	 * @type {Vector2}
+	 * @default {(1,1)}
+	 */
+	get resolution() {
+
+		console.warn( 'THREE.GaussianBlurNode: The "resolution" property has been renamed to "resolutionScale" and is now of type `number`.' ); // @deprecated r180
+
+		return new Vector2( this.resolutionScale, this.resolutionScale );
+
+	}
+
+	set resolution( value ) {
+
+		console.warn( 'THREE.GaussianBlurNode: The "resolution" property has been renamed to "resolutionScale" and is now of type `number`.' ); // @deprecated r180
+
+		this.resolutionScale = value.x;
 
 	}
 
