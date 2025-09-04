@@ -1,4 +1,4 @@
-import { warnOnce } from '../../../utils.js';
+import { warnOnce, warn } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 /**
@@ -29,7 +29,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		if ( ! this.ext ) {
 
-			console.warn( 'EXT_disjoint_timer_query not supported; timestamps will be disabled.' );
+			warn( 'EXT_disjoint_timer_query not supported; timestamps will be disabled.' );
 			this.trackTimestamp = false;
 			return;
 
@@ -124,7 +124,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error in beginQuery:', error );
+			error( 'Error in beginQuery:', error );
 			this.activeQuery = null;
 			this.queryStates.set( baseOffset, 'inactive' );
 
@@ -167,7 +167,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error in endQuery:', error );
+			error( 'Error in endQuery:', error );
 			// Reset state on error
 			this.queryStates.set( baseOffset, 'inactive' );
 			this.activeQuery = null;
@@ -230,7 +230,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error resolving queries:', error );
+			error( 'Error resolving queries:', error );
 			return this.lastValue;
 
 		} finally {
@@ -318,7 +318,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 				} catch ( error ) {
 
-					console.error( 'Error checking query:', error );
+					error( 'Error checking query:', error );
 					resolve( this.lastValue );
 
 				}

@@ -2,13 +2,14 @@ import Renderer from '../common/Renderer.js';
 import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
+import { warn } from '../../utils.js';
 /*
 const debugHandler = {
 
 	get: function ( target, name ) {
 
 		// Add |update
-		if ( /^(create|destroy)/.test( name ) ) console.log( 'WebGPUBackend.' + name );
+		if ( /^(create|destroy)/.test( name ) ) log( 'WebGPUBackend.' + name );
 
 		return target[ name ];
 
@@ -62,7 +63,7 @@ class WebGPURenderer extends Renderer {
 
 			parameters.getFallback = () => {
 
-				console.warn( 'THREE.WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
+				warn( 'WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
 
 				return new WebGLBackend( parameters );
 

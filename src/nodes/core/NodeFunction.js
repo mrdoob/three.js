@@ -1,3 +1,4 @@
+import { warn } from '../../utils.js';
 /**
  * Base class for node functions. A derived module must be implemented
  * for each supported native shader language. Similar to other `Node*` modules,
@@ -57,7 +58,7 @@ class NodeFunction {
 	 */
 	getCode( /*name = this.name*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 

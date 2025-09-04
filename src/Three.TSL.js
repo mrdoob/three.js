@@ -625,5 +625,5 @@ for ( const key of Object.keys( THREE.TSL ) ) {
 
 }
 
-console.log( code );
+log( code );
 //*/
