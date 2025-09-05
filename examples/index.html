@@ -205,9 +205,17 @@
 
 			const external = Array.isArray( tags ) && tags.includes( 'external' ) ? ' <span class="tag">external</span>' : '';
 
+			let href = file + '.html';
+
+			if ( file === 'css3d_mixed' ) {
+
+				href += `?${ new Date().getTime() }`;
+
+			}
+
 			const template = `
 				<div class="card">
-					<a href="${ file }.html" target="viewer">
+					<a href="${ href }" target="viewer">
 						<div class="cover">
 							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
 						</div>
