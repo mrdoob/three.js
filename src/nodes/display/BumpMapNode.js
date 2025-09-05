@@ -3,7 +3,8 @@ import { uv } from '../accessors/UV.js';
 import { normalView } from '../accessors/Normal.js';
 import { positionView } from '../accessors/Position.js';
 import { faceDirection } from './FrontFacingNode.js';
-import { Fn, nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
+import { convertToTexture } from '../utils/RTTNode.js';
+import { Fn, nodeObject, float, vec2 } from '../tsl/TSLBase.js';
 
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
@@ -111,7 +112,7 @@ export default BumpMapNode;
  * @tsl
  * @function
  * @param {Node<float>} textureNode - Represents the bump map data.
- * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
+ * @param {?Node<float>} [scale=null] - Controls the intensity of the bump effect.
  * @returns {BumpMapNode}
  */
-export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode ).setParameterLength( 1, 2 );
+export const bumpMap = ( texture, scale = null ) => new BumpMapNode( convertToTexture( texture ), nodeObject( scale ) );
