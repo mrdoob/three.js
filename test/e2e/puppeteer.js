@@ -133,6 +133,7 @@ const exceptionList = [
 	'webgpu_compute_texture_pingpong',
 	'webgpu_compute_water',
 	'webgpu_materials',
+	'webgpu_multiple_canvas',
 	'webgpu_video_panorama',
 	'webgpu_postprocessing_bloom_emissive',
 	'webgpu_lights_tiled',

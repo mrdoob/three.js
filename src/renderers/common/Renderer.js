@@ -120,7 +120,7 @@ class Renderer {
 		 * @type {number}
 		 * @default 0
 		 */
-		this.samples = samples || ( antialias === true ) ? 4 : 0;
+		this._samples = samples || ( antialias === true ) ? 4 : 0;
 
 		/**
 		 * Whether the renderer should automatically clear the current rendering target
@@ -1247,6 +1247,7 @@ class Renderer {
 
 		frameBufferTarget.depthBuffer = depth;
 		frameBufferTarget.stencilBuffer = stencil;
+
 		if ( outputRenderTarget !== null ) {
 
 			frameBufferTarget.setSize( outputRenderTarget.width, outputRenderTarget.height, outputRenderTarget.depth );
@@ -1292,6 +1293,7 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
+		const previousRenderTarget = this._renderTarget;
 
 		//
 
@@ -1315,6 +1317,12 @@ class Renderer {
 		} else {
 
 			renderTarget = outputRenderTarget;
+
+			if ( outputRenderTarget && outputRenderTarget.isCanvasRenderTarget ) {
+
+				outputRenderTarget.samples = this.samples;
+
+			}
 
 		}
 
@@ -1524,6 +1532,8 @@ class Renderer {
 
 			this._renderOutput( renderTarget );
 
+			this.setRenderTarget( previousRenderTarget, activeCubeFace, activeMipmapLevel );
+
 		}
 
 		//
@@ -1574,7 +1584,6 @@ class Renderer {
 
 		this.autoClear = currentAutoClear;
 		this.xr.enabled = currentXR;
-
 
 	}
 
@@ -2146,6 +2155,44 @@ class Renderer {
 	async clearStencilAsync() {
 
 		this.clearAsync( false, false, true );
+
+	}
+
+	/**
+	 * Returns `true` if a framebuffer target is needed to perform tone mapping or color space conversion.
+	 * If this is the case, the renderer allocates an internal render target for that purpose.
+	 *
+	 */
+	get needsFrameBufferTarget() {
+
+		const useToneMapping = this.currentToneMapping !== NoToneMapping;
+		const useColorSpace = this.currentColorSpace !== ColorManagement.workingColorSpace;
+
+		return useToneMapping || useColorSpace;
+
+	}
+
+	get samples() {
+
+		return this._samples;
+
+	}
+
+	get currentSamples() {
+
+		let samples = this._samples;
+
+		if ( this._renderTarget !== null ) {
+
+			samples = this._renderTarget.samples;
+
+		} else if ( this.needsFrameBufferTarget ) {
+
+			samples = 0;
+
+		}
+
+		return samples;
 
 	}
 
