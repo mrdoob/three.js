@@ -111,8 +111,8 @@ export default BumpMapNode;
  *
  * @tsl
  * @function
- * @param {Node<float>} textureNode - Represents the bump map data.
+ * @param {Node<vec3>} node - Represents the bump map data.
  * @param {?Node<float>} [scale=null] - Controls the intensity of the bump effect.
  * @returns {BumpMapNode}
  */
-export const bumpMap = ( texture, scale = null ) => new BumpMapNode( convertToTexture( texture ), nodeObject( scale ) );
+export const bumpMap = ( node, scale = null ) => new BumpMapNode( convertToTexture( node ), nodeObject( scale ) );
