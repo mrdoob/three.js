@@ -1381,6 +1381,7 @@ function onSessionEnd() {
 
 	this._session = null;
 	this._xrRenderTarget = null;
+	this._glBinding = null;
 
 	// switch layers back to emulated
 	if ( this._sessionUsesLayers === true ) {
