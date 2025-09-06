@@ -117,6 +117,14 @@ class Geometries extends DataMap {
 		 */
 		this.attributeCall = new WeakMap();
 
+		/**
+		 * Stores functions to remove dispose event listeners from geometries.
+		 *
+		 * @private
+		 * @type {Object}
+		 */
+		this._removeListeners = {};
+
 	}
 
 	/**
@@ -154,6 +162,13 @@ class Geometries extends DataMap {
 	initGeometry( renderObject ) {
 
 		const geometry = renderObject.geometry;
+
+		if ( this._removeListeners[ geometry.id ] !== undefined ) {
+
+			return;
+
+		}
+
 		const geometryData = this.get( geometry );
 
 		geometryData.initialized = true;
@@ -189,9 +204,17 @@ class Geometries extends DataMap {
 
 			geometry.removeEventListener( 'dispose', onDispose );
 
+			delete this._removeListeners[ geometry.id ];
+
 		};
 
 		geometry.addEventListener( 'dispose', onDispose );
+
+		this._removeListeners[ geometry.id ] = () => {
+
+			geometry.removeEventListener( 'dispose', onDispose );
+
+		};
 
 	}
 
@@ -336,6 +359,18 @@ class Geometries extends DataMap {
 		}
 
 		return index;
+
+	}
+
+	dispose() {
+
+		for ( const key in this._removeListeners ) {
+
+			this._removeListeners[ key ]();
+
+		}
+
+		this._removeListeners = {};
 
 	}
 
