@@ -1627,6 +1627,9 @@ function onSessionEnd() {
 
 	this._session = null;
 	this._xrRenderTarget = null;
+	this._glBinding = null;
+	this._glBaseLayer = null;
+	this._glProjLayer = null;
 
 	// switch layers back to emulated
 	if ( this._sessionUsesLayers === true ) {

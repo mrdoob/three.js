@@ -108,17 +108,19 @@
 					.setTranscoderPath( 'jsm/libs/basis/' )
 					.detectSupport( renderer );
 
-				function loadTexture( url ) { 
+				function loadTexture( url ) {
 
-					loader.load(url, (texture) => {
+					loader.load( url, ( texture ) => {
+
 						texture.mapping = THREE.CubeUVReflectionMapping;
 						scene.environment = texture;
 						scene.background = texture;
+
 					} );
-					
+
 				}
-				
-				loadTexture("https://cdn.needle.tools/static/hdris/ballroom_2k.pmrem.ktx2");
+
+				loadTexture( "https://cdn.needle.tools/static/hdris/ballroom_2k.pmrem.ktx2" );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -126,6 +128,7 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = .1;
 				controls.maxDistance = 20;
+				controls.enableDamping = true;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -145,17 +148,20 @@
 					loadTexture( params.image );
 
 				} );
+
 				gui.add( params, 'exposure', 0, 2, 0.01 );
+
 				gui.add( params, 'fov', 10, 100 ).onChange( () => {
 
 					camera.fov = params.fov;
 					camera.updateProjectionMatrix();
 
 				} );
-				gui.add( params, 'backgroundBlurriness', 0, 1, 0.01 ).name('background blurriness');
+
+				gui.add( params, 'backgroundBlurriness', 0, 1, 0.01 ).name( 'background blurriness' );
 
 				gui.open();
-				
+
 			}
 
 			function onWindowResize() {
@@ -182,6 +188,8 @@
 
 				renderer.toneMappingExposure = params.exposure;
 				scene.backgroundBlurriness = params.backgroundBlurriness;
+
+				controls.update();
 
 				renderer.render( scene, camera );
 
