@@ -114,10 +114,6 @@
 
 					video.play();
 
-					
-
-					//toggleVideoContainer(container);
-
 				} );
 
 				parentNode = container.parentNode;
@@ -148,10 +144,6 @@
 				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				renderer.xr.setReferenceSpaceType( 'local' );
-
-				renderer.xr.addEventListener("sessionstop", () => {
-					location.reload();
-				});
 
 				//create a native media layer and projection layer / 2D mono/stereo mesh in a group.
 				//media layer position transformation can be applied in a quaternion transformation object.
@@ -258,11 +250,6 @@
 				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
 				scene.add( controllerGrip2 );
 
-			}
-
-			function toggleVideoContainer(container) {
-				parentNode.contains(container) ? parentNode.removeChild(container) : parentNode.addChild(container);
-				console.log("Toggle Video Container For Quest Performance Hit Fix ", parentNode);
 			}
 
 			function buildController( data ) {

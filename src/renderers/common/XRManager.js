@@ -797,7 +797,7 @@ class XRManager extends EventDispatcher {
 
 		}
 
-		if ( this._useLayers ) {
+		if ( this._supportsLayers ) {
 
 			//update and replace the layer item at the specified index or prepend
 			const updateOrPrepend = ( index, layers, layer ) => {
