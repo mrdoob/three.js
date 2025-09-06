@@ -34,7 +34,7 @@ class ViewHelper extends Object3D {
 	 * Constructs a new view helper.
 	 *
 	 * @param {Camera} camera - The camera whose transformation should be visualized.
-	 * @param {HTMLDOMElement} [domElement] - The DOM element that is used to render the view.
+	 * @param {HTMLElement} [domElement] - The DOM element that is used to render the view.
 	 */
 	constructor( camera, domElement ) {
 

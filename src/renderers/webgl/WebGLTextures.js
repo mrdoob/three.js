@@ -554,6 +554,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			uploadTexture( textureProperties, texture, slot );
 			return;
 
+		} else if ( texture.isExternalTexture ) {
+
+			textureProperties.__webglTexture = texture.sourceTexture ? texture.sourceTexture : null;
+
 		}
 
 		state.bindTexture( _gl.TEXTURE_2D_ARRAY, textureProperties.__webglTexture, _gl.TEXTURE0 + slot );

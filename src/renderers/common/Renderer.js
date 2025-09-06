@@ -30,6 +30,8 @@ import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
 
+import { float, vec3, vec4 } from '../../nodes/tsl/TSLCore.js';
+import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { error, warn } from '../../utils.js';
 
@@ -2902,17 +2904,49 @@ class Renderer {
 
 				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
 
+				const hasMap = material.map !== null;
+				const hasColorNode = material.colorNode && material.colorNode.isNode;
+				const hasCastShadowNode = material.castShadowNode && material.castShadowNode.isNode;
+
+				if ( hasMap || hasColorNode || hasCastShadowNode ) {
+
+					overrideColorNode = overrideMaterial.colorNode;
+
+					let shadowRGB;
+					let shadowAlpha;
+
+					if ( hasCastShadowNode ) {
+
+						shadowRGB = material.castShadowNode.rgb;
+						shadowAlpha = material.castShadowNode.a;
+
+					} else {
+
+						shadowRGB = vec3( 0 );
+						shadowAlpha = float( 1 );
+
+					}
+
+					if ( hasMap ) {
+
+						shadowAlpha = shadowAlpha.mul( reference( 'map', 'texture', material ).a );
+
+					}
+
+					if ( hasColorNode ) {
+
+						shadowAlpha = shadowAlpha.mul( material.colorNode.a );
+
+					}
+
+					overrideMaterial.colorNode = vec4( shadowRGB, shadowAlpha );
+
+				}
+
 				if ( material.depthNode && material.depthNode.isNode ) {
 
 					overrideDepthNode = overrideMaterial.depthNode;
 					overrideMaterial.depthNode = material.depthNode;
-
-				}
-
-				if ( material.castShadowNode && material.castShadowNode.isNode ) {
-
-					overrideColorNode = overrideMaterial.colorNode;
-					overrideMaterial.colorNode = material.castShadowNode;
 
 				}
 

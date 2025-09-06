@@ -44,7 +44,7 @@ class DDSLoader extends CompressedTextureLoader {
 	 */
 	parse( buffer, loadMipmaps ) {
 
-		const dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };
+		const dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1, isCubemap: false };
 
 		// Adapted from @toji's DDS utils
 		// https://github.com/toji/webgl-texture-utils/blob/master/texture-util/dds.js
