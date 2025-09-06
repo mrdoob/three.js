@@ -3,8 +3,8 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, EventDispatcher, MathUtils, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, Texture, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, HalfFloatType, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, warnOnce, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, TimestampQuery, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
-export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, log as log$1, Texture, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, HalfFloatType, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, warnOnce, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, TimestampQuery, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -845,7 +845,7 @@ function getLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 9;
 	if ( /mat4/.test( type ) ) return 16;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 
@@ -866,7 +866,7 @@ function getMemoryLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 12;
 	if ( /mat4/.test( type ) ) return 16;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 
@@ -887,7 +887,7 @@ function getByteBoundaryFromType( type ) {
 	if ( /mat3/.test( type ) ) return 48;
 	if ( /mat4/.test( type ) ) return 64;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 
@@ -1747,7 +1747,7 @@ class Node extends EventDispatcher {
 	 */
 	updateBefore( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -1761,7 +1761,7 @@ class Node extends EventDispatcher {
 	 */
 	updateAfter( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -1775,7 +1775,7 @@ class Node extends EventDispatcher {
 	 */
 	update( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -1904,7 +1904,7 @@ class Node extends EventDispatcher {
 
 					} else {
 
-						console.warn( 'THREE.Node: Recursion detected.', this );
+						warn( 'Node: Recursion detected.', this );
 
 						result = '/* Recursion detected. */';
 
@@ -1928,7 +1928,7 @@ class Node extends EventDispatcher {
 
 				// if no snippet is generated, return a default value
 
-				console.error( `THREE.TSL: Invalid generated code, expected a "${ output }".` );
+				error( `TSL: Invalid generated code, expected a "${ output }".` );
 
 				result = builder.generateConst( output );
 
@@ -2454,7 +2454,7 @@ class JoinNode extends TempNode {
 
 			if ( length >= maxLength ) {
 
-				console.error( `THREE.TSL: Length of parameters exceeds maximum length of function '${ type }()' type.` );
+				error( `TSL: Length of parameters exceeds maximum length of function '${ type }()' type.` );
 				break;
 
 			}
@@ -2465,7 +2465,7 @@ class JoinNode extends TempNode {
 
 			if ( length + inputTypeLength > maxLength ) {
 
-				console.error( `THREE.TSL: Length of '${ type }()' data exceeds maximum length of output type.` );
+				error( `TSL: Length of '${ type }()' data exceeds maximum length of output type.` );
 
 				inputTypeLength = maxLength - length;
 				inputType = builder.getTypeFromLength( inputTypeLength );
@@ -3003,7 +3003,7 @@ class InputNode extends Node {
 
 	generate( /*builder, output*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -3173,7 +3173,7 @@ class MemberNode extends Node {
 
 		if ( this.hasMember( builder ) === false ) {
 
-			console.warn( `THREE.TSL: Member "${ this.property }" does not exist in struct.` );
+			warn( `TSL: Member "${ this.property }" does not exist in struct.` );
 
 			const type = this.getNodeType( builder );
 
@@ -3199,7 +3199,7 @@ function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
 
-		console.warn( `THREE.TSL: Redefinition of method chaining '${ name }'.` );
+		warn( `TSL: Redefinition of method chaining '${ name }'.` );
 		return;
 
 	}
@@ -3245,7 +3245,7 @@ Node.prototype.assign = function ( ...params ) {
 
 		} else {
 
-			console.error( 'THREE.TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().' );
+			error( 'TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().' );
 
 		}
 
@@ -3553,13 +3553,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( minParams !== undefined && params.length < minParams ) {
 
-			console.error( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
+			error( `TSL: "${ tslName }" parameter length is less than minimum required.` );
 
 			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
 
 		} else if ( maxParams !== undefined && params.length > maxParams ) {
 
-			console.error( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
+			error( `TSL: "${ tslName }" parameter length exceeds limit.` );
 
 			return params.slice( 0, maxParams );
 
@@ -4029,7 +4029,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( param === undefined ) {
 
-				console.error( `THREE.TSL: Invalid parameter for the type "${ type }".` );
+				error( `TSL: Invalid parameter for the type "${ type }".` );
 
 				return nodeObject( new ConstNode( 0, type ) );
 
@@ -4118,7 +4118,7 @@ class FnNode extends Node {
 
 				} else {
 
-					console.error( 'THREE.TSL: Invalid layout type.' );
+					error( 'TSL: Invalid layout type.' );
 
 				}
 
@@ -4202,7 +4202,7 @@ class FnNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		console.error( 'THREE.TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+		error( 'TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
 
 		return builder.generateConst( type );
 
@@ -4368,14 +4368,14 @@ addMethodChaining( 'convert', convert );
  */
 const append = ( node ) => { // @deprecated, r176
 
-	console.warn( 'THREE.TSL: append() has been renamed to Stack().' );
+	warn( 'TSL: append() has been renamed to Stack().' );
 	return Stack( node );
 
 };
 
 addMethodChaining( 'append', ( node ) => { // @deprecated, r176
 
-	console.warn( 'THREE.TSL: .append() has been renamed to .toStack().' );
+	warn( 'TSL: .append() has been renamed to .toStack().' );
 	return Stack( node );
 
 } );
@@ -4928,7 +4928,7 @@ class UniformNode extends InputNode {
 	 */
 	label( name ) {
 
-		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -5557,13 +5557,13 @@ class FunctionCallNode extends TempNode {
 
 			if ( parameters.length > inputs.length ) {
 
-				console.error( 'THREE.TSL: The number of provided parameters exceeds the expected number of inputs in \'Fn()\'.' );
+				error( 'TSL: The number of provided parameters exceeds the expected number of inputs in \'Fn()\'.' );
 
 				parameters.length = inputs.length;
 
 			} else if ( parameters.length < inputs.length ) {
 
-				console.error( 'THREE.TSL: The number of provided parameters is less than the expected number of inputs in \'Fn()\'.' );
+				error( 'TSL: The number of provided parameters is less than the expected number of inputs in \'Fn()\'.' );
 
 				while ( parameters.length < inputs.length ) {
 
@@ -5591,7 +5591,7 @@ class FunctionCallNode extends TempNode {
 
 				} else {
 
-					console.error( `THREE.TSL: Input '${ inputNode.name }' not found in \'Fn()\'.` );
+					error( `TSL: Input '${ inputNode.name }' not found in \'Fn()\'.` );
 
 					params.push( generateInput( float( 0 ), inputNode ) );
 
@@ -6207,7 +6207,7 @@ const bitAnd = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&' ).setParameterLe
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-const bitNot = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '~' ).setParameterLength( 2 ).setName( 'bitNot' );
+const bitNot = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '~' ).setParameterLength( 1 ).setName( 'bitNot' );
 
 /**
  * Performs bitwise OR on two nodes.
@@ -6353,7 +6353,7 @@ addMethodChaining( 'decrement', decrement );
  */
 const modInt = ( a, b ) => { // @deprecated, r175
 
-	console.warn( 'THREE.TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
 	return mod( int( a ), int( b ) );
 
 };
@@ -6647,7 +6647,7 @@ class MathNode extends TempNode {
 
 				if ( builder.shaderStage !== 'fragment' && ( method === MathNode.DFDX || method === MathNode.DFDY ) ) {
 
-					console.warn( `THREE.TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
+					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
 
 					method = '/*' + method + '*/';
 
@@ -6770,12 +6770,29 @@ const INFINITY = /*@__PURE__*/ float( 1e6 );
 const PI = /*@__PURE__*/ float( Math.PI );
 
 /**
+ * Represents PI * 2. Please use the non-deprecated version `TWO_PI`.
+ *
+ * @tsl
+ * @deprecated
+ * @type {Node<float>}
+ */
+const PI2 = /*@__PURE__*/ float( Math.PI * 2 ); // @deprecated r181
+
+/**
  * Represents PI * 2.
  *
  * @tsl
  * @type {Node<float>}
  */
-const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
+const TWO_PI = /*@__PURE__*/ float( Math.PI * 2 );
+
+/**
+ * Represents PI / 2.
+ *
+ * @tsl
+ * @type {Node<float>}
+ */
+const HALF_PI = /*@__PURE__*/ float( Math.PI * 0.5 );
 
 /**
  * Returns `true` if all components of `x` are `true`.
@@ -7133,7 +7150,7 @@ const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE ).setP
  */
 const equals = ( x, y ) => { // @deprecated, r172
 
-	console.warn( 'THREE.TSL: "equals" is deprecated. Use "equal" inside a vector instead, like: "bvec*( equal( ... ) )"' );
+	warn( 'TSL: "equals" is deprecated. Use "equal" inside a vector instead, like: "bvec*( equal( ... ) )"' );
 	return equal( x, y );
 
 };
@@ -7431,7 +7448,7 @@ const stepElement = ( x, edge ) => step( edge, x );
  */
 const atan2 = ( y, x ) => { // @deprecated, r172
 
-	console.warn( 'THREE.TSL: "atan2" is overloaded. Use "atan" instead.' );
+	warn( 'TSL: "atan2" is overloaded. Use "atan" instead.' );
 	return atan( y, x );
 
 };
@@ -7674,7 +7691,7 @@ class ConditionalNode extends Node {
 
 				if ( functionNode === null ) {
 
-					console.warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+					warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
 
 					ifSnippet = '// ' + ifSnippet;
 
@@ -7704,7 +7721,7 @@ class ConditionalNode extends Node {
 
 					if ( functionNode === null ) {
 
-						console.warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+						warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
 
 						elseSnippet = '// ' + elseSnippet;
 
@@ -7916,7 +7933,7 @@ const setName = ( node, name ) => context( node, { nodeName: name } );
  */
 function label( node, name ) {
 
-	console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+	warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 	return setName( node, name );
 
@@ -8500,14 +8517,14 @@ addMethodChaining( 'toVertexStage', vertexStage );
 
 addMethodChaining( 'varying', ( ...params ) => { // @deprecated, r173
 
-	console.warn( 'THREE.TSL: .varying() has been renamed to .toVarying().' );
+	warn( 'TSL: .varying() has been renamed to .toVarying().' );
 	return varying( ...params );
 
 } );
 
 addMethodChaining( 'vertexStage', ( ...params ) => { // @deprecated, r173
 
-	console.warn( 'THREE.TSL: .vertexStage() has been renamed to .toVertexStage().' );
+	warn( 'TSL: .vertexStage() has been renamed to .toVertexStage().' );
 	return varying( ...params );
 
 } );
@@ -9207,7 +9224,7 @@ class ToneMappingNode extends TempNode {
 
 		} else {
 
-			console.error( 'ToneMappingNode: Unsupported Tone Mapping configuration.', toneMapping );
+			error( 'ToneMappingNode: Unsupported Tone Mapping configuration.', toneMapping );
 
 			outputNode = colorNode;
 
@@ -9706,7 +9723,7 @@ class ComputeNode extends Node {
 	 */
 	label( name ) {
 
-		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -9798,7 +9815,7 @@ const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 	if ( workgroupSize.length === 0 || workgroupSize.length > 3 ) {
 
-		console.error( 'THREE.TSL: compute() workgroupSize must have 1, 2, or 3 elements' );
+		error( 'TSL: compute() workgroupSize must have 1, 2, or 3 elements' );
 
 	}
 
@@ -9808,7 +9825,7 @@ const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 		if ( typeof val !== 'number' || val <= 0 || ! Number.isInteger( val ) ) {
 
-			console.error( `THREE.TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer` );
+			error( `TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer` );
 
 		}
 
@@ -10402,7 +10419,7 @@ class DebugNode extends TempNode {
 
 		} else {
 
-			console.log( code );
+			log$1( code );
 
 		}
 
@@ -10425,13 +10442,9 @@ const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject
 
 addMethodChaining( 'debug', debug );
 
-// Non-PURE exports list, side-effects are required here.
-// TSL Base Syntax
-
-
 function addNodeElement( name/*, nodeElement*/ ) {
 
-	console.warn( 'THREE.TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
+	warn( 'TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
 
 }
 
@@ -10559,7 +10572,7 @@ class AttributeNode extends Node {
 
 		} else {
 
-			console.warn( `AttributeNode: Vertex attribute "${ attributeName }" not found on geometry.` );
+			warn( `AttributeNode: Vertex attribute "${ attributeName }" not found on geometry.` );
 
 			return builder.generateConst( nodeType );
 
@@ -11191,11 +11204,7 @@ class TextureNode extends UniformNode {
 
 		let snippet;
 
-		if ( levelSnippet ) {
-
-			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
-
-		} else if ( biasSnippet ) {
+		if ( biasSnippet ) {
 
 			snippet = builder.generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, offsetSnippet );
 
@@ -11209,7 +11218,11 @@ class TextureNode extends UniformNode {
 
 		} else if ( this.sampler === false ) {
 
-			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet );
+			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
+
+		} else if ( levelSnippet ) {
+
+			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet );
 
 		} else {
 
@@ -11325,7 +11338,7 @@ class TextureNode extends UniformNode {
 	 */
 	uv( uvNode ) { // @deprecated, r172
 
-		console.warn( 'THREE.TextureNode: .uv() has been renamed. Use .sample() instead.' );
+		warn( 'TextureNode: .uv() has been renamed. Use .sample() instead.' );
 
 		return this.sample( uvNode );
 
@@ -11375,7 +11388,7 @@ class TextureNode extends UniformNode {
 
 		if ( textureNode.generateMipmaps === false && ( map && map.generateMipmaps === false || map.minFilter === NearestFilter || map.magFilter === NearestFilter ) ) {
 
-			console.warn( 'THREE.TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
+			warn( 'TSL: texture().blur() requires mipmaps and sampling. Use .generateMipmaps=true and .minFilter/.magFilter=THREE.LinearFilter in the Texture.' );
 
 			textureNode.biasNode = null;
 
@@ -12429,7 +12442,7 @@ const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
  */
 const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
-	console.warn( 'THREE.TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
+	warn( 'TSL: "viewportResolution" is deprecated. Use "screenSize" instead.' );
 
 	return screenSize;
 
@@ -13330,7 +13343,7 @@ const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'normal' ) === false ) {
 
-		console.warn( 'THREE.TSL: Vertex attribute "normal" not found on geometry.' );
+		warn( 'TSL: Vertex attribute "normal" not found on geometry.' );
 
 		return vec3( 0, 1, 0 );
 
@@ -13515,7 +13528,7 @@ const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) => {
  */
 const transformedNormalView = ( Fn( () => { // @deprecated, r177
 
-	console.warn( 'THREE.TSL: "transformedNormalView" is deprecated. Use "normalView" instead.' );
+	warn( 'TSL: "transformedNormalView" is deprecated. Use "normalView" instead.' );
 	return normalView;
 
 } ).once( [ 'NORMAL', 'VERTEX' ] ) )();
@@ -13529,7 +13542,7 @@ const transformedNormalView = ( Fn( () => { // @deprecated, r177
  */
 const transformedNormalWorld = ( Fn( () => { // @deprecated, r177
 
-	console.warn( 'THREE.TSL: "transformedNormalWorld" is deprecated. Use "normalWorld" instead.' );
+	warn( 'TSL: "transformedNormalWorld" is deprecated. Use "normalWorld" instead.' );
 	return normalWorld;
 
 } ).once( [ 'NORMAL', 'VERTEX' ] ) )();
@@ -13543,7 +13556,7 @@ const transformedNormalWorld = ( Fn( () => { // @deprecated, r177
  */
 const transformedClearcoatNormalView = ( Fn( () => { // @deprecated, r177
 
-	console.warn( 'THREE.TSL: "transformedClearcoatNormalView" is deprecated. Use "clearcoatNormalView" instead.' );
+	warn( 'TSL: "transformedClearcoatNormalView" is deprecated. Use "clearcoatNormalView" instead.' );
 	return clearcoatNormalView;
 
 } ).once( [ 'NORMAL', 'VERTEX' ] ) )();
@@ -13705,7 +13718,7 @@ class CubeTextureNode extends TextureNode {
 
 		} else {
 
-			console.error( 'THREE.CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
+			error( 'CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
 
 			return vec3( 0, 0, 0 );
 
@@ -13752,7 +13765,7 @@ class CubeTextureNode extends TextureNode {
 	 */
 	generateUV( builder, cubeUV ) {
 
-		return cubeUV.build( builder, 'vec3' );
+		return cubeUV.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
 
 	}
 
@@ -14045,7 +14058,7 @@ class ReferenceNode extends Node {
 	 */
 	label( name ) {
 
-		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -14622,7 +14635,7 @@ class NormalMapNode extends TempNode {
 
 		} else {
 
-			console.error( `THREE.NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
+			error( `NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
 
 			output = normalView; // Fallback to default normal view
 
@@ -15873,15 +15886,33 @@ class InstanceNode extends Node {
 	 */
 	update( /*frame*/ ) {
 
-		if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.buffer !== null && this.instanceMatrix.version !== this.buffer.version ) {
+		if ( this.buffer !== null ) {
 
-			this.buffer.version = this.instanceMatrix.version;
+			// keep update ranges in sync
+
+			this.buffer.clearUpdateRanges();
+			this.buffer.updateRanges.push( ... this.instanceMatrix.updateRanges );
+
+			// update version if necessary
+
+			if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.instanceMatrix.version !== this.buffer.version ) {
+
+				this.buffer.version = this.instanceMatrix.version;
+
+			}
 
 		}
 
-		if ( this.instanceColor && this.instanceColor.usage !== DynamicDrawUsage && this.bufferColor !== null && this.instanceColor.version !== this.bufferColor.version ) {
+		if ( this.instanceColor && this.bufferColor !== null ) {
 
-			this.bufferColor.version = this.instanceColor.version;
+			this.bufferColor.clearUpdateRanges();
+			this.bufferColor.updateRanges.push( ... this.instanceColor.updateRanges );
+
+			if ( this.instanceColor.usage !== DynamicDrawUsage && this.instanceColor.version !== this.bufferColor.version ) {
+
+				this.bufferColor.version = this.instanceColor.version;
+
+			}
 
 		}
 
@@ -16639,7 +16670,7 @@ const storage = ( value, type = null, count = 0 ) => nodeObject( new StorageBuff
  */
 const storageObject = ( value, type, count ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
+	warn( 'TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
 
 	return storage( value, type, count ).setPBO( true );
 
@@ -17220,7 +17251,7 @@ class LoopNode extends Node {
 
 							} else {
 
-								console.error( 'THREE.TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
 
 								updateSnippet = 'break /* invalid update */';
 
@@ -18983,7 +19014,7 @@ const unpremultiplyAlpha = /*@__PURE__*/ Fn( ( [ color ] ) => {
  */
 const burn = ( ...params ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "burn" has been renamed. Use "blendBurn" instead.' );
+	warn( 'TSL: "burn" has been renamed. Use "blendBurn" instead.' );
 	return blendBurn( params );
 
 };
@@ -18998,7 +19029,7 @@ const burn = ( ...params ) => { // @deprecated, r171
  */
 const dodge = ( ...params ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "dodge" has been renamed. Use "blendDodge" instead.' );
+	warn( 'TSL: "dodge" has been renamed. Use "blendDodge" instead.' );
 	return blendDodge( params );
 
 };
@@ -19013,7 +19044,7 @@ const dodge = ( ...params ) => { // @deprecated, r171
  */
 const screen = ( ...params ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "screen" has been renamed. Use "blendScreen" instead.' );
+	warn( 'TSL: "screen" has been renamed. Use "blendScreen" instead.' );
 	return blendScreen( params );
 
 };
@@ -19028,7 +19059,7 @@ const screen = ( ...params ) => { // @deprecated, r171
  */
 const overlay = ( ...params ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "overlay" has been renamed. Use "blendOverlay" instead.' );
+	warn( 'TSL: "overlay" has been renamed. Use "blendOverlay" instead.' );
 	return blendOverlay( params );
 
 };
@@ -19400,7 +19431,7 @@ class NodeMaterial extends Material {
 
 			set: ( value ) => {
 
-				console.warn( 'THREE.NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
+				warn( 'NodeMaterial: ".shadowPositionNode" was renamed to ".receivedShadowPositionNode".' );
 
 				this.receivedShadowPositionNode = value;
 
@@ -21692,7 +21723,7 @@ class BasicLightingModel extends LightingModel {
 					break;
 
 				default:
-					console.warn( 'THREE.BasicLightingModel: Unsupported .combine value:', material.combine );
+					warn( 'BasicLightingModel: Unsupported .combine value:', material.combine );
 					break;
 
 			}
@@ -23849,7 +23880,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			console.warn( 'THREE.PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
+			warn( 'PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
 
 			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
 
@@ -23926,7 +23957,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			console.warn( 'THREE.PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
+			warn( 'PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
 
 			this._setSizeFromTexture( equirectangular );
 
@@ -23974,7 +24005,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			console.warn( 'THREE.PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
+			warn( 'PMREMGenerator: .fromCubemap() called before the backend is initialized. Try using .fromCubemapAsync() instead.' );
 
 			this._setSizeFromTexture( cubemap );
 
@@ -24371,7 +24402,7 @@ class PMREMGenerator {
 
 		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
 
-			console.error( 'blur direction must be either latitudinal or longitudinal!' );
+			error( 'blur direction must be either latitudinal or longitudinal!' );
 
 		}
 
@@ -24390,7 +24421,7 @@ class PMREMGenerator {
 
 		if ( samples > MAX_SAMPLES ) {
 
-			console.warn( `sigmaRadians, ${
+			warn( `sigmaRadians, ${
 				sigmaRadians}, is too large and will clip, as it requested ${
 				samples} samples when the maximum is set to ${MAX_SAMPLES}` );
 
@@ -29071,7 +29102,7 @@ class Info {
 
 		} else {
 
-			console.error( 'THREE.WebGPUInfo: Unknown object type.' );
+			error( 'WebGPUInfo: Unknown object type.' );
 
 		}
 
@@ -31185,11 +31216,11 @@ class Textures extends DataMap {
 
 				if ( image === undefined ) {
 
-					console.warn( 'THREE.Renderer: Texture marked for update but image is undefined.' );
+					warn( 'Renderer: Texture marked for update but image is undefined.' );
 
 				} else if ( image.complete === false ) {
 
-					console.warn( 'THREE.Renderer: Texture marked for update but image is incomplete.' );
+					warn( 'Renderer: Texture marked for update but image is incomplete.' );
 
 				} else {
 
@@ -31256,7 +31287,7 @@ class Textures extends DataMap {
 
 			if ( texture.isVideoTexture && ColorManagement.getTransfer( texture.colorSpace ) !== SRGBTransfer ) {
 
-				console.warn( 'WebGPURenderer: Video textures must use a color space with a sRGB transfer function, e.g. SRGBColorSpace.' );
+				warn( 'WebGPURenderer: Video textures must use a color space with a sRGB transfer function, e.g. SRGBColorSpace.' );
 
 			}
 
@@ -31634,7 +31665,7 @@ class StackNode extends Node {
 
 		if ( node.isNode !== true ) {
 
-			console.error( 'THREE.TSL: Invalid node added to stack.' );
+			error( 'TSL: Invalid node added to stack.' );
 			return this;
 
 		}
@@ -31732,7 +31763,7 @@ class StackNode extends Node {
 
 		} else {
 
-			console.error( 'THREE.TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
 
 		}
 
@@ -33420,7 +33451,7 @@ class ReflectorBaseNode extends Node {
 
 		if ( parameters.resolution !== undefined ) {
 
-			warnOnce( 'THREE.ReflectorNode: The "resolution" parameter has been renamed to "resolutionScale".' ); // @deprecated r180
+			warnOnce( 'ReflectorNode: The "resolution" parameter has been renamed to "resolutionScale".' ); // @deprecated r180
 
 			this.resolutionScale = parameters.resolution;
 
@@ -33756,7 +33787,7 @@ class ReflectorBaseNode extends Node {
 	 */
 	get resolution() {
 
-		warnOnce( 'THREE.ReflectorNode: The "resolution" property has been renamed to "resolutionScale".' ); // @deprecated r180
+		warnOnce( 'ReflectorNode: The "resolution" property has been renamed to "resolutionScale".' ); // @deprecated r180
 
 		return this.resolutionScale;
 
@@ -33764,7 +33795,7 @@ class ReflectorBaseNode extends Node {
 
 	set resolution( value ) {
 
-		warnOnce( 'THREE.ReflectorNode: The "resolution" property has been renamed to "resolutionScale".' ); // @deprecated r180
+		warnOnce( 'ReflectorNode: The "resolution" property has been renamed to "resolutionScale".' ); // @deprecated r180
 
 		this.resolutionScale = value;
 
@@ -34710,7 +34741,7 @@ class SceneNode extends Node {
 
 		} else {
 
-			console.error( 'THREE.SceneNode: Unknown scope:', scope );
+			error( 'SceneNode: Unknown scope:', scope );
 
 		}
 
@@ -35136,7 +35167,7 @@ class Texture3DNode extends TextureNode {
 	 */
 	generateUV( builder, uvNode ) {
 
-		return uvNode.build( builder, 'vec3' );
+		return uvNode.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
 
 	}
 
@@ -35541,7 +35572,7 @@ const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
  * @function
  * @param {Node<vec3>} color - The color value to compute the luminance for.
  * @param {?Node<vec3>} luminanceCoefficients - The luminance coefficients. By default predefined values of the current working color space are used.
- * @return {Node<vec3>} The luminance.
+ * @return {Node<float>} The luminance.
  */
 const luminance = (
 	color,
@@ -38372,7 +38403,7 @@ const fog = Fn( ( [ color, factor ] ) => {
  */
 function rangeFog( color, near, far ) { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
+	warn( 'TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
 	return fog( color, rangeFogFactor( near, far ) );
 
 }
@@ -38388,7 +38419,7 @@ function rangeFog( color, near, far ) { // @deprecated, r171
  */
 function densityFog( color, density ) { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "densityFog( color, density )" is deprecated. Use "fog( color, densityFogFactor( density ) )" instead.' );
+	warn( 'TSL: "densityFog( color, density )" is deprecated. Use "fog( color, densityFogFactor( density ) )" instead.' );
 	return fog( color, densityFogFactor( density ) );
 
 }
@@ -38662,7 +38693,7 @@ class ComputeBuiltinNode extends Node {
 
 		} else {
 
-			console.warn( `ComputeBuiltinNode: Compute built-in value ${builtinName} can not be accessed in the ${builder.shaderStage} stage` );
+			warn( `ComputeBuiltinNode: Compute built-in value ${builtinName} can not be accessed in the ${builder.shaderStage} stage` );
 			return builder.generateConst( nodeType );
 
 		}
@@ -39006,7 +39037,7 @@ class WorkgroupInfoNode extends Node {
 	 */
 	label( name ) {
 
-		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -40125,7 +40156,7 @@ class LightsNode extends Node {
 
 					if ( lightNodeClass === null ) {
 
-						console.warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
+						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
 						continue;
 
 					}
@@ -41419,7 +41450,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			if ( builder.material.shadowNode ) { // @deprecated, r171
 
-				console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
+				warn( 'NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
 
 			}
 
@@ -44210,6 +44241,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	EPSILON: EPSILON,
 	F_Schlick: F_Schlick,
 	Fn: Fn,
+	HALF_PI: HALF_PI,
 	INFINITY: INFINITY,
 	If: If,
 	Loop: Loop,
@@ -44231,6 +44263,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	Stack: Stack,
 	Switch: Switch,
 	TBNViewMatrix: TBNViewMatrix,
+	TWO_PI: TWO_PI,
 	VSMShadowFilter: VSMShadowFilter,
 	V_GGX_SmithCorrelated: V_GGX_SmithCorrelated,
 	Var: Var,
@@ -44955,7 +44988,7 @@ class Background extends DataMap {
 
 		} else {
 
-			console.error( 'THREE.Renderer: Unsupported background configuration.', background );
+			error( 'Renderer: Unsupported background configuration.', background );
 
 		}
 
@@ -47139,7 +47172,7 @@ class NodeBuilder {
 		/*
 		if ( this.chaining.indexOf( node ) !== - 1 ) {
 
-			console.warn( 'Recursive node: ', node );
+			warn( 'Recursive node: ', node );
 
 		}
 		*/
@@ -47318,7 +47351,7 @@ class NodeBuilder {
 	 */
 	getVertexIndex() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -47330,7 +47363,7 @@ class NodeBuilder {
 	 */
 	getInstanceIndex() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -47343,7 +47376,7 @@ class NodeBuilder {
 	 */
 	getDrawIndex() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -47355,7 +47388,7 @@ class NodeBuilder {
 	 */
 	getFrontFacing() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -47367,7 +47400,7 @@ class NodeBuilder {
 	 */
 	getFragCoord() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -47410,7 +47443,7 @@ class NodeBuilder {
 	 */
 	generateTexture( /* texture, textureProperty, uvSnippet */ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -47427,7 +47460,7 @@ class NodeBuilder {
 	 */
 	generateTextureLod( /* texture, textureProperty, uvSnippet, depthSnippet, levelSnippet */ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -48316,7 +48349,7 @@ class NodeBuilder {
 
 			node.name = name;
 
-			console.warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
+			warn( `TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
 
 		}
 
@@ -48693,7 +48726,7 @@ class NodeBuilder {
 	 */
 	buildFunctionCode( /* shaderNode */ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -48802,7 +48835,7 @@ class NodeBuilder {
 	 */
 	getAttributes( /*shaderStage*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -48815,7 +48848,7 @@ class NodeBuilder {
 	 */
 	getVaryings( /*shaderStage*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -48868,7 +48901,7 @@ class NodeBuilder {
 	 */
 	getUniforms( /*shaderStage*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -48960,7 +48993,7 @@ class NodeBuilder {
 	 */
 	buildCode() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -49118,7 +49151,7 @@ class NodeBuilder {
 
 			if ( nodeMaterial === null ) {
 
-				console.error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
+				error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
 
 				nodeMaterial = new NodeMaterial();
 
@@ -50304,7 +50337,7 @@ class NodeParser {
 	 */
 	parseFunction( /*source*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -50369,7 +50402,7 @@ class NodeFunction {
 	 */
 	getCode( /*name = this.name*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -51042,7 +51075,7 @@ class Nodes extends DataMap {
 
 					} else if ( background.isColor !== true ) {
 
-						console.error( 'WebGPUNodes: Unsupported background configuration.', background );
+						error( 'WebGPUNodes: Unsupported background configuration.', background );
 
 					}
 
@@ -51124,7 +51157,7 @@ class Nodes extends DataMap {
 
 					} else {
 
-						console.error( 'THREE.Renderer: Unsupported fog configuration.', sceneFog );
+						error( 'Renderer: Unsupported fog configuration.', sceneFog );
 
 					}
 
@@ -51171,7 +51204,7 @@ class Nodes extends DataMap {
 
 					} else {
 
-						console.error( 'Nodes: Unsupported environment configuration.', environment );
+						error( 'Nodes: Unsupported environment configuration.', environment );
 
 					}
 
@@ -51867,7 +51900,7 @@ class NodeLibrary {
 
 		if ( library.has( type ) ) {
 
-			console.warn( `Redefinition of node ${ type }` );
+			warn( `Redefinition of node ${ type }` );
 			return;
 
 		}
@@ -51890,7 +51923,7 @@ class NodeLibrary {
 
 		if ( library.has( baseClass ) ) {
 
-			console.warn( `Redefinition of node ${ baseClass.name }` );
+			warn( `Redefinition of node ${ baseClass.name }` );
 			return;
 
 		}
@@ -52550,7 +52583,7 @@ class XRManager extends EventDispatcher {
 
 		if ( this.isPresenting === true ) {
 
-			console.warn( 'THREE.XRManager: Cannot change framebuffer scale while presenting.' );
+			warn( 'XRManager: Cannot change framebuffer scale while presenting.' );
 
 		}
 
@@ -52580,7 +52613,7 @@ class XRManager extends EventDispatcher {
 
 		if ( this.isPresenting === true ) {
 
-			console.warn( 'THREE.XRManager: Cannot change reference space type while presenting.' );
+			warn( 'XRManager: Cannot change reference space type while presenting.' );
 
 		}
 
@@ -54763,7 +54796,7 @@ class Renderer {
 
 		}
 
-		console.error( errorMessage );
+		error( errorMessage );
 
 		this._isDeviceLost = true;
 
@@ -54869,7 +54902,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
+			warn( 'Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
 
 			return this.renderAsync( scene, camera );
 
@@ -55697,7 +55730,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
+			warn( 'Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
 
 			return this.clearAsync( color, depth, stencil );
 
@@ -56019,7 +56052,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
+			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
 
 			return this.computeAsync( computeNodes );
 
@@ -56154,7 +56187,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
+			warn( 'Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
 
 			return false;
 
@@ -56203,7 +56236,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
+			warn( 'Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
 
 		}
 
@@ -56231,7 +56264,7 @@ class Renderer {
 
 			} else {
 
-				console.error( 'THREE.Renderer.copyFramebufferToTexture: Invalid rectangle.' );
+				error( 'Renderer.copyFramebufferToTexture: Invalid rectangle.' );
 
 				return;
 
@@ -56368,7 +56401,7 @@ class Renderer {
 
 			} else if ( object.isLineLoop ) {
 
-				console.error( 'THREE.Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
+				error( 'Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -56582,17 +56615,49 @@ class Renderer {
 
 				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
 
+				const hasMap = material.map !== null;
+				const hasColorNode = material.colorNode && material.colorNode.isNode;
+				const hasCastShadowNode = material.castShadowNode && material.castShadowNode.isNode;
+
+				if ( hasMap || hasColorNode || hasCastShadowNode ) {
+
+					overrideColorNode = overrideMaterial.colorNode;
+
+					let shadowRGB;
+					let shadowAlpha;
+
+					if ( hasCastShadowNode ) {
+
+						shadowRGB = material.castShadowNode.rgb;
+						shadowAlpha = material.castShadowNode.a;
+
+					} else {
+
+						shadowRGB = vec3( 0 );
+						shadowAlpha = float( 1 );
+
+					}
+
+					if ( hasMap ) {
+
+						shadowAlpha = shadowAlpha.mul( reference( 'map', 'texture', material ).a );
+
+					}
+
+					if ( hasColorNode ) {
+
+						shadowAlpha = shadowAlpha.mul( material.colorNode.a );
+
+					}
+
+					overrideMaterial.colorNode = vec4( shadowRGB, shadowAlpha );
+
+				}
+
 				if ( material.depthNode && material.depthNode.isNode ) {
 
 					overrideDepthNode = overrideMaterial.depthNode;
 					overrideMaterial.depthNode = material.depthNode;
-
-				}
-
-				if ( material.castShadowNode && material.castShadowNode.isNode ) {
-
-					overrideColorNode = overrideMaterial.colorNode;
-					overrideMaterial.colorNode = material.castShadowNode;
 
 				}
 
@@ -57206,7 +57271,7 @@ class UniformsGroup extends UniformBuffer {
 		if ( uniform.isMatrix3Uniform ) return this.updateMatrix3( uniform );
 		if ( uniform.isMatrix4Uniform ) return this.updateMatrix4( uniform );
 
-		console.error( 'THREE.WebGPUUniformsGroup: Unsupported uniform type.', uniform );
+		error( 'WebGPUUniformsGroup: Unsupported uniform type.', uniform );
 
 	}
 
@@ -58209,7 +58274,7 @@ ${ flowData.code }
 			const channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
 			const uvSnippet = `ivec2(${indexSnippet} % ${ propertySizeName }, ${indexSnippet} / ${ propertySizeName })`;
 
-			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, null, '0' );
+			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, '0', null, null );
 
 			//
 
@@ -58242,12 +58307,14 @@ ${ flowData.code }
 	 * @param {?Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} levelSnippet - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {string} [levelSnippet='0u'] - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( levelSnippet === null ) levelSnippet = '0';
 
 		let snippet;
 
@@ -58420,7 +58487,7 @@ ${ flowData.code }
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
 
 		}
 
@@ -60689,7 +60756,7 @@ class WebGLState {
 							break;
 
 						default:
-							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -60707,15 +60774,15 @@ class WebGLState {
 							break;
 
 						case SubtractiveBlending:
-							console.error( 'THREE.WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
+							error( 'WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						case MultiplyBlending:
-							console.error( 'THREE.WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
+							error( 'WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						default:
-							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -61841,6 +61908,24 @@ class WebGLTextureUtils {
 		 */
 		this.defaultTextures = {};
 
+		/**
+		 * A scratch framebuffer used for attaching the source texture in
+		 * {@link copyTextureToTexture}.
+		 *
+		 * @private
+		 * @type {?WebGLFramebuffer}
+		 */
+		this._srcFramebuffer = null;
+
+		/**
+		 * A scratch framebuffer used for attaching the destination texture in
+		 * {@link copyTextureToTexture}.
+		 *
+		 * @private
+		 * @type {?WebGLFramebuffer}
+		 */
+		this._dstFramebuffer = null;
+
 		if ( initialized === false ) {
 
 			this._init();
@@ -61944,7 +62029,7 @@ class WebGLTextureUtils {
 
 			if ( gl[ internalFormatName ] !== undefined ) return gl[ internalFormatName ];
 
-			console.warn( 'THREE.WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
+			warn( 'WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
 
 		}
 
@@ -62273,7 +62358,7 @@ class WebGLTextureUtils {
 
 		// gl.readPixels( 0, 0, width, height, altFormat, altType, readout );
 		// gl.bindFramebuffer( gl.FRAMEBUFFER, null );
-		// console.log( readout );
+		// log( readout );
 
 	}
 
@@ -62316,7 +62401,7 @@ class WebGLTextureUtils {
 
 						} else {
 
-							console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+							warn( 'WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 						}
 
@@ -62334,7 +62419,7 @@ class WebGLTextureUtils {
 
 					} else {
 
-						console.warn( 'Unsupported compressed texture format' );
+						warn( 'Unsupported compressed texture format' );
 
 					}
 
@@ -62601,7 +62686,6 @@ class WebGLTextureUtils {
 
 		}
 
-
 		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, dstTexture.flipY );
 		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 		gl.pixelStorei( gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
@@ -62620,8 +62704,10 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
 
 		// set up the src texture
+		const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture || dstTexture.isArrayTexture;
 		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture || dstTexture.isArrayTexture;
-		if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
+
+		if ( srcTexture.isDepthTexture ) {
 
 			const srcTextureData = backend.get( srcTexture );
 			const dstTextureData = backend.get( dstTexture );
@@ -62635,12 +62721,76 @@ class WebGLTextureUtils {
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffer );
 			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, dstFramebuffer );
 
-			let mask = gl.COLOR_BUFFER_BIT;
+			for ( let i = 0; i < depth; i ++ ) {
 
-			if ( srcTexture.isDepthTexture ) mask = gl.DEPTH_BUFFER_BIT;
+				// if the source or destination are a 3d target then a layer needs to be bound
+				if ( isSrc3D ) {
 
-			gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, mask, gl.NEAREST );
+					gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, srcTextureData.textureGPU, srcLevel, minZ + i );
+					gl.framebufferTextureLayer( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, dstTextureGPU, dstLevel, dstZ + i );
 
+				}
+
+				gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+
+			}
+
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
+
+		} else if ( srcLevel !== 0 || srcTexture.isRenderTargetTexture || backend.has( srcTexture ) ) {
+
+			// get the appropriate frame buffers
+			const srcTextureData = backend.get( srcTexture );
+
+			if ( this._srcFramebuffer === null ) this._srcFramebuffer = gl.createFramebuffer();
+			if ( this._dstFramebuffer === null ) this._dstFramebuffer = gl.createFramebuffer();
+
+			// bind the frame buffer targets
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, this._srcFramebuffer );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, this._dstFramebuffer );
+
+			for ( let i = 0; i < depth; i ++ ) {
+
+				// assign the correct layers and mip maps to the frame buffers
+				if ( isSrc3D ) {
+
+					gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, srcTextureData.textureGPU, srcLevel, minZ + i );
+
+				} else {
+
+					gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, srcTextureData.textureGPU, srcLevel );
+
+				}
+
+				if ( isDst3D ) {
+
+					gl.framebufferTextureLayer( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, dstTextureGPU, dstLevel, dstZ + i );
+
+				} else {
+
+					gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dstTextureGPU, dstLevel );
+
+				}
+
+				// copy the data using the fastest function that can achieve the copy
+				if ( srcLevel !== 0 ) {
+
+					gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+
+				} else if ( isDst3D ) {
+
+					gl.copyTexSubImage3D( glTextureType, dstLevel, dstX, dstY, dstZ + i, minX, minY, width, height );
+
+				} else {
+
+					gl.copyTexSubImage2D( glTextureType, dstLevel, dstX, dstY, minX, minY, width, height );
+
+				}
+
+			}
+
+			// unbind read, draw buffers
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
 			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
 
@@ -62668,15 +62818,15 @@ class WebGLTextureUtils {
 				// copy data into the 2d texture
 				if ( srcTexture.isDataTexture ) {
 
-					gl.texSubImage2D( glTextureType, dstLevel, dstX, dstY, width, height, glFormat, glType, image.data );
+					gl.texSubImage2D( gl.TEXTURE_2D, dstLevel, dstX, dstY, width, height, glFormat, glType, image.data );
 
 				} else if ( srcTexture.isCompressedTexture ) {
 
-					gl.compressedTexSubImage2D( glTextureType, dstLevel, dstX, dstY, image.width, image.height, glFormat, image.data );
+					gl.compressedTexSubImage2D( gl.TEXTURE_2D, dstLevel, dstX, dstY, image.width, image.height, glFormat, image.data );
 
 				} else {
 
-					gl.texSubImage2D( glTextureType, dstLevel, dstX, dstY, width, height, glFormat, glType, image );
+					gl.texSubImage2D( gl.TEXTURE_2D, dstLevel, dstX, dstY, width, height, glFormat, glType, image );
 
 				}
 
@@ -62974,6 +63124,18 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.RGBA ) return bytesPerComponent * 4;
 		if ( glFormat === gl.RGB ) return bytesPerComponent * 3;
 		if ( glFormat === gl.ALPHA ) return bytesPerComponent;
+
+	}
+
+	/**
+	 * Frees the internal resources.
+	 */
+	dispose() {
+
+		const { gl } = this;
+
+		if ( this._srcFramebuffer !== null ) gl.deleteFramebuffer( this._srcFramebuffer );
+		if ( this._dstFramebuffer !== null ) gl.deleteFramebuffer( this._dstFramebuffer );
 
 	}
 
@@ -63422,7 +63584,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		if ( ! this.ext ) {
 
-			console.warn( 'EXT_disjoint_timer_query not supported; timestamps will be disabled.' );
+			warn( 'EXT_disjoint_timer_query not supported; timestamps will be disabled.' );
 			this.trackTimestamp = false;
 			return;
 
@@ -63517,7 +63679,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error in beginQuery:', error );
+			error( 'Error in beginQuery:', error );
 			this.activeQuery = null;
 			this.queryStates.set( baseOffset, 'inactive' );
 
@@ -63560,7 +63722,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error in endQuery:', error );
+			error( 'Error in endQuery:', error );
 			// Reset state on error
 			this.queryStates.set( baseOffset, 'inactive' );
 			this.activeQuery = null;
@@ -63623,7 +63785,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error resolving queries:', error );
+			error( 'Error resolving queries:', error );
 			return this.lastValue;
 
 		} finally {
@@ -63711,7 +63873,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 				} catch ( error ) {
 
-					console.error( 'Error checking query:', error );
+					error( 'Error checking query:', error );
 					resolve( this.lastValue );
 
 				}
@@ -64104,7 +64266,7 @@ class WebGLBackend extends Backend {
 			// are midframe flushes and an external depth texture.
 			if ( ( this.extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) && renderTarget._autoAllocateDepthBuffer === true && renderTarget.multiview === false ) {
 
-				console.warn( 'THREE.WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
+				warn( 'WebGLBackend: Render-to-texture extension was disabled because an external texture was provided' );
 
 			}
 
@@ -64825,12 +64987,12 @@ class WebGLBackend extends Backend {
 				if ( object._multiDrawInstances !== null ) {
 
 					// @deprecated, r174
-					warnOnce( 'THREE.WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+					warnOnce( 'WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
 					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
 				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
 
-					warnOnce( 'THREE.WebGLRenderer: WEBGL_multi_draw not supported.' );
+					warnOnce( 'WebGLRenderer: WEBGL_multi_draw not supported.' );
 
 				} else {
 
@@ -65075,7 +65237,7 @@ class WebGLBackend extends Backend {
 	 */
 	createSampler( /*texture*/ ) {
 
-		//console.warn( 'Abstract class.' );
+		//warn( 'Abstract class.' );
 
 	}
 
@@ -65288,7 +65450,7 @@ class WebGLBackend extends Backend {
 					const vertexErrors = this._getShaderErrors( gl, glVertexShader, 'vertex' );
 					const fragmentErrors = this._getShaderErrors( gl, glFragmentShader, 'fragment' );
 
-					console.error(
+					error(
 						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
 						'VALIDATE_STATUS ' + gl.getProgramParameter( programGPU, gl.VALIDATE_STATUS ) + '\n\n' +
 						'Program Info Log: ' + programLog + '\n' +
@@ -65300,7 +65462,7 @@ class WebGLBackend extends Backend {
 
 			} else if ( programLog !== '' ) {
 
-				console.warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
+				warn( 'WebGLProgram: Program Info Log:', programLog );
 
 			}
 
@@ -66359,6 +66521,8 @@ class WebGLBackend extends Backend {
 	 * Frees internal resources.
 	 */
 	dispose() {
+
+		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 
 		const extension = this.extensions.get( 'WEBGL_lose_context' );
 		if ( extension ) extension.loseContext();
@@ -67470,7 +67634,7 @@ class WebGPUTextureUtils {
 
 		if ( format === undefined ) {
 
-			console.warn( 'WebGPURenderer: Texture format not supported.' );
+			warn( 'WebGPURenderer: Texture format not supported.' );
 
 			this.createDefaultTexture( texture );
 			return;
@@ -68443,7 +68607,7 @@ function getFormat( texture, device = null ) {
 				break;
 
 			default:
-				console.error( 'WebGPURenderer: Unsupported texture format.', format );
+				error( 'WebGPURenderer: Unsupported texture format.', format );
 
 		}
 
@@ -68487,7 +68651,7 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
 
 				}
 
@@ -68506,7 +68670,7 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGBFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGBFormat.', type );
 
 				}
 
@@ -68549,7 +68713,7 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
 
 				}
 
@@ -68592,7 +68756,7 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
 
 				}
 
@@ -68615,7 +68779,7 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with DepthFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with DepthFormat.', type );
 
 				}
 
@@ -68633,7 +68797,7 @@ function getFormat( texture, device = null ) {
 
 						if ( device && device.features.has( GPUFeatureName.Depth32FloatStencil8 ) === false ) {
 
-							console.error( 'WebGPURenderer: Depth textures with DepthStencilFormat + FloatType can only be used with the "depth32float-stencil8" GPU feature.' );
+							error( 'WebGPURenderer: Depth textures with DepthStencilFormat + FloatType can only be used with the "depth32float-stencil8" GPU feature.' );
 
 						}
 
@@ -68642,7 +68806,7 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with DepthStencilFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with DepthStencilFormat.', type );
 
 				}
 
@@ -68661,7 +68825,7 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RedIntegerFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RedIntegerFormat.', type );
 
 				}
 
@@ -68680,7 +68844,7 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGIntegerFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGIntegerFormat.', type );
 
 				}
 
@@ -68699,14 +68863,14 @@ function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGBAIntegerFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGBAIntegerFormat.', type );
 
 				}
 
 				break;
 
 			default:
-				console.error( 'WebGPURenderer: Unsupported texture format.', format );
+				error( 'WebGPURenderer: Unsupported texture format.', format );
 
 		}
 
@@ -69223,7 +69387,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					code += `\t\tcoord.${ axis }`;
 
-					console.warn( `WebGPURenderer: Unsupported texture wrap type "${ wrap }" for vertex shader.` );
+					warn( `WebGPURenderer: Unsupported texture wrap type "${ wrap }" for vertex shader.` );
 
 				}
 
@@ -69399,7 +69563,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		const coordSnippet = `${ vecType }<u32>( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } ) )`;
 
-		return this.generateTextureLoad( texture, textureProperty, coordSnippet, depthSnippet, null, levelSnippet );
+		return this.generateTextureLoad( texture, textureProperty, coordSnippet, levelSnippet, depthSnippet, null );
 
 	}
 
@@ -69409,20 +69573,22 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0u' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
-		let snippet;
+		if ( levelSnippet === null ) levelSnippet = '0u';
 
 		if ( offsetSnippet ) {
 
 			uvIndexSnippet = `${ uvIndexSnippet } + ${ offsetSnippet }`;
 
 		}
+
+		let snippet;
 
 		if ( depthSnippet ) {
 
@@ -69555,7 +69721,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.TextureNode.gradient() does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.TextureNode.gradient() does not support ${ shaderStage } shader.` );
 
 		}
 
@@ -69600,7 +69766,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
 
 		}
 
@@ -69668,7 +69834,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.TextureNode.biasNode does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.TextureNode.biasNode does not support ${ shaderStage } shader.` );
 
 		}
 
@@ -69768,7 +69934,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( node.isAtomic === true ) {
 
-				console.warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+				warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
 
 				return NodeAccess.READ_WRITE;
 
@@ -71771,7 +71937,7 @@ class WebGPUAttributeUtils {
 
 		if ( ! format ) {
 
-			console.error( 'THREE.WebGPUAttributeUtils: Vertex format not supported yet.' );
+			error( 'WebGPUAttributeUtils: Vertex format not supported yet.' );
 
 		}
 
@@ -72026,7 +72192,7 @@ class WebGPUBindingUtils {
 
 			} else {
 
-				console.error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
+				error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
 
 			}
 
@@ -72676,11 +72842,11 @@ class WebGPUPipelineUtils {
 						break;
 
 					case SubtractiveBlending:
-						console.error( 'THREE.WebGPURenderer: SubtractiveBlending requires material.premultipliedAlpha = true' );
+						error( 'WebGPURenderer: SubtractiveBlending requires material.premultipliedAlpha = true' );
 						break;
 
 					case MultiplyBlending:
-						console.error( 'THREE.WebGPURenderer: MultiplyBlending requires material.premultipliedAlpha = true' );
+						error( 'WebGPURenderer: MultiplyBlending requires material.premultipliedAlpha = true' );
 						break;
 
 				}
@@ -72695,7 +72861,7 @@ class WebGPUPipelineUtils {
 
 		} else {
 
-			console.error( 'THREE.WebGPURenderer: Invalid blending: ', blending );
+			error( 'WebGPURenderer: Invalid blending: ', blending );
 
 		}
 
@@ -72766,7 +72932,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Blend factor not supported.', blend );
+				error( 'WebGPURenderer: Blend factor not supported.', blend );
 
 		}
 
@@ -72822,7 +72988,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Invalid stencil function.', stencilFunc );
+				error( 'WebGPURenderer: Invalid stencil function.', stencilFunc );
 
 		}
 
@@ -72876,7 +73042,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Invalid stencil operation.', stencilOperation );
+				error( 'WebGPURenderer: Invalid stencil operation.', stencilOperation );
 
 		}
 
@@ -72918,7 +73084,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPUPipelineUtils: Blend equation not supported.', blendEquation );
+				error( 'WebGPUPipelineUtils: Blend equation not supported.', blendEquation );
 
 		}
 
@@ -73034,7 +73200,7 @@ class WebGPUPipelineUtils {
 					break;
 
 				default:
-					console.error( 'THREE.WebGPUPipelineUtils: Invalid depth function.', depthFunc );
+					error( 'WebGPUPipelineUtils: Invalid depth function.', depthFunc );
 
 			}
 
@@ -73241,7 +73407,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 		} catch ( error ) {
 
-			console.error( 'Error resolving queries:', error );
+			error( 'Error resolving queries:', error );
 			if ( this.resultBuffer.mapState === 'mapped' ) {
 
 				this.resultBuffer.unmap();
@@ -73279,7 +73445,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 			} catch ( error ) {
 
-				console.error( 'Error waiting for pending resolve:', error );
+				error( 'Error waiting for pending resolve:', error );
 
 			}
 
@@ -73294,7 +73460,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 			} catch ( error ) {
 
-				console.error( 'Error unmapping buffer:', error );
+				error( 'Error unmapping buffer:', error );
 
 			}
 
@@ -74858,7 +75024,7 @@ class WebGPUBackend extends Backend {
 				if ( drawInstances !== null ) {
 
 					// @deprecated, r174
-					warnOnce( 'THREE.WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+					warnOnce( 'WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
 
 				}
 
@@ -75689,7 +75855,7 @@ class WebGPUBackend extends Backend {
 
 		if ( sourceGPU.format !== destinationGPU.format ) {
 
-			console.error( 'WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match.', sourceGPU.format, destinationGPU.format );
+			error( 'WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match.', sourceGPU.format, destinationGPU.format );
 
 			return;
 
@@ -75913,7 +76079,7 @@ const debugHandler = {
 	get: function ( target, name ) {
 
 		// Add |update
-		if ( /^(create|destroy)/.test( name ) ) console.log( 'WebGPUBackend.' + name );
+		if ( /^(create|destroy)/.test( name ) ) log( 'WebGPUBackend.' + name );
 
 		return target[ name ];
 
@@ -75967,7 +76133,7 @@ class WebGPURenderer extends Renderer {
 
 			parameters.getFallback = () => {
 
-				console.warn( 'THREE.WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
+				warn( 'WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
 
 				return new WebGLBackend( parameters );
 
@@ -76670,7 +76836,7 @@ class NodeLoader extends Loader {
 
 				} else {
 
-					console.error( e );
+					error( e );
 
 				}
 
@@ -76786,7 +76952,7 @@ class NodeLoader extends Loader {
 
 		if ( this.nodes[ type ] === undefined ) {
 
-			console.error( 'THREE.NodeLoader: Node type not found:', type );
+			error( 'NodeLoader: Node type not found:', type );
 			return float();
 
 		}
@@ -77112,4 +77278,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BitcastNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, shaderStages, vectorComponents };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BitcastNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
