@@ -2389,7 +2389,7 @@ class Renderer {
 					computeNode.removeEventListener( 'dispose', dispose );
 
 					pipelines.delete( computeNode );
-					bindings.delete( computeNode );
+					bindings.deleteForCompute( computeNode );
 					nodes.delete( computeNode );
 
 				};
