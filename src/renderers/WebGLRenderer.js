@@ -21,6 +21,7 @@ import {
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
+import { FrustumArray } from '../math/FrustumArray.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
@@ -305,6 +306,7 @@ class WebGLRenderer {
 		// frustum
 
 		const _frustum = new Frustum();
+		const _frustumArray = new FrustumArray();
 
 		// clipping
 
@@ -1555,8 +1557,12 @@ class WebGLRenderer {
 
 			renderStateStack.push( currentRenderState );
 
-			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth );
+			if ( ! camera.perCameraCulling ) {
+
+				_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+				_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth );
+
+			}
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
@@ -1734,7 +1740,9 @@ class WebGLRenderer {
 
 				} else if ( object.isSprite ) {
 
-					if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
+					const frustum = camera.perCameraCulling ? _frustumArray : _frustum;
+
+					if ( ! object.frustumCulled || frustum.intersectsSprite( object, camera ) ) {
 
 						if ( sortObjects ) {
 
@@ -1756,7 +1764,9 @@ class WebGLRenderer {
 
 				} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+					const frustum = camera.perCameraCulling ? _frustumArray : _frustum;
+
+					if ( ! object.frustumCulled || frustum.intersectsObject( object, camera ) ) {
 
 						const geometry = objects.update( object );
 						const material = object.material;
