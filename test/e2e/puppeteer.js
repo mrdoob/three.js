@@ -181,6 +181,7 @@ const exceptionList = [
 	'webgpu_postprocessing_fxaa',
 	'webgpu_postprocessing_afterimage',
 	'webgpu_postprocessing_ca',
+	'webgpu_postprocessing_ssgi',
 	'webgpu_xr_native_layers',
 	'webgpu_volume_caustics',
 
