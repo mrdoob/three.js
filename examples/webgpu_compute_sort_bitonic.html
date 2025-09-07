@@ -85,7 +85,7 @@
 			const globalColors = [ 'rgb(1, 150, 1)', 'red' ];
 
 			// Total number of elements and the dimensions of the display grid.
-			const size = 64;
+			const size = 16;
 			const gridDim = Math.sqrt( size );
 
 			const getNumSteps = () => {
@@ -332,6 +332,8 @@
 					} else {
 
 						renderer.computeAsync( computeReset );
+
+						console.log( new Uint32Array( await renderer.getArrayBufferAsync( bitonicSortModule.dataBuffer.value ) ) );
 
 						currentStep = 0;
 

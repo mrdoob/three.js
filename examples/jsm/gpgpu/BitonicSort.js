@@ -19,23 +19,30 @@ const StepType = {
  * @tsl
  * @private
  * @param {Node<uint>} index - The compute thread's invocation id.
- * @param {Node<uint>} swapSpan - The maximum span over which elements are being swapped.
+ * @param {Node<uint>} blockHeight - The height of the block within which elements are being swapped.
  * @returns {Node<uvec2>} The indices of the elements in the data buffer being compared.
  */
-export const getBitonicFlipIndices = /*@__PURE__*/ Fn( ( [ index, swapSpan ] ) => {
+export const getBitonicFlipIndices = /*@__PURE__*/ Fn( ( [ index, blockHeight ] ) => {
 
-	const blockOffset = ( index.mul( 2 ).div( swapSpan ) ).mul( swapSpan );
-	const halfHeight = swapSpan.div( 2 );
+	const blockOffset = ( index.mul( 2 ).div( blockHeight ) ).mul( blockHeight );
+	const halfHeight = blockHeight.div( 2 );
 	const idx = uvec2(
 		index.mod( halfHeight ),
-		swapSpan.sub( index.mod( halfHeight ) ).sub( 1 )
+		blockHeight.sub( index.mod( halfHeight ) ).sub( 1 )
 	);
 	idx.x.addAssign( blockOffset );
 	idx.y.addAssign( blockOffset );
 
 	return idx;
 
-}, { index: 'uint', swapSpan: 'uint', return: 'uvec2' } );
+}).setLayout({ 
+	name: 'getBitonicFlipIndices', 
+	type: 'uvec2',
+	inputs: [
+		{name: 'index', type: 'uint'},
+		{name: 'blockHeight', type: 'uint'}
+	]
+});
 
 /**
  * Returns the indices that will be compared in a bitonic sort's disperse operation.
@@ -60,7 +67,14 @@ export const getBitonicDisperseIndices = /*@__PURE__*/ Fn( ( [ index, swapSpan ]
 
 	return idx;
 
-}, { index: 'uint', swapSpan: 'uint', return: 'uvec2' } );
+}).setLayout({
+	name: 'getBitonicDisperseIndices',
+	type: 'uvec2', 
+	inputs: [
+		{name: 'index', type: 'uint'},
+		{name: 'blockHeight', type: 'uint'}
+	]
+});
 
 // TODO: Add parameters for computing a buffer larger than vec4
 export class BitonicSort {
@@ -342,7 +356,7 @@ export class BitonicSort {
 			localStorage.element( localID1 ).assign( dataBuffer.element( localOffset.add( localID1 ) ) );
 			localStorage.element( localID2 ).assign( dataBuffer.element( localOffset.add( localID2 ) ) );
 
-			// Ensure that all local data has populated
+			// Ensure that all local data has been populated
 			workgroupBarrier();
 
 			// Perform a chunk of the sort in a single pass that operates entirely in workgroup local space
@@ -357,14 +371,14 @@ export class BitonicSort {
 				const flipIdx = getBitonicFlipIndices( invocationLocalIndex, flipBlockHeight );
 				localCompareAndSwap( flipIdx.x, flipIdx.y );
 
-				const localBlockHeight = flipBlockHeight.toVar();
+				const localBlockHeight = flipBlockHeight.div(2)
 
 				Loop( { start: localBlockHeight, end: uint( 1 ), type: 'uint', condition: '>', update: '>>= 1' }, () => {
 
 					// Ensure that last dispatch op executed
 					workgroupBarrier();
 
-					const disperseIdx = getBitonicFlipIndices( invocationLocalIndex, localBlockHeight );
+					const disperseIdx = getBitonicDisperseIndices( invocationLocalIndex, localBlockHeight );
 					localCompareAndSwap( disperseIdx.x, disperseIdx.y );
 
 					localBlockHeight.divAssign( 2 );
@@ -580,6 +594,7 @@ export class BitonicSort {
 		this.currentDispatch += 1;
 
 		console.log( new Uint32Array( await renderer.getArrayBufferAsync( this.infoStorage.value ) ) );
+		console.log(new Uint32Array(await renderer.getArrayBufferAsync(this.dataBuffer.value)));
 
 
 		if ( this.currentDispatch === this.stepCount ) {
