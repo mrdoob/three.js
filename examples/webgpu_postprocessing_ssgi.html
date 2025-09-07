@@ -89,6 +89,8 @@
 				// gi
 
 				const giPass = ssgi( scenePassColor, scenePassDepth, scenePassNormal, camera );
+				giPass.sliceCount.value = 2;
+				giPass.stepCount.value = 8;
 
 				// composite
 

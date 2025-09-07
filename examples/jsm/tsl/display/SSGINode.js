@@ -24,13 +24,18 @@ let _rendererState;
  *
  * With temporal filtering (recommended):
  *
- * - Low/Medium: `sliceCount` of `1`, `stepCount` of `12`.
- * - Medium/High: `sliceCount` of `2`, `stepCount` of `16`.
+ * - Low: `sliceCount` of `1`, `stepCount` of `12`.
+ * - Medium: `sliceCount` of `2`, `stepCount` of `8`.
+ * - High: `sliceCount` of `3`, `stepCount` of `16`.
+ *
+ * Use for a higher slice count if you notice temporal instabilties like flickering. Reduce the sample
+ * count then to mitigate the performance lost.
  *
  * Without temporal filtering:
  *
- * - Low/Medium: `sliceCount` of `2`, `stepCount` of `6`.
- * - Medium/High: `sliceCount` of `4`, `stepCount` of `8`.
+ * - Low: `sliceCount` of `2`, `stepCount` of `6`.
+ * - Medium: `sliceCount` of `3`, `stepCount` of `8`.
+ * - High: `sliceCount` of `4`, `stepCount` of `12`.
  *
  * @augments TempNode
  * @three_import import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
