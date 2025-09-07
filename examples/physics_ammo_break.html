@@ -538,7 +538,7 @@
 
 				if ( breakable0 && ! collided0 && maxImpulse > fractureImpulse ) {
 
-					const debris = convexBreaker.subdivideByImpact( threeObject0, impactPoint, impactNormal, 1, 2, 1.5 );
+					const debris = convexBreaker.subdivideByImpact( threeObject0, impactPoint, impactNormal, 1, 2 );
 
 					const numObjects = debris.length;
 					for ( let j = 0; j < numObjects; j ++ ) {
@@ -560,7 +560,7 @@
 
 				if ( breakable1 && ! collided1 && maxImpulse > fractureImpulse ) {
 
-					const debris = convexBreaker.subdivideByImpact( threeObject1, impactPoint, impactNormal, 1, 2, 1.5 );
+					const debris = convexBreaker.subdivideByImpact( threeObject1, impactPoint, impactNormal, 1, 2 );
 
 					const numObjects = debris.length;
 					for ( let j = 0; j < numObjects; j ++ ) {
