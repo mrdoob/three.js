@@ -111,16 +111,18 @@ export class BitonicSort {
 		 *
 		 * @type {WorkgroupInfoNode}
 		*/
-		this.localStorage = workgroupArray( 'uint', this.workgroupSize * 2 );
+		this.localStorage = workgroupArray( dataBuffer.nodeType, this.workgroupSize * 2 );
+
+		console.log(dataBuffer)
 
 		/**
 		 * A node representing a storage buffer used for transfering the result of the global sort back to the original data buffer.
 		 *
 		 * @type {StorageBufferNode}
 		*/
-		this.tempBuffer = instancedArray( dataBuffer.value.count, 'uint' ).setName( 'TempStorage' );
+		this.tempBuffer = instancedArray( dataBuffer.value.count, dataBuffer.nodeType ).setName( 'TempStorage' );
 
-		this.infoBuffer = new Uint32Array( 1, 2, 2 );
+		this.infoBuffer = new Uint32Array( [1, 2, 2]);
 
 		/**
 		 * TODO: Determine if needed.
@@ -487,27 +489,35 @@ export class BitonicSort {
 
 		const fnDef = Fn( () => {
 
-			const { infoStorage, workgroupSize } = this;
+			const { infoStorage, workgroupSize, count } = this;
 
 			const currentAlgo = infoStorage.element( 0 );
 			const currentSwapSpan = infoStorage.element( 1 );
 			const maxSwapSpan = infoStorage.element( 2 );
 
-			Switch( currentAlgo ).Case( StepType.SWAP_LOCAL, () => {
+			If( currentAlgo.equal(StepType.SWAP_LOCAL), () => {
 
-				currentAlgo.assign( StepType.FLIP_GLOBAL );
-				currentSwapSpan.assign( workgroupSize * 4 );
-				maxSwapSpan.assign( workgroupSize * 4 );
+				const nextHighestSwapSpan = uint( uint(workgroupSize).mul( 4 ) );
 
-			} ).Case( StepType.DISPERSE_LOCAL, () => {
+				const outOfBoundsSwap = nextHighestSwapSpan.greaterThan( count );
+
+				const nextAlgo = select( outOfBoundsSwap, StepType.SWAP_LOCAL, StepType.FLIP_GLOBAL );
+				const nextSwapSpan = select(outOfBoundsSwap, uint(2), nextHighestSwapSpan).toVar();
+
+				currentAlgo.assign( nextAlgo );
+				currentSwapSpan.assign( nextSwapSpan );
+				maxSwapSpan.assign( nextSwapSpan );
+
+			} ).ElseIf( currentAlgo.equal(StepType.DISPERSE_LOCAL), () => {
 
 				const nextHighestSwapSpan = maxSwapSpan.mul( 2 );
 
-				currentAlgo.assign( StepType.FLIP_GLOBAL );
-				currentSwapSpan.assign( nextHighestSwapSpan );
-				maxSwapSpan.assign( nextHighestSwapSpan );
+				const nextSwapSpan = select(nextHighestSwapSpan.equal(count * 2), uint(2), nextHighestSwapSpan).uniformFlow();
 
-			} ).Default( () => {
+				currentSwapSpan.assign( nextSwapSpan );
+				maxSwapSpan.assign( nextSwapSpan );
+
+			} ).Else( () => {
 
 				const nextSwapSpan = currentSwapSpan.div( 2 );
 				currentAlgo.assign(
@@ -519,7 +529,7 @@ export class BitonicSort {
 				);
 				currentSwapSpan.assign( nextSwapSpan );
 
-			} );
+			} )
 
 		} )().compute( 1 );
 
@@ -527,27 +537,35 @@ export class BitonicSort {
 
 	}
 
-	computeStep( renderer ) {
+	async computeStep( renderer ) {
 
 		// Swap local only runs once
 		if ( this.currentDispatch === 0 ) {
 
-			renderer.compute( this.swapLocalFn );
+			console.log('Running Swap Local')
+
+			await renderer.computeAsync( this.swapLocalFn );
 
 			this.globalOpsRemaining = 1;
 			this.globalOpsInSpan = 1;
 
 		} else if ( this.globalOpsRemaining > 0 ) {
 
-			renderer.compute( this.globalOpsRemaining === this.globalOpsInSpan ? this.flipGlobalFn : this.disperseGlobalFn );
-			renderer.compute( this.alignFn );
+			const swapType = this.globalOpsRemaining === this.globalOpsInSpan ? 'Flip' : 'Disperse';
+
+			console.log(`Running global ${swapType}`)
+
+			await renderer.computeAsync( this.globalOpsRemaining === this.globalOpsInSpan ? this.flipGlobalFn : this.disperseGlobalFn );
+			await renderer.computeAsync( this.alignFn );
 
 			this.globalOpsRemaining -= 1;
 
 		} else {
 
+			console.log('Running local disperse')
+
 			// Then run local disperses when we've finished all global swaps
-			renderer.compute( this.disperseLocalFn );
+			await renderer.computeAsync( this.disperseLocalFn );
 
 			const nextSpanGlobalOps = this.globalOpsInSpan + 1;
 			this.globalOpsInSpan = nextSpanGlobalOps;
@@ -557,9 +575,12 @@ export class BitonicSort {
 		}
 
 		// Pass the next swap span to compute storage
-		renderer.compute( this.setAlgoFn );
+		await renderer.computeAsync( this.setAlgoFn );
 
 		this.currentDispatch += 1;
+
+		console.log( new Uint32Array( await renderer.getArrayBufferAsync( this.infoStorage.value ) ) );
+
 
 		if ( this.currentDispatch === this.stepCount ) {
 
@@ -572,7 +593,7 @@ export class BitonicSort {
 	}
 
 
-	compute( renderer ) {
+	async compute( renderer ) {
 
 		this.globalOpsRemaining = 0;
 		this.globalOpsInSpan = 0;
@@ -580,7 +601,7 @@ export class BitonicSort {
 
 		for ( let i = 0; i < this.stepCount; i ++ ) {
 
-			this.computeStep( renderer );
+			await this.computeStep( renderer );
 
 		}
 

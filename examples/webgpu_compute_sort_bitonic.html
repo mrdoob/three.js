@@ -85,7 +85,7 @@
 			const globalColors = [ 'rgb(1, 150, 1)', 'red' ];
 
 			// Total number of elements and the dimensions of the display grid.
-			const size = 256;
+			const size = 64;
 			const gridDim = Math.sqrt( size );
 
 			const getNumSteps = () => {
@@ -104,6 +104,7 @@
 				gridWidth: uniform( gridDim ),
 				gridHeight: uniform( gridDim ),
 				highlight: uniform( 1 ),
+				stepBitonic: true,
 				'Display Mode': 'Swap Zone Highlight'
 			};
 
@@ -318,7 +319,36 @@
 
 				renderer.info.autoReset = false;
 
-				 const stepAnimation = async function () {
+				gui.add( effectController, 'stepBitonic' ).onChange( async () => {
+
+					renderer.info.reset();
+
+					if ( currentStep < bitonicSortModule.stepCount ) {
+
+						await bitonicSortModule.computeStep( renderer );
+
+						currentStep ++;
+
+					} else {
+
+						renderer.computeAsync( computeReset );
+
+						currentStep = 0;
+
+					}
+
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+
+					renderer.render( scene, camera );
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
+
+					timestamps[ 'local_swap' ].innerHTML = constructInnerHTML( renderer, false, localColors );
+
+				} );
+
+
+
+				 /*const stepAnimation = async function () {
 
 					renderer.info.reset();
 
@@ -359,7 +389,7 @@
 
 				};
 
-				stepAnimation();
+				stepAnimation(); */
 
 				window.addEventListener( 'resize', onWindowResize );
 
