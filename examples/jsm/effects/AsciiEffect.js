@@ -18,7 +18,7 @@ class AsciiEffect {
 
 		// ' .,:;=|iI+hHOE#`$';
 		// darker bolder character set from https://github.com/saw/Canvas-ASCII-Art/
-		// ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'.split('');
+		// ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 
 		// Some ASCII settings
 
@@ -218,6 +218,8 @@ class AsciiEffect {
 			// Coloring loop starts now
 			let strChars = '';
 
+			const maxIdx = aCharList.length - 1;
+
 			// console.time('rendering');
 
 			for ( let y = 0; y < iHeight; y += 2 ) {
@@ -237,6 +239,7 @@ class AsciiEffect {
 					fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
 					// fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
 
+
 					if ( iAlpha == 0 ) {
 
 						// should calculate alpha instead, but quick hack :)
@@ -245,11 +248,15 @@ class AsciiEffect {
 
 					}
 
-					iCharIdx = Math.floor( ( 1 - fBrightness ) * ( aCharList.length - 1 ) );
+					const baseIdx = ( 1 - fBrightness ) * maxIdx;
 
 					if ( bInvert ) {
 
-						iCharIdx = aCharList.length - iCharIdx - 1;
+						iCharIdx = maxIdx - Math.ceil( baseIdx );
+
+					} else {
+
+						iCharIdx = Math.floor( baseIdx );
 
 					}
 
