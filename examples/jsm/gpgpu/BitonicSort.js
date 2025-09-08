@@ -1,7 +1,6 @@
 import { Fn, uvec2, If, instancedArray, instanceIndex, invocationLocalIndex, Loop, workgroupArray, workgroupBarrier, workgroupId, uint, select } from 'three/tsl';
 
 const StepType = {
-
 	NONE: 0,
 	// Swap all values within the local range of workgroupSize * 2
 	SWAP_LOCAL: 1,
@@ -9,7 +8,6 @@ const StepType = {
 	// Swap values within global data buffer.
 	FLIP_GLOBAL: 3,
 	DISPERSE_GLOBAL: 4,
-
 };
 
 
@@ -104,7 +102,7 @@ export class BitonicSort {
 
 		/**
 		 *
-		 * The dispatch size of a sort operation
+		 * The size of each compute dispatch.
 		 * @type {number}
 		 */
 
@@ -116,9 +114,6 @@ export class BitonicSort {
 		 * @type {StorageBufferNode}
 		*/
 		this.workgroupSize = options.workgroupSize ? Math.min( this.dispatchSize, options.workgroupSize ) : Math.min( this.dispatchSize, 64 );
-		//this.sideEffectBuffers = options.sideEffectBuffers ? options.sideEffectBuffers : [];
-
-		// Helper buffers
 
 		/**
 		 * A node representing a workgroup scoped buffer that holds locally sorted elements.
@@ -141,14 +136,12 @@ export class BitonicSort {
 		*/
 		this.tempBuffer = instancedArray( this.count, dataBuffer.nodeType ).setName( 'TempStorage' );
 
-		this.infoBuffer = new Uint32Array( [1, 2, 2]);
-
 		/**
-		 * TODO: Determine if needed.
+		 * A node containing the current algorithm type, the current swap span, and the highest swap span.
 		 *
 		 * @type {StorageBufferNode}
 		*/
-		this.infoStorage = instancedArray( this.infoBuffer, 'uint' ).setName( 'BitonicSortInfo' );
+		this.infoStorage = instancedArray( new Uint32Array([1, 2, 2]), 'uint' ).setName( 'BitonicSortInfo' );
 
 
 		/**
@@ -165,10 +158,6 @@ export class BitonicSort {
 		 * @type {number}
 		*/
 		this.stepCount = this._getStepCount();
-
-		// Have to create three separate shaders since we cannot switch between
-		// local and global sort in a single shader without breaking uniform control flow
-		// and thus workgroupBarrier() functionality
 
 		/**
 		 * A compute shader that executes a 'flip' swap within a global address space on elements in the data buffer.
@@ -201,14 +190,14 @@ export class BitonicSort {
 		// Utility functions
 
 		/**
-		 * TODO.
+		 * A compute shader that sets up the algorithm and the swap span for the next swap operation.
 		 *
 		 * @type {ComputeNode}
 		*/
 		this.setAlgoFn = this._getSetAlgoFn();
 
 		/**
-		 * TODO
+		 * A compute shader that aligns the result of the global swap operation with the current buffer.
 		 *
 		 * @type {ComputeNode}
 		*/
@@ -216,12 +205,18 @@ export class BitonicSort {
 
 
 		/**
-		 * TODO
+		 * A compute shader that resets the algorithm and swap span information.
 		 *
 		 * @type {ComputeNode}
 		*/
 		this.resetFn = this._getResetFn();
 
+
+		/**
+		 * The current compute shader dispatch within the list of dispatches needed to complete the sort.
+		 *
+		 * @type {number}
+		*/
 		this.currentDispatch = 0;
 
 		/**
@@ -242,6 +237,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Get total number of distinct swaps that occur in a bitonic sort.
+	 *
+	 * @private
+	 */
 	_getSwapOpCount() {
 
 		const n = Math.log2( this.count );
@@ -249,6 +249,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Get the number of steps it takes to execute a complete bitonic sort.
+	 *
+	 * @private
+	 */
 	_getStepCount() {
 
 		const logElements = Math.log2( this.count );
@@ -278,6 +283,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Compares and swaps two data points in the data buffer within the global address space.
+	 *
+	 * @private
+	 */
 	_globalCompareAndSwapTSL( idxBefore, idxAfter, dataBuffer, tempBuffer ) {
 
 		// If the later element is less than the current element
@@ -296,7 +306,11 @@ export class BitonicSort {
 
 	}
 
-
+	/**
+	 * Create the compute shader that performs a global disperse swap on the data buffer.
+	 *
+	 * @private
+	 */
 	_getDisperseGlobal() {
 
 		const { infoStorage, tempBuffer, dataBuffer } = this;
@@ -314,6 +328,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Create the compute shader that performs a global flip swap on the data buffer.
+	 *
+	 * @private
+	 */
 	_getFlipGlobal() {
 
 		const { infoStorage, tempBuffer, dataBuffer } = this;
@@ -331,6 +350,12 @@ export class BitonicSort {
 
 	}
 
+	
+	/**
+	 * Create the compute shader that performs a complete local swap on the data buffer.
+	 *
+	 * @private
+	 */
 	_getSwapLocal() {
 
 		const { localStorage, dataBuffer, workgroupSize } = this;
@@ -406,6 +431,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Create the compute shader that performs a local disperse swap on the data buffer.
+	 *
+	 * @private
+	 */
 	_getDisperseLocal() {
 
 		const { localStorage, dataBuffer, workgroupSize, infoStorage } = this;
@@ -463,6 +493,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Create the compute shader that resets the sort's algorithm information.
+	 *
+	 * @private
+	 */
 	_getResetFn() {
 
 		const fnDef = Fn( () => {
@@ -483,6 +518,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Create the compute shader that copies the state of the global swap to the data buffer.
+	 *
+	 * @private
+	 */
 	_getAlignFn() {
 
 		const { dataBuffer, tempBuffer } = this;
@@ -499,6 +539,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Create the compute shader that sets the algorithm's information.
+	 *
+	 * @private
+	 */
 	_getSetAlgoFn() {
 
 		const fnDef = Fn( () => {
@@ -546,6 +591,11 @@ export class BitonicSort {
 
 	}
 
+	/**
+	 * Executes a step of the bitonic sort operation.
+	 *
+	 * @param {Renderer} renderer - The current scene's renderer.
+	 */
 	async computeStep( renderer ) {
 
 		// Swap local only runs once
@@ -598,7 +648,11 @@ export class BitonicSort {
 
 	}
 
-
+	/**
+	 * Executes a complete bitonic sort on the data buffer.
+	 *
+	 * @param {Renderer} renderer - The current scene's renderer.
+	 */
 	async compute( renderer ) {
 
 		this.globalOpsRemaining = 0;
