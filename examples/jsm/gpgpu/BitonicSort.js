@@ -242,34 +242,6 @@ export class BitonicSort {
 
 	}
 
-	async logBuffer( name ) {
-
-		switch(name) {
-
-			case 'info': {
-
-				console.log( new Uint32Array( await renderer.getArrayBufferAsync( this.infoStorage.value ) ) );
-
-			}
-
-			case 'temp': {
-
-				console.log( new Uint32Array( await renderer.getArrayBufferAsync( this.dataBuffer.value ) ) );
-
-			}
-
-			
-			case 'temp': {
-
-				console.log( new Uint32Array( await renderer.getArrayBufferAsync( this.tempBuffer.value ) ) );
-
-			}
-
-
-		}
-
-	}
-
 	_getSwapOpCount() {
 
 		const n = Math.log2( this.count );

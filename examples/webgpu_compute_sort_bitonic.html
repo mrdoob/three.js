@@ -7,16 +7,10 @@
 	</head>
 	<body>
 
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br /> This example demonstrates a bitonic sort running step by step in a compute shader.
-			<br /> The left canvas swaps values within workgroup local arrays. The right swaps values within storage buffers.
-			<br /> Reference implementation by <a href="https://poniesandlight.co.uk/reflect/bitonic_merge_sort/">Tim Gfrerer</a>
-			<br />
-			<div id="local_swap" style="
+		<style>
+			.swap_area {
 				position: absolute;
 				top: 150px;
-				left: 0;
 				padding: 10px;
 				background: rgba( 0, 0, 0, 0.5 );
 				color: #fff;
@@ -25,20 +19,18 @@
 				line-height: 1.5;
 				pointer-events: none;
 				text-align: left;
-			"></div>
-			<div id="global_swap" style="
-			position: absolute;
-			top: 150px;
-			right: 0;
-			padding: 10px;
-			background: rgba( 0, 0, 0, 0.5 );
-			color: #fff;
-			font-family: monospace;
-			font-size: 12px;
-			line-height: 1.5;
-			pointer-events: none;
-			text-align: left;
-		"></div>
+			}
+		
+		</style>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<br /> This example demonstrates a bitonic sort running step by step in a compute shader.
+			<br /> The left canvas swaps values within workgroup local arrays. The right swaps values within storage buffers.
+			<br /> Reference implementation by <a href="https://poniesandlight.co.uk/reflect/bitonic_merge_sort/">Tim Gfrerer</a>
+			<br />
+			<div id="local_swap" class="swap_area" style="left: 0;"></div>
+			<div id="global_swap" class="swap_area" style="right: 0;"></div>
 		</div>
 
 		<script type="importmap">
@@ -67,7 +59,7 @@
 
 				NONE: 0,
 				// Swap values within workgroup local values
-				FLIP_LOCAL: 1,
+				SWAP_LOCAL: 1,
 				DISPERSE_LOCAL: 2,
 				// Swap values within global data buffer.
 				FLIP_GLOBAL: 3,
@@ -234,6 +226,38 @@
 				return plane;
 
 			};
+
+			const createDisplayMesh2 = ( elementsStorage, infoStorage ) => {
+
+				const material = new THREE.MeshBasicNodeMaterial( { color: 0x00ff00 } );
+
+				const display = Fn( () => {
+
+					const { gridWidth, gridHeight, highlight } = effectController;
+
+					const elementIndex = getElementIndex( uv(), gridWidth, gridHeight );
+					const color = getColor( elementsStorage.element( elementIndex ), gridWidth, gridHeight ).toVar();
+
+
+					If( highlight.equal( 1 ).and( not( infoStorage.element( 0 ).equal( StepType.SWAP_LOCAL ) ) ), () => {
+
+						const boolCheck = int( elementIndex.mod( infoStorage.element( 1 ) ).lessThan( infoStorage.element( 1 ).div( 2 ) ) );
+						color.z.assign( infoStorage.element( 0 ).lessThanEqual( StepType.DISPERSE_LOCAL ) );
+						color.x.mulAssign( boolCheck );
+						color.y.mulAssign( abs( boolCheck.sub( 1 ) ) );
+
+					} );
+
+
+					return color;
+
+				} );
+
+				material.colorNode = display();
+				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				return plane;
+
+			};
 			
 			const setupDomElement = ( renderer ) => {
 
@@ -282,8 +306,6 @@
 
 				} );
 
-				scene.add( createDisplayMesh( currentElementsStorage ) );
-
 				const renderer = new THREE.WebGPURenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
@@ -307,7 +329,7 @@
 					}
 				);
 
-				console.log( bitonicSortModule );
+				scene.add( createDisplayMesh2( currentElementsStorage, bitonicSortModule.infoStorage ) );
 
 				// Initialize each value in the elements buffer.
 				const computeInit = computeInitFn().compute( size );
@@ -337,7 +359,7 @@
 
 
 
-				 /*const stepAnimation = async function () {
+				 const stepAnimation = async function () {
 
 					renderer.info.reset();
 
@@ -355,21 +377,21 @@
 
 					}
 
-					timestamps[ 'local_swap' ].innerHTML = constructInnerHTML(false, localColors );
+					timestamps[ 'local_swap' ].innerHTML = constructInnerHTML( false, localColors );
 
 					if ( currentStep === bitonicSortModule.stepCount ) {
 
-						setTimeout( stepAnimation, 5000 );
+						setTimeout( stepAnimation, 1000 );
 
 					} else {
 
-						setTimeout( stepAnimation, 5000 );
+						setTimeout( stepAnimation, 100 );
 
 					}
 
 				};
 
-				stepAnimation(); */
+				stepAnimation();
 
 				window.addEventListener( 'resize', onWindowResize );
 
