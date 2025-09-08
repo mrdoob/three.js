@@ -24,13 +24,20 @@
 			import * as THREE from 'three';
 
 			import { AsciiEffect } from 'three/addons/effects/AsciiEffect.js';
-			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let camera, controls, scene, renderer, effect;
+			let camera, scene, renderer, effect, rendererDomElement;
 
 			let sphere, plane;
 
 			const start = Date.now();
+
+			const params = {
+
+				displayEffect: true,
+
+			};
 
 			init();
 
@@ -56,7 +63,7 @@
 
 				// Plane
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0, side: THREE.DoubleSide } ) );
 				plane.position.y = - 200;
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
@@ -64,22 +71,36 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.domElement.style.position = 'absolute';
+				renderer.domElement.style.zIndex = '-1';
+				rendererDomElement = renderer.domElement;
+
+				document.body.appendChild( renderer.domElement );
 
 				effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.domElement.style.color = 'white';
 				effect.domElement.style.backgroundColor = 'black';
+				effect.domElement.style.position = 'absolute';
 
 				// Special case: append effect.domElement, instead of renderer.domElement.
 				// AsciiEffect creates a custom domElement (a div container) where the ASCII elements are placed.
 
 				document.body.appendChild( effect.domElement );
 
-				controls = new TrackballControls( camera, effect.domElement );
+				new OrbitControls( camera, renderer.domElement );
+				new OrbitControls( camera, effect.domElement );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = new GUI();
+				gui.add( params, 'displayEffect' ).name( 'Display Ascii Effect' ).onChange( ( value ) => {
+
+					rendererDomElement.style.zIndex = value ? '-1' : '1';
+
+				} );
 
 			}
 
@@ -102,8 +123,6 @@
 				sphere.position.y = Math.abs( Math.sin( timer * 0.002 ) ) * 150;
 				sphere.rotation.x = timer * 0.0003;
 				sphere.rotation.z = timer * 0.0002;
-
-				controls.update();
 
 				effect.render( scene, camera );
 
