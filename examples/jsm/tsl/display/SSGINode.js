@@ -499,7 +499,7 @@ class SSGINode extends TempNode {
 
 				let frontBackHorizon = vec2( dot( pixelToSample, viewDir ), dot( pixelToSampleBackface, viewDir ) );
 				frontBackHorizon = GTAOFastAcos( clamp( frontBackHorizon, - 1, 1 ) );
-				frontBackHorizon = clamp( div( mul( samplingDirection, frontBackHorizon.negate() ).sub( n.sub( HALF_PI ) ), PI ) );
+				frontBackHorizon = clamp( div( mul( samplingDirection, frontBackHorizon.negate() ).sub( n.sub( HALF_PI ) ), PI ) ); // Port note: subtract half pi instead of adding it
 				frontBackHorizon = directionIsRight.equal( true ).select( frontBackHorizon.yx, frontBackHorizon.xy ); // Front/Back get inverted depending on angle
 
 				const result = computeOccludedBitfield( frontBackHorizon.x, frontBackHorizon.y, occludedBitfield );
