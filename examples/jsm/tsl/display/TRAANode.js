@@ -293,6 +293,7 @@ class TRAANode extends TempNode {
 
 		renderer.setRenderTarget( this._resolveRenderTarget );
 		_quadMesh.material = this._resolveMaterial;
+		_quadMesh.name = 'TRAA';
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
 

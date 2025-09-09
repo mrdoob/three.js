@@ -176,6 +176,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 1, 0 );
 
+		_quadMesh.name = 'Gaussian Blur [ Horizontal ]';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -185,6 +186,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 0, 1 );
 
+		_quadMesh.name = 'Gaussian Blur [ Vertical ]';
 		_quadMesh.render( renderer );
 
 		// restore
