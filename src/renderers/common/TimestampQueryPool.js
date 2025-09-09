@@ -67,6 +67,25 @@ class TimestampQueryPool {
 		 */
 		this.pendingResolve = false;
 
+		/**
+		 * Stores the latest timestamp for each render context.
+		 *
+		 * @type {Map<string, number>}
+		 */
+		this.timestamps = new Map();
+
+	}
+
+	/**
+	 * Returns the latest timestamp for a given render context.
+	 *
+	 * @param {string} uid - A unique identifier for the render context.
+	 * @return {?number} The latest timestamp, or undefined if not available.
+	 */
+	getCurrentTimestamp( uid ) {
+
+		return this.timestamps.get( uid );
+
 	}
 
 	/**

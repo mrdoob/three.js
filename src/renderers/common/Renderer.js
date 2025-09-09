@@ -1283,6 +1283,8 @@ class Renderer {
 
 		if ( this._isDeviceLost === true ) return;
 
+		//
+
 		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
 		// preserve render tree
@@ -1332,6 +1334,10 @@ class Renderer {
 		this.info.render.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
+
+		//
+
+		this.backend.updateTimeStampUID( renderContext );
 
 		//
 
@@ -2360,6 +2366,10 @@ class Renderer {
 		this.info.compute.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
+
+		//
+
+		this.backend.updateTimeStampUID( computeNodes );
 
 		//
 

@@ -445,10 +445,6 @@ class WebGLBackend extends Backend {
 
 		//
 
-		renderContextData.frameCalls = this.renderer.info.render.frameCalls;
-
-		//
-
 		if ( renderContext.viewport ) {
 
 			this.updateViewport( renderContext );
@@ -808,10 +804,6 @@ class WebGLBackend extends Backend {
 
 		const { state, gl } = this;
 		const computeGroupData = this.get( computeGroup );
-
-		//
-
-		computeGroupData.frameCalls = this.renderer.info.compute.frameCalls;
 
 		//
 
