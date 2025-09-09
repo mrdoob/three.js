@@ -50,18 +50,19 @@ class Sampler extends Binding {
 		 */
 		this.isSampler = true;
 
-	}
+		/**
+		 * An event listener which is added to {@link texture}'s dispose event.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onTextureDispose = () => {
 
-	/**
-	 * An event listener which is added to {@link texture}'s dispose event.
-	 *
-	 * @private
-	 */
-	_onTextureDispose() {
+			this._texture = null;
+			this.generation = null;
+			this.version = 0;
 
-		this._texture = null;
-		this.generation = null;
-		this.version = 0;
+		};
 
 	}
 
