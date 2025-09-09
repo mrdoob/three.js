@@ -232,11 +232,8 @@ class AsciiEffect {
 					const iGreen = oImgData[ iOffset + 1 ];
 					const iBlue = oImgData[ iOffset + 2 ];
 					const iAlpha = oImgData[ iOffset + 3 ];
-					let iCharIdx;
 
-					let fBrightness;
-
-					fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
+					let fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
 					// fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
 
 
@@ -248,15 +245,11 @@ class AsciiEffect {
 
 					}
 
-					const baseIdx = ( 1 - fBrightness ) * maxIdx;
+					let iCharIdx = Math.round( ( 1 - fBrightness ) * maxIdx );
 
 					if ( bInvert ) {
 
-						iCharIdx = maxIdx - Math.ceil( baseIdx );
-
-					} else {
-
-						iCharIdx = Math.floor( baseIdx );
+						iCharIdx = maxIdx - iCharIdx;
 
 					}
 
