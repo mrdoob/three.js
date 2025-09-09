@@ -33,14 +33,14 @@ export const getBitonicFlipIndices = /*@__PURE__*/ Fn( ( [ index, blockHeight ] 
 
 	return idx;
 
-}).setLayout({ 
-	name: 'getBitonicFlipIndices', 
+} ).setLayout( {
+	name: 'getBitonicFlipIndices',
 	type: 'uvec2',
 	inputs: [
-		{name: 'index', type: 'uint'},
-		{name: 'blockHeight', type: 'uint'}
+		{ name: 'index', type: 'uint' },
+		{ name: 'blockHeight', type: 'uint' }
 	]
-});
+} );
 
 /**
  * Returns the indices that will be compared in a bitonic sort's disperse operation.
@@ -65,18 +65,25 @@ export const getBitonicDisperseIndices = /*@__PURE__*/ Fn( ( [ index, swapSpan ]
 
 	return idx;
 
-}).setLayout({
+} ).setLayout( {
 	name: 'getBitonicDisperseIndices',
-	type: 'uvec2', 
+	type: 'uvec2',
 	inputs: [
-		{name: 'index', type: 'uint'},
-		{name: 'blockHeight', type: 'uint'}
+		{ name: 'index', type: 'uint' },
+		{ name: 'blockHeight', type: 'uint' }
 	]
-});
+} );
 
 // TODO: Add parameters for computing a buffer larger than vec4
 export class BitonicSort {
 
+	/**
+	 * Constructs a new light probe helper.
+	 *
+	 * @param {Renderer} renderer - The current scene's renderer.
+	 * @param {StorageBufferNode} [size=1] - The size of the helper.
+	 * @param {Object} [options={}] - The size of the helper.
+	 */
 	constructor( renderer, dataBuffer, options = {} ) {
 
 		/**
@@ -122,10 +129,10 @@ export class BitonicSort {
 		*/
 		this.localStorage = workgroupArray( dataBuffer.nodeType, this.workgroupSize * 2 );
 
-		this._tempArray = new Uint32Array(this.count);
-		for (let i = 0; i < this.count; i++) {
+		this._tempArray = new Uint32Array( this.count );
+		for ( let i = 0; i < this.count; i ++ ) {
 
-			this._tempArray[i] = 0;
+			this._tempArray[ i ] = 0;
 
 		}
 
@@ -141,7 +148,7 @@ export class BitonicSort {
 		 *
 		 * @type {StorageBufferNode}
 		*/
-		this.infoStorage = instancedArray( new Uint32Array([1, 2, 2]), 'uint' ).setName( 'BitonicSortInfo' );
+		this.infoStorage = instancedArray( new Uint32Array( [ 1, 2, 2 ] ), 'uint' ).setName( 'BitonicSortInfo' );
 
 
 		/**
@@ -350,7 +357,7 @@ export class BitonicSort {
 
 	}
 
-	
+
 	/**
 	 * Create the compute shader that performs a complete local swap on the data buffer.
 	 *
@@ -399,7 +406,7 @@ export class BitonicSort {
 				const flipIdx = getBitonicFlipIndices( invocationLocalIndex, flipBlockHeight );
 				localCompareAndSwap( flipIdx.x, flipIdx.y );
 
-				const localBlockHeight = flipBlockHeight.div(2)
+				const localBlockHeight = flipBlockHeight.div( 2 );
 
 				Loop( { start: localBlockHeight, end: uint( 1 ), type: 'uint', condition: '>', update: '>>= 1' }, () => {
 
@@ -438,7 +445,7 @@ export class BitonicSort {
 	 */
 	_getDisperseLocal() {
 
-		const { localStorage, dataBuffer, workgroupSize, infoStorage } = this;
+		const { localStorage, dataBuffer, workgroupSize } = this;
 
 		const localCompareAndSwap = ( idxBefore, idxAfter ) => {
 
@@ -467,7 +474,7 @@ export class BitonicSort {
 			// Ensure that all local data has been populated
 			workgroupBarrier();
 
-			const localBlockHeight = uint(workgroupSize * 2);
+			const localBlockHeight = uint( workgroupSize * 2 );
 
 			Loop( { start: localBlockHeight, end: uint( 1 ), type: 'uint', condition: '>', update: '>>= 1' }, () => {
 
@@ -548,7 +555,7 @@ export class BitonicSort {
 
 		const fnDef = Fn( () => {
 
-			const { infoStorage, workgroupSize, count } = this;
+			const { infoStorage, workgroupSize } = this;
 
 			const currentAlgo = infoStorage.element( 0 );
 			const currentSwapSpan = infoStorage.element( 1 );
@@ -559,10 +566,10 @@ export class BitonicSort {
 				const nextHighestSwapSpan = uint( workgroupSize * 4 );
 
 				currentAlgo.assign( StepType.FLIP_GLOBAL );
-				currentSwapSpan.assign( nextHighestSwapSpan);
+				currentSwapSpan.assign( nextHighestSwapSpan );
 				maxSwapSpan.assign( nextHighestSwapSpan );
 
-			} ).ElseIf( currentAlgo.equal(StepType.DISPERSE_LOCAL), () => {
+			} ).ElseIf( currentAlgo.equal( StepType.DISPERSE_LOCAL ), () => {
 
 				currentAlgo.assign( StepType.FLIP_GLOBAL );
 
@@ -583,7 +590,7 @@ export class BitonicSort {
 				);
 				currentSwapSpan.assign( nextSwapSpan );
 
-			} )
+			} );
 
 		} )().compute( 1 );
 
@@ -629,11 +636,11 @@ export class BitonicSort {
 
 
 		this.currentDispatch += 1;
-		
+
 		if ( this.currentDispatch === this.stepCount ) {
 
 			// Just reset the algorithm information
-			await renderer.computeAsync( this.resetFn )
+			await renderer.computeAsync( this.resetFn );
 
 			this.currentDispatch = 0;
 			this.globalOpsRemaining = 0;
