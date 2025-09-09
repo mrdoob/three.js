@@ -65,7 +65,7 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 1, 0 );
-				controls.enablePan = false;
+				controls.enablePan = true;
 				controls.minDistance = 1;
 				controls.maxDistance = 6;
 				controls.update();
@@ -89,8 +89,8 @@
 				// gi
 
 				const giPass = ssgi( scenePassColor, scenePassDepth, scenePassNormal, camera );
-				//giPass.sliceCount.value = 2;
-				//giPass.stepCount.value = 8;
+				giPass.sliceCount.value = 2;
+				giPass.stepCount.value = 8;
 
 				// composite
 
