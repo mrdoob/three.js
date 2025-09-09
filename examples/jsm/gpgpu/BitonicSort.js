@@ -1,4 +1,4 @@
-import { Fn, uvec2, If, instancedArray, instanceIndex, invocationLocalIndex, Loop, workgroupArray, workgroupBarrier, workgroupId, uint, select } from 'three/tsl';
+import { Fn, uvec2, If, instancedArray, instanceIndex, invocationLocalIndex, Loop, workgroupArray, workgroupBarrier, workgroupId, uint, select, min, max } from 'three/tsl';
 
 const StepType = {
 	NONE: 0,
@@ -297,21 +297,31 @@ export class BitonicSort {
 	 */
 	_globalCompareAndSwapTSL( idxBefore, idxAfter, dataBuffer, tempBuffer ) {
 
-		// If the later element is less than the current element
-		If( dataBuffer.element( idxAfter ).lessThan( dataBuffer.element( idxBefore ) ), () => {
+		const data1 = dataBuffer.element( idxBefore );
+		const data2 = dataBuffer.element( idxAfter );
 
-			tempBuffer.element( idxBefore ).assign( dataBuffer.element( idxAfter ) );
-			tempBuffer.element( idxAfter ).assign( dataBuffer.element( idxBefore ) );
-
-		} ).Else( () => {
-
-			// Otherwise apply the existing values to temporary storage.
-			tempBuffer.element( idxBefore ).assign( dataBuffer.element( idxBefore ) );
-			tempBuffer.element( idxAfter ).assign( dataBuffer.element( idxAfter ) );
-
-		} );
+		tempBuffer.element( idxBefore ).assign( min( data1, data2 ) );
+		tempBuffer.element( idxAfter ).assign( max( data1, data2 ) );
 
 	}
+
+	/**
+	 * Compares and swaps two data points in the data buffer within the local address space.
+	 *
+	 * @private
+	 */
+	_localCompareAndSwapTSL( idxBefore, idxAfter ) {
+
+		const { localStorage } = this;
+
+		const data1 = localStorage.element( idxBefore ).toVar();
+		const data2 = localStorage.element( idxAfter ).toVar();
+
+		localStorage.element( idxBefore ).assign( min( data1, data2 ) );
+		localStorage.element( idxAfter ).assign( max( data1, data2 ) );
+
+	}
+
 
 	/**
 	 * Create the compute shader that performs a global disperse swap on the data buffer.
@@ -367,18 +377,6 @@ export class BitonicSort {
 
 		const { localStorage, dataBuffer, workgroupSize } = this;
 
-		const localCompareAndSwap = ( idxBefore, idxAfter ) => {
-
-			If( localStorage.element( idxAfter ).lessThan( localStorage.element( idxBefore ) ), () => {
-
-				const temp = localStorage.element( idxBefore ).toVar();
-				localStorage.element( idxBefore ).assign( localStorage.element( idxAfter ) );
-				localStorage.element( idxAfter ).assign( temp );
-
-			} );
-
-		};
-
 		const fnDef = Fn( () => {
 
 			// Get ids of indices needed to populate workgroup local buffer.
@@ -404,7 +402,8 @@ export class BitonicSort {
 				workgroupBarrier();
 
 				const flipIdx = getBitonicFlipIndices( invocationLocalIndex, flipBlockHeight );
-				localCompareAndSwap( flipIdx.x, flipIdx.y );
+
+				this._localCompareAndSwapTSL( flipIdx.x, flipIdx.y );
 
 				const localBlockHeight = flipBlockHeight.div( 2 );
 
@@ -414,7 +413,7 @@ export class BitonicSort {
 					workgroupBarrier();
 
 					const disperseIdx = getBitonicDisperseIndices( invocationLocalIndex, localBlockHeight );
-					localCompareAndSwap( disperseIdx.x, disperseIdx.y );
+					this._localCompareAndSwapTSL( disperseIdx.x, disperseIdx.y );
 
 					localBlockHeight.divAssign( 2 );
 
@@ -431,7 +430,6 @@ export class BitonicSort {
 			dataBuffer.element( localOffset.add( localID1 ) ).assign( localStorage.element( localID1 ) );
 			dataBuffer.element( localOffset.add( localID2 ) ).assign( localStorage.element( localID2 ) );
 
-
 		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
 
 		return fnDef;
@@ -446,18 +444,6 @@ export class BitonicSort {
 	_getDisperseLocal() {
 
 		const { localStorage, dataBuffer, workgroupSize } = this;
-
-		const localCompareAndSwap = ( idxBefore, idxAfter ) => {
-
-			If( localStorage.element( idxAfter ).lessThan( localStorage.element( idxBefore ) ), () => {
-
-				const temp = localStorage.element( idxBefore ).toVar();
-				localStorage.element( idxBefore ).assign( localStorage.element( idxAfter ) );
-				localStorage.element( idxAfter ).assign( temp );
-
-			} );
-
-		};
 
 		const fnDef = Fn( () => {
 
@@ -482,7 +468,7 @@ export class BitonicSort {
 				workgroupBarrier();
 
 				const disperseIdx = getBitonicDisperseIndices( invocationLocalIndex, localBlockHeight );
-				localCompareAndSwap( disperseIdx.x, disperseIdx.y );
+				this._localCompareAndSwapTSL( disperseIdx.x, disperseIdx.y );
 
 				localBlockHeight.divAssign( 2 );
 
@@ -630,7 +616,6 @@ export class BitonicSort {
 			const nextSpanGlobalOps = this.globalOpsInSpan + 1;
 			this.globalOpsInSpan = nextSpanGlobalOps;
 			this.globalOpsRemaining = nextSpanGlobalOps;
-
 
 		}
 
