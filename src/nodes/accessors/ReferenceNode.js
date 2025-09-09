@@ -7,6 +7,7 @@ import { buffer } from './BufferNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
+import { warn } from '../../utils.js';
 
 // TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
 
@@ -238,7 +239,7 @@ class ReferenceNode extends Node {
 	 */
 	label( name ) {
 
-		console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 		return this.setName( name );
 
@@ -284,7 +285,7 @@ class ReferenceNode extends Node {
 
 		if ( this.name !== null ) node.setName( this.name );
 
-		this.node = node.getSelf();
+		this.node = node;
 
 	}
 

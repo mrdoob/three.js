@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials - equirectangular exr image based lighting</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of <a href="https://cloud.needle.tools/hdris" target="_blank">FastHDR</a>, loading 10x faster and using 95% less GPU memory than EXR.<br/>Photography by <a href="https://cloud.needle.tools/hdris?img=Ballroom" target="_blank" rel="noopener">Sergej Majboroda</a></div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+
+			const params = {
+				'image': 'ballroom',
+				'fov': 40,
+				'exposure': 1.0,
+				'backgroundBlurriness': 0.0
+			};
+
+			let container, stats;
+			let camera, scene, renderer, controls;
+
+			init();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( params.fov, window.innerWidth / window.innerHeight, .1, 50 );
+				camera.position.set( 7, 0, 0 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+
+				container.appendChild( renderer.domElement );
+
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+				//
+
+				const sphereGeometry = new THREE.SphereGeometry( 0.45, 64, 32 );
+
+				const sphere01 = new THREE.Mesh( sphereGeometry, new THREE.MeshPhysicalMaterial( {
+					transmission: 1.0,
+					thickness: 2.0,
+					metalness: 0.0,
+					roughness: 0.0,
+				} ) );
+				sphere01.position.z += 2;
+				scene.add( sphere01 );
+
+				const sphere02 = new THREE.Mesh( sphereGeometry, new THREE.MeshStandardMaterial( {
+					metalness: 0.0,
+					roughness: 1.0,
+				} ) );
+				sphere02.position.z += 1;
+				scene.add( sphere02 );
+
+				const sphere03 = new THREE.Mesh( sphereGeometry, new THREE.MeshStandardMaterial( {
+					metalness: 1.0,
+					roughness: 0.0,
+				} ) );
+				sphere03.position.z += 0;
+				scene.add( sphere03 );
+
+				const sphere04 = new THREE.Mesh( sphereGeometry, new THREE.MeshStandardMaterial( {
+					metalness: 1.0,
+					roughness: 0.5,
+					color: 0x888888
+				} ) );
+				sphere04.position.z -= 1;
+				scene.add( sphere04 );
+
+				const sphere05 = new THREE.Mesh( sphereGeometry, new THREE.MeshStandardMaterial( {
+					metalness: 0.0,
+					roughness: 0.0,
+					color: 0x6ab440
+				} ) );
+				sphere05.position.z -= 2;
+				scene.add( sphere05 );
+
+				const loader = new KTX2Loader()
+					.setTranscoderPath( 'jsm/libs/basis/' )
+					.detectSupport( renderer );
+
+				function loadTexture( url ) {
+
+					loader.load( url, ( texture ) => {
+
+						texture.mapping = THREE.CubeUVReflectionMapping;
+						scene.environment = texture;
+						scene.background = texture;
+
+					} );
+
+				}
+
+				loadTexture( "https://cdn.needle.tools/static/hdris/ballroom_2k.pmrem.ktx2" );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = .1;
+				controls.maxDistance = 20;
+				controls.enableDamping = true;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = new GUI();
+
+				gui.add( params, 'image', {
+					'ballroom': 'https://cdn.needle.tools/static/hdris/ballroom_2k.pmrem.ktx2',
+					'brown photostudio': 'https://cdn.needle.tools/static/hdris/brown_photostudio_02_2k.pmrem.ktx2',
+					'cape hill': 'https://cdn.needle.tools/static/hdris/cape_hill_2k.pmrem.ktx2',
+					'cannon': "https://cdn.needle.tools/static/hdris/cannon_2k.pmrem.ktx2",
+					'metro noord': "https://cdn.needle.tools/static/hdris/metro_noord_2k.pmrem.ktx2",
+					'the sky is on fire': "https://cdn.needle.tools/static/hdris/the_sky_is_on_fire_2k.pmrem.ktx2",
+					'studio small 09': 'https://cdn.needle.tools/static/hdris/studio_small_09_2k.pmrem.ktx2',
+					'wide street 01': 'https://cdn.needle.tools/static/hdris/wide_street_01_2k.pmrem.ktx2'
+				} ).onChange( () => {
+
+					loadTexture( params.image );
+
+				} );
+
+				gui.add( params, 'exposure', 0, 2, 0.01 );
+
+				gui.add( params, 'fov', 10, 100 ).onChange( () => {
+
+					camera.fov = params.fov;
+					camera.updateProjectionMatrix();
+
+				} );
+
+				gui.add( params, 'backgroundBlurriness', 0, 1, 0.01 ).name( 'background blurriness' );
+
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				renderer.toneMappingExposure = params.exposure;
+				scene.backgroundBlurriness = params.backgroundBlurriness;
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

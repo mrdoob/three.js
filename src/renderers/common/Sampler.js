@@ -19,21 +19,26 @@ class Sampler extends Binding {
 		super( name );
 
 		/**
-		 * This function is called when the texture is disposed.
-		 * @type {function}
+		 * The texture the sampler is referring to.
+		 *
 		 * @private
+		 * @type {?Texture}
 		 */
-		this._onDisposeTexture = () => {
+		this._texture = null;
+
+		/**
+		 * An event listener which is added to {@link texture}'s dispose event.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onTextureDispose = () => {
 
 			this.texture = null;
 
 		};
 
-		/**
-		 * The texture the sampler is referring to.
-		 *
-		 * @type {?Texture}
-		 */
+		// Assignment to the texture via a setter must occur after "_onTextureDispose" is initialized.
 		this.texture = texture;
 
 		/**
@@ -73,7 +78,7 @@ class Sampler extends Binding {
 
 		if ( this._texture ) {
 
-			this._texture.removeEventListener( 'dispose', this._onDisposeTexture );
+			this._texture.removeEventListener( 'dispose', this._onTextureDispose );
 
 		}
 
@@ -84,7 +89,7 @@ class Sampler extends Binding {
 
 		if ( this._texture ) {
 
-			this._texture.addEventListener( 'dispose', this._onDisposeTexture );
+			this._texture.addEventListener( 'dispose', this._onTextureDispose );
 
 		}
 
@@ -119,6 +124,28 @@ class Sampler extends Binding {
 		}
 
 		return false;
+
+	}
+
+
+	clone() {
+
+		const clonedSampler = super.clone();
+
+		// fix dispose handler for cloned instances
+		// TODO: Find better solution, see #31747
+
+		clonedSampler._texture = null;
+
+		clonedSampler._onTextureDispose = () => {
+
+			clonedSampler.texture = null;
+
+		};
+
+		clonedSampler.texture = this.texture;
+
+		return clonedSampler;
 
 	}
 

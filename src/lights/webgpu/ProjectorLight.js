@@ -24,7 +24,7 @@ class ProjectorLight extends SpotLight {
 		/**
 		 * Aspect ratio of the light. Set to `null` to use the texture aspect ratio.
 		 *
-		 * @type {number}
+		 * @type {?number}
 		 * @default null
 		 */
 		this.aspect = null;

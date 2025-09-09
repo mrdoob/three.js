@@ -7,6 +7,7 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
 import { directionToFaceDirection } from './FrontFacingNode.js';
 import { reconstructZ } from '../utils/Packing.js';
+import { error } from '../../utils.js';
 
 /**
  * This class can be used for applying normals maps to materials.
@@ -126,7 +127,7 @@ class NormalMapNode extends TempNode {
 
 		} else {
 
-			console.error( `THREE.NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
+			error( `NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
 
 			output = normalView; // Fallback to default normal view
 

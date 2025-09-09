@@ -1,7 +1,7 @@
 import {
 	WireframeGeometry
 } from 'three';
-import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
+import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
 
 /**
  * A special type of line segments geometry intended for wireframe rendering.

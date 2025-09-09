@@ -135,6 +135,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
 
@@ -638,7 +639,7 @@ class PassNode extends TempNode {
 	/**
 	 * Precompiles the pass.
 	 *
-	 * Note that this method must be called after the pass configuartion is complete.
+	 * Note that this method must be called after the pass configuration is complete.
 	 * So calls like `setMRT()` and `getTextureNode()` must proceed the precompilation.
 	 *
 	 * @async

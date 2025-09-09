@@ -8,6 +8,7 @@ import { builtin } from '../../../nodes/accessors/BuiltinNode.js';
 
 import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 import { hashArray } from '../../../nodes/core/NodeUtils.js';
+import { error } from '../../../utils.js';
 
 const _outputNodeMap = new WeakMap();
 const _chainKeys = [];
@@ -489,7 +490,7 @@ class Nodes extends DataMap {
 
 					} else if ( background.isColor !== true ) {
 
-						console.error( 'WebGPUNodes: Unsupported background configuration.', background );
+						error( 'WebGPUNodes: Unsupported background configuration.', background );
 
 					}
 
@@ -571,7 +572,7 @@ class Nodes extends DataMap {
 
 					} else {
 
-						console.error( 'THREE.Renderer: Unsupported fog configuration.', sceneFog );
+						error( 'Renderer: Unsupported fog configuration.', sceneFog );
 
 					}
 
@@ -618,7 +619,7 @@ class Nodes extends DataMap {
 
 					} else {
 
-						console.error( 'Nodes: Unsupported environment configuration.', environment );
+						error( 'Nodes: Unsupported environment configuration.', environment );
 
 					}
 

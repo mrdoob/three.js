@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>线段组（[name]）</h1>
+
+		<p class="desc">
+			在顶点对之间绘制的一系列线段。
+		</p>
+
+		<p class="desc">
+			相比 [page:LineSegments]，该类提供了更多功能，如任意线宽设置以及支持使用世界单位定义线宽。
+			[page:Line2] 继承自该对象，形成连续的多段线而不是独立的线段。
+		</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			查看[link:#manual/introduction/Installation Installation / Addons]。
+		</p>
+
+		<code>
+			import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
+		</code>
+
+		<h2>示例</h2>
+
+		<p>[example:webgl_lines_fat_raycasting WebGL / lines / fat / raycasting ]</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LineSegmentsGeometry geometry], [param:LineMaterial material] )</h3>
+		<p>
+			[page:LineSegmentsGeometry geometry] — （可选）表示每个线段的顶点对。<br />
+			[page:Material material] — （可选）线段的材质。默认为具有随机颜色的 [page:LineMaterial]。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性，请参见基类 [page:Mesh]。</p>
+
+		<h3>[property:Boolean isLineSegments2]</h3>
+		<p>只读标志，用于检查给定对象是否为 [name] 类型。</p>
+
+		<h2>方法</h2>
+		<p>共有方法，请参见基类 [page:Mesh]。</p>
+
+		<h3>[method:undefined onBeforeRender]( [param:WebGLRenderer renderer] )</h3>
+		<p>
+			此方法由框架调用，用于更新材质的分辨率属性，该属性为实现屏幕比例宽度所必需。
+		</p>
+		<p>
+			如果您的对象对相机不可见（例如通过 [page:Object3D.layers layers] 或 [page:Object3D.visible visible]），则在视口发生变化时需要手动调用此方法。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/lines/LineSegments2.js examples/jsm/lines/LineSegments2.js]
+		</p>
+	</body>
+</html>

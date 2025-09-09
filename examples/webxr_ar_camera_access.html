@@ -64,7 +64,7 @@
 				const boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 				const boxMaterial = new THREE.MeshStandardMaterial();
 				cube = new THREE.Mesh( boxGeometry, boxMaterial );
-				cube.position.z = -3;
+				cube.position.z = - 3;
 
 				scene.add( cube );
 
@@ -103,21 +103,21 @@
 				const frame = renderer.xr.getFrame();
 				const referenceSpace = renderer.xr.getReferenceSpace();
 
-				if ( !frame || !referenceSpace ) return;
+				if ( ! frame || ! referenceSpace ) return;
 
 				const viewerPose = frame.getViewerPose( referenceSpace );
 
 				if ( ! viewerPose ) return;
 
 				const view = viewerPose.views.find( view => view.camera );
-				
+			
 				const cameraTexture = renderer.xr.getCameraTexture( view.camera );
 
 				if ( cube.material.map === cameraTexture ) return;
 
 				cube.material.map = cameraTexture;
 				cube.material.needsUpdate = true;
-				
+			
 			}
 
 			function animate() {

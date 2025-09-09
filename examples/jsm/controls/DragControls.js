@@ -61,7 +61,7 @@ class DragControls extends Controls {
 	 *
 	 * @param {Array<Object3D>} objects - An array of draggable 3D objects.
 	 * @param {Camera} camera - The camera of the rendered scene.
-	 * @param {?HTMLDOMElement} [domElement=null] - The HTML DOM element used for event listeners.
+	 * @param {?HTMLElement} [domElement=null] - The HTML DOM element used for event listeners.
 	 */
 	constructor( objects, camera, domElement = null ) {
 

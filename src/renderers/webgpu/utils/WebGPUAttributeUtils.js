@@ -1,6 +1,7 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
+import { error } from '../../../utils.js';
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],
@@ -406,7 +407,7 @@ class WebGPUAttributeUtils {
 
 		if ( ! format ) {
 
-			console.error( 'THREE.WebGPUAttributeUtils: Vertex format not supported yet.' );
+			error( 'WebGPUAttributeUtils: Vertex format not supported yet.' );
 
 		}
 

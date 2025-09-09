@@ -548,7 +548,7 @@ class NodeMaterialObserver {
 	 *
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {number} renderId - The render ID.
-	 * @return {Array} The lights for the given lights node and render ID.
+	 * @return {Array<Object>} The lights for the given lights node and render ID.
 	 */
 	getLights( lightsNode, renderId ) {
 

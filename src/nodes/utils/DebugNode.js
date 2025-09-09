@@ -1,5 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
+import { log } from '../../utils.js';
 
 class DebugNode extends TempNode {
 
@@ -56,7 +57,7 @@ class DebugNode extends TempNode {
 
 		} else {
 
-			console.log( code );
+			log( code );
 
 		}
 

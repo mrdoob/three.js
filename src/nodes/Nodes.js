@@ -57,6 +57,9 @@ export { default as MemberNode } from './utils/MemberNode.js';
 export { default as DebugNode } from './utils/DebugNode.js';
 export { default as EventNode } from './utils/EventNode.js';
 
+// math
+export { default as BitcastNode } from './math/BitcastNode.js';
+
 // accessors
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';
 export { default as BufferAttributeNode } from './accessors/BufferAttributeNode.js';

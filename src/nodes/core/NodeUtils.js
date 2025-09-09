@@ -5,6 +5,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { error } from '../../utils.js';
 
 // cyrb53 (c) 2018 bryc (github.com/bryc). License: Public domain. Attribution appreciated.
 // A fast and simple 64-bit (or 53-bit) string hash function with decent collision resistance.
@@ -88,7 +89,6 @@ export function getCacheKey( object, force = false ) {
 	if ( object.isNode === true ) {
 
 		values.push( object.id );
-		object = object.getSelf();
 
 	}
 
@@ -113,7 +113,7 @@ export function getCacheKey( object, force = false ) {
  */
 export function* getNodeChildren( node, toJSON = false ) {
 
-	for ( const property in node ) {
+	for ( const property of Object.getOwnPropertyNames( node ) ) {
 
 		// Ignore private properties.
 		if ( property.startsWith( '_' ) === true ) continue;
@@ -235,7 +235,7 @@ export function getLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 9;
 	if ( /mat4/.test( type ) ) return 16;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 
@@ -256,7 +256,7 @@ export function getMemoryLengthFromType( type ) {
 	if ( /mat3/.test( type ) ) return 12;
 	if ( /mat4/.test( type ) ) return 16;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 
@@ -277,7 +277,7 @@ export function getByteBoundaryFromType( type ) {
 	if ( /mat3/.test( type ) ) return 48;
 	if ( /mat4/.test( type ) ) return 64;
 
-	console.error( 'THREE.TSL: Unsupported type:', type );
+	error( 'TSL: Unsupported type:', type );
 
 }
 
