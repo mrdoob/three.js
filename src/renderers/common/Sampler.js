@@ -57,7 +57,7 @@ class Sampler extends Binding {
 	 *
 	 * @private
 	 */
-	_onDispose() {
+	_onTextureDispose() {
 
 		this._texture = null;
 		this.generation = null;
@@ -75,7 +75,7 @@ class Sampler extends Binding {
 
 		if ( this._texture ) {
 
-			this._texture.removeEventListener( 'dispose', this._onDispose );
+			this._texture.removeEventListener( 'dispose', this._onTextureDispose );
 
 		}
 
@@ -86,7 +86,7 @@ class Sampler extends Binding {
 
 		if ( this._texture ) {
 
-			this._texture.addEventListener( 'dispose', this._onDispose );
+			this._texture.addEventListener( 'dispose', this._onTextureDispose );
 
 		}
 
