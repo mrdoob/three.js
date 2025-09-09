@@ -472,7 +472,8 @@ class SSGINode extends TempNode {
 
 			stepRadius.divAssign( float( STEP_COUNT ).add( 1 ) );
 			const radiusVS = max( 1, float( STEP_COUNT.sub( 1 ) ) ).mul( stepRadius );
-			const samplingDirection = directionIsRight.equal( true ).select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
+			const uvDirection = directionIsRight.equal( true ).select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
+			const samplingDirection = directionIsRight.equal( true ).select( 1, - 1 );
 
 			const color = vec3( 0 );
 			const occludedBitfield = uint( globalOccludedBitfield ).toVar();
@@ -483,7 +484,7 @@ class SSGINode extends TempNode {
 
 				const offset = pow( abs( mul( stepRadius, float( i ).add( initialRayStep ) ).div( radiusVS ) ), EXP_FACTOR ).mul( radiusVS ).toConst();
 				const uvOffset = slideDirTexelSize.mul( max( offset, float( i ).add( 1 ) ) ).toConst();
-				const sampleUV = uvNode.add( uvOffset.mul( samplingDirection ) ).toConst();
+				const sampleUV = uvNode.add( uvOffset.mul( uvDirection ) ).toConst();
 
 				If( sampleUV.x.lessThanEqual( 0 ).or( sampleUV.y.lessThanEqual( 0 ) ).or( sampleUV.x.greaterThanEqual( 1 ) ).or( sampleUV.y.greaterThanEqual( 1 ) ), () => {
 
@@ -498,7 +499,7 @@ class SSGINode extends TempNode {
 
 				let frontBackHorizon = vec2( dot( pixelToSample, viewDir ), dot( pixelToSampleBackface, viewDir ) );
 				frontBackHorizon = GTAOFastAcos( clamp( frontBackHorizon, - 1, 1 ) );
-				frontBackHorizon = clamp( div( mul( samplingDirection, vec2( frontBackHorizon.x.negate(), frontBackHorizon.y ) ).sub( n.sub( HALF_PI ) ), PI ) ); // Port note: This line also required an update because of different uv conventions
+				frontBackHorizon = clamp( div( mul( samplingDirection, frontBackHorizon.negate() ).sub( n.sub( HALF_PI ) ), PI ) );
 				frontBackHorizon = directionIsRight.equal( true ).select( frontBackHorizon.yx, frontBackHorizon.xy ); // Front/Back get inverted depending on angle
 
 				const result = computeOccludedBitfield( frontBackHorizon.x, frontBackHorizon.y, occludedBitfield );
