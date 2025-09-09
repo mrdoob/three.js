@@ -21,8 +21,24 @@ class Sampler extends Binding {
 		/**
 		 * The texture the sampler is referring to.
 		 *
+		 * @private
 		 * @type {?Texture}
 		 */
+		this._texture = null;
+
+		/**
+		 * An event listener which is added to {@link texture}'s dispose event.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onTextureDispose = () => {
+
+			this.texture = null;
+
+		};
+
+		// Assignment to the texture via a setter must occur after "_onTextureDispose" is initialized.
 		this.texture = texture;
 
 		/**
@@ -49,20 +65,6 @@ class Sampler extends Binding {
 		 * @default true
 		 */
 		this.isSampler = true;
-
-		/**
-		 * An event listener which is added to {@link texture}'s dispose event.
-		 *
-		 * @private
-		 * @type {Function}
-		 */
-		this._onTextureDispose = () => {
-
-			this._texture = null;
-			this.generation = null;
-			this.version = 0;
-
-		};
 
 	}
 
@@ -134,6 +136,13 @@ class Sampler extends Binding {
 		// TODO: Find better solution, see #31747
 
 		clonedSampler._texture = null;
+
+		clonedSampler._onTextureDispose = () => {
+
+			clonedSampler.texture = null;
+
+		};
+
 		clonedSampler.texture = this.texture;
 
 		return clonedSampler;
