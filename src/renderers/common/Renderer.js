@@ -1677,6 +1677,17 @@ class Renderer {
 	}
 
 	/**
+	 * Returns the current animation loop callback.
+	 *
+	 * @return {?Function} The current animation loop callback.
+	 */
+	getAnimationLoop() {
+
+		return this._animation.getAnimationLoop();
+
+	}
+
+	/**
 	 * Can be used to transfer buffer data from a storage buffer attribute
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
