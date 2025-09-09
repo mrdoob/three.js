@@ -17,6 +17,7 @@ import RenderBundles from './RenderBundles.js';
 import NodeLibrary from './nodes/NodeLibrary.js';
 import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
+import InspectorBase from './InspectorBase.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -268,6 +269,9 @@ class Renderer {
 		this.lighting = new Lighting();
 
 		// internals
+
+		this._inspector = new InspectorBase();
+		this._inspector.setRenderer( this );
 
 		/**
 		 * This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
@@ -789,7 +793,7 @@ class Renderer {
 			}
 
 			this._nodes = new Nodes( this, backend );
-			this._animation = new Animation( this._nodes, this.info );
+			this._animation = new Animation( this, this._nodes, this.info );
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
 			this._geometries = new Geometries( this._attributes, this.info );
@@ -805,6 +809,12 @@ class Renderer {
 
 			this._animation.start();
 			this._initialized = true;
+
+			//
+
+			this._inspector.init();
+
+			//
 
 			resolve( this );
 
@@ -993,6 +1003,32 @@ class Renderer {
 	async waitForGPU() {
 
 		await this.backend.waitForGPU();
+
+	}
+
+	//
+
+	/**
+	 * Sets the inspector instance. The inspector can be any class that extends from `InspectorBase`.
+	 *
+	 * @param {InspectorBase} value - The new inspector.
+	 */
+	set inspector( value ) {
+
+		if ( this._inspector !== null ) {
+
+			this._inspector.setRenderer( null );
+
+		}
+
+		this._inspector = value;
+		this._inspector.setRenderer( this );
+
+	}
+
+	get inspector() {
+
+		return this._inspector;
 
 	}
 
@@ -1339,6 +1375,8 @@ class Renderer {
 
 		this.backend.updateTimeStampUID( renderContext );
 
+		this.inspector.beginRender( this.backend.getTimestampUID( renderContext ), scene, camera, renderTarget );
+
 		//
 
 		const coordinateSystem = this.coordinateSystem;
@@ -1535,6 +1573,10 @@ class Renderer {
 		//
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
+
+		//
+
+		this.inspector.finishRender( this.backend.getTimestampUID( renderContext ) );
 
 		//
 
@@ -2371,6 +2413,8 @@ class Renderer {
 
 		this.backend.updateTimeStampUID( computeNodes );
 
+		this.inspector.beginCompute( this.backend.getTimestampUID( computeNodes ), computeNodes );
+
 		//
 
 		const backend = this.backend;
@@ -2434,6 +2478,10 @@ class Renderer {
 
 		nodeFrame.renderId = previousRenderId;
 
+		//
+
+		this.inspector.finishCompute( this.backend.getTimestampUID( computeNodes ) );
+
 	}
 
 	/**
@@ -2447,6 +2495,8 @@ class Renderer {
 	async computeAsync( computeNodes, dispatchSizeOrCount = null ) {
 
 		if ( this._initialized === false ) await this.init();
+
+		this._inspector.computeAsync( computeNodes, dispatchSizeOrCount );
 
 		this.compute( computeNodes, dispatchSizeOrCount );
 
