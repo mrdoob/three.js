@@ -391,7 +391,7 @@ class Textures extends DataMap {
 				target.height = image.videoHeight || 1;
 				target.depth = 1;
 
-			} else if ( image instanceof VideoFrame ) {
+			} else if ( ( typeof VideoFrame !== 'undefined' ) && ( image instanceof VideoFrame ) ) {
 
 				target.width = image.displayWidth || 1;
 				target.height = image.displayHeight || 1;
