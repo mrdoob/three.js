@@ -53,6 +53,19 @@ class Sampler extends Binding {
 	}
 
 	/**
+	 * An event listener which is added to {@link texture}'s dispose event.
+	 *
+	 * @private
+	 */
+	_onDispose() {
+
+		this._texture = null;
+		this.generation = null;
+		this.version = 0;
+
+	}
+
+	/**
 	 * Sets the texture of this sampler.
 	 * @param {?Texture} value - The texture to set.
 	 */
@@ -60,17 +73,9 @@ class Sampler extends Binding {
 
 		if ( this._texture === value ) return;
 
-		const onDispose = () => {
-
-			this._texture = null;
-			this.generation = null;
-			this.version = 0;
-
-		};
-
 		if ( this._texture ) {
 
-			this._texture.removeEventListener( 'dispose', onDispose );
+			this._texture.removeEventListener( 'dispose', this._onDispose );
 
 		}
 
@@ -81,7 +86,7 @@ class Sampler extends Binding {
 
 		if ( this._texture ) {
 
-			this._texture.addEventListener( 'dispose', onDispose );
+			this._texture.addEventListener( 'dispose', this._onDispose );
 
 		}
 
