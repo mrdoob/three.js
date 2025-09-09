@@ -1906,10 +1906,11 @@ class WebGPUBackend extends Backend {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
-		this.textureUtils.destroyTexture( texture );
+		this.textureUtils.destroyTexture( texture, isDefaultTexture );
 
 	}
 
