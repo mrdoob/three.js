@@ -493,7 +493,7 @@ class SSGINode extends TempNode {
 
 				const sampleViewPosition = getViewPosition( sampleUV, sampleDepth( sampleUV ), this._cameraProjectionMatrixInverse ).toConst();
 				const pixelToSample = sampleViewPosition.sub( viewPosition ).normalize().toConst();
-				const linearThicknessMultiplier = this.useLinearThickness.equal( true ).select( sampleViewPosition.z.div( this._cameraFar ).clamp().mul( 100 ), float( 1 ) );
+				const linearThicknessMultiplier = this.useLinearThickness.equal( true ).select( sampleViewPosition.z.negate().div( this._cameraFar ).clamp().mul( 100 ), float( 1 ) );
 				const pixelToSampleBackface = normalize( sampleViewPosition.sub( linearThicknessMultiplier.mul( viewDir ).mul( THICKNESS ) ).sub( viewPosition ) );
 
 				let frontBackHorizon = vec2( dot( pixelToSample, viewDir ), dot( pixelToSampleBackface, viewDir ) );
