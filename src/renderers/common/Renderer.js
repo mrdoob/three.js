@@ -446,7 +446,8 @@ class Renderer {
 		 * @type {QuadMesh}
 		 */
 		this._quad = new QuadMesh( new NodeMaterial() );
-		this._quad.material.name = 'Renderer_output';
+		this._quad.name = 'Output Color Transform';
+		this._quad.material.name = 'outputColorTransform';
 
 		/**
 		 * A reference to the current render context.
