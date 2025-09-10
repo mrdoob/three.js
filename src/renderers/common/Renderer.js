@@ -2933,6 +2933,10 @@ class Renderer {
 
 				positionNode = material.castShadowPositionNode;
 
+			} else {
+
+				positionNode = material.positionNode;
+
 			}
 
 			const side = material.shadowSide === null ? material.side : material.shadowSide;
