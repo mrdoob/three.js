@@ -123,7 +123,7 @@ class Geometries extends DataMap {
 		 * @private
 		 * @type {Map<BufferGeometry,Function>}
 		 */
-		this._removeListeners = new Map();
+		this._geometryDisposeListeners = new Map();
 
 	}
 
@@ -197,7 +197,7 @@ class Geometries extends DataMap {
 
 			geometry.removeEventListener( 'dispose', onDispose );
 
-			this._removeListeners.delete( geometry );
+			this._geometryDisposeListeners.delete( geometry );
 
 		};
 
@@ -205,7 +205,7 @@ class Geometries extends DataMap {
 
 		// see #31798 why tracking separate remove listeners is required right now
 		// TODO: Re-evaluate how onDispose() is managed in this component
-		this._removeListeners.set( geometry, onDispose );
+		this._geometryDisposeListeners.set( geometry, onDispose );
 
 	}
 
@@ -355,13 +355,13 @@ class Geometries extends DataMap {
 
 	dispose() {
 
-		for ( const [ geometry, onDispose ] of this._removeListeners.entries() ) {
+		for ( const [ geometry, onDispose ] of this._geometryDisposeListeners.entries() ) {
 
 			geometry.removeEventListener( 'dispose', onDispose );
 
 		}
 
-		this._removeListeners.clear();
+		this._geometryDisposeListeners.clear();
 
 	}
 
