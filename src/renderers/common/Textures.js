@@ -475,8 +475,15 @@ class Textures extends DataMap {
 
 		if ( this.has( texture ) === true ) {
 
+			// if a texture is not ready for use, it falls back to a default texture so it's possible
+			// to use it for rendering. If a texture in this state is disposed, it's important to
+			// not destroy/delete the underlying GPU texture object since it is cached and shared with
+			// other textures.
+
+			const isDefaultTexture = this.get( texture ).isDefaultTexture;
+
 			this.backend.destroySampler( texture );
-			this.backend.destroyTexture( texture );
+			this.backend.destroyTexture( texture, isDefaultTexture );
 
 			this.delete( texture );
 

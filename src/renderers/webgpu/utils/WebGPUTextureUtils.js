@@ -293,13 +293,14 @@ class WebGPUTextureUtils {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined ) textureData.texture.destroy();
+		if ( textureData.texture !== undefined && isDefaultTexture === false ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
