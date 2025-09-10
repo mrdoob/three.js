@@ -409,8 +409,7 @@ class WebGLTextureUtils {
 
 		backend.set( texture, {
 			textureGPU,
-			glTextureType,
-			isDefault: true
+			glTextureType
 		} );
 
 	}
