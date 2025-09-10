@@ -2939,11 +2939,8 @@ class Renderer {
 
 			}
 
-			const side = material.shadowSide === null ? material.side : material.shadowSide;
-
 			cache = {
 				version,
-				side,
 				colorNode,
 				depthNode,
 				positionNode
@@ -3009,9 +3006,9 @@ class Renderer {
 
 			if ( overrideMaterial.isShadowPassMaterial ) {
 
-				const { side, colorNode, depthNode, positionNode } = this._getShadowNodes( material );
+				const { colorNode, depthNode, positionNode } = this._getShadowNodes( material );
 
-				overrideMaterial.side = side;
+				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
 				overrideMaterial.colorNode = colorNode;
 				overrideMaterial.depthNode = depthNode;
 				overrideMaterial.positionNode = positionNode;
