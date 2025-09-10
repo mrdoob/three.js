@@ -49,6 +49,7 @@
 				camera.position.set( 2.8, 1.8, 5 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				renderer = new THREE.WebGPURenderer();
 				//renderer.setPixelRatio( window.devicePixelRatio ); // probably too costly for most hardware

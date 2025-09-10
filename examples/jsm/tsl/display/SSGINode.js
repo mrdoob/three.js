@@ -354,7 +354,7 @@ class SSGINode extends TempNode {
 
 		// clear
 
-		renderer.setClearColor( 0xffffff, 1 );
+		renderer.setClearColor( 0x000000, 1 );
 
 		// gi
 
