@@ -118,12 +118,12 @@ class Geometries extends DataMap {
 		this.attributeCall = new WeakMap();
 
 		/**
-		 * Stores functions to remove dispose event listeners from geometries.
+		 * Stores the event listeners attached to geometries.
 		 *
 		 * @private
-		 * @type {Object}
+		 * @type {Map<BufferGeometry,Function>}
 		 */
-		this._removeListeners = {};
+		this._removeListeners = new Map();
 
 	}
 
@@ -162,13 +162,6 @@ class Geometries extends DataMap {
 	initGeometry( renderObject ) {
 
 		const geometry = renderObject.geometry;
-
-		if ( this._removeListeners[ geometry.id ] !== undefined ) {
-
-			return;
-
-		}
-
 		const geometryData = this.get( geometry );
 
 		geometryData.initialized = true;
@@ -204,17 +197,15 @@ class Geometries extends DataMap {
 
 			geometry.removeEventListener( 'dispose', onDispose );
 
-			delete this._removeListeners[ geometry.id ];
+			this._removeListeners.delete( geometry );
 
 		};
 
 		geometry.addEventListener( 'dispose', onDispose );
 
-		this._removeListeners[ geometry.id ] = () => {
-
-			geometry.removeEventListener( 'dispose', onDispose );
-
-		};
+		// see #31798 why tracking separate remove listeners is required right now
+		// TODO: Re-evaluate how onDispose() is managed in this component
+		this._removeListeners.set( geometry, onDispose );
 
 	}
 
@@ -364,13 +355,13 @@ class Geometries extends DataMap {
 
 	dispose() {
 
-		for ( const key in this._removeListeners ) {
+		for ( const [ geometry, onDispose ] of this._removeListeners.entries() ) {
 
-			this._removeListeners[ key ]();
+			geometry.removeEventListener( 'dispose', onDispose );
 
 		}
 
-		this._removeListeners = {};
+		this._removeListeners.clear();
 
 	}
 
