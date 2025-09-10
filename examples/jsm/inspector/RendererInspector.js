@@ -199,9 +199,7 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
-	finishRender( uid ) {
-
-		const frame = this.getFrame();
+	finishRender() {
 
 		const currentRender = this.currentRender;
 		currentRender.cpu = performance.now() - currentRender.timestamp;

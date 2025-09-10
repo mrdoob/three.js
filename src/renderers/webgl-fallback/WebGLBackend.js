@@ -803,7 +803,6 @@ class WebGLBackend extends Backend {
 	beginCompute( computeGroup ) {
 
 		const { state, gl } = this;
-		const computeGroupData = this.get( computeGroup );
 
 		//
 

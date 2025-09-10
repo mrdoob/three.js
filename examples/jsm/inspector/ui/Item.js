@@ -97,12 +97,8 @@ export class Item {
 				this.itemRow.classList.remove( 'collapsible' );
 				this.itemRow.removeEventListener( 'click', this.onItemClick );
 
-				if ( this.childrenContainer ) {
-
-					this.childrenContainer.remove();
-					this.childrenContainer = null;
-
-				}
+				this.childrenContainer.remove();
+				this.childrenContainer = null;
 
 			}
 
