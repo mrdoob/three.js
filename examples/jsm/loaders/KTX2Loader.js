@@ -189,7 +189,7 @@ class KTX2Loader extends Loader {
 	 * Async version of {@link KTX2Loader#detectSupport}.
 	 *
 	 * @async
-	 * @param {WebGPURenderer|WebGLRenderer} renderer - The renderer.
+	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @return {Promise} A Promise that resolves when the support has been detected.
 	 */
 	async detectSupportAsync( renderer ) {
@@ -242,6 +242,21 @@ class KTX2Loader extends Loader {
 				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
 					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
 			};
+			
+			if ( typeof navigator !== 'undefined' &&
+				navigator.platform.indexOf( 'Linux' ) >= 0 && navigator.userAgent.indexOf( 'Firefox' ) >= 0 &&
+				this.workerConfig.astcSupported && this.workerConfig.etc2Supported && 
+				this.workerConfig.bptcSupported && this.workerConfig.dxtSupported ) {
+					
+				// On Linux, Mesa drivers for AMD and Intel GPUs expose ETC2 and ASTC even though the hardware doesn't support these.
+				// Using these extensions will result in expensive software decompression on the main thread inside the driver, causing performance issues.
+				// When using ANGLE (e.g. via Chrome), these extensions are not exposed except for some specific Intel GPU models - however, Firefox doesn't perform this filtering.
+				// Since a granular filter is a little too fragile and we can transcode into other GPU formats, disable formats that are likely to be emulated.
+				
+				this.workerConfig.astcSupported = false;
+				this.workerConfig.etc2Supported = false;
+					
+			}
 
 		}
 
@@ -841,13 +856,9 @@ KTX2Loader.BasisWorker = function () {
 	];
 
 	const OPTIONS = {
-		// TODO: For ETC1S we intentionally sort by _UASTC_ priority, preserving
-		// a historical accident shown to avoid performance pitfalls for Linux with
-		// Firefox & AMD GPU (RadeonSI). Further work needed.
-		// See https://github.com/mrdoob/three.js/pull/29730.
 		[ BasisFormat.ETC1S ]: FORMAT_OPTIONS
 			.filter( ( opt ) => opt.basisFormat.includes( BasisFormat.ETC1S ) )
-			.sort( ( a, b ) => a.priorityUASTC - b.priorityUASTC ),
+			.sort( ( a, b ) => a.priorityETC1S - b.priorityETC1S ),
 
 		[ BasisFormat.UASTC ]: FORMAT_OPTIONS
 			.filter( ( opt ) => opt.basisFormat.includes( BasisFormat.UASTC ) )
