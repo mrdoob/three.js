@@ -625,6 +625,14 @@ class Renderer {
 		this._colorBufferType = colorBufferType;
 
 		/**
+		 * A cache for shadow nodes per material
+		 *
+		 * @private
+		 * @type {WeakMap<Material, Object>}
+		 */
+		this._cacheShadowNodes = new WeakMap();
+
+		/**
 		 * Whether the renderer has been initialized or not.
 		 *
 		 * @private
@@ -2860,6 +2868,92 @@ class Renderer {
 	}
 
 	/**
+	 * Retrieves shadow nodes for the given material. This is used to setup shadow passes.
+	 * The result is cached per material and updated when the material's version changes.
+	 *
+	 * @param {Material} material
+	 * @returns {Object} - The shadow nodes for the material.
+	 */
+	_getShadowNodes( material ) {
+
+		const version = material.version;
+
+		let cache = this._cacheShadowNodes.get( material );
+
+		if ( cache === undefined || cache.version !== version ) {
+
+			const hasMap = material.map !== null;
+			const hasColorNode = material.colorNode && material.colorNode.isNode;
+			const hasCastShadowNode = material.castShadowNode && material.castShadowNode.isNode;
+
+			let positionNode = null;
+			let colorNode = null;
+			let depthNode = null;
+
+			if ( hasMap || hasColorNode || hasCastShadowNode ) {
+
+				let shadowRGB;
+				let shadowAlpha;
+
+				if ( hasCastShadowNode ) {
+
+					shadowRGB = material.castShadowNode.rgb;
+					shadowAlpha = material.castShadowNode.a;
+
+				} else {
+
+					shadowRGB = vec3( 0 );
+					shadowAlpha = float( 1 );
+
+				}
+
+				if ( hasMap ) {
+
+					shadowAlpha = shadowAlpha.mul( reference( 'map', 'texture', material ).a );
+
+				}
+
+				if ( hasColorNode ) {
+
+					shadowAlpha = shadowAlpha.mul( material.colorNode.a );
+
+				}
+
+				colorNode = vec4( shadowRGB, shadowAlpha );
+
+			}
+
+			if ( material.depthNode && material.depthNode.isNode ) {
+
+				depthNode = material.depthNode;
+
+			}
+
+			if ( material.castShadowPositionNode && material.castShadowPositionNode.isNode ) {
+
+				positionNode = material.castShadowPositionNode;
+
+			}
+
+			const side = material.shadowSide === null ? material.side : material.shadowSide;
+
+			cache = {
+				version,
+				side,
+				colorNode,
+				depthNode,
+				positionNode
+			};
+
+			this._cacheShadowNodes.set( material, cache );
+
+		}
+
+		return cache;
+
+	}
+
+	/**
 	 * This method represents the default render object function that manages the render lifecycle
 	 * of the object.
 	 *
@@ -2875,9 +2969,11 @@ class Renderer {
 	 */
 	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
 
-		let overridePositionNode;
-		let overrideColorNode;
-		let overrideDepthNode;
+		let materialOverride = false;
+		let materialColorNode;
+		let materialDepthNode;
+		let materialPositionNode;
+		let materialSide;
 
 		//
 
@@ -2889,9 +2985,16 @@ class Renderer {
 
 			const overrideMaterial = scene.overrideMaterial;
 
+			materialOverride = true;
+
+			// store original nodes
+			materialColorNode = scene.overrideMaterial.colorNode;
+			materialDepthNode = scene.overrideMaterial.depthNode;
+			materialPositionNode = scene.overrideMaterial.positionNode;
+			materialSide = scene.overrideMaterial.side;
+
 			if ( material.positionNode && material.positionNode.isNode ) {
 
-				overridePositionNode = overrideMaterial.positionNode;
 				overrideMaterial.positionNode = material.positionNode;
 
 			}
@@ -2902,60 +3005,12 @@ class Renderer {
 
 			if ( overrideMaterial.isShadowPassMaterial ) {
 
-				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
+				const { side, colorNode, depthNode, positionNode } = this._getShadowNodes( material );
 
-				const hasMap = material.map !== null;
-				const hasColorNode = material.colorNode && material.colorNode.isNode;
-				const hasCastShadowNode = material.castShadowNode && material.castShadowNode.isNode;
-
-				if ( hasMap || hasColorNode || hasCastShadowNode ) {
-
-					overrideColorNode = overrideMaterial.colorNode;
-
-					let shadowRGB;
-					let shadowAlpha;
-
-					if ( hasCastShadowNode ) {
-
-						shadowRGB = material.castShadowNode.rgb;
-						shadowAlpha = material.castShadowNode.a;
-
-					} else {
-
-						shadowRGB = vec3( 0 );
-						shadowAlpha = float( 1 );
-
-					}
-
-					if ( hasMap ) {
-
-						shadowAlpha = shadowAlpha.mul( reference( 'map', 'texture', material ).a );
-
-					}
-
-					if ( hasColorNode ) {
-
-						shadowAlpha = shadowAlpha.mul( material.colorNode.a );
-
-					}
-
-					overrideMaterial.colorNode = vec4( shadowRGB, shadowAlpha );
-
-				}
-
-				if ( material.depthNode && material.depthNode.isNode ) {
-
-					overrideDepthNode = overrideMaterial.depthNode;
-					overrideMaterial.depthNode = material.depthNode;
-
-				}
-
-				if ( material.castShadowPositionNode && material.castShadowPositionNode.isNode ) {
-
-					overridePositionNode = overrideMaterial.positionNode;
-					overrideMaterial.positionNode = material.castShadowPositionNode;
-
-				}
+				overrideMaterial.side = side;
+				overrideMaterial.colorNode = colorNode;
+				overrideMaterial.depthNode = depthNode;
+				overrideMaterial.positionNode = positionNode;
 
 			}
 
@@ -2983,21 +3038,12 @@ class Renderer {
 
 		//
 
-		if ( overridePositionNode !== undefined ) {
+		if ( materialOverride ) {
 
-			scene.overrideMaterial.positionNode = overridePositionNode;
-
-		}
-
-		if ( overrideDepthNode !== undefined ) {
-
-			scene.overrideMaterial.depthNode = overrideDepthNode;
-
-		}
-
-		if ( overrideColorNode !== undefined ) {
-
-			scene.overrideMaterial.colorNode = overrideColorNode;
+			scene.overrideMaterial.colorNode = materialColorNode;
+			scene.overrideMaterial.depthNode = materialDepthNode;
+			scene.overrideMaterial.positionNode = materialPositionNode;
+			scene.overrideMaterial.side = materialSide;
 
 		}
 
