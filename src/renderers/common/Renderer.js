@@ -2933,7 +2933,7 @@ class Renderer {
 
 				positionNode = material.castShadowPositionNode;
 
-			} else {
+			} else if ( material.positionNode && material.positionNode.isNode ) {
 
 				positionNode = material.positionNode;
 
