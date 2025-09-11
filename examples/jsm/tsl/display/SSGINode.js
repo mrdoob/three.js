@@ -576,7 +576,7 @@ class SSGINode extends TempNode {
 
 			const noiseOffset = spatialOffsets( screenCoordinate );
 			const noiseDirection = gradientNoise( screenCoordinate );
-			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( this._temporalDirection )  ).mul( 2 ).sub( 1 ) );
+			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( this._temporalDirection )  ).mul( 2 ).sub( 1 ) ); // Port: Add _temporalDirection here for slightly better noise convergence with TRAA
 
 			const ao = float( 0 );
 			const color = vec3( 0 );
