@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity, add, vec3, vec4 } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4 } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -78,11 +78,13 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
+					diffuseColor: diffuseColor,
 					normal: normalView,
 					velocity: velocity
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDiffuse = scenePass.getTextureNode( 'diffuseColor' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
@@ -98,7 +100,7 @@
 				const gi = giPass.rgb;
 				const ao = giPass.a;
 			
-				const compositePass = vec4( add( scenePassColor.rgb, gi ).mul( ao ), scenePassColor.a );
+				const compositePass = vec4( scenePassColor.rgb.mul( ao ).add( scenePassDiffuse.rgb.mul( gi ) ), scenePassColor.a );
 			
 				// traa
 
