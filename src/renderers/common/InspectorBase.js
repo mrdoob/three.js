@@ -68,6 +68,10 @@ class InspectorBase {
 	 */
 	init() { }
 
+	begin() { }
+
+	finish() { }
+
 	/**
 	 * When a compute operation is performed.
 	 *
@@ -108,13 +112,6 @@ class InspectorBase {
 	 * @param {string} uid - A unique identifier for the render context.
 	 */
 	finishRender( /*uid*/ ) { }
-
-	/**
-	 * Called when a frame is resolved.
-	 *
-	 * @param {Object} frame - The frame being resolved.
-	 */
-	async resolveFrame( /*frame*/ ) { }
 
 }
 

@@ -124,7 +124,7 @@ class Inspector extends RendererInspector {
 
 		const renderer = this.getRenderer();
 
-		let sign = `🚀 "WebGPURenderer" - ${ REVISION } [ Running on "`;
+		let sign = `🚀 "WebGPURenderer" - ${ REVISION } [ "`;
 
 		if ( renderer.backend.isWebGPUBackend ) {
 
@@ -148,9 +148,9 @@ class Inspector extends RendererInspector {
 
 			setConsoleFunction( this.resolveConsole.bind( this ) );
 
-			renderer.hasFeatureAsync( 'timestamp-query' ).then( ( available ) => {
+			renderer.backend.trackTimestamp = true;
 
-				renderer.backend.trackTimestamp = true;
+			renderer.hasFeatureAsync( 'timestamp-query' ).then( ( available ) => {
 
 				if ( available !== true ) {
 
@@ -179,15 +179,15 @@ class Inspector extends RendererInspector {
 
 	}
 
-	getStatsData( uid ) {
+	getStatsData( cid ) {
 
-		let data = this.statsData.get( uid );
+		let data = this.statsData.get( cid );
 
 		if ( data === undefined ) {
 
 			data = {};
 
-			this.statsData.set( uid, data );
+			this.statsData.set( cid, data );
 
 		}
 
@@ -197,7 +197,7 @@ class Inspector extends RendererInspector {
 
 	resolveStats( stats ) {
 
-		const data = this.getStatsData( stats.uid );
+		const data = this.getStatsData( stats.cid );
 
 		if ( data.initialized !== true ) {
 
@@ -208,8 +208,8 @@ class Inspector extends RendererInspector {
 
 		}
 
-		data.cpu = ease( data.cpu, stats.cpu, this.nodeFrame.deltaTime );
-		data.gpu = ease( data.gpu, stats.gpu, this.nodeFrame.deltaTime );
+		data.cpu = stats.cpu;
+		data.gpu = stats.gpu;
 		data.total = data.cpu + data.gpu;
 
 		//
@@ -222,14 +222,13 @@ class Inspector extends RendererInspector {
 
 	}
 
-	async resolveFrame( frame ) {
+	resolveFrame( frame ) {
 
-		await super.resolveFrame( frame );
+		super.resolveFrame( frame );
 
-		const deltaTime = this.nodeFrame.deltaTime;
-		const fps = 1 / deltaTime;
+		const fps = ( frame.deltaTime > 0 ) ? ( 1 / frame.deltaTime ) : 0;
 
-		this.fps = ease( this.fps, fps, deltaTime );
+		this.fps = ease( this.fps, fps, this.nodeFrame.deltaTime );
 
 		this.resolveStats( frame );
 

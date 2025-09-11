@@ -74,7 +74,7 @@ class Performance extends Tab {
 
 	resolveStats( inspector, stats ) {
 
-		const data = inspector.getStatsData( stats.uid );
+		const data = inspector.getStatsData( stats.cid );
 
 		let item = data.item;
 
@@ -92,7 +92,7 @@ class Performance extends Tab {
 
 			} else {
 
-				stats.name = `Unnamed ${ stats.uid }`;
+				stats.name = `Unnamed ${ stats.cid }`;
 
 			}
 
@@ -103,11 +103,11 @@ class Performance extends Tab {
 
 		} else {
 
-			if ( this.notInUse.has( stats.uid ) ) {
+			if ( this.notInUse.has( stats.cid ) ) {
 
 				item.domElement.firstElementChild.classList.remove( 'alert' );
 
-				this.notInUse.delete( stats.uid );
+				this.notInUse.delete( stats.cid );
 
 			}
 
@@ -140,7 +140,7 @@ class Performance extends Tab {
 
 		this.currentItem = previousItem;
 
-		this.frameItems.set( stats.uid, item );
+		this.frameItems.set( stats.cid, item );
 
 	}
 
@@ -153,22 +153,22 @@ class Performance extends Tab {
 
 	}
 
-	addNotInUse( uid, item ) {
+	addNotInUse( cid, item ) {
 
 		item.domElement.firstElementChild.classList.add( 'alert' );
 
-		this.notInUse.set( uid, {
+		this.notInUse.set( cid, {
 			item,
 			time: performance.now()
 		} );
 
-		this.updateNotInUse( uid );
+		this.updateNotInUse( cid );
 
 	}
 
-	updateNotInUse( uid ) {
+	updateNotInUse( cid ) {
 
-		const { item, time } = this.notInUse.get( uid );
+		const { item, time } = this.notInUse.get( cid );
 
 		const current = performance.now();
 		const duration = 5;
@@ -186,7 +186,7 @@ class Performance extends Tab {
 			item.domElement.firstElementChild.classList.remove( 'alert' );
 			item.parent.remove( item );
 
-			this.notInUse.delete( uid );
+			this.notInUse.delete( cid );
 
 		}
 
@@ -207,13 +207,13 @@ class Performance extends Tab {
 
 		// remove unused frame items
 
-		for ( const [ uid, item ] of oldFrameItems ) {
+		for ( const [ cid, item ] of oldFrameItems ) {
 
-			if ( ! this.frameItems.has( uid ) ) {
+			if ( ! this.frameItems.has( cid ) ) {
 
-				this.addNotInUse( uid, item );
+				this.addNotInUse( cid, item );
 
-				oldFrameItems.delete( uid );
+				oldFrameItems.delete( cid );
 
 			}
 
@@ -221,9 +221,9 @@ class Performance extends Tab {
 
 		// update not in use items
 
-		for ( const uid of this.notInUse.keys() ) {
+		for ( const cid of this.notInUse.keys() ) {
 
-			this.updateNotInUse( uid );
+			this.updateNotInUse( cid );
 
 		}
 

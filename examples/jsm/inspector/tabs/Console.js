@@ -1,4 +1,5 @@
 import { Tab } from '../ui/Tab.js';
+
 class Console extends Tab {
 
 	constructor() {

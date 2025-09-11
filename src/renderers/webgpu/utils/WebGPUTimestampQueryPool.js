@@ -64,6 +64,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		this.currentQueryIndex += 2;
 
 		this.queryOffsets.set( uid, baseOffset );
+
 		return baseOffset;
 
 	}
@@ -178,9 +179,22 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			}
 
 			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
-			let totalDuration = 0;
+			const framesDuration = {};
+
+			const frames = [];
 
 			for ( const [ uid, baseOffset ] of currentOffsets ) {
+
+				const match = uid.match( /^(.*):f(\d+)$/ );
+				const frame = parseInt( match[ 2 ] );
+
+				if ( frames.includes( frame ) === false ) {
+
+					frames.push( frame );
+
+				}
+
+				if ( framesDuration[ frame ] === undefined ) framesDuration[ frame ] = 0;
 
 				const startTime = times[ baseOffset ];
 				const endTime = times[ baseOffset + 1 ];
@@ -188,12 +202,16 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 				this.timestamps.set( uid, duration );
 
-				totalDuration += duration;
+				framesDuration[ frame ] += duration;
 
 			}
 
+			// Return the total duration of the last frame
+			const totalDuration = framesDuration[ this.frames[ this.frames.length - 1 ] ];
+
 			this.resultBuffer.unmap();
 			this.lastValue = totalDuration;
+			this.frames = frames;
 
 			return totalDuration;
 

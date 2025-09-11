@@ -60,6 +60,13 @@ class TimestampQueryPool {
 		this.lastValue = 0;
 
 		/**
+		 * Stores all timestamp frames.
+		 *
+		 * @type {Array<number>}
+		 */
+		this.frames = [];
+
+		/**
 		 * TODO
 		 *
 		 * @type {boolean}
@@ -76,13 +83,19 @@ class TimestampQueryPool {
 
 	}
 
+	getTimestampFrames() {
+
+		return this.frames;
+
+	}
+
 	/**
-	 * Returns the latest timestamp for a given render context.
+	 * Returns the timestamp for a given render context.
 	 *
 	 * @param {string} uid - A unique identifier for the render context.
-	 * @return {?number} The latest timestamp, or undefined if not available.
+	 * @return {?number} The timestamp, or undefined if not available.
 	 */
-	getCurrentTimestamp( uid ) {
+	getTimestamp( uid ) {
 
 		return this.timestamps.get( uid );
 
@@ -93,9 +106,10 @@ class TimestampQueryPool {
 	 *
 	 * @abstract
 	 * @param {string} uid - A unique identifier for the render context.
+	 * @param {number} frameId - The current frame identifier.
 	 * @returns {?number}
 	 */
-	allocateQueriesForContext( /* uid */ ) {}
+	allocateQueriesForContext( /* uid, frameId */ ) {}
 
 	/**
 	 * Resolve all timestamps and return data (or process them).

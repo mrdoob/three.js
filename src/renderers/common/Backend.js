@@ -4,7 +4,7 @@ let _color4 = null;
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { createCanvasElement, warnOnce } from '../../utils.js';
-import { REVISION } from '../../constants.js';
+import { REVISION, TimestampQuery } from '../../constants.js';
 
 /**
  * Most of the rendering related logic is implemented in the
@@ -64,8 +64,8 @@ class Backend {
    		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
 		 */
 		this.timestampQueryPool = {
-			'render': null,
-			'compute': null
+			[ TimestampQuery.RENDER ]: null,
+			[ TimestampQuery.COMPUTE ]: null
 		};
 
 		/**
@@ -448,6 +448,7 @@ class Backend {
 	updateTimeStampUID( abstractRenderContext ) {
 
 		const contextData = this.get( abstractRenderContext );
+		const frame = this.renderer.info.frame;
 
 		let prefix;
 
@@ -461,7 +462,7 @@ class Backend {
 
 		}
 
-		contextData.timestampUID = prefix + ':' + abstractRenderContext.id;
+		contextData.timestampUID = prefix + ':' + abstractRenderContext.id + ':f' + frame;
 
 	}
 
@@ -475,6 +476,23 @@ class Backend {
 	getTimestampUID( abstractRenderContext ) {
 
 		return this.get( abstractRenderContext ).timestampUID;
+
+	}
+
+	getTimestampFrames( type ) {
+
+		const queryPool = this.timestampQueryPool[ type ];
+
+		return queryPool ? queryPool.getTimestampFrames() : [];
+
+	}
+
+	getTimestamp( uid ) {
+
+		const type = uid.startsWith( 'c:' ) ? TimestampQuery.COMPUTE : TimestampQuery.RENDER;
+		const queryPool = this.timestampQueryPool[ type ];
+
+		return queryPool.getTimestamp( uid );
 
 	}
 

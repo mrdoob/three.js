@@ -426,7 +426,7 @@ export class Style {
 	white-space: pre-wrap;
 	word-break: break-all;
 	border-radius: 3px;
-	line-height: 1.5;
+	line-height: 1.5 !important;
 }
 
 .log-message.hidden {
@@ -598,6 +598,14 @@ export class Style {
 	background: var(--profiler-header);
 	border-radius: 5px;
 	border: 1px solid var(--profiler-border);
+}
+
+@media screen and (max-width: 768px) and (orientation: portrait) {
+
+	.console-filter-input {
+		max-width: 100px;
+	}
+
 }
 `;
 		const styleElement = document.createElement( 'style' );
