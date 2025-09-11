@@ -471,7 +471,7 @@ class SSGINode extends TempNode {
 
 			If( this.useScreenSpaceSampling.equal( true ), () => {
 
-				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( STEP_COUNT ) ) );
+				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
 
 			} ).Else( () => {
 
