@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity, add, vec3, vec4 } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4 } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -78,11 +78,13 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
+					diffuseColor: diffuseColor,
 					normal: normalView,
 					velocity: velocity
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDiffuse = scenePass.getTextureNode( 'diffuseColor' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
@@ -97,8 +99,8 @@
 
 				const gi = giPass.rgb;
 				const ao = giPass.a;
-			
-				const compositePass = vec4( add( scenePassColor.rgb, gi ).mul( ao ), scenePassColor.a );
+
+				const compositePass = vec4( add ( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( gi ) ) ), scenePassColor.a );
 			
 				// traa
 
@@ -123,27 +125,16 @@
 
 				//
 
-				const gui = new GUI();
-				gui.title( 'SSGI settings' );
-				gui.add( giPass.sliceCount, 'value', 1, 4 ).step( 1 ).name( 'slice count' );
-				gui.add( giPass.stepCount, 'value', 1, 32 ).step( 1 ).name( 'step count' );
-				gui.add( giPass.radius, 'value', 1, 25 ).name( 'radius' );
-				gui.add( giPass.expFactor, 'value', 1, 3 ).name( 'exp factor' );
-				gui.add( giPass.thickness, 'value', 0.01, 10 ).name( 'thickness' );
-				gui.add( giPass.backfaceLighting, 'value', 0, 1 ).name( 'backface lighting' );
-				gui.add( giPass.aoIntensity, 'value', 0, 4 ).name( 'AO intenstiy' );
-				gui.add( giPass.giIntensity, 'value', 0, 100 ).name( 'GI intenstiy' );
-				gui.add( giPass.useLinearThickness, 'value' ).name( 'use linear thickness' );
-				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
-				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
-
 				const params = {
 					output: 0
 				};
 
 				const types = { Default: 0, AO: 1, GI: 2, Beauty: 3 };
 
-				gui.add( params, 'output', types ).onChange( value => {
+				const gui = new GUI();
+				gui.title( 'SSGI settings' );
+				let outputDropdown = gui.add( params, 'output', types );
+				outputDropdown.onChange( value => {
 			
 					if ( value === 1 ) {
 
@@ -159,14 +150,24 @@
 
 					} else {
 
-						postProcessing.outputNode = traaPass;
+						postProcessing.outputNode = giPass.useTemporalFiltering ? traaPass : compositePass;
 
 					}
 
 					postProcessing.needsUpdate = true;
 
 				} );
-
+				gui.add( giPass.sliceCount, 'value', 1, 4 ).step( 1 ).name( 'slice count' );
+				gui.add( giPass.stepCount, 'value', 1, 32 ).step( 1 ).name( 'step count' );
+				gui.add( giPass.radius, 'value', 1, 25 ).name( 'radius' );
+				gui.add( giPass.expFactor, 'value', 1, 3 ).name( 'exp factor' );
+				gui.add( giPass.thickness, 'value', 0.01, 10 ).name( 'thickness' );
+				gui.add( giPass.backfaceLighting, 'value', 0, 1 ).name( 'backface lighting' );
+				gui.add( giPass.aoIntensity, 'value', 0, 4 ).name( 'AO intenstiy' );
+				gui.add( giPass.giIntensity, 'value', 0, 100 ).name( 'GI intenstiy' );
+				gui.add( giPass.useLinearThickness, 'value' ).name( 'use linear thickness' );
+				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
+				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( outputDropdown._onChange );
 			}
 
 			function onWindowResize() {
