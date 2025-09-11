@@ -83,7 +83,7 @@ class WebGPUUtils {
 			const renderer = this.backend.renderer;
 			const renderTarget = renderer.getRenderTarget();
 
-			samples = renderTarget ? renderTarget.samples : renderer.samples;
+			samples = renderTarget ? renderTarget.samples : renderer.currentSamples;
 
 		} else if ( texture.renderTarget ) {
 
@@ -186,7 +186,7 @@ class WebGPUUtils {
 
 		}
 
-		return this.getSampleCount( this.backend.renderer.samples );
+		return this.getSampleCount( this.backend.renderer.currentSamples );
 
 	}
 
