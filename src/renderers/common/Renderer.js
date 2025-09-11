@@ -3009,9 +3009,9 @@ class Renderer {
 				const { colorNode, depthNode, positionNode } = this._getShadowNodes( material );
 
 				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
-				overrideMaterial.colorNode = colorNode;
-				overrideMaterial.depthNode = depthNode;
-				overrideMaterial.positionNode = positionNode;
+				if ( colorNode !== null ) overrideMaterial.colorNode = colorNode;
+				if ( depthNode !== null ) overrideMaterial.depthNode = depthNode;
+				if ( positionNode !== null ) overrideMaterial.positionNode = positionNode;
 
 			}
 
