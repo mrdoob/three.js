@@ -1,5 +1,23 @@
-import { RenderTarget, Vector2, QuadMesh, NodeMaterial, RendererUtils, TempNode, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, texture, passTexture, uniform, sign, max, convertToTexture } from 'three/tsl';
+import {
+  RenderTarget,
+  Vector2,
+  QuadMesh,
+  NodeMaterial,
+  RendererUtils,
+  TempNode,
+  NodeUpdateType,
+} from 'three/webgpu';
+import {
+  nodeObject,
+  Fn,
+  float,
+  uv,
+  texture,
+  passTexture,
+  sign,
+  max,
+  convertToTexture,
+} from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
@@ -13,219 +31,202 @@ let _rendererState;
  * @three_import import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
  */
 class AfterImageNode extends TempNode {
+  static get type() {
+    return 'AfterImageNode';
+  }
 
-	static get type() {
+  /**
+   * Constructs a new after image node.
+   *
+   * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
+   * @param {UniformNode<float>} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+   */
+  constructor(textureNode, damp = float(0.96)) {
+    super('vec4');
 
-		return 'AfterImageNode';
+    /**
+     * The texture node that represents the input of the effect.
+     *
+     * @type {TextureNode}
+     */
+    this.textureNode = textureNode;
 
-	}
+    /**
+     * The texture represents the pervious frame.
+     *
+     * @type {TextureNode}
+     */
+    this.textureNodeOld = texture(null);
 
-	/**
-	 * Constructs a new after image node.
-	 *
-	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
-	 * @param {number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
-	 */
-	constructor( textureNode, damp = 0.96 ) {
+    /**
+     * How quickly the after-image fades. A higher value means the after-image
+     * persists longer, while a lower value means it fades faster. Should be in
+     * the range `[0, 1]`.
+     *
+     * @type {UniformNode<float>}
+     */
+    this.damp = damp;
 
-		super( 'vec4' );
+    /**
+     * The render target used for compositing the effect.
+     *
+     * @private
+     * @type {RenderTarget}
+     */
+    this._compRT = new RenderTarget(1, 1, { depthBuffer: false });
+    this._compRT.texture.name = 'AfterImageNode.comp';
 
-		/**
-		 * The texture node that represents the input of the effect.
-		 *
-		 * @type {TextureNode}
-		 */
-		this.textureNode = textureNode;
+    /**
+     * The render target that represents the previous frame.
+     *
+     * @private
+     * @type {RenderTarget}
+     */
+    this._oldRT = new RenderTarget(1, 1, { depthBuffer: false });
+    this._oldRT.texture.name = 'AfterImageNode.old';
 
-		/**
-		 * The texture represents the pervious frame.
-		 *
-		 * @type {TextureNode}
-		 */
-		this.textureNodeOld = texture( null );
+    /**
+     * The result of the effect is represented as a separate texture node.
+     *
+     * @private
+     * @type {PassTextureNode}
+     */
+    this._textureNode = passTexture(this, this._compRT.texture);
 
-		/**
-		 * How quickly the after-image fades. A higher value means the after-image
-		 * persists longer, while a lower value means it fades faster. Should be in
-		 * the range `[0, 1]`.
-		 *
-		 * @type {UniformNode<float>}
-		 */
-		this.damp = uniform( damp );
+    /**
+     * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
+     * its effect once per frame in `updateBefore()`.
+     *
+     * @type {string}
+     * @default 'frame'
+     */
+    this.updateBeforeType = NodeUpdateType.FRAME;
+  }
 
-		/**
-		 * The render target used for compositing the effect.
-		 *
-		 * @private
-		 * @type {RenderTarget}
-		 */
-		this._compRT = new RenderTarget( 1, 1, { depthBuffer: false } );
-		this._compRT.texture.name = 'AfterImageNode.comp';
+  /**
+   * Returns the result of the effect as a texture node.
+   *
+   * @return {PassTextureNode} A texture node that represents the result of the effect.
+   */
+  getTextureNode() {
+    return this._textureNode;
+  }
 
-		/**
-		 * The render target that represents the previous frame.
-		 *
-		 * @private
-		 * @type {RenderTarget}
-		 */
-		this._oldRT = new RenderTarget( 1, 1, { depthBuffer: false } );
-		this._oldRT.texture.name = 'AfterImageNode.old';
+  /**
+   * Sets the size of the effect.
+   *
+   * @param {number} width - The width of the effect.
+   * @param {number} height - The height of the effect.
+   */
+  setSize(width, height) {
+    this._compRT.setSize(width, height);
+    this._oldRT.setSize(width, height);
+  }
 
-		/**
-		 * The result of the effect is represented as a separate texture node.
-		 *
-		 * @private
-		 * @type {PassTextureNode}
-		 */
-		this._textureNode = passTexture( this, this._compRT.texture );
+  /**
+   * This method is used to render the effect once per frame.
+   *
+   * @param {NodeFrame} frame - The current node frame.
+   */
+  updateBefore(frame) {
+    const { renderer } = frame;
 
-		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
-		 * its effect once per frame in `updateBefore()`.
-		 *
-		 * @type {string}
-		 * @default 'frame'
-		 */
-		this.updateBeforeType = NodeUpdateType.FRAME;
+    _rendererState = RendererUtils.resetRendererState(renderer, _rendererState);
 
-	}
+    //
 
-	/**
-	 * Returns the result of the effect as a texture node.
-	 *
-	 * @return {PassTextureNode} A texture node that represents the result of the effect.
-	 */
-	getTextureNode() {
+    const textureNode = this.textureNode;
+    const map = textureNode.value;
 
-		return this._textureNode;
+    const textureType = map.type;
 
-	}
+    this._compRT.texture.type = textureType;
+    this._oldRT.texture.type = textureType;
 
-	/**
-	 * Sets the size of the effect.
-	 *
-	 * @param {number} width - The width of the effect.
-	 * @param {number} height - The height of the effect.
-	 */
-	setSize( width, height ) {
+    renderer.getDrawingBufferSize(_size);
 
-		this._compRT.setSize( width, height );
-		this._oldRT.setSize( width, height );
+    this.setSize(_size.x, _size.y);
 
-	}
+    const currentTexture = textureNode.value;
 
-	/**
-	 * This method is used to render the effect once per frame.
-	 *
-	 * @param {NodeFrame} frame - The current node frame.
-	 */
-	updateBefore( frame ) {
+    this.textureNodeOld.value = this._oldRT.texture;
 
-		const { renderer } = frame;
+    // comp
+    _quadMeshComp.material = this._materialComposed;
 
-		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
+    renderer.setRenderTarget(this._compRT);
+    _quadMeshComp.render(renderer);
 
-		//
+    // Swap the textures
 
-		const textureNode = this.textureNode;
-		const map = textureNode.value;
+    const temp = this._oldRT;
+    this._oldRT = this._compRT;
+    this._compRT = temp;
 
-		const textureType = map.type;
+    //
 
-		this._compRT.texture.type = textureType;
-		this._oldRT.texture.type = textureType;
+    textureNode.value = currentTexture;
 
-		renderer.getDrawingBufferSize( _size );
+    RendererUtils.restoreRendererState(renderer, _rendererState);
+  }
 
-		this.setSize( _size.x, _size.y );
+  /**
+   * This method is used to setup the effect's TSL code.
+   *
+   * @param {NodeBuilder} builder - The current node builder.
+   * @return {PassTextureNode}
+   */
+  setup(builder) {
+    const textureNode = this.textureNode;
+    const textureNodeOld = this.textureNodeOld;
 
-		const currentTexture = textureNode.value;
+    //
 
-		this.textureNodeOld.value = this._oldRT.texture;
+    textureNodeOld.uvNode = textureNode.uvNode || uv();
 
-		// comp
-		_quadMeshComp.material = this._materialComposed;
+    const afterImg = Fn(() => {
+      const texelOld = textureNodeOld.sample().toVar();
+      const texelNew = textureNode.sample().toVar();
 
-		renderer.setRenderTarget( this._compRT );
-		_quadMeshComp.render( renderer );
+      const threshold = float(0.1).toConst();
 
-		// Swap the textures
+      // m acts as a mask. It's 1 if the previous pixel was "bright enough" (above the threshold) and 0 if it wasn't.
+      const m = max(sign(texelOld.sub(threshold)), 0.0);
 
-		const temp = this._oldRT;
-		this._oldRT = this._compRT;
-		this._compRT = temp;
+      // This is where the after-image fades:
+      //
+      // - If m is 0, texelOld is multiplied by 0, effectively clearing the after-image for that pixel.
+      // - If m is 1, texelOld is multiplied by "damp". Since "damp" is between 0 and 1, this reduces the color value of
+      // texelOld, making it darker and causing it to fade.
+      texelOld.mulAssign(this.damp.mul(m));
 
-		//
+      return max(texelNew, texelOld);
+    });
 
-		textureNode.value = currentTexture;
+    //
 
-		RendererUtils.restoreRendererState( renderer, _rendererState );
+    const materialComposed =
+      this._materialComposed || (this._materialComposed = new NodeMaterial());
+    materialComposed.name = 'AfterImage';
+    materialComposed.fragmentNode = afterImg();
+    //
 
-	}
+    const properties = builder.getNodeProperties(this);
+    properties.textureNode = textureNode;
 
-	/**
-	 * This method is used to setup the effect's TSL code.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {PassTextureNode}
-	 */
-	setup( builder ) {
+    //
 
-		const textureNode = this.textureNode;
-		const textureNodeOld = this.textureNodeOld;
+    return this._textureNode;
+  }
 
-		//
-
-		textureNodeOld.uvNode = textureNode.uvNode || uv();
-
-		const afterImg = Fn( () => {
-
-			const texelOld = textureNodeOld.sample().toVar();
-			const texelNew = textureNode.sample().toVar();
-
-			const threshold = float( 0.1 ).toConst();
-
-			// m acts as a mask. It's 1 if the previous pixel was "bright enough" (above the threshold) and 0 if it wasn't.
-			const m = max( sign( texelOld.sub( threshold ) ), 0.0 );
-
-			// This is where the after-image fades:
-			//
-			// - If m is 0, texelOld is multiplied by 0, effectively clearing the after-image for that pixel.
-			// - If m is 1, texelOld is multiplied by "damp". Since "damp" is between 0 and 1, this reduces the color value of
-			// texelOld, making it darker and causing it to fade.
-			texelOld.mulAssign( this.damp.mul( m ) );
-
-			return max( texelNew, texelOld );
-
-		} );
-
-		//
-
-		const materialComposed = this._materialComposed || ( this._materialComposed = new NodeMaterial() );
-		materialComposed.name = 'AfterImage';
-		materialComposed.fragmentNode = afterImg();
-		//
-
-		const properties = builder.getNodeProperties( this );
-		properties.textureNode = textureNode;
-
-		//
-
-		return this._textureNode;
-
-	}
-
-	/**
-	 * Frees internal resources. This method should be called
-	 * when the effect is no longer required.
-	 */
-	dispose() {
-
-		this._compRT.dispose();
-		this._oldRT.dispose();
-
-	}
-
+  /**
+   * Frees internal resources. This method should be called
+   * when the effect is no longer required.
+   */
+  dispose() {
+    this._compRT.dispose();
+    this._oldRT.dispose();
+  }
 }
 
 /**
@@ -237,6 +238,7 @@ class AfterImageNode extends TempNode {
  * @param {number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
  * @returns {AfterImageNode}
  */
-export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), damp ) );
+export const afterImage = (node, damp) =>
+  nodeObject(new AfterImageNode(convertToTexture(node), damp));
 
 export default AfterImageNode;
