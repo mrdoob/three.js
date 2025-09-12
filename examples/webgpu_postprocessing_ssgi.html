@@ -160,7 +160,9 @@
 				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
 				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
-				function updatePostprocessing( value ) {
+				function updatePostprocessing() {
+
+					const value = params.output;
 
 					if ( value === 1 ) {
 
