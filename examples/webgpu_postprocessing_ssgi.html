@@ -31,7 +31,6 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -117,77 +116,92 @@
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
 				postProcessing.outputNode = traaPass;
 
-				//
+				// Cornell Box inspired scene
 
-				let geo = new THREE.PlaneGeometry(1, 1);
-				let mat = new THREE.MeshPhysicalMaterial({ color: "#ff0000" });
-				let mesh = new THREE.Mesh(geo, mat);
-				mesh.scale.set( 20, 15, 1 );
-				mesh.rotation.y = Math.PI * 0.5;
-				mesh.position.set(-10, 7.5, 0);
-				mesh.receiveShadow = true;
-				scene.add(mesh);
+				// Walls
+				const wallGeometry = new THREE.PlaneGeometry(1, 1);
+				
+				// Left wall - red
+				const redWallMaterial = new THREE.MeshPhysicalMaterial({ color: "#ff0000" });
+				const leftWall = new THREE.Mesh(wallGeometry, redWallMaterial);
+				leftWall.scale.set( 20, 15, 1 );
+				leftWall.rotation.y = Math.PI * 0.5;
+				leftWall.position.set(-10, 7.5, 0);
+				leftWall.receiveShadow = true;
+				scene.add(leftWall);
 
-				mat = new THREE.MeshPhysicalMaterial({ color: "#00ff00" });
-				mesh = new THREE.Mesh(geo, mat);
-				mesh.scale.set( 20, 15, 1 );
-				mesh.rotation.y = Math.PI * -0.5;
-				mesh.position.set(10, 7.5, 0);
-				mesh.receiveShadow = true;
-				scene.add(mesh);
+				// Right wall - green
+				const greenWallMaterial = new THREE.MeshPhysicalMaterial({ color: "#00ff00" });
+				const rightWall = new THREE.Mesh(wallGeometry, greenWallMaterial);
+				rightWall.scale.set( 20, 15, 1 );
+				rightWall.rotation.y = Math.PI * -0.5;
+				rightWall.position.set(10, 7.5, 0);
+				rightWall.receiveShadow = true;
+				scene.add(rightWall);
 
-				mat = new THREE.MeshPhysicalMaterial({ color: "#fff" });
-				mesh = new THREE.Mesh(geo, mat);
-				mesh.scale.set( 20, 20, 1 );
-				mesh.rotation.x = Math.PI * -.5;
-				mesh.receiveShadow = true;
-				scene.add(mesh);
+				// White walls and boxes
+				const whiteMaterial = new THREE.MeshPhysicalMaterial({ color: "#fff" });
+				
+				// Floor
+				const floor = new THREE.Mesh(wallGeometry, whiteMaterial);
+				floor.scale.set( 20, 20, 1 );
+				floor.rotation.x = Math.PI * -.5;
+				floor.receiveShadow = true;
+				scene.add(floor);
 
-				mesh = new THREE.Mesh(geo, mat);
-				mesh.scale.set( 15, 20, 1 );
-				mesh.rotation.z = Math.PI * -0.5;
-				mesh.position.set(0, 7.5, -10);
-				mesh.receiveShadow = true;
-				scene.add(mesh);
+				// Back wall
+				const backWall = new THREE.Mesh(wallGeometry, whiteMaterial);
+				backWall.scale.set( 15, 20, 1 );
+				backWall.rotation.z = Math.PI * -0.5;
+				backWall.position.set(0, 7.5, -10);
+				backWall.receiveShadow = true;
+				scene.add(backWall);
 
-				mesh = new THREE.Mesh(geo, mat);
-				mesh.scale.set( 20, 20, 1 );
-				mesh.rotation.x = Math.PI * 0.5;
-				mesh.position.set(0, 15, 0);
-				mesh.receiveShadow = true;
-				scene.add(mesh);
+				// Ceiling
+				const ceiling = new THREE.Mesh(wallGeometry, whiteMaterial);
+				ceiling.scale.set( 20, 20, 1 );
+				ceiling.rotation.x = Math.PI * 0.5;
+				ceiling.position.set(0, 15, 0);
+				ceiling.receiveShadow = true;
+				scene.add(ceiling);
 
-				geo = new THREE.BoxGeometry(5, 7, 5);
-				mesh = new THREE.Mesh(geo, mat);
-				mesh.rotation.y = Math.PI * 0.25;
-				mesh.position.set(-3, 3.5, -2);
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add(mesh);
+				// Boxes
+				const tallBoxGeometry = new THREE.BoxGeometry(5, 7, 5);
+				const tallBox = new THREE.Mesh(tallBoxGeometry, whiteMaterial);
+				tallBox.rotation.y = Math.PI * 0.25;
+				tallBox.position.set(-3, 3.5, -2);
+				tallBox.castShadow = true;
+				tallBox.receiveShadow = true;
+				scene.add(tallBox);
 
-				geo = new THREE.BoxGeometry(4, 4, 4);
-				mesh = new THREE.Mesh(geo, mat);
-				mesh.rotation.y = Math.PI * -0.1;
-				mesh.position.set(4, 2, 4);
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add(mesh);
+				const shortBoxGeometry = new THREE.BoxGeometry(4, 4, 4);
+				const shortBox = new THREE.Mesh(shortBoxGeometry, whiteMaterial);
+				shortBox.rotation.y = Math.PI * -0.1;
+				shortBox.position.set(4, 2, 4);
+				shortBox.castShadow = true;
+				shortBox.receiveShadow = true;
+				scene.add(shortBox);
 
-				mesh = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 1, 64), 
-									new THREE.MeshBasicMaterial());
-				mesh.position.y = 15;
-				scene.add(mesh);
+				// Light source geometry
+				const lightSourceGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1, 64);
+				const lightSourceMaterial = new THREE.MeshBasicMaterial();
+				const lightSource = new THREE.Mesh(lightSourceGeometry, lightSourceMaterial);
+				lightSource.position.y = 15;
+				scene.add(lightSource);
 
-				const light = new THREE.PointLight("#ffffff", 100);
-				light.position.set(0, 13, 0);
-				light.distance = 100;
-				light.castShadow = true;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
-				light.shadow.bias = -0.002;
-				scene.add(light);
+				// Point light
+				const pointLight = new THREE.PointLight("#ffffff", 100);
+				pointLight.position.set(0, 13, 0);
+				pointLight.distance = 100;
+				pointLight.castShadow = true;
+				pointLight.shadow.mapSize.width = 1024;
+				pointLight.shadow.mapSize.height = 1024;
+				pointLight.shadow.bias = -0.002;
+				scene.add(pointLight);
 
-				scene.add(new THREE.AmbientLight("#0c0c0c"));
+				// Ambient light
+				const ambientLight = new THREE.AmbientLight("#0c0c0c");
+				scene.add(ambientLight);
 
 				window.addEventListener( 'resize', onWindowResize );
 
