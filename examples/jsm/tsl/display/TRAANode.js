@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4 } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, length, vec3, mat4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -99,6 +99,22 @@ class TRAANode extends TempNode {
 		 * @type {UniformNode<vec2>}
 		 */
 		this._invSize = uniform( new Vector2() );
+
+		/**
+		 * A uniform node holding the camera world matrix.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraWorldMatrix = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the camera projection matrix inverse.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraProjectionMatrixInverse = uniform( new Matrix4() );
 
 		/**
 		 * The render target that represents the history of frame data.
@@ -246,6 +262,10 @@ class TRAANode extends TempNode {
 
 		const { renderer } = frame;
 
+		// Update camera matrices uniforms
+		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
+		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
+
 		// keep the TRAA in sync with the dimensions of the beauty node
 
 		const beautyRenderTarget = ( this.beautyNode.isRTTNode ) ? this.beautyNode.renderTarget : this.beautyNode.passNode.renderTarget;
@@ -388,10 +408,21 @@ class TRAANode extends TempNode {
 
 			const clampedHistoryColor = clamp( historyColor, minColor, maxColor );
 
+			// Calculate world position using getViewPosition
+			const currentDepth = depthTexture.sample( uvNode ).r;
+			const viewPosition = getViewPosition( uvNode, currentDepth, this._cameraProjectionMatrixInverse );
+			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz;
+			const distanceFromOrigin = length( worldPosition );
+
 			// flicker reduction based on luminance weighing
 
 			const currentWeight = float( 0.05 ).toVar();
 			const historyWeight = currentWeight.oneMinus().toVar();
+
+			// Zero out history weighting if world position is within 1 unit of the origin
+			If( distanceFromOrigin.lessThan( 2.0 ), () => {
+				historyWeight.assign( 0.0 );
+			} );
 
 			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1.0 ) ) ) );
 			const compressedHistory = clampedHistoryColor.mul( float( 1 ).div( ( max( clampedHistoryColor.r, clampedHistoryColor.g, clampedHistoryColor.b ).add( 1.0 ) ) ) );
