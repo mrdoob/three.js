@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, length, vec3, mat4 } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, length, mat4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -358,7 +358,7 @@ class TRAANode extends TempNode {
 
 		// Copy current depth to previous depth buffer
 		const currentDepth = this.depthNode.value;
-		if (this._previousDepthTexture.image.width  !== currentDepth.width ||
+		if (this._previousDepthTexture.image.width !== currentDepth.width ||
 			this._previousDepthTexture.image.height !== currentDepth.height ) {
 			this._previousDepthTexture.dispose();
 			this._previousDepthTexture = currentDepth.clone();
@@ -506,10 +506,6 @@ class TRAANode extends TempNode {
 			historyWeight.mulAssign( float( 1.0 ).div( luminanceHistory.add( 1 ) ) );
 
 			const smoothedOutput = add( currentColor.mul( currentWeight ), clampedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
-
-			// debug: visualize where unoccluded areas have appeared
-
-			//If( rejectPixel, () => { smoothedOutput.assign( vec3( 1.0, 0.0, 0.0 ) ); } );
 
 			return smoothedOutput;
 
