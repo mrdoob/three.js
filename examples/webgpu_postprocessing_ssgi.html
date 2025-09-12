@@ -10,8 +10,6 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Post-Processing - SSGI<br />
-			<a href="https://skfb.ly/YZoC" target="_blank" rel="noopener">Mirror's Edge Apartment</a> by 
-			<a href="https://sketchfab.com/aurelien_martel" target="_blank" rel="noopener">Aurélien Martel</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial</a>.<br />
 		</div>
 
 		<script type="importmap">
@@ -34,7 +32,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -45,18 +42,17 @@
 
 			async function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 50 );
-				camera.position.set( 2.8, 1.8, 5 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 10, 30 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				scene.background = new THREE.Color( 0xaaaaaa );
 
 				renderer = new THREE.WebGPURenderer();
 				//renderer.setPixelRatio( window.devicePixelRatio ); // probably too costly for most hardware
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.NeutralToneMapping;
-				renderer.toneMappingExposure = 1.5;
+				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -65,10 +61,10 @@
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 1, 0 );
+				controls.target.set( 0, 7, 0 );
 				controls.enablePan = true;
 				controls.minDistance = 1;
-				controls.maxDistance = 6;
+				controls.maxDistance = 100;
 				controls.update();
 
 				//
@@ -123,17 +119,75 @@
 
 				//
 
-				const dracoLoader = new DRACOLoader();
-				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
-				dracoLoader.setDecoderConfig( { type: 'js' } );
-				const loader = new GLTFLoader();
-				loader.setDRACOLoader( dracoLoader );
-				loader.setPath( 'models/gltf/' );
+				let geo = new THREE.PlaneGeometry(1, 1);
+				let mat = new THREE.MeshPhysicalMaterial({ color: "#ff0000" });
+				let mesh = new THREE.Mesh(geo, mat);
+				mesh.scale.set( 20, 15, 1 );
+				mesh.rotation.y = Math.PI * 0.5;
+				mesh.position.set(-10, 7.5, 0);
+				mesh.receiveShadow = true;
+				scene.add(mesh);
 
-				const gltf = await loader.loadAsync( 'mirrors_edge.glb' );
+				mat = new THREE.MeshPhysicalMaterial({ color: "#00ff00" });
+				mesh = new THREE.Mesh(geo, mat);
+				mesh.scale.set( 20, 15, 1 );
+				mesh.rotation.y = Math.PI * -0.5;
+				mesh.position.set(10, 7.5, 0);
+				mesh.receiveShadow = true;
+				scene.add(mesh);
 
-				const model = gltf.scene;
-				scene.add( model );
+				mat = new THREE.MeshPhysicalMaterial({ color: "#fff" });
+				mesh = new THREE.Mesh(geo, mat);
+				mesh.scale.set( 20, 20, 1 );
+				mesh.rotation.x = Math.PI * -.5;
+				mesh.receiveShadow = true;
+				scene.add(mesh);
+
+				mesh = new THREE.Mesh(geo, mat);
+				mesh.scale.set( 15, 20, 1 );
+				mesh.rotation.z = Math.PI * -0.5;
+				mesh.position.set(0, 7.5, -10);
+				mesh.receiveShadow = true;
+				scene.add(mesh);
+
+				mesh = new THREE.Mesh(geo, mat);
+				mesh.scale.set( 20, 20, 1 );
+				mesh.rotation.x = Math.PI * 0.5;
+				mesh.position.set(0, 15, 0);
+				mesh.receiveShadow = true;
+				scene.add(mesh);
+
+				geo = new THREE.BoxGeometry(5, 7, 5);
+				mesh = new THREE.Mesh(geo, mat);
+				mesh.rotation.y = Math.PI * 0.25;
+				mesh.position.set(-3, 3.5, -2);
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add(mesh);
+
+				geo = new THREE.BoxGeometry(4, 4, 4);
+				mesh = new THREE.Mesh(geo, mat);
+				mesh.rotation.y = Math.PI * -0.1;
+				mesh.position.set(4, 2, 4);
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add(mesh);
+
+				mesh = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 1, 64), 
+									new THREE.MeshBasicMaterial());
+				mesh.position.y = 15;
+				scene.add(mesh);
+
+				const light = new THREE.PointLight("#ffffff", 100);
+				light.position.set(0, 13, 0);
+				light.distance = 100;
+				light.castShadow = true;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
+				light.shadow.bias = -0.002;
+				scene.add(light);
+
+				scene.add(new THREE.AmbientLight("#0c0c0c"));
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -143,7 +197,7 @@
 					output: 0
 				};
 
-				const types = { Default: 0, AO: 1, GI: 2, Beauty: 3 };
+				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
 
 				const gui = new GUI();
 				gui.title( 'SSGI settings' );
