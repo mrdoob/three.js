@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instancedBufferAttribute, mod, pass, texture, float, time, vec2, vec3, vec4, sin, cos } from 'three/tsl';
+			import { instancedBufferAttribute, uniform, mod, pass, texture, float, time, vec2, vec3, vec4, sin, cos } from 'three/tsl';
 			import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -38,7 +38,7 @@
 
 			const params = {
 
-				damp: 0.8,
+				damp: uniform( 0.8, 'float' ).setName( 'damp' ),
 				enabled: true
 
 			};
@@ -81,7 +81,7 @@
 					colors.push( color.r, color.g, color.b );
 
 					timeOffsets.push( i / count );
-			
+
 				}
 
 				const positionAttribute = new THREE.InstancedBufferAttribute( new Float32Array( vertices ), 3 );
@@ -158,13 +158,13 @@
 
 				const angle = Math.random() * Math.PI * 2;
 				const u = Math.random() * 2 - 1;
-			
+
 				v.set(
 					Math.cos( angle ) * Math.sqrt( 1 - Math.pow( u, 2 ) ) * r,
 					Math.sin( angle ) * Math.sqrt( 1 - Math.pow( u, 2 ) ) * r,
 					u * r
 				);
-			
+
 				return v;
 
 			}
