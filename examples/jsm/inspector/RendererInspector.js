@@ -213,7 +213,7 @@ export class RendererInspector extends InspectorBase {
 
 						if ( frame.computes.length > 0 ) {
 
-							if ( computeFrames.includes( frameId ) && frame.resolvedCompute !== true ) {
+							if ( computeFrames.includes( frameId ) ) {
 
 								for ( const stats of frame.computes ) {
 
@@ -239,7 +239,7 @@ export class RendererInspector extends InspectorBase {
 
 						if ( frame.renders.length > 0 ) {
 
-							if ( renderFrames.includes( frameId ) && frame.resolvedRender !== true ) {
+							if ( renderFrames.includes( frameId ) ) {
 
 								for ( const stats of frame.renders ) {
 
