@@ -67,7 +67,7 @@ class Inspector extends RendererInspector {
 		const renderer = this.getRenderer();
 		const animationLoop = renderer.getAnimationLoop();
 
-		if ( renderer.initialized && animationLoop !== null ) {
+		if ( renderer.info.frame > 1 && animationLoop !== null ) {
 
 			this.resolveConsoleOnce( 'info', 'TIP: "computeAsync()" was called while a "setAnimationLoop()" is active. This is probably not necessary, use "compute()" instead.' );
 
@@ -228,7 +228,7 @@ class Inspector extends RendererInspector {
 
 		const fps = ( frame.deltaTime > 0 ) ? ( 1 / frame.deltaTime ) : 0;
 
-		this.fps = ease( this.fps, fps, this.nodeFrame.deltaTime );
+		this.fps = ease( this.fps, fps, this.nodeFrame.deltaTime, .1 );
 
 		this.resolveStats( frame );
 

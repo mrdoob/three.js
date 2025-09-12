@@ -1,4 +1,4 @@
-export function ease( target, current, deltaTime, duration = .1 ) {
+export function ease( target, current, deltaTime, duration ) {
 
 	if ( duration <= 0 ) return current;
 
