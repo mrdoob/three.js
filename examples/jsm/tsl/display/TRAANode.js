@@ -484,7 +484,7 @@ class TRAANode extends TempNode {
 			const historyWeight = currentWeight.oneMinus().toVar();
 
 			// Zero out history weight if world positions are different (indicating motion) except on edges
-			// TODO: Figure out more principled ways to set these values...
+			// TODO: Figure out if there is a scale independent unit for these values...
 			const rejectPixel = worldPositionDifference.greaterThan( 0.01 ).and( farthestDepth.sub( closestDepth ).lessThan( 0.0001 ) );
 			If( rejectPixel, () => {
 
