@@ -1,3 +1,5 @@
+import { warn } from '../../utils.js';
+
 /**
  * Abstract base class of a timestamp query pool.
  *
@@ -83,6 +85,11 @@ class TimestampQueryPool {
 
 	}
 
+	/**
+	 * Returns all timestamp frames.
+	 *
+	 * @return {Array<number>} The timestamp frames.
+	 */
 	getTimestampFrames() {
 
 		return this.frames;
@@ -97,7 +104,17 @@ class TimestampQueryPool {
 	 */
 	getTimestamp( uid ) {
 
-		return this.timestamps.get( uid );
+		let timestamp = this.timestamps.get( uid );
+
+		if ( timestamp === undefined ) {
+
+			warn( `TimestampQueryPool: No timestamp available for uid ${ uid }.` );
+
+			timestamp = 0;
+
+		}
+
+		return timestamp;
 
 	}
 

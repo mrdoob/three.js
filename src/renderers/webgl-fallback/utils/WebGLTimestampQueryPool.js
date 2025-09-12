@@ -216,20 +216,39 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 			}
 
-			let totalDuration = 0;
+			//
+
+			const framesDuration = {};
+
+			const frames = [];
 
 			for ( const [ uid, promise ] of resolvePromises ) {
+
+				const match = uid.match( /^(.*):f(\d+)$/ );
+				const frame = parseInt( match[ 2 ] );
+
+				if ( frames.includes( frame ) === false ) {
+
+					frames.push( frame );
+
+				}
+
+				if ( framesDuration[ frame ] === undefined ) framesDuration[ frame ] = 0;
 
 				const duration = await promise;
 
 				this.timestamps.set( uid, duration );
 
-				totalDuration += duration;
+				framesDuration[ frame ] += duration;
 
 			}
 
+			// Return the total duration of the last frame
+			const totalDuration = framesDuration[ this.frames[ this.frames.length - 1 ] ];
+
 			// Store the last valid result
 			this.lastValue = totalDuration;
+			this.frames = frames;
 
 			// Reset states
 			this.currentQueryIndex = 0;

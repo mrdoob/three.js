@@ -126,34 +126,6 @@ export class RendererInspector extends InspectorBase {
 
 		return this.currentFrame;
 
-		/*const frameId = this.nodeFrame.frameId;
-
-		if ( this.currentFrame && this.currentFrame.frameId === frameId ) {
-
-			return this.currentFrame;
-
-		}
-
-		if ( this.currentFrame !== null ) {
-
-			this.addFrame( this.currentFrame );
-
-		}
-
-		this.currentFrame = {
-			frameId: frameId,
-			resolvedCompute: false,
-			resolvedRender: false,
-			deltaTime: this.nodeFrame.deltaTime,
-			children: [],
-			renders: [],
-			computes: []
-		};
-
-		this.currentRender = this.currentFrame;
-
-		return this.currentFrame;*/
-
 	}
 
 	updateStats( stats ) {

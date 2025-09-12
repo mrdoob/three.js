@@ -68,8 +68,14 @@ class InspectorBase {
 	 */
 	init() { }
 
+	/**
+	 * Called when a frame begins.
+	 */
 	begin() { }
 
+	/**
+	 * Called when a frame ends.
+	 */
 	finish() { }
 
 	/**

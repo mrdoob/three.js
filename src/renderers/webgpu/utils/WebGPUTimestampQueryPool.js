@@ -178,6 +178,8 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 			}
 
+			//
+
 			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
 			const framesDuration = {};
 
