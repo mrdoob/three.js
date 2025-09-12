@@ -59,6 +59,14 @@ class Sampler extends Binding {
 		this.generation = null;
 
 		/**
+		 * The binding's sampler key.
+		 *
+		 * @type {string}
+		 * @default ''
+		 */
+		this.samplerKey = '';
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
