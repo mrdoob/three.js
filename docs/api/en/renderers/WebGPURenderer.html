@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+	<h1>[name]</h1>
+
+	<p class="desc">
+		The WebGPU renderer is the next-generation renderer for Three.js, designed to leverage the power of 
+		[link:https://gpuweb.github.io/gpuweb/ WebGPU] for high-performance, modern graphics rendering. 
+		WebGPURenderer provides improved performance, better memory management, and modern GPU features compared to WebGL. 
+		If WebGPU is not available in the browser, <b>WebGPURenderer</b> automatically falls back to a WebGL 2 backend for compatibility.
+	</p>
+
+	<h2>Constructor</h2>
+
+	<h3>[name]( [param:Object parameters] )</h3>
+	<p>
+		[page:Object parameters] - (optional) object with properties defining the renderer's behavior. 
+		The constructor also accepts no parameters at all. In all cases, it will assume sane defaults when parameters are missing.
+		The following are valid parameters:<br /><br />
+
+		[page:Boolean forceWebGL] - If true, forces the renderer to use the WebGL 2 backend even if WebGPU is available. Default is `false`.<br />
+
+		[page:Function getFallback] - A callback function that provides a fallback backend if WebGPU is not available. 
+		By default, the renderer automatically falls back to WebGL 2.<br />
+
+		[page:Boolean antialias] - Whether to perform antialiasing. Default is `false`.<br />
+
+		[page:Boolean alpha] - Whether the default framebuffer should be transparent or opaque. When set to `true`, 
+		the clear alpha value is `0`. Otherwise it's `1`. Default is `true`.<br />
+
+		[page:Boolean depth] - Whether the drawing buffer has a depth buffer of at least 16 bits. Default is `true`.<br />
+
+		[page:Boolean stencil] - Whether the drawing buffer has a stencil buffer of at least 8 bits. Default is `false`.<br />
+
+		[page:Number samples] - Number of MSAA samples. When `antialias` is `true`, `4` samples are used by default. 
+		This parameter can be set to any other integer value to overwrite the default. Default is `0`.<br />
+
+		[page:Boolean logarithmicDepthBuffer] - Whether to use a logarithmic depth buffer. It may be necessary to use this 
+		if dealing with huge differences in scale in a single scene. Default is `false`.<br />
+
+		[page:Number colorBufferType] - Defines the type of color buffers. The default `HalfFloatType` is recommended for best quality. 
+		To save memory and bandwidth, `UnsignedByteType` might be used. Default is `HalfFloatType`.<br />
+
+		[page:Boolean multiview] - If set to `true`, the renderer will use multiview during WebXR rendering if supported. Default is `false`.<br />
+
+		[page:String powerPreference] - Provides a hint indicating what configuration of GPU is suitable for the WebGPU context. 
+		Can be `"high-performance"`, `"low-power"` or `"default"`. Default is `"default"`.<br />
+
+		[page:Boolean trackTimestamp] - Whether to enable timestamp queries for performance measurement. 
+		When enabled, use `renderer.resolveTimestampsAsync()` to get timing information. Default is `false`.<br />
+
+		[page:Object requiredLimits] - Specifies the limits that are required by the WebGPU device request. 
+		The request will fail if the adapter cannot provide these limits. Default is `{}`.<br />
+
+		[page:GPUDevice device] - If there is an existing WebGPU device on app level, it can be passed to the renderer. 
+		This allows sharing the same device across multiple renderers. Default is `undefined`.<br />
+
+		[page:Boolean compatibilityMode] - Whether the WebGPU backend should run in compatibility mode. 
+		This may provide better compatibility with older hardware but may reduce performance. Default is `false`.<br />
+	</p>
+
+	<h2>Properties</h2>
+
+	<h3>[property:Boolean autoClear]</h3>
+	<p>
+		Defines whether the renderer should automatically clear its output before rendering a frame. Default is `true`.
+	</p>
+
+	<h3>[property:Boolean autoClearColor]</h3>
+	<p>
+		If [page:.autoClear autoClear] is true, defines whether the renderer should clear the color buffer. Default is `true`.
+	</p>
+
+	<h3>[property:Boolean autoClearDepth]</h3>
+	<p>
+		If [page:.autoClear autoClear] is true, defines whether the renderer should clear the depth buffer. Default is `true`.
+	</p>
+
+	<h3>[property:Boolean autoClearStencil]</h3>
+	<p>
+		If [page:.autoClear autoClear] is true, defines whether the renderer should clear the stencil buffer. Default is `true`.
+	</p>
+
+	<h3>[property:Backend backend]</h3>
+	<p>
+		A reference to the current backend (WebGPU or WebGL 2) being used by the renderer.
+	</p>
+
+	<h3>[property:Object capabilities]</h3>
+	<p>
+		An object containing details about the capabilities of the current backend. 
+		The specific capabilities depend on whether WebGPU or WebGL 2 is being used.<br />
+
+		<strong>When using WebGL 2 backend (fallback):</strong><br />
+		- [page:Boolean floatFragmentTextures]: whether the context supports the
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float] extension.<br />
+		- [page:Boolean floatVertexTextures]: `true` if [page:Boolean floatFragmentTextures] 
+		and [page:Boolean vertexTextures] are both true.<br />
+		- [page:Method getMaxAnisotropy](): Returns the maximum available
+		anisotropy texture filtering value.<br />
+		- [page:Method getMaxPrecision](): Returns the maximum available precision
+		for vertex and fragment shaders.<br />
+		- [page:Boolean isWebGL2]: `true` if the context in use is a
+		WebGL2RenderingContext object.<br />
+		- [page:Boolean logarithmicDepthBuffer]: `true` if the [page:parameter logarithmicDepthBuffer] 
+		was set to true in the constructor.<br />
+		- [page:Integer maxAttributes]: The value of `gl.MAX_VERTEX_ATTRIBS`.<br />
+		- [page:Integer maxCubemapSize]: The value of
+		`gl.MAX_CUBE_MAP_TEXTURE_SIZE`. Maximum height * width of cube map
+		textures that a shader can use.<br />
+		- [page:Integer maxFragmentUniforms]: The value of
+		`gl.MAX_FRAGMENT_UNIFORM_VECTORS`. The number of uniforms that can be used
+		by a fragment shader.<br />
+		- [page:Integer maxSamples]: The value of `gl.MAX_SAMPLES`. Maximum number
+		of samples in context of Multisample anti-aliasing (MSAA).<br />
+		- [page:Integer maxTextureSize]: The value of `gl.MAX_TEXTURE_SIZE`.
+		Maximum height * width of a texture that a shader can use.<br />
+		- [page:Integer maxTextures]: The value of `gl.MAX_TEXTURE_IMAGE_UNITS`.
+		The maximum number of textures that can be used by a shader.<br />
+		- [page:Integer maxVaryings]: The value of `gl.MAX_VARYING_VECTORS`. The
+		number of varying vectors that can be used by shaders.<br />
+		- [page:Integer maxVertexTextures]: The value of
+		`gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS`. The number of textures that can be
+		used in a vertex shader.<br />
+		- [page:Integer maxVertexUniforms]: The value of
+		`gl.MAX_VERTEX_UNIFORM_VECTORS`. The maximum number of uniforms that can
+		be used in a vertex shader.<br />
+		- [page:String precision]: The shader precision currently being used by
+		the renderer.<br />
+		- [page:Boolean reverseDepthBuffer]: `true` if the [page:parameter reverseDepthBuffer] 
+		was set to `true` in the constructor and the context
+		supports the [link:https://registry.khronos.org/webgl/extensions/EXT_clip_control/ EXT_clip_control] extension.<br />
+		- [page:Boolean vertexTextures]: `true` if [property:Integer maxVertexTextures] 
+		is greater than 0 (i.e. vertex textures can be used).<br />
+
+		<strong>When using WebGPU backend:</strong><br />
+		- [page:Method getMaxAnisotropy](): Returns `16`. WebGPU supports up to 16x anisotropic filtering.<br />
+		- [page:Method hasFeature]( [param:String featureName] ): Returns `true` if the specified WebGPU feature is supported by the device. 
+		This can check for features like:
+		<ul>
+			<li>`"depth-clip-control"` - Depth clipping control</li>
+			<li>`"depth32float-stencil8"` - 32-bit float depth with 8-bit stencil</li>
+			<li>`"texture-compression-bc"` - BC texture compression formats</li>
+			<li>`"texture-compression-etc2"` - ETC2 texture compression formats</li>
+			<li>`"texture-compression-astc"` - ASTC texture compression formats</li>
+			<li>`"timestamp-query"` - Timestamp queries for performance measurement</li>
+			<li>`"indirect-first-instance"` - Indirect drawing with first instance support</li>
+			<li>`"shader-f16"` - 16-bit floating-point support in shaders</li>
+		</ul>
+		- Access to WebGPU device limits through `device.limits` including:
+		<ul>
+			<li>`maxTextureDimension1D/2D/3D` - Maximum texture dimensions</li>
+			<li>`maxTextureArrayLayers` - Maximum texture array layers</li>
+			<li>`maxBindGroups` - Maximum number of bind groups per pipeline layout</li>
+			<li>`maxBindingsPerBindGroup` - Maximum bindings per bind group</li>
+			<li>`maxBufferSize` - Maximum buffer size in bytes</li>
+			<li>`maxStorageBufferBindingSize` - Maximum storage buffer binding size</li>
+			<li>`maxUniformBufferBindingSize` - Maximum uniform buffer binding size</li>
+			<li>`maxComputeWorkgroupsPerDimension` - Maximum compute workgroups per dimension</li>
+		</ul>
+	</p>
+
+	<h3>[property:Array clippingPlanes]</h3>
+	<p>
+		User-defined clipping planes specified as THREE.Plane objects in world space. These planes apply globally. 
+		Points in space whose dot product with the plane is negative are cut away. Default is [].
+	</p>
+
+	<h3>[property:DOMElement domElement]</h3>
+	<p>
+		A [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas] where the renderer draws its output.<br />
+		This is automatically created by the renderer in the constructor; you just need to add it to your page like so:<br />
+		<code>document.body.appendChild( renderer.domElement );</code>
+	</p>
+
+	<h3>[property:Object info]</h3>
+	<p>
+		An object with a series of statistical information about the graphics memory and the rendering process. 
+		Useful for debugging or just for the sake of curiosity. The object contains the following fields:
+	</p>
+	<ul>
+		<li>
+			memory:
+			<ul>
+				<li>geometries</li>
+				<li>textures</li>
+			</ul>
+		</li>
+		<li>
+			render:
+			<ul>
+				<li>calls</li>
+				<li>triangles</li>
+				<li>points</li>
+				<li>lines</li>
+				<li>frame</li>
+			</ul>
+		</li>
+		<li>programs</li>
+	</ul>
+	<p>
+		By default these data are reset at each render call but when having multiple render passes per frame 
+		(e.g. when using post processing) it can be preferred to reset with a custom pattern. First, set `autoReset` to `false`.
+		<code>renderer.info.autoReset = false;</code>
+		Call `reset()` whenever you have finished to render a single frame.
+		<code>renderer.info.reset();</code>
+	</p>
+
+	<h3>[property:Boolean isRenderer]</h3>
+	<p>
+		Read-only flag to check if this is a renderer instance. Always `true` for renderer classes.
+	</p>
+
+	<h3>[property:Boolean isWebGPURenderer]</h3>
+	<p>
+		Read-only flag to check if this is a WebGPURenderer. Always `true` for this class.
+	</p>
+
+	<h3>[property:StandardNodeLibrary library]</h3>
+	<p>
+		The standard node library used for type mapping and node-based materials. This is automatically set and contains 
+		the mapping for various node types used in Three.js material systems.
+	</p>
+
+	<h3>[property:Boolean localClippingEnabled]</h3>
+	<p>
+		Defines whether the renderer respects object-level clipping planes. Default is `false`.
+	</p>
+
+	<h3>[property:Boolean logarithmicDepthBuffer]</h3>
+	<p>
+		Whether logarithmic depth buffer is enabled. This can be useful when dealing with scenes that have huge differences in scale.
+	</p>
+
+	<h3>[property:string outputColorSpace]</h3>
+	<p>
+		Defines the output color space of the renderer. Default is [page:Textures THREE.SRGBColorSpace].
+	</p>
+	<p>
+		If a render target has been set using [page:WebGPURenderer.setRenderTarget .setRenderTarget] 
+		then renderTarget.texture.colorSpace will be used instead.
+	</p>
+	<p>
+		See the [page:Textures texture constants] page for details of other formats.
+	</p>
+
+	<h3>[property:Number samples]</h3>
+	<p>
+		The number of MSAA samples. Default is `0` when antialias is false, or `4` when antialias is true.
+	</p>
+
+	<h3>[property:Boolean sortObjects]</h3>
+	<p>
+		Defines whether the renderer should sort objects. Default is `true`.<br /><br />
+
+		Note: Sorting is used to attempt to properly render objects that have some degree of transparency. 
+		By definition, sorting objects may not work in all cases. Depending on the needs of application, 
+		it may be necessary to turn off sorting and use other methods to deal with transparency rendering 
+		e.g. manually determining each object's rendering order.
+	</p>
+
+	<h3>[property:Constant toneMapping]</h3>
+	<p>
+		Default is [page:Renderer NoToneMapping]. See the [page:Renderer Renderer constants] for other choices.
+	</p>
+
+	<h3>[property:Number toneMappingExposure]</h3>
+	<p>Exposure level of tone mapping. Default is `1`.</p>
+
+	<h2>Methods</h2>
+	<p>See the base [page:Renderer] class for inherited methods such as:</p>
+	
+	<ul>
+		<li>[page:Renderer.render render]( scene, camera )</li>
+		<li>[page:Renderer.setSize setSize]( width, height, updateStyle )</li>
+		<li>[page:Renderer.setPixelRatio setPixelRatio]( value )</li>
+		<li>[page:Renderer.setClearColor setClearColor]( color, alpha )</li>
+		<li>[page:Renderer.setClearAlpha setClearAlpha]( alpha )</li>
+		<li>[page:Renderer.clear clear]( color, depth, stencil )</li>
+		<li>[page:Renderer.setRenderTarget setRenderTarget]( renderTarget, activeCubeFace, activeMipmapLevel )</li>
+		<li>[page:Renderer.readRenderTargetPixels readRenderTargetPixels]( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex )</li>
+		<li>[page:Renderer.setAnimationLoop setAnimationLoop]( callback )</li>
+		<li>[page:Renderer.dispose dispose]()</li>
+	</ul>
+
+	<h3>[method:Promise resolveTimestampsAsync]( [param:String type] )</h3>
+	<p>
+		[page:String type] - (optional) The type of timestamp query to resolve. Can be `'render'`, `'compute'`, or other custom types. Default is `'render'`.<br /><br />
+
+		Asynchronously resolves timestamp queries and returns the total duration in milliseconds. 
+		This method is only available when `trackTimestamp` is enabled in the constructor parameters. 
+		Useful for performance profiling and optimization.
+	</p>
+
+	<h3>[method:Promise renderAsync]( [param:Scene scene], [param:Camera camera] )</h3>
+	<p>
+		[page:Scene scene] - The scene to render.<br />
+		[page:Camera camera] - The camera to render the scene with.<br /><br />
+
+		Asynchronously renders the scene with the given camera. This method returns a Promise that resolves 
+		when the rendering is complete. This is particularly useful when working with WebGPU's asynchronous nature 
+		and when timing operations are needed.
+	</p>
+
+	<p>
+		For detailed method signatures and parameters, see the [page:Renderer] documentation.
+	</p>
+
+	<h2>Usage Examples</h2>
+
+	<h3>Basic Setup</h3>
+	<code>
+	// Create a WebGPU renderer
+	const renderer = new THREE.WebGPURenderer( { 
+		antialias: true,
+		alpha: true 
+	} );
+
+	// Set size and append to DOM
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	// Set up scene and camera
+	const scene = new THREE.Scene();
+	const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+	// Render loop
+	function animate() {
+		renderer.setAnimationLoop( animate );
+		renderer.render( scene, camera );
+	}
+	animate();
+	</code>
+
+	<h3>Force WebGL Backend</h3>
+	<code>
+	// Force the use of WebGL 2 backend even if WebGPU is available
+	const renderer = new THREE.WebGPURenderer( { 
+		forceWebGL: true,
+		antialias: true 
+	} );
+	</code>
+
+	<h3>Custom Fallback Handler</h3>
+	<code>
+	// Provide a custom fallback function
+	const renderer = new THREE.WebGPURenderer( {
+		getFallback: () => {
+			console.log( 'WebGPU not available, falling back to WebGL 2' );
+			return new THREE.WebGLBackend( { antialias: true } );
+		}
+	} );
+	</code>
+
+	<h3>High Quality Settings</h3>
+	<code>
+	// High quality settings for demanding applications
+	const renderer = new THREE.WebGPURenderer( {
+		antialias: true,
+		samples: 4,
+		colorBufferType: THREE.FloatType, // Higher precision
+		logarithmicDepthBuffer: true      // Better depth precision
+	} );
+	</code>
+
+	<h3>Performance Monitoring</h3>
+	<code>
+	// Enable timestamp tracking for performance measurement
+	const renderer = new THREE.WebGPURenderer( {
+		trackTimestamp: true,
+		antialias: true
+	} );
+
+	// Render with async timing
+	async function render() {
+		await renderer.renderAsync( scene, camera );
+		
+		// Get rendering duration
+		const renderTime = await renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
+		console.log( `Render time: ${renderTime}ms` );
+	}
+	</code>
+
+	<h3>WebGPU Device Sharing</h3>
+	<code>
+	// Share WebGPU device between multiple renderers
+	const adapter = await navigator.gpu.requestAdapter();
+	const device = await adapter.requestDevice();
+
+	const renderer1 = new THREE.WebGPURenderer( { device } );
+	const renderer2 = new THREE.WebGPURenderer( { device } );
+	</code>
+
+	<h3>Advanced Configuration</h3>
+	<code>
+	// Advanced WebGPU configuration
+	const renderer = new THREE.WebGPURenderer( {
+		powerPreference: 'high-performance',
+		requiredLimits: {
+			maxTextureSize: 8192,
+			maxStorageBufferBindingSize: 1024 * 1024 * 128
+		},
+		compatibilityMode: false,
+		trackTimestamp: true
+	} );
+	</code>
+
+	<h2>WebGPU vs WebGL Compatibility</h2>
+	<p>
+		WebGPURenderer provides a unified API that works with both WebGPU and WebGL 2 backends. 
+		The renderer automatically selects the best available backend:
+	</p>
+	
+	<ul>
+		<li><strong>WebGPU Backend</strong>: Used when WebGPU is available and supported by the browser</li>
+		<li><strong>WebGL 2 Backend</strong>: Used as fallback when WebGPU is not available</li>
+		<li><strong>Manual Selection</strong>: Use `forceWebGL: true` to explicitly use WebGL 2</li>
+	</ul>
+
+	<h2>WebGPU Features</h2>
+	<p>WebGPURenderer provides access to modern WebGPU features when available:</p>
+	
+	<ul>
+		<li><strong>Compute Shaders</strong>: Support for general-purpose GPU computing alongside rendering</li>
+		<li><strong>Advanced Texture Compression</strong>: Support for BC, ETC2, and ASTC texture compression formats</li>
+		<li><strong>Timestamp Queries</strong>: Precise GPU timing measurements for performance optimization</li>
+		<li><strong>Advanced Depth Testing</strong>: Support for depth32float-stencil8 and depth clipping control</li>
+		<li><strong>16-bit Float Shaders</strong>: Shader f16 support for memory optimization</li>
+		<li><strong>Indirect Drawing</strong>: Efficient batch rendering with indirect-first-instance support</li>
+		<li><strong>Modern Memory Management</strong>: Better buffer management and memory allocation</li>
+		<li><strong>Multi-threading</strong>: Reduced CPU overhead through better threading support</li>
+	</ul>
+
+	<h2>Compatibility Considerations</h2>
+	<p>When developing with WebGPURenderer, consider the following compatibility aspects:</p>
+	
+	<ul>
+		<li><strong>Feature Detection</strong>: Use `renderer.capabilities.hasFeature()` to check for WebGPU features</li>
+		<li><strong>Graceful Degradation</strong>: The renderer automatically falls back to WebGL 2 when needed</li>
+		<li><strong>Cross-Platform</strong>: WebGPU support varies across platforms and browsers</li>
+		<li><strong>Node Materials</strong>: Full support for Three.js node-based material system</li>
+		<li><strong>Legacy Support</strong>: Maintains compatibility with existing Three.js materials and objects</li>
+	</ul>
+
+	<h2>Performance Considerations</h2>
+	<p>WebGPU offers several performance advantages over WebGL:</p>
+	
+	<ul>
+		<li><strong>Lower CPU overhead</strong>: Better multi-threading and reduced driver overhead</li>
+		<li><strong>Modern GPU features</strong>: Access to newer GPU capabilities and optimizations</li>
+		<li><strong>Better memory management</strong>: More efficient resource handling</li>
+		<li><strong>Compute shaders</strong>: Support for general-purpose GPU computing</li>
+	</ul>
+
+	<h2>Browser Support</h2>
+	<p>
+		WebGPU support varies by browser and platform. The renderer automatically detects availability:
+	</p>
+	
+	<ul>
+		<li><strong>Chrome/Chromium</strong>: WebGPU support available on desktop and mobile (with flags)</li>
+		<li><strong>Firefox</strong>: WebGPU support in development</li>
+		<li><strong>Safari</strong>: WebGPU support in development</li>
+		<li><strong>Fallback</strong>: WebGL 2 is used when WebGPU is not available</li>
+	</ul>
+
+	<h2>Backend Fallback</h2>
+	<p>
+		If the browser does not support WebGPU, the renderer will automatically fall back to a WebGL 2 backend 
+		(unless <b>forceWebGL</b> is set). You can provide a custom fallback via the <b>getFallback</b> parameter 
+		to handle this transition gracefully in your application.
+	</p>
+
+	<h2>Node-Based Materials</h2>
+	<p>
+		WebGPURenderer includes built-in support for Three.js node-based materials through the StandardNodeLibrary. 
+		This enables advanced material authoring and more efficient shader generation.
+	</p>
+
+	<h2>See Also</h2>
+	<ul>
+		<li>[page:Renderer] - Base renderer class with common methods and properties</li>
+		<li>[page:WebGLRenderer] - Traditional WebGL 2 renderer</li>
+		<li>[link:https://gpuweb.github.io/gpuweb/ WebGPU specification] - Official WebGPU specification</li>
+		<li>[link:https://developer.chrome.com/blog/webgpu-release/ Chrome WebGPU release blog] - WebGPU in Chrome</li>
+		<li>[link:https://caniuse.com/webgpu Can I use WebGPU] - Browser support information</li>
+	</ul>
+
+	<h2>Source</h2>
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/src/renderers/webgpu/WebGPURenderer.js src/renderers/webgpu/WebGPURenderer.js]
+	</p>
+</body>
+</html>
