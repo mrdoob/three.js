@@ -83,6 +83,7 @@ export class RendererInspector extends InspectorBase {
 		this.frames = [];
 		this.maxFrames = 512;
 
+		this._lastFinishTime = 0;
 		this._resolveTimestampPromise = null;
 
 		this.isRendererInspector = true;
@@ -98,13 +99,18 @@ export class RendererInspector extends InspectorBase {
 
 	finish() {
 
+		const now = performance.now();
+
 		const frame = this.currentFrame;
-		frame.deltaTime = this.nodeFrame.deltaTime;
+		frame.finishTime = now;
+		frame.deltaTime = now - ( this._lastFinishTime > 0 ? this._lastFinishTime : now );
 
 		this.addFrame( frame );
 
 		this.currentFrame = null;
 		this.currentRender = null;
+
+		this._lastFinishTime = now;
 
 	}
 
@@ -114,7 +120,11 @@ export class RendererInspector extends InspectorBase {
 			frameId: this.nodeFrame.frameId,
 			resolvedCompute: false,
 			resolvedRender: false,
-			deltaTime: this.nodeFrame.deltaTime,
+			deltaTime: 0,
+			startTime: performance.now(),
+			finishTime: 0,
+			//idle: 0,
+			//miscellaneous: 0,
 			children: [],
 			renders: [],
 			computes: []
@@ -268,14 +278,6 @@ export class RendererInspector extends InspectorBase {
 	}
 
 	addFrame( frame ) {
-
-		// Link parent.
-
-		/*if ( this.frames.length > 0 ) {
-
-			frame.parent = this.frames[ this.frames.length - 1 ];
-
-		}*/
 
 		// Limit to max frames.
 

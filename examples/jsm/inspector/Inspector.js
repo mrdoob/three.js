@@ -226,9 +226,11 @@ class Inspector extends RendererInspector {
 
 		super.resolveFrame( frame );
 
-		const fps = ( frame.deltaTime > 0 ) ? ( 1 / frame.deltaTime ) : 0;
+		const deltaTime = frame.deltaTime / 1000; // to seconds
 
-		this.fps = ease( this.fps, fps, this.nodeFrame.deltaTime, .1 );
+		const fps = ( deltaTime > 0 ) ? ( 1 / deltaTime ) : 0;
+
+		this.fps = ease( this.fps, fps, deltaTime, .1 );
 
 		this.resolveStats( frame );
 
