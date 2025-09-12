@@ -440,7 +440,7 @@ class TRAANode extends TempNode {
 
 					} );
 
-					// find the farthest depth in the neighborhood (used for edge stopping)
+					// find the farthest depth in the neighborhood (used to preserve edge anti-aliasing)
 
 					If( currentDepth.greaterThan( farthestDepth ), () => {
 
@@ -463,28 +463,29 @@ class TRAANode extends TempNode {
 
 			const clampedHistoryColor = clamp( historyColor, minColor, maxColor );
 
-			// Calculate current frame world position
+			// calculate current frame world position
+
 			const currentDepth = depthTexture.sample( uvNode ).r;
 			const currentViewPosition = getViewPosition( uvNode, currentDepth, this._cameraProjectionMatrixInverse );
 			const currentWorldPosition = this._cameraWorldMatrix.mul( vec4( currentViewPosition, 1.0 ) ).xyz;
 
-			// Calculate previous frame world position from history UV and previous depth
+			// calculate previous frame world position from history UV and previous depth
+
 			const historyUV = uvNode.sub( offset );
 			const previousDepth = this._previousDepthNode.sample( historyUV ).r;
 			const previousViewPosition = getViewPosition( historyUV, previousDepth, this._previousCameraProjectionMatrixInverse );
 			const previousWorldPosition = this._previousCameraWorldMatrix.mul( vec4( previousViewPosition, 1.0 ) ).xyz;
 
-			// Calculate difference in world positions
+			// calculate difference in world positions
+
 			const worldPositionDifference = length( currentWorldPosition.sub( previousWorldPosition ) ).toVar();
 			worldPositionDifference.assign( min( max( worldPositionDifference.sub( 1.0 ), 0.0 ), 1.0 ) );
-
-			// flicker reduction based on luminance weighing
 
 			const currentWeight = float( 0.05 ).toVar();
 			const historyWeight = currentWeight.oneMinus().toVar();
 
-			// Zero out history weight if world positions are different (indicating motion) except on edges
-			// TODO: Figure out if there is a scale independent unit for these values...
+			// zero out history weight if world positions are different (indicating motion) except on edges
+
 			const rejectPixel = worldPositionDifference.greaterThan( 0.01 ).and( farthestDepth.sub( closestDepth ).lessThan( 0.0001 ) );
 			If( rejectPixel, () => {
 
@@ -492,6 +493,8 @@ class TRAANode extends TempNode {
 				historyWeight.assign( 0.0 );
 
 			} );
+
+			// flicker reduction based on luminance weighing
 
 			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1.0 ) ) ) );
 			const compressedHistory = clampedHistoryColor.mul( float( 1 ).div( ( max( clampedHistoryColor.r, clampedHistoryColor.g, clampedHistoryColor.b ).add( 1.0 ) ) ) );
@@ -504,7 +507,8 @@ class TRAANode extends TempNode {
 
 			const smoothedOutput = add( currentColor.mul( currentWeight ), clampedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
 
-			// Debug: Visualize where unoccluded areas appeared
+			// debug: visualize where unoccluded areas have appeared
+
 			//If( rejectPixel, () => { smoothedOutput.assign( vec3( 1.0, 0.0, 0.0 ) ); } );
 
 			return smoothedOutput;
