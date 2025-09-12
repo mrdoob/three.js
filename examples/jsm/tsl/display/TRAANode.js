@@ -413,6 +413,7 @@ class TRAANode extends TempNode {
 			const minColor = vec4( 10000 ).toVar();
 			const maxColor = vec4( - 10000 ).toVar();
 			const closestDepth = float( 1 ).toVar();
+			const farthestDepth = float( 0 ).toVar();
 			const closestDepthPixelPosition = vec2( 0 ).toVar();
 
 			// sample a 3x3 neighborhood to create a box in color space
@@ -436,6 +437,14 @@ class TRAANode extends TempNode {
 
 						closestDepth.assign( currentDepth );
 						closestDepthPixelPosition.assign( uvNeighbor );
+
+					} );
+
+					// find the farthest depth in the neighborhood (used for edge stopping)
+
+					If( currentDepth.greaterThan( farthestDepth ), () => {
+
+						farthestDepth.assign( currentDepth );
 
 					} );
 
@@ -474,10 +483,14 @@ class TRAANode extends TempNode {
 			const currentWeight = float( 0.05 ).toVar();
 			const historyWeight = currentWeight.oneMinus().toVar();
 
-			// Zero out history weight if world positions are different (indicating motion)
-			If( worldPositionDifference.greaterThan( 0.1 ), () => {
+			// Zero out history weight if world positions are different (indicating motion) except on edges
+			// TODO: Figure out more principled ways to set these values...
+			const rejectPixel = worldPositionDifference.greaterThan( 0.01 ).and( farthestDepth.sub( closestDepth ).lessThan( 0.0001 ) );
+			If( rejectPixel, () => {
+
 				currentWeight.assign( 1.0 );
 				historyWeight.assign( 0.0 );
+
 			} );
 
 			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1.0 ) ) ) );
@@ -489,7 +502,12 @@ class TRAANode extends TempNode {
 			currentWeight.mulAssign( float( 1.0 ).div( luminanceCurrent.add( 1 ) ) );
 			historyWeight.mulAssign( float( 1.0 ).div( luminanceHistory.add( 1 ) ) );
 
-			return add( currentColor.mul( currentWeight ), clampedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) );
+			const smoothedOutput = add( currentColor.mul( currentWeight ), clampedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
+
+			// Debug: Visualize where unoccluded areas appeared
+			//If( rejectPixel, () => { smoothedOutput.assign( vec3( 1.0, 0.0, 0.0 ) ); } );
+
+			return smoothedOutput;
 
 		} );
 
