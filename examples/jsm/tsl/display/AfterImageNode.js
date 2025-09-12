@@ -24,7 +24,7 @@ class AfterImageNode extends TempNode {
 	 * Constructs a new after image node.
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
-	 * @param {UniformNode<float>} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+	 * @param {Node<float>} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
 	 */
 	constructor( textureNode, damp = float( 0.96 ) ) {
 
