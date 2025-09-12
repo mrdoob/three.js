@@ -49,7 +49,7 @@ class AfterImageNode extends TempNode {
 		 * persists longer, while a lower value means it fades faster. Should be in
 		 * the range `[0, 1]`.
 		 *
-		 * @type {UniformNode<float>}
+		 * @type {Node<float>}
 		 */
 		this.damp = damp;
 
@@ -234,9 +234,9 @@ class AfterImageNode extends TempNode {
  * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
- * @param {number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+ * @param {(Node<float>|number)} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
  * @returns {AfterImageNode}
  */
-export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), damp ) );
+export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), nodeObject( damp ) ) );
 
 export default AfterImageNode;
