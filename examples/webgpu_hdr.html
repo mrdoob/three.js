@@ -138,6 +138,7 @@
 
 			function onPointerMove( e ) {
 
+				e.preventDefault();
 				const rect = renderer.domElement.getBoundingClientRect();
 				const x = e.clientX - rect.left;
 				const y = e.clientY - rect.top;
@@ -148,6 +149,11 @@
 			}
 
 			window.addEventListener( 'pointermove', onPointerMove, { passive: false } );
+
+			// Prevent mobile scroll on touch
+			renderer.domElement.addEventListener( 'touchstart', ( e ) => e.preventDefault(), { passive: false } );
+			renderer.domElement.addEventListener( 'touchmove', ( e ) => e.preventDefault(), { passive: false } );
+			renderer.domElement.addEventListener( 'touchend', ( e ) => e.preventDefault(), { passive: false } );
 
 			// GUI setup
 			const gui = new GUI();
