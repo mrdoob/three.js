@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4 } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
 import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, length, vec3, mat4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -117,6 +117,22 @@ class TRAANode extends TempNode {
 		this._cameraProjectionMatrixInverse = uniform( new Matrix4() );
 
 		/**
+		 * A uniform node holding the previous frame's view matrix.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._previousCameraWorldMatrix = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the previous frame's projection matrix inverse.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
+
+		/**
 		 * The render target that represents the history of frame data.
 		 *
 		 * @private
@@ -158,6 +174,22 @@ class TRAANode extends TempNode {
 		 * @type {Matrix4}
 		 */
 		this._originalProjectionMatrix = new Matrix4();
+
+		/**
+		 * The previous frame's depth buffer.
+		 *
+		 * @private
+		 * @type {?DepthTexture}
+		 */
+		this._previousDepthTexture = new DepthTexture( 1, 1 );
+
+		/**
+		 * A texture node for the previous depth buffer.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
+		this._previousDepthNode = texture( new DepthTexture( 1, 1 ) );
 
 		/**
 		 * Sync the post processing stack with the TRAA node.
@@ -262,6 +294,10 @@ class TRAANode extends TempNode {
 
 		const { renderer } = frame;
 
+		// Store previous frame matrices before updating current ones
+		this._previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix.value );
+		this._previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse.value );
+
 		// Update camera matrices uniforms
 		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
@@ -319,6 +355,16 @@ class TRAANode extends TempNode {
 		// update history
 
 		renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
+
+		// Copy current depth to previous depth buffer
+		const currentDepth = this.depthNode.value;
+		if (this._previousDepthTexture.image.width  !== currentDepth.width ||
+			this._previousDepthTexture.image.height !== currentDepth.height ) {
+			this._previousDepthTexture.dispose();
+			this._previousDepthTexture = currentDepth.clone();
+			this._previousDepthNode.value = this._previousDepthTexture;
+		}
+		renderer.copyTextureToTexture( currentDepth, this._previousDepthTexture );
 
 		// restore
 
@@ -408,19 +454,29 @@ class TRAANode extends TempNode {
 
 			const clampedHistoryColor = clamp( historyColor, minColor, maxColor );
 
-			// Calculate world position using getViewPosition
+			// Calculate current frame world position
 			const currentDepth = depthTexture.sample( uvNode ).r;
-			const viewPosition = getViewPosition( uvNode, currentDepth, this._cameraProjectionMatrixInverse );
-			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz;
-			const distanceFromOrigin = length( worldPosition );
+			const currentViewPosition = getViewPosition( uvNode, currentDepth, this._cameraProjectionMatrixInverse );
+			const currentWorldPosition = this._cameraWorldMatrix.mul( vec4( currentViewPosition, 1.0 ) ).xyz;
+
+			// Calculate previous frame world position from history UV and previous depth
+			const historyUV = uvNode.sub( offset );
+			const previousDepth = this._previousDepthNode.sample( historyUV ).r;
+			const previousViewPosition = getViewPosition( historyUV, previousDepth, this._previousCameraProjectionMatrixInverse );
+			const previousWorldPosition = this._previousCameraWorldMatrix.mul( vec4( previousViewPosition, 1.0 ) ).xyz;
+
+			// Calculate difference in world positions
+			const worldPositionDifference = length( currentWorldPosition.sub( previousWorldPosition ) ).toVar();
+			worldPositionDifference.assign( min( max( worldPositionDifference.sub( 1.0 ), 0.0 ), 1.0 ) );
 
 			// flicker reduction based on luminance weighing
 
 			const currentWeight = float( 0.05 ).toVar();
 			const historyWeight = currentWeight.oneMinus().toVar();
 
-			// Zero out history weighting if world position is within 1 unit of the origin
-			If( distanceFromOrigin.lessThan( 2.0 ), () => {
+			// Zero out history weight if world positions are different (indicating motion)
+			If( worldPositionDifference.greaterThan( 0.1 ), () => {
+				currentWeight.assign( 1.0 );
 				historyWeight.assign( 0.0 );
 			} );
 
@@ -453,6 +509,10 @@ class TRAANode extends TempNode {
 
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
+
+		if ( this._previousDepthTexture ) {
+			this._previousDepthTexture.dispose();
+		}
 
 		this._resolveMaterial.dispose();
 
