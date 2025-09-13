@@ -17,12 +17,6 @@ class ObjectStats {
 
 	}
 
-	get total() {
-
-		return this.cpu + this.gpu;
-
-	}
-
 }
 
 class RenderStats extends ObjectStats {
