@@ -10,8 +10,6 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Post-Processing - SSGI<br />
-			<a href="https://skfb.ly/YZoC" target="_blank" rel="noopener">Mirror's Edge Apartment</a> by 
-			<a href="https://sketchfab.com/aurelien_martel" target="_blank" rel="noopener">Aurélien Martel</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial</a>.<br />
 		</div>
 
 		<script type="importmap">
@@ -33,8 +31,6 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -45,18 +41,17 @@
 
 			async function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 50 );
-				camera.position.set( 2.8, 1.8, 5 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 10, 30 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				scene.background = new THREE.Color( 0xaaaaaa );
 
 				renderer = new THREE.WebGPURenderer();
 				//renderer.setPixelRatio( window.devicePixelRatio ); // probably too costly for most hardware
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.NeutralToneMapping;
-				renderer.toneMappingExposure = 1.5;
+				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -65,10 +60,10 @@
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 1, 0 );
+				controls.target.set( 0, 7, 0 );
 				controls.enablePan = true;
 				controls.minDistance = 1;
-				controls.maxDistance = 6;
+				controls.maxDistance = 100;
 				controls.update();
 
 				//
@@ -121,19 +116,92 @@
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
 				postProcessing.outputNode = traaPass;
 
-				//
+				// Cornell Box inspired scene
 
-				const dracoLoader = new DRACOLoader();
-				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
-				dracoLoader.setDecoderConfig( { type: 'js' } );
-				const loader = new GLTFLoader();
-				loader.setDRACOLoader( dracoLoader );
-				loader.setPath( 'models/gltf/' );
+				// Walls
+				const wallGeometry = new THREE.PlaneGeometry(1, 1);
+				
+				// Left wall - red
+				const redWallMaterial = new THREE.MeshPhysicalMaterial({ color: "#ff0000" });
+				const leftWall = new THREE.Mesh(wallGeometry, redWallMaterial);
+				leftWall.scale.set( 20, 15, 1 );
+				leftWall.rotation.y = Math.PI * 0.5;
+				leftWall.position.set(-10, 7.5, 0);
+				leftWall.receiveShadow = true;
+				scene.add(leftWall);
 
-				const gltf = await loader.loadAsync( 'mirrors_edge.glb' );
+				// Right wall - green
+				const greenWallMaterial = new THREE.MeshPhysicalMaterial({ color: "#00ff00" });
+				const rightWall = new THREE.Mesh(wallGeometry, greenWallMaterial);
+				rightWall.scale.set( 20, 15, 1 );
+				rightWall.rotation.y = Math.PI * -0.5;
+				rightWall.position.set(10, 7.5, 0);
+				rightWall.receiveShadow = true;
+				scene.add(rightWall);
 
-				const model = gltf.scene;
-				scene.add( model );
+				// White walls and boxes
+				const whiteMaterial = new THREE.MeshPhysicalMaterial({ color: "#fff" });
+				
+				// Floor
+				const floor = new THREE.Mesh(wallGeometry, whiteMaterial);
+				floor.scale.set( 20, 20, 1 );
+				floor.rotation.x = Math.PI * -.5;
+				floor.receiveShadow = true;
+				scene.add(floor);
+
+				// Back wall
+				const backWall = new THREE.Mesh(wallGeometry, whiteMaterial);
+				backWall.scale.set( 15, 20, 1 );
+				backWall.rotation.z = Math.PI * -0.5;
+				backWall.position.set(0, 7.5, -10);
+				backWall.receiveShadow = true;
+				scene.add(backWall);
+
+				// Ceiling
+				const ceiling = new THREE.Mesh(wallGeometry, whiteMaterial);
+				ceiling.scale.set( 20, 20, 1 );
+				ceiling.rotation.x = Math.PI * 0.5;
+				ceiling.position.set(0, 15, 0);
+				ceiling.receiveShadow = true;
+				scene.add(ceiling);
+
+				// Boxes
+				const tallBoxGeometry = new THREE.BoxGeometry(5, 7, 5);
+				const tallBox = new THREE.Mesh(tallBoxGeometry, whiteMaterial);
+				tallBox.rotation.y = Math.PI * 0.25;
+				tallBox.position.set(-3, 3.5, -2);
+				tallBox.castShadow = true;
+				tallBox.receiveShadow = true;
+				scene.add(tallBox);
+
+				const shortBoxGeometry = new THREE.BoxGeometry(4, 4, 4);
+				const shortBox = new THREE.Mesh(shortBoxGeometry, whiteMaterial);
+				shortBox.rotation.y = Math.PI * -0.1;
+				shortBox.position.set(4, 2, 4);
+				shortBox.castShadow = true;
+				shortBox.receiveShadow = true;
+				scene.add(shortBox);
+
+				// Light source geometry
+				const lightSourceGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1, 64);
+				const lightSourceMaterial = new THREE.MeshBasicMaterial();
+				const lightSource = new THREE.Mesh(lightSourceGeometry, lightSourceMaterial);
+				lightSource.position.y = 15;
+				scene.add(lightSource);
+
+				// Point light
+				const pointLight = new THREE.PointLight("#ffffff", 100);
+				pointLight.position.set(0, 13, 0);
+				pointLight.distance = 100;
+				pointLight.castShadow = true;
+				pointLight.shadow.mapSize.width = 1024;
+				pointLight.shadow.mapSize.height = 1024;
+				pointLight.shadow.bias = -0.0025;
+				scene.add(pointLight);
+
+				// Ambient light
+				const ambientLight = new THREE.AmbientLight("#0c0c0c");
+				scene.add(ambientLight);
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -143,7 +211,7 @@
 					output: 0
 				};
 
-				const types = { Default: 0, AO: 1, GI: 2, Beauty: 3 };
+				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
 
 				const gui = new GUI();
 				gui.title( 'SSGI settings' );
