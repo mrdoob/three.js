@@ -13,7 +13,13 @@ class Value extends EventDispatcher {
 
 		this.addEventListener( 'change', ( e ) => {
 
-			if ( this._onChangeFunction ) this._onChangeFunction( e.value );
+			// defer to avoid issues when changing multiple values in the same call stack
+
+			requestAnimationFrame( () => {
+
+				if ( this._onChangeFunction ) this._onChangeFunction( e.value );
+
+			} );
 
 		} );
 
@@ -306,7 +312,7 @@ class ValueSelect extends Value {
 		if ( type === 'number' ) return parseFloat( value );
 		if ( type === 'boolean' ) return value === 'true';
 
-		return this.select.value;
+		return value;
 
 	}
 

@@ -87,7 +87,13 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => description.textContent = name;
+		editor.name = ( name ) => {
+
+			description.textContent = name;
+
+			return editor;
+
+		};
 
 		return editor;
 
@@ -115,7 +121,13 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => description.textContent = name;
+		editor.name = ( name ) => {
+
+			description.textContent = name;
+
+			return editor;
+
+		};
 
 		return editor;
 
@@ -143,7 +155,13 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => description.textContent = name;
+		editor.name = ( name ) => {
+
+			description.textContent = name;
+
+			return editor;
+
+		};
 
 		return editor;
 
@@ -172,7 +190,13 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => description.textContent = name;
+		editor.name = ( name ) => {
+
+			description.textContent = name;
+
+			return editor;
+
+		};
 
 		return editor;
 
