@@ -223,6 +223,12 @@ class Inspector extends RendererInspector {
 
 			this.resolveStats( child );
 
+			const childData = this.getStatsData( child.cid );
+
+			data.cpu += childData.cpu;
+			data.gpu += childData.gpu;
+			data.total += childData.total;
+
 		}
 
 	}
