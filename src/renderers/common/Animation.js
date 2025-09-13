@@ -9,10 +9,18 @@ class Animation {
 	/**
 	 * Constructs a new animation loop management component.
 	 *
+	 * @param {Renderer} renderer - A reference to the main renderer.
 	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
 	 * @param {Info} info - Renderer component for managing metrics and monitoring data.
 	 */
-	constructor( nodes, info ) {
+	constructor( renderer, nodes, info ) {
+
+		/**
+		 * A reference to the main renderer.
+		 *
+		 * @type {Renderer}
+		 */
+		this.renderer = renderer;
 
 		/**
 		 * Renderer component for managing nodes related logic.
@@ -70,7 +78,11 @@ class Animation {
 
 			this.info.frame = this.nodes.nodeFrame.frameId;
 
+			this.renderer._inspector.begin();
+
 			if ( this._animationLoop !== null ) this._animationLoop( time, xrFrame );
+
+			this.renderer._inspector.finish();
 
 		};
 

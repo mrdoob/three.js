@@ -351,6 +351,7 @@ class SSGINode extends TempNode {
 		//
 
 		_quadMesh.material = this._material;
+		_quadMesh.name = 'SSGI';
 
 		// clear
 

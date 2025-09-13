@@ -195,30 +195,60 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 		try {
 
 			// Wait for all ended queries to complete
-			const resolvePromises = [];
+			const resolvePromises = new Map();
 
-			for ( const [ baseOffset, state ] of this.queryStates ) {
+			for ( const [ uid, baseOffset ] of this.queryOffsets ) {
+
+				const state = this.queryStates.get( baseOffset );
 
 				if ( state === 'ended' ) {
 
 					const query = this.queries[ baseOffset ];
-					resolvePromises.push( this.resolveQuery( query ) );
+					resolvePromises.set( uid, this.resolveQuery( query ) );
 
 				}
 
 			}
 
-			if ( resolvePromises.length === 0 ) {
+			if ( resolvePromises.size === 0 ) {
 
 				return this.lastValue;
 
 			}
 
-			const results = await Promise.all( resolvePromises );
-			const totalDuration = results.reduce( ( acc, val ) => acc + val, 0 );
+			//
+
+			const framesDuration = {};
+
+			const frames = [];
+
+			for ( const [ uid, promise ] of resolvePromises ) {
+
+				const match = uid.match( /^(.*):f(\d+)$/ );
+				const frame = parseInt( match[ 2 ] );
+
+				if ( frames.includes( frame ) === false ) {
+
+					frames.push( frame );
+
+				}
+
+				if ( framesDuration[ frame ] === undefined ) framesDuration[ frame ] = 0;
+
+				const duration = await promise;
+
+				this.timestamps.set( uid, duration );
+
+				framesDuration[ frame ] += duration;
+
+			}
+
+			// Return the total duration of the last frame
+			const totalDuration = framesDuration[ this.frames[ this.frames.length - 1 ] ];
 
 			// Store the last valid result
 			this.lastValue = totalDuration;
+			this.frames = frames;
 
 			// Reset states
 			this.currentQueryIndex = 0;

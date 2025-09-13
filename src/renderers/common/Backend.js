@@ -4,7 +4,7 @@ let _color4 = null;
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { createCanvasElement, warnOnce } from '../../utils.js';
-import { REVISION } from '../../constants.js';
+import { REVISION, TimestampQuery } from '../../constants.js';
 
 /**
  * Most of the rendering related logic is implemented in the
@@ -64,8 +64,8 @@ class Backend {
    		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
 		 */
 		this.timestampQueryPool = {
-			'render': null,
-			'compute': null
+			[ TimestampQuery.RENDER ]: null,
+			[ TimestampQuery.COMPUTE ]: null
 		};
 
 		/**
@@ -441,6 +441,33 @@ class Backend {
 	// utils
 
 	/**
+	 * Updates a unique identifier for the given render context that can be used
+	 * to allocate resources like occlusion queries or timestamp queries.
+	 *
+	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
+	 */
+	updateTimeStampUID( abstractRenderContext ) {
+
+		const contextData = this.get( abstractRenderContext );
+		const frame = this.renderer.info.frame;
+
+		let prefix;
+
+		if ( abstractRenderContext.isComputeNode === true ) {
+
+			prefix = 'c:' + this.renderer.info.compute.frameCalls;
+
+		} else {
+
+			prefix = 'r:' + this.renderer.info.render.frameCalls;
+
+		}
+
+		contextData.timestampUID = prefix + ':' + abstractRenderContext.id + ':f' + frame;
+
+	}
+
+	/**
 	 * Returns a unique identifier for the given render context that can be used
 	 * to allocate resources like occlusion queries or timestamp queries.
 	 *
@@ -449,12 +476,24 @@ class Backend {
 	 */
 	getTimestampUID( abstractRenderContext ) {
 
-		const contextData = this.get( abstractRenderContext );
+		return this.get( abstractRenderContext ).timestampUID;
 
-		let uid = abstractRenderContext.isComputeNode === true ? 'c' : 'r';
-		uid += ':' + contextData.frameCalls + ':' + abstractRenderContext.id;
+	}
 
-		return uid;
+	getTimestampFrames( type ) {
+
+		const queryPool = this.timestampQueryPool[ type ];
+
+		return queryPool ? queryPool.getTimestampFrames() : [];
+
+	}
+
+	getTimestamp( uid ) {
+
+		const type = uid.startsWith( 'c:' ) ? TimestampQuery.COMPUTE : TimestampQuery.RENDER;
+		const queryPool = this.timestampQueryPool[ type ];
+
+		return queryPool.getTimestamp( uid );
 
 	}
 
@@ -488,9 +527,9 @@ class Backend {
 		}
 
 		const queryPool = this.timestampQueryPool[ type ];
+
 		if ( ! queryPool ) {
 
-			warnOnce( `WebGPURenderer: No timestamp query pool for type '${type}' found.` );
 			return;
 
 		}
