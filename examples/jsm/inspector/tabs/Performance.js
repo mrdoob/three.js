@@ -59,6 +59,7 @@ class Performance extends Tab {
 
 		const miscellaneous = new Item( 'Miscellaneous / Idle', createValueSpan(), createValueSpan(), createValueSpan() );
 		miscellaneous.domElement.firstChild.style.backgroundColor = '#00ff0b1a';
+		miscellaneous.domElement.firstChild.classList.add( 'no-hover' );
 		frameStats.add( miscellaneous );
 
 		//

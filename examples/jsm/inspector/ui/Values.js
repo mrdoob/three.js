@@ -210,7 +210,7 @@ class ValueSlider extends Value {
 
 		const numberValue = new ValueNumber( { value, min, max, step } );
 		this.numberInput = numberValue.input;
-		this.numberInput.style.width = '70px';
+		this.numberInput.style.width = '60px';
 		this.numberInput.style.flexShrink = '0';
 
 		this.domElement.append( this.slider, this.numberInput );

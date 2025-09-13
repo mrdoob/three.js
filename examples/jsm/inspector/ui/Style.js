@@ -269,20 +269,29 @@ export class Style {
 	cursor: pointer;
 }
 
-.list-item-row.collapsible:hover,
-.list-item-row.actionable:hover,
 .list-item-row.collapsible.open {
 	background-color: rgba(0, 170, 255, 0.15) !important;
-}
-
-.list-item-row.collapsible.open:hover,
-.list-item-row.collapsible.open.actionable:hover {
-    background-color: rgba(0, 170, 255, 0.25) !important;
 }
 
 .list-item-row.collapsible.alert,
 .list-item-row.alert {
 	background-color: rgba(244, 67, 54, 0.1) !important;
+}
+
+@media (hover: hover) {
+
+	.list-item-row.collapsible:hover,
+	.list-item-row.collapsible.open:hover {
+		background-color: rgba(0, 170, 255, 0.25) !important;
+	}
+
+	.list-item-row:hover:not(.collapsible):not(.no-hover),
+	.list-item-row:hover:not(.no-hover),
+	.list-item-row.actionable:hover,
+	.list-item-row.collapsible.open.actionable:hover {
+		background-color: rgba(255, 255, 255, 0.05) !important;
+	}
+
 }
 
 .list-item-cell {
@@ -362,7 +371,7 @@ export class Style {
 }
 
 .list-container.parameters .list-item-row:not(.collapsible) {
-	height: 30px;
+	height: 31px;
 }
 
 .graph-container {
@@ -485,6 +494,7 @@ export class Style {
 	color: var(--text-primary);
 	border-radius: 4px;
 	padding: 4px 6px;
+	padding-bottom: 2px;
 	font-family: var(--font-mono);
 	width: 100%;
 	box-sizing: border-box;
@@ -492,7 +502,7 @@ export class Style {
 
 .param-control select {
 	padding-top: 3px;
-	padding-bottom: 3px;
+	padding-bottom: 1px;
 }
 
 .param-control input[type="number"] {

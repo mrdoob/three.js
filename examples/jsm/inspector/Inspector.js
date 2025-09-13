@@ -270,6 +270,12 @@ class Inspector extends RendererInspector {
 
 		//
 
+		if ( this.softDeltaTime === 0 ) {
+
+			this.softDeltaTime = frame.deltaTime;
+
+		}
+
 		this.deltaTime = frame.deltaTime;
 		this.softDeltaTime = ease( this.softDeltaTime, frame.deltaTime, this.nodeFrame.deltaTime, EASE_FACTOR );
 

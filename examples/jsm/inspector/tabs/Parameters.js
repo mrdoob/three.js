@@ -110,6 +110,9 @@ class ParametersGroup {
 		const subItem = new Item( description, editor.domElement );
 		this.item.add( subItem );
 
+		const itemRow = subItem.domElement.firstChild;
+		itemRow.classList.add( 'actionable' );
+
 		// extend object property
 
 		editor.name = ( name ) => description.textContent = name;
@@ -134,6 +137,9 @@ class ParametersGroup {
 
 		const subItem = new Item( description, editor.domElement );
 		this.item.add( subItem );
+
+		const itemRow = subItem.domElement.firstChild;
+		itemRow.classList.add( 'actionable' );
 
 		// extend object property
 
@@ -161,6 +167,9 @@ class ParametersGroup {
 		const subItem = new Item( description, editor.domElement );
 		this.item.add( subItem );
 
+		const itemRow = subItem.domElement.firstChild;
+		itemRow.classList.add( 'actionable' );
+
 		// extend object property
 
 		editor.name = ( name ) => description.textContent = name;
@@ -179,11 +188,15 @@ class Parameters extends Tab {
 
 		const paramList = new List( 'Property', 'Value' );
 		paramList.domElement.classList.add( 'parameters' );
-		paramList.setGridStyle( '1fr 1fr' );
+		paramList.setGridStyle( '.5fr 1fr' );
+		paramList.domElement.style.minWidth = '300px';
+
+		const scrollWrapper = document.createElement( 'div' );
+		scrollWrapper.className = 'list-scroll-wrapper';
+		scrollWrapper.appendChild( paramList.domElement );
+		this.content.appendChild( scrollWrapper );
 
 		this.paramList = paramList;
-
-		this.content.appendChild( paramList.domElement );
 
 	}
 
