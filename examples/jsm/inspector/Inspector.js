@@ -143,6 +143,14 @@ class Inspector extends RendererInspector {
 
 		this.console.addMessage( 'info', sign );
 
+		//
+
+		if ( renderer.inspector.domElement.parentElement === null && renderer.domElement.parentElement !== null ) {
+
+			renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
+
+		}
+
 	}
 
 	setRenderer( renderer ) {

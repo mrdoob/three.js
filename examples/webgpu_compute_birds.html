@@ -164,10 +164,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.NeutralToneMapping;
-				container.appendChild( renderer.domElement );
-
 				renderer.inspector = new Inspector();
-				container.appendChild( renderer.inspector.domElement );
+				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera );
 				controls.connect( renderer.domElement );
@@ -439,7 +437,6 @@
 				gui.add( effectController.separation, 'value', 0.0, 100.0, 1.0 ).name( 'Separation' );
 				gui.add( effectController.alignment, 'value', 0.0, 100, 0.001 ).name( 'Alignment ' );
 				gui.add( effectController.cohesion, 'value', 0.0, 100, 0.025 ).name( 'Cohesion' );
-				gui.close();
 
 			}
 

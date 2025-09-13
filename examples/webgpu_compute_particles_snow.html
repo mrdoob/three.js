@@ -280,10 +280,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				document.body.appendChild( renderer.domElement );
-
 				renderer.inspector = new Inspector();
-				document.body.appendChild( renderer.inspector.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
@@ -341,7 +339,7 @@
 
 			}
 
-			async function animate() {
+			function animate() {
 
 				controls.update();
 
