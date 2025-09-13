@@ -256,6 +256,10 @@ export class Style {
 	margin-bottom: 2px;
 }
 
+.list-item-wrapper:first-child {
+	/*margin-top: 0;*/
+}
+
 .list-item-wrapper:not(.header-wrapper):nth-child(odd) > .list-item-row {
 	background-color: rgba(0,0,0,0.1);
 }
@@ -336,6 +340,7 @@ export class Style {
 	overflow: hidden;
 	max-height: 1000px;
 	transition: max-height 0.1s ease-out;
+	margin-top: 2px;
 }
 
 .list-children-container.closed {
