@@ -251,6 +251,11 @@ export class Style {
 	border-bottom: none;
 }
 
+.list-item-wrapper {
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
 .list-item-wrapper:not(.header-wrapper):nth-child(odd) > .list-item-row {
 	background-color: rgba(0,0,0,0.1);
 }
@@ -330,9 +335,7 @@ export class Style {
 	padding-left: 1.5em;
 	overflow: hidden;
 	max-height: 1000px;
-
 	transition: max-height 0.1s ease-out;
-	margin-top: 5px;
 }
 
 .list-children-container.closed {
