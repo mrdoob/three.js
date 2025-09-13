@@ -138,7 +138,7 @@ class TRAANode extends TempNode {
 		 * @private
 		 * @type {?RenderTarget}
 		 */
-		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
+		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, depthTexture: new DepthTexture() } );
 		this._historyRenderTarget.texture.name = 'TRAANode.history';
 
 		/**
@@ -176,14 +176,6 @@ class TRAANode extends TempNode {
 		this._originalProjectionMatrix = new Matrix4();
 
 		/**
-		 * The previous frame's depth buffer.
-		 *
-		 * @private
-		 * @type {?DepthTexture}
-		 */
-		this._previousDepthTexture = new DepthTexture( 1, 1 );
-
-		/**
 		 * A texture node for the previous depth buffer.
 		 *
 		 * @private
@@ -197,6 +189,14 @@ class TRAANode extends TempNode {
 		 * @type {boolean}
 		 */
 		this._needsPostProcessingSync = false;
+
+		/**
+		 * Whether the current frame is the first one or not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 */
+		this._firstFrame = true;
 
 	}
 
@@ -357,17 +357,19 @@ class TRAANode extends TempNode {
 		renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
 
 		// Copy current depth to previous depth buffer
-		const currentDepth = this.depthNode.value;
-		if ( this._previousDepthTexture.image.width !== currentDepth.width ||
-			this._previousDepthTexture.image.height !== currentDepth.height ) {
 
-			this._previousDepthTexture.dispose();
-			this._previousDepthTexture = currentDepth.clone();
-			this._previousDepthNode.value = this._previousDepthTexture;
+		if ( this._firstFrame === true ) {
+
+			this._firstFrame = false;
+
+		} else {
+
+			const currentDepth = this.depthNode.value;
+			renderer.copyTextureToTexture( currentDepth, this._historyRenderTarget.depthTexture );
+			this._previousDepthNode.value = this._historyRenderTarget.depthTexture;
 
 		}
 
-		renderer.copyTextureToTexture( currentDepth, this._previousDepthTexture );
 
 		// restore
 
@@ -530,12 +532,6 @@ class TRAANode extends TempNode {
 
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
-
-		if ( this._previousDepthTexture ) {
-
-			this._previousDepthTexture.dispose();
-
-		}
 
 		this._resolveMaterial.dispose();
 
