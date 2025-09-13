@@ -8,6 +8,8 @@ import { setText, ease } from './ui/utils.js';
 
 import { setConsoleFunction, REVISION } from 'three/webgpu';
 
+const EASE_FACTOR = 0.1;
+
 class Inspector extends RendererInspector {
 
 	constructor() {
@@ -32,7 +34,8 @@ class Inspector extends RendererInspector {
 
 		//
 
-		this.fps = 0;
+		this.deltaTime = 0;
+		this.softDeltaTime = 0;
 
 		this.statsData = new Map();
 		this.profiler = profiler;
@@ -49,7 +52,7 @@ class Inspector extends RendererInspector {
 			},
 			graph: {
 				needsUpdate: false,
-				duration: .1,
+				duration: .05,
 				time: 0
 			}
 		};
@@ -208,7 +211,9 @@ class Inspector extends RendererInspector {
 
 		}
 
-		data.cpu = stats.cpu;
+		// TODO: Smooth values
+
+		data.cpu = stats.cpu; // ease( .. )
 		data.gpu = stats.gpu;
 		data.total = data.cpu + data.gpu;
 
@@ -224,15 +229,43 @@ class Inspector extends RendererInspector {
 
 	resolveFrame( frame ) {
 
-		super.resolveFrame( frame );
+		const nextFrame = this.getFrameById( frame.frameId + 1 );
 
-		const deltaTime = frame.deltaTime / 1000; // to seconds
+		if ( ! nextFrame ) return;
 
-		const fps = ( deltaTime > 0 ) ? ( 1 / deltaTime ) : 0;
+		frame.cpu = 0;
+		frame.gpu = 0;
+		frame.total = 0;
 
-		this.fps = ease( this.fps, fps, deltaTime, .1 );
+		for ( const stats of frame.children ) {
 
-		this.resolveStats( frame );
+			this.resolveStats( stats );
+
+			const data = this.getStatsData( stats.cid );
+
+			frame.cpu += data.cpu;
+			frame.gpu += data.gpu;
+			frame.total += data.total;
+
+		}
+
+		// improve stats using next frame
+
+		frame.deltaTime = nextFrame.startTime - frame.startTime;
+		frame.miscellaneous = frame.deltaTime - frame.total;
+
+		if ( frame.miscellaneous < 0 ) {
+
+			// Frame desync, probably due to async GPU timing.
+
+			return;
+
+		}
+
+		//
+
+		this.deltaTime = frame.deltaTime;
+		this.softDeltaTime = ease( this.softDeltaTime, frame.deltaTime, this.nodeFrame.deltaTime, EASE_FACTOR );
 
 		this.updateCycle( this.displayCycle.text );
 		this.updateCycle( this.displayCycle.graph );
@@ -253,6 +286,18 @@ class Inspector extends RendererInspector {
 
 		this.displayCycle.text.needsUpdate = false;
 		this.displayCycle.graph.needsUpdate = false;
+
+	}
+
+	get fps() {
+
+		return 1000 / this.deltaTime;
+
+	}
+
+	get softFPS() {
+
+		return 1000 / this.softDeltaTime;
 
 	}
 

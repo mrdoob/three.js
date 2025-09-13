@@ -81,6 +81,7 @@ export class RendererInspector extends InspectorBase {
 		this.currentRender = null;
 
 		this.frames = [];
+		this.framesLib = {};
 		this.maxFrames = 512;
 
 		this._lastFinishTime = 0;
@@ -123,8 +124,7 @@ export class RendererInspector extends InspectorBase {
 			deltaTime: 0,
 			startTime: performance.now(),
 			finishTime: 0,
-			//idle: 0,
-			//miscellaneous: 0,
+			miscellaneous: 0,
 			children: [],
 			renders: [],
 			computes: []
@@ -138,48 +138,13 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
-	updateStats( stats ) {
-
-		for ( const child of stats.children ) {
-
-			this.updateStats( child );
-
-			stats.cpu += child.cpu;
-			stats.gpu += child.gpu;
-
-		}
-
-	}
-
 	getFrameById( frameId ) {
 
-		for ( const frame of this.frames ) {
-
-			if ( frame.frameId === frameId ) return frame;
-
-		}
-
-		return null;
+		return this.framesLib[ frameId ] || null;
 
 	}
 
-	resolveFrame( frame ) {
-
-		frame.cpu = 0;
-		frame.gpu = 0;
-		frame.total = 0;
-
-		for ( const stats of frame.children ) {
-
-			this.updateStats( stats );
-
-			frame.cpu += stats.cpu;
-			frame.gpu += stats.gpu;
-			frame.total += stats.total;
-
-		}
-
-	}
+	resolveFrame( /*frame*/ ) { }
 
 	async resolveTimestamp() {
 
@@ -189,87 +154,93 @@ export class RendererInspector extends InspectorBase {
 
 		}
 
-		this._resolveTimestampPromise = new Promise( async () => {
+		this._resolveTimestampPromise = new Promise( ( resolve ) => {
 
-			const renderer = this.getRenderer();
+			requestAnimationFrame( async () => {
 
-			await renderer.resolveTimestampsAsync( TimestampQuery.COMPUTE );
-			await renderer.resolveTimestampsAsync( TimestampQuery.RENDER );
+				const renderer = this.getRenderer();
 
-			const computeFrames = renderer.backend.getTimestampFrames( TimestampQuery.COMPUTE );
-			const renderFrames = renderer.backend.getTimestampFrames( TimestampQuery.RENDER );
+				await renderer.resolveTimestampsAsync( TimestampQuery.COMPUTE );
+				await renderer.resolveTimestampsAsync( TimestampQuery.RENDER );
 
-			const frameIds = [ ...new Set( [ ...computeFrames, ...renderFrames ] ) ];
+				const computeFrames = renderer.backend.getTimestampFrames( TimestampQuery.COMPUTE );
+				const renderFrames = renderer.backend.getTimestampFrames( TimestampQuery.RENDER );
 
-			for ( const frameId of frameIds ) {
+				const frameIds = [ ...new Set( [ ...computeFrames, ...renderFrames ] ) ];
 
-				const frame = this.getFrameById( frameId );
+				for ( const frameId of frameIds ) {
 
-				if ( frame !== null ) {
+					const frame = this.getFrameById( frameId );
 
-					// resolve compute timestamps
+					if ( frame !== null ) {
 
-					if ( frame.resolvedCompute === false ) {
+						// resolve compute timestamps
 
-						if ( frame.computes.length > 0 ) {
+						if ( frame.resolvedCompute === false ) {
 
-							if ( computeFrames.includes( frameId ) ) {
+							if ( frame.computes.length > 0 ) {
 
-								for ( const stats of frame.computes ) {
+								if ( computeFrames.includes( frameId ) ) {
 
-									stats.gpu = renderer.backend.getTimestamp( stats.uid );
+									for ( const stats of frame.computes ) {
+
+										stats.gpu = renderer.backend.getTimestamp( stats.uid );
+
+									}
+
+									frame.resolvedCompute = true;
 
 								}
+
+							} else {
 
 								frame.resolvedCompute = true;
 
 							}
 
-						} else {
-
-							frame.resolvedCompute = true;
-
 						}
 
-					}
+						// resolve render timestamps
 
-					// resolve render timestamps
+						if ( frame.resolvedRender === false ) {
 
-					if ( frame.resolvedRender === false ) {
+							if ( frame.renders.length > 0 ) {
 
-						if ( frame.renders.length > 0 ) {
+								if ( renderFrames.includes( frameId ) ) {
 
-							if ( renderFrames.includes( frameId ) ) {
+									for ( const stats of frame.renders ) {
 
-								for ( const stats of frame.renders ) {
+										stats.gpu = renderer.backend.getTimestamp( stats.uid );
 
-									stats.gpu = renderer.backend.getTimestamp( stats.uid );
+									}
+
+									frame.resolvedRender = true;
 
 								}
+
+							} else {
 
 								frame.resolvedRender = true;
 
 							}
 
-						} else {
+						}
 
-							frame.resolvedRender = true;
+						if ( frame.resolvedCompute === true && frame.resolvedRender === true ) {
+
+							this.resolveFrame( frame );
 
 						}
 
 					}
 
-					if ( frame.resolvedCompute === true && frame.resolvedRender === true ) {
-
-						this.resolveFrame( frame );
-
-					}
-
 				}
 
-			}
+				this._resolveTimestampPromise = null;
 
-			this._resolveTimestampPromise = null;
+				resolve();
+
+			} );
 
 		} );
 
@@ -283,13 +254,13 @@ export class RendererInspector extends InspectorBase {
 
 		if ( this.frames.length >= this.maxFrames ) {
 
-			this.frames.shift();
+			const removedFrame = this.frames.shift();
+			delete this.framesLib[ removedFrame.frameId ];
 
 		}
 
 		this.frames.push( frame );
-
-		//
+		this.framesLib[ frame.frameId ] = frame;
 
 		this.resolveTimestamp();
 
