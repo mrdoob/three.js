@@ -261,7 +261,8 @@
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/en/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",
-				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
+				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget",
+				"WebGPURenderer": "api/en/renderers/WebGPURenderer"
 			},
 
 			"Renderers / Shaders": {
