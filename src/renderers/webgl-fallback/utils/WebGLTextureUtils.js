@@ -409,8 +409,7 @@ class WebGLTextureUtils {
 
 		backend.set( texture, {
 			textureGPU,
-			glTextureType,
-			isDefault: true
+			glTextureType
 		} );
 
 	}
@@ -741,14 +740,20 @@ class WebGLTextureUtils {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
 		const { gl, backend } = this;
 		const { textureGPU, renderTarget } = backend.get( texture );
 
 		this.deallocateRenderBuffers( renderTarget );
-		gl.deleteTexture( textureGPU );
+
+		if ( isDefaultTexture === false ) {
+
+			gl.deleteTexture( textureGPU );
+
+		}
 
 		backend.delete( texture );
 

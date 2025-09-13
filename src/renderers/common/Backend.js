@@ -328,8 +328,9 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( /*texture*/ ) { }
+	destroyTexture( /*texture, isDefaultTexture*/ ) { }
 
 	/**
 	 * Returns texture data as a typed array.

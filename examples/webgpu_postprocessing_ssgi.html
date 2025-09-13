@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity, add, vec3, vec4 } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, directionToColor, colorToDirection, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -55,6 +55,7 @@
 				camera.position.set( 2.8, 1.8, 5 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				renderer = new THREE.WebGPURenderer();
 				//renderer.setPixelRatio( window.devicePixelRatio ); // probably too costly for most hardware
@@ -71,7 +72,7 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 1, 0 );
-				controls.enablePan = false;
+				controls.enablePan = true;
 				controls.minDistance = 1;
 				controls.maxDistance = 6;
 				controls.update();
@@ -83,18 +84,34 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: normalView,
+					diffuseColor: diffuseColor,
+					normal: directionToColor( normalView ),
 					velocity: velocity
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDiffuse = scenePass.getTextureNode( 'diffuseColor' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 
+				// bandwidth optimization
+
+				const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
+				diffuseTexture.type = THREE.UnsignedByteType;
+
+				const normalTexture = scenePass.getTexture( 'normal' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				const sceneNormal = sample( ( uv ) => {
+
+					return colorToDirection( scenePassNormal.sample( uv ) );
+
+				} );
+
 				// gi
 
-				const giPass = ssgi( scenePassColor, scenePassDepth, scenePassNormal, camera );
+				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
 
@@ -102,8 +119,8 @@
 
 				const gi = giPass.rgb;
 				const ao = giPass.a;
-			
-				const compositePass = vec4( add( scenePassColor.rgb, gi ).mul( ao ), scenePassColor.a );
+
+				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( gi ) ) ), scenePassColor.a );
 				compositePass.name = 'Composite';
 			
 				// traa
@@ -129,7 +146,14 @@
 
 				//
 
+				const params = {
+					output: 0
+				};
+
+				const types = { Default: 0, AO: 1, GI: 2, Beauty: 3 };
+
 				const gui = renderer.inspector.createParameters( 'SSGI settings' );
+				gui.add( params, 'output', types ).onChange( updatePostprocessing );
 				gui.add( giPass.sliceCount, 'value', 1, 4 ).step( 1 ).name( 'slice count' );
 				gui.add( giPass.stepCount, 'value', 1, 32 ).step( 1 ).name( 'step count' );
 				gui.add( giPass.radius, 'value', 1, 25 ).name( 'radius' );
@@ -140,9 +164,9 @@
 				gui.add( giPass.giIntensity, 'value', 0, 100 ).name( 'GI intenstiy' );
 				gui.add( giPass.useLinearThickness, 'value' ).name( 'use linear thickness' );
 				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
-				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
+				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
-				gui.add( { output: 0 }, 'output', { Default: 0, AO: 1, GI: 2, Beauty: 3 } ).onChange( value => {
+				function updatePostprocessing( value ) {
 
 					if ( value === 1 ) {
 
@@ -158,13 +182,15 @@
 
 					} else {
 
-						postProcessing.outputNode = traaPass;
+						postProcessing.outputNode = giPass.useTemporalFiltering ? traaPass : compositePass;
 
 					}
 
 					postProcessing.needsUpdate = true;
 
-				} );
+
+				}
+
 
 			}
 

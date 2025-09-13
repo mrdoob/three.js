@@ -170,6 +170,22 @@ class Bindings extends DataMap {
 
 	}
 
+	/**
+	 * Deletes the bindings for the given renderObject node.
+	 *
+	 * @param {RenderObject} renderObject - The renderObject.
+	 */
+	deleteForRender( renderObject ) {
+
+		const bindings = renderObject.getBindings();
+
+		for ( const bindGroup of bindings ) {
+
+			this.delete( bindGroup );
+
+		}
+
+	}
 
 	/**
 	 * Updates the given array of bindings.

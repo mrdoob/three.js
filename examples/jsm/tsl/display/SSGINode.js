@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils } from 'three/webgpu';
-import { clamp, normalize, reference, nodeObject, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, uvec2, convertToTexture, bool, getNormalFromDepth } from 'three/tsl';
+import { clamp, normalize, reference, nodeObject, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -355,7 +355,7 @@ class SSGINode extends TempNode {
 
 		// clear
 
-		renderer.setClearColor( 0xffffff, 1 );
+		renderer.setClearColor( 0x000000, 1 );
 
 		// gi
 
@@ -378,6 +378,7 @@ class SSGINode extends TempNode {
 
 		const uvNode = uv();
 		const MAX_RAY = uint( 32 );
+		const globalOccludedBitfield = uint( 0 );
 
 		const sampleDepth = ( uv ) => {
 
@@ -404,6 +405,12 @@ class SSGINode extends TempNode {
 
 			return float( 0.25 ).mul( sub( position.y, position.x ).bitAnd( 3 ) );
 
+		} ).setLayout( {
+			name: 'spatialOffsets',
+			type: 'float',
+			inputs: [
+				{ name: 'position', type: 'vec2' }
+			]
 		} );
 
 		// Interleaved gradient function from Jimenez 2014 http://goo.gl/eomGso
@@ -412,6 +419,12 @@ class SSGINode extends TempNode {
 
 			return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
 
+		} ).setLayout( {
+			name: 'gradientNoise',
+			type: 'float',
+			inputs: [
+				{ name: 'position', type: 'vec2' }
+			]
 		} );
 
 		const GTAOFastAcos = Fn( ( [ value ] ) => {
@@ -424,35 +437,31 @@ class SSGINode extends TempNode {
 
 			return vec2( x, y );
 
+		} ).setLayout( {
+			name: 'GTAOFastAcos',
+			type: 'vec2',
+			inputs: [
+				{ name: 'value', type: 'vec2' }
+			]
 		} );
 
-		const bitCount = Fn( ( [ value_immutable ] ) => {
+		const bitCount = Fn( ( [ value ] ) => {
 
-			const value = value_immutable;
-			value.assign( value.sub( value.shiftRight( uint( 1 ) ).bitAnd( uint( 0x55555555 ) ) ) );
-			value.assign( value.bitAnd( uint( 0x33333333 ) ).add( value.shiftRight( uint( 2 ) ).bitAnd( uint( 0x33333333 ) ) ) );
+			const v = uint( value );
+			v.assign( v.sub( v.shiftRight( uint( 1 ) ).bitAnd( uint( 0x55555555 ) ) ) );
+			v.assign( v.bitAnd( uint( 0x33333333 ) ).add( v.shiftRight( uint( 2 ) ).bitAnd( uint( 0x33333333 ) ) ) );
 
-			return value.add( value.shiftRight( uint( 4 ) ) ).bitAnd( uint( 0xF0F0F0F ) ).mul( uint( 0x1010101 ) ).shiftRight( uint( 24 ) );
+			return v.add( v.shiftRight( uint( 4 ) ) ).bitAnd( uint( 0xF0F0F0F ) ).mul( uint( 0x1010101 ) ).shiftRight( uint( 24 ) );
 
+		} ).setLayout( {
+			name: 'bitCount',
+			type: 'uint',
+			inputs: [
+				{ name: 'value', type: 'uint' }
+			]
 		} );
 
-		const computeOccludedBitfield = Fn( ( [ minHorizon, maxHorizon, globalOccludedBitfield ] ) => {
-
-			const startHorizonInt = uint( minHorizon.mul( float( MAX_RAY ) ) ).toConst();
-			const angleHorizonInt = uint( ceil( maxHorizon.sub( minHorizon ).mul( float( MAX_RAY ) ) ) ).toConst();
-			const angleHorizonBitfield = angleHorizonInt.greaterThan( uint( 0 ) ).select( uint( shiftRight( uint( 0xFFFFFFFF ), uint( 32 ).sub( MAX_RAY ).add( MAX_RAY.sub( angleHorizonInt ) ) ) ), uint( 0 ) ).toConst();
-			let currentOccludedBitfield = angleHorizonBitfield.shiftLeft( startHorizonInt );
-			currentOccludedBitfield = currentOccludedBitfield.bitAnd( globalOccludedBitfield.bitNot() );
-
-			const result = uvec2();
-			result.x = globalOccludedBitfield.bitOr( currentOccludedBitfield );
-			result.y = bitCount( currentOccludedBitfield );
-
-			return result;
-
-		} );
-
-		const horizonSampling = Fn( ( [ directionIsRight, RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n, globalOccludedBitfield ] ) => {
+		const horizonSampling = Fn( ( [ directionIsRight, RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
 
 			const STEP_COUNT = this.stepCount.toConst();
 			const EXP_FACTOR = this.expFactor.toConst();
@@ -463,7 +472,7 @@ class SSGINode extends TempNode {
 
 			If( this.useScreenSpaceSampling.equal( true ), () => {
 
-				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( STEP_COUNT ) ) );
+				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
 
 			} ).Else( () => {
 
@@ -473,10 +482,10 @@ class SSGINode extends TempNode {
 
 			stepRadius.divAssign( float( STEP_COUNT ).add( 1 ) );
 			const radiusVS = max( 1, float( STEP_COUNT.sub( 1 ) ) ).mul( stepRadius );
-			const samplingDirection = directionIsRight.equal( true ).select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
+			const uvDirection = directionIsRight.equal( true ).select( vec2( 1, - 1 ), vec2( - 1, 1 ) ); // Port note: Because of different uv conventions, uv-y has a different sign
+			const samplingDirection = directionIsRight.equal( true ).select( 1, - 1 );
 
 			const color = vec3( 0 );
-			const occludedBitfield = uint( globalOccludedBitfield ).toVar();
 
 			const lastSampleViewPosition = vec3( viewPosition ).toVar();
 
@@ -484,7 +493,7 @@ class SSGINode extends TempNode {
 
 				const offset = pow( abs( mul( stepRadius, float( i ).add( initialRayStep ) ).div( radiusVS ) ), EXP_FACTOR ).mul( radiusVS ).toConst();
 				const uvOffset = slideDirTexelSize.mul( max( offset, float( i ).add( 1 ) ) ).toConst();
-				const sampleUV = uvNode.add( uvOffset.mul( samplingDirection ) ).toConst();
+				const sampleUV = uvNode.add( uvOffset.mul( uvDirection ) ).toConst();
 
 				If( sampleUV.x.lessThanEqual( 0 ).or( sampleUV.y.lessThanEqual( 0 ) ).or( sampleUV.x.greaterThanEqual( 1 ) ).or( sampleUV.y.greaterThanEqual( 1 ) ), () => {
 
@@ -499,12 +508,24 @@ class SSGINode extends TempNode {
 
 				let frontBackHorizon = vec2( dot( pixelToSample, viewDir ), dot( pixelToSampleBackface, viewDir ) );
 				frontBackHorizon = GTAOFastAcos( clamp( frontBackHorizon, - 1, 1 ) );
-				frontBackHorizon = clamp( div( mul( samplingDirection, vec2( frontBackHorizon.x.negate(), frontBackHorizon.y ) ).sub( n.sub( HALF_PI ) ), PI ) ); // Port note: This line also required an update because of different uv conventions
+				frontBackHorizon = clamp( div( mul( samplingDirection, frontBackHorizon.negate() ).sub( n.sub( HALF_PI ) ), PI ) ); // Port note: subtract half pi instead of adding it
 				frontBackHorizon = directionIsRight.equal( true ).select( frontBackHorizon.yx, frontBackHorizon.xy ); // Front/Back get inverted depending on angle
 
-				const result = computeOccludedBitfield( frontBackHorizon.x, frontBackHorizon.y, occludedBitfield );
-				occludedBitfield.assign( result.x );
-				const numOccludedZones = result.y;
+				// inline ComputeOccludedBitfield() for easier debugging
+
+				const minHorizon = frontBackHorizon.x.toConst();
+				const maxHorizon = frontBackHorizon.y.toConst();
+
+				const startHorizonInt = uint( frontBackHorizon.mul( float( MAX_RAY ) ) ).toConst();
+				const angleHorizonInt = uint( ceil( maxHorizon.sub( minHorizon ).mul( float( MAX_RAY ) ) ) ).toConst();
+				const angleHorizonBitfield = angleHorizonInt.greaterThan( uint( 0 ) ).select( uint( shiftRight( uint( 0xFFFFFFFF ), uint( 32 ).sub( MAX_RAY ).add( MAX_RAY.sub( angleHorizonInt ) ) ) ), uint( 0 ) ).toConst();
+				let currentOccludedBitfield = angleHorizonBitfield.shiftLeft( startHorizonInt );
+				currentOccludedBitfield = currentOccludedBitfield.bitAnd( globalOccludedBitfield.bitNot() );
+
+				globalOccludedBitfield.assign( globalOccludedBitfield.bitOr( currentOccludedBitfield ) );
+				const numOccludedZones = bitCount( currentOccludedBitfield );
+
+				//
 
 				If( numOccludedZones.greaterThan( 0 ), () => { // If a ray hit the sample, that sample is visible from shading point
 
@@ -538,7 +559,7 @@ class SSGINode extends TempNode {
 
 			} );
 
-			return vec4( color, occludedBitfield );
+			return vec3( color );
 
 		} );
 
@@ -556,7 +577,8 @@ class SSGINode extends TempNode {
 
 			const noiseOffset = spatialOffsets( screenCoordinate );
 			const noiseDirection = gradientNoise( screenCoordinate );
-			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode ).mul( 2 ).sub( 1 ) );
+			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
+			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
 
 			const ao = float( 0 );
 			const color = vec3( 0 );
@@ -580,15 +602,10 @@ class SSGINode extends TempNode {
 				const cos_n = clamp( dot( projectedNormalNormalized, viewDir ), - 1, 1 ).toConst();
 				const n = sign( dot( projectedNormal, tangent ) ).negate().mul( acos( cos_n ) ).toConst();
 
-				const globalOccludedBitfield = uint( 0 );
+				globalOccludedBitfield.assign( 0 );
 
-				const resultRight = horizonSampling( bool( true ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n, globalOccludedBitfield );
-				color.addAssign( resultRight.xyz );
-				globalOccludedBitfield.assign( resultRight.a );
-
-				const resultLeft = horizonSampling( bool( false ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n, globalOccludedBitfield );
-				color.addAssign( resultLeft.xyz );
-				globalOccludedBitfield.assign( resultLeft.a );
+				color.addAssign( horizonSampling( bool( true ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
+				color.addAssign( horizonSampling( bool( false ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
 
 				ao.addAssign( float( bitCount( globalOccludedBitfield ) ).div( float( MAX_RAY ) ) );
 

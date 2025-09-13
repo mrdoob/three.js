@@ -29943,6 +29943,24 @@ class Bindings extends DataMap {
 	}
 
 	/**
+	 * Deletes the bindings for the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
+	deleteForCompute( computeNode ) {
+
+		const bindings = this.nodes.getForCompute( computeNode ).bindings;
+
+		for ( const bindGroup of bindings ) {
+
+			this.delete( bindGroup );
+
+		}
+
+	}
+
+
+	/**
 	 * Updates the given array of bindings.
 	 *
 	 * @param {Array<BindGroup>} bindings - The bind groups.
@@ -31337,7 +31355,7 @@ class Textures extends DataMap {
 				target.height = image.videoHeight || 1;
 				target.depth = 1;
 
-			} else if ( image instanceof VideoFrame ) {
+			} else if ( ( typeof VideoFrame !== 'undefined' ) && ( image instanceof VideoFrame ) ) {
 
 				target.width = image.displayWidth || 1;
 				target.height = image.displayHeight || 1;
@@ -31421,8 +31439,15 @@ class Textures extends DataMap {
 
 		if ( this.has( texture ) === true ) {
 
+			// if a texture is not ready for use, it falls back to a default texture so it's possible
+			// to use it for rendering. If a texture in this state is disposed, it's important to
+			// not destroy/delete the underlying GPU texture object since it is cached and shared with
+			// other textures.
+
+			const isDefaultTexture = this.get( texture ).isDefaultTexture;
+
 			this.backend.destroySampler( texture );
-			this.backend.destroyTexture( texture );
+			this.backend.destroyTexture( texture, isDefaultTexture );
 
 			this.delete( texture );
 
@@ -31539,6 +31564,36 @@ class ParameterNode extends PropertyNode {
 		 * @default true
 		 */
 		this.isParameterNode = true;
+
+	}
+
+	/**
+	 * Gets the type of a member variable in the parameter node.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @param {string} name - The name of the member variable.
+	 * @returns {string}
+	 */
+	getMemberType( builder, name ) {
+
+		const type = this.getNodeType( builder );
+		const struct = builder.getStructTypeNode( type );
+
+		let memberType;
+
+		if ( struct !== null ) {
+
+			memberType = struct.getMemberType( builder, name );
+
+		} else {
+
+			error( `TSL: Member "${ name }" not found in struct "${ type }".` );
+
+			memberType = 'float';
+
+		}
+
+		return memberType;
 
 	}
 
@@ -33365,6 +33420,7 @@ class ReflectorNode extends TextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.offsetNode = this.offsetNode;
 		newNode._reflectorBaseNode = this._reflectorBaseNode;
 
 		return newNode;
@@ -35815,6 +35871,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.offsetNode = this.offsetNode;
 
 		return newNode;
 
@@ -53457,6 +53514,9 @@ function onSessionEnd() {
 
 	this._session = null;
 	this._xrRenderTarget = null;
+	this._glBinding = null;
+	this._glBaseLayer = null;
+	this._glProjLayer = null;
 
 	// switch layers back to emulated
 	if ( this._sessionUsesLayers === true ) {
@@ -55328,7 +55388,7 @@ class Renderer {
 	 * for best compatibility.
 	 *
 	 * @async
-	 * @param {?Function} callback - The application's animation loop.
+	 * @param {?onAnimationCallback} callback - The application's animation loop.
 	 * @return {Promise} A Promise that resolves when the set has been executed.
 	 */
 	async setAnimationLoop( callback ) {
@@ -56100,7 +56160,7 @@ class Renderer {
 					computeNode.removeEventListener( 'dispose', dispose );
 
 					pipelines.delete( computeNode );
-					bindings.delete( computeNode );
+					bindings.deleteForCompute( computeNode );
 					nodes.delete( computeNode );
 
 				};
@@ -57615,8 +57675,24 @@ class Sampler extends Binding {
 		/**
 		 * The texture the sampler is referring to.
 		 *
+		 * @private
 		 * @type {?Texture}
 		 */
+		this._texture = null;
+
+		/**
+		 * An event listener which is added to {@link texture}'s dispose event.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onTextureDispose = () => {
+
+			this.texture = null;
+
+		};
+
+		// Assignment to the texture via a setter must occur after "_onTextureDispose" is initialized.
 		this.texture = texture;
 
 		/**
@@ -57654,17 +57730,9 @@ class Sampler extends Binding {
 
 		if ( this._texture === value ) return;
 
-		const onDispose = () => {
-
-			this._texture = null;
-			this.generation = null;
-			this.version = 0;
-
-		};
-
 		if ( this._texture ) {
 
-			this._texture.removeEventListener( 'dispose', onDispose );
+			this._texture.removeEventListener( 'dispose', this._onTextureDispose );
 
 		}
 
@@ -57675,7 +57743,7 @@ class Sampler extends Binding {
 
 		if ( this._texture ) {
 
-			this._texture.addEventListener( 'dispose', onDispose );
+			this._texture.addEventListener( 'dispose', this._onTextureDispose );
 
 		}
 
@@ -57722,6 +57790,13 @@ class Sampler extends Binding {
 		// TODO: Find better solution, see #31747
 
 		clonedSampler._texture = null;
+
+		clonedSampler._onTextureDispose = () => {
+
+			clonedSampler.texture = null;
+
+		};
+
 		clonedSampler.texture = this.texture;
 
 		return clonedSampler;
@@ -59745,8 +59820,9 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( /*texture*/ ) { }
+	destroyTexture( /*texture, isDefaultTexture*/ ) { }
 
 	/**
 	 * Returns texture data as a typed array.
@@ -62268,8 +62344,7 @@ class WebGLTextureUtils {
 
 		backend.set( texture, {
 			textureGPU,
-			glTextureType,
-			isDefault: true
+			glTextureType
 		} );
 
 	}
@@ -62600,14 +62675,20 @@ class WebGLTextureUtils {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
 		const { gl, backend } = this;
 		const { textureGPU, renderTarget } = backend.get( texture );
 
 		this.deallocateRenderBuffers( renderTarget );
-		gl.deleteTexture( textureGPU );
+
+		if ( isDefaultTexture === false ) {
+
+			gl.deleteTexture( textureGPU );
+
+		}
 
 		backend.delete( texture );
 
@@ -65205,10 +65286,11 @@ class WebGLBackend extends Backend {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
-		this.textureUtils.destroyTexture( texture );
+		this.textureUtils.destroyTexture( texture, isDefaultTexture );
 
 	}
 
@@ -67671,13 +67753,14 @@ class WebGPUTextureUtils {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined ) textureData.texture.destroy();
+		if ( textureData.texture !== undefined && isDefaultTexture === false ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
@@ -75388,10 +75471,11 @@ class WebGPUBackend extends Backend {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
-		this.textureUtils.destroyTexture( texture );
+		this.textureUtils.destroyTexture( texture, isDefaultTexture );
 
 	}
 

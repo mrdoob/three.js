@@ -1,4 +1,4 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils } from 'three/webgpu';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -48,7 +48,7 @@ class GTAONode extends TempNode {
 	 */
 	constructor( depthNode, normalNode, camera ) {
 
-		super( 'vec4' );
+		super( 'float' );
 
 		/**
 		 * A node that represents the scene's depth.
@@ -90,7 +90,7 @@ class GTAONode extends TempNode {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
+		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		// uniforms
@@ -392,7 +392,7 @@ class GTAONode extends TempNode {
 			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
 			ao.assign( pow( ao, this.scale ) );
 
-			return vec4( vec3( ao ), 1.0 );
+			return ao;
 
 		} );
 

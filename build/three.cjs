@@ -9055,7 +9055,16 @@ class RenderTarget extends EventDispatcher {
 				this.textures[ i ].image.width = width;
 				this.textures[ i ].image.height = height;
 				this.textures[ i ].image.depth = depth;
-				this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
+
+				if ( this.textures[ i ].isData3DTexture !== true ) { // Fix for #31693
+
+					// TODO: Reconsider setting isArrayTexture flag here and in the ctor of Texture.
+					// Maybe a method `isArrayTexture()` or just a getter could replace a flag since
+					// both are evaluated on each call?
+
+					this.textures[ i ].isArrayTexture = this.textures[ i ].image.depth > 1;
+
+				}
 
 			}
 
@@ -75166,6 +75175,13 @@ class WebGLRenderer {
 
 		if ( typeof self !== 'undefined' ) animation.setContext( self );
 
+		/**
+		 * Applications are advised to always define the animation loop
+		 * with this method and not manually with `requestAnimationFrame()`
+		 * for best compatibility.
+		 *
+		 * @param {?onAnimationCallback} callback - The application's animation loop.
+		 */
 		this.setAnimationLoop = function ( callback ) {
 
 			onAnimationFrameCallback = callback;

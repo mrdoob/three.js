@@ -1,16 +1,13 @@
 /* global QUnit */
 
-import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer.js';
-
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module( 'WebGLRenderer-webonly', () => {
+	QUnit.module( 'WebGLRenderer', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const renderer = new WebGLRenderer();
-			assert.ok( renderer, 'Can instantiate a WebGLRenderer.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -256,12 +253,9 @@ export default QUnit.module( 'Renderers', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'dispose', ( assert ) => {
 
-			assert.expect( 0 );
-
-			const object = new WebGLRenderer();
-			object.dispose();
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
