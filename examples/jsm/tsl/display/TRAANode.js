@@ -358,12 +358,15 @@ class TRAANode extends TempNode {
 
 		// Copy current depth to previous depth buffer
 		const currentDepth = this.depthNode.value;
-		if (this._previousDepthTexture.image.width !== currentDepth.width ||
+		if ( this._previousDepthTexture.image.width !== currentDepth.width ||
 			this._previousDepthTexture.image.height !== currentDepth.height ) {
+
 			this._previousDepthTexture.dispose();
 			this._previousDepthTexture = currentDepth.clone();
 			this._previousDepthNode.value = this._previousDepthTexture;
+
 		}
+
 		renderer.copyTextureToTexture( currentDepth, this._previousDepthTexture );
 
 		// restore
@@ -529,7 +532,9 @@ class TRAANode extends TempNode {
 		this._resolveRenderTarget.dispose();
 
 		if ( this._previousDepthTexture ) {
+
 			this._previousDepthTexture.dispose();
+
 		}
 
 		this._resolveMaterial.dispose();
