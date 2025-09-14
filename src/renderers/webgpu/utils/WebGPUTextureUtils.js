@@ -89,7 +89,7 @@ class WebGPUTextureUtils {
 
 		this.frameBufferData = {
 			color: {
-				buffer: null, // TODO: Move to Texture
+				buffer: null, // TODO: Move to FramebufferTexture
 				width: 0,
 				height: 0,
 				samples: 0
