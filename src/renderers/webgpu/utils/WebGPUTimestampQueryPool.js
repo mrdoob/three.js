@@ -209,7 +209,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 			}
 
 			// Return the total duration of the last frame
-			const totalDuration = framesDuration[ this.frames[ this.frames.length - 1 ] ];
+			const totalDuration = framesDuration[ frames[ frames.length - 1 ] ];
 
 			this.resultBuffer.unmap();
 			this.lastValue = totalDuration;

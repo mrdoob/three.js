@@ -244,7 +244,7 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 			}
 
 			// Return the total duration of the last frame
-			const totalDuration = framesDuration[ this.frames[ this.frames.length - 1 ] ];
+			const totalDuration = framesDuration[ frames[ frames.length - 1 ] ];
 
 			// Store the last valid result
 			this.lastValue = totalDuration;
