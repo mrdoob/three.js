@@ -2687,6 +2687,8 @@ class Renderer {
 
 		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext, rectangle );
 
+		this._inspector.copyFramebufferToTexture( framebufferTexture );
+
 	}
 
 	/**
@@ -2705,6 +2707,8 @@ class Renderer {
 		this._textures.updateTexture( dstTexture );
 
 		this.backend.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, srcLevel, dstLevel );
+
+		this._inspector.copyTextureToTexture( srcTexture, dstTexture );
 
 	}
 

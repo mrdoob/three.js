@@ -119,6 +119,21 @@ class InspectorBase {
 	 */
 	finishRender( /*uid*/ ) { }
 
+	/**
+	 * Called when a texture copy operation is performed.
+	 *
+	 * @param {Texture} srcTexture - The source texture.
+	 * @param {Texture} dstTexture - The destination texture.
+	 */
+	copyTextureToTexture( /*srcTexture, dstTexture*/ ) { }
+
+	/**
+	 * Called when a framebuffer copy operation is performed.
+	 *
+	 * @param {Texture} framebufferTexture - The texture associated with the framebuffer.
+	 */
+	copyFramebufferToTexture( /*framebufferTexture*/ ) { }
+
 }
 
 export default InspectorBase;
