@@ -109,6 +109,8 @@ class Performance extends Tab {
 
 		} else {
 
+			item.userData.name = stats.name;
+
 			if ( this.notInUse.has( stats.cid ) ) {
 
 				item.domElement.firstElementChild.classList.remove( 'alert' );
