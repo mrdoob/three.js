@@ -278,7 +278,7 @@ export class Style {
 	cursor: pointer;
 }
 
-.list-item-row.collapsible.open {
+.list-item-row.collapsible {
 	background-color: rgba(0, 170, 255, 0.15) !important;
 }
 
@@ -289,16 +289,15 @@ export class Style {
 
 @media (hover: hover) {
 
-	.list-item-row.collapsible:hover,
-	.list-item-row.collapsible.open:hover {
-		background-color: rgba(0, 170, 255, 0.25) !important;
-	}
-
 	.list-item-row:hover:not(.collapsible):not(.no-hover),
 	.list-item-row:hover:not(.no-hover),
 	.list-item-row.actionable:hover,
-	.list-item-row.collapsible.open.actionable:hover {
+	.list-item-row.collapsible.actionable:hover {
 		background-color: rgba(255, 255, 255, 0.05) !important;
+	}
+
+	.list-item-row.collapsible:hover {
+		background-color: rgba(0, 170, 255, 0.25) !important;
 	}
 
 }
