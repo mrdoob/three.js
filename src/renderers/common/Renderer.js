@@ -118,6 +118,7 @@ class Renderer {
 		/**
 		 * The number of MSAA samples.
 		 *
+		 * @private
 		 * @type {number}
 		 * @default 0
 		 */
@@ -2247,6 +2248,7 @@ class Renderer {
 	 * The number of samples used for multi-sample anti-aliasing (MSAA).
 	 *
 	 * @type {number}
+	 * @default 0
 	 */
 	get samples() {
 
