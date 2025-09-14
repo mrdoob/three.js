@@ -24,6 +24,8 @@ export const PCFShadowFilter = TSL.PCFShadowFilter;
 export const PCFSoftShadowFilter = TSL.PCFSoftShadowFilter;
 export const PI = TSL.PI;
 export const PI2 = TSL.PI2;
+export const TWO_PI = TSL.TWO_PI;
+export const HALF_PI = TSL.HALF_PI;
 export const PointShadowFilter = TSL.PointShadowFilter;
 export const Return = TSL.Return;
 export const Schlick_to_F0 = TSL.Schlick_to_F0;
@@ -179,6 +181,8 @@ export const faceDirection = TSL.faceDirection;
 export const faceForward = TSL.faceForward;
 export const faceforward = TSL.faceforward;
 export const float = TSL.float;
+export const floatBitsToInt = TSL.floatBitsToInt;
+export const floatBitsToUint = TSL.floatBitsToUint;
 export const floor = TSL.floor;
 export const fog = TSL.fog;
 export const fract = TSL.fract;
@@ -221,6 +225,7 @@ export const instancedBufferAttribute = TSL.instancedBufferAttribute;
 export const instancedDynamicBufferAttribute = TSL.instancedDynamicBufferAttribute;
 export const instancedMesh = TSL.instancedMesh;
 export const int = TSL.int;
+export const intBitsToFloat = TSL.intBitsToFloat;
 export const inverse = TSL.inverse;
 export const inverseSqrt = TSL.inverseSqrt;
 export const inversesqrt = TSL.inversesqrt;
@@ -467,6 +472,7 @@ export const saturate = TSL.saturate;
 export const saturation = TSL.saturation;
 export const screen = TSL.screen;
 export const screenCoordinate = TSL.screenCoordinate;
+export const screenDPR = TSL.screenDPR;
 export const screenSize = TSL.screenSize;
 export const screenUV = TSL.screenUV;
 export const scriptable = TSL.scriptable;
@@ -562,6 +568,7 @@ export const triplanarTexture = TSL.triplanarTexture;
 export const triplanarTextures = TSL.triplanarTextures;
 export const trunc = TSL.trunc;
 export const uint = TSL.uint;
+export const uintBitsToFloat = TSL.uintBitsToFloat;
 export const uniform = TSL.uniform;
 export const uniformArray = TSL.uniformArray;
 export const uniformCubeTexture = TSL.uniformCubeTexture;
@@ -618,5 +625,5 @@ for ( const key of Object.keys( THREE.TSL ) ) {
 
 }
 
-console.log( code );
+log( code );
 //*/

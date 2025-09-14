@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import { warn } from '../../utils.js';
 
 /**
  * Base class for representing member access on an object-like
@@ -100,7 +101,7 @@ class MemberNode extends Node {
 
 		if ( this.hasMember( builder ) === false ) {
 
-			console.warn( `THREE.TSL: Member "${ this.property }" does not exist in struct.` );
+			warn( `TSL: Member "${ this.property }" does not exist in struct.` );
 
 			const type = this.getNodeType( builder );
 

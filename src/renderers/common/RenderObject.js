@@ -770,7 +770,7 @@ class RenderObject {
 
 		}
 
-		if ( object.count > 1 ) {
+		if ( object.isInstancedMesh || object.count > 1 ) {
 
 			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
 

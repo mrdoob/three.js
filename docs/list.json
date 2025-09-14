@@ -358,6 +358,7 @@
 				"OBJLoader": "examples/en/loaders/OBJLoader",
 				"PCDLoader": "examples/en/loaders/PCDLoader",
 				"PDBLoader": "examples/en/loaders/PDBLoader",
+				"PLYLoader": "examples/en/loaders/PLYLoader",
 				"SVGLoader": "examples/en/loaders/SVGLoader",
 				"TGALoader": "examples/en/loaders/TGALoader"
 			},
@@ -1041,6 +1042,14 @@
 
 			"灯光": {
 				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
+			},
+
+			"线段": {
+				"Line2": "examples/zh/lines/Line2",
+				"LineGeometry": "examples/en/lines/LineGeometry",
+				"LineMaterial": "examples/en/lines/LineMaterial",
+				"LineSegments2": "examples/en/lines/LineSegments2",
+				"LineSegmentsGeometry": "examples/en/lines/LineSegmentsGeometry"
 			},
 
 			"加载器": {

@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity } from 'three/tsl';
+			import { pass, mrt, output, normalView, velocity, vec3, vec4 } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -45,17 +45,13 @@
 			let aoPass, traaPass, blendPassAO, scenePassColor;
 
 			const params = {
+				samples: 16,
 				distanceExponent: 1,
 				distanceFallOff: 1,
 				radius: 0.25,
 				scale: 1,
 				thickness: 1,
-				denoised: false,
-				enabled: true,
-				denoiseRadius: 5,
-				lumaPhi: 5,
-				depthPhi: 5,
-				normalPhi: 5
+				aoOnly: false
 			};
 
 			init();
@@ -116,12 +112,11 @@
 
 				aoPass = ao( scenePassDepth, scenePassNormal, camera );
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
-				blendPassAO = aoPass.getTextureNode().mul( scenePassColor );
+				blendPassAO = vec4( scenePassColor.rgb.mul( aoPass.r ), scenePassColor.a ); // the AO is stored only in the red channel
 
 				// traa
 
 				traaPass = traa( blendPassAO, scenePassDepth, scenePassVelocity, camera );
-
 				postProcessing.outputNode = traaPass;
 
 				//
@@ -158,16 +153,34 @@
 
 				const gui = new GUI();
 				gui.title( 'AO settings' );
-				gui.add( params, 'distanceExponent' ).min( 1 ).max( 4 ).onChange( updateParameters );
+				gui.add( params, 'samples' ).min( 4 ).max( 32 ).step( 1 ).onChange( updateParameters );
+				gui.add( params, 'distanceExponent' ).min( 1 ).max( 2 ).onChange( updateParameters );
 				gui.add( params, 'distanceFallOff' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
 				gui.add( params, 'radius' ).min( 0.1 ).max( 1 ).onChange( updateParameters );
 				gui.add( params, 'scale' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
 				gui.add( params, 'thickness' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
+				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
+
+					if ( value === true ) {
+
+						postProcessing.outputNode = vec4( vec3( aoPass.r ), 1 );
+
+					} else {
+
+
+						postProcessing.outputNode = traaPass;
+
+					}
+
+					postProcessing.needsUpdate = true;
+
+				} );
 
 			}
 
 			function updateParameters() {
 
+				aoPass.samples.value = params.samples;
 				aoPass.distanceExponent.value = params.distanceExponent;
 				aoPass.distanceFallOff.value = params.distanceFallOff;
 				aoPass.radius.value = params.radius;

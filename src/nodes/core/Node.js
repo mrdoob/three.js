@@ -3,6 +3,7 @@ import { getNodeChildren, getCacheKey, hash } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
+import { warn, error } from '../../utils.js';
 
 const _parentBuildStage = {
 	analyze: 'setup',
@@ -81,6 +82,14 @@ class Node extends EventDispatcher {
 		 * @default 0
 		 */
 		this.version = 0;
+
+		/**
+		 * The name of the node.
+		 *
+		 * @type {string}
+		 * @default ''
+		 */
+		this.name = '';
 
 		/**
 		 * Whether this node is global or not. This property is relevant for the internal
@@ -549,7 +558,7 @@ class Node extends EventDispatcher {
 	 * This state builds the output node and returns the resulting shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {?string} output - Can be used to define the output type.
+	 * @param {?string} [output] - Can be used to define the output type.
 	 * @return {?string} The generated shader string.
 	 */
 	generate( builder, output ) {
@@ -574,7 +583,7 @@ class Node extends EventDispatcher {
 	 */
 	updateBefore( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -588,7 +597,7 @@ class Node extends EventDispatcher {
 	 */
 	updateAfter( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -602,7 +611,7 @@ class Node extends EventDispatcher {
 	 */
 	update( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -613,8 +622,8 @@ class Node extends EventDispatcher {
 	 * - **generate**: Generates the shader code for the node. Returns the generated shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {string|Node|null} [output=null] - Can be used to define the output type.
-	 * @return {Node|string|null} The result of the build process, depending on the build stage.
+	 * @param {?(string|Node)} [output=null] - Can be used to define the output type.
+	 * @return {?(Node|string)} The result of the build process, depending on the build stage.
 	 */
 	build( builder, output = null ) {
 
@@ -731,7 +740,7 @@ class Node extends EventDispatcher {
 
 					} else {
 
-						console.warn( 'THREE.Node: Recursion detected.', this );
+						warn( 'Node: Recursion detected.', this );
 
 						result = '/* Recursion detected. */';
 
@@ -755,7 +764,7 @@ class Node extends EventDispatcher {
 
 				// if no snippet is generated, return a default value
 
-				console.error( `THREE.TSL: Invalid generated code, expected a "${ output }".` );
+				error( `TSL: Invalid generated code, expected a "${ output }".` );
 
 				result = builder.generateConst( output );
 
@@ -773,7 +782,7 @@ class Node extends EventDispatcher {
 	/**
 	 * Returns the child nodes as a JSON object.
 	 *
-	 * @return {Array<Object>} An iterable list of serialized child objects as JSON.
+	 * @return {Generator<Object>} An iterable list of serialized child objects as JSON.
 	 */
 	getSerializeChildren() {
 

@@ -1,6 +1,7 @@
 import { AudioContext } from '../audio/AudioContext.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
+import { error } from '../utils.js';
 
 /**
  * Class for loading audio buffers. Audios are internally
@@ -81,7 +82,7 @@ class AudioLoader extends Loader {
 
 			} else {
 
-				console.error( e );
+				error( e );
 
 			}
 

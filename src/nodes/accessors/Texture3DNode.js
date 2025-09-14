@@ -153,7 +153,7 @@ class Texture3DNode extends TextureNode {
 	 */
 	generateUV( builder, uvNode ) {
 
-		return uvNode.build( builder, 'vec3' );
+		return uvNode.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
 
 	}
 

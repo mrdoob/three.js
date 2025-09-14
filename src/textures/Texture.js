@@ -15,6 +15,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Source } from './Source.js';
+import { warn } from '../utils.js';
 
 let _textureId = 0;
 
@@ -521,7 +522,7 @@ class Texture extends EventDispatcher {
 
 			if ( newValue === undefined ) {
 
-				console.warn( `THREE.Texture.setValues(): parameter '${ key }' has value of undefined.` );
+				warn( `Texture.setValues(): parameter '${ key }' has value of undefined.` );
 				continue;
 
 			}
@@ -530,7 +531,7 @@ class Texture extends EventDispatcher {
 
 			if ( currentValue === undefined ) {
 
-				console.warn( `THREE.Texture.setValues(): property '${ key }' does not exist.` );
+				warn( `Texture.setValues(): property '${ key }' does not exist.` );
 				continue;
 
 			}

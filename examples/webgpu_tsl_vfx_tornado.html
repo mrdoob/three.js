@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { luminance, cos, min, time, atan, uniform, pass, PI, PI2, color, positionLocal, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { luminance, cos, min, time, atan, uniform, pass, PI, TWO_PI, color, positionLocal, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -59,7 +59,7 @@
 					const centeredUv = uv.sub( 0.5 ).toVar();
 					const distanceToCenter = centeredUv.length();
 					const angle = atan( centeredUv.y, centeredUv.x );
-					const radialUv = vec2( angle.add( PI ).div( PI2 ), distanceToCenter ).toVar();
+					const radialUv = vec2( angle.add( PI ).div( TWO_PI ), distanceToCenter ).toVar();
 					radialUv.mulAssign( multiplier );
 					radialUv.x.addAssign( rotation );
 					radialUv.y.addAssign( offset );

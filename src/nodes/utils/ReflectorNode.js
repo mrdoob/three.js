@@ -164,6 +164,7 @@ class ReflectorNode extends TextureNode {
 		newNode.depthNode = this.depthNode;
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
+		newNode.offsetNode = this.offsetNode;
 		newNode._reflectorBaseNode = this._reflectorBaseNode;
 
 		return newNode;
@@ -250,7 +251,7 @@ class ReflectorBaseNode extends Node {
 
 		if ( parameters.resolution !== undefined ) {
 
-			warnOnce( 'THREE.ReflectorNode: The "resolution" parameter has been renamed to "resolutionScale".' ); // @deprecated r180
+			warnOnce( 'ReflectorNode: The "resolution" parameter has been renamed to "resolutionScale".' ); // @deprecated r180
 
 			this.resolutionScale = parameters.resolution;
 
@@ -586,7 +587,7 @@ class ReflectorBaseNode extends Node {
 	 */
 	get resolution() {
 
-		warnOnce( 'THREE.ReflectorNode: The "resolution" property has been renamed to "resolutionScale".' ); // @deprecated r180
+		warnOnce( 'ReflectorNode: The "resolution" property has been renamed to "resolutionScale".' ); // @deprecated r180
 
 		return this.resolutionScale;
 
@@ -594,7 +595,7 @@ class ReflectorBaseNode extends Node {
 
 	set resolution( value ) {
 
-		warnOnce( 'THREE.ReflectorNode: The "resolution" property has been renamed to "resolutionScale".' ); // @deprecated r180
+		warnOnce( 'ReflectorNode: The "resolution" property has been renamed to "resolutionScale".' ); // @deprecated r180
 
 		this.resolutionScale = value;
 
