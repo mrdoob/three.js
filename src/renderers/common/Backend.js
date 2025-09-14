@@ -273,20 +273,13 @@ class Backend {
 	// textures
 
 	/**
-	 * Creates a GPU sampler for the given texture.
+	 * Updates a GPU sampler for the given texture.
 	 *
 	 * @abstract
-	 * @param {Texture} texture - The texture to create the sampler for.
+	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @return {string} The current sampler key.
 	 */
-	createSampler( /*texture*/ ) { }
-
-	/**
-	 * Destroys the GPU sampler for the given texture.
-	 *
-	 * @abstract
-	 * @param {Texture} texture - The texture to destroy the sampler for.
-	 */
-	destroySampler( /*texture*/ ) {}
+	updateSampler( /*texture*/ ) { }
 
 	/**
 	 * Creates a default texture for the given texture that can be used
