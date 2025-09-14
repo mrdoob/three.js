@@ -17,6 +17,7 @@ import RenderBundles from './RenderBundles.js';
 import NodeLibrary from './nodes/NodeLibrary.js';
 import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
+import InspectorBase from './InspectorBase.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -269,6 +270,9 @@ class Renderer {
 
 		// internals
 
+		this._inspector = new InspectorBase();
+		this._inspector.setRenderer( this );
+
 		/**
 		 * This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
 		 *
@@ -442,7 +446,8 @@ class Renderer {
 		 * @type {QuadMesh}
 		 */
 		this._quad = new QuadMesh( new NodeMaterial() );
-		this._quad.material.name = 'Renderer_output';
+		this._quad.name = 'Output Color Transform';
+		this._quad.material.name = 'outputColorTransform';
 
 		/**
 		 * A reference to the current render context.
@@ -797,7 +802,7 @@ class Renderer {
 			}
 
 			this._nodes = new Nodes( this, backend );
-			this._animation = new Animation( this._nodes, this.info );
+			this._animation = new Animation( this, this._nodes, this.info );
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
 			this._geometries = new Geometries( this._attributes, this.info );
@@ -813,6 +818,12 @@ class Renderer {
 
 			this._animation.start();
 			this._initialized = true;
+
+			//
+
+			this._inspector.init();
+
+			//
 
 			resolve( this );
 
@@ -1001,6 +1012,32 @@ class Renderer {
 	async waitForGPU() {
 
 		await this.backend.waitForGPU();
+
+	}
+
+	//
+
+	/**
+	 * Sets the inspector instance. The inspector can be any class that extends from `InspectorBase`.
+	 *
+	 * @param {InspectorBase} value - The new inspector.
+	 */
+	set inspector( value ) {
+
+		if ( this._inspector !== null ) {
+
+			this._inspector.setRenderer( null );
+
+		}
+
+		this._inspector = value;
+		this._inspector.setRenderer( this );
+
+	}
+
+	get inspector() {
+
+		return this._inspector;
 
 	}
 
@@ -1210,6 +1247,18 @@ class Renderer {
 	}
 
 	/**
+	 * Returns whether the renderer has been initialized or not.
+	 *
+	 * @readonly
+	 * @return {boolean} Whether the renderer has been initialized or not.
+	 */
+	get initialized() {
+
+		return this._initialized;
+
+	}
+
+	/**
 	 * Returns an internal render target which is used when computing the output tone mapping
 	 * and color space conversion. Unlike in `WebGLRenderer`, this is done in a separate render
 	 * pass and not inline to achieve more correct results.
@@ -1291,6 +1340,8 @@ class Renderer {
 
 		if ( this._isDeviceLost === true ) return;
 
+		//
+
 		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
 		// preserve render tree
@@ -1340,6 +1391,12 @@ class Renderer {
 		this.info.render.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
+
+		//
+
+		this.backend.updateTimeStampUID( renderContext );
+
+		this.inspector.beginRender( this.backend.getTimestampUID( renderContext ), scene, camera, renderTarget );
 
 		//
 
@@ -1540,6 +1597,10 @@ class Renderer {
 
 		//
 
+		this.inspector.finishRender( this.backend.getTimestampUID( renderContext ) );
+
+		//
+
 		return renderContext;
 
 	}
@@ -1633,6 +1694,17 @@ class Renderer {
 		if ( this._initialized === false ) await this.init();
 
 		this._animation.setAnimationLoop( callback );
+
+	}
+
+	/**
+	 * Returns the current animation loop callback.
+	 *
+	 * @return {?Function} The current animation loop callback.
+	 */
+	getAnimationLoop() {
+
+		return this._animation.getAnimationLoop();
 
 	}
 
@@ -2372,6 +2444,12 @@ class Renderer {
 
 		//
 
+		this.backend.updateTimeStampUID( computeNodes );
+
+		this.inspector.beginCompute( this.backend.getTimestampUID( computeNodes ), computeNodes );
+
+		//
+
 		const backend = this.backend;
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
@@ -2433,6 +2511,10 @@ class Renderer {
 
 		nodeFrame.renderId = previousRenderId;
 
+		//
+
+		this.inspector.finishCompute( this.backend.getTimestampUID( computeNodes ) );
+
 	}
 
 	/**
@@ -2446,6 +2528,8 @@ class Renderer {
 	async computeAsync( computeNodes, dispatchSizeOrCount = null ) {
 
 		if ( this._initialized === false ) await this.init();
+
+		this._inspector.computeAsync( computeNodes, dispatchSizeOrCount );
 
 		this.compute( computeNodes, dispatchSizeOrCount );
 
@@ -2603,6 +2687,8 @@ class Renderer {
 
 		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext, rectangle );
 
+		this._inspector.copyFramebufferToTexture( framebufferTexture );
+
 	}
 
 	/**
@@ -2621,6 +2707,8 @@ class Renderer {
 		this._textures.updateTexture( dstTexture );
 
 		this.backend.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, srcLevel, dstLevel );
+
+		this._inspector.copyTextureToTexture( srcTexture, dstTexture );
 
 	}
 

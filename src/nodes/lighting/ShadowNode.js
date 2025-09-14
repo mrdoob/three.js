@@ -577,7 +577,13 @@ class ShadowNode extends ShadowBaseNode {
 
 		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
 
+		const currentSceneName = scene.name;
+
+		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
+
 		renderer.render( scene, shadow.camera );
+
+		scene.name = currentSceneName;
 
 	}
 

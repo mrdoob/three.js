@@ -570,10 +570,6 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		renderContextData.frameCalls = this.renderer.info.render.frameCalls;
-
-		//
-
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
@@ -1293,10 +1289,6 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		groupGPU.frameCalls = this.renderer.info.compute.frameCalls;
-
-		//
-
 		const descriptor = {
 			label: 'computeGroup_' + computeGroup.id
 		};
@@ -1949,7 +1941,7 @@ class WebGPUBackend extends Backend {
 			querySet: timestampQueryPool.querySet,
 			beginningOfPassWriteIndex: baseOffset,
 			endOfPassWriteIndex: baseOffset + 1,
-		  };
+		};
 
 	}
 

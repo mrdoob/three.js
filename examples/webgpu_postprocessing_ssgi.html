@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js WebGPU - SSGI</title>
+		<title>three.js webgpu - SSGI</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Post-Processing - SSGI<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSGI</span>
+			</div>
+
+			<small>Real-time indirect illumination and ambient occlusion using screen-space information.</small>
 		</div>
 
 		<script type="importmap">
@@ -32,10 +38,9 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls, stats;
+			let camera, scene, renderer, postProcessing, controls;
 
 			init();
 
@@ -54,8 +59,8 @@
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				document.body.appendChild( stats.domElement );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.inspector.domElement );
 
 				//
 
@@ -110,6 +115,7 @@
 				const ao = giPass.a;
 
 				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( gi ) ) ), scenePassColor.a );
+				compositePass.name = 'Composite';
 			
 				// traa
 
@@ -213,8 +219,7 @@
 
 				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
 
-				const gui = new GUI();
-				gui.title( 'SSGI settings' );
+				const gui = renderer.inspector.createParameters( 'SSGI settings' );
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
 				gui.add( giPass.sliceCount, 'value', 1, 4 ).step( 1 ).name( 'slice count' );
 				gui.add( giPass.stepCount, 'value', 1, 32 ).step( 1 ).name( 'step count' );
@@ -228,9 +233,7 @@
 				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
 				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
-				function updatePostprocessing() {
-
-					const value = params.output;
+				function updatePostprocessing( value ) {
 
 					if ( value === 1 ) {
 
@@ -273,8 +276,6 @@
 			function animate() {
 
 				controls.update();
-
-				stats.update();
 
 				postProcessing.render();
 

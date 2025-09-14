@@ -279,7 +279,13 @@ class PointShadowNode extends ShadowNode {
 
 			shadow.updateMatrices( light, vp );
 
+			const currentSceneName = scene.name;
+
+			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ vp + 1 }`;
+
 			renderer.render( scene, shadow.camera );
+
+			scene.name = currentSceneName;
 
 		}
 
