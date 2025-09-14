@@ -101,7 +101,7 @@ export class Style {
 	display: flex;
 	flex-direction: column;
 	z-index: 1000;
-	box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5);
+	/*box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5);*/
 	transform: translateY(100%);
 	transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), height 0.3s ease-out;
 	font-family: var(--font-mono);
