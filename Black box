@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>House of Black Boxes — Realistic Prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<style>
+  html,body{height:100%;margin:0;overflow:hidden;background:#0f0f10;font-family:Inter,Segoe UI,Roboto,Arial}
+  canvas{display:block}
+  #hud{
+    position: absolute; right:12px; top:12px; z-index:40;
+    background: rgba(0,0,0,0.45); color:#fff; padding:10px 14px; border-radius:10px; font-family:monospace;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  }
+  #overlay{
+    position:absolute; left:12px; top:12px; z-index:40; color:#fff;
+    background:rgba(0,0,0,0.28); padding:10px;border-radius:10px; font-size:13px; max-width:340px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  }
+  #instructions{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:50;
+    background:rgba(0,0,0,0.75); color:#fff; padding:18px; border-radius:12px; text-align:center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  }
+  /* Joystick (always visible) */
+  .joystick {
+    position: absolute; left:16px; bottom:18px; z-index:45;
+    width:140px; height:140px; border-radius:50%;
+    background: rgba(255,255,255,0.04); backdrop-filter: blur(4px);
+    display:flex; align-items:center; justify-content:center; touch-action:none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+  .stick {
+    width:56px; height:56px; border-radius:50%; background:rgba(255,255,255,0.08);
+    transform: translate(0,0); box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+  }
+  /* Buttons */
+  .buttons {
+    position:absolute; right:16px; bottom:22px; z-index:45; display:flex; flex-direction:column; gap:12px;
+  }
+  .btn {
+    width:92px; height:68px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; user-select:none;
+    touch-action:none; box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  }
+  .btn:active { transform: scale(0.98); }
+  #log{max-height:120px; overflow:auto; margin-top:8px; font-size:12px}
+  @media (min-width:900px){
+    .joystick{ width:120px; height:120px }
+    .stick{ width:48px; height:48px }
+  }
+  /* small crosshair */
+  .crosshair {
+    position:absolute; left:50%; top:50%; width:18px; height:18px; margin-left:-9px; margin-top:-9px; z-index:35;
+    pointer-events:none;
+  }
+  .crosshair:before, .crosshair:after {
+    content:''; position:absolute; left:50%; top:50%; width:2px; height:12px; background:rgba(255,255,255,0.85); transform:translate(-50%,-50%);
+  }
+  .crosshair:after { transform:translate(-50%,-50%) rotate(90deg); }
+</style>
+</head>
+<body>
+  <div id="overlay">
+    <strong>House of Black Boxes — Realistic Prototype</strong><br>
+    Move with joystick (left) or WASD. Look with mouse or drag right half of screen. Shoot: button/click. Pick: button/E.<br>
+    <div id="log"></div>
+  </div>
+  <div id="hud">lvl:1 rank:Trainee hp:100</div>
+
+  <div class="joystick" id="joy">
+    <div class="stick" id="stick"></div>
+  </div>
+
+  <div class="buttons">
+    <div class="btn" id="shootBtn">🔫 Shoot</div>
+    <div class="btn" id="pickBtn">📦 Pick</div>
+  </div>
+
+  <div class="crosshair"></div>
+
+  <div id="instructions">
+    Click Start to lock pointer on desktop (optional). On mobile, joystick and touch-look are active.<br><br>
+    <button id="btnStart">Start</button>
+  </div>
+
+<script type="module">
+// --- Imports ---
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.module.js';
+import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.153.0/examples/jsm/controls/PointerLockControls.js';
+
+const logEl = document.getElementById('log');
+function log(msg){ const d=document.createElement('div'); d.textContent=msg; logEl.prepend(d); }
+const hud = document.getElementById('hud');
+const btnStart = document.getElementById('btnStart');
+const shootBtn = document.getElementById('shootBtn');
+const pickBtn = document.getElementById('pickBtn');
+
+// --- Scene / Renderer ---
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0e0e10);
+
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+// Lights: directional (sun-like) + fill + spot for dramatic box highlight
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+dirLight.position.set(8, 20, 10);
+dirLight.castShadow = true;
+dirLight.shadow.camera.left = -50; dirLight.shadow.camera.right = 50; dirLight.shadow.camera.top = 50; dirLight.shadow.camera.bottom = -50;
+dirLight.shadow.mapSize.set(2048,2048);
+scene.add(dirLight);
+
+const ambient = new THREE.HemisphereLight(0xbfcfe6, 0x101010, 0.45);
+scene.add(ambient);
+
+// subtle rim light
+const rim = new THREE.PointLight(0xffffff, 0.12);
+rim.position.set(-10,8,-10);
+scene.add(rim);
+
+// --- Controls ---
+const controls = new PointerLockControls(camera, renderer.domElement);
+
+// pointer lock start button
+btnStart.addEventListener('click', ()=> controls.lock());
+controls.addEventListener('lock', ()=> { document.getElementById('instructions').style.display='none'; });
+controls.addEventListener('unlock', ()=> { document.getElementById('instructions').style.display='block'; });
+
+// --- Map generation (rooms grid with door connectivity) ---
+const rows = 4, cols = 5;
+const roomSize = 14;
+const wallHeight = 5;
+const wallThickness = 0.5;
+const map = [];
+function rand(n){ return Math.floor(Math.random()*n); }
+function choose(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function genMap(){
+  for(let r=0;r<rows;r++){
+    const row=[];
+    for(let c=0;c<cols;c++) row.push({doors:{n:false,e:false,s:false,w:false}, box:null, r,c});
+    map.push(row);
+  }
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(r>0 && Math.random()<0.28){ map[r][c].doors.n=true; map[r-1][c].doors.s=true; }
+    if(c<cols-1 && Math.random()<0.28){ map[r][c].doors.e=true; map[r][c+1].doors.w=true; }
+    if(r<rows-1 && Math.random()<0.28){ map[r][c].doors.s=true; map[r+1][c].doors.n=true; }
+    if(c>0 && Math.random()<0.28){ map[r][c].doors.w=true; map[r][c-1].doors.e=true; }
+  }
+  // no isolated rooms
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const m = map[r][c];
+    if(!m.doors.n && !m.doors.e && !m.doors.s && !m.doors.w){
+      const choices=[]; if(r>0) choices.push('n'); if(c<cols-1) choices.push('e'); if(r<rows-1) choices.push('s'); if(c>0) choices.push('w');
+      const pick = choose(choices);
+      m.doors[pick]=true;
+      if(pick==='n') map[r-1][c].doors.s=true;
+      if(pick==='e') map[r][c+1].doors.w=true;
+      if(pick==='s') map[r+1][c].doors.n=true;
+      if(pick==='w') map[r][c-1].doors.e=true;
+    }
+  }
+}
+genMap();
+
+// --- Texture generator for floor (canvas) ---
+function makeFloorTexture(){
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#3a3a3a'; ctx.fillRect(0,0,size,size);
+  ctx.fillStyle = '#2f2f2f';
+  for(let y=0;y<size;y+=64){
+    for(let x=0;x<size;x+=64){
+      ctx.fillRect(x+2,y+2,60,60);
+    }
+  }
+  // subtle noise
+  const img = ctx.getImageData(0,0,size,size);
+  for(let i=0;i<img.data.length;i+=4){
+    const v = Math.random()*8;
+    img.data[i] += v; img.data[i+1] += v; img.data[i+2] += v;
+  }
+  ctx.putImageData(img,0,0);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(4,4);
+  return tex;
+}
+const floorTex = makeFloorTexture();
+
+// --- Build rooms: floors + walls, and store wall bounding boxes for collision ---
+const floorMat = new THREE.MeshStandardMaterial({map:floorTex, roughness:1, metalness:0});
+const wallMat = new THREE.MeshStandardMaterial({color:0x5a5a5a, roughness:0.95, metalness:0.02});
+const wallBoxes = []; // THREE.Box3 list used for collisions
+
+function addWallMesh(mesh){
+  mesh.receiveShadow = true; mesh.castShadow = true; scene.add(mesh);
+  mesh.updateMatrixWorld();
+  const box = new THREE.Box3().setFromObject(mesh);
+  wallBoxes.push(box);
+}
+
+function buildRooms(){
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const cell = map[r][c];
+      const cx = (c - cols/2 + 0.5) * roomSize;
+      const cz = (r - rows/2 + 0.5) * roomSize;
+      cell.floorPos = new THREE.Vector3(cx,0,cz);
+
+      // floor
+      const floor = new THREE.Mesh(new THREE.BoxGeometry(roomSize - wallThickness, 0.4, roomSize - wallThickness), floorMat);
+      floor.position.set(cx, -0.2, cz);
+      floor.receiveShadow = true;
+      scene.add(floor);
+
+      // wall helper
+      function addWall(x,y,z,sx,sy,sz){
+        const m = new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz), wallMat);
+        m.position.set(x,y,z); addWallMesh(m);
+      }
+
+      // north
+      if(!cell.doors.n){
+        addWall(cx, wallHeight/2, cz - roomSize/2 + wallThickness/2, roomSize, wallHeight, wallThickness);
+      } else {
+        const gap = roomSize*0.28, side = (roomSize - gap)/2;
+        addWall(cx - (gap+side)/2, wallHeight/2, cz - roomSize/2 + wallThickness/2, side, wallHeight, wallThickness);
+        addWall(cx + (gap+side)/2, wallHeight/2, cz - roomSize/2 + wallThickness/2, side, wallHeight, wallThickness);
+      }
+      // south
+      if(!cell.doors.s){
+        addWall(cx, wallHeight/2, cz + roomSize/2 - wallThickness/2, roomSize, wallHeight, wallThickness);
+      } else {
+        const gap = roomSize*0.28, side = (roomSize - gap)/2;
+        addWall(cx - (gap+side)/2, wallHeight/2, cz + roomSize/2 - wallThickness/2, side, wallHeight, wallThickness);
+        addWall(cx + (gap+side)/2, wallHeight/2, cz + roomSize/2 - wallThickness/2, side, wallHeight, wallThickness);
+      }
+      // west
+      if(!cell.doors.w){
+        addWall(cx - roomSize/2 + wallThickness/2, wallHeight/2, cz, wallThickness, wallHeight, roomSize);
+      } else {
+        const gap = roomSize*0.28, side = (roomSize - gap)/2;
+        addWall(cx - roomSize/2 + wallThickness/2, wallHeight/2, cz - (gap+side)/2, wallThickness, wallHeight, side);
+        addWall(cx - roomSize/2 + wallThickness/2, wallHeight/2, cz + (gap+side)/2, wallThickness, wallHeight, side);
+      }
+      // east
+      if(!cell.doors.e){
+        addWall(cx + roomSize/2 - wallThickness/2, wallHeight/2, cz, wallThickness, wallHeight, roomSize);
+      } else {
+        const gap = roomSize*0.28, side = (roomSize - gap)/2;
+        addWall(cx + roomSize/2 - wallThickness/2, wallHeight/2, cz - (gap+side)/2, wallThickness, wallHeight, side);
+        addWall(cx + roomSize/2 - wallThickness/2, wallHeight/2, cz + (gap+side)/2, wallThickness, wallHeight, side);
+      }
+    }
+  }
+}
+buildRooms();
+
+// border walls to keep player inside
+(function buildBorder(){
+  const geomX = new THREE.BoxGeometry(cols*roomSize + 6, wallHeight, 2);
+  const m1 = new THREE.Mesh(geomX, wallMat); m1.position.set(0, wallHeight/2, - (rows*roomSize)/2 - 3); addWallMesh(m1);
+  const m2 = new THREE.Mesh(geomX, wallMat); m2.position.set(0, wallHeight/2, (rows*roomSize)/2 + 3); addWallMesh(m2);
+  const geomZ = new THREE.BoxGeometry(2, wallHeight, rows*roomSize + 6);
+  const m3 = new THREE.Mesh(geomZ, wallMat); m3.position.set(- (cols*roomSize)/2 - 3, wallHeight/2, 0); addWallMesh(m3);
+  const m4 = new THREE.Mesh(geomZ, wallMat); m4.position.set((cols*roomSize)/2 + 3, wallHeight/2, 0); addWallMesh(m4);
+})();
+
+// --- Boxes (hidden until close) ---
+const boxMat = new THREE.MeshStandardMaterial({color:0x060606, roughness:0.2, metalness:0.1});
+const boxGlowMat = new THREE.MeshStandardMaterial({color:0x111111, emissive:0x222222, emissiveIntensity:0.8, roughness:0.1});
+function placeBoxes(){
+  const num = Math.max(4, Math.floor(rows*cols*0.18));
+  let placed=0;
+  while(placed < num){
+    const r = rand(rows), c = rand(cols);
+    const cell = map[r][c]; if(cell.box) { continue; }
+    if(r===0 && c===0) continue; // avoid spawn
+    const b = new THREE.Mesh(new THREE.BoxGeometry(1.6,1.6,1.6), boxMat);
+    b.position.copy(cell.floorPos).add(new THREE.Vector3(Math.random()*3-1.5,0.9,Math.random()*3-1.5));
+    b.userData = { type: Math.random()>0.94?'gold' : (Math.random()>0.7?'silver' : 'normal'), value:0 };
+    if(b.userData.type==='normal') b.userData.value = 1;
+    if(b.userData.type==='silver') b.userData.value = 3;
+    if(b.userData.type==='gold') b.userData.value = 7;
+    b.castShadow = true; b.receiveShadow = true;
+    b.visible = false;
+    scene.add(b);
+    cell.box = b;
+    placed++;
+  }
+}
+placeBoxes();
+
+// --- Bots with room-based pathfinding (BFS) and improved behavior ---
+class Bot {
+  constructor(name, r, c){
+    this.name = name; this.r=r; this.c=c; this.hp=100; this.alive=true;
+    const mat = new THREE.MeshStandardMaterial({color:0xff6b6b, roughness:0.6, metalness:0});
+    this.mesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.6, 0.8, 4, 8), mat);
+    this.mesh.position.copy(map[r][c].floorPos).add(new THREE.Vector3(Math.random()*2-1,0.9,Math.random()*2-1));
+    this.mesh.castShadow = true; this.mesh.receiveShadow = true;
+    scene.add(this.mesh);
+    this.path = []; // array of cells to travel to
+    this.targetTimer = 0;
+  }
+  step(dt){
+    if(!this.alive) return;
+    // if player in same room -> attack occasionally
+    const pr = getPlayerRoom();
+    if(pr && pr.r===this.r && pr.c===this.c){
+      if(Math.random() < 0.02) { player.hp -= 6; log(`${this.name} shot you (-6 hp)`); }
+      return;
+    }
+    // if path is empty occasionally choose a target (either wander or chase if player nearby)
+    this.targetTimer -= dt;
+    if(this.targetTimer <= 0){
+      this.targetTimer = 1.0 + Math.random()*2.0;
+      const playerRoom = getPlayerRoom();
+      if(playerRoom && Math.abs(playerRoom.r - this.r) + Math.abs(playerRoom.c - this.c) <= 3 && Math.random() < 0.6){
+        // compute BFS path to player
+        this.path = findPath({r:this.r,c:this.c}, playerRoom) || [];
+      } else {
+        // wander to random neighbor or two rooms away
+        const choices = [];
+        const cell = map[this.r][this.c];
+        if(cell.doors.n) choices.push({r:this.r-1,c:this.c});
+        if(cell.doors.s) choices.push({r:this.r+1,c:this.c});
+        if(cell.doors.e) choices.push({r:this.r,c:this.c+1});
+        if(cell.doors.w) choices.push({r:this.r,c:this.c-1});
+        if(choices.length) this.path = [ choose(choices) ];
+      }
+    }
+    // follow path
+    if(this.path && this.path.length){
+      const next = this.path[0];
+      const targetPos = map[next.r][next.c].floorPos.clone().add(new THREE.Vector3( Math.random()*2-1, 0.9, Math.random()*2-1 ));
+      const delta = targetPos.clone().sub(this.mesh.position); delta.y = 0;
+      const speed = 1.2;
+      if(delta.length() < 0.15){
+        // arrived at next cell
+        this.r = next.r; this.c = next.c;
+        this.path.shift();
+      } else {
+        delta.normalize();
+        // move while checking collisions with walls (simple)
+        const proposed = this.mesh.position.clone().add(delta.multiplyScalar(speed * dt));
+        if(!testCollisionSphere(proposed, 0.6)) this.mesh.position.copy(proposed); // safe
+        else { this.path = []; } // recompute later
+      }
+      // subtle orientation
+      if(delta.length()>0.001) this.mesh.lookAt(this.mesh.position.clone().add(delta));
+    }
+  }
+}
+
+let bots = [];
+function spawnBots(n=4){
+  bots.forEach(b => scene.remove(b.mesh));
+  bots=[];
+  let created=0;
+  while(created<n){
+    const r = rand(rows), c = rand(cols);
+    if(r===0 && c===0) continue;
+    bots.push(new Bot('Agent_'+(created+1), r, c));
+    created++;
+  }
+}
+spawnBots(4);
+
+// --- Player state ---
+const player = { hp: 120, level:1, rankIndex:0, rankNames:['Trainee','Operative','Specialist','Commander','Director'], gunDamage: 18 };
+
+// place player in map[0][0]
+function placePlayer(){
+  const start = map[0][0].floorPos.clone();
+  controls.getObject().position.set(start.x, 1.6, start.z);
+}
+placePlayer();
+
+// --- Collision system ---
+// wallBoxes already contains Box3 for each wall mesh
+// We'll use a capsule/sphere for player collision tests
+function testCollisionSphere(pos, radius){
+  // check against wallBoxes
+  const pBox = new THREE.Box3(new THREE.Vector3(pos.x - radius, pos.y - 0.9, pos.z - radius), new THREE.Vector3(pos.x + radius, pos.y + 0.9, pos.z + radius));
+  for(const wb of wallBoxes){
+    if(wb.intersectsBox(pBox)) return true;
+  }
+  return false;
+}
+
+// small helper to test movement: given current pos and delta, check whether allowed
+function movePlayerBy(delta){
+  const obj = controls.getObject();
+  const proposed = obj.position.clone().add(delta);
+  if(!testCollisionSphere(proposed, 0.5)){
+    obj.position.copy(proposed);
+    return true;
+  }
+  return false;
+}
+
+// --- Raycast for shooting / hit detection ---
+const raycaster = new THREE.Raycaster();
+function shoot(){
+  const origin = controls.getObject().position.clone();
+  const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
+  raycaster.set(origin, dir);
+  const intersects = raycaster.intersectObjects(scene.children, true);
+  for(const it of intersects){
+    // hit bot
+    for(const b of bots){
+      if(b.mesh === it.object || b.mesh === it.object.parent){
+        if(b.alive){
+          b.hp -= player.gunDamage;
+          log(`You hit ${b.name} (-${player.gunDamage})`);
+          if(b.hp <= 0){ b.alive=false; scene.remove(b.mesh); log(`${b.name} eliminated`); }
+        }
+        return;
+      }
+    }
+    // hit box
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+      const cell = map[r][c];
+      if(cell.box && (cell.box === it.object || cell.box === it.object.parent)){
+        pickupBoxAt(r,c);
+        return;
+      }
+    }
+    // else we hit wall/floor: stop
+    break;
+  }
+}
+
+// pickup
+function pickupBoxAt(r,c){
+  const cell = map[r][c]; if(!cell.box) return;
+  const dist = controls.getObject().position.distanceTo(cell.box.position);
+  const pr = getPlayerRoom();
+  if(pr && pr.r===r && pr.c===c && dist < 5){
+    const val = cell.box.userData.value;
+    player.level += val;
+    if(player.level >= 12) player.rankIndex = 4;
+    else if(player.level >= 8) player.rankIndex = 3;
+    else if(player.level >= 5) player.rankIndex = 2;
+    else if(player.level >= 3) player.rankIndex = 1;
+    hud.innerHTML = `lvl:${player.level} rank:${player.rankNames[player.rankIndex]} hp:${player.hp}`;
+    log(`Picked ${cell.box.userData.type} box (+${val}) -> lvl ${player.level}`);
+    scene.remove(cell.box); cell.box = null;
+  } else {
+    log('Too far to pick up');
+  }
+}
+
+// reveal boxes near player
+function revealBoxesNearPlayer(){
+  const pr = getPlayerRoom(); if(!pr) return;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const cell = map[r][c];
+    if(cell.box){
+      const d = controls.getObject().position.distanceTo(cell.box.position);
+      if((pr.r===r && pr.c===c) || d < 8){
+        cell.box.visible = true;
+        cell.box.material = boxGlowMat;
+      } else {
+        cell.box.visible = false;
+      }
+    }
+  }
+}
+
+// --- Pathfinding (BFS) between room cells using door connectivity ---
+function findPath(start, goal){
+  const key = (p)=> `${p.r},${p.c}`;
+  const q = [start];
+  const cameFrom = {};
+  cameFrom[key(start)] = null;
+  while(q.length){
+    const cur = q.shift();
+    if(cur.r===goal.r && cur.c===goal.c) {
+      // reconstruct
+      const path = [];
+      let curKey = key(cur);
+      while(cameFrom[curKey]){
+        const prev = cameFrom[curKey];
+        path.unshift(cur);
+        cur = prev;
+        curKey = key(cur);
+      }
+      return path;
+    }
+    const neighbors = [];
+    const m = map[cur.r][cur.c];
+    if(m.doors.n) neighbors.push({r:cur.r-1,c:cur.c});
+    if(m.doors.s) neighbors.push({r:cur.r+1,c:cur.c});
+    if(m.doors.e) neighbors.push({r:cur.r,c:cur.c+1});
+    if(m.doors.w) neighbors.push({r:cur.r,c:cur.c-1});
+    for(const n of neighbors){
+      const nKey = key(n);
+      if(!(nKey in cameFrom)){
+        cameFrom[nKey] = cur;
+        q.push(n);
+      }
+    }
+  }
+  return null;
+}
+
+// --- Player room detection ---
+function worldToCell(pos){
+  let best=null; let bestD=1e9;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const d = pos.distanceTo(map[r][c].floorPos);
+    if(d < bestD){ bestD = d; best = {r,c}; }
+  }
+  return best;
+}
+function getPlayerRoom(){ return worldToCell(controls.getObject().position); }
+
+// --- Bots spawn ---
+function spawnBots(n=4){
+  bots.forEach(b => { if(b.mesh) scene.remove(b.mesh); });
+  bots = [];
+  let s=0;
+  while(s<n){
+    const r=rand(rows), c=rand(cols); if(r===0 && c===0) continue;
+    bots.push(new Bot('Agent_'+(s+1), r, c));
+    s++;
+  }
+}
+spawnBots(4);
+
+// --- Joystick and input handlers (mobile & pc) ---
+const joy = document.getElementById('joy'), stick = document.getElementById('stick');
+let joyActive=false; let joyVec = {x:0,y:0};
+function setStickFromTouch(clientX, clientY){
+  const rect = joy.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  const dx = clientX - cx;
+  const dy = clientY - cy;
+  const max = rect.width/2 - 12;
+  let nx = Math.max(-1, Math.min(1, dx/max));
+  let ny = Math.max(-1, Math.min(1, dy/max));
+  nx = Math.abs(nx) < 0.05 ? 0 : nx;
+  ny = Math.abs(ny) < 0.05 ? 0 : ny;
+  joyVec.x = nx;
+  joyVec.y = -ny;
+  stick.style.transform = `translate(${nx * max}px, ${ny * max}px)`;
+}
+function resetStick(){ joyVec.x=0; joyVec.y=0; stick.style.transform = `translate(0px,0px)`; }
+joy.addEventListener('touchstart', (e)=>{ e.preventDefault(); joyActive=true; setStickFromTouch(e.touches[0].clientX, e.touches[0].clientY); });
+joy.addEventListener('touchmove', (e)=>{ e.preventDefault(); if(joyActive) setStickFromTouch(e.touches[0].clientX, e.touches[0].clientY); });
+joy.addEventListener('touchend', (e)=>{ e.preventDefault(); joyActive=false; resetStick(); });
+joy.addEventListener('mousedown', (e)=>{ e.preventDefault(); joyActive=true; setStickFromTouch(e.clientX,e.clientY); });
+window.addEventListener('mousemove', (e)=>{ if(joyActive) setStickFromTouch(e.clientX,e.clientY); });
+window.addEventListener('mouseup', (e)=>{ if(joyActive){ joyActive=false; resetStick(); } });
+
+// buttons
+shootBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); shoot(); });
+pickBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); const pr=getPlayerRoom(); if(pr) pickupBoxAt(pr.r, pr.c); });
+shootBtn.addEventListener('mousedown', ()=> shoot());
+pickBtn.addEventListener('mousedown', ()=> { const pr=getPlayerRoom(); if(pr) pickupBoxAt(pr.r, pr.c); });
+
+// keyboard
+const keys = {};
+window.addEventListener('keydown', (e)=>{ keys[e.key.toLowerCase()] = true; if(e.key==='e' || e.key==='E'){ const pr=getPlayerRoom(); if(pr) pickupBoxAt(pr.r, pr.c); }});
+window.addEventListener('keyup', (e)=>{ keys[e.key.toLowerCase()] = false; });
+
+// touch-look on right half
+let touchLookActive=false, lastTouch=null;
+const lookSensitivity = 0.004;
+renderer.domElement.addEventListener('touchstart', (e)=>{
+  if(e.touches.length===1){
+    const t = e.touches[0];
+    if(t.clientX > window.innerWidth * 0.45){
+      touchLookActive=true; lastTouch={x:t.clientX, y:t.clientY};
+    }
+  }
+});
+renderer.domElement.addEventListener('touchmove', (e)=>{
+  if(!touchLookActive) return;
+  const t = e.touches[0];
+  const dx = t.clientX - lastTouch.x; const dy = t.clientY - lastTouch.y;
+  controls.getObject().rotation.y -= dx * lookSensitivity;
+  camera.rotation.x -= dy * lookSensitivity;
+  camera.rotation.x = Math.max(-1.2, Math.min(1.2, camera.rotation.x));
+  lastTouch = {x:t.clientX, y:t.clientY};
+});
+renderer.domElement.addEventListener('touchend', ()=>{ touchLookActive=false; lastTouch=null; });
+
+// mouse shooting (desktop)
+renderer.domElement.addEventListener('mousedown', (e)=>{ if(e.button===0 && controls.isLocked) shoot(); });
+renderer.domElement.addEventListener('click', (e)=>{ if(!controls.isLocked && e.clientX < window.innerWidth*0.85) shoot(); });
+
+// --- Camera head-bob variables ---
+let bobTime = 0;
+function applyHeadBob(dt, moving){
+  if(moving){
+    bobTime += dt * 8;
+    const bobY = Math.sin(bobTime) * 0.04;
+    const bobX = Math.sin(bobTime * 0.5) * 0.02;
+    camera.position.y = 0.05 + 1.55 + bobY;
+    controls.getObject().rotation.z = bobX * 0.15;
+  } else {
+    bobTime = 0;
+    camera.position.y = 1.6;
+    controls.getObject().rotation.z *= 0.8;
+  }
+}
+
+// --- Movement & animation loop ---
+let prev = performance.now();
+function animate(){
+  requestAnimationFrame(animate);
+  const now = performance.now(); const dt = (now - prev)/1000; prev = now;
+
+  // movement vector: joystick + keyboard
+  let mx = joyVec.x, mz = joyVec.y;
+  if(keys['w']) mz = 1; if(keys['s']) mz = -1; if(keys['a']) mx = -1; if(keys['d']) mx = 1;
+  const camYaw = controls.getObject().rotation.y;
+  const forward = new THREE.Vector3(0,0,-1).applyAxisAngle(new THREE.Vector3(0,1,0), camYaw);
+  const right = new THREE.Vector3(1,0,0).applyAxisAngle(new THREE.Vector3(0,1,0), camYaw);
+  const moveVec = new THREE.Vector3();
+  moveVec.add(forward.clone().multiplyScalar(mz));
+  moveVec.add(right.clone().multiplyScalar(mx));
+  const moving = moveVec.length() > 0.01;
+  if(moving) moveVec.normalize();
+  const walkSpeed = keys['shift'] ? 6.0 : 3.6;
+  const delta = moveVec.multiplyScalar(walkSpeed * dt);
+  // try moving while respecting collisions: attempt along X then Z axis for sliding
+  if(delta.length() > 0){
+    const dx = new THREE.Vector3(delta.x, 0, 0);
+    const dz = new THREE.Vector3(0, 0, delta.z);
+    const movedX = movePlayerBy(dx);
+    const movedZ = movePlayerBy(dz);
+    if(!movedX && !movedZ){
+      // try diagonal small step
+      movePlayerBy(delta.multiplyScalar(0.5));
+    }
+  }
+
+  // apply head-bob for immersion
+  applyHeadBob(dt, moving);
+
+  // reveal boxes
+  revealBoxesNearPlayer();
+
+  // bots update
+  bots.forEach(b => b.step(dt));
+
+  // update HUD
+  hud.innerHTML = `lvl:${player.level} rank:${player.rankNames[player.rankIndex]} hp:${player.hp}`;
+
+  // player death
+  if(player.hp <= 0){
+    hud.innerHTML = 'DEAD - Reload to restart';
+    controls.unlock();
+  }
+
+  renderer.render(scene, camera);
+}
+animate();
+
+// --- helper: find nearest cell to controls object and return {r,c} ---
+function getPlayerRoom(){ return worldToCell(controls.getObject().position); }
+
+// event resize
+window.addEventListener('resize', ()=>{ camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+// set initial camera height
+controls.getObject().position.y = 1.6;
+placePlayer();
+
+</script>
+</body>
+</html>
