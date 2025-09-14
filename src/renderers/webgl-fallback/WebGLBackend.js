@@ -219,7 +219,7 @@ class WebGLBackend extends Backend {
 		const parameters = this.parameters;
 
 		const contextAttributes = {
-			antialias: renderer.samples > 0,
+			antialias: renderer.currentSamples > 0,
 			alpha: true, // always true for performance reasons
 			depth: renderer.depth,
 			stencil: renderer.stencil

@@ -118,10 +118,11 @@ class Renderer {
 		/**
 		 * The number of MSAA samples.
 		 *
+		 * @private
 		 * @type {number}
 		 * @default 0
 		 */
-		this.samples = samples || ( antialias === true ) ? 4 : 0;
+		this._samples = samples || ( antialias === true ) ? 4 : 0;
 
 		/**
 		 * Whether the renderer should automatically clear the current rendering target
@@ -2226,6 +2227,59 @@ class Renderer {
 	async clearStencilAsync() {
 
 		this.clearAsync( false, false, true );
+
+	}
+
+	/**
+	 * Returns `true` if a framebuffer target is needed to perform tone mapping or color space conversion.
+	 * If this is the case, the renderer allocates an internal render target for that purpose.
+	 *
+	 */
+	get needsFrameBufferTarget() {
+
+		const useToneMapping = this.currentToneMapping !== NoToneMapping;
+		const useColorSpace = this.currentColorSpace !== ColorManagement.workingColorSpace;
+
+		return useToneMapping || useColorSpace;
+
+	}
+
+	/**
+	 * The number of samples used for multi-sample anti-aliasing (MSAA).
+	 *
+	 * @type {number}
+	 * @default 0
+	 */
+	get samples() {
+
+		return this._samples;
+
+	}
+
+	/**
+	 * The current number of samples used for multi-sample anti-aliasing (MSAA).
+	 *
+	 * When rendering to a custom render target, the number of samples of that render target is used.
+	 * If the renderer needs an internal framebuffer target for tone mapping or color space conversion,
+	 * the number of samples is set to 0.
+	 *
+	 * @type {number}
+	 */
+	get currentSamples() {
+
+		let samples = this._samples;
+
+		if ( this._renderTarget !== null ) {
+
+			samples = this._renderTarget.samples;
+
+		} else if ( this.needsFrameBufferTarget ) {
+
+			samples = 0;
+
+		}
+
+		return samples;
 
 	}
 
