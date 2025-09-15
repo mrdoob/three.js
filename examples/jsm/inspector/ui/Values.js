@@ -209,7 +209,6 @@ class ValueSlider extends Value {
 
 		this.slider = document.createElement( 'input' );
 		this.slider.type = 'range';
-		this.slider.value = value;
 		this.slider.min = min;
 		this.slider.max = max;
 		this.slider.step = step;
@@ -218,6 +217,8 @@ class ValueSlider extends Value {
 		this.numberInput = numberValue.input;
 		this.numberInput.style.width = '60px';
 		this.numberInput.style.flexShrink = '0';
+
+		this.slider.value = value;
 
 		this.domElement.append( this.slider, this.numberInput );
 
@@ -318,4 +319,69 @@ class ValueSelect extends Value {
 
 }
 
-export { Value, ValueNumber, ValueCheckbox, ValueSlider, ValueSelect };
+class ValueColor extends Value {
+
+	constructor( { value = '#ffffff' } ) {
+
+		super();
+
+		const colorInput = document.createElement( 'input' );
+		colorInput.type = 'color';
+		colorInput.value = this._getColorHex( value );
+		this.colorInput = colorInput;
+
+		this._value = value;
+
+		colorInput.addEventListener( 'input', () => {
+
+			const colorValue = colorInput.value;
+
+			if ( this._value.isColor ) {
+
+				this._value.setHex( parseInt( colorValue.slice( 1 ), 16 ) );
+
+			} else {
+
+				this._value = colorValue;
+
+			}
+
+			this.dispatchChange();
+
+		} );
+
+		this.domElement.appendChild( colorInput );
+
+	}
+
+	_getColorHex( color ) {
+
+		if ( color.isColor ) {
+
+			color = color.getHex();
+
+		}
+
+		if ( typeof color === 'number' ) {
+
+			color = `#${ color.toString( 16 ) }`;
+
+		} else {
+
+			color = color;
+
+		}
+
+		return color;
+
+	}
+
+	getValue() {
+
+		return this._value;
+
+	}
+
+}
+
+export { Value, ValueNumber, ValueCheckbox, ValueSlider, ValueSelect, ValueColor };

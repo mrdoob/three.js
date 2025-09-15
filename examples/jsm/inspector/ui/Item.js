@@ -66,6 +66,7 @@ export class Item {
 
 			this.childrenContainer = document.createElement( 'div' );
 			this.childrenContainer.className = 'list-children-container';
+			this.childrenContainer.classList.toggle( 'closed', ! this.isOpen );
 			this.domElement.appendChild( this.childrenContainer );
 			this.itemRow.addEventListener( 'click', this.onItemClick );
 
@@ -141,10 +142,16 @@ export class Item {
 
 	toggle() {
 
-		if ( ! this.childrenContainer ) return;
 		this.isOpen = ! this.isOpen;
 		this.itemRow.classList.toggle( 'open', this.isOpen );
-		this.childrenContainer.classList.toggle( 'closed', ! this.isOpen );
+
+		if ( this.childrenContainer ) {
+
+			this.childrenContainer.classList.toggle( 'closed', ! this.isOpen );
+
+		}
+
+		return this;
 
 	}
 

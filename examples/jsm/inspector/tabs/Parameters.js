@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan } from '../ui/utils.js';
-import { ValueNumber, ValueSlider, ValueSelect, ValueCheckbox } from '../ui/Values.js';
+import { ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor } from '../ui/Values.js';
 
 class ParametersGroup {
 
@@ -11,7 +11,15 @@ class ParametersGroup {
 		this.parameters = parameters;
 		this.name = name;
 
-		this.item = new Item( name );
+		this.paramList = new Item( name );
+
+	}
+
+	close() {
+
+		this.paramList.close();
+
+		return this;
 
 	}
 
@@ -48,6 +56,16 @@ class ParametersGroup {
 
 	}
 
+	addFolder( name ) {
+
+		const group = new ParametersGroup( this.parameters, name );
+
+		this.paramList.add( group.paramList );
+
+		return group;
+
+	}
+
 	addBoolean( object, property ) {
 
 		const value = object[ property ];
@@ -63,7 +81,7 @@ class ParametersGroup {
 		description.textContent = property;
 
 		const subItem = new Item( description, editor.domElement );
-		this.item.add( subItem );
+		this.paramList.add( subItem );
 
 		// extends logic to toggle checkbox when clicking on the row
 
@@ -114,7 +132,41 @@ class ParametersGroup {
 		description.textContent = property;
 
 		const subItem = new Item( description, editor.domElement );
-		this.item.add( subItem );
+		this.paramList.add( subItem );
+
+		const itemRow = subItem.domElement.firstChild;
+		itemRow.classList.add( 'actionable' );
+
+		// extend object property
+
+		editor.name = ( name ) => {
+
+			description.textContent = name;
+
+			return editor;
+
+		};
+
+		return editor;
+
+	}
+
+	addColor( object, property ) {
+
+		const value = object[ property ];
+
+		const editor = new ValueColor( { value } );
+		editor.addEventListener( 'change', ( { value } ) => {
+
+			object[ property ] = value;
+
+		} );
+
+		const description = createValueSpan();
+		description.textContent = property;
+
+		const subItem = new Item( description, editor.domElement );
+		this.paramList.add( subItem );
 
 		const itemRow = subItem.domElement.firstChild;
 		itemRow.classList.add( 'actionable' );
@@ -148,7 +200,7 @@ class ParametersGroup {
 		description.textContent = property;
 
 		const subItem = new Item( description, editor.domElement );
-		this.item.add( subItem );
+		this.paramList.add( subItem );
 
 		const itemRow = subItem.domElement.firstChild;
 		itemRow.classList.add( 'actionable' );
@@ -183,7 +235,7 @@ class ParametersGroup {
 		description.textContent = property;
 
 		const subItem = new Item( description, editor.domElement );
-		this.item.add( subItem );
+		this.paramList.add( subItem );
 
 		const itemRow = subItem.domElement.firstChild;
 		itemRow.classList.add( 'actionable' );
@@ -226,9 +278,9 @@ class Parameters extends Tab {
 
 	createGroup( name ) {
 
-		const group = new ParametersGroup( this.parameters, name );
+		const group = new ParametersGroup( this, name );
 
-		this.paramList.add( group.item );
+		this.paramList.add( group.paramList );
 
 		return group;
 
