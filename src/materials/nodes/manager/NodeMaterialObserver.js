@@ -465,13 +465,14 @@ class NodeMaterialObserver {
 
 				if ( renderObjectData.morphTargetInfluences[ i ] !== object.morphTargetInfluences[ i ] ) {
 
+					renderObjectData.morphTargetInfluences[ i ] = object.morphTargetInfluences[ i ];
 					morphChanged = true;
 
 				}
 
 			}
 
-			if ( morphChanged ) return true;
+			if ( morphChanged ) return false;
 
 		}
 
