@@ -757,7 +757,13 @@ class PassNode extends TempNode {
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
 
+		const currentSceneName = scene.name;
+
+		scene.name = this.name ? this.name : scene.name;
+
 		renderer.render( scene, camera );
+
+		scene.name = currentSceneName;
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
