@@ -242,6 +242,14 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
+	get isAvailable() {
+
+		const renderer = this.getRenderer();
+
+		return renderer !== null && renderer.backend.isWebGPUBackend;
+
+	}
+
 	addFrame( frame ) {
 
 		// Limit to max frames.
@@ -256,7 +264,11 @@ export class RendererInspector extends InspectorBase {
 		this.frames.push( frame );
 		this.framesLib[ frame.frameId ] = frame;
 
-		this.resolveTimestamp();
+		if ( this.isAvailable ) {
+
+			this.resolveTimestamp();
+
+		}
 
 	}
 

@@ -155,25 +155,31 @@ class Inspector extends RendererInspector {
 
 	setRenderer( renderer ) {
 
+		super.setRenderer( renderer );
+
 		if ( renderer !== null ) {
 
 			setConsoleFunction( this.resolveConsole.bind( this ) );
 
-			renderer.backend.trackTimestamp = true;
+			if ( this.isAvailable ) {
 
-			renderer.hasFeatureAsync( 'timestamp-query' ).then( ( available ) => {
+				renderer.backend.trackTimestamp = true;
 
-				if ( available !== true ) {
+				renderer.hasFeatureAsync( 'timestamp-query' ).then( ( available ) => {
 
-					this.console.addMessage( 'error', 'THREE.Inspector: GPU Timestamp Queries not available.' );
+					if ( available !== true ) {
 
-				}
+						this.console.addMessage( 'error', 'THREE.Inspector: GPU Timestamp Queries not available.' );
 
-			} );
+					}
+
+				} );
+
+			}
 
 		}
 
-		return super.setRenderer( renderer );
+		return this;
 
 	}
 
