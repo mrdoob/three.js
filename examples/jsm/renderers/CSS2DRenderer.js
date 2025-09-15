@@ -59,6 +59,7 @@ class CSS2DObject extends Object3D {
 			this.traverse( function ( object ) {
 
 				if (
+					object.element &&
 					object.element instanceof object.element.ownerDocument.defaultView.Element &&
 					object.element.parentNode !== null
 				) {
