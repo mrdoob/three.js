@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import puppeteer from 'puppeteer';
 import express from 'express';
 import path from 'path';
@@ -138,6 +137,7 @@ const exceptionList = [
 	'webgpu_postprocessing_bloom_emissive',
 	'webgpu_lights_tiled',
 	'webgpu_postprocessing_traa',
+	'webgpu_tsl_wood',
 
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',
@@ -181,6 +181,7 @@ const exceptionList = [
 	'webgpu_postprocessing_fxaa',
 	'webgpu_postprocessing_afterimage',
 	'webgpu_postprocessing_ca',
+	'webgpu_postprocessing_ssgi',
 	'webgpu_xr_native_layers',
 	'webgpu_volume_caustics',
 
@@ -214,9 +215,9 @@ const height = 250;
 const viewScale = 2;
 const jpgQuality = 95;
 
-console.red = msg => console.log( chalk.red( msg ) );
-console.yellow = msg => console.log( chalk.yellow( msg ) );
-console.green = msg => console.log( chalk.green( msg ) );
+console.red = msg => console.log( `\x1b[31m${msg}\x1b[39m` );
+console.green = msg => console.log( `\x1b[32m${msg}\x1b[39m` );
+console.yellow = msg => console.log( `\x1b[33m${msg}\x1b[39m` );
 
 let browser;
 

@@ -27,7 +27,7 @@ class GaussianBlurNode extends TempNode {
 	 * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
 	 * @param {Object} [options={}] - Additional options for the gaussian blur effect.
 	 * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
-	 * @param {Vector2} [options.resolution=new Vector2(1, 1)] - The resolution of the effect. 0.5 means half the resolution of the texture node.
+	 * @param {number} [options.resolutionScale=1] - The resolution of the effect. 0.5 means half the resolution of the texture node.
 	 */
 	constructor( textureNode, directionNode = null, sigma = 4, options = {} ) {
 
@@ -110,7 +110,7 @@ class GaussianBlurNode extends TempNode {
 		/**
 		 * The resolution scale.
 		 *
-		 * @type {float}
+		 * @type {number}
 		 * @default (1)
 		 */
 		this.resolutionScale = options.resolutionScale || 1;
@@ -176,6 +176,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 1, 0 );
 
+		_quadMesh.name = 'Gaussian Blur [ Horizontal Pass ]';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -185,6 +186,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 0, 1 );
 
+		_quadMesh.name = 'Gaussian Blur [ Vertical Pass ]';
 		_quadMesh.render( renderer );
 
 		// restore
@@ -353,7 +355,7 @@ export default GaussianBlurNode;
  * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
  * @param {Object} [options={}] - Additional options for the gaussian blur effect.
  * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
- * @param {Vector2} [options.resolution=new Vector2(1, 1)] - The resolution of the effect. 0.5 means half the resolution of the texture node.
+ * @param {number} [options.resolutionScale=1] - The resolution of the effect. 0.5 means half the resolution of the texture node.
  * @returns {GaussianBlurNode}
  */
 export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma, options ) );

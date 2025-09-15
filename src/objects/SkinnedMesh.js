@@ -6,6 +6,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Ray } from '../math/Ray.js';
 import { AttachedBindMode, DetachedBindMode } from '../constants.js';
+import { warn } from '../utils.js';
 
 const _basePosition = /*@__PURE__*/ new Vector3();
 
@@ -299,7 +300,7 @@ class SkinnedMesh extends Mesh {
 
 		} else {
 
-			console.warn( 'THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );
+			warn( 'SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );
 
 		}
 

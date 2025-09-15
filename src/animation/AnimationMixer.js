@@ -641,7 +641,7 @@ class AnimationMixer extends EventDispatcher {
 	/**
 	 * Deactivates all previously scheduled actions on this mixer.
 	 *
-	 * @return {AnimationMixer} A reference to thi animation mixer.
+	 * @return {AnimationMixer} A reference to this animation mixer.
 	 */
 	stopAllAction() {
 
@@ -665,7 +665,7 @@ class AnimationMixer extends EventDispatcher {
 	 * time from {@link Clock} or {@link Timer}.
 	 *
 	 * @param {number} deltaTime - The delta time in seconds.
-	 * @return {AnimationMixer} A reference to thi animation mixer.
+	 * @return {AnimationMixer} A reference to this animation mixer.
 	 */
 	update( deltaTime ) {
 
@@ -711,7 +711,7 @@ class AnimationMixer extends EventDispatcher {
 	 * input parameter will be scaled by {@link AnimationMixer#timeScale}
 	 *
 	 * @param {number} time - The time to set in seconds.
-	 * @return {AnimationMixer} A reference to thi animation mixer.
+	 * @return {AnimationMixer} A reference to this animation mixer.
 	 */
 	setTime( time ) {
 

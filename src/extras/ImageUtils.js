@@ -1,4 +1,4 @@
-import { createElementNS } from '../utils.js';
+import { createElementNS, warn } from '../utils.js';
 import { SRGBToLinear } from '../math/ColorManagement.js';
 
 let _canvas;
@@ -125,7 +125,7 @@ class ImageUtils {
 
 		} else {
 
-			console.warn( 'THREE.ImageUtils.sRGBToLinear(): Unsupported image type. No color space conversion applied.' );
+			warn( 'ImageUtils.sRGBToLinear(): Unsupported image type. No color space conversion applied.' );
 			return image;
 
 		}

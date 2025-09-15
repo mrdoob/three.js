@@ -49,7 +49,7 @@
 <div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">십이면체(Dodecahedron)</div>
 <div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">사각(bevel)을 주어 깍아낸(extruded) 2D 모양입니다.
 아래에서는 하트 모양으로 깍아냈죠. <code class="notranslate" translate="no">ExtrudedGeometry</code>는 나중에 설명할
-<a href="/docs/#api/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>과 <a href="/docs/#api/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>의 기초 모델입니다.</div>
+<a href="/docs/#examples/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>과 <a href="/docs/#examples/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>의 기초 모델입니다.</div>
 <div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">이십면체(Icosahedron)</div>
 <div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">선(line)을 회전시켜 만든 모양입니다. 램프, 볼링핀, 초, 초 받침, 와인잔, 유리잔 등이 있죠(물레로 도자기를 만드는 것처럼. 역주). 2D 형태를 점(point, Vector2 클래스를 말함. 역주)을 사용해 지정하고, Three.js에게 축을 따라 세분값(아래 예제의 <code class="notranslate" translate="no">segments</code> 값. 역주)과 회전값(아래 예제의 <code class="notranslate" translate="no">phiLength</code> 값. 역주)을 지정해주면 됩니다.</div>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">팔면체(Octahedron)</div>
@@ -155,8 +155,8 @@ function addObject(x, y, obj) {
 </div>
 
 <p></p>
-<p>몇몇 예외가 보일 텐데, 가장 크게 두드러진 것은 아마 <a href="/docs/#api/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>일 겁니다.
-<a href="/docs/#api/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>는 텍스트의 <code class="notranslate" translate="no">mesh</code>를 생성하기 위해 3D 폰트 데이터를 필요로 합니다.
+<p>몇몇 예외가 보일 텐데, 가장 크게 두드러진 것은 아마 <a href="/docs/#examples/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>일 겁니다.
+<a href="/docs/#examples/ko/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>는 텍스트의 <code class="notranslate" translate="no">mesh</code>를 생성하기 위해 3D 폰트 데이터를 필요로 합니다.
 이 데이터는 비동기로 로드되므로, 객체를 생성하기 전에 3D 폰트 데이터가 로드되기를 기다려야
 하죠. 폰트 로드 과정을 프로미스화 하면 이 과정를 더 쉽게 만들 수 있습니다. 먼저 <a href="/docs/#api/ko/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a>를
 생성하고, Promise를 반환하는 <code class="notranslate" translate="no">loadFont</code> 함수를 만들어 요청을 Promise로 감쌉니다.

@@ -93,7 +93,7 @@ export default BufferNode;
  *
  * @tsl
  * @function
- * @param {Array} value - Array-like buffer data.
+ * @param {Array<number>} value - Array-like buffer data.
  * @param {string} type - The data type of a buffer element.
  * @param {number} count - The count of buffer elements.
  * @returns {BufferNode}

@@ -18,6 +18,7 @@ export { default as ProjectorLight } from './lights/webgpu/ProjectorLight.js';
 export { default as NodeLoader } from './loaders/nodes/NodeLoader.js';
 export { default as NodeObjectLoader } from './loaders/nodes/NodeObjectLoader.js';
 export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoader.js';
+export { default as InspectorBase } from './renderers/common/InspectorBase.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export { CanvasRenderTarget } from './core/CanvasRenderTarget.js';
 export * from './nodes/Nodes.js';

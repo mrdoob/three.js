@@ -2,6 +2,7 @@ import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { subBuild } from './SubBuildNode.js';
+import { warn } from '../../utils.js';
 
 /**
  * Class for representing shader varyings as nodes. Varyings are create from
@@ -213,14 +214,14 @@ addMethodChaining( 'toVertexStage', vertexStage );
 
 addMethodChaining( 'varying', ( ...params ) => { // @deprecated, r173
 
-	console.warn( 'THREE.TSL: .varying() has been renamed to .toVarying().' );
+	warn( 'TSL: .varying() has been renamed to .toVarying().' );
 	return varying( ...params );
 
 } );
 
 addMethodChaining( 'vertexStage', ( ...params ) => { // @deprecated, r173
 
-	console.warn( 'THREE.TSL: .vertexStage() has been renamed to .toVertexStage().' );
+	warn( 'TSL: .vertexStage() has been renamed to .toVertexStage().' );
 	return varying( ...params );
 
 } );

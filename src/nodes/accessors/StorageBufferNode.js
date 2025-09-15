@@ -4,6 +4,7 @@ import { nodeObject, varying } from '../tsl/TSLBase.js';
 import { storageElement } from '../utils/StorageArrayElementNode.js';
 import { NodeAccess } from '../core/constants.js';
 import { getTypeFromLength } from '../core/NodeUtils.js';
+import { warn } from '../../utils.js';
 
 /**
  * This node is used in context of compute shaders and allows to define a
@@ -408,7 +409,7 @@ export const storage = ( value, type = null, count = 0 ) => nodeObject( new Stor
  */
 export const storageObject = ( value, type, count ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
+	warn( 'TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
 
 	return storage( value, type, count ).setPBO( true );
 

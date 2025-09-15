@@ -4,6 +4,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
+import { warn } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector3();
 
@@ -210,7 +211,6 @@ class Textures extends DataMap {
 
 			// it's an update
 
-			backend.destroySampler( texture );
 			backend.destroyTexture( texture );
 
 		}
@@ -253,16 +253,11 @@ class Textures extends DataMap {
 
 		if ( isRenderTarget || texture.isStorageTexture === true || texture.isExternalTexture === true ) {
 
-			backend.createSampler( texture );
 			backend.createTexture( texture, options );
 
 			textureData.generation = texture.version;
 
 		} else {
-
-			const needsCreate = textureData.initialized !== true;
-
-			if ( needsCreate ) backend.createSampler( texture );
 
 			if ( texture.version > 0 ) {
 
@@ -270,11 +265,11 @@ class Textures extends DataMap {
 
 				if ( image === undefined ) {
 
-					console.warn( 'THREE.Renderer: Texture marked for update but image is undefined.' );
+					warn( 'Renderer: Texture marked for update but image is undefined.' );
 
 				} else if ( image.complete === false ) {
 
-					console.warn( 'THREE.Renderer: Texture marked for update but image is incomplete.' );
+					warn( 'Renderer: Texture marked for update but image is incomplete.' );
 
 				} else {
 
@@ -309,6 +304,8 @@ class Textures extends DataMap {
 
 					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
 
+					if ( texture.onUpdate ) texture.onUpdate( texture );
+
 				}
 
 			} else {
@@ -339,7 +336,7 @@ class Textures extends DataMap {
 
 			if ( texture.isVideoTexture && ColorManagement.getTransfer( texture.colorSpace ) !== SRGBTransfer ) {
 
-				console.warn( 'WebGPURenderer: Video textures must use a color space with a sRGB transfer function, e.g. SRGBColorSpace.' );
+				warn( 'WebGPURenderer: Video textures must use a color space with a sRGB transfer function, e.g. SRGBColorSpace.' );
 
 			}
 
@@ -360,6 +357,24 @@ class Textures extends DataMap {
 		//
 
 		textureData.version = texture.version;
+
+	}
+
+	/**
+	 * Updates the sampler for the given texture. This method has no effect
+	 * for the WebGL backend since it has no concept of samplers. Texture
+	 * parameters are configured with the `texParameter()` command for each
+	 * texture.
+	 *
+	 * In WebGPU, samplers are objects like textures and it's possible to share
+	 * them when the texture parameters match.
+	 *
+	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @return {string} The current sampler key.
+	 */
+	updateSampler( texture ) {
+
+		return this.backend.updateSampler( texture );
 
 	}
 
@@ -389,7 +404,7 @@ class Textures extends DataMap {
 				target.height = image.videoHeight || 1;
 				target.depth = 1;
 
-			} else if ( image instanceof VideoFrame ) {
+			} else if ( ( typeof VideoFrame !== 'undefined' ) && ( image instanceof VideoFrame ) ) {
 
 				target.width = image.displayWidth || 1;
 				target.height = image.displayHeight || 1;
@@ -473,8 +488,13 @@ class Textures extends DataMap {
 
 		if ( this.has( texture ) === true ) {
 
-			this.backend.destroySampler( texture );
-			this.backend.destroyTexture( texture );
+			// if a texture is not ready for use, it falls back to a default texture so it's possible
+			// to use it for rendering. If a texture in this state is disposed, it's important to
+			// not destroy/delete the underlying GPU texture object since it is cached and shared with
+			// other textures.
+
+			const isDefaultTexture = this.get( texture ).isDefaultTexture;
+			this.backend.destroyTexture( texture, isDefaultTexture );
 
 			this.delete( texture );
 

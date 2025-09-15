@@ -1,6 +1,7 @@
 import Node from './Node.js';
 import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
+import { error } from '../../utils.js';
 
 /**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
@@ -100,7 +101,7 @@ class StackNode extends Node {
 
 		if ( node.isNode !== true ) {
 
-			console.error( 'THREE.TSL: Invalid node added to stack.' );
+			error( 'TSL: Invalid node added to stack.' );
 			return this;
 
 		}
@@ -198,7 +199,7 @@ class StackNode extends Node {
 
 		} else {
 
-			console.error( 'THREE.TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
 
 		}
 

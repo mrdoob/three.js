@@ -217,7 +217,17 @@ class RTTNode extends TextureNode {
 
 		//
 
+		let name = 'RTT';
+
+		if ( this.node.name ) {
+
+			name = this.node.name + ' [ ' + name + ' ]';
+
+		}
+
+
 		this._quadMesh.material.fragmentNode = this._rttNode;
+		this._quadMesh.name = name;
 
 		//
 
