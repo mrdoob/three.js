@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, length, mat4 } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, length } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -190,14 +190,6 @@ class TRAANode extends TempNode {
 		 */
 		this._needsPostProcessingSync = false;
 
-		/**
-		 * Whether the current frame is the first one or not.
-		 *
-		 * @private
-		 * @type {boolean}
-		 */
-		this._firstFrame = true;
-
 	}
 
 	/**
@@ -294,11 +286,13 @@ class TRAANode extends TempNode {
 
 		const { renderer } = frame;
 
-		// Store previous frame matrices before updating current ones
+		// store previous frame matrices before updating current ones
+
 		this._previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix.value );
 		this._previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse.value );
 
-		// Update camera matrices uniforms
+		// update camera matrices uniforms
+
 		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
@@ -359,18 +353,20 @@ class TRAANode extends TempNode {
 
 		// Copy current depth to previous depth buffer
 
-		if ( this._firstFrame === true ) {
+		const size = renderer.getDrawingBufferSize( _size );
 
-			this._firstFrame = false;
+		// only allow the depth copy if the dimensions of the history render target match with the drawing
+		// render buffer and thus the depth texture of the scene. For some reasons, there are timing issues
+		// with WebGPU resulting in different size of the drawing buffer and the beauty render target when
+		// resizing the browser window. This does not happen with the WebGL backend
 
-		} else {
+		if ( this._historyRenderTarget.height === size.height && this._historyRenderTarget.width === size.width ) {
 
 			const currentDepth = this.depthNode.value;
 			renderer.copyTextureToTexture( currentDepth, this._historyRenderTarget.depthTexture );
 			this._previousDepthNode.value = this._historyRenderTarget.depthTexture;
 
 		}
-
 
 		// restore
 
