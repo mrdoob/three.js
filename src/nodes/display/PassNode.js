@@ -10,6 +10,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { warn } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -342,7 +343,7 @@ class PassNode extends TempNode {
 		 * @type {number}
 		 * @default 1
 		 */
-		this._resolution = 1;
+		this._resolutionScale = 1;
 
 		/**
 		 * Custom viewport definition.
@@ -397,9 +398,9 @@ class PassNode extends TempNode {
 	 * @param {number} resolution - The resolution to set. A value of `1` means full resolution.
 	 * @return {PassNode} A reference to this pass.
 	 */
-	setResolution( resolution ) {
+	setResolutionScale( resolution ) {
 
-		this._resolution = resolution;
+		this._resolutionScale = resolution;
 
 		return this;
 
@@ -410,9 +411,39 @@ class PassNode extends TempNode {
 	 *
 	 * @return {number} The current resolution. A value of `1` means full resolution.
 	 */
-	getResolution() {
+	getResolutionScale() {
 
-		return this._resolution;
+		return this._resolutionScale;
+
+	}
+
+	/**
+	 * Sets the resolution for the pass.
+	 * The resolution is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolution - The resolution to set. A value of `1` means full resolution.
+	 * @return {PassNode} A reference to this pass.
+	 * @deprecated since r181. Use {@link PassNode#setResolutionScale `setResolutionScale()`} instead.
+	 */
+	setResolution( resolution ) { // @deprecated, r181
+
+		warn( 'PassNode: .setResolution() is deprecated. Use .setResolutionScale() instead.' );
+
+		return this.setResolutionScale( resolution );
+
+	}
+
+	/**
+	 * Gets the current resolution of the pass.
+	 *
+	 * @return {number} The current resolution. A value of `1` means full resolution.
+	 * @deprecated since r181. Use {@link PassNode#getResolutionScale `getResolutionScale()`} instead.
+	 */
+	getResolution() { // @deprecated, r181
+
+		warn( 'PassNode: .getResolution() is deprecated. Use .getResolutionScale() instead.' );
+
+		return this.getResolutionScale();
 
 	}
 
@@ -746,8 +777,8 @@ class PassNode extends TempNode {
 		this._width = width;
 		this._height = height;
 
-		const effectiveWidth = this._width * this._pixelRatio * this._resolution;
-		const effectiveHeight = this._height * this._pixelRatio * this._resolution;
+		const effectiveWidth = this._width * this._pixelRatio * this._resolutionScale;
+		const effectiveHeight = this._height * this._pixelRatio * this._resolutionScale;
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
@@ -787,7 +818,7 @@ class PassNode extends TempNode {
 
 			}
 
-			this._scissor.multiplyScalar( this._pixelRatio * this._resolution ).floor();
+			this._scissor.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
 
 		}
 
@@ -823,7 +854,7 @@ class PassNode extends TempNode {
 
 			}
 
-			this._viewport.multiplyScalar( this._pixelRatio * this._resolution ).floor();
+			this._viewport.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
 
 		}
 
