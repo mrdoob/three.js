@@ -836,7 +836,7 @@ class AsciiEffect {
 					} else {
 
 						// In non-color mode, group all characters together
-						if ( ! bColor && currentColor === null ) {
+						if ( currentColor === null ) {
 
 							currentGroup += strThisChar;
 
