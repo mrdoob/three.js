@@ -762,7 +762,7 @@ class AsciiEffect {
 
 				if ( bColor && currentColor ) {
 
-					stringBuffer[ bufferIndex ++ ] = `<span style="color:${currentColor}${bBlock && currentColor ? `;background-color:${currentColor}` : ''}">${escapeHtml( currentGroup )}</span>`;
+					stringBuffer[ bufferIndex ++ ] = `<span style="color:${currentColor}${bBlock ? `;background-color:${currentColor}` : ''}">${escapeHtml( currentGroup )}</span>`;
 
 				} else {
 
