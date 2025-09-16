@@ -797,7 +797,7 @@ class AsciiEffect {
 
 					}
 
-					let iCharIdx = Math.floor( ( 1 - fBrightness ) * charListLengthMinus1 );
+					let iCharIdx = Math.round( ( 1 - fBrightness ) * charListLengthMinus1 );
 
 					if ( bInvert ) {
 
