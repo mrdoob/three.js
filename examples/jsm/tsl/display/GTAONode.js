@@ -1,4 +1,4 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils } from 'three/webgpu';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -48,7 +48,7 @@ class GTAONode extends TempNode {
 	 */
 	constructor( depthNode, normalNode, camera ) {
 
-		super( 'vec4' );
+		super( 'float' );
 
 		/**
 		 * A node that represents the scene's depth.
@@ -90,7 +90,7 @@ class GTAONode extends TempNode {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
+		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		// uniforms
@@ -323,6 +323,8 @@ class GTAONode extends TempNode {
 
 			const ao = float( 0 ).toVar();
 
+			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
+
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
 				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).toVar();
@@ -337,9 +339,13 @@ class GTAONode extends TempNode {
 				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent ).toVar();
 				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
 
+				// For each slice, the inner loop performs ray marching to find the horizons.
+
 				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
 					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
+
+					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
 
 					// x
 
@@ -371,6 +377,8 @@ class GTAONode extends TempNode {
 
 				} );
 
+				// After the horizons are found for a given slice, their contribution to the total occlusion is calculated.
+
 				const sinHorizons = sqrt( sub( 1.0, cosHorizons.mul( cosHorizons ) ) ).toVar();
 				const nx = dot( normalInSlice, sliceTangent );
 				const ny = dot( normalInSlice, viewDir );
@@ -384,7 +392,7 @@ class GTAONode extends TempNode {
 			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
 			ao.assign( pow( ao, this.scale ) );
 
-			return vec4( vec3( ao ), 1.0 );
+			return ao;
 
 		} );
 

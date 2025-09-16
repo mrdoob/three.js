@@ -1,14 +1,24 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Particles Snow</title>
+		<title>three.js webgpu - compute snow</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<!-- <link type="text/css" rel="stylesheet" href="main.css"> -->
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Snow - 100K Particles
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>compute snow</span>
+			</div>
+
+			<small>
+				100k snow particles simulation.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -17,8 +27,7 @@
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
-					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,16 +38,16 @@
 			import { Fn, texture, vec3, pass, color, uint, screenUV, instancedArray, positionWorld, positionLocal, time, vec2, hash, instanceIndex, If } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from 'stats-gl';
-
 			const maxParticleCount = 100000;
 
 			let camera, scene, renderer;
-			let controls, stats;
+			let controls;
 			let computeParticles;
 			let postProcessing;
 
@@ -128,7 +137,7 @@
 					particleData.z = position.z;
 					particleData.w = randX;
 
-				} )().compute( maxParticleCount );
+				} )().compute( maxParticleCount ).setName( 'Init Particles' );
 
 				//
 
@@ -165,6 +174,7 @@
 				} );
 
 				computeParticles = computeUpdate().compute( maxParticleCount );
+				computeParticles.name = 'Update Particles';
 
 				// rain
 
@@ -253,6 +263,7 @@
 					color: 0xfcfb9e
 				} ) );
 
+				teapotTree.name = 'Teapot Pass';
 				teapotTree.position.y = 18;
 
 				scene.add( tree() );
@@ -269,17 +280,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats( {
-					precision: 3,
-					horizontal: false,
-					trackGPU: true,
-					trackCPT: true
-				} );
-				stats.init( renderer );
-				document.body.appendChild( stats.dom );
-
 
 				//
 
@@ -300,10 +302,10 @@
 
 				const teapotTreePass = pass( teapotTree, camera ).getTextureNode();
 				const teapotTreePassBlurred = gaussianBlur( teapotTreePass, vec2( 1 ), 6 );
-				teapotTreePassBlurred.resolution = new THREE.Vector2( .2, .2 );
+				teapotTreePassBlurred.resolutionScale = 0.2;
 
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
-				scenePassColorBlurred.resolution = new THREE.Vector2( .5, .5 );
+				scenePassColorBlurred.resolutionScale = 0.5;
 				scenePassColorBlurred.directionNode = vec2( 1 );
 
 				// compose
@@ -337,12 +339,13 @@
 
 			}
 
-			async function animate() {
+			function animate() {
 
 				controls.update();
 
 				// position
 
+				scene.name = 'Collider Position';
 				scene.overrideMaterial = collisionPosMaterial;
 				renderer.setRenderTarget( collisionPosRT );
 				renderer.render( scene, collisionCamera );
@@ -350,17 +353,14 @@
 				// compute
 
 				renderer.compute( computeParticles );
-				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 				// result
 
+				scene.name = 'Scene';
 				scene.overrideMaterial = null;
 				renderer.setRenderTarget( null );
 
-				await postProcessing.renderAsync();
-
-				renderer.resolveTimestampsAsync();
-				stats.update();
+				postProcessing.render();
 
 			}
 

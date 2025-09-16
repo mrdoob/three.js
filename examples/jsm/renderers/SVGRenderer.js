@@ -120,7 +120,7 @@ class SVGRenderer {
 		/**
 		 * The DOM where the renderer appends its child-elements.
 		 *
-		 * @type {DOMElement}
+		 * @type {SVGSVGElement}
 		 */
 		this.domElement = _svg;
 

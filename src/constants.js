@@ -1,4 +1,4 @@
-export const REVISION = '180dev';
+export const REVISION = '181dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -1670,6 +1670,6 @@ export const InterpolationSamplingMode = {
  * @property {string} NORMAL - Normal sampling mode.
  * @property {string} CENTROID - Centroid sampling mode.
  * @property {string} SAMPLE - Sample-specific sampling mode.
- * @property {string} FLAT_FIRST - Flat interpolation using the first vertex.
- * @property {string} FLAT_EITHER - Flat interpolation using either vertex.
+ * @property {string} FIRST - Flat interpolation using the first vertex.
+ * @property {string} EITHER - Flat interpolation using either vertex.
  */

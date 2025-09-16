@@ -115,7 +115,7 @@ class ArcballControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Camera} camera - The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.
-	 * @param {?HTMLDOMElement} [domElement=null] - The HTML element used for event listeners.
+	 * @param {?HTMLElement} [domElement=null] - The HTML element used for event listeners.
 	 * @param {?Scene} [scene=null] The scene rendered by the camera. If not given, gizmos cannot be shown.
 	 */
 	constructor( camera, domElement = null, scene = null ) {
@@ -1315,7 +1315,7 @@ class ArcballControls extends Controls {
 	 *
 	 * @param {'PAN'|'ROTATE'|'ZOOM'|'FOV'} operation - The operation to be performed ('PAN', 'ROTATE', 'ZOOM', 'FOV').
 	 * @param {0|1|2|'WHEEL'} mouse - A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.
-	 * @param {'CTRL'|'SHIFT'|null} [key=null] - The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.
+	 * @param {?('CTRL'|'SHIFT')} [key=null] - The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.
 	 * @returns {boolean} `true` if the mouse action has been successfully added, `false` otherwise.
 	 */
 	setMouseAction( operation, mouse, key = null ) {
@@ -1396,7 +1396,7 @@ class ArcballControls extends Controls {
 	 * Remove a mouse action by specifying its mouse/key combination.
 	 *
 	 * @param {0|1|2|'WHEEL'} mouse - A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.
-	 * @param {'CTRL'|'SHIFT'|null} key - The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.
+	 * @param {?('CTRL'|'SHIFT')} key - The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.
 	 * @returns {boolean} `true` if the operation has been successfully removed, `false` otherwise.
 	 */
 	unsetMouseAction( mouse, key = null ) {
@@ -1421,8 +1421,8 @@ class ArcballControls extends Controls {
 	 *
 	 * @private
 	 * @param {0|1|2|'WHEEL'} mouse - Mouse button index (0, 1, 2) or 'WHEEL' for wheel notches.
-	 * @param {'CTRL'|'SHIFT'|null} key - Keyboard modifier.
-	 * @returns {'PAN'|'ROTATE'|'ZOOM'|'FOV'|null} The operation if it has been found, `null` otherwise.
+	 * @param {?('CTRL'|'SHIFT')} key - Keyboard modifier.
+	 * @returns {?('PAN'|'ROTATE'|'ZOOM'|'FOV')} The operation if it has been found, `null` otherwise.
 	 */
 	getOpFromAction( mouse, key ) {
 
@@ -1463,7 +1463,7 @@ class ArcballControls extends Controls {
 	 *
 	 * @private
 	 * @param {0|1|2} mouse - Mouse button index (0, 1, 2)
-	 * @param {'CTRL'|'SHIFT'|null} key - Keyboard modifier
+	 * @param {?('CTRL'|'SHIFT')} key - Keyboard modifier
 	 * @returns {?STATE} The FSA state obtained from the operation associated to mouse/keyboard combination.
 	 */
 	getOpStateFromAction( mouse, key ) {
@@ -2509,8 +2509,8 @@ class ArcballControls extends Controls {
 	 * Sets values in transformation object.
 	 *
 	 * @private
-	 * @param {Matrix4} [camera=null] - Transformation to be applied to the camera.
-	 * @param {Matrix4} [gizmos=null] - Transformation to be applied to gizmos.
+	 * @param {?Matrix4} [camera=null] - Transformation to be applied to the camera.
+	 * @param {?Matrix4} [gizmos=null] - Transformation to be applied to gizmos.
 	 */
 	setTransformationMatrices( camera = null, gizmos = null ) {
 

@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, uniform, float, uv, vec2, vec3, hash, shapeCircle,
+			import { Fn, If, uniform, float, uv, vec3, hash, shapeCircle,
 				instancedArray, instanceIndex } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -46,7 +46,7 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const particleCount = 200_000;
+			const particleCount = 200000;
 
 			const gravity = uniform( - .00098 );
 			const bounce = uniform( .8 );
@@ -81,7 +81,7 @@
 				const colors = instancedArray( particleCount, 'vec3' );
 
 				// compute
-				
+
 				const separation = 0.2;
 				const amount = Math.sqrt( particleCount );
 				const offset = float( amount / 2 );
@@ -90,10 +90,10 @@
 
 					const position = positions.element( instanceIndex );
 					const color = colors.element( instanceIndex );
-					
+
 					const x = instanceIndex.mod( amount );
 					const z = instanceIndex.div( amount );
-					
+
 					position.x = offset.sub( x ).mul( separation );
 					position.z = offset.sub( z ).mul( separation );
 
@@ -197,7 +197,7 @@
 				//
 
 				function onMove( event ) {
-					
+
 					if ( isOrbitControlsActive ) return;
 
 					pointer.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
@@ -231,11 +231,19 @@
 				controls.enableDamping = true;
 				controls.minDistance = 5;
 				controls.maxDistance = 200;
-				controls.target.set( 0, -8, 0 );
+				controls.target.set( 0, - 8, 0 );
 				controls.update();
-				
-				controls.addEventListener( 'start', () => { isOrbitControlsActive = true; } );
-				controls.addEventListener( 'end', () => { isOrbitControlsActive = false; } );
+
+				controls.addEventListener( 'start', () => {
+
+					isOrbitControlsActive = true;
+
+				} );
+				controls.addEventListener( 'end', () => {
+
+					isOrbitControlsActive = false;
+
+				} );
 
 				controls.touches = {
 					ONE: null,

@@ -12,6 +12,7 @@ import { DepthTexture } from '../../textures/DepthTexture.js';
 import { ExternalTexture } from '../../textures/ExternalTexture.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
 import { WebXRDepthSensing } from './WebXRDepthSensing.js';
+import { warn } from '../../utils.js';
 
 /**
  * This class represents an abstraction of the WebXR Device API and is
@@ -51,6 +52,8 @@ class WebXRManager extends EventDispatcher {
 		let glProjLayer = null;
 		let glBaseLayer = null;
 		let xrFrame = null;
+
+		const supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
 
 		const depthSensing = new WebXRDepthSensing();
 		const cameraAccessTextures = {};
@@ -276,7 +279,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( scope.isPresenting === true ) {
 
-				console.warn( 'THREE.WebXRManager: Cannot change framebuffer scale while presenting.' );
+				warn( 'WebXRManager: Cannot change framebuffer scale while presenting.' );
 
 			}
 
@@ -298,7 +301,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( scope.isPresenting === true ) {
 
-				console.warn( 'THREE.WebXRManager: Cannot change reference space type while presenting.' );
+				warn( 'WebXRManager: Cannot change reference space type while presenting.' );
 
 			}
 
@@ -329,6 +332,9 @@ class WebXRManager extends EventDispatcher {
 		/**
 		 * Returns the current base layer.
 		 *
+		 * This is an `XRProjectionLayer` when the targeted XR device supports the
+		 * WebXR Layers API, or an `XRWebGLLayer` otherwise.
+		 *
 		 * @return {?(XRWebGLLayer|XRProjectionLayer)} The XR base layer.
 		 */
 		this.getBaseLayer = function () {
@@ -340,9 +346,18 @@ class WebXRManager extends EventDispatcher {
 		/**
 		 * Returns the current XR binding.
 		 *
-		 * @return {?XRWebGLBinding} The XR binding.
+		 * Creates a new binding if needed and the browser is
+		 * capable of doing so.
+		 *
+		 * @return {?XRWebGLBinding} The XR binding. Returns `null` if one cannot be created.
 		 */
 		this.getBinding = function () {
+
+			if ( glBinding === null && supportsGlBinding ) {
+
+				glBinding = new XRWebGLBinding( session, gl );
+
+			}
 
 			return glBinding;
 
@@ -405,17 +420,12 @@ class WebXRManager extends EventDispatcher {
 				currentPixelRatio = renderer.getPixelRatio();
 				renderer.getSize( currentSize );
 
-				if ( typeof XRWebGLBinding !== 'undefined' ) {
-
-					glBinding = new XRWebGLBinding( session, gl );
-
-				}
 
 				// Check that the browser implements the necessary APIs to use an
 				// XRProjectionLayer rather than an XRWebGLLayer
-				const useLayers = glBinding !== null && 'createProjectionLayer' in XRWebGLBinding.prototype;
+				const supportsLayers = supportsGlBinding && 'createProjectionLayer' in XRWebGLBinding.prototype;
 
-				if ( ! useLayers ) {
+				if ( ! supportsLayers ) {
 
 					const layerInit = {
 						antialias: attributes.antialias,
@@ -465,6 +475,8 @@ class WebXRManager extends EventDispatcher {
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
+
+					glBinding = this.getBinding();
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
@@ -524,6 +536,8 @@ class WebXRManager extends EventDispatcher {
 
 		/**
 		 * Returns the current depth texture computed via depth sensing.
+		 *
+		 * See {@link WebXRDepthSensing#getDepthTexture}.
 		 *
 		 * @return {?Texture} The depth texture.
 		 */
@@ -695,7 +709,7 @@ class WebXRManager extends EventDispatcher {
 
 		/**
 		 * Updates the state of the XR camera. Use this method on app level if you
-		 * set cameraAutoUpdate` to `false`. The method requires the non-XR
+		 * set `cameraAutoUpdate` to `false`. The method requires the non-XR
 		 * camera of the scene as a parameter. The passed in camera's transformation
 		 * is automatically adjusted to the position of the XR camera when calling
 		 * this method.
@@ -872,6 +886,8 @@ class WebXRManager extends EventDispatcher {
 		/**
 		 * Returns the depth sensing mesh.
 		 *
+		 * See {@link WebXRDepthSensing#getMesh}.
+		 *
 		 * @return {Mesh} The depth sensing mesh.
 		 */
 		this.getDepthSensingMesh = function () {
@@ -992,7 +1008,9 @@ class WebXRManager extends EventDispatcher {
 					enabledFeatures.includes( 'depth-sensing' ) &&
 					session.depthUsage == 'gpu-optimized';
 
-				if ( gpuDepthSensingEnabled && glBinding ) {
+				if ( gpuDepthSensingEnabled && supportsGlBinding ) {
+
+					glBinding = scope.getBinding();
 
 					const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
@@ -1007,31 +1025,29 @@ class WebXRManager extends EventDispatcher {
 				const cameraAccessEnabled = enabledFeatures &&
 				    enabledFeatures.includes( 'camera-access' );
 
-				if ( cameraAccessEnabled ) {
+				if ( cameraAccessEnabled && supportsGlBinding ) {
 
 					renderer.state.unbindTexture();
 
-					if ( glBinding ) {
+					glBinding = scope.getBinding();
 
-						for ( let i = 0; i < views.length; i ++ ) {
+					for ( let i = 0; i < views.length; i ++ ) {
 
-							const camera = views[ i ].camera;
+						const camera = views[ i ].camera;
 
-							if ( camera ) {
+						if ( camera ) {
 
-								let cameraTex = cameraAccessTextures[ camera ];
+							let cameraTex = cameraAccessTextures[ camera ];
 
-								if ( ! cameraTex ) {
+							if ( ! cameraTex ) {
 
-									cameraTex = new ExternalTexture();
-									cameraAccessTextures[ camera ] = cameraTex;
-
-								}
-
-								const glTexture = glBinding.getCameraImage( camera );
-								cameraTex.sourceTexture = glTexture;
+								cameraTex = new ExternalTexture();
+								cameraAccessTextures[ camera ] = cameraTex;
 
 							}
+
+							const glTexture = glBinding.getCameraImage( camera );
+							cameraTex.sourceTexture = glTexture;
 
 						}
 

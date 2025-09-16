@@ -14,11 +14,12 @@ import {
 	RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format,
 	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, UnsignedIntType, UnsignedShortType, UnsignedInt248Type, UnsignedInt5999Type,
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, IntType, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat,
-	UnsignedInt101111Type
+	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
 import { DepthTexture } from '../../../textures/DepthTexture.js';
 import { Texture } from '../../../textures/Texture.js';
+import { warn, error } from '../../../utils.js';
 
 const _compareToWebGPU = {
 	[ NeverCompare ]: 'never',
@@ -86,21 +87,29 @@ class WebGPUTextureUtils {
 		 */
 		this.defaultVideoFrame = null;
 
-		/**
-		 * Represents the color attachment of the default framebuffer.
-		 *
-		 * @type {?GPUTexture}
-		 * @default null
-		 */
-		this.colorBuffer = null;
+		this.frameBufferData = {
+			color: {
+				buffer: null, // TODO: Move to FramebufferTexture
+				width: 0,
+				height: 0,
+				samples: 0
+			},
+			depth: {
+				texture: new DepthTexture(),
+				width: 0,
+				height: 0,
+				samples: 0,
+				depth: false,
+				stencil: false
+			}
+		};
 
 		/**
-		 * Represents the depth attachment of the default framebuffer.
+		 * A cache of shared texture samplers.
 		 *
-		 * @type {DepthTexture}
+		 * @type {Map<string, Object>}
 		 */
-		this.depthTexture = new DepthTexture();
-		this.depthTexture.name = 'depthBuffer';
+		this._samplerCache = new Map();
 
 	}
 
@@ -108,39 +117,81 @@ class WebGPUTextureUtils {
 	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to create the sampler for.
+	 * @return {string} The current sampler key.
 	 */
-	createSampler( texture ) {
+	updateSampler( texture ) {
 
 		const backend = this.backend;
-		const device = backend.device;
 
-		const textureGPU = backend.get( texture );
+		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
+			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
+			texture.anisotropy + '-' + ( texture.compareFunction || 0 );
 
-		const samplerDescriptorGPU = {
-			addressModeU: this._convertAddressMode( texture.wrapS ),
-			addressModeV: this._convertAddressMode( texture.wrapT ),
-			addressModeW: this._convertAddressMode( texture.wrapR ),
-			magFilter: this._convertFilterMode( texture.magFilter ),
-			minFilter: this._convertFilterMode( texture.minFilter ),
-			mipmapFilter: this._convertFilterMode( texture.minFilter ),
-			maxAnisotropy: 1
-		};
+		let samplerData = this._samplerCache.get( samplerKey );
 
-		// anisotropy can only be used when all filter modes are set to linear.
+		if ( samplerData === undefined ) {
 
-		if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
+			const samplerDescriptorGPU = {
+				addressModeU: this._convertAddressMode( texture.wrapS ),
+				addressModeV: this._convertAddressMode( texture.wrapT ),
+				addressModeW: this._convertAddressMode( texture.wrapR ),
+				magFilter: this._convertFilterMode( texture.magFilter ),
+				minFilter: this._convertFilterMode( texture.minFilter ),
+				mipmapFilter: this._convertFilterMode( texture.minFilter ),
+				maxAnisotropy: 1
+			};
 
-			samplerDescriptorGPU.maxAnisotropy = texture.anisotropy;
+			// anisotropy can only be used when all filter modes are set to linear.
+
+			if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
+
+				samplerDescriptorGPU.maxAnisotropy = texture.anisotropy;
+
+			}
+
+			if ( texture.isDepthTexture && texture.compareFunction !== null ) {
+
+				samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
+
+			}
+
+			const sampler = backend.device.createSampler( samplerDescriptorGPU );
+
+			samplerData = { sampler, usedTimes: 0 };
+
+			this._samplerCache.set( samplerKey, samplerData );
 
 		}
 
-		if ( texture.isDepthTexture && texture.compareFunction !== null ) {
+		const textureData = backend.get( texture );
 
-			samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
+		if ( textureData.sampler !== samplerData.sampler ) {
+
+			// check if previous sampler is unused so it can be deleted
+
+			if ( textureData.sampler !== undefined ) {
+
+				const oldSamplerData = this._samplerCache.get( textureData.samplerKey );
+				oldSamplerData.usedTimes --;
+
+				if ( oldSamplerData.usedTimes === 0 ) {
+
+					this._samplerCache.delete( textureData.samplerKey );
+
+				}
+
+			}
+
+			// update to new sampler data
+
+			textureData.samplerKey = samplerKey;
+			textureData.sampler = samplerData.sampler;
+
+			samplerData.usedTimes ++;
 
 		}
 
-		textureGPU.sampler = device.createSampler( samplerDescriptorGPU );
+		return samplerKey;
 
 	}
 
@@ -187,6 +238,15 @@ class WebGPUTextureUtils {
 
 		}
 
+		if ( texture.isExternalTexture ) {
+
+			textureData.texture = texture.sourceTexture;
+			textureData.initialized = true;
+
+			return;
+
+		}
+
 		if ( options.needsMipmaps === undefined ) options.needsMipmaps = false;
 		if ( options.levels === undefined ) options.levels = 1;
 		if ( options.depth === undefined ) options.depth = 1;
@@ -222,7 +282,7 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( texture.isCompressedTexture !== true && texture.isCompressedArrayTexture !== true ) {
+		if ( texture.isCompressedTexture !== true && texture.isCompressedArrayTexture !== true && format !== GPUTextureFormat.RGB9E5UFloat ) {
 
 			usage |= GPUTextureUsage.RENDER_ATTACHMENT;
 
@@ -246,7 +306,7 @@ class WebGPUTextureUtils {
 
 		if ( format === undefined ) {
 
-			console.warn( 'WebGPURenderer: Texture format not supported.' );
+			warn( 'WebGPURenderer: Texture format not supported.' );
 
 			this.createDefaultTexture( texture );
 			return;
@@ -283,31 +343,18 @@ class WebGPUTextureUtils {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined ) textureData.texture.destroy();
+		if ( textureData.texture !== undefined && isDefaultTexture === false ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
 		backend.delete( texture );
-
-	}
-
-	/**
-	 * Destroys the GPU sampler for the given texture.
-	 *
-	 * @param {Texture} texture - The texture to destroy the sampler for.
-	 */
-	destroySampler( texture ) {
-
-		const backend = this.backend;
-		const textureData = backend.get( texture );
-
-		delete textureData.sampler;
 
 	}
 
@@ -350,24 +397,44 @@ class WebGPUTextureUtils {
 	 */
 	getColorBuffer() {
 
-		if ( this.colorBuffer ) this.colorBuffer.destroy();
-
 		const backend = this.backend;
 		const { width, height } = backend.getDrawingBufferSize();
+		const samples = backend.renderer.currentSamples;
 
-		this.colorBuffer = backend.device.createTexture( {
+		const frameBufferColor = this.frameBufferData.color;
+
+		if ( frameBufferColor.width === width && frameBufferColor.height === height && frameBufferColor.samples === samples ) {
+
+			return frameBufferColor.buffer;
+
+		}
+
+		// recreate
+
+		let colorBuffer = frameBufferColor.buffer;
+
+		if ( colorBuffer ) colorBuffer.destroy();
+
+		colorBuffer = backend.device.createTexture( {
 			label: 'colorBuffer',
 			size: {
 				width: width,
 				height: height,
 				depthOrArrayLayers: 1
 			},
-			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
+			sampleCount: backend.utils.getSampleCount( backend.renderer.currentSamples ),
 			format: backend.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
 
-		return this.colorBuffer;
+		//
+
+		frameBufferColor.buffer = colorBuffer;
+		frameBufferColor.width = width;
+		frameBufferColor.height = height;
+		frameBufferColor.samples = samples;
+
+		return colorBuffer;
 
 	}
 
@@ -383,8 +450,23 @@ class WebGPUTextureUtils {
 
 		const backend = this.backend;
 		const { width, height } = backend.getDrawingBufferSize();
+		const samples = backend.renderer.currentSamples;
 
-		const depthTexture = this.depthTexture;
+		const frameBufferDepth = this.frameBufferData.depth;
+		const depthTexture = frameBufferDepth.texture;
+
+		if ( depthTexture.width === width &&
+			depthTexture.height === height &&
+			depthTexture.samples === samples &&
+			depthTexture.depth === depth &&
+			depthTexture.stencil === stencil ) {
+
+			return backend.get( depthTexture ).texture;
+
+		}
+
+		//
+
 		const depthTextureGPU = backend.get( depthTexture ).texture;
 
 		let format, type;
@@ -412,6 +494,8 @@ class WebGPUTextureUtils {
 			this.destroyTexture( depthTexture );
 
 		}
+
+		// recreate
 
 		depthTexture.name = 'depthBuffer';
 		depthTexture.format = format;
@@ -503,8 +587,6 @@ class WebGPUTextureUtils {
 
 		textureData.version = texture.version;
 
-		if ( texture.onUpdate ) texture.onUpdate( texture );
-
 	}
 
 	/**
@@ -533,7 +615,7 @@ class WebGPUTextureUtils {
 
 		const readBuffer = device.createBuffer(
 			{
-				size: width * height * bytesPerTexel,
+				size: ( ( height - 1 ) * bytesPerRow ) + ( width * bytesPerTexel ), // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			}
 		);
@@ -565,6 +647,15 @@ class WebGPUTextureUtils {
 		const buffer = readBuffer.getMappedRange();
 
 		return new typedArrayType( buffer );
+
+	}
+
+	/**
+	 * Frees all internal resources.
+	 */
+	dispose() {
+
+		this._samplerCache.clear();
 
 	}
 
@@ -1033,7 +1124,7 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG8Snorm ) return Int8Array;
 		if ( format === GPUTextureFormat.RGBA8Uint ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGBA8Sint ) return Int8Array;
-		if ( format === GPUTextureFormat.RGBA8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8UnormSRGB ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGBA8Snorm ) return Int8Array;
 
 
@@ -1058,8 +1149,7 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RGBA32Sint ) return Int32Array;
 		if ( format === GPUTextureFormat.RGBA32Float ) return Float32Array;
 
-		if ( format === GPUTextureFormat.BGRA8Unorm ) return Uint8Array;
-		if ( format === GPUTextureFormat.BGRA8UnormSRGB ) return Uint8Array;
+		if ( format === GPUTextureFormat.BGRA8Unorm || format === GPUTextureFormat.BGRA8UnormSRGB ) return Uint8Array;
 		if ( format === GPUTextureFormat.RGB10A2Unorm ) return Uint32Array;
 		if ( format === GPUTextureFormat.RGB9E5UFloat ) return Uint32Array;
 		if ( format === GPUTextureFormat.RG11B10UFloat ) return Uint32Array;
@@ -1119,6 +1209,7 @@ export function getFormat( texture, device = null ) {
 
 		switch ( format ) {
 
+			case RGB_S3TC_DXT1_Format:
 			case RGBA_S3TC_DXT1_Format:
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm;
 				break;
@@ -1131,7 +1222,28 @@ export function getFormat( texture, device = null ) {
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
 				break;
 
+			case RED_RGTC1_Format:
+				formatGPU = GPUTextureFormat.BC4RUnorm;
+				break;
+
+			case SIGNED_RED_RGTC1_Format:
+				formatGPU = GPUTextureFormat.BC4RSnorm;
+				break;
+
+			case RED_GREEN_RGTC2_Format:
+				formatGPU = GPUTextureFormat.BC5RGUnorm;
+				break;
+
+			case SIGNED_RED_GREEN_RGTC2_Format:
+				formatGPU = GPUTextureFormat.BC5RGSnorm;
+				break;
+
+			case RGBA_BPTC_Format:
+				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.BC7RGBAUnormSRGB : GPUTextureFormat.BC7RGBAUnorm;
+				break;
+
 			case RGB_ETC2_Format:
+			case RGB_ETC1_Format:
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.ETC2RGB8UnormSRGB : GPUTextureFormat.ETC2RGB8Unorm;
 				break;
 
@@ -1200,7 +1312,7 @@ export function getFormat( texture, device = null ) {
 				break;
 
 			default:
-				console.error( 'WebGPURenderer: Unsupported texture format.', format );
+				error( 'WebGPURenderer: Unsupported texture format.', format );
 
 		}
 
@@ -1244,7 +1356,7 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
 
 				}
 
@@ -1263,7 +1375,7 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGBFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGBFormat.', type );
 
 				}
 
@@ -1306,7 +1418,7 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
 
 				}
 
@@ -1349,7 +1461,7 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
 
 				}
 
@@ -1372,7 +1484,7 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with DepthFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with DepthFormat.', type );
 
 				}
 
@@ -1390,7 +1502,7 @@ export function getFormat( texture, device = null ) {
 
 						if ( device && device.features.has( GPUFeatureName.Depth32FloatStencil8 ) === false ) {
 
-							console.error( 'WebGPURenderer: Depth textures with DepthStencilFormat + FloatType can only be used with the "depth32float-stencil8" GPU feature.' );
+							error( 'WebGPURenderer: Depth textures with DepthStencilFormat + FloatType can only be used with the "depth32float-stencil8" GPU feature.' );
 
 						}
 
@@ -1399,7 +1511,7 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with DepthStencilFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with DepthStencilFormat.', type );
 
 				}
 
@@ -1418,7 +1530,7 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RedIntegerFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RedIntegerFormat.', type );
 
 				}
 
@@ -1437,7 +1549,7 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGIntegerFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGIntegerFormat.', type );
 
 				}
 
@@ -1456,14 +1568,14 @@ export function getFormat( texture, device = null ) {
 						break;
 
 					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGBAIntegerFormat.', type );
+						error( 'WebGPURenderer: Unsupported texture type with RGBAIntegerFormat.', type );
 
 				}
 
 				break;
 
 			default:
-				console.error( 'WebGPURenderer: Unsupported texture format.', format );
+				error( 'WebGPURenderer: Unsupported texture format.', format );
 
 		}
 

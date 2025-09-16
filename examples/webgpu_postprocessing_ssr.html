@@ -14,7 +14,7 @@
 
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing - screen space reflections<br />
-		<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by 
+		<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by
 		<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
 	</div>
 
@@ -45,13 +45,15 @@
 
 		const params = {
 			quality: 0.5,
+			blurQuality: 2,
 			maxDistance: 0.5,
 			opacity: 1,
 			thickness: 0.015,
+			roughness: 1,
 			enabled: true
 		};
 
-		let camera, scene, renderer, postProcessing, ssrPass;
+		let camera, scene, model, renderer, postProcessing, ssrPass;
 		let gui, stats, controls;
 
 		init();
@@ -67,12 +69,14 @@
 			const dracoLoader = new DRACOLoader();
 			dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
 			dracoLoader.setDecoderConfig( { type: 'js' } );
-		
+
 			const loader = new GLTFLoader();
 			loader.setDRACOLoader( dracoLoader );
 			loader.load( 'models/gltf/steampunk_camera.glb', function ( gltf ) {
 
-				gltf.scene.traverse( function ( object ) {
+				model = gltf.scene;
+
+				model.traverse( function ( object ) {
 
 					if ( object.material ) {
 
@@ -84,13 +88,13 @@
 
 						// Avoid overdrawing
 						object.material.side = THREE.FrontSide;
-		
+
 					}
-		
+
 				} );
-		
-				gltf.scene.position.y = 0.1;
-				scene.add( gltf.scene );
+
+				model.position.y = 0.1;
+				scene.add( model );
 
 			} );
 
@@ -116,11 +120,11 @@
 
 			postProcessing = new THREE.PostProcessing( renderer );
 
-			const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
+			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: directionToColor( normalView ),
-				metalrough: vec2( metalness, roughness )
+				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' );
@@ -128,7 +132,7 @@
 			const scenePassDepth = scenePass.getTextureNode( 'depth' );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' );
 
-			// optimization bandwidth packing the normals and reducing the texture precision if possible
+			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
 
 			const normalTexture = scenePass.getTexture( 'normal' );
 			normalTexture.type = THREE.UnsignedByteType;
@@ -136,26 +140,20 @@
 			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
 			metalRoughTexture.type = THREE.UnsignedByteType;
 
-			const customNormal = sample( ( uv ) => {
+			const sceneNormal = sample( ( uv ) => {
 
 				return colorToDirection( scenePassNormal.sample( uv ) );
 
 			} );
 
-			const customMetalness = sample( ( uv ) => {
-
-				return scenePassMetalRough.sample( uv ).r;
-
-			} );
-
 			//
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, customNormal, customMetalness, camera );
+			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, scenePassMetalRough.r, scenePassMetalRough.g );
 
 			// blend SSR over beauty
 
-			const outputNode = smaa( blendColor( scenePassColor, ssrPass.mul( scenePassMetalRough.g.oneMinus() ) ) );
-		
+			const outputNode = smaa( blendColor( scenePassColor, ssrPass ) );
+
 			postProcessing.outputNode = outputNode;
 
 			//
@@ -174,11 +172,13 @@
 			// GUI
 
 			gui = new GUI();
-			gui.add( params, 'quality' ).min( 0 ).max( 1 ).onChange( updateParameters );
-			gui.add( params, 'maxDistance' ).min( 0 ).max( 1 ).onChange( updateParameters );
-			gui.add( params, 'opacity' ).min( 0 ).max( 1 ).onChange( updateParameters );
-			gui.add( params, 'thickness' ).min( 0 ).max( 0.05 ).onChange( updateParameters );
-			gui.add( params, 'enabled' ).onChange( () => {
+			const ssrFolder = gui.addFolder( 'SSR' );
+			ssrFolder.add( params, 'quality' ).min( 0 ).max( 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'blurQuality' ).min( 1 ).max( 3 ).step( 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'maxDistance' ).min( 0 ).max( 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'opacity' ).min( 0 ).max( 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'thickness' ).min( 0 ).max( 0.05 ).onChange( updateParameters );
+			ssrFolder.add( params, 'enabled' ).onChange( () => {
 
 				if ( params.enabled === true ) {
 
@@ -193,7 +193,21 @@
 				postProcessing.needsUpdate = true;
 
 			} );
-		
+			const modelFolder = gui.addFolder( 'Model' );
+			modelFolder.add( params, 'roughness' ).min( 0 ).max( 1 ).onChange( ( value ) => {
+
+				model.traverse( function ( object ) {
+
+					if ( object.material ) {
+
+						object.material.roughness = value;
+
+					}
+
+				} );
+
+			} );
+
 			updateParameters();
 
 		}
@@ -201,10 +215,10 @@
 		function updateParameters() {
 
 			ssrPass.quality.value = params.quality;
+			ssrPass.blurQuality.value = params.blurQuality;
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrPass.opacity.value = params.opacity;
 			ssrPass.thickness.value = params.thickness;
-
 
 		}
 

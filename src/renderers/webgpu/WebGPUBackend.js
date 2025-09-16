@@ -13,9 +13,9 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem } from '../../constants.js';
+import { WebGPUCoordinateSystem, TimestampQuery } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
-import { warnOnce } from '../../utils.js';
+import { warnOnce, error } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
 /**
@@ -91,14 +91,6 @@ class WebGPUBackend extends Backend {
 		 * @default null
 		 */
 		this.context = null;
-
-		/**
-		 * A reference to the color attachment of the default framebuffer.
-		 *
-		 * @type {?GPUTexture}
-		 * @default null
-		 */
-		this.colorBuffer = null;
 
 		/**
 		 * A reference to the default render pass descriptor.
@@ -328,9 +320,9 @@ class WebGPUBackend extends Backend {
 
 			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-			if ( this.renderer.samples > 0 ) {
+			if ( this.renderer.currentSamples > 0 ) {
 
-				colorAttachment.view = this.colorBuffer.createView();
+				colorAttachment.view = this.textureUtils.getColorBuffer().createView();
 
 			} else {
 
@@ -344,7 +336,7 @@ class WebGPUBackend extends Backend {
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-		if ( this.renderer.samples > 0 ) {
+		if ( this.renderer.currentSamples > 0 ) {
 
 			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
 
@@ -390,8 +382,6 @@ class WebGPUBackend extends Backend {
 		if ( descriptors === undefined ||
 			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
-			renderTargetData.activeMipmapLevel !== renderContext.activeMipmapLevel ||
-			renderTargetData.activeCubeFace !== renderContext.activeCubeFace ||
 			renderTargetData.samples !== renderTarget.samples
 		) {
 
@@ -570,6 +560,8 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
+		//
+
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
@@ -610,7 +602,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.initTimestampQuery( renderContext, descriptor );
+		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ), descriptor );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
@@ -1287,11 +1279,13 @@ class WebGPUBackend extends Backend {
 
 		const groupGPU = this.get( computeGroup );
 
+		//
+
 		const descriptor = {
 			label: 'computeGroup_' + computeGroup.id
 		};
 
-		this.initTimestampQuery( computeGroup, descriptor );
+		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), descriptor );
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( { label: 'computeGroup_' + computeGroup.id } );
 
@@ -1306,7 +1300,7 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {Array<number>|number} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, dispatchSizeOrCount = null ) {
 
@@ -1532,7 +1526,7 @@ class WebGPUBackend extends Backend {
 				if ( drawInstances !== null ) {
 
 					// @deprecated, r174
-					warnOnce( 'THREE.WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+					warnOnce( 'WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
 
 				}
 
@@ -1796,6 +1790,11 @@ class WebGPUBackend extends Backend {
 		const utils = this.utils;
 		const renderContext = renderObject.context;
 
+		// meshes with negative scale have a different frontFace render pipeline
+		// descriptor value so the following must be honored in the cache key
+
+		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
 		return [
 			material.transparent, material.blending, material.premultipliedAlpha,
 			material.blendSrc, material.blendDst, material.blendEquation,
@@ -1806,6 +1805,7 @@ class WebGPUBackend extends Backend {
 			material.stencilFail, material.stencilZFail, material.stencilZPass,
 			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
+			frontFaceCW,
 			utils.getSampleCountRenderContext( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ),
@@ -1818,24 +1818,14 @@ class WebGPUBackend extends Backend {
 	// textures
 
 	/**
-	 * Creates a GPU sampler for the given texture.
+	 * Updates a GPU sampler for the given texture.
 	 *
-	 * @param {Texture} texture - The texture to create the sampler for.
+	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @return {string} The current sampler key.
 	 */
-	createSampler( texture ) {
+	updateSampler( texture ) {
 
-		this.textureUtils.createSampler( texture );
-
-	}
-
-	/**
-	 * Destroys the GPU sampler for the given texture.
-	 *
-	 * @param {Texture} texture - The texture to destroy the sampler for.
-	 */
-	destroySampler( texture ) {
-
-		this.textureUtils.destroySampler( texture );
+		return this.textureUtils.updateSampler( texture );
 
 	}
 
@@ -1844,10 +1834,11 @@ class WebGPUBackend extends Backend {
 	 * as a placeholder until the actual texture is ready for usage.
 	 *
 	 * @param {Texture} texture - The texture to create a default texture for.
+	 * @return {boolean} Whether the sampler has been updated or not.
 	 */
 	createDefaultTexture( texture ) {
 
-		this.textureUtils.createDefaultTexture( texture );
+		return this.textureUtils.createDefaultTexture( texture );
 
 	}
 
@@ -1890,10 +1881,11 @@ class WebGPUBackend extends Backend {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
-		this.textureUtils.destroyTexture( texture );
+		this.textureUtils.destroyTexture( texture, isDefaultTexture );
 
 	}
 
@@ -1918,14 +1910,13 @@ class WebGPUBackend extends Backend {
 	/**
 	 * Inits a time stamp query for the given render context.
 	 *
-	 * @param {RenderContext} renderContext - The render context.
+	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
+	 * @param {number} uid - Unique id for the context (e.g. render context id).
 	 * @param {Object} descriptor - The query descriptor.
 	 */
-	initTimestampQuery( renderContext, descriptor ) {
+	initTimestampQuery( type, uid, descriptor ) {
 
 		if ( ! this.trackTimestamp ) return;
-
-		const type = renderContext.isComputeNode ? 'compute' : 'render';
 
 		if ( ! this.timestampQueryPool[ type ] ) {
 
@@ -1936,13 +1927,13 @@ class WebGPUBackend extends Backend {
 
 		const timestampQueryPool = this.timestampQueryPool[ type ];
 
-		const baseOffset = timestampQueryPool.allocateQueriesForContext( renderContext );
+		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
 		descriptor.timestampWrites = {
 			querySet: timestampQueryPool.querySet,
 			beginningOfPassWriteIndex: baseOffset,
 			endOfPassWriteIndex: baseOffset + 1,
-		  };
+		};
 
 	}
 
@@ -2194,7 +2185,6 @@ class WebGPUBackend extends Backend {
 	 */
 	updateSize() {
 
-		this.colorBuffer = this.textureUtils.getColorBuffer();
 		this.defaultRenderPassdescriptor = null;
 
 	}
@@ -2358,7 +2348,7 @@ class WebGPUBackend extends Backend {
 
 		if ( sourceGPU.format !== destinationGPU.format ) {
 
-			console.error( 'WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match.', sourceGPU.format, destinationGPU.format );
+			error( 'WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match.', sourceGPU.format, destinationGPU.format );
 
 			return;
 
@@ -2433,6 +2423,12 @@ class WebGPUBackend extends Backend {
 			this.textureUtils.generateMipmaps( texture );
 
 		}
+
+	}
+
+	dispose() {
+
+		this.textureUtils.dispose();
 
 	}
 

@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - compute - flocking</title>
+		<title>three.js webgpu - compute birds</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				background-color: #fff;
-				color: #444;
-			}
-			a {
-				color:#08f;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgpu compute birds<br/>
-			Move mouse to disturb birds.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>compute birds</span>
+			</div>
+
+			<small>
+				Move mouse to disturb birds.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -37,14 +36,15 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from 'stats-gl';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-			let container, stats;
+			let container;
 			let camera, scene, renderer;
 
 			let last = performance.now();
@@ -63,17 +63,11 @@
 
 					super();
 
-					const trianglesPerBird = 3;
-					const triangles = BIRDS * trianglesPerBird;
-					const points = triangles * 3;
+					const points = 3 * 3;
 
 					const vertices = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
-					const references = new THREE.BufferAttribute( new Uint32Array( points ), 1 );
-					const birdVertex = new THREE.BufferAttribute( new Uint32Array( points ), 1 );
 
 					this.setAttribute( 'position', vertices );
-					this.setAttribute( 'reference', references );
-					this.setAttribute( 'birdVertex', birdVertex );
 
 					let v = 0;
 
@@ -89,44 +83,40 @@
 
 					const wingsSpan = 20;
 
-					for ( let f = 0; f < BIRDS; f ++ ) {
+					// Body
+					verts_push(
+						0, 0, - 20,
+						0, - 8, 10,
+						0, 0, 30
+					);
 
-						// Body
-						verts_push(
-							0, 0, - 20,
-							0, - 8, 10,
-							0, 0, 30
-						);
+					// Left Wing
+					verts_push(
+						0, 0, - 15,
+						- wingsSpan, 0, 5,
+						0, 0, 15
+					);
 
-						// Wings
-						verts_push(
-							0, 0, - 15,
-							- wingsSpan, 0, 5,
-							0, 0, 15
-						);
-
-						verts_push(
-							0, 0, 15,
-							wingsSpan, 0, 5,
-							0, 0, - 15
-						);
-
-					}
-
-					for ( let v = 0; v < triangles * 3; v ++ ) {
-
-						const triangleIndex = ~ ~ ( v / 3 );
-						const birdIndex = ~ ~ ( triangleIndex / trianglesPerBird );
-
-						references.array[ v ] = birdIndex;
-
-						birdVertex.array[ v ] = v % 9;
-
-					}
+					// Right Wing
+					verts_push(
+						0, 0, 15,
+						wingsSpan, 0, 5,
+						0, 0, - 15
+					);
 
 					this.scale( 0.2, 0.2, 0.2 );
 
 				}
+
+			}
+
+			// TODO: Fix example with WebGL backend
+			
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
 
 			}
 
@@ -172,8 +162,9 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera );
@@ -242,14 +233,11 @@
 
 				const birdVertexTSL = Fn( () => {
 
-					const reference = attribute( 'reference' );
-					const birdVertex = attribute( 'birdVertex' );
-
 					const position = positionLocal.toVar();
-					const newPhase = phaseStorage.element( reference ).toVar();
-					const newVelocity = normalize( velocityStorage.element( reference ) ).toVar();
+					const newPhase = phaseStorage.element( instanceIndex ).toVar();
+					const newVelocity = normalize( velocityStorage.element( instanceIndex ) ).toVar();
 
-					If( birdVertex.equal( 4 ).or( birdVertex.equal( 7 ) ), () => {
+					If( vertexIndex.equal( 4 ).or( vertexIndex.equal( 7 ) ), () => {
 
 						// flap wings
 						position.y = sin( newPhase ).mul( 5.0 );
@@ -283,7 +271,7 @@
 					);
 
 					const finalVert = maty.mul( matz ).mul( newPosition );
-					finalVert.addAssign( positionStorage.element( reference ) );
+					finalVert.addAssign( positionStorage.element( instanceIndex ) );
 
 					return cameraProjectionMatrix.mul( cameraViewMatrix ).mul( finalVert );
 
@@ -292,7 +280,7 @@
 				birdMaterial.vertexNode = birdVertexTSL();
 				birdMaterial.side = THREE.DoubleSide;
 
-				const birdMesh = new THREE.Mesh( birdGeometry, birdMaterial );
+				const birdMesh = new THREE.InstancedMesh( birdGeometry, birdMaterial, BIRDS );
 				birdMesh.rotation.y = Math.PI / 2;
 				birdMesh.matrixAutoUpdate = false;
 				birdMesh.frustumCulled = false;
@@ -423,7 +411,8 @@
 					// Write back the final velocity to storage
 					velocityStorage.element( birdIndex ).assign( velocity );
 
-				} )().compute( BIRDS );
+				} )().compute( BIRDS ).setName( 'Birds Velocity' );
+
 				computePosition = Fn( () => {
 
 					const { deltaTime } = effectController;
@@ -435,30 +424,19 @@
 					const modValue = phase.add( deltaTime ).add( length( velocity.xz ).mul( deltaTime ).mul( 3.0 ) ).add( max( velocity.y, 0.0 ).mul( deltaTime ).mul( 6.0 ) );
 					phaseStorage.element( instanceIndex ).assign( modValue.mod( 62.83 ) );
 
-				} )().compute( BIRDS );
+				} )().compute( BIRDS ).setName( 'Birds Position' );
 
 				scene.add( birdMesh );
-
-				stats = new Stats( {
-					precision: 3,
-					horizontal: false,
-					trackGPU: true,
-					trackCPT: true
-				} );
-				stats.init( renderer );
-				container.appendChild( stats.dom );
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const gui = new GUI();
-
+				const gui = renderer.inspector.createParameters( 'Birds settings' );
 				gui.add( effectController.separation, 'value', 0.0, 100.0, 1.0 ).name( 'Separation' );
 				gui.add( effectController.alignment, 'value', 0.0, 100, 0.001 ).name( 'Alignment ' );
 				gui.add( effectController.cohesion, 'value', 0.0, 100, 0.025 ).name( 'Cohesion' );
-				gui.close();
 
 			}
 
@@ -480,14 +458,6 @@
 
 			}
 
-			function animate() {
-
-				render();
-				renderer.resolveTimestampsAsync();
-				stats.update();
-
-			}
-
 			function render() {
 
 				const now = performance.now();
@@ -505,7 +475,7 @@
 
 				renderer.compute( computeVelocity );
 				renderer.compute( computePosition );
-				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+
 				renderer.render( scene, camera );
 
 				// Move pointer away so we only affect birds when moving the mouse

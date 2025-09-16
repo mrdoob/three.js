@@ -58,7 +58,7 @@ class Pipelines extends DataMap {
 		 * fragment and compute) the programmable stage objects which
 		 * represent the actual shader code.
 		 *
-		 * @type {Object<string,Map>}
+		 * @type {Object<string,Map<string, ProgrammableStage>>}
 		 */
 		this.programs = {
 			vertex: new Map(),

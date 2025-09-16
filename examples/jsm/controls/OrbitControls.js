@@ -91,7 +91,7 @@ class OrbitControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Object3D} object - The object that is managed by the controls.
-	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 * @param {?HTMLElement} domElement - The HTML element used for event listeners.
 	 */
 	constructor( object, domElement = null ) {
 
@@ -541,7 +541,7 @@ class OrbitControls extends Controls {
 	 * Adds key event listeners to the given DOM element.
 	 * `window` is a recommended argument for using this method.
 	 *
-	 * @param {HTMLDOMElement} domElement - The DOM element
+	 * @param {HTMLElement} domElement - The DOM element
 	 */
 	listenToKeyEvents( domElement ) {
 

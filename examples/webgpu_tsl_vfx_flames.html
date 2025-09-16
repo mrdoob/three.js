@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { PI2, oneMinus, spherizeUV, sin, step, texture, time, Fn, uv, vec2, vec3, vec4, mix, billboarding } from 'three/tsl';
+			import { TWO_PI, oneMinus, spherizeUV, sin, step, texture, time, Fn, uv, vec2, vec3, vec4, mix, billboarding } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -104,7 +104,7 @@
 					mainUv.assign( mainUv.mul( 2, 1 ).sub( vec2( 0.5, 0 ) ) ); // scale
 
 					// gradients
-					const gradient1 = sin( time.mul( 10 ).sub( mainUv.y.mul( PI2 ).mul( 2 ) ) ).toVar();
+					const gradient1 = sin( time.mul( 10 ).sub( mainUv.y.mul( TWO_PI ).mul( 2 ) ) ).toVar();
 					const gradient2 = mainUv.y.smoothstep( 0, 1 ).toVar();
 					mainUv.x.addAssign( gradient1.mul( gradient2 ).mul( 0.2 ) );
 
@@ -136,7 +136,7 @@
 					// main UV
 					const mainUv = uv().toVar();
 					mainUv.assign( spherizeUV( mainUv, 10 ).mul( 0.6 ).add( 0.2 ) ); // spherize
-					mainUv.assign( mainUv.pow( vec2( 1, 3 ) ) ); // stretch
+					mainUv.assign( mainUv.abs().pow( vec2( 1, 3 ) ).mul( mainUv.sign() ) ); // stretch
 					mainUv.assign( mainUv.mul( 2, 1 ).sub( vec2( 0.5, 0 ) ) ); // scale
 
 					// perlin noise
@@ -145,7 +145,7 @@
 					mainUv.x.addAssign( perlinNoise.x.mul( 0.5 ) );
 
 					// gradients
-					const gradient1 = sin( time.mul( 10 ).sub( mainUv.y.mul( PI2 ).mul( 2 ) ) );
+					const gradient1 = sin( time.mul( 10 ).sub( mainUv.y.mul( TWO_PI ).mul( 2 ) ) );
 					const gradient2 = mainUv.y.smoothstep( 0, 1 );
 					const gradient3 = oneMinus( mainUv.y ).smoothstep( 0, 0.3 );
 					mainUv.x.addAssign( gradient1.mul( gradient2 ).mul( 0.2 ) );

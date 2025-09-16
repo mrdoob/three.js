@@ -24,7 +24,7 @@ export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0
 
 	textureNode = convertToTexture( textureNode );
 
-	const repeats = nodeObject( options.size ) || float( 45 );
+	const repeats = nodeObject( options.repeats ) || float( 45 );
 	const premultipliedAlpha = options.premultipliedAlpha || false;
 
 	const tap = ( uv ) => {

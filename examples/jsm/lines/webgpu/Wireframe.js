@@ -6,7 +6,7 @@ import {
 	Vector3
 } from 'three/webgpu';
 
-import { LineSegmentsGeometry } from '../../lines/LineSegmentsGeometry.js';
+import { LineSegmentsGeometry } from '../LineSegmentsGeometry.js';
 
 const _start = new Vector3();
 const _end = new Vector3();

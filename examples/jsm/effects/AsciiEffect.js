@@ -791,6 +791,7 @@ class AsciiEffect {
 
 					let fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
 
+
 					if ( iAlpha == 0 ) {
 
 						fBrightness = 1;

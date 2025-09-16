@@ -300,6 +300,7 @@ class BloomNode extends TempNode {
 
 		renderer.setRenderTarget( this._renderTargetBright );
 		_quadMesh.material = this._highPassFilterMaterial;
+		_quadMesh.name = 'Bloom [ High Pass ]';
 		_quadMesh.render( renderer );
 
 		// 2. Blur all the mips progressively
@@ -313,11 +314,13 @@ class BloomNode extends TempNode {
 			this._separableBlurMaterials[ i ].colorTexture.value = inputRenderTarget.texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionX;
 			renderer.setRenderTarget( this._renderTargetsHorizontal[ i ] );
+			_quadMesh.name = `Bloom [ Blur Horizontal - ${ i } ]`;
 			_quadMesh.render( renderer );
 
 			this._separableBlurMaterials[ i ].colorTexture.value = this._renderTargetsHorizontal[ i ].texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionY;
 			renderer.setRenderTarget( this._renderTargetsVertical[ i ] );
+			_quadMesh.name = `Bloom [ Blur Vertical - ${ i } ]`;
 			_quadMesh.render( renderer );
 
 			inputRenderTarget = this._renderTargetsVertical[ i ];
@@ -328,6 +331,7 @@ class BloomNode extends TempNode {
 
 		renderer.setRenderTarget( this._renderTargetsHorizontal[ 0 ] );
 		_quadMesh.material = this._compositeMaterial;
+		_quadMesh.name = 'Bloom [ Composite ]';
 		_quadMesh.render( renderer );
 
 		// restore
@@ -364,7 +368,7 @@ class BloomNode extends TempNode {
 
 		// gaussian blur materials
 
-		// These sizes have been changed to account for the altered coefficents-calculation to avoid blockiness,
+		// These sizes have been changed to account for the altered coefficients-calculation to avoid blockiness,
 		// while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
 		const kernelSizeArray = [ 6, 10, 14, 18, 22 ];
 

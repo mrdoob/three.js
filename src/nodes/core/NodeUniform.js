@@ -43,7 +43,7 @@ class NodeUniform {
 		 *
 		 * @type {UniformNode}
 		 */
-		this.node = node.getSelf();
+		this.node = node;
 
 	}
 

@@ -1,4 +1,5 @@
 import { ColorManagement } from '../../math/ColorManagement.js';
+import { warn } from '../../utils.js';
 
 // Uniform Utilities
 
@@ -21,7 +22,7 @@ export function cloneUniforms( src ) {
 
 				if ( property.isRenderTargetTexture ) {
 
-					console.warn( 'UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().' );
+					warn( 'UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().' );
 					dst[ u ][ p ] = null;
 
 				} else {

@@ -7,7 +7,7 @@ import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
-import { getTypedArray } from '../utils.js';
+import { getTypedArray, error } from '../utils.js';
 
 /**
  * Class for loading geometries. The files are internally
@@ -67,7 +67,7 @@ class BufferGeometryLoader extends Loader {
 
 				} else {
 
-					console.error( e );
+					error( e );
 
 				}
 
