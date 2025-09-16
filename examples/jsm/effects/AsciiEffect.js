@@ -185,14 +185,13 @@ class AsciiEffect {
 		let isDisposed = false;
 		let width = 0, height = 0;
 		let iWidth = 0, iHeight = 0;
-		let oImg = null;
 
 		// DOM elements
 		const domElement = document.createElement( 'div' );
 		domElement.style.cursor = 'default';
 		domElement.setAttribute( 'data-ascii-effect', 'true' );
 
-		const oAscii = document.createElement( 'table' );
+		const oAscii = document.createElement( 'pre' );
 		domElement.appendChild( oAscii );
 
 		// Performance optimization: reusable string buffer
@@ -338,7 +337,6 @@ class AsciiEffect {
 			stringBuffer.length = 0;
 			width = height = null;
 			iWidth = iHeight = null;
-			oImg = null;
 
 		}
 
@@ -565,32 +563,37 @@ class AsciiEffect {
 
 			oCanvas.width = iWidth;
 			oCanvas.height = iHeight;
-			// oCanvas.style.display = "none";
-			// oCanvas.style.width = iWidth;
-			// oCanvas.style.height = iHeight;
 
-			oImg = renderer.domElement;
-
-			if ( oImg.style.backgroundColor ) {
-
-				oAscii.rows[ 0 ].cells[ 0 ].style.backgroundColor = oImg.style.backgroundColor;
-				oAscii.rows[ 0 ].cells[ 0 ].style.color = oImg.style.color;
-
-			}
-
-			oAscii.cellSpacing = '0';
-			oAscii.cellPadding = '0';
-
+			// Apply CSS optimizations for layout performance
 			const oStyle = oAscii.style;
+
+			// Use CSS containment to isolate layout calculations
+			oStyle.contain = 'layout style paint';
+
+			// Optimize text rendering
 			oStyle.whiteSpace = 'pre';
-			oStyle.margin = '0px';
-			oStyle.padding = '0px';
+			oStyle.margin = '0';
+			oStyle.padding = '0';
 			oStyle.fontFamily = strFont.toLowerCase();
 			oStyle.fontWeight = iFontWeight;
 			oStyle.fontSize = strFontSize;
 			oStyle.lineHeight = fLineHeight + 'px';
 			oStyle.textAlign = 'left';
 			oStyle.textDecoration = 'none';
+
+			// Performance optimizations
+			oStyle.willChange = 'contents'; // Hint that content will change frequently
+			oStyle.transform = 'translateZ(0)'; // Force hardware acceleration
+			oStyle.backfaceVisibility = 'hidden';
+
+			// Prevent text selection for performance
+			oStyle.userSelect = 'none';
+
+			// Size and overflow
+			oStyle.width = width + 'px';
+			oStyle.height = height + 'px';
+			oStyle.overflow = 'hidden';
+			oStyle.display = 'block';
 
 			// Create a configuration key for font-related parameters that affect letter spacing
 			const currentFontConfig = createFontConfig();
@@ -716,7 +719,7 @@ class AsciiEffect {
 		/**
 		 * Convert img element to ascii
 		 * @private
-		 * @param {HTMLTableElement} oAscii - The ASCII table element to populate
+		 * @param {HTMLElement} oAscii - The ASCII element to populate
 		 */
 		function asciifyImage( oAscii ) {
 
@@ -730,10 +733,6 @@ class AsciiEffect {
 			const widthTimes4 = iWidth * 4;
 
 			// Calculate step sizes based on density settings
-			// Higher density = smaller steps = more characters per line/column
-			// Base step of 1 pixel when density = 1.0
-			// For density > 1.0, we need fractional steps (sub-pixel sampling)
-			// Apply half the density effect to get the desired mapping
 			const xStep = 1 / ( fDensityHorizontal * 0.5 );
 			const yStep = 1 / ( fDensityVertical * 0.5 );
 
@@ -742,10 +741,9 @@ class AsciiEffect {
 			const asciiHeight = Math.floor( iHeight / yStep );
 
 			// Calculate expected buffer size for optimization
-			const expectedPixels = asciiHeight * ( asciiWidth + 1 ); // +1 for <br/> tags
+			const expectedPixels = asciiHeight * ( asciiWidth + 1 ); // +1 for newlines
 
 			// Reuse string buffer to avoid massive string allocations
-			// Only resize if needed
 			if ( stringBuffer.length < expectedPixels || stringBuffer.length > expectedPixels * 2 ) {
 
 				stringBuffer.length = expectedPixels;
@@ -754,7 +752,28 @@ class AsciiEffect {
 
 			let bufferIndex = 0;
 
-			// console.time('rendering');
+			// Optimization: Group consecutive characters with same color to reduce DOM nodes
+			let currentColor = null;
+			let currentGroup = '';
+
+			function flushCharacterGroup() {
+
+				if ( currentGroup.length === 0 ) return;
+
+				if ( bColor && currentColor ) {
+
+					stringBuffer[ bufferIndex ++ ] = `<span style="color:${currentColor}${bBlock && currentColor ? `;background-color:${currentColor}` : ''}">${escapeHtml( currentGroup )}</span>`;
+
+				} else {
+
+					stringBuffer[ bufferIndex ++ ] = escapeHtml( currentGroup );
+
+				}
+
+				currentGroup = '';
+				currentColor = null;
+
+			}
 
 			for ( let y = 0; y < iHeight; y += yStep ) {
 
@@ -769,21 +788,16 @@ class AsciiEffect {
 					const iGreen = oImgData[ iOffset + 1 ];
 					const iBlue = oImgData[ iOffset + 2 ];
 					const iAlpha = oImgData[ iOffset + 3 ];
-					let iCharIdx;
 
-					let fBrightness;
-
-					fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
+					let fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
 
 					if ( iAlpha == 0 ) {
 
-						// should calculate alpha instead, but quick hack :)
-						//fBrightness *= (iAlpha / 255);
 						fBrightness = 1;
 
 					}
 
-					iCharIdx = Math.floor( ( 1 - fBrightness ) * charListLengthMinus1 );
+					let iCharIdx = Math.floor( ( 1 - fBrightness ) * charListLengthMinus1 );
 
 					if ( bInvert ) {
 
@@ -791,43 +805,74 @@ class AsciiEffect {
 
 					}
 
-					// good for debugging
-					//fBrightness = Math.floor(fBrightness * 10);
-					//strThisChar = fBrightness;
-
 					let strThisChar = aCharList[ iCharIdx ];
 
-					if ( strThisChar === undefined )
+					if ( strThisChar === undefined ) {
+
 						strThisChar = ' ';
+
+					}
 
 					if ( bColor ) {
 
-						stringBuffer[ bufferIndex ++ ] = '<span style="'
-							+ 'color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');'
-							+ ( bBlock ? 'background-color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');' : '' )
-							+ ( bAlpha ? 'opacity:' + ( iAlpha / 255 ) + ';' : '' )
-							+ '">' + escapeHtml( strThisChar ) + '</span>';
+						const pixelColor = `rgb(${iRed},${iGreen},${iBlue})`;
+						const alphaStyle = bAlpha ? `${pixelColor.slice( 0, - 1 )},${iAlpha / 255})`.replace( 'rgb', 'rgba' ) : pixelColor;
+
+						// Group consecutive characters with same color
+						if ( currentColor === alphaStyle ) {
+
+							currentGroup += strThisChar;
+
+						} else {
+
+							// Flush current group and start new one
+							flushCharacterGroup();
+							currentColor = alphaStyle;
+							currentGroup = strThisChar;
+
+						}
 
 					} else {
 
-						stringBuffer[ bufferIndex ++ ] = strThisChar;
+						// In non-color mode, group all characters together
+						if ( ! bColor && currentColor === null ) {
+
+							currentGroup += strThisChar;
+
+						} else {
+
+							flushCharacterGroup();
+							currentColor = null;
+							currentGroup = strThisChar;
+
+						}
 
 					}
 
 				}
 
-				stringBuffer[ bufferIndex ++ ] = '<br/>';
+				// Flush any pending characters before line break
+				flushCharacterGroup();
+				stringBuffer[ bufferIndex ++ ] = '\n';
 
 			}
 
-			// Join only the used portion of the buffer
+			// Final flush
+			flushCharacterGroup();
+
+			// Join only the used portion of the buffer and update DOM once
 			const strChars = stringBuffer.slice( 0, bufferIndex ).join( '' );
 
-			oAscii.innerHTML = `<tr><td style="display:block;width:${width}px;height:${height}px;overflow:hidden">${strChars}</td></tr>`;
+			// Use textContent for non-color mode (much faster)
+			if ( ! bColor ) {
 
-			// console.timeEnd('rendering');
+				oAscii.textContent = strChars;
 
-			// return oAscii;
+			} else {
+
+				oAscii.innerHTML = strChars;
+
+			}
 
 		}
 
