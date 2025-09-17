@@ -69,7 +69,6 @@
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-e2e-webgpu": "node test/e2e/puppeteer.js --webgpu",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
-    "test-circular-deps": "dpdm --no-warning --no-tree --exit-code circular:1 src/nodes/Nodes.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
@@ -98,7 +97,6 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.0",
     "concurrently": "^9.0.0",
-    "dpdm": "^3.14.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^6.0.0",

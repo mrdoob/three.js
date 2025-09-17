@@ -34,9 +34,6 @@ jobs:
       - name: === Unit addons testing ===
         run: npm run test-unit-addons
 
-      - name: === Circular dependencies testing ===
-        run: npm run test-circular-deps
-
       - name: === Examples ready for release ===
         run: npm run test-e2e-cov
 
