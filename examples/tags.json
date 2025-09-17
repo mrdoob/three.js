@@ -155,6 +155,7 @@
 	"webgpu_postprocessing_ca": [ "chromatic aberration" ],
 	"webgpu_postprocessing_sobel": [ "filter", "edge detection" ],
 	"webgpu_postprocessing_ssaa": [ "msaa", "multisampled" ],
+	"webgpu_postprocessing_ssgi": [ "global illumination", "indirect diffuse" ],
 	"webgpu_refraction": [ "water" ],
 	"webgpu_rtt": [ "renderTarget", "texture" ],
 	"webgpu_rendertarget_2d-array_3d": [ "renderTarget", "2d-array", "3d" ],

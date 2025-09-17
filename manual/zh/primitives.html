@@ -44,7 +44,7 @@
 <div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">圆柱</div>
 <div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">十二面体</div>
 <div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">受挤压的 2D 形状，及可选的斜切。
-这里我们挤压了一个心型。注意，这分别是 <a href="/docs/#api/zh/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> 和 <a href="/docs/#api/zh/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> 的基础。</div>
+这里我们挤压了一个心型。注意，这分别是 <a href="/docs/#examples/zh/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> 和 <a href="/docs/#examples/zh/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> 的基础。</div>
 <div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">二十面体</div>
 <div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">绕着一条线旋转形成的形状。例如：灯泡、保龄球瓶、蜡烛、蜡烛台、酒瓶、玻璃杯等。你提供一系列点作为 2D 轮廓，并告诉 Three.js 沿着某条轴旋转时需要将侧面分成多少块。</div>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">八面体</div>
@@ -155,7 +155,7 @@ function addObject(x, y, obj) {
 </div>
 
 <p></p>
-<p>上面的模式有一些值得注意的例外。最大的可能就是 <a href="/docs/#api/zh/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>。在为文字生成网格前需要先加载 3D 字体数据。
+<p>上面的模式有一些值得注意的例外。最大的可能就是 <a href="/docs/#examples/zh/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>。在为文字生成网格前需要先加载 3D 字体数据。
 数据的加载是异步的，所以在尝试创建几何体前需要等待。通过将字体加载 Promise 化，我们可以让这个过程更简单。
 我们创建一个 <a href="/docs/#api/zh/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a>，然后 <code class="notranslate" translate="no">loadFont</code> 函数返回一个 <code class="notranslate" translate="no">promise</code>，<code class="notranslate" translate="no">promise</code> 的 <code class="notranslate" translate="no">resolve</code> 会给我们字体。
 接着我们创建一个 <code class="notranslate" translate="no">async</code> 函数 <code class="notranslate" translate="no">doit</code>，使用 <code class="notranslate" translate="no">await</code> 加载字体。最后创建几何体，调用 <code class="notranslate" translate="no">addOjbect</code> 将它添加到场景中。</p>

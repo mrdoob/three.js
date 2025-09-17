@@ -4,14 +4,19 @@
 		<title>three.js webgpu - volumetric lighting</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - volumetric lighting
-			<br>Improve the quality/performance adjusting the parameters in the Controls
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Volumetric Lighting</span>
+			</div>
+
+			<small>Compatible with native lights and shadows using post-processing pass.</small>
 		</div>
 
 		<script type="importmap">
@@ -30,6 +35,8 @@
 			import * as THREE from 'three/webgpu';
 			import { vec3, Fn, time, texture3D, screenUV, uniform, screenCoordinate, pass } from 'three/tsl';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
@@ -37,14 +44,9 @@
 			import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
 			let renderer, scene, camera;
 			let volumetricMesh, teapot, pointLight, spotLight;
 			let postProcessing;
-			let stats;
 
 			init();
 
@@ -99,9 +101,6 @@
 
 				const LAYER_VOLUMETRIC_LIGHTING = 10;
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -109,6 +108,7 @@
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 2;
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -216,8 +216,9 @@
 				// Volumetric Lighting Pass
 
 				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
+				volumetricPass.name = 'Volumetric Lighting';
 				volumetricPass.setLayers( volumetricLayer );
-				volumetricPass.setResolution( .25 );
+				volumetricPass.setResolutionScale( .25 );
 
 				// Compose and Denoise
 
@@ -232,16 +233,16 @@
 				// GUI
 
 				const params = {
-					resolution: volumetricPass.getResolution(),
+					resolution: volumetricPass.getResolutionScale(),
 					denoise: true
 				};
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Volumetric Lighting' );
 
-				const rayMarching = gui.addFolder( 'Ray Marching' ).close();
+				const rayMarching = gui.addFolder( 'Ray Marching' );
 				rayMarching.add( params, 'resolution', .1, .5 ).onChange( ( resolution ) => {
 
-					volumetricPass.setResolution( resolution );
+					volumetricPass.setResolutionScale( resolution );
 
 				} );
 				rayMarching.add( volumetricMaterial, 'steps', 2, 12 ).name( 'step count' );
@@ -257,7 +258,7 @@
 
 				} );
 
-				const lighting = gui.addFolder( 'Lighting / Scene' ).close();
+				const lighting = gui.addFolder( 'Lighting / Scene' );
 				lighting.add( pointLight, 'intensity', 0, 6 ).name( 'light intensity' );
 				lighting.add( spotLight, 'intensity', 0, 200 ).name( 'spot intensity' );
 				lighting.add( volumetricLightingIntensity, 'value', 0, 2 ).name( 'fog intensity' );
@@ -277,8 +278,6 @@
 			}
 
 			function animate() {
-
-				stats.update();
 
 				const time = performance.now() * 0.001;
 				const scale = 2.4;
