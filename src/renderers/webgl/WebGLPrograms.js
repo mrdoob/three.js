@@ -303,7 +303,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			useFog: material.fog === true,
 			fogExp2: ( !! fog && fog.isFogExp2 ),
 
-			flatShading: ( material.flatShading === true && material.wireframe === false ),
+			flatShading: ( material.flatShading === true && material.wireframe !== true ),
 
 			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
