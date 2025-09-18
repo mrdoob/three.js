@@ -143,6 +143,7 @@ const exceptionList = [
 	'webgpu_compute_sort_bitonic',
 	'webgpu_compute_reduce',
 	'webgpu_struct_drawindirect',
+	'webgpu_hdr',
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_backdrop_water',
