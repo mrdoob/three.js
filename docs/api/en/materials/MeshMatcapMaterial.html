@@ -157,6 +157,22 @@
 			Default is a [page:Vector2] set to (1,1).
 		</p>
 
+		<h3>[property:Boolean wireframe]</h3>
+		<p>
+			Render geometry as wireframe. Default is false (i.e. render as smooth
+			shaded).
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>
+			Controls wireframe thickness. Default is `1`.<br /><br />
+
+			Due to limitations of the
+			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+			with the [page:WebGLRenderer WebGL] renderer on most
+			platforms linewidth will always be `1` regardless of the set value.
+		</p>
+
 		<h2>Methods</h2>
 		<p>See the base [page:Material] class for common methods.</p>
 
