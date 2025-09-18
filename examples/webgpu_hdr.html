@@ -85,7 +85,6 @@
 
 			// Enable Extended sRGB output color space for HDR presentation
 			THREE.ColorManagement.define( { [ ExtendedSRGBColorSpace ]: ExtendedSRGBColorSpaceImpl } );
-			THREE.ColorManagement.workingColorSpace = ExtendedSRGBColorSpace;
 
 			// Renderer (HalfFloat output + Extended sRGB)
 			const renderer = new THREE.WebGPURenderer( {
@@ -98,9 +97,8 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 
-			// 2D orthographic camera (pixel space: [0..W]x[0..H])
-			const camera = new THREE.OrthographicCamera( 0, window.innerWidth, window.innerHeight, 0, - 1, 1 );
-
+			const camera = new THREE.OrthographicCamera( 0, window.innerWidth, window.innerHeight, 0, 1, 2 );
+			camera.position.z = 1;
 
 			// Brush scene (rendered into drawTarget)
 			const brushScene = new THREE.Scene();
