@@ -2,7 +2,6 @@ import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { NoToneMapping, SRGBColorSpace } from '../../constants.js';
 
 /**
  * CanvasTarget is a class that represents the final output destination of the renderer.
