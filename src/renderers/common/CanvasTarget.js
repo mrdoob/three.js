@@ -45,30 +45,6 @@ class CanvasTarget extends EventDispatcher {
 		this.domElement = domElement;
 
 		/**
-		 * Defines the output color space of the renderer.
-		 *
-		 * @type {string}
-		 * @default SRGBColorSpace
-		 */
-		this.outputColorSpace = SRGBColorSpace;
-
-		/**
-		 * Defines the tone mapping of the renderer.
-		 *
-		 * @type {number}
-		 * @default NoToneMapping
-		 */
-		this.toneMapping = NoToneMapping;
-
-		/**
-		 * Defines the tone mapping exposure.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.toneMappingExposure = 1.0;
-
-		/**
 		 * The renderer's pixel ratio.
 		 *
 		 * @private
