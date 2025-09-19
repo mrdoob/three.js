@@ -2333,7 +2333,6 @@ class Renderer {
 	setCanvasTarget( canvasTarget ) {
 
 		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
-		this._canvasTarget.removeEventListener( 'contextlost', this._onCanvasTargetResize );
 
 		this._canvasTarget = canvasTarget;
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );

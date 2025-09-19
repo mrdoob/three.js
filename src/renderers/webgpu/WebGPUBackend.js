@@ -13,7 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem, TimestampQuery } from '../../constants.js';
+import { WebGPUCoordinateSystem, TimestampQuery, REVISION } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce, error } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
@@ -232,7 +232,8 @@ class WebGPUBackend extends Backend {
 	 */
 	get context() {
 
-		const canvasData = this.get( this.renderer.getCanvasTarget() );
+		const canvasTarget = this.renderer.getCanvasTarget();
+		const canvasData = this.get( canvasTarget );
 
 		let context = canvasData.context;
 
@@ -240,15 +241,18 @@ class WebGPUBackend extends Backend {
 
 			const parameters = this.parameters;
 
-			if ( canvasData.isDefaultCanvasTarget === true && parameters.context !== undefined ) {
+			if ( canvasTarget.isDefaultCanvasTarget === true && parameters.context !== undefined ) {
 
 				context = parameters.context;
 
 			} else {
 
-				context = this.renderer.domElement.getContext( 'webgpu' );
+				context = canvasTarget.domElement.getContext( 'webgpu' );
 
 			}
+
+			// OffscreenCanvas does not have setAttribute, see #22811
+			if ( 'setAttribute' in canvasTarget.domElement ) canvasTarget.domElement.setAttribute( 'data-engine', `three.js r${ REVISION } webgpu` );
 
 			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
