@@ -268,7 +268,7 @@ class Renderer {
 		 * @private
 		 * @type {CanvasTarget}
 		 */
-		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
+		this._canvasTarget = new CanvasTarget( backend.getDomElement(), { antialias, samples } );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
