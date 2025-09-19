@@ -17,7 +17,6 @@ import {
 	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
-import { DepthTexture } from '../../../textures/DepthTexture.js';
 import { Texture } from '../../../textures/Texture.js';
 import { warn, error } from '../../../utils.js';
 
