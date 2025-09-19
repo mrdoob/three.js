@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Ping/Pong Textures Fluid simulation</title>
+		<title>three.js - WebGPU - Compute Ping/Pong Textures Fluid simulation with TSL</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,8 +8,9 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Ping/Pong Textures Fluid simulation
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Ping/Pong Textures Fluid simulation with TSL
 			<br />Based on shaders by <a href="https://github.com/PavelDoGreat/WebGL-Fluid-Simulation?tab=readme-ov-file" target="_blank" rel="noopener">Pavel Dobryakov</a> and <a href="https://oframe.github.io/ogl/examples/?src=post-fluid-distortion.html" target="_blank" rel="noopener">OGL Fluid Distortion example</a>
+			<br />By <a href="https://mathis-biabiany.fr/" target="_blank" rel="noopener">Mathis Biabiany</a>
 		</div>
 
 		<script type="importmap">
@@ -179,7 +180,6 @@
 				const posX = instanceIndex.mod( width )
 				const posY = instanceIndex.div( width )
 				const indexUV = uvec2(posX, posY)
-				const uvT = vec2(posX, posY).div(vec2(width, height))
 
 				// center-of-texel for this cell
 				const uvC = getUVs({ width, height })
@@ -208,7 +208,6 @@
 				const posX = instanceIndex.mod( width )
 				const posY = instanceIndex.div( width )
 				const indexUV = uvec2(posX, posY)
-				const uvT = vec2(posX, posY).div(vec2(width, height))
 			
 				// center-of-texel for this cell
 				const uvC = getUVs({ width, height })
@@ -523,7 +522,7 @@
 						y: 1 - e.y / rendererSize.y,
 						dx: deltaX * params.deltaX,
 						dy: deltaY * params.deltaY
-					})
+					});
 				}
 			}
 
