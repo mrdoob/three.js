@@ -35,6 +35,7 @@
 
 			const API = {
 				color: 0xffffff, // sRGB
+				wireframeLinewidth: 1,
 				exposure: 1.0
 			};
 
@@ -63,7 +64,7 @@
 				// controls
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
-				controls.enableZoom = false;
+				//controls.enableZoom = false;
 				controls.enablePan = false;
 
 				// manager
@@ -84,11 +85,22 @@
 					mesh = gltf.scene.children[ 0 ];
 					mesh.position.y = - 0.25;
 
+					// the renderer will do this block
+					if ( mesh.geometry.index ) mesh.geometry = mesh.geometry.toNonIndexed();
+					setupAttributes( mesh.geometry );
+
 					mesh.material = new THREE.MeshMatcapMaterial( {
 
 						color: new THREE.Color().setHex( API.color ),
 						matcap: matcap,
-						normalMap: normalmap
+						normalMap: normalmap,
+
+						//todo: disable renderer code - hardwired to true for now...
+						wireframe2: true,
+
+						wireframeLinewidth: API.wireframeLinewidth,
+
+						side: THREE.DoubleSide,
 
 					} );
 
@@ -107,6 +119,14 @@
 						render();
 
 					} );
+
+				gui.add( API, 'wireframeLinewidth', 0, 4 )
+					.onChange( function () {
+
+					mesh.material.wireframeLinewidth = API.wireframeLinewidth;
+					render();
+
+				} );
 
 				gui.add( API, 'exposure', 0, 2 )
 					.onChange( function () {
@@ -139,6 +159,27 @@
 			function render() {
 
 				renderer.render( scene, camera );
+
+			}
+
+			function setupAttributes( geometry ) {
+
+				const vectors = [
+					new THREE.Vector3( 1, 0, 0 ),
+					new THREE.Vector3( 0, 1, 0 ),
+					new THREE.Vector3( 0, 0, 1 )
+				];
+
+				const position = geometry.attributes.position;
+				const centers = new Float32Array( position.count * 3 );
+
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					vectors[ i % 3 ].toArray( centers, i * 3 );
+
+				}
+
+				geometry.setAttribute( 'center', new THREE.BufferAttribute( centers, 3 ) );
 
 			}
 

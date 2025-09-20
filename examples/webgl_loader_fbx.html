@@ -36,11 +36,13 @@
 
 			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
 			let mixer;
+			let matcap;
 
 			const clock = new THREE.Clock();
 
 			const params = {
-				asset: 'Samba Dancing'
+				asset: 'Samba Dancing',
+				wireframeLinewidth: 1
 			};
 
 			const assets = [
@@ -91,11 +93,15 @@
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
+
+				// matcap
+				const loaderJPG = new THREE.TextureLoader( manager );
+				matcap = loaderJPG.load( 'textures/matcaps/matcap-porcelain-white.jpg' );
 			
 				loader = new FBXLoader( manager );
 				loadAsset( params.asset );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -116,6 +122,20 @@
 				gui.add( params, 'asset', assets ).onChange( function ( value ) {
 
 					loadAsset( value );
+
+				} );
+
+				gui.add( params, 'wireframeLinewidth', 1, 10, 1 ).onChange( function ( value ) {
+
+					object.traverse( function ( child ) {
+
+						if ( child.isMesh ) {
+
+							child.material.wireframeLinewidth = value;
+
+						}
+
+					} );
 
 				} );
 
@@ -181,6 +201,18 @@
 
 						if ( child.isMesh ) {
 
+							child.material = new THREE.MeshMatcapMaterial( {
+								color: 0x4080ff,
+								matcap: matcap,
+								wireframe2: true,
+								wireframeLinewidth: 1,
+								side: THREE.DoubleSide
+							} );
+
+							if ( child.geometry.index ) child.geometry = child.geometry.toNonIndexed();
+
+							setupAttributes( child.geometry );
+
 							child.castShadow = true;
 							child.receiveShadow = true;
 
@@ -203,6 +235,27 @@
 					scene.add( object );
 
 				} );
+
+			}
+
+			function setupAttributes( geometry ) {
+
+				const vectors = [
+					new THREE.Vector3( 1, 0, 0 ),
+					new THREE.Vector3( 0, 1, 0 ),
+					new THREE.Vector3( 0, 0, 1 )
+				];
+
+				const position = geometry.attributes.position;
+				const centers = new Float32Array( position.count * 3 );
+
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					vectors[ i % 3 ].toArray( centers, i * 3 );
+
+				}
+
+				geometry.setAttribute( 'center', new THREE.BufferAttribute( centers, 3 ) );
 
 			}
 
