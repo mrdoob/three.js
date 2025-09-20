@@ -657,6 +657,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGARITHMIC_DEPTH_BUFFER' : '',
 			parameters.reversedDepthBuffer ? '#define USE_REVERSED_DEPTH_BUFFER' : '',
 
+			parameters.wireframe2 ? '#define USE_WIREFRAME' : '',
+
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
@@ -823,6 +825,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGARITHMIC_DEPTH_BUFFER' : '',
 			parameters.reversedDepthBuffer ? '#define USE_REVERSED_DEPTH_BUFFER' : '',
+
+			parameters.wireframe2 ? '#define USE_WIREFRAME' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',

@@ -104,6 +104,10 @@ import transmission_pars_fragment from './ShaderChunk/transmission_pars_fragment
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl.js';
 import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl.js';
 import uv_vertex from './ShaderChunk/uv_vertex.glsl.js';
+import wireframe_pars_vertex from './ShaderChunk/wireframe_pars_vertex.glsl.js';
+import wireframe_vertex from './ShaderChunk/wireframe_vertex.glsl.js';
+import wireframe_pars_fragment from './ShaderChunk/wireframe_pars_fragment.glsl.js';
+import wireframe_fragment from './ShaderChunk/wireframe_fragment.glsl.js';
 import worldpos_vertex from './ShaderChunk/worldpos_vertex.glsl.js';
 
 import * as background from './ShaderLib/background.glsl.js';
@@ -231,6 +235,10 @@ export const ShaderChunk = {
 	uv_pars_fragment: uv_pars_fragment,
 	uv_pars_vertex: uv_pars_vertex,
 	uv_vertex: uv_vertex,
+	wireframe_pars_vertex: wireframe_pars_vertex,
+	wireframe_vertex: wireframe_vertex,
+	wireframe_pars_fragment: wireframe_pars_fragment,
+	wireframe_fragment: wireframe_fragment,
 	worldpos_vertex: worldpos_vertex,
 
 	background_vert: background.vertex,
