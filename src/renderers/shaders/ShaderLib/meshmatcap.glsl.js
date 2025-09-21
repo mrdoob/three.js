@@ -14,6 +14,7 @@ varying vec3 vViewPosition;
 #include <skinning_pars_vertex>
 
 #include <logdepthbuf_pars_vertex>
+#include <wireframe_pars_vertex>
 #include <clipping_planes_pars_vertex>
 
 void main() {
@@ -38,6 +39,7 @@ void main() {
 	#include <project_vertex>
 
 	#include <logdepthbuf_vertex>
+	#include <wireframe_vertex>
 	#include <clipping_planes_vertex>
 	#include <fog_vertex>
 
@@ -68,11 +70,14 @@ varying vec3 vViewPosition;
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
+#include <wireframe_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
 void main() {
 
 	vec4 diffuseColor = vec4( diffuse, opacity );
+
+	#include <wireframe_fragment>
 	#include <clipping_planes_fragment>
 
 	#include <logdepthbuf_fragment>

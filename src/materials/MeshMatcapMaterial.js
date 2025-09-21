@@ -170,7 +170,7 @@ class MeshMatcapMaterial extends Material {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.wireframe = false;
+		this.wireframe2 = false;
 
 		/**
 		 * Controls the thickness of the wireframe.

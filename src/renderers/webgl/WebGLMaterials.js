@@ -214,6 +214,12 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
+		if ( material.wireframe2 === true && material.wireframeLinewidth ) {
+
+			uniforms.wireframeLinewidth.value = material.wireframeLinewidth;
+
+		}
+
 		const materialProperties = properties.get( material );
 
 		const envMap = materialProperties.envMap;
