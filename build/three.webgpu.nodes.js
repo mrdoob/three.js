@@ -36231,24 +36231,24 @@ class PassNode extends TempNode {
 	}
 
 	/**
-	 * Sets the resolution for the pass.
-	 * The resolution is a factor that is multiplied with the renderer's width and height.
+	 * Sets the resolution scale for the pass.
+	 * The resolution scale is a factor that is multiplied with the renderer's width and height.
 	 *
-	 * @param {number} resolution - The resolution to set. A value of `1` means full resolution.
+	 * @param {number} resolutionScale - The resolution scale to set. A value of `1` means full resolution.
 	 * @return {PassNode} A reference to this pass.
 	 */
-	setResolutionScale( resolution ) {
+	setResolutionScale( resolutionScale ) {
 
-		this._resolutionScale = resolution;
+		this._resolutionScale = resolutionScale;
 
 		return this;
 
 	}
 
 	/**
-	 * Gets the current resolution of the pass.
+	 * Gets the current resolution scale of the pass.
 	 *
-	 * @return {number} The current resolution. A value of `1` means full resolution.
+	 * @return {number} The current resolution scale. A value of `1` means full resolution.
 	 */
 	getResolutionScale() {
 
@@ -54096,6 +54096,377 @@ class InspectorBase {
 
 }
 
+/**
+ * CanvasTarget is a class that represents the final output destination of the renderer.
+ *
+ * @augments EventDispatcher
+ */
+class CanvasTarget extends EventDispatcher {
+
+	/**
+	 * CanvasTarget options.
+	 *
+	 * @typedef {Object} CanvasTarget~Options
+	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
+	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
+	 * to overwrite the default.
+	 */
+
+	/**
+	 * Constructs a new CanvasTarget.
+	 *
+	 * @param {HTMLCanvasElement|OffscreenCanvas} domElement - The canvas element to render to.
+	 * @param {Object} [parameters={}] - The parameters.
+	 */
+	constructor( domElement, parameters = {} ) {
+
+		super();
+
+		const {
+			antialias = false,
+			samples = 0
+		} = parameters;
+
+		/**
+		 * A reference to the canvas element the renderer is drawing to.
+		 * This value of this property will automatically be created by
+		 * the renderer.
+		 *
+		 * @type {HTMLCanvasElement|OffscreenCanvas}
+		 */
+		this.domElement = domElement;
+
+		/**
+		 * The renderer's pixel ratio.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 1
+		 */
+		this._pixelRatio = 1;
+
+		/**
+		 * The width of the renderer's default framebuffer in logical pixel unit.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._width = this.domElement.width;
+
+		/**
+		 * The height of the renderer's default framebuffer in logical pixel unit.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._height = this.domElement.height;
+
+		/**
+		 * The viewport of the renderer in logical pixel unit.
+		 *
+		 * @private
+		 * @type {Vector4}
+		 */
+		this._viewport = new Vector4( 0, 0, this._width, this._height );
+
+		/**
+		 * The scissor rectangle of the renderer in logical pixel unit.
+		 *
+		 * @private
+		 * @type {Vector4}
+		 */
+		this._scissor = new Vector4( 0, 0, this._width, this._height );
+
+		/**
+		 * Whether the scissor test should be enabled or not.
+		 *
+		 * @private
+		 * @type {boolean}
+		 */
+		this._scissorTest = false;
+
+		/**
+		 * The number of MSAA samples.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._samples = samples || ( antialias === true ) ? 4 : 0;
+
+		/**
+		 * The color texture of the default framebuffer.
+		 *
+		 * @type {FramebufferTexture}
+		 */
+		this.colorTexture = new FramebufferTexture();
+
+		/**
+		 * The depth texture of the default framebuffer.
+		 *
+		 * @type {DepthTexture}
+		 */
+		this.depthTexture = new DepthTexture();
+
+	}
+
+	/**
+	 * The number of samples used for multi-sample anti-aliasing (MSAA).
+	 *
+	 * @type {number}
+	 * @default 0
+	 */
+	get samples() {
+
+		return this._samples;
+
+	}
+
+	/**
+	 * Returns the pixel ratio.
+	 *
+	 * @return {number} The pixel ratio.
+	 */
+	getPixelRatio() {
+
+		return this._pixelRatio;
+
+	}
+
+	/**
+	 * Returns the drawing buffer size in physical pixels. This method honors the pixel ratio.
+	 *
+	 * @param {Vector2} target - The method writes the result in this target object.
+	 * @return {Vector2} The drawing buffer size.
+	 */
+	getDrawingBufferSize( target ) {
+
+		return target.set( this._width * this._pixelRatio, this._height * this._pixelRatio ).floor();
+
+	}
+
+	/**
+	 * Returns the renderer's size in logical pixels. This method does not honor the pixel ratio.
+	 *
+	 * @param {Vector2} target - The method writes the result in this target object.
+	 * @return {Vector2} The renderer's size in logical pixels.
+	 */
+	getSize( target ) {
+
+		return target.set( this._width, this._height );
+
+	}
+
+	/**
+	 * Sets the given pixel ratio and resizes the canvas if necessary.
+	 *
+	 * @param {number} [value=1] - The pixel ratio.
+	 */
+	setPixelRatio( value = 1 ) {
+
+		if ( this._pixelRatio === value ) return;
+
+		this._pixelRatio = value;
+
+		this.setSize( this._width, this._height, false );
+
+	}
+
+	/**
+	 * This method allows to define the drawing buffer size by specifying
+	 * width, height and pixel ratio all at once. The size of the drawing
+	 * buffer is computed with this formula:
+	 * ```js
+	 * size.x = width * pixelRatio;
+	 * size.y = height * pixelRatio;
+	 * ```
+	 *
+	 * @param {number} width - The width in logical pixels.
+	 * @param {number} height - The height in logical pixels.
+	 * @param {number} pixelRatio - The pixel ratio.
+	 */
+	setDrawingBufferSize( width, height, pixelRatio ) {
+
+		// Renderer can't be resized while presenting in XR.
+		if ( this.xr && this.xr.isPresenting ) return;
+
+		this._width = width;
+		this._height = height;
+
+		this._pixelRatio = pixelRatio;
+
+		this.domElement.width = Math.floor( width * pixelRatio );
+		this.domElement.height = Math.floor( height * pixelRatio );
+
+		this.setViewport( 0, 0, width, height );
+
+		this._dispatchResize();
+
+	}
+
+	/**
+	 * Sets the size of the renderer.
+	 *
+	 * @param {number} width - The width in logical pixels.
+	 * @param {number} height - The height in logical pixels.
+	 * @param {boolean} [updateStyle=true] - Whether to update the `style` attribute of the canvas or not.
+	 */
+	setSize( width, height, updateStyle = true ) {
+
+		// Renderer can't be resized while presenting in XR.
+		if ( this.xr && this.xr.isPresenting ) return;
+
+		this._width = width;
+		this._height = height;
+
+		this.domElement.width = Math.floor( width * this._pixelRatio );
+		this.domElement.height = Math.floor( height * this._pixelRatio );
+
+		if ( updateStyle === true ) {
+
+			this.domElement.style.width = width + 'px';
+			this.domElement.style.height = height + 'px';
+
+		}
+
+		this.setViewport( 0, 0, width, height );
+
+		this._dispatchResize();
+
+	}
+
+	/**
+	 * Returns the scissor rectangle.
+	 *
+	 * @param {Vector4} target - The method writes the result in this target object.
+	 * @return {Vector4} The scissor rectangle.
+	 */
+	getScissor( target ) {
+
+		const scissor = this._scissor;
+
+		target.x = scissor.x;
+		target.y = scissor.y;
+		target.width = scissor.width;
+		target.height = scissor.height;
+
+		return target;
+
+	}
+
+	/**
+	 * Defines the scissor rectangle.
+	 *
+	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
+	 * @param {number} y - The vertical coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number} width - The width of the scissor box in logical pixel unit.
+	 * @param {number} height - The height of the scissor box in logical pixel unit.
+	 */
+	setScissor( x, y, width, height ) {
+
+		const scissor = this._scissor;
+
+		if ( x.isVector4 ) {
+
+			scissor.copy( x );
+
+		} else {
+
+			scissor.set( x, y, width, height );
+
+		}
+
+	}
+
+	/**
+	 * Returns the scissor test value.
+	 *
+	 * @return {boolean} Whether the scissor test should be enabled or not.
+	 */
+	getScissorTest() {
+
+		return this._scissorTest;
+
+	}
+
+	/**
+	 * Defines the scissor test.
+	 *
+	 * @param {boolean} boolean - Whether the scissor test should be enabled or not.
+	 */
+	setScissorTest( boolean ) {
+
+		this._scissorTest = boolean;
+
+	}
+
+	/**
+	 * Returns the viewport definition.
+	 *
+	 * @param {Vector4} target - The method writes the result in this target object.
+	 * @return {Vector4} The viewport definition.
+	 */
+	getViewport( target ) {
+
+		return target.copy( this._viewport );
+
+	}
+
+	/**
+	 * Defines the viewport.
+	 *
+	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+	 * @param {number} width - The width of the viewport in logical pixel unit.
+	 * @param {number} height - The height of the viewport in logical pixel unit.
+	 * @param {number} minDepth - The minimum depth value of the viewport. WebGPU only.
+	 * @param {number} maxDepth - The maximum depth value of the viewport. WebGPU only.
+	 */
+	setViewport( x, y, width, height, minDepth = 0, maxDepth = 1 ) {
+
+		const viewport = this._viewport;
+
+		if ( x.isVector4 ) {
+
+			viewport.copy( x );
+
+		} else {
+
+			viewport.set( x, y, width, height );
+
+		}
+
+		viewport.minDepth = minDepth;
+		viewport.maxDepth = maxDepth;
+
+	}
+
+	/**
+	 * Dispatches the resize event.
+	 *
+	 * @private
+	 */
+	_dispatchResize() {
+
+		this.dispatchEvent( { type: 'resize' } );
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 *
+	 * @fires RenderTarget#dispose
+	 */
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
+}
+
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
@@ -54160,29 +54531,11 @@ class Renderer {
 		} = parameters;
 
 		/**
-		 * A reference to the canvas element the renderer is drawing to.
-		 * This value of this property will automatically be created by
-		 * the renderer.
-		 *
-		 * @type {HTMLCanvasElement|OffscreenCanvas}
-		 */
-		this.domElement = backend.getDomElement();
-
-		/**
 		 * A reference to the current backend.
 		 *
 		 * @type {Backend}
 		 */
 		this.backend = backend;
-
-		/**
-		 * The number of MSAA samples.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 0
-		 */
-		this._samples = samples || ( antialias === true ) ? 4 : 0;
 
 		/**
 		 * Whether the renderer should automatically clear the current rendering target
@@ -54331,6 +54684,30 @@ class Renderer {
 
 		// internals
 
+		/**
+		 * OnCanvasTargetResize callback function.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
+
+		/**
+		 * The canvas target for rendering.
+		 *
+		 * @private
+		 * @type {CanvasTarget}
+		 */
+		this._canvasTarget = new CanvasTarget( backend.getDomElement(), { antialias, samples } );
+		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.isDefaultCanvasTarget = true;
+
+		/**
+		 * The inspector provides information about the internal renderer state.
+		 *
+		 * @private
+		 * @type {InspectorBase}
+		 */
 		this._inspector = new InspectorBase();
 		this._inspector.setRenderer( this );
 
@@ -54341,55 +54718,6 @@ class Renderer {
 		 * @type {?Function}
 		 */
 		this._getFallback = getFallback;
-
-		/**
-		 * The renderer's pixel ratio.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 1
-		 */
-		this._pixelRatio = 1;
-
-		/**
-		 * The width of the renderer's default framebuffer in logical pixel unit.
-		 *
-		 * @private
-		 * @type {number}
-		 */
-		this._width = this.domElement.width;
-
-		/**
-		 * The height of the renderer's default framebuffer in logical pixel unit.
-		 *
-		 * @private
-		 * @type {number}
-		 */
-		this._height = this.domElement.height;
-
-		/**
-		 * The viewport of the renderer in logical pixel unit.
-		 *
-		 * @private
-		 * @type {Vector4}
-		 */
-		this._viewport = new Vector4( 0, 0, this._width, this._height );
-
-		/**
-		 * The scissor rectangle of the renderer in logical pixel unit.
-		 *
-		 * @private
-		 * @type {Vector4}
-		 */
-		this._scissor = new Vector4( 0, 0, this._width, this._height );
-
-		/**
-		 * Whether the scissor test should be enabled or not.
-		 *
-		 * @private
-		 * @type {boolean}
-		 */
-		this._scissorTest = false;
 
 		/**
 		 * A reference to a renderer module for managing shader attributes.
@@ -54895,6 +55223,19 @@ class Renderer {
 	}
 
 	/**
+	 * A reference to the canvas element the renderer is drawing to.
+	 * This value of this property will automatically be created by
+	 * the renderer.
+	 *
+	 * @type {HTMLCanvasElement|OffscreenCanvas}
+	 */
+	get domElement() {
+
+		return this._canvasTarget.domElement;
+
+	}
+
+	/**
 	 * The coordinate system of the renderer. The value of this property
 	 * depends on the selected backend. Either `THREE.WebGLCoordinateSystem` or
 	 * `THREE.WebGPUCoordinateSystem`.
@@ -55375,11 +55716,13 @@ class Renderer {
 
 		}
 
-		frameBufferTarget.viewport.copy( this._viewport );
-		frameBufferTarget.scissor.copy( this._scissor );
-		frameBufferTarget.viewport.multiplyScalar( this._pixelRatio );
-		frameBufferTarget.scissor.multiplyScalar( this._pixelRatio );
-		frameBufferTarget.scissorTest = this._scissorTest;
+		const canvasTarget = this._canvasTarget;
+
+		frameBufferTarget.viewport.copy( canvasTarget._viewport );
+		frameBufferTarget.scissor.copy( canvasTarget._scissor );
+		frameBufferTarget.viewport.multiplyScalar( canvasTarget._pixelRatio );
+		frameBufferTarget.scissor.multiplyScalar( canvasTarget._pixelRatio );
+		frameBufferTarget.scissorTest = canvasTarget._scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
 		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
@@ -55497,9 +55840,11 @@ class Renderer {
 
 		//
 
-		let viewport = this._viewport;
-		let scissor = this._scissor;
-		let pixelRatio = this._pixelRatio;
+		const canvasTarget = this._canvasTarget;
+
+		let viewport = canvasTarget._viewport;
+		let scissor = canvasTarget._scissor;
+		let pixelRatio = canvasTarget._pixelRatio;
 
 		if ( renderTarget !== null ) {
 
@@ -55524,7 +55869,7 @@ class Renderer {
 		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
+		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
@@ -55668,8 +56013,10 @@ class Renderer {
 
 	_setXRLayerSize( width, height ) {
 
-		this._width = width;
-		this._height = height;
+		// TODO: Find a better solution to resize the canvas when in XR.
+
+		this._canvasTarget._width = width;
+		this._canvasTarget._height = height;
 
 		this.setViewport( 0, 0, width, height );
 
@@ -55801,7 +56148,7 @@ class Renderer {
 	 */
 	getPixelRatio() {
 
-		return this._pixelRatio;
+		return this._canvasTarget.getPixelRatio();
 
 	}
 
@@ -55813,7 +56160,7 @@ class Renderer {
 	 */
 	getDrawingBufferSize( target ) {
 
-		return target.set( this._width * this._pixelRatio, this._height * this._pixelRatio ).floor();
+		return this._canvasTarget.getDrawingBufferSize( target );
 
 	}
 
@@ -55825,7 +56172,7 @@ class Renderer {
 	 */
 	getSize( target ) {
 
-		return target.set( this._width, this._height );
+		return this._canvasTarget.getSize( target );
 
 	}
 
@@ -55836,11 +56183,7 @@ class Renderer {
 	 */
 	setPixelRatio( value = 1 ) {
 
-		if ( this._pixelRatio === value ) return;
-
-		this._pixelRatio = value;
-
-		this.setSize( this._width, this._height, false );
+		this._canvasTarget.setPixelRatio( value );
 
 	}
 
@@ -55862,17 +56205,7 @@ class Renderer {
 		// Renderer can't be resized while presenting in XR.
 		if ( this.xr && this.xr.isPresenting ) return;
 
-		this._width = width;
-		this._height = height;
-
-		this._pixelRatio = pixelRatio;
-
-		this.domElement.width = Math.floor( width * pixelRatio );
-		this.domElement.height = Math.floor( height * pixelRatio );
-
-		this.setViewport( 0, 0, width, height );
-
-		if ( this._initialized ) this.backend.updateSize();
+		this._canvasTarget.setDrawingBufferSize( width, height, pixelRatio );
 
 	}
 
@@ -55888,22 +56221,7 @@ class Renderer {
 		// Renderer can't be resized while presenting in XR.
 		if ( this.xr && this.xr.isPresenting ) return;
 
-		this._width = width;
-		this._height = height;
-
-		this.domElement.width = Math.floor( width * this._pixelRatio );
-		this.domElement.height = Math.floor( height * this._pixelRatio );
-
-		if ( updateStyle === true ) {
-
-			this.domElement.style.width = width + 'px';
-			this.domElement.style.height = height + 'px';
-
-		}
-
-		this.setViewport( 0, 0, width, height );
-
-		if ( this._initialized ) this.backend.updateSize();
+		this._canvasTarget.setSize( width, height, updateStyle );
 
 	}
 
@@ -55939,14 +56257,7 @@ class Renderer {
 	 */
 	getScissor( target ) {
 
-		const scissor = this._scissor;
-
-		target.x = scissor.x;
-		target.y = scissor.y;
-		target.width = scissor.width;
-		target.height = scissor.height;
-
-		return target;
+		return this._canvasTarget.getScissor( target );
 
 	}
 
@@ -55961,17 +56272,7 @@ class Renderer {
 	 */
 	setScissor( x, y, width, height ) {
 
-		const scissor = this._scissor;
-
-		if ( x.isVector4 ) {
-
-			scissor.copy( x );
-
-		} else {
-
-			scissor.set( x, y, width, height );
-
-		}
+		this._canvasTarget.setScissor( x, y, width, height );
 
 	}
 
@@ -55982,7 +56283,7 @@ class Renderer {
 	 */
 	getScissorTest() {
 
-		return this._scissorTest;
+		return this._canvasTarget.getScissorTest();
 
 	}
 
@@ -55993,7 +56294,9 @@ class Renderer {
 	 */
 	setScissorTest( boolean ) {
 
-		this._scissorTest = boolean;
+		this._canvasTarget.setScissorTest( boolean );
+
+		// TODO: Move it to CanvasTarget event listener.
 
 		this.backend.setScissorTest( boolean );
 
@@ -56007,7 +56310,7 @@ class Renderer {
 	 */
 	getViewport( target ) {
 
-		return target.copy( this._viewport );
+		return this._canvasTarget.getViewport( target );
 
 	}
 
@@ -56023,20 +56326,7 @@ class Renderer {
 	 */
 	setViewport( x, y, width, height, minDepth = 0, maxDepth = 1 ) {
 
-		const viewport = this._viewport;
-
-		if ( x.isVector4 ) {
-
-			viewport.copy( x );
-
-		} else {
-
-			viewport.set( x, y, width, height );
-
-		}
-
-		viewport.minDepth = minDepth;
-		viewport.maxDepth = maxDepth;
+		this._canvasTarget.setViewport( x, y, width, height, minDepth, maxDepth );
 
 	}
 
@@ -56312,7 +56602,7 @@ class Renderer {
 	 */
 	get samples() {
 
-		return this._samples;
+		return this._canvasTarget.samples;
 
 	}
 
@@ -56327,7 +56617,7 @@ class Renderer {
 	 */
 	get currentSamples() {
 
-		let samples = this._samples;
+		let samples = this.samples;
 
 		if ( this._renderTarget !== null ) {
 
@@ -56461,6 +56751,32 @@ class Renderer {
 	getOutputRenderTarget() {
 
 		return this._outputRenderTarget;
+
+	}
+
+	/**
+	 * Sets the canvas target. The canvas target manages the HTML canvas
+	 * or the offscreen canvas the renderer draws into.
+	 *
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	setCanvasTarget( canvasTarget ) {
+
+		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
+
+		this._canvasTarget = canvasTarget;
+		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+
+	}
+
+	/**
+	 * Returns the current canvas target.
+	 *
+	 * @return {CanvasTarget} The current canvas target.
+	 */
+	getCanvasTarget() {
+
+		return this._canvasTarget;
 
 	}
 
@@ -57345,6 +57661,17 @@ class Renderer {
 		this._pipelines.getForRender( renderObject, this._compilationPromises );
 
 		this._nodes.updateAfter( renderObject );
+
+	}
+
+	/**
+	 * Callback when the canvas has been resized.
+	 *
+	 * @private
+	 */
+	_onCanvasTargetResize() {
+
+		if ( this._initialized ) this.backend.updateSize();
 
 	}
 
@@ -68137,23 +68464,6 @@ class WebGPUTextureUtils {
 		 */
 		this.defaultVideoFrame = null;
 
-		this.frameBufferData = {
-			color: {
-				buffer: null, // TODO: Move to FramebufferTexture
-				width: 0,
-				height: 0,
-				samples: 0
-			},
-			depth: {
-				texture: new DepthTexture(),
-				width: 0,
-				height: 0,
-				samples: 0,
-				depth: false,
-				stencil: false
-			}
-		};
-
 		/**
 		 * A cache of shared texture samplers.
 		 *
@@ -68448,20 +68758,22 @@ class WebGPUTextureUtils {
 	getColorBuffer() {
 
 		const backend = this.backend;
+		const canvasTarget = backend.renderer.getCanvasTarget();
 		const { width, height } = backend.getDrawingBufferSize();
 		const samples = backend.renderer.currentSamples;
 
-		const frameBufferColor = this.frameBufferData.color;
+		const colorTexture = canvasTarget.colorTexture;
+		const colorTextureData = backend.get( colorTexture );
 
-		if ( frameBufferColor.width === width && frameBufferColor.height === height && frameBufferColor.samples === samples ) {
+		if ( colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
 
-			return frameBufferColor.buffer;
+			return colorTextureData.texture;
 
 		}
 
 		// recreate
 
-		let colorBuffer = frameBufferColor.buffer;
+		let colorBuffer = colorTextureData.texture;
 
 		if ( colorBuffer ) colorBuffer.destroy();
 
@@ -68479,10 +68791,11 @@ class WebGPUTextureUtils {
 
 		//
 
-		frameBufferColor.buffer = colorBuffer;
-		frameBufferColor.width = width;
-		frameBufferColor.height = height;
-		frameBufferColor.samples = samples;
+		colorTexture.source.width = width;
+		colorTexture.source.height = height;
+		colorTexture.samples = samples;
+
+		colorTextureData.texture = colorBuffer;
 
 		return colorBuffer;
 
@@ -68499,11 +68812,11 @@ class WebGPUTextureUtils {
 	getDepthBuffer( depth = true, stencil = false ) {
 
 		const backend = this.backend;
+		const canvasTarget = backend.renderer.getCanvasTarget();
 		const { width, height } = backend.getDrawingBufferSize();
 		const samples = backend.renderer.currentSamples;
 
-		const frameBufferDepth = this.frameBufferData.depth;
-		const depthTexture = frameBufferDepth.texture;
+		const depthTexture = canvasTarget.depthTexture;
 
 		if ( depthTexture.width === width &&
 			depthTexture.height === height &&
@@ -68535,7 +68848,7 @@ class WebGPUTextureUtils {
 
 		if ( depthTextureGPU !== undefined ) {
 
-			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
+			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type && depthTexture.samples === samples ) {
 
 				return depthTextureGPU;
 
@@ -68552,6 +68865,7 @@ class WebGPUTextureUtils {
 		depthTexture.type = type;
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
+		depthTexture.samples = samples;
 
 		this.createTexture( depthTexture, { width, height } );
 
@@ -74345,14 +74659,6 @@ class WebGPUBackend extends Backend {
 		this.device = null;
 
 		/**
-		 * A reference to the context.
-		 *
-		 * @type {?GPUCanvasContext}
-		 * @default null
-		 */
-		this.context = null;
-
-		/**
 		 * A reference to the default render pass descriptor.
 		 *
 		 * @type {?Object}
@@ -74484,28 +74790,63 @@ class WebGPUBackend extends Backend {
 
 		} );
 
-		const context = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgpu' );
-
 		this.device = device;
-		this.context = context;
-
-		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
-
-		const toneMappingMode = ColorManagement.getToneMappingMode( this.renderer.outputColorSpace );
-
-		this.context.configure( {
-			device: this.device,
-			format: this.utils.getPreferredCanvasFormat(),
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-			alphaMode: alphaMode,
-			toneMapping: {
-				mode: toneMappingMode
-			}
-		} );
 
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
+
+	}
+
+	/**
+	 * A reference to the context.
+	 *
+	 * @type {?GPUCanvasContext}
+	 * @default null
+	 */
+	get context() {
+
+		const canvasTarget = this.renderer.getCanvasTarget();
+		const canvasData = this.get( canvasTarget );
+
+		let context = canvasData.context;
+
+		if ( context === undefined ) {
+
+			const parameters = this.parameters;
+
+			if ( canvasTarget.isDefaultCanvasTarget === true && parameters.context !== undefined ) {
+
+				context = parameters.context;
+
+			} else {
+
+				context = canvasTarget.domElement.getContext( 'webgpu' );
+
+			}
+
+			// OffscreenCanvas does not have setAttribute, see #22811
+			if ( 'setAttribute' in canvasTarget.domElement ) canvasTarget.domElement.setAttribute( 'data-engine', `three.js r${ REVISION } webgpu` );
+
+			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
+
+			const toneMappingMode = ColorManagement.getToneMappingMode( this.renderer.outputColorSpace );
+
+			context.configure( {
+				device: this.device,
+				format: this.utils.getPreferredCanvasFormat(),
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+				alphaMode: alphaMode,
+				toneMapping: {
+					mode: toneMappingMode
+				}
+			} );
+
+			canvasData.context = context;
+
+		}
+
+		return context;
 
 	}
 
@@ -74558,19 +74899,22 @@ class WebGPUBackend extends Backend {
 	 */
 	_getDefaultRenderPassDescriptor() {
 
-		let descriptor = this.defaultRenderPassdescriptor;
+		const renderer = this.renderer;
+		const canvasTarget = renderer.getCanvasTarget();
+		const canvasData = this.get( canvasTarget );
+		const samples = renderer.currentSamples;
 
-		if ( descriptor === null ) {
+		let descriptor = canvasData.descriptor;
 
-			const renderer = this.renderer;
+		if ( descriptor === undefined || canvasData.samples !== samples ) {
 
 			descriptor = {
 				colorAttachments: [ {
 					view: null
-				} ],
+				} ]
 			};
 
-			if ( this.renderer.depth === true || this.renderer.stencil === true ) {
+			if ( renderer.depth === true || renderer.stencil === true ) {
 
 				descriptor.depthStencilAttachment = {
 					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
@@ -74580,7 +74924,7 @@ class WebGPUBackend extends Backend {
 
 			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-			if ( this.renderer.currentSamples > 0 ) {
+			if ( samples > 0 ) {
 
 				colorAttachment.view = this.textureUtils.getColorBuffer().createView();
 
@@ -74590,13 +74934,14 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			this.defaultRenderPassdescriptor = descriptor;
+			canvasData.descriptor = descriptor;
+			canvasData.samples = samples;
 
 		}
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-		if ( this.renderer.currentSamples > 0 ) {
+		if ( samples > 0 ) {
 
 			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
 
@@ -76445,7 +76790,7 @@ class WebGPUBackend extends Backend {
 	 */
 	updateSize() {
 
-		this.defaultRenderPassdescriptor = null;
+		this.delete( this.renderer.getCanvasTarget() );
 
 	}
 
@@ -77809,4 +78154,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BitcastNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InspectorBase, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BitcastNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InspectorBase, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
