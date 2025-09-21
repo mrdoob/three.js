@@ -21,6 +21,7 @@ export { default as NodeLoader } from './loaders/nodes/NodeLoader.js';
 export { default as NodeObjectLoader } from './loaders/nodes/NodeObjectLoader.js';
 export { default as NodeMaterialLoader } from './loaders/nodes/NodeMaterialLoader.js';
 export { default as InspectorBase } from './renderers/common/InspectorBase.js';
+export { default as CanvasTarget } from './renderers/common/CanvasTarget.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
 import * as TSL from './nodes/TSL.js';

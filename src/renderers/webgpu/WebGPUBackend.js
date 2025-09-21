@@ -13,7 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem, TimestampQuery } from '../../constants.js';
+import { WebGPUCoordinateSystem, TimestampQuery, REVISION } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce, error } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
@@ -83,14 +83,6 @@ class WebGPUBackend extends Backend {
 		 * @default null
 		 */
 		this.device = null;
-
-		/**
-		 * A reference to the context.
-		 *
-		 * @type {?GPUCanvasContext}
-		 * @default null
-		 */
-		this.context = null;
 
 		/**
 		 * A reference to the default render pass descriptor.
@@ -224,28 +216,63 @@ class WebGPUBackend extends Backend {
 
 		} );
 
-		const context = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgpu' );
-
 		this.device = device;
-		this.context = context;
-
-		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
-
-		const toneMappingMode = ColorManagement.getToneMappingMode( this.renderer.outputColorSpace );
-
-		this.context.configure( {
-			device: this.device,
-			format: this.utils.getPreferredCanvasFormat(),
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-			alphaMode: alphaMode,
-			toneMapping: {
-				mode: toneMappingMode
-			}
-		} );
 
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
+
+	}
+
+	/**
+	 * A reference to the context.
+	 *
+	 * @type {?GPUCanvasContext}
+	 * @default null
+	 */
+	get context() {
+
+		const canvasTarget = this.renderer.getCanvasTarget();
+		const canvasData = this.get( canvasTarget );
+
+		let context = canvasData.context;
+
+		if ( context === undefined ) {
+
+			const parameters = this.parameters;
+
+			if ( canvasTarget.isDefaultCanvasTarget === true && parameters.context !== undefined ) {
+
+				context = parameters.context;
+
+			} else {
+
+				context = canvasTarget.domElement.getContext( 'webgpu' );
+
+			}
+
+			// OffscreenCanvas does not have setAttribute, see #22811
+			if ( 'setAttribute' in canvasTarget.domElement ) canvasTarget.domElement.setAttribute( 'data-engine', `three.js r${ REVISION } webgpu` );
+
+			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
+
+			const toneMappingMode = ColorManagement.getToneMappingMode( this.renderer.outputColorSpace );
+
+			context.configure( {
+				device: this.device,
+				format: this.utils.getPreferredCanvasFormat(),
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+				alphaMode: alphaMode,
+				toneMapping: {
+					mode: toneMappingMode
+				}
+			} );
+
+			canvasData.context = context;
+
+		}
+
+		return context;
 
 	}
 
@@ -298,11 +325,13 @@ class WebGPUBackend extends Backend {
 	 */
 	_getDefaultRenderPassDescriptor() {
 
-		let descriptor = this.defaultRenderPassdescriptor;
+		const renderer = this.renderer;
+		const canvasTarget = renderer.getCanvasTarget();
+		const canvasData = this.get( canvasTarget );
 
-		if ( descriptor === null ) {
+		let descriptor = canvasData.descriptor;
 
-			const renderer = this.renderer;
+		if ( descriptor === undefined ) {
 
 			descriptor = {
 				colorAttachments: [ {
@@ -310,7 +339,7 @@ class WebGPUBackend extends Backend {
 				} ],
 			};
 
-			if ( this.renderer.depth === true || this.renderer.stencil === true ) {
+			if ( renderer.depth === true || renderer.stencil === true ) {
 
 				descriptor.depthStencilAttachment = {
 					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
@@ -320,7 +349,7 @@ class WebGPUBackend extends Backend {
 
 			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-			if ( this.renderer.currentSamples > 0 ) {
+			if ( renderer.currentSamples > 0 ) {
 
 				colorAttachment.view = this.textureUtils.getColorBuffer().createView();
 
@@ -330,13 +359,13 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			this.defaultRenderPassdescriptor = descriptor;
+			canvasData.descriptor = descriptor;
 
 		}
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-		if ( this.renderer.currentSamples > 0 ) {
+		if ( renderer.currentSamples > 0 ) {
 
 			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
 
@@ -2185,7 +2214,7 @@ class WebGPUBackend extends Backend {
 	 */
 	updateSize() {
 
-		this.defaultRenderPassdescriptor = null;
+		this.delete( this.renderer.getCanvasTarget() );
 
 	}
 

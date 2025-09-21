@@ -17,7 +17,6 @@ import {
 	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
-import { DepthTexture } from '../../../textures/DepthTexture.js';
 import { Texture } from '../../../textures/Texture.js';
 import { warn, error } from '../../../utils.js';
 
@@ -86,23 +85,6 @@ class WebGPUTextureUtils {
 		 * @default null
 		 */
 		this.defaultVideoFrame = null;
-
-		this.frameBufferData = {
-			color: {
-				buffer: null, // TODO: Move to FramebufferTexture
-				width: 0,
-				height: 0,
-				samples: 0
-			},
-			depth: {
-				texture: new DepthTexture(),
-				width: 0,
-				height: 0,
-				samples: 0,
-				depth: false,
-				stencil: false
-			}
-		};
 
 		/**
 		 * A cache of shared texture samplers.
@@ -398,20 +380,22 @@ class WebGPUTextureUtils {
 	getColorBuffer() {
 
 		const backend = this.backend;
+		const canvasTarget = backend.renderer.getCanvasTarget();
 		const { width, height } = backend.getDrawingBufferSize();
 		const samples = backend.renderer.currentSamples;
 
-		const frameBufferColor = this.frameBufferData.color;
+		const colorTexture = canvasTarget.colorTexture;
+		const colorTextureData = backend.get( colorTexture );
 
-		if ( frameBufferColor.width === width && frameBufferColor.height === height && frameBufferColor.samples === samples ) {
+		if ( colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
 
-			return frameBufferColor.buffer;
+			return colorTextureData.texture;
 
 		}
 
 		// recreate
 
-		let colorBuffer = frameBufferColor.buffer;
+		let colorBuffer = colorTextureData.texture;
 
 		if ( colorBuffer ) colorBuffer.destroy();
 
@@ -429,10 +413,11 @@ class WebGPUTextureUtils {
 
 		//
 
-		frameBufferColor.buffer = colorBuffer;
-		frameBufferColor.width = width;
-		frameBufferColor.height = height;
-		frameBufferColor.samples = samples;
+		colorTexture.source.width = width;
+		colorTexture.source.height = height;
+		colorTexture.samples = samples;
+
+		colorTextureData.texture = colorBuffer;
 
 		return colorBuffer;
 
@@ -449,11 +434,11 @@ class WebGPUTextureUtils {
 	getDepthBuffer( depth = true, stencil = false ) {
 
 		const backend = this.backend;
+		const canvasTarget = backend.renderer.getCanvasTarget();
 		const { width, height } = backend.getDrawingBufferSize();
 		const samples = backend.renderer.currentSamples;
 
-		const frameBufferDepth = this.frameBufferData.depth;
-		const depthTexture = frameBufferDepth.texture;
+		const depthTexture = canvasTarget.depthTexture;
 
 		if ( depthTexture.width === width &&
 			depthTexture.height === height &&

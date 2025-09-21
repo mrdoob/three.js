@@ -18,6 +18,7 @@ import NodeLibrary from './nodes/NodeLibrary.js';
 import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
+import CanvasTarget from './CanvasTarget.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -100,29 +101,11 @@ class Renderer {
 		} = parameters;
 
 		/**
-		 * A reference to the canvas element the renderer is drawing to.
-		 * This value of this property will automatically be created by
-		 * the renderer.
-		 *
-		 * @type {HTMLCanvasElement|OffscreenCanvas}
-		 */
-		this.domElement = backend.getDomElement();
-
-		/**
 		 * A reference to the current backend.
 		 *
 		 * @type {Backend}
 		 */
 		this.backend = backend;
-
-		/**
-		 * The number of MSAA samples.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 0
-		 */
-		this._samples = samples || ( antialias === true ) ? 4 : 0;
 
 		/**
 		 * Whether the renderer should automatically clear the current rendering target
@@ -271,6 +254,30 @@ class Renderer {
 
 		// internals
 
+		/**
+		 * OnCanvasTargetResize callback function.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
+
+		/**
+		 * The canvas target for rendering.
+		 *
+		 * @private
+		 * @type {CanvasTarget}
+		 */
+		this._canvasTarget = new CanvasTarget( backend.getDomElement(), { antialias, samples } );
+		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.isDefaultCanvasTarget = true;
+
+		/**
+		 * The inspector provides information about the internal renderer state.
+		 *
+		 * @private
+		 * @type {InspectorBase}
+		 */
 		this._inspector = new InspectorBase();
 		this._inspector.setRenderer( this );
 
@@ -281,55 +288,6 @@ class Renderer {
 		 * @type {?Function}
 		 */
 		this._getFallback = getFallback;
-
-		/**
-		 * The renderer's pixel ratio.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 1
-		 */
-		this._pixelRatio = 1;
-
-		/**
-		 * The width of the renderer's default framebuffer in logical pixel unit.
-		 *
-		 * @private
-		 * @type {number}
-		 */
-		this._width = this.domElement.width;
-
-		/**
-		 * The height of the renderer's default framebuffer in logical pixel unit.
-		 *
-		 * @private
-		 * @type {number}
-		 */
-		this._height = this.domElement.height;
-
-		/**
-		 * The viewport of the renderer in logical pixel unit.
-		 *
-		 * @private
-		 * @type {Vector4}
-		 */
-		this._viewport = new Vector4( 0, 0, this._width, this._height );
-
-		/**
-		 * The scissor rectangle of the renderer in logical pixel unit.
-		 *
-		 * @private
-		 * @type {Vector4}
-		 */
-		this._scissor = new Vector4( 0, 0, this._width, this._height );
-
-		/**
-		 * Whether the scissor test should be enabled or not.
-		 *
-		 * @private
-		 * @type {boolean}
-		 */
-		this._scissorTest = false;
 
 		/**
 		 * A reference to a renderer module for managing shader attributes.
@@ -835,6 +793,19 @@ class Renderer {
 	}
 
 	/**
+	 * A reference to the canvas element the renderer is drawing to.
+	 * This value of this property will automatically be created by
+	 * the renderer.
+	 *
+	 * @type {HTMLCanvasElement|OffscreenCanvas}
+	 */
+	get domElement() {
+
+		return this._canvasTarget.domElement;
+
+	}
+
+	/**
 	 * The coordinate system of the renderer. The value of this property
 	 * depends on the selected backend. Either `THREE.WebGLCoordinateSystem` or
 	 * `THREE.WebGPUCoordinateSystem`.
@@ -1315,11 +1286,13 @@ class Renderer {
 
 		}
 
-		frameBufferTarget.viewport.copy( this._viewport );
-		frameBufferTarget.scissor.copy( this._scissor );
-		frameBufferTarget.viewport.multiplyScalar( this._pixelRatio );
-		frameBufferTarget.scissor.multiplyScalar( this._pixelRatio );
-		frameBufferTarget.scissorTest = this._scissorTest;
+		const canvasTarget = this._canvasTarget;
+
+		frameBufferTarget.viewport.copy( canvasTarget._viewport );
+		frameBufferTarget.scissor.copy( canvasTarget._scissor );
+		frameBufferTarget.viewport.multiplyScalar( canvasTarget._pixelRatio );
+		frameBufferTarget.scissor.multiplyScalar( canvasTarget._pixelRatio );
+		frameBufferTarget.scissorTest = canvasTarget._scissorTest;
 		frameBufferTarget.multiview = outputRenderTarget !== null ? outputRenderTarget.multiview : false;
 		frameBufferTarget.resolveDepthBuffer = outputRenderTarget !== null ? outputRenderTarget.resolveDepthBuffer : true;
 		frameBufferTarget._autoAllocateDepthBuffer = outputRenderTarget !== null ? outputRenderTarget._autoAllocateDepthBuffer : false;
@@ -1437,9 +1410,11 @@ class Renderer {
 
 		//
 
-		let viewport = this._viewport;
-		let scissor = this._scissor;
-		let pixelRatio = this._pixelRatio;
+		const canvasTarget = this._canvasTarget;
+
+		let viewport = canvasTarget._viewport;
+		let scissor = canvasTarget._scissor;
+		let pixelRatio = canvasTarget._pixelRatio;
 
 		if ( renderTarget !== null ) {
 
@@ -1464,7 +1439,7 @@ class Renderer {
 		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
+		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
@@ -1608,8 +1583,10 @@ class Renderer {
 
 	_setXRLayerSize( width, height ) {
 
-		this._width = width;
-		this._height = height;
+		// TODO: Find a better solution to resize the canvas when in XR.
+
+		this._canvasTarget._width = width;
+		this._canvasTarget._height = height;
 
 		this.setViewport( 0, 0, width, height );
 
@@ -1741,7 +1718,7 @@ class Renderer {
 	 */
 	getPixelRatio() {
 
-		return this._pixelRatio;
+		return this._canvasTarget.getPixelRatio();
 
 	}
 
@@ -1753,7 +1730,7 @@ class Renderer {
 	 */
 	getDrawingBufferSize( target ) {
 
-		return target.set( this._width * this._pixelRatio, this._height * this._pixelRatio ).floor();
+		return this._canvasTarget.getDrawingBufferSize( target );
 
 	}
 
@@ -1765,7 +1742,7 @@ class Renderer {
 	 */
 	getSize( target ) {
 
-		return target.set( this._width, this._height );
+		return this._canvasTarget.getSize( target );
 
 	}
 
@@ -1776,11 +1753,7 @@ class Renderer {
 	 */
 	setPixelRatio( value = 1 ) {
 
-		if ( this._pixelRatio === value ) return;
-
-		this._pixelRatio = value;
-
-		this.setSize( this._width, this._height, false );
+		this._canvasTarget.setPixelRatio( value );
 
 	}
 
@@ -1802,17 +1775,7 @@ class Renderer {
 		// Renderer can't be resized while presenting in XR.
 		if ( this.xr && this.xr.isPresenting ) return;
 
-		this._width = width;
-		this._height = height;
-
-		this._pixelRatio = pixelRatio;
-
-		this.domElement.width = Math.floor( width * pixelRatio );
-		this.domElement.height = Math.floor( height * pixelRatio );
-
-		this.setViewport( 0, 0, width, height );
-
-		if ( this._initialized ) this.backend.updateSize();
+		this._canvasTarget.setDrawingBufferSize( width, height, pixelRatio );
 
 	}
 
@@ -1828,22 +1791,7 @@ class Renderer {
 		// Renderer can't be resized while presenting in XR.
 		if ( this.xr && this.xr.isPresenting ) return;
 
-		this._width = width;
-		this._height = height;
-
-		this.domElement.width = Math.floor( width * this._pixelRatio );
-		this.domElement.height = Math.floor( height * this._pixelRatio );
-
-		if ( updateStyle === true ) {
-
-			this.domElement.style.width = width + 'px';
-			this.domElement.style.height = height + 'px';
-
-		}
-
-		this.setViewport( 0, 0, width, height );
-
-		if ( this._initialized ) this.backend.updateSize();
+		this._canvasTarget.setSize( width, height, updateStyle );
 
 	}
 
@@ -1879,14 +1827,7 @@ class Renderer {
 	 */
 	getScissor( target ) {
 
-		const scissor = this._scissor;
-
-		target.x = scissor.x;
-		target.y = scissor.y;
-		target.width = scissor.width;
-		target.height = scissor.height;
-
-		return target;
+		return this._canvasTarget.getScissor( target );
 
 	}
 
@@ -1901,17 +1842,7 @@ class Renderer {
 	 */
 	setScissor( x, y, width, height ) {
 
-		const scissor = this._scissor;
-
-		if ( x.isVector4 ) {
-
-			scissor.copy( x );
-
-		} else {
-
-			scissor.set( x, y, width, height );
-
-		}
+		this._canvasTarget.setScissor( x, y, width, height );
 
 	}
 
@@ -1922,7 +1853,7 @@ class Renderer {
 	 */
 	getScissorTest() {
 
-		return this._scissorTest;
+		return this._canvasTarget.getScissorTest();
 
 	}
 
@@ -1933,7 +1864,9 @@ class Renderer {
 	 */
 	setScissorTest( boolean ) {
 
-		this._scissorTest = boolean;
+		this._canvasTarget.setScissorTest( boolean );
+
+		// TODO: Move it to CanvasTarget event listener.
 
 		this.backend.setScissorTest( boolean );
 
@@ -1947,7 +1880,7 @@ class Renderer {
 	 */
 	getViewport( target ) {
 
-		return target.copy( this._viewport );
+		return this._canvasTarget.getViewport( target );
 
 	}
 
@@ -1963,20 +1896,7 @@ class Renderer {
 	 */
 	setViewport( x, y, width, height, minDepth = 0, maxDepth = 1 ) {
 
-		const viewport = this._viewport;
-
-		if ( x.isVector4 ) {
-
-			viewport.copy( x );
-
-		} else {
-
-			viewport.set( x, y, width, height );
-
-		}
-
-		viewport.minDepth = minDepth;
-		viewport.maxDepth = maxDepth;
+		this._canvasTarget.setViewport( x, y, width, height, minDepth, maxDepth );
 
 	}
 
@@ -2252,7 +2172,7 @@ class Renderer {
 	 */
 	get samples() {
 
-		return this._samples;
+		return this._canvasTarget.samples;
 
 	}
 
@@ -2267,7 +2187,7 @@ class Renderer {
 	 */
 	get currentSamples() {
 
-		let samples = this._samples;
+		let samples = this.samples;
 
 		if ( this._renderTarget !== null ) {
 
@@ -2401,6 +2321,32 @@ class Renderer {
 	getOutputRenderTarget() {
 
 		return this._outputRenderTarget;
+
+	}
+
+	/**
+	 * Sets the canvas target. The canvas target manages the HTML canvas
+	 * or the offscreen canvas the renderer draws into.
+	 *
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	setCanvasTarget( canvasTarget ) {
+
+		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
+
+		this._canvasTarget = canvasTarget;
+		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+
+	}
+
+	/**
+	 * Returns the current canvas target.
+	 *
+	 * @return {CanvasTarget} The current canvas target.
+	 */
+	getCanvasTarget() {
+
+		return this._canvasTarget;
 
 	}
 
@@ -3285,6 +3231,17 @@ class Renderer {
 		this._pipelines.getForRender( renderObject, this._compilationPromises );
 
 		this._nodes.updateAfter( renderObject );
+
+	}
+
+	/**
+	 * Callback when the canvas has been resized.
+	 *
+	 * @private
+	 */
+	_onCanvasTargetResize() {
+
+		if ( this._initialized ) this.backend.updateSize();
 
 	}
 
