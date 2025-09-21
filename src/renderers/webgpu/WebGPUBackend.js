@@ -328,15 +328,16 @@ class WebGPUBackend extends Backend {
 		const renderer = this.renderer;
 		const canvasTarget = renderer.getCanvasTarget();
 		const canvasData = this.get( canvasTarget );
+		const samples = renderer.currentSamples;
 
 		let descriptor = canvasData.descriptor;
 
-		if ( descriptor === undefined ) {
+		if ( descriptor === undefined || canvasData.samples !== samples ) {
 
 			descriptor = {
 				colorAttachments: [ {
 					view: null
-				} ],
+				} ]
 			};
 
 			if ( renderer.depth === true || renderer.stencil === true ) {
@@ -349,7 +350,7 @@ class WebGPUBackend extends Backend {
 
 			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-			if ( renderer.currentSamples > 0 ) {
+			if ( samples > 0 ) {
 
 				colorAttachment.view = this.textureUtils.getColorBuffer().createView();
 
@@ -360,12 +361,13 @@ class WebGPUBackend extends Backend {
 			}
 
 			canvasData.descriptor = descriptor;
+			canvasData.samples = samples;
 
 		}
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
 
-		if ( renderer.currentSamples > 0 ) {
+		if ( samples > 0 ) {
 
 			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
 
