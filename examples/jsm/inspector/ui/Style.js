@@ -348,7 +348,7 @@ export class Style {
 
 .item-toggler {
 	display: inline-block;
-	width: 1.5em;
+	margin-right: 0.8em;
 	text-align: left;
 }
 

@@ -4,9 +4,11 @@ import { Profiler } from './ui/Profiler.js';
 import { Performance } from './tabs/Performance.js';
 import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
-import { setText, ease } from './ui/utils.js';
+import { Viewer } from './tabs/Viewer.js';
+import { setText, ease, splitPath, splitCamelCase } from './ui/utils.js';
 
-import { setConsoleFunction, REVISION } from 'three/webgpu';
+import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
+import { renderOutput, vec3, vec4 } from 'three/tsl';
 
 const EASE_FACTOR = 0.1;
 
@@ -24,6 +26,9 @@ class Inspector extends RendererInspector {
 		parameters.hide();
 		profiler.addTab( parameters );
 
+		const viewer = new Viewer();
+		profiler.addTab( viewer );
+
 		const performance = new Performance();
 		profiler.addTab( performance );
 
@@ -38,10 +43,12 @@ class Inspector extends RendererInspector {
 		this.softDeltaTime = 0;
 
 		this.statsData = new Map();
+		this.canvasNodes = new Map();
 		this.profiler = profiler;
 		this.performance = performance;
 		this.console = console;
 		this.parameters = parameters;
+		this.viewer = viewer;
 		this.once = {};
 
 		this.displayCycle = {
@@ -244,6 +251,63 @@ class Inspector extends RendererInspector {
 			data.total += childData.total;
 
 		}
+
+	}
+
+	getCanvasDataByNode( node ) {
+
+		let canvasData = this.canvasNodes.get( node );
+
+		if ( canvasData === undefined ) {
+
+			const renderer = this.getRenderer();
+
+			const canvas = document.createElement( 'canvas' );
+
+			const canvasTarget = new CanvasTarget( canvas );
+			canvasTarget.setPixelRatio( window.devicePixelRatio );
+			canvasTarget.setSize( 140, 140 );
+
+			const id = node.id;
+
+			const { path, name } = splitPath( splitCamelCase( node.getName() || '(unnamed)' ) );
+
+			let output = vec4( vec3( node ), 1 );
+			output = renderOutput( output, NoToneMapping, renderer.outputColorSpace );
+			output = output.context( { inspector: true } );
+
+			const material = new NodeMaterial();
+			material.outputNode = output;
+
+			const quad = new QuadMesh( material );
+			quad.name = 'Inspector - ' + name;
+
+			canvasData = {
+				id,
+				name,
+				path,
+				node,
+				quad,
+				canvasTarget,
+				material
+			};
+
+			this.canvasNodes.set( node, canvasData );
+
+		}
+
+		return canvasData;
+
+	}
+
+	resolveViewer() {
+
+		const nodes = this.currentNodes;
+
+		const renderer = this.getRenderer();
+		const canvasDataList = nodes.map( node => this.getCanvasDataByNode( node ) );
+
+		this.viewer.update( renderer, canvasDataList );
 
 	}
 
