@@ -11,6 +11,7 @@ export class Tab {
 		this.content.id = `${this.id}-content`;
 		this.content.className = 'profiler-content';
 
+		this.isActive = false;
 		this.isVisible = true;
 
 	}
@@ -19,6 +20,8 @@ export class Tab {
 
 		this.button.classList.toggle( 'active', isActive );
 		this.content.classList.toggle( 'active', isActive );
+
+		this.isActive = isActive;
 
 	}
 

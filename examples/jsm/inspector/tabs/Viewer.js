@@ -70,6 +70,10 @@ class Viewer extends Tab {
 
 	update( renderer, canvasDataList ) {
 
+		if ( ! this.isActive ) return;
+
+		//
+
 		const previousDataList = [ ...this.currentDataList ];
 
 		// remove old

@@ -342,7 +342,7 @@ class Inspector extends RendererInspector {
 
 			// Frame desync, probably due to async GPU timing.
 
-			return;
+			frame.miscellaneous = 0;
 
 		}
 
@@ -362,7 +362,7 @@ class Inspector extends RendererInspector {
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
-			setText( 'fps-counter', this.fps.toFixed() );
+			setText( 'fps-counter', this.softFPS.toFixed() );
 
 			this.performance.updateText( this, frame );
 
