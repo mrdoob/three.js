@@ -255,6 +255,15 @@ class Renderer {
 		// internals
 
 		/**
+		 * The number of MSAA samples.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._samples = samples || ( antialias === true ) ? 4 : 0;
+
+		/**
 		 * OnCanvasTargetResize callback function.
 		 *
 		 * @private
@@ -2187,7 +2196,7 @@ class Renderer {
 	 */
 	get currentSamples() {
 
-		let samples = this.samples;
+		let samples = this._samples;
 
 		if ( this._renderTarget !== null ) {
 
