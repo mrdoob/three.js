@@ -27,6 +27,7 @@ export * from '../utils/Discard.js'; // Discard(), Return()
 export * from '../display/RenderOutputNode.js'; // .renderOutput()
 export * from '../utils/DebugNode.js'; // debug()
 export * from '../core/SubBuildNode.js'; // subBuild()
+export * from '../core/InspectorNode.js'; // inspector(), .toInspector()
 
 export function addNodeElement( name/*, nodeElement*/ ) {
 
