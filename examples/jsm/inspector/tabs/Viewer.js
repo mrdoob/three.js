@@ -1,8 +1,6 @@
 import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
-import { Graph } from '../ui/Graph.js';
 import { Item } from '../ui/Item.js';
-import { createValueSpan, setText, splitPath } from '../ui/utils.js';
 
 import { RendererUtils, NoToneMapping, LinearSRGBColorSpace } from 'three/webgpu';
 
