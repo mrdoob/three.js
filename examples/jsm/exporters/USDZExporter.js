@@ -682,9 +682,19 @@ function buildVector3Array( attribute, count ) {
 
 	for ( let i = 0; i < attribute.count; i ++ ) {
 
-		const x = attribute.getX( i );
-		const y = attribute.getY( i );
-		const z = attribute.getZ( i );
+		let x = attribute.getX( i );
+		let y = attribute.getY( i );
+		let z = attribute.getZ( i );
+
+		if ( isNaN( x ) ) {
+			x = 0;
+		}
+		if ( isNaN( y ) ) {
+			y = 0;
+		}
+		if ( isNaN( z ) ) {
+			z = 0;
+		}
 
 		array.push(
 			`(${x.toPrecision( PRECISION )}, ${y.toPrecision(
@@ -704,8 +714,15 @@ function buildVector2Array( attribute ) {
 
 	for ( let i = 0; i < attribute.count; i ++ ) {
 
-		const x = attribute.getX( i );
-		const y = attribute.getY( i );
+		let x = attribute.getX( i );
+		let y = attribute.getY( i );
+
+		if ( isNaN( x ) ) {
+			x = 0;
+		}
+		if ( isNaN( y ) ) {
+			y = 0;
+		}
 
 		array.push(
 			`(${x.toPrecision( PRECISION )}, ${1 - y.toPrecision( PRECISION )})`
