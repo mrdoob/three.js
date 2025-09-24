@@ -309,6 +309,8 @@ class TextureNode extends UniformNode {
 
 			if ( this._flipYUniform === null ) this._flipYUniform = uniform( false );
 
+			uvNode = uvNode.toVar(); // #31929
+
 			if ( this.sampler ) {
 
 				uvNode = this._flipYUniform.equal( true ).select( uvNode.flipY(), uvNode );
