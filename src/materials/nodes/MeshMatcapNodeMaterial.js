@@ -53,7 +53,7 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 	 */
 	setupVariants( builder ) {
 
-		const uv = matcapUV;
+		const uv = matcapUV.toVar();
 
 		let matcapColor;
 
