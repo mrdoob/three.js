@@ -2181,7 +2181,7 @@ class Renderer {
 	 */
 	get samples() {
 
-		return this._canvasTarget.samples;
+		return this._samples;
 
 	}
 
