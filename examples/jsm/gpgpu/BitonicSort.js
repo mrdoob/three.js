@@ -74,15 +74,14 @@ export const getBitonicDisperseIndices = /*@__PURE__*/ Fn( ( [ index, swapSpan ]
 	]
 } );
 
-// TODO: Add parameters for computing a buffer larger than vec4
 export class BitonicSort {
 
 	/**
 	 * Constructs a new light probe helper.
 	 *
 	 * @param {Renderer} renderer - The current scene's renderer.
-	 * @param {StorageBufferNode} [size=1] - The size of the helper.
-	 * @param {Object} [options={}] - The size of the helper.
+	 * @param {StorageBufferNode} dataBuffer - The data buffer to sort.
+	 * @param {Object} [options={}] - Options that modify the bitonic sort.
 	 */
 	constructor( renderer, dataBuffer, options = {} ) {
 
@@ -248,6 +247,7 @@ export class BitonicSort {
 	 * Get total number of distinct swaps that occur in a bitonic sort.
 	 *
 	 * @private
+	 * @returns {number} - The total number of distinct swaps in a bitonic sort
 	 */
 	_getSwapOpCount() {
 
@@ -260,6 +260,7 @@ export class BitonicSort {
 	 * Get the number of steps it takes to execute a complete bitonic sort.
 	 *
 	 * @private
+	 * @returns {number} The number of steps it takes to execute a complete bitonic sort.
 	 */
 	_getStepCount() {
 
@@ -292,8 +293,12 @@ export class BitonicSort {
 
 	/**
 	 * Compares and swaps two data points in the data buffer within the global address space.
-	 *
+	 * @param {Node<uint>} idxBefore - The index of the first data element in the data buffer.
+	 * @param {Node<uint>} idxAfter - The index of the second data element in the data buffer.
+	 * @param {StorageBufferNode} dataBuffer - The buffer of data to read from.
+	 * @param {StorageBufferNode} tempBuffer - The buffer of data to write to.
 	 * @private
+	 *
 	 */
 	_globalCompareAndSwapTSL( idxBefore, idxAfter, dataBuffer, tempBuffer ) {
 
@@ -309,6 +314,8 @@ export class BitonicSort {
 	 * Compares and swaps two data points in the data buffer within the local address space.
 	 *
 	 * @private
+	 * @param {Node<uint>} idxBefore - The index of the first data element in the data buffer.
+	 * @param {Node<uint>} idxAfter - The index of the second data element in the data buffer
 	 */
 	_localCompareAndSwapTSL( idxBefore, idxAfter ) {
 
@@ -327,6 +334,7 @@ export class BitonicSort {
 	 * Create the compute shader that performs a global disperse swap on the data buffer.
 	 *
 	 * @private
+	 * @returns {ComputeNode} - A compute shader that executes a global disperse swap.
 	 */
 	_getDisperseGlobal() {
 
@@ -349,6 +357,7 @@ export class BitonicSort {
 	 * Create the compute shader that performs a global flip swap on the data buffer.
 	 *
 	 * @private
+	 * @returns {ComputeNode} - A compute shader that executes a global flip swap.
 	 */
 	_getFlipGlobal() {
 
@@ -372,6 +381,7 @@ export class BitonicSort {
 	 * Create the compute shader that performs a complete local swap on the data buffer.
 	 *
 	 * @private
+	 * @returns {ComputeNode} - A compute shader that executes a full local swap.
 	 */
 	_getSwapLocal() {
 
@@ -440,6 +450,7 @@ export class BitonicSort {
 	 * Create the compute shader that performs a local disperse swap on the data buffer.
 	 *
 	 * @private
+	 * @returns {ComputeNode} - A compute shader that executes a local disperse swap.
 	 */
 	_getDisperseLocal() {
 
@@ -490,6 +501,7 @@ export class BitonicSort {
 	 * Create the compute shader that resets the sort's algorithm information.
 	 *
 	 * @private
+	 * @returns {ComputeNode} - A compute shader that resets the bitonic sort's algorithm information.
 	 */
 	_getResetFn() {
 
@@ -512,9 +524,10 @@ export class BitonicSort {
 	}
 
 	/**
-	 * Create the compute shader that copies the state of the global swap to the data buffer.
+	 * Create the compute shader that copies the state of the last global swap to the data buffer.
 	 *
 	 * @private
+	 * @returns {ComputeNode} - A compute shader that copies the state of the last global swap to the data buffer.
 	 */
 	_getAlignFn() {
 
@@ -533,9 +546,10 @@ export class BitonicSort {
 	}
 
 	/**
-	 * Create the compute shader that sets the algorithm's information.
+	 * Create the compute shader that sets the bitonic sort algorithm's information.
 	 *
 	 * @private
+	 * @returns {ComputeNode} - A compute shader that sets the bitonic sort algorithm's information.
 	 */
 	_getSetAlgoFn() {
 
