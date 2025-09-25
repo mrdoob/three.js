@@ -990,16 +990,6 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns an invocation's global index within a grid of workgroups.
-	 * Its value is equivalent to an invocation's workgroup index * workgroupSize + invocationLocalIndex.
-	 */
-	getInvocationGlobalIndex() {
-
-		error( 'GLSLNodeBuilder: WebGLBackend does not support the invocationGlobalIndex node' );
-
-	}
-
-	/**
 	 * Returns a builtin representing the size of a subgroup within the current shader.
 	 */
 	getSubgroupSize() {

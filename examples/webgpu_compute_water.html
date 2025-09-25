@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView, invocationGlobalIndex } from 'three/tsl';
+			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView, globalId } from 'three/tsl';
 
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -230,8 +230,8 @@
 
 					// Get x and y position of the coordinate in the water plane
 
-					const x = float( invocationGlobalIndex.x ).mul( 1 / WIDTH );
-					const y = float( invocationGlobalIndex.y ).mul( 1 / WIDTH );
+					const x = float( globalId.x ).mul( 1 / WIDTH );
+					const y = float( globalId.y ).mul( 1 / WIDTH );
 
 					// Mouse influence
 					const centerVec = vec2( 0.5 );

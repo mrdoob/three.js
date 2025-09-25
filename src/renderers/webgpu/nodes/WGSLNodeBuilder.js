@@ -1143,19 +1143,6 @@ ${ flowData.code }
 
 	}
 
-
-	/**
-	 * Returns an invocation's global index within a grid of workgroups.
-	 * Its value is equivalent to an invocation's workgroup index * workgroupSize + invocationLocalIndex.
-	 *
-	 * @return {string} The invocation global index.
-	 */
-	getInvocationGlobalIndex() {
-
-		return this.getBuiltin( 'global_invocation_id', 'globalId', 'vec3<u32>', 'attribute' );
-
-	}
-
 	/**
 	 * Returns a builtin representing the size of a subgroup within the current shader.
 	 *
@@ -1945,6 +1932,7 @@ ${ flowData.code }
 			const workgroupSize = this.object.workgroupSize;
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
+			console.log( this.computeShader );
 
 		}
 

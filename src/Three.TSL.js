@@ -229,7 +229,6 @@ export const intBitsToFloat = TSL.intBitsToFloat;
 export const inverse = TSL.inverse;
 export const inverseSqrt = TSL.inverseSqrt;
 export const inversesqrt = TSL.inversesqrt;
-export const invocationGlobalIndex = TSL.invocationGlobalIndex;
 export const invocationLocalIndex = TSL.invocationLocalIndex;
 export const invocationSubgroupIndex = TSL.invocationSubgroupIndex;
 export const ior = TSL.ior;
