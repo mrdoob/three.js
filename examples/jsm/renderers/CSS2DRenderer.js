@@ -290,6 +290,7 @@ class CSS2DRenderer {
 
 				if ( a.renderOrder !== b.renderOrder ) {
 
+					// Sort by ascending renderOrder
 					return a.renderOrder - b.renderOrder;
 
 				}
@@ -299,7 +300,8 @@ class CSS2DRenderer {
 					const depthA = a.depthTest ? 1 : 0;
 					const depthB = b.depthTest ? 1 : 0;
 
-					return depthA - depthB;
+					// Put objects with depthTest=false in front of those with depthTest=true
+					return depthB - depthA;
 				}
 
 				const distanceA = cache.objects.get( a ).distanceToCameraSquared;
