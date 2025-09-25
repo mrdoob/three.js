@@ -1133,7 +1133,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the invocation local index builtin.
+	 * Returns a builtin representing the index of an invocation within its workgroup.
 	 *
 	 * @return {string} The invocation local index.
 	 */
@@ -1152,12 +1152,12 @@ ${ flowData.code }
 	 */
 	getInvocationGlobalIndex() {
 
-		return this.getBuiltin( 'global_invocation_id', 'globalId', 'vec3<u32>', 'attribute' );
+		return this.getBuiltin( 'global_invocation_id', 'invocationGlobalIndex', 'vec3<u32>', 'attribute' );
 
 	}
 
 	/**
-	 * Returns the subgroup size builtin.
+	 * Returns a builtin representing the size of a subgroup within the current shader.
 	 *
 	 * @return {string} The subgroup size.
 	 */
@@ -1170,7 +1170,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the invocation subgroup index builtin.
+	 * Returns a builtin representing the index of an invocation within its subgroup.
 	 *
 	 * @return {string} The invocation subgroup index.
 	 */
@@ -1183,7 +1183,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the subgroup index builtin.
+	 * Returns a builtin representing the index of the current invocation's subgroup within its workgroup.
 	 *
 	 * @return {string} The subgroup index.
 	 */
@@ -1945,8 +1945,6 @@ ${ flowData.code }
 			const workgroupSize = this.object.workgroupSize;
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
-
-			console.log( this.computeShader );
 
 		}
 

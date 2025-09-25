@@ -975,7 +975,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the invocation local index builtin.
+	 * Returns a builtin representing the index of an invocation within its workgroup.
 	 *
 	 * @return {string} The invocation local index.
 	 */
@@ -992,7 +992,6 @@ ${ flowData.code }
 	/**
 	 * Returns an invocation's global index within a grid of workgroups.
 	 * Its value is equivalent to an invocation's workgroup index * workgroupSize + invocationLocalIndex.
-	 *
 	 */
 	getInvocationGlobalIndex() {
 
@@ -1001,10 +1000,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the subgroup size builtin.
-	 *
-	 * @abstract
-	 * @return {string} The subgroup size.
+	 * Returns a builtin representing the size of a subgroup within the current shader.
 	 */
 	getSubgroupSize() {
 
@@ -1013,10 +1009,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the invocation subgroup index builtin.
-	 *
-	 * @abstract
-	 * @return {string} The invocation subgroup index.
+	 * Returns a builtin representing the index of an invocation within its subgroup.
 	 */
 	getInvocationSubgroupIndex() {
 
@@ -1025,10 +1018,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the subgroup index builtin.
-	 *
-	 * @abstract
-	 * @return {string} The subgroup index.
+	 * Returns a builtin representing the index of the current invocation's subgroup within its workgroup.
 	 */
 	getSubgroupIndex() {
 
