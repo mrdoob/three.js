@@ -300,7 +300,8 @@ class CSS2DRenderer {
 					const depthA = a.depthTest ? 1 : 0;
 					const depthB = b.depthTest ? 1 : 0;
 
-					// Put objects with depthTest=false in front of those with depthTest=true
+					// Put objects with depthTest=false after objects with depthTest=true when
+					// they have the same renderOrder
 					return depthB - depthA;
 				}
 
