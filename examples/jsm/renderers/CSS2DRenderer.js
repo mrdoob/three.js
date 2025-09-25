@@ -30,6 +30,15 @@ class CSS2DObject extends Object3D {
 		 * @default true
 		 */
 		this.isCSS2DObject = true;
+		/**
+		 * If set to `true` (default), the renderer will automatically assign `z-index` css properties
+		 * according to the object's renderOrder and distance to the camera. If set to `false`, the `z-index`
+		 * of the object's element will not be changed by the renderer and can be controlled manually.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoSortZ = true;
 
 		/**
 		 * The DOM element which defines the appearance of this 3D object.
@@ -268,7 +277,7 @@ class CSS2DRenderer {
 
 			scene.traverseVisible( function ( object ) {
 
-				if ( object.isCSS2DObject ) result.push( object );
+				if ( object.isCSS2DObject && object.autoSortZ ) result.push( object );
 
 			} );
 
