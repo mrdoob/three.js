@@ -165,6 +165,11 @@ export class BitonicSort {
 		*/
 		this.stepCount = this._getStepCount();
 
+		/**
+		 * The number of the buffer being read from.
+		 *
+		 * @type {string}
+		*/
 		this.readBufferName = 'Data';
 
 		/**
@@ -200,8 +205,8 @@ export class BitonicSort {
 		 * @type {Object<string, ComputeNode>}
 		*/
 		this.disperseLocalNodes = {
-			'Data': this._getDisperseLocal(),
-			'Temp': this._getDisperseLocal(),
+			'Data': this._getDisperseLocal( this.dataBuffer ),
+			'Temp': this._getDisperseLocal( this.tempBuffer ),
 		};
 
 		// Utility functions
@@ -370,6 +375,8 @@ export class BitonicSort {
 	 * Create the compute shader that performs a global flip swap on the data buffer.
 	 *
 	 * @private
+	 * @param {StorageBufferNode} readBuffer - The data buffer to read from.
+	 * @param {StorageBufferNode} writeBuffer - The data buffer to read from.
 	 * @returns {ComputeNode} - A compute shader that executes a global flip swap.
 	 */
 	_getFlipGlobal( readBuffer, writeBuffer ) {
@@ -463,11 +470,12 @@ export class BitonicSort {
 	 * Create the compute shader that performs a local disperse swap on the data buffer.
 	 *
 	 * @private
+	 * @param {StorageBufferNode} readWriteBuffer - The data buffer to read from and write to.
 	 * @returns {ComputeNode} - A compute shader that executes a local disperse swap.
 	 */
-	_getDisperseLocal() {
+	_getDisperseLocal( readWriteBuffer ) {
 
-		const { localStorage, dataBuffer, workgroupSize } = this;
+		const { localStorage, workgroupSize } = this;
 
 		const fnDef = Fn( () => {
 
@@ -478,8 +486,8 @@ export class BitonicSort {
 			const localID1 = invocationLocalIndex.mul( 2 );
 			const localID2 = invocationLocalIndex.mul( 2 ).add( 1 );
 
-			localStorage.element( localID1 ).assign( dataBuffer.element( localOffset.add( localID1 ) ) );
-			localStorage.element( localID2 ).assign( dataBuffer.element( localOffset.add( localID2 ) ) );
+			localStorage.element( localID1 ).assign( readWriteBuffer.element( localOffset.add( localID1 ) ) );
+			localStorage.element( localID2 ).assign( readWriteBuffer.element( localOffset.add( localID2 ) ) );
 
 			// Ensure that all local data has been populated
 			workgroupBarrier();
@@ -501,8 +509,8 @@ export class BitonicSort {
 			// Ensure that all invocations have swapped their own regions of data
 			workgroupBarrier();
 
-			dataBuffer.element( localOffset.add( localID1 ) ).assign( localStorage.element( localID1 ) );
-			dataBuffer.element( localOffset.add( localID2 ) ).assign( localStorage.element( localID2 ) );
+			readWriteBuffer.element( localOffset.add( localID1 ) ).assign( localStorage.element( localID1 ) );
+			readWriteBuffer.element( localOffset.add( localID2 ) ).assign( localStorage.element( localID2 ) );
 
 		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
 
@@ -631,7 +639,16 @@ export class BitonicSort {
 			const swapType = this.globalOpsRemaining === this.globalOpsInSpan ? 'Flip' : 'Disperse';
 
 			await renderer.computeAsync( swapType === 'Flip' ? this.flipGlobalNodes[ this.readBufferName ] : this.disperseGlobalNodes[ this.readBufferName ] );
-			await renderer.computeAsync( this.alignFn );
+
+			if ( this.readBufferName === 'Data' ) {
+
+				this.readBufferName = 'Temp';
+
+			} else {
+
+				this.readBufferName = 'Data';
+
+			}
 
 			this.globalOpsRemaining -= 1;
 
@@ -650,6 +667,15 @@ export class BitonicSort {
 		this.currentDispatch += 1;
 
 		if ( this.currentDispatch === this.stepCount ) {
+
+			// If our last swap addressed only addressed the temp buffer, then re-allign it with the data buffer
+			// to fulfill the requirement of an in-place sort.
+			if ( this.readBufferName === 'Temp' ) {
+
+				await renderer.computeAsync( this.alignFn );
+				this.readBufferName = 'Data';
+
+			}
 
 			// Just reset the algorithm information
 			await renderer.computeAsync( this.resetFn );
