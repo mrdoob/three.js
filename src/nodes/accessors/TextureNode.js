@@ -350,7 +350,7 @@ class TextureNode extends UniformNode {
 		//
 
 		let uvNode = Fn( () => {
-			
+
 			uvNode = this.uvNode;
 
 			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
