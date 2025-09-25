@@ -31,14 +31,13 @@ class CSS2DObject extends Object3D {
 		 */
 		this.isCSS2DObject = true;
 		/**
-		 * If set to `true` (default), the renderer will automatically assign `z-index` css properties
-		 * according to the object's renderOrder and distance to the camera. If set to `false`, the `z-index`
-		 * of the object's element will not be changed by the renderer and can be controlled manually.
+		 * If set to `true` (default), the renderer will assign different `z-index` css properties
+		 * to objects with the same `renderOrder` based on their distance to the camera.
 		 *
 		 * @type {boolean}
 		 * @default true
 		 */
-		this.autoSortZ = true;
+		this.depthTest = true;
 
 		/**
 		 * The DOM element which defines the appearance of this 3D object.
@@ -291,8 +290,16 @@ class CSS2DRenderer {
 
 				if ( a.renderOrder !== b.renderOrder ) {
 
-					return b.renderOrder - a.renderOrder;
+					return a.renderOrder - b.renderOrder;
 
+				}
+
+				if (a.depthTest !== b.depthTest){
+
+					const depthA = a.depthTest ? 1 : 0;
+					const depthB = b.depthTest ? 1 : 0;
+
+					return depthA - depthB;
 				}
 
 				const distanceA = cache.objects.get( a ).distanceToCameraSquared;
@@ -302,11 +309,20 @@ class CSS2DRenderer {
 
 			} );
 
-			const zMax = sorted.length;
+			let zIndex = 0;
+			let lastRenderOrder = null;
 
 			for ( let i = 0, l = sorted.length; i < l; i ++ ) {
+				const object = sorted[ i ];
 
-				sorted[ i ].element.style.zIndex = zMax - i;
+				if(object.renderOrder !== lastRenderOrder){
+					lastRenderOrder = object.renderOrder;
+					zIndex += 1;
+				} else if( object.depthTest ) {
+					zIndex += 1;
+				}
+
+				object.element.style.zIndex = zIndex;
 
 			}
 
