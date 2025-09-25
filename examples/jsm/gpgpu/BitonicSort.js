@@ -165,19 +165,27 @@ export class BitonicSort {
 		*/
 		this.stepCount = this._getStepCount();
 
-		/**
-		 * A compute shader that executes a 'flip' swap within a global address space on elements in the data buffer.
-		 *
-		 * @type {ComputeNode}
-		*/
-		this.flipGlobalFn = this._getFlipGlobal();
+		this.readBufferName = 'Data';
 
 		/**
-		 * A compute shader that executes a 'disperse' swap within a global address space on elements in the data buffer.
+		 * An object containing compute shaders that execute a 'flip' swap within a global address space on elements in the data buffer.
 		 *
-		 * @type {ComputeNode}
+		 * @type {Object<string, ComputeNode>}
 		*/
-		this.disperseGlobalFn = this._getDisperseGlobal();
+		this.flipGlobalNodes = {
+			'Data': this._getFlipGlobal( this.dataBuffer, this.tempBuffer ),
+			'Temp': this._getFlipGlobal( this.tempBuffer, this.dataBuffer )
+		};
+
+		/**
+		 * An object containing compute shaders that execute a 'disperse' swap within a global address space on elements in the data buffer.
+		 *
+		 * @type {Object<string, ComputeNode>}
+		*/
+		this.disperseGlobalNodes = {
+			'Data': this._getDisperseGlobal( this.dataBuffer, this.tempBuffer ),
+			'Temp': this._getDisperseGlobal( this.tempBuffer, this.dataBuffer )
+		};
 
 		/**
 		 * A compute shader that executes a sequence of flip and disperse swaps within a local address space on elements in the data buffer.
@@ -189,9 +197,12 @@ export class BitonicSort {
 		/**
 		 * A compute shader that executes a sequence of disperse swaps within a local address space on elements in the data buffer.
 		 *
-		 * @type {ComputeNode}
+		 * @type {Object<string, ComputeNode>}
 		*/
-		this.disperseLocalFn = this._getDisperseLocal();
+		this.disperseLocalNodes = {
+			'Data': this._getDisperseLocal(),
+			'Temp': this._getDisperseLocal(),
+		};
 
 		// Utility functions
 
@@ -334,18 +345,20 @@ export class BitonicSort {
 	 * Create the compute shader that performs a global disperse swap on the data buffer.
 	 *
 	 * @private
-	 * @returns {ComputeNode} - A compute shader that executes a global disperse swap.
+	 * @param {StorageBufferNode} readBuffer - The data buffer to read from.
+	 * @param {StorageBufferNode} writeBuffer - The data buffer to read from.
+	 * @returns {ComputeNode} - A compute shader that performs a global disperse swap on the data buffer.
 	 */
-	_getDisperseGlobal() {
+	_getDisperseGlobal( readBuffer, writeBuffer ) {
 
-		const { infoStorage, tempBuffer, dataBuffer } = this;
+		const { infoStorage } = this;
 
 		const currentSwapSpan = infoStorage.element( 1 );
 
 		const fnDef = Fn( () => {
 
 			const idx = getBitonicDisperseIndices( instanceIndex, currentSwapSpan );
-			this._globalCompareAndSwapTSL( idx.x, idx.y, dataBuffer, tempBuffer );
+			this._globalCompareAndSwapTSL( idx.x, idx.y, readBuffer, writeBuffer );
 
 		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
 
@@ -359,16 +372,16 @@ export class BitonicSort {
 	 * @private
 	 * @returns {ComputeNode} - A compute shader that executes a global flip swap.
 	 */
-	_getFlipGlobal() {
+	_getFlipGlobal( readBuffer, writeBuffer ) {
 
-		const { infoStorage, tempBuffer, dataBuffer } = this;
+		const { infoStorage } = this;
 
 		const currentSwapSpan = infoStorage.element( 1 );
 
 		const fnDef = Fn( () => {
 
 			const idx = getBitonicFlipIndices( instanceIndex, currentSwapSpan );
-			this._globalCompareAndSwapTSL( idx.x, idx.y, dataBuffer, tempBuffer );
+			this._globalCompareAndSwapTSL( idx.x, idx.y, readBuffer, writeBuffer );
 
 		} )().compute( this.dispatchSize, [ this.workgroupSize ] );
 
@@ -617,7 +630,7 @@ export class BitonicSort {
 
 			const swapType = this.globalOpsRemaining === this.globalOpsInSpan ? 'Flip' : 'Disperse';
 
-			await renderer.computeAsync( swapType === 'Flip' ? this.flipGlobalFn : this.disperseGlobalFn );
+			await renderer.computeAsync( swapType === 'Flip' ? this.flipGlobalNodes[ this.readBufferName ] : this.disperseGlobalNodes[ this.readBufferName ] );
 			await renderer.computeAsync( this.alignFn );
 
 			this.globalOpsRemaining -= 1;
@@ -625,7 +638,7 @@ export class BitonicSort {
 		} else {
 
 			// Then run local disperses when we've finished all global swaps
-			await renderer.computeAsync( this.disperseLocalFn );
+			await renderer.computeAsync( this.disperseLocalNodes[ this.readBufferName ] );
 
 			const nextSpanGlobalOps = this.globalOpsInSpan + 1;
 			this.globalOpsInSpan = nextSpanGlobalOps;
