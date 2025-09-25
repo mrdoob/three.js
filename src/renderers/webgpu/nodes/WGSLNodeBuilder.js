@@ -1152,7 +1152,7 @@ ${ flowData.code }
 	 */
 	getInvocationGlobalIndex() {
 
-		return this.getBuiltin( 'global_invocation_id', 'invocationGlobalIndex', 'vec3<u32>', 'attribute' );
+		return this.getBuiltin( 'global_invocation_id', 'globalId', 'vec3<u32>', 'attribute' );
 
 	}
 
