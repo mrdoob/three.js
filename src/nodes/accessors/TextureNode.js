@@ -4,7 +4,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToWorking } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
-import { nodeProxy, vec3, nodeObject, int } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 import { IntType, NearestFilter, UnsignedIntType } from '../../constants.js';
@@ -309,15 +309,15 @@ class TextureNode extends UniformNode {
 
 			if ( this._flipYUniform === null ) this._flipYUniform = uniform( false );
 
-			uvNode = uvNode.toVar(); // #31929
+			uvNode = uvNode.toVar();
 
 			if ( this.sampler ) {
 
-				uvNode = this._flipYUniform.equal( true ).select( uvNode.flipY(), uvNode );
+				uvNode = this._flipYUniform.select( uvNode.flipY(), uvNode );
 
 			} else {
 
-				uvNode = this._flipYUniform.equal( true ).select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
+				uvNode = this._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
 
 			}
 
@@ -349,27 +349,35 @@ class TextureNode extends UniformNode {
 
 		//
 
-		let uvNode = this.uvNode;
+		let uvNode = Fn( () => {
+			
+			uvNode = this.uvNode;
 
-		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
+			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-			uvNode = builder.context.getUV( this, builder );
+				uvNode = builder.context.getUV( this, builder );
 
-		}
+			}
 
-		if ( ! uvNode ) uvNode = this.getDefaultUV();
+			if ( ! uvNode ) uvNode = this.getDefaultUV();
 
-		if ( this.updateMatrix === true ) {
+			if ( this.updateMatrix === true ) {
 
-			uvNode = this.getTransformedUV( uvNode );
+				uvNode = this.getTransformedUV( uvNode );
 
-		}
+			}
 
-		uvNode = this.setupUV( builder, uvNode );
+			uvNode = this.setupUV( builder, uvNode );
 
-		//
+			//
 
-		this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
+			this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
+
+			//
+
+			return uvNode;
+
+		} )();
 
 		//
 
