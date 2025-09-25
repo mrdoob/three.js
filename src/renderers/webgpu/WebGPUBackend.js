@@ -1410,6 +1410,8 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		console.log( dispatchSize );
+
 		//
 
 		passEncoderGPU.dispatchWorkgroups(

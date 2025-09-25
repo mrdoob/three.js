@@ -1115,7 +1115,8 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the instance index builtin.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @return {string} The instance index.
 	 */
@@ -1139,6 +1140,19 @@ ${ flowData.code }
 	getInvocationLocalIndex() {
 
 		return this.getBuiltin( 'local_invocation_index', 'invocationLocalIndex', 'u32', 'attribute' );
+
+	}
+
+
+	/**
+	 * Returns an invocation's global index within a grid of workgroups.
+	 * Its value is equivalent to an invocation's workgroup index * workgroupSize + invocationLocalIndex.
+	 *
+	 * @return {string} The invocation global index.
+	 */
+	getInvocationGlobalIndex() {
+
+		return this.getBuiltin( 'global_invocation_id', 'globalId', 'vec3<u32>', 'attribute' );
 
 	}
 
@@ -1931,6 +1945,8 @@ ${ flowData.code }
 			const workgroupSize = this.object.workgroupSize;
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
+
+			console.log( this.computeShader );
 
 		}
 

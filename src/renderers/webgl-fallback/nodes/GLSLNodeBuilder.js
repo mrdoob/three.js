@@ -963,7 +963,8 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the instance index builtin.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @return {string} The instance index.
 	 */
@@ -985,6 +986,53 @@ ${ flowData.code }
 		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
 
 		return `uint( gl_InstanceID ) % ${size}u`;
+
+	}
+
+	/**
+	 * Returns an invocation's global index within a grid of workgroups.
+	 * Its value is equivalent to an invocation's workgroup index * workgroupSize + invocationLocalIndex.
+	 *
+	 */
+	getInvocationGlobalIndex() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the invocationGlobalIndex node' );
+
+	}
+
+	/**
+	 * Returns the subgroup size builtin.
+	 *
+	 * @abstract
+	 * @return {string} The subgroup size.
+	 */
+	getSubgroupSize() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the subgroupSize node' );
+
+	}
+
+	/**
+	 * Returns the invocation subgroup index builtin.
+	 *
+	 * @abstract
+	 * @return {string} The invocation subgroup index.
+	 */
+	getInvocationSubgroupIndex() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the invocationSubgroupIndex node' );
+
+	}
+
+	/**
+	 * Returns the subgroup index builtin.
+	 *
+	 * @abstract
+	 * @return {string} The subgroup index.
+	 */
+	getSubgroupIndex() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the subgroupIndex node' );
 
 	}
 

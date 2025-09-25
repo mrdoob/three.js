@@ -25,11 +25,19 @@ class IndexNode extends Node {
 	/**
 	 * Constructs a new index node.
 	 *
-	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
+	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationGlobal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
 	 */
 	constructor( scope ) {
 
-		super( 'uint' );
+		if ( scope === 'invocationGlobal' ) {
+
+			super( 'uvec3' );
+
+		} else {
+
+			super( 'uint' );
+
+		}
 
 		/**
 		 * The scope of the index node.
@@ -80,6 +88,10 @@ class IndexNode extends Node {
 
 			propertyName = builder.getSubgroupIndex();
 
+		} else if ( scope === IndexNode.INVOCATION_GLOBAL ) {
+
+			propertyName = builder.getInvocationGlobalIndex();
+
 		} else {
 
 			throw new Error( 'THREE.IndexNode: Unknown scope: ' + scope );
@@ -111,6 +123,7 @@ IndexNode.INSTANCE = 'instance';
 IndexNode.SUBGROUP = 'subgroup';
 IndexNode.INVOCATION_LOCAL = 'invocationLocal';
 IndexNode.INVOCATION_SUBGROUP = 'invocationSubgroup';
+IndexNode.INVOCATION_GLOBAL = 'invocationGlobal';
 IndexNode.DRAW = 'draw';
 
 export default IndexNode;
@@ -154,6 +167,14 @@ export const invocationSubgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, I
  * @type {IndexNode}
  */
 export const invocationLocalIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
+
+/**
+ * TSL object that represents the index of a compute invocation within the scope of a workgroup grid.
+ *
+ * @tsl
+ * @type {IndexNode}
+ */
+export const invocationGlobalIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_GLOBAL );
 
 /**
  * TSL object that represents the index of a draw call.
