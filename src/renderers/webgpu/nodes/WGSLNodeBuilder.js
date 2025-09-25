@@ -1132,8 +1132,9 @@ ${ flowData.code }
 
 	}
 
+
 	/**
-	 * Returns a builtin representing the index of an invocation within its workgroup.
+	 * Returns a builtin representing The index of a compute invocation within the scope of a workgroup load.
 	 *
 	 * @return {string} The invocation local index.
 	 */
@@ -1157,7 +1158,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns a builtin representing the index of an invocation within its subgroup.
+	 * Returns a builtin representing the index of a compute invocation within the scope of a subgroup.
 	 *
 	 * @return {string} The invocation subgroup index.
 	 */
