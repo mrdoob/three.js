@@ -73,6 +73,7 @@ export class RendererInspector extends InspectorBase {
 
 		this.currentFrame = null;
 		this.currentRender = null;
+		this.currentNodes = null;
 
 		this.frames = [];
 		this.framesLib = {};
@@ -89,6 +90,7 @@ export class RendererInspector extends InspectorBase {
 
 		this.currentFrame = this._createFrame();
 		this.currentRender = this.currentFrame;
+		this.currentNodes = [];
 
 	}
 
@@ -104,6 +106,7 @@ export class RendererInspector extends InspectorBase {
 
 		this.currentFrame = null;
 		this.currentRender = null;
+		this.currentNodes = null;
 
 		this._lastFinishTime = now;
 
@@ -137,6 +140,8 @@ export class RendererInspector extends InspectorBase {
 		return this.framesLib[ frameId ] || null;
 
 	}
+
+	resolveViewer() { }
 
 	resolveFrame( /*frame*/ ) { }
 
@@ -266,9 +271,16 @@ export class RendererInspector extends InspectorBase {
 
 		if ( this.isAvailable ) {
 
+			this.resolveViewer();
 			this.resolveTimestamp();
 
 		}
+
+	}
+
+	inspect( node ) {
+
+		this.currentNodes.push( node );
 
 	}
 
