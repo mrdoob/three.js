@@ -4,7 +4,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToWorking } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
-import { nodeProxy, vec3, nodeObject, int } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 import { IntType, NearestFilter, UnsignedIntType } from '../../constants.js';
@@ -124,9 +124,9 @@ class TextureNode extends UniformNode {
 		this.updateMatrix = false;
 
 		/**
-		 * By default the `update()` method is not executed. `setUpdateMatrix()`
-		 * sets the value to `frame` when the uv transformation matrix should
-		 * automatically be updated.
+		 * By default the `update()` method is not executed. Depending on
+		 * whether a uv transformation matrix and/or flipY is applied, `update()`
+		 * is exeucted per object.
 		 *
 		 * @type {string}
 		 * @default 'none'
@@ -154,8 +154,18 @@ class TextureNode extends UniformNode {
 		 *
 		 * @private
 		 * @type {?UniformNode<mat3>}
+		 * @default null
 		 */
 		this._matrixUniform = null;
+
+		/**
+		 * The uniform node that represents the y-flip. Only required for WebGL.
+		 *
+		 * @private
+		 * @type {?UniformNode<bool>}
+		 * @default null
+		 */
+		this._flipYUniform = null;
 
 		this.setUpdateMatrix( uvNode === null );
 
@@ -280,7 +290,6 @@ class TextureNode extends UniformNode {
 	setUpdateMatrix( value ) {
 
 		this.updateMatrix = value;
-		this.updateType = value ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
 
 		return this;
 
@@ -296,17 +305,19 @@ class TextureNode extends UniformNode {
 	 */
 	setupUV( builder, uvNode ) {
 
-		const texture = this.value;
+		if ( builder.isFlipY() ) {
 
-		if ( builder.isFlipY() && ( ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
+			if ( this._flipYUniform === null ) this._flipYUniform = uniform( false );
+
+			uvNode = uvNode.toVar();
 
 			if ( this.sampler ) {
 
-				uvNode = uvNode.flipY();
+				uvNode = this._flipYUniform.select( uvNode.flipY(), uvNode );
 
 			} else {
 
-				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
+				uvNode = this._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
 
 			}
 
@@ -338,23 +349,35 @@ class TextureNode extends UniformNode {
 
 		//
 
-		let uvNode = this.uvNode;
+		let uvNode = Fn( () => {
 
-		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
+			uvNode = this.uvNode;
 
-			uvNode = builder.context.getUV( this, builder );
+			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-		}
+				uvNode = builder.context.getUV( this, builder );
 
-		if ( ! uvNode ) uvNode = this.getDefaultUV();
+			}
 
-		if ( this.updateMatrix === true ) {
+			if ( ! uvNode ) uvNode = this.getDefaultUV();
 
-			uvNode = this.getTransformedUV( uvNode );
+			if ( this.updateMatrix === true ) {
 
-		}
+				uvNode = this.getTransformedUV( uvNode );
 
-		uvNode = this.setupUV( builder, uvNode );
+			}
+
+			uvNode = this.setupUV( builder, uvNode );
+
+			//
+
+			this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
+
+			//
+
+			return uvNode;
+
+		} )();
 
 		//
 
@@ -774,6 +797,16 @@ class TextureNode extends UniformNode {
 		if ( texture.matrixAutoUpdate === true ) {
 
 			texture.updateMatrix();
+
+		}
+
+		//
+
+		const flipYUniform = this._flipYUniform;
+
+		if ( flipYUniform !== null ) {
+
+			flipYUniform.value = ( ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true );
 
 		}
 
