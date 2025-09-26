@@ -218,7 +218,7 @@ class SSGINode extends TempNode {
 		/**
 		 * Temporal offset added to the initial ray step.
 		 *
-		 * @type {UniformNode<vec2>}
+		 * @type {UniformNode<float>}
 		 */
 		this._temporalOffset = uniform( 0 );
 
