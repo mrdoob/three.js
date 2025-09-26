@@ -17,10 +17,10 @@ export default function earcut(data, holeIndices, dim = 2) {
 
     // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
     if (data.length > 80 * dim) {
-        minX = Infinity;
-        minY = Infinity;
-        let maxX = -Infinity;
-        let maxY = -Infinity;
+        minX = data[0];
+        minY = data[1];
+        let maxX = minX;
+        let maxY = minY;
 
         for (let i = dim; i < outerLen; i += dim) {
             const x = data[i];
@@ -296,7 +296,7 @@ function compareXYSlope(a, b) {
     return result;
 }
 
-// find a bridge between vertices that connects hole with an outer ring and and link it
+// find a bridge between vertices that connects hole with an outer ring and link it
 function eliminateHole(hole, outerNode) {
     const bridge = findHoleBridge(hole, outerNode);
     if (!bridge) {
