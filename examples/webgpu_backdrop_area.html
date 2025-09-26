@@ -4,12 +4,20 @@
 		<title>three.js - WebGPU - Backdrop Area</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Backdrop Area
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Backdrop Area</span>
+			</div>
+
+			<small>
+				Backdrop area effect.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -29,7 +37,7 @@
 			import { color, positionWorld, linearDepth, viewportLinearDepth, viewportSharedTexture, screenUV, hue, time, checker, uv, modelScale } from 'three/tsl';
 			import { hashBlur } from 'three/addons/tsl/display/hashBlur.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -124,6 +132,7 @@
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = .9;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -141,13 +150,12 @@
 					'pixel': pixelMaterial
 				};
 
-				const gui = new GUI();
 				const options = { material: 'blurred' };
-
 				box.material = materials[ options.material ];
 
-				gui.add( box.scale, 'x', 0.1, 2, 0.01 );
-				gui.add( box.scale, 'z', 0.1, 2, 0.01 );
+				const gui = renderer.inspector.createParameters( 'Scene settings' );
+				gui.add( box.scale, 'x', 0.1, 2 ).step( 0.01 ).name( 'box scale x' );
+				gui.add( box.scale, 'y', 0.1, 2 ).step( 0.01 ).name( 'box scale y' );
 				gui.add( options, 'material', Object.keys( materials ) ).onChange( name => {
 
 					box.material = materials[ name ];
