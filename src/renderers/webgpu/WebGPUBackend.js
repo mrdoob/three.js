@@ -13,7 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem, TimestampQuery, REVISION } from '../../constants.js';
+import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce, error } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
@@ -256,7 +256,7 @@ class WebGPUBackend extends Backend {
 
 			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
-			const toneMappingMode = ColorManagement.getToneMappingMode( this.renderer.outputColorSpace );
+			const toneMappingMode = this.parameters.outputType === HalfFloatType ? 'extended' : 'standard';
 
 			context.configure( {
 				device: this.device,
