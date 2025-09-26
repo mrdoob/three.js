@@ -95,6 +95,7 @@
 				materialFX.colorNode = hue( saturation( scenePassTexture.rgb, screenFXNode.x.oneMinus() ), screenFXNode.y );
 
 				quadMesh = new THREE.QuadMesh( materialFX );
+				quadMesh.name = 'Post-Processing';
 
 			}
 
