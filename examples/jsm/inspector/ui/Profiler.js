@@ -44,7 +44,7 @@ export class Profiler {
 		this.tabsContainer.className = 'profiler-tabs';
 
 		const controls = document.createElement( 'div' );
-		controls.style.display = 'flex';
+		controls.className = 'profiler-controls';
 
 		this.maximizeBtn = document.createElement( 'button' );
 		this.maximizeBtn.id = 'maximize-btn';
