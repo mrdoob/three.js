@@ -16,7 +16,6 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce, error } from '../../utils.js';
-import { ColorManagement } from '../../math/ColorManagement.js';
 
 /**
  * A backend implementation targeting WebGPU.
