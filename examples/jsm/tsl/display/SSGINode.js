@@ -96,7 +96,7 @@ class SSGINode extends TempNode {
 		 * Number of per-pixel hemisphere slices. This has a big performance cost and should be kept as low as possible.
 		 * Should be in the range `[1, 4]`.
 		 *
-		 * @type {UniformNode<int>}
+		 * @type {UniformNode<uint>}
 		 * @default 1
 		 */
 		this.sliceCount = uniform( 1, 'uint' );
@@ -105,7 +105,7 @@ class SSGINode extends TempNode {
 		 * Number of samples taken along one side of a given hemisphere slice. This has a big performance cost and should
 		 * be kept as low as possible.  Should be in the range `[1, 32]`.
 		 *
-		 * @type {UniformNode<int>}
+		 * @type {UniformNode<uint>}
 		 * @default 12
 		 */
 		this.stepCount = uniform( 12, 'uint' );
