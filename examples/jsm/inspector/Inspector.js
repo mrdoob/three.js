@@ -280,7 +280,7 @@ class Inspector extends RendererInspector {
 			material.outputNode = output;
 
 			const quad = new QuadMesh( material );
-			quad.name = 'Inspector - ' + name;
+			quad.name = 'Viewer - ' + name;
 
 			canvasData = {
 				id,
