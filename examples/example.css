@@ -88,3 +88,7 @@ a {
 	background: #c3c3c3;
 	opacity: .5;
 }
+
+#info.invert {
+	filter: invert(1);
+}
