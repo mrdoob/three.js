@@ -255,7 +255,7 @@ class WebGPUBackend extends Backend {
 
 			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
-			const toneMappingMode = this.parameters.outputType === HalfFloatType ? 'extended' : 'standard';
+			const toneMappingMode = parameters.outputType === HalfFloatType ? 'extended' : 'standard';
 
 			context.configure( {
 				device: this.device,
