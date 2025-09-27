@@ -900,6 +900,22 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Adds context data to the builder's current context.
+	 *
+	 * @param {Object} context - The context to add.
+	 * @return {Object} The previous context.
+	 */
+	addContext( context ) {
+
+		const previousContext = this.getContext();
+
+		this.setContext( { ...this.context, ...context } );
+
+		return previousContext;
+
+	}
+
+	/**
 	 * Gets a context used in shader construction that can be shared across different materials.
 	 * This is necessary since the renderer cache can reuse shaders generated in one material and use them in another.
 	 *
