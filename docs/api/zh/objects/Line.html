@@ -63,14 +63,13 @@
 
 		<h3>[property:Array morphTargetInfluences]</h3>
 		<p>
-		An array of weights typically from 0-1 that specify how much of the morph is applied.
-		Undefined by default, but reset to a blank array by [page:.updateMorphTargets]().
+		一个权重数组，通常取值范围为 0-1，用于指定应用的变形程度。默认为 undefined，但可通过 [page:.updateMorphTargets]() 重置为空数组。
 		</p>
 
 		<h3>[property:Object morphTargetDictionary]</h3>
 		<p>
-		A dictionary of morphTargets based on the morphTarget.name property.
-		Undefined by default, but rebuilt [page:.updateMorphTargets]().
+		基于 morphTarget.name 属性的 morphTargets 字典。
+		默认为 undefined，但可通过 [page:.updateMorphTargets]() 重建。
 		</p>
 
 		<h2>方法</h2>
@@ -90,8 +89,7 @@
 
 		<h3>[method:undefined updateMorphTargets]()</h3>
 		<p>
-		Updates the morphTargets to have no influence on the object. Resets the
-		[page:.morphTargetInfluences] and [page:.morphTargetDictionary] properties.
+		更新 morphTargets，使其不对对象产生影响。重置 [page:.morphTargetInfluences] 和 [page:.morphTargetDictionary] 属性。
 		</p>
 
 		<h2>源代码</h2>

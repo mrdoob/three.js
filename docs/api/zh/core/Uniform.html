@@ -14,7 +14,7 @@
 
 		<h2>代码示例</h2>
 		<p>
-			When declaring a uniform of a [page:ShaderMaterial], it is declared by value or by object.
+			当声明 [page:ShaderMaterial] 的 uniform 时，它是通过值或对象来声明的。
 		</p>
 		<code>
 		uniforms: {
@@ -185,8 +185,7 @@
 		<h2>Structured Uniforms</h2>
 
 		<p>
-			Sometimes you want to organize uniforms as *structs* in your shader code. The following style must be used so *three.js* is able
-			to process structured uniform data.
+			有时，您希望在着色器代码中将 uniforms 组织为 *structs* 。必须使用以下样式，以便 *three.js* 能够处理结构化的统一数据。
 		</p>
 		<code>
 		uniforms = {
@@ -198,7 +197,7 @@
 			}
 		};
 		</code>
-		This definition can be mapped on the following GLSL code:
+		此定义可以映射到以下 GLSL 代码上：
 		<code>
 		struct Data {
 			vec3 position;
@@ -211,7 +210,7 @@
 		<h2>Structured Uniforms with Arrays</h2>
 
 		<p>
-			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
+			也可以用数组来管理 *structs* 。此用例的语法如下：
 		</p>
 		<code>
 		const entry1 = {
@@ -229,7 +228,7 @@
 			}
 		};
 		</code>
-		This definition can be mapped on the following GLSL code:
+		此定义可以映射到以下 GLSL 代码上：
 		<code>
 		struct Data {
 			vec3 position;

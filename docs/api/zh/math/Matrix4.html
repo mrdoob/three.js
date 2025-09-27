@@ -10,7 +10,7 @@
 		<h1>四维矩阵（[name]）</h1>
 
 		<p class="desc">
-			表示为一个 4x4 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].<br /><br />
+			一个表示 4x4 矩阵 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix] 的类。<br /><br />
 
 			在3D计算机图形学中，4x4矩阵最常用的用法是作为一个变换矩阵[link:https://en.wikipedia.org/wiki/Transformation_matrix Transformation Matrix]。
 			有关WebGL中使用的变换矩阵的介绍，请参阅本教程[link:http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices this tutorial]。<br /><br />
@@ -48,10 +48,9 @@
 
 		<h2>注意行优先列优先的顺序。</h2>
 		<p>
-				设置[page:.set set]()方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
-				而它们在内部是用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]顺序存储在数组当中。<br /><br />
-
-				这意味着
+			构造函数和 [page:set]() 方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
+			而它们在内部是用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]顺序存储在 [page:.elements elements] 数组当中。<br /><br />
+			这意味着
 		<code>
 const m = new THREE.Matrix4();
 
@@ -101,8 +100,7 @@ m.elements = [ 11, 21, 31, 41,
 			[param:Number n41], [param:Number n42], [param:Number n43], [param:Number n44] )</h3>
 
 		<p>
-			Creates a 4x4 matrix with the given arguments in row-major order. If no arguments are provided, the constructor initializes 
-			the [name] to the 4x4 [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+			根据给定的参数，按行优先顺序创建一个 4x4 矩阵。如果没有提供参数，构造函数会将 [name] 初始化为 4x4 单位矩阵([link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix])。
 		</p>
 
 		<h2>属性（Properties）</h2>
@@ -467,7 +465,7 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
 		<p>
-		[page:Float theta] — Rotation angle in radians.<br /><br />
+		[page:Float theta] — 旋转角度（以弧度为单位）。<br /><br />
 
 		把该矩阵设置为绕x轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
 		结果如下：
@@ -529,7 +527,7 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:this makeRotationY]( [param:Float theta] )</h3>
 		<p>
-		[page:Float theta] — Rotation angle in radians.<br /><br />
+		[page:Float theta] — 旋转角度（以弧度为单位）。<br /><br />
 
 		把该矩阵设置为绕Y轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
 		结果如下：
@@ -591,7 +589,7 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:this makeRotationZ]( [param:Float theta] )</h3>
 		<p>
-		[page:Float theta] — Rotation angle in radians.<br /><br />
+		[page:Float theta] — 旋转角度（以弧度为单位）。<br /><br />
 
 		把该矩阵设置为绕z轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
 		结果如下：

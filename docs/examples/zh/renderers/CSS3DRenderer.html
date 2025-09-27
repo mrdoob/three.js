@@ -46,7 +46,20 @@
 
 		<h2>构造函数</h2>
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:DOMElement element] )</h3>
+		<p>
+			[page:DOMElement element] - 一个承载子元素的 [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement HTMLElement]。
+			这对应于下面的 [page:CSS3DRenderer.domElement domElement] 属性。
+			如果未在此处传递，则会创建一个新的 div 元素。
+		</p>
+		
+		<h2>属性</h2>
+
+		<h3>[property:DOMElement domElement]</h3>
+		<p>
+			渲染器承载其子元素的 [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement HTMLElement]。
+			这是由渲染器在构造函数中自动创建的（如果尚未提供）。
+		</p>
 
 		<h2>方法</h2>
 

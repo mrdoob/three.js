@@ -314,6 +314,12 @@
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>Multiplies this vector by scalar [page:Float s].</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between `0` and
+			`1`, excluding `1`.
+		</p>
+
 		<h3>
 			[method:this rotateAround]( [param:Vector2 center], [param:Float angle] )
 		</h3>
@@ -389,12 +395,6 @@
 			[page:Integer offset] - (optional) optional offset into the array.<br /><br />
 
 			Returns an array [x, y], or copies x and y into the provided [page:Array array].
-		</p>
-
-		<h3>[method:this random]()</h3>
-		<p>
-			Sets each component of this vector to a pseudo-random value between `0` and
-			`1`, excluding `1`.
 		</p>
 
 		<h2>Source</h2>

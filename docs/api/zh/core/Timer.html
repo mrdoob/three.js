@@ -55,6 +55,16 @@
 
 	<h2>方法</h2>
 
+	<h3>[method:this connect]( [param:Document document] )</h3>
+	<p>
+		将计时器连接到给定DOM。调用此方法并非使用计时器的强制要求，但可以启用 Page Visibility API 来避免较大的时间增量值。
+	</p>
+
+	<h3>[method:this disconnect]()</h3>
+	<p>
+		断开计时器与DOM的连接，并禁用 Page Visibility API 的使用。
+	</p>
+
 	<h3>[method:Number getDelta]()</h3>
 	<p>
 		返回以秒为单位的时间增量。

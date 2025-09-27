@@ -130,6 +130,14 @@
 		<p>See the base [page:Mesh] class for common methods.</p>
 
 		<h3>
+			[method:Vector3 applyBoneTransform]( [param:Integer index], [param:Vector3 vector] )
+		</h3>
+		<p>
+			Applies the bone transform associated with the given index to the given
+			position vector. Returns the updated vector.
+		</p>
+
+		<h3>
 			[method:undefined bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )
 		</h3>
 		<p>
@@ -166,14 +174,6 @@
 
 		<h3>[method:undefined pose]()</h3>
 		<p>This method sets the skinned mesh in the rest pose (resets the pose).</p>
-
-		<h3>
-			[method:Vector3 applyBoneTransform]( [param:Integer index], [param:Vector3 vector] )
-		</h3>
-		<p>
-			Applies the bone transform associated with the given index to the given
-			position vector. Returns the updated vector.
-		</p>
 
 		<h2>Source</h2>
 
