@@ -106,6 +106,12 @@
 		<h3>[property:Boolean isDataArrayTexture]</h3>
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
+		<h3>[property:Set layerUpdates]</h3>
+		<p>
+			A set of all layers which need to be updated in the texture. See
+			[Page:DataArrayTexture.addLayerUpdate addLayerUpdate].
+		</p>
+
 		<h3>[property:number magFilter]</h3>
 		<p>
 			How the texture is sampled when a texel covers more than one pixel. The
@@ -143,13 +149,9 @@
 			page for details.
 		</p>
 
-		<h3>[property:Set layerUpdates]</h3>
-		<p>
-			A set of all layers which need to be updated in the texture. See
-			[Page:DataArrayTexture.addLayerUpdate addLayerUpdate].
-		</p>
-
 		<h2>Methods</h2>
+
+		<p>See the base [page:Texture Texture] class for common methods.</p>
 
 		<h3>[method:addLayerUpdate addLayerUpdate]( layerIndex )</h3>
 		<p>
@@ -165,9 +167,6 @@
 			Resets the layer updates registry. See
 			[Page:DataArrayTexture.addLayerUpdate addLayerUpdate].
 		</p>
-
-
-		<p>See the base [page:Texture Texture] class for common methods.</p>
 
 		<h2>Source</h2>
 

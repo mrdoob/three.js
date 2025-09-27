@@ -60,7 +60,7 @@ scene.background = new THREE.CubeTextureLoader()
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String urls] — 数组长度为6的图像数组，数组内容为URL，每一个URL用于CubeTexture的每一侧。
 		这些URL将被指定顺序: pos-x, neg-x, pos-y, neg-y, pos-z, neg-z.
@@ -74,7 +74,7 @@ scene.background = new THREE.CubeTextureLoader()
 		[page:Function onError] — 在加载错误时被调用。<br />
 		</p>
 		<p>
-			从URL中进行加载，并将被加载的[page:Texture texture]传递给onLoad。
+			从URL中进行加载，并将被加载的[page:Texture texture]传递给onLoad。该方法还返回一个新的纹理对象，可直接用于材质创建。
 		</p>
 
 		<h2>源</h2>

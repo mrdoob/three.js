@@ -100,17 +100,14 @@
 
 		<h3>[property:Camera camera]</h3>
 		<p>
-		The camera to use when raycasting against view-dependent objects such as billboarded objects like [page:Sprites]. This field
-		can be set manually or is set when calling "setFromCamera".
-
-		Defaults to null.
+		对依赖视图的对象(例如像广告牌的[page:Sprites]) 进行光线投射时使用的相机。
+		此字段可以手动设置，也可以在调用“setFromCamera”时设置。
+		默认为 null。
 		</p>
 
 		<h3>[property:Layers layers]</h3>
 		<p>
-		Used by [name] to selectively ignore 3D objects when performing intersection tests. The following code example ensures that
-		only 3D objects on layer *1* will be honored by the instance of [name].
-
+		[name] 使用它在执行相交测试时选择性地忽略 3D 对象。以下代码示例确保 [name] 实例仅接受第 1 层上的 3D 对象。
 		<code>
 		raycaster.layers.set( 1 );
 		object.layers.enable( 1 );
@@ -131,7 +128,7 @@
 }
 			</code>
 
-		Where threshold is the precision of the raycaster when intersecting objects, in world units.
+		其中阈值是光线投射器与物体相交时的精度，以世界单位表示。
 		</p>
 
 		<h3>[property:Ray ray]</h3>
@@ -161,9 +158,9 @@
 
 		<h3>[method:this setFromXRController]( [param:WebXRController controller] )</h3>
 		<p>
-			[page:WebXRController controller] — The controller to copy the position and direction from.
+			[page:WebXRController controller] — 从中复制位置和方向的控制器。
 		</p>
-		<p>Updates the ray with a new origin and direction.</p>
+		<p>使用新的原点和方向更新射线。</p>
 
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>

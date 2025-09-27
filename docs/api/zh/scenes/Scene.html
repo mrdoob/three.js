@@ -27,10 +27,16 @@
 
 		<h3>[property:Object background]</h3>
 		<p>
-		若不为空，在渲染场景的时候将设置背景，且背景总是首先被渲染的。
-		可以设置一个用于的“clear”的[page:Color]（颜色）、一个覆盖canvas的[page:Texture]（纹理），
-		或是 a cubemap as a [page:CubeTexture] or an equirectangular as a [page:Texture]。默认值为null。
+			定义场景的背景。默认值为 `null`。有效输入包括：
 		</p>
+		<ul>
+			<li>[page:Color] 一个用于定背景的颜色。</li>
+			<li>[page:Texture] 一个用于定义（平面）背景的纹理。</li>
+			<li>
+				用于定义天空盒的纹理立方体（[page:CubeTexture]）或等距矩形纹理。
+			</li>
+		</ul>
+		注意：任何与相机相关的配置（如 `zoom` 或 `view`）都将被忽略。
 
 		<h3>[property:Float backgroundBlurriness]</h3>
 		<p>

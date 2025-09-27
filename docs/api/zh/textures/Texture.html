@@ -11,11 +11,10 @@
 
 		<p class="desc">创建一个纹理贴图，将其应用到一个表面，或者作为反射/折射贴图。</p>
 
-
-		<h2>构造函数</h2>
-
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
-
+		<p>
+		注意：纹理首次使用后，其尺寸、格式和类型将无法更改。请对纹理调用 [page:.dispose]() 并实例化一个新的纹理。
+		</p>
+		
 		<h2>代码示例</h2>
 
 		<code>
@@ -25,6 +24,10 @@
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( 4, 4 );
 		</code>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
 		<h2>属性</h2>
 
@@ -218,7 +221,7 @@
 
 		<h3>[property:Integer version]</h3>
 		<p>
-		这个值起始值为*0*，计算[property:Boolean needsUpdate]被设置为*true*的次数。
+		这个值起始值为 *0*，计算 [page:Texture.needsUpdate .needsUpdate] 被设置为 *true* 的次数。
 		</p>
 
 		<h3>[property:Function onUpdate]</h3>
@@ -245,18 +248,27 @@
 
 		<h2>方法</h2>
 
-		<p>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</p>
-
-		<h3>[method:undefined updateMatrix]()</h3>
+		<p>[page:EventDispatcher EventDispatcher]的方法在这个类上可以使用。</p>
+		
+		<h3>[method:undefined addUpdateRange]( [param:number start], [param:number count] )</h3>
 		<p>
-			从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、
-			[page:Texture.rotation .rotation]和[page:Texture.center .center]属性来更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
+		向数据纹理中添加一个需要更新到GPU的数据范围。
+		</p>
+
+		<h3>[method:undefined clearUpdateRanges]()</h3>
+		<p>
+			清空数据更新范围。
 		</p>
 
 		<h3>[method:Texture clone]()</h3>
 		<p>
 			拷贝纹理。请注意。这不是“深拷贝”，图像是共用的。
-			除此之外，拷贝一个纹理并不会将此纹理自动标记并上传。你需要在图片的属性变更或者源数据完全加载完的时候并准备好的时候将[page:Texture.needsUpdate]设置为true。
+			除此之外，拷贝一个纹理并不会将此纹理自动标记并上传。你需要在图片的属性变更或者源数据完全加载完的时候并准备好的时候将[page:Texture.needsUpdate .needsUpdate]设置为true。
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			使用“废置”事件类型调用[page:EventDispatcher EventDispatcher].dispatchEvent。
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -265,15 +277,16 @@
 		将Texture对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
 		</p>
 
-		<h3>[method:undefined dispose]()</h3>
-		<p>
-			使用“废置”事件类型调用[page:EventDispatcher EventDispatcher].dispatchEvent。
-		</p>
-
 		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>
 		<p>
 			基于纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、
 			[page:Texture.wrapS .wrapS]、[page:Texture.wrapT .wrapT]和[page:Texture.flipY .flipY]属性值来变换uv。
+		</p>
+
+		<h3>[method:undefined updateMatrix]()</h3>
+		<p>
+			从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、
+			[page:Texture.rotation .rotation]和[page:Texture.center .center]属性来更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
 		</p>
 
 		<h2>源代码</h2>

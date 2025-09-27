@@ -40,7 +40,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:DataTexture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — 文件的URL或者路径，也可以为
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -49,7 +49,7 @@
 		[page:Function onError] —在加载错误时被调用。<br />
 		</p>
 		<p>
-			从URL中进行加载，并将被加载的纹理传递给onLoad。
+			从URL中进行加载，并将被加载的纹理传递给onLoad。该方法还返回一个新的纹理对象，可直接用于材质创建。
 		</p>
 
 		<h2>源</h2>

@@ -33,10 +33,11 @@
 
 		<h2>代码示例</h2>
 
-		<code>const geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
-		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-		const torus = new THREE.Mesh( geometry, material );
-		scene.add( torus );
+		<code>
+const geometry = new THREE.TorusGeometry( 10, 3, 16, 100 ); 
+const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
+const torus = new THREE.Mesh( geometry, material ); 
+scene.add( torus );
 		</code>
 
 		<h2>构造器</h2>
@@ -53,7 +54,7 @@
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
 
-		<h3>.parameters</h3>
+		<h3>[property:Object parameters]</h3>
 		<p>
 				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
 		</p>
