@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
-import { nodeObject, nodeArray, Fn } from '../tsl/TSLBase.js';
+import { nodeArray, Fn } from '../tsl/TSLBase.js';
 import { error } from '../../utils.js';
 
 /**
