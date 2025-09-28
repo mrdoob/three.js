@@ -551,27 +551,20 @@ class AnimationClip {
 function getTrackTypeForValueTypeName( typeName ) {
 
 	var trackTypeMapper = {
-		
 		'scalar': NumberKeyframeTrack,
 		'double': NumberKeyframeTrack,
 		'float': NumberKeyframeTrack,
 		'number': NumberKeyframeTrack,
 		'integer': NumberKeyframeTrack,
-		
 		'vector': VectorKeyframeTrack,
 		'vector2': VectorKeyframeTrack,
 		'vector3': VectorKeyframeTrack,
 		'vector4': VectorKeyframeTrack,
-
 		'color': ColorKeyframeTrack,
-
 		'quaternion': QuaternionKeyframeTrack,
-
 		'bool': BooleanKeyframeTrack,
 		'boolean': BooleanKeyframeTrack,
-
 		'string': StringKeyframeTrack
-		
 	};
 
 	var trackType = trackTypeMapper[ typeName.toLowerCase() ];
