@@ -340,7 +340,7 @@ export default LoopNode;
  * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
-export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).toStack();
+export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
  * TSL function for creating a `Continue()` expression.
