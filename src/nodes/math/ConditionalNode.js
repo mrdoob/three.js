@@ -100,7 +100,7 @@ class ConditionalNode extends Node {
 
 	setup( builder ) {
 
-		const condNode = this.condNode.cache();
+		const condNode = this.condNode;
 		const ifNode = this.ifNode.cache();
 		const elseNode = this.elseNode ? this.elseNode.cache() : null;
 
