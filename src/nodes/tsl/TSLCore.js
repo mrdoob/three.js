@@ -488,6 +488,7 @@ class ShaderCallNodeInternal extends Node {
 		//
 
 		const previousSubBuildFn = builder.subBuildFn;
+		const previousContext = builder.addContext( { fnCall: this } );
 
 		builder.subBuildFn = subBuild;
 
@@ -565,6 +566,7 @@ class ShaderCallNodeInternal extends Node {
 		}
 
 		builder.subBuildFn = previousSubBuildFn;
+		builder.setContext( previousContext );
 
 		if ( shaderNode.once ) {
 
@@ -607,6 +609,8 @@ class ShaderCallNodeInternal extends Node {
 
 		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
+
+		const previousContext = builder.addContext( { fnCall: this } );
 
 		if ( buildStage === 'setup' ) {
 
@@ -654,6 +658,8 @@ class ShaderCallNodeInternal extends Node {
 			result = outputNode.build( builder, output ) || '';
 
 		}
+
+		builder.setContext( previousContext );
 
 		return result;
 
@@ -788,9 +794,15 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	getLayout() {
+
+		return this.layout;
+
+	}
+
 	call( rawInputs = null ) {
 
-		return nodeObject( new ShaderCallNodeInternal( this, rawInputs ) );
+		return new ShaderCallNodeInternal( this, rawInputs );
 
 	}
 
