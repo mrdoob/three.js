@@ -322,6 +322,14 @@
 		<h3>[method:this projectOnVector]( [param:Vector3 v] )</h3>
 		<p>投影（[link:https://en.wikipedia.org/wiki/Vector_projection Projects]）该向量到向量[page:Vector3 v]上。</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+		将该向量的每个分量(x、y、z)设置为介于 0 和 1 之间的伪随机数，不包括 1。
+		</p>
+
+		<h3>[method:this randomDirection]()</h3>
+		<p>将此向量设置为单位球体上的均匀随机点。</p>
+		
 		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
 		<p>
 		[page:Vector3 normal] - 反射面法线<br /><br />
@@ -348,6 +356,11 @@
 		若index为 0 则设置 [page:.x x] 值为 [page:Float value]。<br />
 		若index为 1 则设置 [page:.y y] 值为 [page:Float value]。<br />
 		若index为 2 则设置 [page:.z z] 值为 [page:Float value]。
+		</p>
+
+		<h3>[method:this setFromColor]( [param:Color color] )</h3>
+		<p>
+			根据指定 [page:Color color] 的 r、g 和 b 分量设置该向量的 [page:.x x]、[page:.y y] 和 [page:.z z] 分量。
 		</p>
 
 		<h3>[method:this setFromCylindrical]( [param:Cylindrical c] )</h3>
@@ -441,11 +454,6 @@
 		[page:Camera camera] — 在投影中使用的摄像机。<br /><br />
 
 		将此向量(坐标)从相机的标准化设备坐标 (NDC) 空间投影到世界空间。
-		</p>
-
-		<h3>[method:this random]()</h3>
-		<p>
-		将该向量的每个分量(x、y、z)设置为介于 0 和 1 之间的伪随机数，不包括 1。
 		</p>
 
 		<h2>源代码</h2>

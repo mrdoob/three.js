@@ -4,14 +4,22 @@
 		<title>three.js webgpu - points instanced</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 
-		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
-		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> webgpu - instanced points</div>
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Instanced Points</span>
+			</div>
+
+			<small>
+				Rendering instanced sprites with TSL to emulate wide points.
+			</small>
+		</div>
 
 		<script type="importmap">
 			{
@@ -29,17 +37,13 @@
 			import * as THREE from 'three/webgpu';
 			import { color, storage, Fn, instancedBufferAttribute, instanceIndex, sin, time, float, uniform, shapeCircle, mix, vec3 } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
 
 			let renderer, scene, camera, camera2, controls, backgroundNode;
 			let material;
-			let stats;
-			let gui;
 			let effectController;
 
 			// viewport
@@ -67,8 +71,7 @@
 
 					pulseSpeed: uniform( 6 ),
 					minWidth: uniform( 6 ),
-					maxWidth: uniform( 20 ),
-					alphaToCoverage: true
+					maxWidth: uniform( 20 )
 
 				};
 
@@ -148,7 +151,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				//renderer.logarithmicDepthBuffer = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -161,16 +164,9 @@
 
 				// GUI
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
-				gui = new GUI();
-
-				gui.add( effectController, 'alphaToCoverage' ).onChange( function ( val ) {
-
-					material.alphaToCoverage = val;
-
-				} );
+				gui.add( material, 'alphaToCoverage' );
 
 				gui.add( effectController.minWidth, 'value', 1, 30, 1 ).name( 'minWidth' );
 				gui.add( effectController.maxWidth, 'value', 2, 30, 1 ).name( 'maxWidth' );
@@ -194,8 +190,6 @@
 			}
 
 			function animate() {
-
-				stats.update();
 
 				// compute
 

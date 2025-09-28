@@ -1293,6 +1293,8 @@ class Node extends EventDispatcher {
 
 		// private
 
+		this._beforeNodes = null;
+
 		/**
 		 * The cache key of this node.
 		 *
@@ -1788,6 +1790,16 @@ class Node extends EventDispatcher {
 
 	}
 
+	before( node ) {
+
+		if ( this._beforeNodes === null ) this._beforeNodes = [];
+
+		this._beforeNodes.push( node );
+
+		return this;
+
+	}
+
 	/**
 	 * This method performs the build of a node. The behavior and return value depend on the current build stage:
 	 * - **setup**: Prepares the node and its children for the build process. This process can also create new nodes. Returns the node itself or a variant.
@@ -1805,6 +1817,24 @@ class Node extends EventDispatcher {
 		if ( this !== refNode ) {
 
 			return refNode.build( builder, output );
+
+		}
+
+		//
+
+		if ( this._beforeNodes !== null ) {
+
+			const currentBeforeNodes = this._beforeNodes;
+
+			this._beforeNodes = null;
+
+			for ( const beforeNode of currentBeforeNodes ) {
+
+				beforeNode.build( builder, output );
+
+			}
+
+			this._beforeNodes = currentBeforeNodes;
 
 		}
 
@@ -10451,6 +10481,121 @@ const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject
 
 addMethodChaining( 'debug', debug );
 
+/**
+ * InspectorNode is a wrapper node that allows inspection of node values during rendering.
+ * It can be used to debug or analyze node outputs in the rendering pipeline.
+ *
+ * @augments Node
+ */
+class InspectorNode extends Node {
+
+	/**
+	 * Returns the type of the node.
+	 *
+	 * @returns {string}
+	 */
+	static get type() {
+
+		return 'InspectorNode';
+
+	}
+
+	/**
+	 * Creates an InspectorNode.
+	 *
+	 * @param {Node} node - The node to inspect.
+	 * @param {string} [name=''] - Optional name for the inspector node.
+	 * @param {Function|null} [callback=null] - Optional callback to modify the node during setup.
+	 */
+	constructor( node, name = '', callback = null ) {
+
+		super();
+
+		this.node = node;
+		this.name = name;
+		this.callback = callback;
+
+		this.updateType = NodeUpdateType.FRAME;
+
+		this.isInspectorNode = true;
+
+	}
+
+	/**
+	 * Returns the name of the inspector node.
+	 *
+	 * @returns {string}
+	 */
+	getName() {
+
+		return this.name || this.node.name;
+
+	}
+
+	/**
+	 * Updates the inspector node, allowing inspection of the wrapped node.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	update( frame ) {
+
+		frame.renderer.inspector.inspect( this );
+
+	}
+
+	/**
+	 * Returns the type of the wrapped node.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @returns {string}
+	 */
+	getNodeType( builder ) {
+
+		return this.node.getNodeType( builder );
+
+	}
+
+	/**
+	 * Sets up the inspector node.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @returns {Node} The setup node.
+	 */
+	setup( builder ) {
+
+		let node = this.node;
+
+		if ( builder.context.inspector === true && this.callback !== null ) {
+
+			node = this.callback( node );
+
+		}
+
+		return node;
+
+	}
+
+}
+
+/**
+ * Creates an inspector node to wrap around a given node for inspection purposes.
+ *
+ * @tsl
+ * @param {Node} node - The node to inspect.
+ * @param {string} [name=''] - Optional name for the inspector node.
+ * @param {Function|null} [callback=null] - Optional callback to modify the node during setup.
+ * @returns {Node} The inspector node.
+ */
+function inspector( node, name = '', callback = null ) {
+
+	node = nodeObject( node );
+
+	return node.before( new InspectorNode( node, name, callback ) );
+
+}
+
+addMethodChaining( 'toInspector', inspector );
+
 function addNodeElement( name/*, nodeElement*/ ) {
 
 	warn( 'TSL: AddNodeElement has been removed in favor of tree-shaking. Trying add', name );
@@ -10913,9 +11058,9 @@ class TextureNode extends UniformNode {
 		this.updateMatrix = false;
 
 		/**
-		 * By default the `update()` method is not executed. `setUpdateMatrix()`
-		 * sets the value to `frame` when the uv transformation matrix should
-		 * automatically be updated.
+		 * By default the `update()` method is not executed. Depending on
+		 * whether a uv transformation matrix and/or flipY is applied, `update()`
+		 * is exeucted per object.
 		 *
 		 * @type {string}
 		 * @default 'none'
@@ -10943,8 +11088,18 @@ class TextureNode extends UniformNode {
 		 *
 		 * @private
 		 * @type {?UniformNode<mat3>}
+		 * @default null
 		 */
 		this._matrixUniform = null;
+
+		/**
+		 * The uniform node that represents the y-flip. Only required for WebGL.
+		 *
+		 * @private
+		 * @type {?UniformNode<bool>}
+		 * @default null
+		 */
+		this._flipYUniform = null;
 
 		this.setUpdateMatrix( uvNode === null );
 
@@ -11069,7 +11224,6 @@ class TextureNode extends UniformNode {
 	setUpdateMatrix( value ) {
 
 		this.updateMatrix = value;
-		this.updateType = value ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
 
 		return this;
 
@@ -11085,17 +11239,19 @@ class TextureNode extends UniformNode {
 	 */
 	setupUV( builder, uvNode ) {
 
-		const texture = this.value;
+		if ( builder.isFlipY() ) {
 
-		if ( builder.isFlipY() && ( ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
+			if ( this._flipYUniform === null ) this._flipYUniform = uniform( false );
+
+			uvNode = uvNode.toVar();
 
 			if ( this.sampler ) {
 
-				uvNode = uvNode.flipY();
+				uvNode = this._flipYUniform.select( uvNode.flipY(), uvNode );
 
 			} else {
 
-				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
+				uvNode = this._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
 
 			}
 
@@ -11127,23 +11283,35 @@ class TextureNode extends UniformNode {
 
 		//
 
-		let uvNode = this.uvNode;
+		let uvNode = Fn( () => {
 
-		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
+			uvNode = this.uvNode;
 
-			uvNode = builder.context.getUV( this, builder );
+			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-		}
+				uvNode = builder.context.getUV( this, builder );
 
-		if ( ! uvNode ) uvNode = this.getDefaultUV();
+			}
 
-		if ( this.updateMatrix === true ) {
+			if ( ! uvNode ) uvNode = this.getDefaultUV();
 
-			uvNode = this.getTransformedUV( uvNode );
+			if ( this.updateMatrix === true ) {
 
-		}
+				uvNode = this.getTransformedUV( uvNode );
 
-		uvNode = this.setupUV( builder, uvNode );
+			}
+
+			uvNode = this.setupUV( builder, uvNode );
+
+			//
+
+			this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
+
+			//
+
+			return uvNode;
+
+		} )();
 
 		//
 
@@ -11563,6 +11731,16 @@ class TextureNode extends UniformNode {
 		if ( texture.matrixAutoUpdate === true ) {
 
 			texture.updateMatrix();
+
+		}
+
+		//
+
+		const flipYUniform = this._flipYUniform;
+
+		if ( flipYUniform !== null ) {
+
+			flipYUniform.value = ( ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true );
 
 		}
 
@@ -15561,7 +15739,7 @@ const modelViewProjection = /*@__PURE__*/ ( Fn( ( builder ) => {
  * - `drawIndex`: The index of a draw call.
  * - `invocationLocalIndex`: The index of a compute invocation within the scope of a workgroup load.
  * - `invocationSubgroupIndex`: The index of a compute invocation within the scope of a subgroup.
- * - `subgroupIndex`: The index of the subgroup the current compute invocation belongs to.
+ * - `subgroupIndex`: The index of a compute invocation's subgroup within its workgroup.
  *
  * @augments Node
  */
@@ -15576,7 +15754,7 @@ class IndexNode extends Node {
 	/**
 	 * Constructs a new index node.
 	 *
-	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
+	 * @param {('vertex'|'instance'|'subgroup'|'invocationLocal'|'invocationGlobal'|'invocationSubgroup'|'draw')} scope - The scope of the index node.
 	 */
 	constructor( scope ) {
 
@@ -19888,7 +20066,16 @@ class NodeMaterial extends Material {
 
 			alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+			if ( this.alphaToCoverage === true ) {
+
+				diffuseColor.a = smoothstep( alphaTestNode, alphaTestNode.add( fwidth( diffuseColor.a ) ), diffuseColor.a );
+				diffuseColor.a.lessThanEqual( 0 ).discard();
+
+			} else {
+
+				diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+
+			}
 
 		}
 
@@ -19907,10 +20094,6 @@ class NodeMaterial extends Material {
 		if ( isOpaque ) {
 
 			diffuseColor.a.assign( 1.0 );
-
-		} else if ( alphaTestNode === null ) {
-
-			diffuseColor.a.lessThanEqual( 0 ).discard();
 
 		}
 
@@ -35210,9 +35393,9 @@ const normal = Fn( ( { texture, uv } ) => {
 
 		const step = 0.01;
 
-		const x = texture.sample( uv.add( vec3( - step, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
-		const y = texture.sample( uv.add( vec3( 0.0, - step, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
-		const z = texture.sample( uv.add( vec3( 0.0, 0.0, - step ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
+		const x = texture.sample( uv.add( vec3( -0.01, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
+		const y = texture.sample( uv.add( vec3( 0.0, -0.01, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
+		const z = texture.sample( uv.add( vec3( 0.0, 0.0, -0.01 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
 
 		ret.assign( vec3( x, y, z ) );
 
@@ -41618,7 +41801,19 @@ class ShadowNode extends ShadowBaseNode {
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
 
-		return shadowOutput;
+		// Shadow Output + Inspector
+
+		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
+
+		return shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+
+			return texture( this.shadowMap.texture );
+
+		} ).toInspector( `${ inspectName } / Depth`, () => {
+
+			return textureLoad( this.shadowMap.depthTexture, uv$1().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).x.oneMinus();
+
+		} );
 
 	}
 
@@ -44657,6 +44852,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	hue: hue,
 	increment: increment,
 	incrementBefore: incrementBefore,
+	inspector: inspector,
 	instance: instance,
 	instanceIndex: instanceIndex,
 	instancedArray: instancedArray,
@@ -47565,7 +47761,8 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the instanceIndex input variable as a native shader string.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @abstract
 	 * @return {string} The instanceIndex shader string.
@@ -54039,6 +54236,13 @@ class InspectorBase {
 	finish() { }
 
 	/**
+	 * Inspects a node.
+	 *
+	 * @param {Node} node - The node to inspect.
+	 */
+	inspect( /*node*/ ) { }
+
+	/**
 	 * When a compute operation is performed.
 	 *
 	 * @param {ComputeNode} computeNode - The compute node being executed.
@@ -54104,28 +54308,13 @@ class InspectorBase {
 class CanvasTarget extends EventDispatcher {
 
 	/**
-	 * CanvasTarget options.
-	 *
-	 * @typedef {Object} CanvasTarget~Options
-	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
-	 * to overwrite the default.
-	 */
-
-	/**
 	 * Constructs a new CanvasTarget.
 	 *
 	 * @param {HTMLCanvasElement|OffscreenCanvas} domElement - The canvas element to render to.
-	 * @param {Object} [parameters={}] - The parameters.
 	 */
-	constructor( domElement, parameters = {} ) {
+	constructor( domElement ) {
 
 		super();
-
-		const {
-			antialias = false,
-			samples = 0
-		} = parameters;
 
 		/**
 		 * A reference to the canvas element the renderer is drawing to.
@@ -54186,15 +54375,6 @@ class CanvasTarget extends EventDispatcher {
 		this._scissorTest = false;
 
 		/**
-		 * The number of MSAA samples.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 0
-		 */
-		this._samples = samples || ( antialias === true ) ? 4 : 0;
-
-		/**
 		 * The color texture of the default framebuffer.
 		 *
 		 * @type {FramebufferTexture}
@@ -54207,18 +54387,6 @@ class CanvasTarget extends EventDispatcher {
 		 * @type {DepthTexture}
 		 */
 		this.depthTexture = new DepthTexture();
-
-	}
-
-	/**
-	 * The number of samples used for multi-sample anti-aliasing (MSAA).
-	 *
-	 * @type {number}
-	 * @default 0
-	 */
-	get samples() {
-
-		return this._samples;
 
 	}
 
@@ -54685,6 +54853,15 @@ class Renderer {
 		// internals
 
 		/**
+		 * The number of MSAA samples.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._samples = samples || ( antialias === true ) ? 4 : 0;
+
+		/**
 		 * OnCanvasTargetResize callback function.
 		 *
 		 * @private
@@ -54698,7 +54875,7 @@ class Renderer {
 		 * @private
 		 * @type {CanvasTarget}
 		 */
-		this._canvasTarget = new CanvasTarget( backend.getDomElement(), { antialias, samples } );
+		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
@@ -56602,7 +56779,7 @@ class Renderer {
 	 */
 	get samples() {
 
-		return this._canvasTarget.samples;
+		return this._samples;
 
 	}
 
@@ -56617,7 +56794,7 @@ class Renderer {
 	 */
 	get currentSamples() {
 
-		let samples = this.samples;
+		let samples = this._samples;
 
 		if ( this._renderTarget !== null ) {
 
@@ -59762,7 +59939,8 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the instance index builtin.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @return {string} The instance index.
 	 */
@@ -59773,7 +59951,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the invocation local index builtin.
+	 * Returns a builtin representing the index of an invocation within its workgroup.
 	 *
 	 * @return {string} The invocation local index.
 	 */
@@ -59784,6 +59962,33 @@ ${ flowData.code }
 		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
 
 		return `uint( gl_InstanceID ) % ${size}u`;
+
+	}
+
+	/**
+	 * Returns a builtin representing the size of a subgroup within the current shader.
+	 */
+	getSubgroupSize() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the subgroupSize node' );
+
+	}
+
+	/**
+	 * Returns a builtin representing the index of an invocation within its subgroup.
+	 */
+	getInvocationSubgroupIndex() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the invocationSubgroupIndex node' );
+
+	}
+
+	/**
+	 * Returns a builtin representing the index of the current invocation's subgroup within its workgroup.
+	 */
+	getSubgroupIndex() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the subgroupIndex node' );
 
 	}
 
@@ -71249,7 +71454,8 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the instance index builtin.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @return {string} The instance index.
 	 */
@@ -71265,8 +71471,9 @@ ${ flowData.code }
 
 	}
 
+
 	/**
-	 * Returns the invocation local index builtin.
+	 * Returns a builtin representing the index of a compute invocation within the scope of a workgroup load.
 	 *
 	 * @return {string} The invocation local index.
 	 */
@@ -71277,7 +71484,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the subgroup size builtin.
+	 * Returns a builtin representing the size of a subgroup within the current shader.
 	 *
 	 * @return {string} The subgroup size.
 	 */
@@ -71290,7 +71497,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the invocation subgroup index builtin.
+	 * Returns a builtin representing the index of a compute invocation within the scope of a subgroup.
 	 *
 	 * @return {string} The invocation subgroup index.
 	 */
@@ -71303,7 +71510,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the subgroup index builtin.
+	 * Returns a builtin representing the index of a compute invocation's subgroup within its workgroup.
 	 *
 	 * @return {string} The subgroup index.
 	 */
@@ -72499,6 +72706,26 @@ class WebGPUUtils {
 		}
 
 		return format;
+
+	}
+
+	/**
+	 * Returns the GPU formats of all color attachments of the current render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Array<string>} The GPU texture formats of all color attachments.
+	 */
+	getCurrentColorFormats( renderContext ) {
+
+		if ( renderContext.textures !== null ) {
+
+			return renderContext.textures.map( t => this.getTextureFormatGPU( t ) );
+
+		} else {
+
+			return [ this.getPreferredCanvasFormat() ]; // default context format
+
+		}
 
 	}
 
@@ -73770,12 +73997,12 @@ class WebGPUPipelineUtils {
 		const { utils, device } = backend;
 
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
-		const colorFormat = utils.getCurrentColorFormat( renderContext );
+		const colorFormats = utils.getCurrentColorFormats( renderContext );
 		const sampleCount = this._getSampleCount( renderContext );
 
 		const descriptor = {
-			label: label,
-			colorFormats: [ colorFormat ],
+			label,
+			colorFormats,
 			depthStencilFormat,
 			sampleCount
 		};

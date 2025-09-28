@@ -255,6 +255,15 @@ class Renderer {
 		// internals
 
 		/**
+		 * The number of MSAA samples.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._samples = samples || ( antialias === true ) ? 4 : 0;
+
+		/**
 		 * OnCanvasTargetResize callback function.
 		 *
 		 * @private
@@ -268,7 +277,7 @@ class Renderer {
 		 * @private
 		 * @type {CanvasTarget}
 		 */
-		this._canvasTarget = new CanvasTarget( backend.getDomElement(), { antialias, samples } );
+		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
@@ -2172,7 +2181,7 @@ class Renderer {
 	 */
 	get samples() {
 
-		return this._canvasTarget.samples;
+		return this._samples;
 
 	}
 
@@ -2187,7 +2196,7 @@ class Renderer {
 	 */
 	get currentSamples() {
 
-		let samples = this.samples;
+		let samples = this._samples;
 
 		if ( this._renderTarget !== null ) {
 

@@ -137,10 +137,24 @@ export class Style {
 	flex-shrink: 0;
 	justify-content: space-between;
 	align-items: stretch;
+
+	overflow-x: auto;
+	overflow-y: hidden;
+	width: calc(100% - 89px);
 }
 
 .profiler-tabs {
 	display: flex;
+}
+
+.profiler-controls {
+	display: flex;
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 38px;
+	background: var(--profiler-header);
+	border-bottom: 1px solid var(--profiler-border);
 }
 
 .tab-btn {
@@ -348,7 +362,7 @@ export class Style {
 
 .item-toggler {
 	display: inline-block;
-	width: 1.5em;
+	margin-right: 0.8em;
 	text-align: left;
 }
 
@@ -391,7 +405,7 @@ export class Style {
 .graph-svg {
 	width: 100%;
 	height: 80px;
-	background-color: #2a2a33;
+	background-color: var(--profiler-header);
 	border: 1px solid var(--profiler-border);
 	border-radius: 4px;
 }

@@ -73,6 +73,8 @@ export class RendererInspector extends InspectorBase {
 
 		this.currentFrame = null;
 		this.currentRender = null;
+		this.currentNodes = null;
+		this.lastFrame = null;
 
 		this.frames = [];
 		this.framesLib = {};
@@ -89,6 +91,7 @@ export class RendererInspector extends InspectorBase {
 
 		this.currentFrame = this._createFrame();
 		this.currentRender = this.currentFrame;
+		this.currentNodes = [];
 
 	}
 
@@ -102,8 +105,11 @@ export class RendererInspector extends InspectorBase {
 
 		this.addFrame( frame );
 
+		this.lastFrame = frame;
+
 		this.currentFrame = null;
 		this.currentRender = null;
+		this.currentNodes = null;
 
 		this._lastFinishTime = now;
 
@@ -128,7 +134,7 @@ export class RendererInspector extends InspectorBase {
 
 	getFrame() {
 
-		return this.currentFrame;
+		return this.currentFrame || this.lastFrame;
 
 	}
 
@@ -137,6 +143,8 @@ export class RendererInspector extends InspectorBase {
 		return this.framesLib[ frameId ] || null;
 
 	}
+
+	resolveViewer() { }
 
 	resolveFrame( /*frame*/ ) { }
 
@@ -266,9 +274,16 @@ export class RendererInspector extends InspectorBase {
 
 		if ( this.isAvailable ) {
 
+			this.resolveViewer();
 			this.resolveTimestamp();
 
 		}
+
+	}
+
+	inspect( node ) {
+
+		this.currentNodes.push( node );
 
 	}
 
@@ -315,6 +330,8 @@ export class RendererInspector extends InspectorBase {
 
 		const frame = this.getFrame();
 
+		if ( ! frame ) return;
+
 		const currentRender = new RenderStats( uid, scene, camera, renderTarget );
 		currentRender.timestamp = performance.now();
 		currentRender.parent = this.currentRender;
@@ -336,6 +353,10 @@ export class RendererInspector extends InspectorBase {
 	}
 
 	finishRender() {
+
+		const frame = this.getFrame();
+
+		if ( ! frame ) return;
 
 		const currentRender = this.currentRender;
 		currentRender.cpu = performance.now() - currentRender.timestamp;

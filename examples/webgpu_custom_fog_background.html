@@ -4,22 +4,22 @@
 		<title>three.js webgpu - custom fog background</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-
-			#info {
-				background-color: #4080cc;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - custom fog background<br />
-			Battle Damaged Sci-fi Helmet by
-			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Custom Fog Background</span>
+			</div>
+
+			<small>
+				Custom Fog Background via Post-Processing.<br/>
+				Battle Damaged Sci-fi Helmet by <a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a>.<br/>
+				<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -50,9 +50,6 @@
 
 			function init() {
 
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.6, 2.7 );
 
@@ -62,7 +59,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.NoToneMapping; // apply tone mapping in post processing, instead
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				// post processing
 

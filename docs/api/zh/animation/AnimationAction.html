@@ -20,12 +20,12 @@
 
 		<h2>构造器</h2>
 
-
-		<h3>[name]( [param:AnimationMixer mixer], [param:AnimationClip clip], [param:Object3D localRoot] )</h3>
+		<h3>[name]( [param:AnimationMixer mixer], [param:AnimationClip clip], [param:Object3D localRoot], [param:Number blendMode] )</h3>
 		<p>
 			[page:AnimationMixer mixer] - 被此动作控制的 *动画混合器* <br />
 			[page:AnimationClip clip] - *动画剪辑* 保存了此动作当中的动画数据 <br />
-			[page:Object3D localRoot] - 动作执行的根对象 <br /><br />
+			[page:Object3D localRoot] (optional) - 动作执行的根对象，默认值为 `null`。 <br />
+			[page:Number blendMode] (optional)- 定义当同时播放两个或多个动画时如何混合/组合动画。默认值为 *clip.blendMode*。<br /><br />
 
 			说明: 不要直接调用这个构造函数，而应该先用[page:AnimationMixer.clipAction]实例化一个AnimationAction，因为这个方法提供了缓存以提高性能。
 		</p>
@@ -33,6 +33,11 @@
 
 		<h2>属性</h2>
 
+		<h3>[property:Number blendMode]</h3>
+		<p>
+			定义当同时播放两个或多个动画时如何混合/组合动画。有效值是 *NormalAnimationBlendMode*
+			(default) 和 *AdditiveAnimationBlendMode*。
+		</p>
 
 		<h3>[property:Boolean clampWhenFinished]</h3>
 		<p>

@@ -111,6 +111,9 @@
 		断开连接[page:Audio.source]. 在设置/删除filters时使用.
 		</p>
 
+		<h3>[method:Float getDetune]()</h3>
+		<p>返回振荡的失谐值，以音分为单位。</p>
+
 		<h3>[method:BiquadFilterNode getFilter]()</h3>
 		<p>
 		返回 [page:Audio.filters filters] 数组的第一个元素.
@@ -162,6 +165,9 @@
 		设置[page:Audio.source source]给audioBuffer, 和设置[page:Audio.sourceType sourceType]给'buffer'.<br />
 		如果[page:Audio.autoplay autoplay]为true, 也开始播放.
 		</p>
+
+		<h3>[method:this setDetune]( [param:Float value] )</h3>
+		<p>设置振荡的失谐值，以音分为单位。</p>
 
 		<h3>[method:this setFilter]( filter )</h3>
 		<p>

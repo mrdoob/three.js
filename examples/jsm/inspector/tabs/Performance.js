@@ -57,7 +57,7 @@ class Performance extends Tab {
 		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan(), createValueSpan() );
 		perfList.add( frameStats );
 
-		const miscellaneous = new Item( 'Miscellaneous / Idle', createValueSpan(), createValueSpan(), createValueSpan() );
+		const miscellaneous = new Item( 'Miscellaneous & Idle', createValueSpan(), createValueSpan(), createValueSpan() );
 		miscellaneous.domElement.firstChild.style.backgroundColor = '#00ff0b1a';
 		miscellaneous.domElement.firstChild.classList.add( 'no-hover' );
 		frameStats.add( miscellaneous );
@@ -235,7 +235,7 @@ class Performance extends Tab {
 
 		//
 
-		setText( 'graph-fps-counter', inspector.fps.toFixed() + ' FPS' );
+		setText( 'graph-fps-counter', inspector.softFPS.toFixed() + ' FPS' );
 
 		//
 
@@ -248,6 +248,7 @@ class Performance extends Tab {
 		setText( this.miscellaneous.data[ 1 ], frame.miscellaneous.toFixed( 2 ) );
 		setText( this.miscellaneous.data[ 2 ], '-' );
 		setText( this.miscellaneous.data[ 3 ], frame.miscellaneous.toFixed( 2 ) );
+
 		//
 
 		this.currentItem = null;

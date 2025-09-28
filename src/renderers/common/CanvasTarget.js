@@ -11,28 +11,13 @@ import { DepthTexture } from '../../textures/DepthTexture.js';
 class CanvasTarget extends EventDispatcher {
 
 	/**
-	 * CanvasTarget options.
-	 *
-	 * @typedef {Object} CanvasTarget~Options
-	 * @property {boolean} [antialias=false] - Whether MSAA as the default anti-aliasing should be enabled or not.
-	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
-	 * to overwrite the default.
-	 */
-
-	/**
 	 * Constructs a new CanvasTarget.
 	 *
 	 * @param {HTMLCanvasElement|OffscreenCanvas} domElement - The canvas element to render to.
-	 * @param {Object} [parameters={}] - The parameters.
 	 */
-	constructor( domElement, parameters = {} ) {
+	constructor( domElement ) {
 
 		super();
-
-		const {
-			antialias = false,
-			samples = 0
-		} = parameters;
 
 		/**
 		 * A reference to the canvas element the renderer is drawing to.
@@ -93,15 +78,6 @@ class CanvasTarget extends EventDispatcher {
 		this._scissorTest = false;
 
 		/**
-		 * The number of MSAA samples.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 0
-		 */
-		this._samples = samples || ( antialias === true ) ? 4 : 0;
-
-		/**
 		 * The color texture of the default framebuffer.
 		 *
 		 * @type {FramebufferTexture}
@@ -114,18 +90,6 @@ class CanvasTarget extends EventDispatcher {
 		 * @type {DepthTexture}
 		 */
 		this.depthTexture = new DepthTexture();
-
-	}
-
-	/**
-	 * The number of samples used for multi-sample anti-aliasing (MSAA).
-	 *
-	 * @type {number}
-	 * @default 0
-	 */
-	get samples() {
-
-		return this._samples;
 
 	}
 

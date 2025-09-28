@@ -110,11 +110,49 @@
 		基于三角形计算出一个平面（[page:Plane plane]）。
 		</p>
 
+		<h3>
+			[method:Vector getInterpolation]( [param:Vector3 point], [param:Vector3 p1], [param:Vector3 p2], [param:Vector3 p3], [param:Vector v1], [param:Vector v2], [param:Vector v3], [param:Vector target] )
+		</h3>
+		<p>
+			[page:Vector3 point] - 插值点的位置<br />
+			[page:Vector3 p1] - 第一个顶点的位置<br />
+			[page:Vector3 p2] - 第二个顶点的位置<br />
+			[page:Vector3 p3] - 第三个顶点的位置<br />
+			[page:Vector v1] - 第一个顶点的值<br />
+			[page:Vector v2] - 第二个顶点的值<br />
+			[page:Vector v3] - 第三个顶点的值<br />
+			[page:Vector target] — 结果将会被拷贝到该向量中<br /><br />
+
+			返回三角形上指定点经过重心插值计算得到的结果值。
+			如果是退化三角形(无法形成有效面积)，则返回 `null`。
+		</p>
+
+		<h3>
+			[method:Vector getInterpolatedAttribute]( [param:BufferAttribute attribute], [param:Number i1], [param:Vector3 i2], [param:Number i3], [param:Vector3 barycoord], [param:Vector3 target] )
+		</h3>
+		<p>
+			[page:BufferAttribute attribute] - 要插入的属性<br />
+			p1 - 第一个顶点的索引<br />
+			p2 - 第二个顶点的索引<br />
+			p3 - 第三个顶点的索引<br />
+			barycoord - 用于插值的重心坐标值<br />
+			[page:Vector target] — 结果将会被拷贝到该向量中<br /><br />
+
+			返回根据给定属性和索引进行重心插值计算得到的结果值。
+		</p>
+
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
 		[page:Box3 box] - 将被用于检测是否与三角形有交集的box。<br /><br />
 
 		判定三角形与传入的[page:Box3 box]是否相交。
+		</p>
+
+		<h3>[method:Boolean isFrontFacing]( [param:Vector3 direction] )</h3>
+		<p>
+			[page:Vector3 direction] - 测试的方向<br /><br />
+
+			三角形是否朝向给定的方向。
 		</p>
 
 		<h3>[method:this set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
@@ -125,12 +163,12 @@
 
 		<h3>[method:this setFromAttributeAndIndices]( [param:BufferAttribute attribute], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
 		<p>
-		attribute - [page:BufferAttribute] of vertex data <br />
-		i0 - [page:Integer] index <br />
-		i1 - [page:Integer] index <br />
-		i2 - [page:Integer] index<br /><br />
+		attribute - [page:BufferAttribute] 顶点数据 <br />
+		i0 - 整数（[page:Integer]）索引 <br />
+		i1 - 整数（[page:Integer]）索引 <br />
+		i2 - 整数（[page:Integer]）索引<br /><br />
 
-		Sets the triangle's vertices from the buffer attribute vertex data.
+		从缓冲区属性顶点数据设置三角形的顶点。
 		</p>
 
 
