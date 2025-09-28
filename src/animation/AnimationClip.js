@@ -368,7 +368,42 @@ class AnimationClip {
 
 						for ( let m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
 
-							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
+	
+	switch ( typeName.toLowerCase() ) {
+
+		case 'scalar':
+		case 'double':
+		case 'float':
+		case 'number':
+		case 'integer':
+
+			return NumberKeyframeTrack;
+
+		case 'vector':
+		case 'vector2':
+		case 'vector3':
+		case 'vector4':
+
+			return VectorKeyframeTrack;
+
+		case 'color':
+
+			return ColorKeyframeTrack;
+
+		case 'quaternion':
+
+			return QuaternionKeyframeTrack;
+
+		case 'bool':
+		case 'boolean':
+
+			return BooleanKeyframeTrack;
+
+		case 'string':
+
+			return StringKeyframeTrack;
+
+	}						morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
 
 						}
 
@@ -550,44 +585,36 @@ class AnimationClip {
 
 function getTrackTypeForValueTypeName( typeName ) {
 
-	switch ( typeName.toLowerCase() ) {
+	var trackTypeMapper = {
+		'scalar': NumberKeyframeTrack,
+		'double': NumberKeyframeTrack,
+		'float': NumberKeyframeTrack,
+		'number': NumberKeyframeTrack,
+		'integer': NumberKeyframeTrack,
 
-		case 'scalar':
-		case 'double':
-		case 'float':
-		case 'number':
-		case 'integer':
+		'vector': VectorKeyframeTrack,
+		'vector2': VectorKeyframeTrack,
+		'vector3': VectorKeyframeTrack,
+		'vector4': VectorKeyframeTrack,
 
-			return NumberKeyframeTrack;
+		'color': ColorKeyframeTrack,
 
-		case 'vector':
-		case 'vector2':
-		case 'vector3':
-		case 'vector4':
+		'quaternion': QuaternionKeyframeTrack,
 
-			return VectorKeyframeTrack;
+		'bool': BooleanKeyframeTrack,
+		'boolean': BooleanKeyframeTrack,
 
-		case 'color':
+		'string': StringKeyframeTrack
+	};
 
-			return ColorKeyframeTrack;
+	var trackType = trackTypeMapper[ typeName.toLowerCase() ];
 
-		case 'quaternion':
-
-			return QuaternionKeyframeTrack;
-
-		case 'bool':
-		case 'boolean':
-
-			return BooleanKeyframeTrack;
-
-		case 'string':
-
-			return StringKeyframeTrack;
-
+	if ( !trackType )  {
+		
+		throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
 	}
 
-	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
-
+	return trackType;
 }
 
 function parseKeyframeTrack( json ) {
