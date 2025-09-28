@@ -20,9 +20,9 @@ class CacheNode extends Node {
 	 * Constructs a new cache node.
 	 *
 	 * @param {Node} node - The node that should be cached.
-	 * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
+	 * @param {Node} [scope=null] - The scope node that defines the cache context.
 	 */
-	constructor( node, parent = true ) {
+	constructor( node, scope = null ) {
 
 		super();
 
@@ -32,6 +32,15 @@ class CacheNode extends Node {
 		 * @type {Node}
 		 */
 		this.node = node;
+
+
+		/**
+		 * The scope node that defines the cache context.
+		 *
+		 * @type {Node}
+		 * @default null
+		 */
+		this.scope = scope || this;
 
 		/**
 		 * Whether this node refers to a shared parent cache or not.
@@ -55,7 +64,7 @@ class CacheNode extends Node {
 	getNodeType( builder ) {
 
 		const previousCache = builder.getCache();
-		const cache = builder.getCacheFromNode( this, this.parent );
+		const cache = builder.getCacheFromNode( this.scope, this.parent );
 
 		builder.setCache( cache );
 
@@ -70,7 +79,7 @@ class CacheNode extends Node {
 	build( builder, ...params ) {
 
 		const previousCache = builder.getCache();
-		const cache = builder.getCacheFromNode( this, this.parent );
+		const cache = builder.getCacheFromNode( this.scope, this.parent );
 
 		builder.setCache( cache );
 
@@ -92,9 +101,9 @@ export default CacheNode;
  * @tsl
  * @function
  * @param {Node} node - The node that should be cached.
- * @param {boolean} [parent] - Whether this node refers to a shared parent cache or not.
+ * @param {Node} [scope=null] - The scope node that defines the cache context.
  * @returns {CacheNode}
  */
-export const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
+export const cache = ( node, scope = null ) => nodeObject( new CacheNode( nodeObject( node ), scope ) );
 
 addMethodChaining( 'cache', cache );
