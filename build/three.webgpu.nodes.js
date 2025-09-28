@@ -3706,6 +3706,7 @@ class ShaderCallNodeInternal extends Node {
 		//
 
 		const previousSubBuildFn = builder.subBuildFn;
+		const previousContext = builder.addContext( { fnCall: this } );
 
 		builder.subBuildFn = subBuild;
 
@@ -3783,6 +3784,7 @@ class ShaderCallNodeInternal extends Node {
 		}
 
 		builder.subBuildFn = previousSubBuildFn;
+		builder.setContext( previousContext );
 
 		if ( shaderNode.once ) {
 
@@ -3825,6 +3827,8 @@ class ShaderCallNodeInternal extends Node {
 
 		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
+
+		const previousContext = builder.addContext( { fnCall: this } );
 
 		if ( buildStage === 'setup' ) {
 
@@ -3872,6 +3876,8 @@ class ShaderCallNodeInternal extends Node {
 			result = outputNode.build( builder, output ) || '';
 
 		}
+
+		builder.setContext( previousContext );
 
 		return result;
 
@@ -4006,9 +4012,15 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	getLayout() {
+
+		return this.layout;
+
+	}
+
 	call( rawInputs = null ) {
 
-		return nodeObject( new ShaderCallNodeInternal( this, rawInputs ) );
+		return new ShaderCallNodeInternal( this, rawInputs );
 
 	}
 
@@ -7890,9 +7902,7 @@ class ContextNode extends Node {
 
 	analyze( builder ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		this.node.build( builder );
 
@@ -7902,9 +7912,7 @@ class ContextNode extends Node {
 
 	setup( builder ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		this.node.build( builder );
 
@@ -7914,9 +7922,7 @@ class ContextNode extends Node {
 
 	generate( builder, output ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		const snippet = this.node.build( builder, output );
 
@@ -8128,14 +8134,53 @@ class VarNode extends Node {
 
 	}
 
+	isAssign( builder ) {
+
+		if ( this.intent !== true ) return true;
+
+		//
+
+		const properties = builder.getNodeProperties( this );
+
+		let assign = properties.assign;
+
+		if ( assign !== true ) {
+
+			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
+
+				if ( builder.context.fnCall && builder.context.fnCall.shaderNode ) {
+
+					const nodeType = this.node.getNodeType( builder );
+
+					if ( nodeType !== 'void' ) {
+
+						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
+
+						if ( shaderNodeData.hasLoop ) {
+
+							assign = true;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return assign;
+
+	}
+
 	build( ...params ) {
 
 		if ( this.intent === true ) {
 
 			const builder = params[ 0 ];
-			const properties = builder.getNodeProperties( this );
 
-			if ( properties.assign !== true ) {
+			if ( this.isAssign( builder ) !== true ) {
 
 				return this.node.build( ...params );
 
@@ -17309,6 +17354,13 @@ class LoopNode extends Node {
 
 		this.getProperties( builder );
 
+		if ( builder.context.fnCall ) {
+
+			const shaderNodeData = builder.getDataFromNode( builder.context.fnCall.shaderNode );
+			shaderNodeData.hasLoop = true;
+
+		}
+
 	}
 
 	generate( builder ) {
@@ -17501,7 +17553,7 @@ class LoopNode extends Node {
  * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
-const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).toStack();
+const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
  * TSL function for creating a `Continue()` expression.
@@ -32157,15 +32209,9 @@ class StackNode extends Node {
 
 		for ( const childNode of this.getChildren() ) {
 
-			if ( childNode.isVarNode && childNode.intent === true ) {
+			if ( childNode.isVarNode && childNode.isAssign( builder ) !== true ) {
 
-				const properties = builder.getNodeProperties( childNode );
-
-				if ( properties.assign !== true ) {
-
-					continue;
-
-				}
+				continue;
 
 			}
 
@@ -32198,15 +32244,9 @@ class StackNode extends Node {
 
 		for ( const node of this.nodes ) {
 
-			if ( node.isVarNode && node.intent === true ) {
+			if ( node.isVarNode && node.isAssign( builder ) !== true ) {
 
-				const properties = builder.getNodeProperties( node );
-
-				if ( properties.assign !== true ) {
-
-					continue;
-
-				}
+				continue;
 
 			}
 
@@ -35393,9 +35433,9 @@ const normal = Fn( ( { texture, uv } ) => {
 
 		const step = 0.01;
 
-		const x = texture.sample( uv.add( vec3( -0.01, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
-		const y = texture.sample( uv.add( vec3( 0.0, -0.01, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
-		const z = texture.sample( uv.add( vec3( 0.0, 0.0, -0.01 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
+		const x = texture.sample( uv.add( vec3( - step, 0.0, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( step, 0.0, 0.0 ) ) ).r );
+		const y = texture.sample( uv.add( vec3( 0.0, - step, 0.0 ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
+		const z = texture.sample( uv.add( vec3( 0.0, 0.0, - step ) ) ).r.sub( texture.sample( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
 
 		ret.assign( vec3( x, y, z ) );
 
@@ -47680,6 +47720,22 @@ class NodeBuilder {
 	getContext() {
 
 		return this.context;
+
+	}
+
+	/**
+	 * Adds context data to the builder's current context.
+	 *
+	 * @param {Object} context - The context to add.
+	 * @return {Object} The previous context.
+	 */
+	addContext( context ) {
+
+		const previousContext = this.getContext();
+
+		this.setContext( { ...this.context, ...context } );
+
+		return previousContext;
 
 	}
 
@@ -68065,7 +68121,15 @@ class NodeSampler extends Sampler {
 	 */
 	update() {
 
-		this.texture = this.textureNode.value;
+		const { textureNode } = this;
+
+		if ( this.texture !== textureNode.value ) {
+
+			this.texture = textureNode.value;
+
+			return true;
+
+		}
 
 		return super.update();
 
@@ -75057,7 +75121,7 @@ class WebGPUBackend extends Backend {
 
 			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
-			const toneMappingMode = ColorManagement.getToneMappingMode( this.renderer.outputColorSpace );
+			const toneMappingMode = parameters.outputType === HalfFloatType ? 'extended' : 'standard';
 
 			context.configure( {
 				device: this.device,

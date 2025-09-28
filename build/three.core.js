@@ -34403,8 +34403,8 @@ class Shape extends Path {
 }
 
 /* eslint-disable */
-// copy of mapbox/earcut version 3.0.1
-// https://github.com/mapbox/earcut/tree/v3.0.1
+// copy of mapbox/earcut version 3.0.2
+// https://github.com/mapbox/earcut/tree/v3.0.2
 
 function earcut(data, holeIndices, dim = 2) {
 
@@ -34421,10 +34421,10 @@ function earcut(data, holeIndices, dim = 2) {
 
     // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
     if (data.length > 80 * dim) {
-        minX = Infinity;
-        minY = Infinity;
-        let maxX = -Infinity;
-        let maxY = -Infinity;
+        minX = data[0];
+        minY = data[1];
+        let maxX = minX;
+        let maxY = minY;
 
         for (let i = dim; i < outerLen; i += dim) {
             const x = data[i];
@@ -34700,7 +34700,7 @@ function compareXYSlope(a, b) {
     return result;
 }
 
-// find a bridge between vertices that connects hole with an outer ring and and link it
+// find a bridge between vertices that connects hole with an outer ring and link it
 function eliminateHole(hole, outerNode) {
     const bridge = findHoleBridge(hole, outerNode);
     if (!bridge) {
@@ -57455,34 +57455,34 @@ class CameraHelper extends LineSegments {
 
 		// near
 
-		setPoint( 'n1', pointMap, geometry, _camera, -1, -1, nearZ );
-		setPoint( 'n2', pointMap, geometry, _camera, w, -1, nearZ );
-		setPoint( 'n3', pointMap, geometry, _camera, -1, h, nearZ );
+		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, nearZ );
+		setPoint( 'n2', pointMap, geometry, _camera, w, - h, nearZ );
+		setPoint( 'n3', pointMap, geometry, _camera, - w, h, nearZ );
 		setPoint( 'n4', pointMap, geometry, _camera, w, h, nearZ );
 
 		// far
 
-		setPoint( 'f1', pointMap, geometry, _camera, -1, -1, farZ );
-		setPoint( 'f2', pointMap, geometry, _camera, w, -1, farZ );
-		setPoint( 'f3', pointMap, geometry, _camera, -1, h, farZ );
+		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, farZ );
+		setPoint( 'f2', pointMap, geometry, _camera, w, - h, farZ );
+		setPoint( 'f3', pointMap, geometry, _camera, - w, h, farZ );
 		setPoint( 'f4', pointMap, geometry, _camera, w, h, farZ );
 
 		// up
 
 		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, nearZ );
-		setPoint( 'u2', pointMap, geometry, _camera, -1 * 0.7, h * 1.1, nearZ );
+		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, nearZ );
 		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, nearZ );
 
 		// cross
 
-		setPoint( 'cf1', pointMap, geometry, _camera, -1, 0, farZ );
+		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, farZ );
 		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, farZ );
-		setPoint( 'cf3', pointMap, geometry, _camera, 0, -1, farZ );
+		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, farZ );
 		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, farZ );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, -1, 0, nearZ );
+		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
 		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, -1, nearZ );
+		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, nearZ );
 		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, nearZ );
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
