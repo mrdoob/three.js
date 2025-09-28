@@ -550,44 +550,38 @@ class AnimationClip {
 
 function getTrackTypeForValueTypeName( typeName ) {
 
-	switch ( typeName.toLowerCase() ) {
+	var trackTypeMapper = {
+		
+		'scalar': NumberKeyframeTrack,
+		'double': NumberKeyframeTrack,
+		'float': NumberKeyframeTrack,
+		'number': NumberKeyframeTrack,
+		'integer': NumberKeyframeTrack,
+		
+		'vector': VectorKeyframeTrack,
+		'vector2': VectorKeyframeTrack,
+		'vector3': VectorKeyframeTrack,
+		'vector4': VectorKeyframeTrack,
 
-		case 'scalar':
-		case 'double':
-		case 'float':
-		case 'number':
-		case 'integer':
+		'color': ColorKeyframeTrack,
 
-			return NumberKeyframeTrack;
+		'quaternion': QuaternionKeyframeTrack,
 
-		case 'vector':
-		case 'vector2':
-		case 'vector3':
-		case 'vector4':
+		'bool': BooleanKeyframeTrack,
+		'boolean': BooleanKeyframeTrack,
 
-			return VectorKeyframeTrack;
+		'string': StringKeyframeTrack
+		
+	};
 
-		case 'color':
+	var trackType = trackTypeMapper[ typeName.toLowerCase() ];
 
-			return ColorKeyframeTrack;
-
-		case 'quaternion':
-
-			return QuaternionKeyframeTrack;
-
-		case 'bool':
-		case 'boolean':
-
-			return BooleanKeyframeTrack;
-
-		case 'string':
-
-			return StringKeyframeTrack;
-
+	if ( !trackType ) {
+		
+		throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
 	}
 
-	throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
-
+	return trackType;
 }
 
 function parseKeyframeTrack( json ) {
