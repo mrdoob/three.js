@@ -572,6 +572,7 @@ function getTrackTypeForValueTypeName( typeName ) {
 	if ( ! trackType ) {
 		
 		throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+	
 	}
 
 	return trackType;
