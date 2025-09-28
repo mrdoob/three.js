@@ -570,7 +570,9 @@ function getTrackTypeForValueTypeName( typeName ) {
 	var trackType = trackTypeMapper[ typeName.toLowerCase() ];
 
 	if ( ! trackType ) throw new Error( 'THREE.KeyframeTrack: Unsupported typeName: ' + typeName );
+
 	return trackType;
+
 }
 
 function parseKeyframeTrack( json ) {
