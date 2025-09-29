@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
+import { warn } from '../../utils.js';
 
 /**
  * This node can be used as a cache management component for another node.
@@ -8,11 +9,11 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  *
  * @augments Node
  */
-class CacheNode extends Node {
+class IsolateNode extends Node {
 
 	static get type() {
 
-		return 'CacheNode';
+		return 'IsolateNode';
 
 	}
 
@@ -20,9 +21,9 @@ class CacheNode extends Node {
 	 * Constructs a new cache node.
 	 *
 	 * @param {Node} node - The node that should be cached.
-	 * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
+	 * @param {Node} [scope=null] - The scope node that defines the cache context.
 	 */
-	constructor( node, parent = true ) {
+	constructor( node ) {
 
 		super();
 
@@ -48,7 +49,7 @@ class CacheNode extends Node {
 		 * @readonly
 		 * @default true
 		 */
-		this.isCacheNode = true;
+		this.isIsolateNode = true;
 
 	}
 
@@ -82,9 +83,23 @@ class CacheNode extends Node {
 
 	}
 
+	setParent( parent ) {
+
+		this.parent = parent;
+
+		return this;
+
+	}
+
+	getParent() {
+
+		return this.parent;
+
+	}
+
 }
 
-export default CacheNode;
+export default IsolateNode;
 
 /**
  * TSL function for creating a cache node.
@@ -92,9 +107,28 @@ export default CacheNode;
  * @tsl
  * @function
  * @param {Node} node - The node that should be cached.
- * @param {boolean} [parent] - Whether this node refers to a shared parent cache or not.
- * @returns {CacheNode}
+ * @returns {IsolateNode}
  */
-export const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
+export const isolate = ( node ) => new IsolateNode( nodeObject( node ) );
+
+
+/**
+ * TSL function for creating a cache node.
+ *
+ * @tsl
+ * @function
+ * @deprecated
+ * @param {Node} node - The node that should be cached.
+ * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
+ * @returns {IsolateNode}
+ */
+export function cache( node, parent = true ) {
+
+	warn( 'TSL: "cache()" has been deprecated. Use "isolate()" instead.' ); // @deprecated r181
+
+	return isolate( node ).setParent( parent );
+
+}
 
 addMethodChaining( 'cache', cache );
+addMethodChaining( 'isolate', isolate );
