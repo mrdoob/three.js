@@ -154,7 +154,7 @@ class VarNode extends Node {
 
 		if ( assign !== true ) {
 
-			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
+			/*if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
 
 				if ( builder.fnCall && builder.fnCall.shaderNode ) {
 
@@ -174,7 +174,7 @@ class VarNode extends Node {
 
 				}
 
-			}
+			}*/
 
 		}
 
