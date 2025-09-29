@@ -158,17 +158,11 @@ class VarNode extends Node {
 
 				if ( builder.fnCall && builder.fnCall.shaderNode ) {
 
-					const nodeType = this.node.getNodeType( builder );
+					const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
 
-					if ( nodeType !== 'void' ) {
+					if ( shaderNodeData.hasLoop ) {
 
-						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-						if ( shaderNodeData.hasLoop ) {
-
-							//assign = true;
-
-						}
+						assign = true;
 
 					}
 
