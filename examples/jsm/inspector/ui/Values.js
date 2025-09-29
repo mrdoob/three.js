@@ -377,7 +377,7 @@ class ValueColor extends Value {
 
 	getValue() {
 
-		return this._value;
+		return parseInt( this._value.slice( 1 ), 16 );
 
 	}
 
