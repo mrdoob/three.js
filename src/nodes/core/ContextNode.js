@@ -94,7 +94,9 @@ class ContextNode extends Node {
 
 	analyze( builder ) {
 
-		const previousContext = builder.addContext( this.value );
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.value } );
 
 		this.node.build( builder );
 
@@ -104,7 +106,9 @@ class ContextNode extends Node {
 
 	setup( builder ) {
 
-		const previousContext = builder.addContext( this.value );
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.value } );
 
 		this.node.build( builder );
 
@@ -114,7 +118,9 @@ class ContextNode extends Node {
 
 	generate( builder, output ) {
 
-		const previousContext = builder.addContext( this.value );
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.value } );
 
 		const snippet = this.node.build( builder, output );
 
