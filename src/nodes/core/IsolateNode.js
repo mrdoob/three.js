@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
+import { warn } from '../../utils.js';
 
 /**
  * This node can be used as a cache management component for another node.
@@ -8,11 +9,11 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  *
  * @augments Node
  */
-class CacheNode extends Node {
+class IsolateNode extends Node {
 
 	static get type() {
 
-		return 'CacheNode';
+		return 'IsolateNode';
 
 	}
 
@@ -40,7 +41,7 @@ class CacheNode extends Node {
 		 * @type {Node}
 		 * @default null
 		 */
-		this.scope = scope || this;
+		this.scope = scope;
 
 		/**
 		 * Whether this node refers to a shared parent cache or not.
@@ -57,14 +58,33 @@ class CacheNode extends Node {
 		 * @readonly
 		 * @default true
 		 */
-		this.isCacheNode = true;
+		this.isIsolateNode = true;
+
+	}
+
+	getNodeCache( builder ) {
+
+		return builder.getCacheFromNode( this, this.parent );
 
 	}
 
 	getNodeType( builder ) {
 
-		const previousCache = builder.getCache();
-		const cache = builder.getCacheFromNode( this.scope, this.parent );
+		let previousCache = null;
+
+		if ( this.scope ) {
+
+			previousCache = this.scope.getNodeCache( builder );
+
+			builder.setCache( previousCache );
+
+		} else {
+
+			previousCache = builder.getCache();
+
+		}
+
+		const cache = builder.getCacheFromNode( this, this.parent );
 
 		builder.setCache( cache );
 
@@ -79,7 +99,7 @@ class CacheNode extends Node {
 	build( builder, ...params ) {
 
 		const previousCache = builder.getCache();
-		const cache = builder.getCacheFromNode( this.scope, this.parent );
+		const cache = builder.getCacheFromNode( this, this.parent );
 
 		builder.setCache( cache );
 
@@ -93,7 +113,7 @@ class CacheNode extends Node {
 
 }
 
-export default CacheNode;
+export default IsolateNode;
 
 /**
  * TSL function for creating a cache node.
@@ -102,8 +122,27 @@ export default CacheNode;
  * @function
  * @param {Node} node - The node that should be cached.
  * @param {Node} [scope=null] - The scope node that defines the cache context.
- * @returns {CacheNode}
+ * @returns {IsolateNode}
  */
-export const cache = ( node, scope = null ) => nodeObject( new CacheNode( nodeObject( node ), scope ) );
+export const isolate = ( node, scope = null ) => new IsolateNode( nodeObject( node ), scope );
+
+
+/**
+ * TSL function for creating a cache node.
+ *
+ * @tsl
+ * @function
+ * @deprecated
+ * @param {Node} node - The node that should be cached.
+ * @returns {IsolateNode}
+ */
+export function cache( node ) {
+
+	warn( 'TSL: "cache()" has been deprecated. Use "isolate()" instead.' ); // @deprecated r181
+
+	return isolate( node );
+
+}
 
 addMethodChaining( 'cache', cache );
+addMethodChaining( 'isolate', isolate );
