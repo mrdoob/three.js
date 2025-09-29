@@ -451,14 +451,6 @@ class NodeBuilder {
 		 */
 		this.subBuildFn = null;
 
-		/**
-		 * The current TSL function(Fn) call node.
-		 *
-		 * @type {?Node}
-		 * @default null
-		 */
-		this.fnCall = null;
-
 	}
 
 	/**
