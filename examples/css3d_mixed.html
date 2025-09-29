@@ -104,11 +104,6 @@
 				controls.addEventListener( 'end', () => iframe.style.pointerEvents = 'auto' );
 				controls.enableDamping = true;
 
-				// Track OrbitControls state
-				let isDragging = false;
-				controls.addEventListener( 'start', () => isDragging = true );
-				controls.addEventListener( 'end', () => isDragging = false );
-
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
