@@ -4,12 +4,18 @@
 		<title>three.js webgpu - spotlight</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - spotlight<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>spot light</span>
+			</div>
+
+			<small>Spot light projecting texture map.</small>
 		</div>
 
 		<script type="importmap">
@@ -27,7 +33,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -47,6 +53,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+
+				renderer.inspector = new Inspector();
 
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 1;
@@ -156,7 +164,7 @@
 
 				// GUI
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				const params = {
 					map: textures[ 'disturb.jpg' ],
@@ -232,8 +240,6 @@
 					spotLight.shadowCameraHelper.visible = val;
 
 				} );
-
-				gui.open();
 
 			}
 
