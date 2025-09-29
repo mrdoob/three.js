@@ -23,7 +23,7 @@ class IsolateNode extends Node {
 	 * @param {Node} node - The node that should be cached.
 	 * @param {Node} [scope=null] - The scope node that defines the cache context.
 	 */
-	constructor( node, scope = null ) {
+	constructor( node ) {
 
 		super();
 
@@ -33,15 +33,6 @@ class IsolateNode extends Node {
 		 * @type {Node}
 		 */
 		this.node = node;
-
-
-		/**
-		 * The scope node that defines the cache context.
-		 *
-		 * @type {Node}
-		 * @default null
-		 */
-		this.scope = scope;
 
 		/**
 		 * Whether this node refers to a shared parent cache or not.
@@ -62,28 +53,9 @@ class IsolateNode extends Node {
 
 	}
 
-	getNodeCache( builder ) {
-
-		return builder.getCacheFromNode( this, this.parent );
-
-	}
-
 	getNodeType( builder ) {
 
-		let previousCache = null;
-
-		if ( this.scope ) {
-
-			previousCache = this.scope.getNodeCache( builder );
-
-			builder.setCache( previousCache );
-
-		} else {
-
-			previousCache = builder.getCache();
-
-		}
-
+		const previousCache = builder.getCache();
 		const cache = builder.getCacheFromNode( this, this.parent );
 
 		builder.setCache( cache );
@@ -111,6 +83,20 @@ class IsolateNode extends Node {
 
 	}
 
+	setParent( parent ) {
+
+		this.parent = parent;
+
+		return this;
+
+	}
+
+	getParent() {
+
+		return this.parent;
+
+	}
+
 }
 
 export default IsolateNode;
@@ -121,10 +107,9 @@ export default IsolateNode;
  * @tsl
  * @function
  * @param {Node} node - The node that should be cached.
- * @param {Node} [scope=null] - The scope node that defines the cache context.
  * @returns {IsolateNode}
  */
-export const isolate = ( node, scope = null ) => new IsolateNode( nodeObject( node ), scope );
+export const isolate = ( node ) => new IsolateNode( nodeObject( node ) );
 
 
 /**
@@ -134,13 +119,14 @@ export const isolate = ( node, scope = null ) => new IsolateNode( nodeObject( no
  * @function
  * @deprecated
  * @param {Node} node - The node that should be cached.
+ * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
  * @returns {IsolateNode}
  */
-export function cache( node ) {
+export function cache( node, parent = true ) {
 
 	warn( 'TSL: "cache()" has been deprecated. Use "isolate()" instead.' ); // @deprecated r181
 
-	return isolate( node );
+	return isolate( node ).setParent( parent );
 
 }
 
