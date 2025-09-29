@@ -160,7 +160,7 @@ class VarNode extends Node {
 
 			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
 
-				if ( builder.context.fnCall && builder.context.fnCall.shaderNode ) {
+				if ( builder.fnCall && builder.fnCall.shaderNode ) {
 
 					const nodeType = this.node.getNodeType( builder );
 
