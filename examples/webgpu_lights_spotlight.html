@@ -34,7 +34,7 @@
 
 			let renderer, scene, camera;
 
-			let spotLight, lightHelper;
+			let spotLight;
 
 			init();
 
@@ -48,11 +48,11 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 1;
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1;
 
 				scene = new THREE.Scene();
 
@@ -91,10 +91,11 @@
 
 				// Lights
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.15 );
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.25 );
 				scene.add( ambient );
 
 				spotLight = new THREE.SpotLight( 0xffffff, 100 );
+				spotLight.name = 'spotLight';
 				spotLight.map = textures[ 'disturb.jpg' ];
 				spotLight.position.set( 2.5, 5, 2.5 );
 				spotLight.angle = Math.PI / 6;
@@ -105,18 +106,24 @@
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
-				spotLight.shadow.camera.near = 1;
+				spotLight.shadow.camera.near = 2;
 				spotLight.shadow.camera.far = 10;
 				spotLight.shadow.focus = 1;
 				spotLight.shadow.bias = - .003;
+				spotLight.shadow.intensity = 1;
 				scene.add( spotLight );
 
-				lightHelper = new THREE.SpotLightHelper( spotLight );
-				scene.add( lightHelper );
+				spotLight.lightHelper = new THREE.SpotLightHelper( spotLight );
+				spotLight.lightHelper.visible = false;
+				scene.add( spotLight.lightHelper );
+
+				spotLight.shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera ); // colored lines
+				spotLight.shadowCameraHelper.visible = false;
+				scene.add( spotLight.shadowCameraHelper );
 
 				//
 
-				const geometry = new THREE.PlaneGeometry( 200, 200 );
+				const geometry = new THREE.PlaneGeometry( 10, 10 );
 				const material = new THREE.MeshLambertMaterial( { color: 0xbcbcbc } );
 
 				const mesh = new THREE.Mesh( geometry, material );
@@ -125,7 +132,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				// Models
+				// Model
 
 				new PLYLoader().load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
 
@@ -143,6 +150,8 @@
 
 				} );
 
+				//
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				// GUI
@@ -158,8 +167,8 @@
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
 					focus: spotLight.shadow.focus,
-					shadows: true,
-					customAttenuation: false
+					shadowIntensity: spotLight.shadow.intensity,
+					helpers: false
 				};
 
 				gui.add( params, 'map', textures ).onChange( function ( val ) {
@@ -211,19 +220,16 @@
 
 				} );
 
-				gui.add( params, 'shadows' ).onChange( function ( val ) {
+				gui.add( params, 'shadowIntensity', 0, 1 ).onChange( function ( val ) {
 
-					renderer.shadowMap.enabled = val;
+					spotLight.shadow.intensity = val;
 
-					scene.traverse( function ( child ) {
+				} );
 
-						if ( child.material ) {
+				gui.add( params, 'helpers' ).onChange( function ( val ) {
 
-							child.material.needsUpdate = true;
-
-						}
-
-					} );
+					spotLight.lightHelper.visible = val;
+					spotLight.shadowCameraHelper.visible = val;
 
 				} );
 
@@ -247,7 +253,7 @@
 				spotLight.position.x = Math.cos( time ) * 2.5;
 				spotLight.position.z = Math.sin( time ) * 2.5;
 
-				lightHelper.update();
+				spotLight.lightHelper.update();
 
 				renderer.render( scene, camera );
 
