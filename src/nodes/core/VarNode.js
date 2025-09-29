@@ -148,6 +148,10 @@ class VarNode extends Node {
 
 	isAssign( builder ) {
 
+		if ( this.intent !== true ) return true;
+
+		//
+
 		const properties = builder.getNodeProperties( this );
 
 		let assign = properties.assign;
