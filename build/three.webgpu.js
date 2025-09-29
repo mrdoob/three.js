@@ -3706,7 +3706,6 @@ class ShaderCallNodeInternal extends Node {
 		//
 
 		const previousSubBuildFn = builder.subBuildFn;
-		const previousContext = builder.addContext( { fnCall: this } );
 
 		builder.subBuildFn = subBuild;
 
@@ -3784,7 +3783,6 @@ class ShaderCallNodeInternal extends Node {
 		}
 
 		builder.subBuildFn = previousSubBuildFn;
-		builder.setContext( previousContext );
 
 		if ( shaderNode.once ) {
 
@@ -3827,8 +3825,6 @@ class ShaderCallNodeInternal extends Node {
 
 		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
-
-		const previousContext = builder.addContext( { fnCall: this } );
 
 		if ( buildStage === 'setup' ) {
 
@@ -3876,8 +3872,6 @@ class ShaderCallNodeInternal extends Node {
 			result = outputNode.build( builder, output ) || '';
 
 		}
-
-		builder.setContext( previousContext );
 
 		return result;
 
@@ -4012,15 +4006,9 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	getLayout() {
-
-		return this.layout;
-
-	}
-
 	call( rawInputs = null ) {
 
-		return new ShaderCallNodeInternal( this, rawInputs );
+		return nodeObject( new ShaderCallNodeInternal( this, rawInputs ) );
 
 	}
 
@@ -5664,7 +5652,7 @@ const call = ( func, ...params ) => {
 
 	params = params.length > 1 || ( params[ 0 ] && params[ 0 ].isNode === true ) ? nodeArray( params ) : nodeObjects( params[ 0 ] );
 
-	return nodeObject( new FunctionCallNode( nodeObject( func ), params ) );
+	return new FunctionCallNode( nodeObject( func ), params );
 
 };
 
@@ -7668,9 +7656,9 @@ class ConditionalNode extends Node {
 
 	setup( builder ) {
 
-		const condNode = this.condNode.cache();
-		const ifNode = this.ifNode.cache();
-		const elseNode = this.elseNode ? this.elseNode.cache() : null;
+		const condNode = this.condNode;
+		const ifNode = this.ifNode.isolate();
+		const elseNode = this.elseNode ? this.elseNode.isolate() : null;
 
 		//
 
@@ -7902,7 +7890,9 @@ class ContextNode extends Node {
 
 	analyze( builder ) {
 
-		const previousContext = builder.addContext( this.value );
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.value } );
 
 		this.node.build( builder );
 
@@ -7912,7 +7902,9 @@ class ContextNode extends Node {
 
 	setup( builder ) {
 
-		const previousContext = builder.addContext( this.value );
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.value } );
 
 		this.node.build( builder );
 
@@ -7922,7 +7914,9 @@ class ContextNode extends Node {
 
 	generate( builder, output ) {
 
-		const previousContext = builder.addContext( this.value );
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.value } );
 
 		const snippet = this.node.build( builder, output );
 
@@ -8134,53 +8128,14 @@ class VarNode extends Node {
 
 	}
 
-	isAssign( builder ) {
-
-		if ( this.intent !== true ) return true;
-
-		//
-
-		const properties = builder.getNodeProperties( this );
-
-		let assign = properties.assign;
-
-		if ( assign !== true ) {
-
-			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
-
-				if ( builder.context.fnCall && builder.context.fnCall.shaderNode ) {
-
-					const nodeType = this.node.getNodeType( builder );
-
-					if ( nodeType !== 'void' ) {
-
-						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-						if ( shaderNodeData.hasLoop ) {
-
-							assign = true;
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return assign;
-
-	}
-
 	build( ...params ) {
 
 		if ( this.intent === true ) {
 
 			const builder = params[ 0 ];
+			const properties = builder.getNodeProperties( this );
 
-			if ( this.isAssign( builder ) !== true ) {
+			if ( properties.assign !== true ) {
 
 				return this.node.build( ...params );
 
@@ -9947,11 +9902,11 @@ addMethodChaining( 'computeKernel', computeKernel );
  *
  * @augments Node
  */
-class CacheNode extends Node {
+class IsolateNode extends Node {
 
 	static get type() {
 
-		return 'CacheNode';
+		return 'IsolateNode';
 
 	}
 
@@ -9959,9 +9914,9 @@ class CacheNode extends Node {
 	 * Constructs a new cache node.
 	 *
 	 * @param {Node} node - The node that should be cached.
-	 * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
+	 * @param {Node} [scope=null] - The scope node that defines the cache context.
 	 */
-	constructor( node, parent = true ) {
+	constructor( node ) {
 
 		super();
 
@@ -9987,7 +9942,7 @@ class CacheNode extends Node {
 		 * @readonly
 		 * @default true
 		 */
-		this.isCacheNode = true;
+		this.isIsolateNode = true;
 
 	}
 
@@ -10021,6 +9976,20 @@ class CacheNode extends Node {
 
 	}
 
+	setParent( parent ) {
+
+		this.parent = parent;
+
+		return this;
+
+	}
+
+	getParent() {
+
+		return this.parent;
+
+	}
+
 }
 
 /**
@@ -10029,12 +9998,31 @@ class CacheNode extends Node {
  * @tsl
  * @function
  * @param {Node} node - The node that should be cached.
- * @param {boolean} [parent] - Whether this node refers to a shared parent cache or not.
- * @returns {CacheNode}
+ * @returns {IsolateNode}
  */
-const cache = ( node, parent ) => nodeObject( new CacheNode( nodeObject( node ), parent ) );
+const isolate = ( node ) => new IsolateNode( nodeObject( node ) );
+
+
+/**
+ * TSL function for creating a cache node.
+ *
+ * @tsl
+ * @function
+ * @deprecated
+ * @param {Node} node - The node that should be cached.
+ * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
+ * @returns {IsolateNode}
+ */
+function cache( node, parent = true ) {
+
+	warn( 'TSL: "cache()" has been deprecated. Use "isolate()" instead.' ); // @deprecated r181
+
+	return isolate( node ).setParent( parent );
+
+}
 
 addMethodChaining( 'cache', cache );
+addMethodChaining( 'isolate', isolate );
 
 /**
  * The class generates the code of a given node but returns another node in the output.
@@ -11328,9 +11316,9 @@ class TextureNode extends UniformNode {
 
 		//
 
-		let uvNode = Fn( () => {
+		const uvNode = Fn( () => {
 
-			uvNode = this.uvNode;
+			let uvNode = this.uvNode;
 
 			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
@@ -14896,7 +14884,7 @@ const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode ).setParameterLength( 1
 const dHdxy_fwd = Fn( ( { textureNode, bumpScale } ) => {
 
 	// It's used to preserve the same TextureNode instance
-	const sampleTexture = ( callback ) => textureNode.cache().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv$1() ), forceUVContext: true } );
+	const sampleTexture = ( callback ) => textureNode.isolate().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv$1() ), forceUVContext: true } );
 
 	const Hll = float( sampleTexture( ( uvNode ) => uvNode ) );
 
@@ -17354,13 +17342,6 @@ class LoopNode extends Node {
 
 		this.getProperties( builder );
 
-		if ( builder.context.fnCall ) {
-
-			const shaderNodeData = builder.getDataFromNode( builder.context.fnCall.shaderNode );
-			shaderNodeData.hasLoop = true;
-
-		}
-
 	}
 
 	generate( builder ) {
@@ -17553,7 +17534,7 @@ class LoopNode extends Node {
  * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
-const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
+const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).toStack();
 
 /**
  * TSL function for creating a `Continue()` expression.
@@ -25360,8 +25341,8 @@ class EnvironmentNode extends LightingNode {
 		const radiance = envNode.context( createRadianceContext( roughness, radianceNormalView ) ).mul( materialEnvIntensity );
 		const irradiance = envNode.context( createIrradianceContext( normalWorld ) ).mul( Math.PI ).mul( materialEnvIntensity );
 
-		const isolateRadiance = cache( radiance );
-		const isolateIrradiance = cache( irradiance );
+		const isolateRadiance = isolate( radiance );
+		const isolateIrradiance = isolate( irradiance );
 
 		//
 
@@ -25376,7 +25357,7 @@ class EnvironmentNode extends LightingNode {
 		if ( clearcoatRadiance ) {
 
 			const clearcoatRadianceContext = envNode.context( createRadianceContext( clearcoatRoughness, clearcoatNormalView ) ).mul( materialEnvIntensity );
-			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
+			const isolateClearcoatRadiance = isolate( clearcoatRadianceContext );
 
 			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
 
@@ -32209,9 +32190,15 @@ class StackNode extends Node {
 
 		for ( const childNode of this.getChildren() ) {
 
-			if ( childNode.isVarNode && childNode.isAssign( builder ) !== true ) {
+			if ( childNode.isVarNode && childNode.intent === true ) {
 
-				continue;
+				const properties = builder.getNodeProperties( childNode );
+
+				if ( properties.assign !== true ) {
+
+					continue;
+
+				}
 
 			}
 
@@ -32244,9 +32231,15 @@ class StackNode extends Node {
 
 		for ( const node of this.nodes ) {
 
-			if ( node.isVarNode && node.isAssign( builder ) !== true ) {
+			if ( node.isVarNode && node.intent === true ) {
 
-				continue;
+				const properties = builder.getNodeProperties( node );
+
+				if ( properties.assign !== true ) {
+
+					continue;
+
+				}
 
 			}
 
@@ -44910,6 +44903,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	iridescence: iridescence,
 	iridescenceIOR: iridescenceIOR,
 	iridescenceThickness: iridescenceThickness,
+	isolate: isolate,
 	ivec2: ivec2,
 	ivec3: ivec3,
 	ivec4: ivec4,
@@ -47720,22 +47714,6 @@ class NodeBuilder {
 	getContext() {
 
 		return this.context;
-
-	}
-
-	/**
-	 * Adds context data to the builder's current context.
-	 *
-	 * @param {Object} context - The context to add.
-	 * @return {Object} The previous context.
-	 */
-	addContext( context ) {
-
-		const previousContext = this.getContext();
-
-		this.setContext( { ...this.context, ...context } );
-
-		return previousContext;
 
 	}
 
@@ -78674,4 +78652,4 @@ class ClippingGroup extends Group {
 
 }
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BitcastNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CacheNode, Camera, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InspectorBase, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AttributeNode, BackSide, BasicEnvironmentNode, BasicShadowMap, BatchNode, BitcastNode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, Camera, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, CodeNode, Color, ColorManagement, ColorSpaceNode, ComputeNode, ConstNode, ContextNode, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, EventNode, ExpressionNode, FileLoader, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InspectorBase, InstanceNode, InstancedBufferAttribute, InstancedInterleavedBuffer, InstancedMeshNode, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OutputStructNode, PCFShadowMap, PMREMGenerator, PMREMNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, PosterizeNode, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, Scene, SceneNode, ScreenNode, ScriptableNode, ScriptableValueNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, SkinningNode, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticDrawUsage, Storage3DTexture, StorageArrayElementNode, StorageArrayTexture, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubtractEquation, SubtractiveBlending, TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
