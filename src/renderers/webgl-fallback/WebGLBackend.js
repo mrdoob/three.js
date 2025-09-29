@@ -1080,7 +1080,7 @@ class WebGLBackend extends Backend {
 
 				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
 
-					warnOnce( 'WebGLRenderer: WEBGL_multi_draw not supported.' );
+					warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
 
 				} else {
 
