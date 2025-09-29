@@ -131,7 +131,7 @@ class Performance extends Tab {
 
 		setText( item.data[ 0 ], item.userData.name );
 		setText( item.data[ 1 ], data.cpu.toFixed( 2 ) );
-		setText( item.data[ 2 ], data.gpu.toFixed( 2 ) );
+		setText( item.data[ 2 ], stats.gpuNotAvailable === true ? '-' : data.gpu.toFixed( 2 ) );
 		setText( item.data[ 3 ], data.total.toFixed( 2 ) );
 
 		//
