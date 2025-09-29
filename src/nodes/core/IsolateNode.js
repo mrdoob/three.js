@@ -21,9 +21,9 @@ class IsolateNode extends Node {
 	 * Constructs a new cache node.
 	 *
 	 * @param {Node} node - The node that should be cached.
-	 * @param {Node} [scope=null] - The scope node that defines the cache context.
+	 * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
 	 */
-	constructor( node ) {
+	constructor( node, parent = true ) {
 
 		super();
 
@@ -110,7 +110,6 @@ export default IsolateNode;
  * @returns {IsolateNode}
  */
 export const isolate = ( node ) => new IsolateNode( nodeObject( node ) );
-
 
 /**
  * TSL function for creating a cache node.
