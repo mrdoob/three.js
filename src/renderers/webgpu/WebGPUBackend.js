@@ -2240,7 +2240,7 @@ class WebGPUBackend extends Backend {
 	 */
 	hasFeature( name ) {
 
-		if ( GPUFeatureMap[ name ] !== null ) name = GPUFeatureMap[ name ];
+		if ( GPUFeatureMap[ name ] !== undefined ) name = GPUFeatureMap[ name ];
 
 		return this.device.features.has( name );
 
