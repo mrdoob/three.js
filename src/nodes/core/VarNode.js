@@ -146,14 +146,53 @@ class VarNode extends Node {
 
 	}
 
+	isAssign( builder ) {
+
+		if ( this.intent !== true ) return true;
+
+		//
+
+		const properties = builder.getNodeProperties( this );
+
+		let assign = properties.assign;
+
+		if ( assign !== true ) {
+
+			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
+
+				if ( builder.context.fnCall && builder.context.fnCall.shaderNode ) {
+
+					const nodeType = this.node.getNodeType( builder );
+
+					if ( nodeType !== 'void' ) {
+
+						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
+
+						if ( shaderNodeData.hasLoop ) {
+
+							assign = true;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return assign;
+
+	}
+
 	build( ...params ) {
 
 		if ( this.intent === true ) {
 
 			const builder = params[ 0 ];
-			const properties = builder.getNodeProperties( this );
 
-			if ( properties.assign !== true ) {
+			if ( this.isAssign( builder ) !== true ) {
 
 				return this.node.build( ...params );
 
