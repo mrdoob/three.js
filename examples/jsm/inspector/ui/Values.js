@@ -377,7 +377,15 @@ class ValueColor extends Value {
 
 	getValue() {
 
-		return parseInt( this._value.slice( 1 ), 16 );
+		let value = this._value;
+
+		if ( typeof value === 'string' ) {
+
+			value = parseInt( value.slice( 1 ), 16 );
+
+		}
+
+		return value;
 
 	}
 
