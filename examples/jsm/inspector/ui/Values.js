@@ -264,12 +264,11 @@ class ValueSelect extends Value {
 		super();
 
 		const select = document.createElement( 'select' );
-		const type = typeof value;
 
 		const createOption = ( name, optionValue ) => {
 
 			const optionEl = document.createElement( 'option' );
-			optionEl.value = optionValue;
+			optionEl.value = name;
 			optionEl.textContent = name;
 
 			if ( optionValue == value ) optionEl.selected = true;
@@ -300,20 +299,24 @@ class ValueSelect extends Value {
 
 		} );
 
+		this.options = options;
 		this.select = select;
-		this.type = type;
 
 	}
 
 	getValue() {
 
-		const value = this.select.value;
-		const type = this.type;
+		const options = this.options;
 
-		if ( type === 'number' ) return parseFloat( value );
-		if ( type === 'boolean' ) return value === 'true';
+		if ( Array.isArray( options ) ) {
 
-		return value;
+			return options[ this.select.selectedIndex ];
+
+		} else {
+
+			return options[ this.select.value ];
+
+		}
 
 	}
 
@@ -374,7 +377,15 @@ class ValueColor extends Value {
 
 	getValue() {
 
-		return this._value;
+		let value = this._value;
+
+		if ( typeof value === 'string' ) {
+
+			value = parseInt( value.slice( 1 ), 16 );
+
+		}
+
+		return value;
 
 	}
 
