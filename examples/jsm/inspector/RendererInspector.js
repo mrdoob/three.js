@@ -87,6 +87,12 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
+	getParent() {
+
+		return this.currentRender || this.getFrame();
+
+	}
+
 	begin() {
 
 		this.currentFrame = this._createFrame();
@@ -313,7 +319,7 @@ export class RendererInspector extends InspectorBase {
 
 		const currentCompute = new ComputeStats( uid, computeNode );
 		currentCompute.timestamp = performance.now();
-		currentCompute.parent = this.currentRender;
+		currentCompute.parent = this.currentCompute || this.getParent();
 
 		frame.computes.push( currentCompute );
 
@@ -340,7 +346,7 @@ export class RendererInspector extends InspectorBase {
 		const currentCompute = this.currentCompute;
 		currentCompute.cpu = performance.now() - currentCompute.timestamp;
 
-		this.currentCompute = null;
+		this.currentCompute = currentCompute.parent.isComputeStats ? currentCompute.parent : null;
 
 	}
 
@@ -352,7 +358,7 @@ export class RendererInspector extends InspectorBase {
 
 		const currentRender = new RenderStats( uid, scene, camera, renderTarget );
 		currentRender.timestamp = performance.now();
-		currentRender.parent = this.currentRender;
+		currentRender.parent = this.getParent();
 
 		frame.renders.push( currentRender );
 
