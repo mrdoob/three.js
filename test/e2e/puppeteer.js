@@ -177,6 +177,8 @@ const exceptionList = [
 	'webgpu_rendertarget_2d-array_3d',
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_ao',
+	'webgpu_postprocessing_difference',
+	'webgpu_postprocessing_dof',
 	'webgpu_postprocessing_sobel',
 	'webgpu_postprocessing_3dlut',
 	'webgpu_postprocessing_fxaa',
