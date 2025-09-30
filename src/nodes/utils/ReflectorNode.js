@@ -560,7 +560,13 @@ class ReflectorBaseNode extends Node {
 
 		} else {
 
+			const previousName = scene.name;
+
+			scene.name = ( scene.name || 'Scene' ) + ' [ Reflector ]'; // TODO: Add bounce index
+
 			renderer.render( scene, virtualCamera );
+
+			scene.name = previousName;
 
 			this.hasOutput = true;
 
