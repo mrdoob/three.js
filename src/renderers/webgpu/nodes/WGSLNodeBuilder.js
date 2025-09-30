@@ -949,9 +949,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, access );
 
+				} else if ( type === 'storageTexture3D' ) {
 				}
 
-				texture.store = node.isStorageTextureNode === true;
+				// Only mark as storage binding when actually writing (storeNode is set)
+				texture.store = node.isStorageTextureNode === true && node.storeNode !== null;
+				texture.mipLevel = texture.store ? node.mipLevel : 0;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				if ( this.isUnfilterable( node.value ) === false && texture.store === false ) {
