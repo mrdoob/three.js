@@ -25,6 +25,14 @@ class Value extends EventDispatcher {
 
 	}
 
+	setValue( /*val*/ ) {
+
+		this.dispatchChange();
+
+		return this;
+
+	}
+
 	getValue() {
 
 		return null;
@@ -237,6 +245,15 @@ class ValueSlider extends Value {
 			this.dispatchChange();
 
 		} );
+
+	}
+
+	setValue( val ) {
+
+		this.slider.value = val;
+		this.numberInput.value = val;
+
+		return super.setValue( val );
 
 	}
 

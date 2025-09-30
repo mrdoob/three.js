@@ -4,13 +4,19 @@
 		<title>three.js webgpu - chromatic aberration</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - chromatic aberration
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>CA</span>
+			</div>
+
+			<small>Chromatic Aberration effect.</small>
 		</div>
 
 		<script type="importmap">
@@ -33,7 +39,7 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
 				enabled: true,
@@ -56,6 +62,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
@@ -114,8 +121,7 @@
 
 				// GUI
 
-				const gui = new GUI();
-				gui.title( 'Chromatic Aberration' );
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 

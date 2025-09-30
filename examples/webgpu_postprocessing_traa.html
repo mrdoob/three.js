@@ -4,11 +4,18 @@
 		<title>three.js webgpu - postprocessing traa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Temporal Reprojection Anti-Aliasing (TRAA) 
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>TRAA</span>
+			</div>
+
+			<small>Temporal Reprojection Anti-Aliasing.</small>
 		</div>
 
 		<script type="importmap">
@@ -28,10 +35,9 @@
 			import { mrt, output, pass, velocity } from 'three/tsl';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, postProcessing;
-			let stats;
 			let index = 0;
 
 			init();
@@ -42,10 +48,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 2.5;
@@ -80,9 +84,13 @@
 					velocity: velocity
 				} ) );
 
-				const scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+				const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+
+					return scenePass.getLinearDepthNode();
+
+				} );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 
 				const traaNode = traa( scenePassColor, scenePassDepth, scenePassVelocity, camera );
 			
@@ -124,8 +132,6 @@
 				}
 
 				postProcessing.render();
-
-				stats.update();
 
 			}
 

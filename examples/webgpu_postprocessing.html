@@ -4,9 +4,20 @@
 		<title>three.js webgpu - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Post Processing</span>
+			</div>
+
+			<small>Mix of simple post processing effects.</small>
+		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -24,6 +35,7 @@
 			import { pass } from 'three/tsl';
 			import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
 			import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, renderer, postProcessing;
 			let object;
@@ -36,6 +48,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -74,7 +87,7 @@
 				postProcessing = new THREE.PostProcessing( renderer );
 
 				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
+				const scenePassColor = scenePass.getTextureNode().toInspector( 'Scene Color' );
 
 				const dotScreenPass = dotScreen( scenePassColor );
 				dotScreenPass.scale.value = 0.3;

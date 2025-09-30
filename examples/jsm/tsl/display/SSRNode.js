@@ -347,6 +347,7 @@ class SSRNode extends TempNode {
 		// ssr
 
 		renderer.setRenderTarget( ssrRenderTarget );
+		_quadMesh.name = 'SSR [ Reflections ]';
 		_quadMesh.render( renderer );
 
 		// blur (optional)
@@ -361,6 +362,7 @@ class SSRNode extends TempNode {
 
 				this._blurSpread.value = i;
 				renderer.setRenderTarget( blurRenderTarget, 0, i );
+				_quadMesh.name = 'SSR [ Blur Level ' + i + ' ]';
 				_quadMesh.render( renderer );
 
 			}
