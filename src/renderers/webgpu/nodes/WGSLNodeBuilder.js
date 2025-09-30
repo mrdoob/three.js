@@ -949,7 +949,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, access );
 
-				} else if ( type === 'storageTexture3D' ) {
 				}
 
 				// Only mark as storage binding when actually writing (storeNode is set)
