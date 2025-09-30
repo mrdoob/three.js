@@ -33,8 +33,10 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { uniform, pass } from 'three/tsl';
 			import { transition } from 'three/addons/tsl/display/TransitionNode.js';
 
@@ -159,6 +161,7 @@
 				}
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.inspector = new Inspector();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -173,7 +176,7 @@
 
 				postProcessing.outputNode = transitionPass;
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( effectController, 'animateScene' ).name( 'Animate Scene' );
 				gui.add( effectController, 'animateTransition' ).name( 'Animate Transition' );
