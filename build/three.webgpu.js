@@ -3,7 +3,7 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, log as log$1, Texture, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, HalfFloatType, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, warnOnce, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, TimestampQuery, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, Texture, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, HalfFloatType, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, RGFormat, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, DataTexture, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, TimestampQuery, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
@@ -3706,8 +3706,10 @@ class ShaderCallNodeInternal extends Node {
 		//
 
 		const previousSubBuildFn = builder.subBuildFn;
+		const previousFnCall = builder.fnCall;
 
 		builder.subBuildFn = subBuild;
+		builder.fnCall = this;
 
 		let result = null;
 
@@ -3783,6 +3785,7 @@ class ShaderCallNodeInternal extends Node {
 		}
 
 		builder.subBuildFn = previousSubBuildFn;
+		builder.fnCall = previousFnCall;
 
 		if ( shaderNode.once ) {
 
@@ -3825,6 +3828,10 @@ class ShaderCallNodeInternal extends Node {
 
 		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
+
+		const previousFnCall = builder.fnCall;
+
+		builder.fnCall = this;
 
 		if ( buildStage === 'setup' ) {
 
@@ -3872,6 +3879,8 @@ class ShaderCallNodeInternal extends Node {
 			result = outputNode.build( builder, output ) || '';
 
 		}
+
+		builder.fnCall = previousFnCall;
 
 		return result;
 
@@ -4006,9 +4015,15 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	getLayout() {
+
+		return this.layout;
+
+	}
+
 	call( rawInputs = null ) {
 
-		return nodeObject( new ShaderCallNodeInternal( this, rawInputs ) );
+		return new ShaderCallNodeInternal( this, rawInputs );
 
 	}
 
@@ -7890,9 +7905,7 @@ class ContextNode extends Node {
 
 	analyze( builder ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		this.node.build( builder );
 
@@ -7902,9 +7915,7 @@ class ContextNode extends Node {
 
 	setup( builder ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		this.node.build( builder );
 
@@ -7914,9 +7925,7 @@ class ContextNode extends Node {
 
 	generate( builder, output ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		const snippet = this.node.build( builder, output );
 
@@ -8128,14 +8137,43 @@ class VarNode extends Node {
 
 	}
 
+	isAssign( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		let assign = properties.assign;
+
+		if ( assign !== true ) {
+
+			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
+
+				if ( builder.fnCall && builder.fnCall.shaderNode ) {
+
+					const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
+
+					if ( shaderNodeData.hasLoop ) {
+
+						assign = true;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return assign;
+
+	}
+
 	build( ...params ) {
 
 		if ( this.intent === true ) {
 
 			const builder = params[ 0 ];
-			const properties = builder.getNodeProperties( this );
 
-			if ( properties.assign !== true ) {
+			if ( this.isAssign( builder ) !== true ) {
 
 				return this.node.build( ...params );
 
@@ -8165,7 +8203,23 @@ class VarNode extends Node {
 
 		}
 
-		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
+		const nodeType = this.getNodeType( builder );
+
+		if ( nodeType == 'void' ) {
+
+			if ( this.intent !== true ) {
+
+				error( 'TSL: ".toVar()" can not be used with void type.' );
+
+			}
+
+			const snippet = node.build( builder );
+
+			return snippet;
+
+		}
+
+		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
@@ -9914,9 +9968,9 @@ class IsolateNode extends Node {
 	 * Constructs a new cache node.
 	 *
 	 * @param {Node} node - The node that should be cached.
-	 * @param {Node} [scope=null] - The scope node that defines the cache context.
+	 * @param {boolean} [parent=true] - Whether this node refers to a shared parent cache or not.
 	 */
-	constructor( node ) {
+	constructor( node, parent = true ) {
 
 		super();
 
@@ -10001,7 +10055,6 @@ class IsolateNode extends Node {
  * @returns {IsolateNode}
  */
 const isolate = ( node ) => new IsolateNode( nodeObject( node ) );
-
 
 /**
  * TSL function for creating a cache node.
@@ -10515,6 +10568,151 @@ const debug = ( node, callback = null ) => nodeObject( new DebugNode( nodeObject
 addMethodChaining( 'debug', debug );
 
 /**
+ * InspectorBase is the base class for all inspectors.
+ *
+ * @class InspectorBase
+ */
+class InspectorBase {
+
+	/**
+	 * Creates a new InspectorBase.
+	 */
+	constructor() {
+
+		/**
+		 * The renderer associated with this inspector.
+		 *
+		 * @type {WebGLRenderer}
+		 * @private
+		 */
+		this._renderer = null;
+
+		/**
+		 * The current frame being processed.
+		 *
+		 * @type {Object}
+		 */
+		this.currentFrame = null;
+
+	}
+
+	/**
+	 * Returns the node frame for the current renderer.
+	 *
+	 * @return {Object} The node frame.
+	 */
+	get nodeFrame() {
+
+		return this._renderer._nodes.nodeFrame;
+
+	}
+
+	/**
+	 * Sets the renderer for this inspector.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer to associate with this inspector.
+	 * @return {InspectorBase} This inspector instance.
+	 */
+	setRenderer( renderer ) {
+
+		this._renderer = renderer;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the renderer associated with this inspector.
+	 *
+	 * @return {WebGLRenderer} The associated renderer.
+	 */
+	getRenderer() {
+
+		return this._renderer;
+
+	}
+
+	/**
+	 * Initializes the inspector.
+	 */
+	init() { }
+
+	/**
+	 * Called when a frame begins.
+	 */
+	begin() { }
+
+	/**
+	 * Called when a frame ends.
+	 */
+	finish() { }
+
+	/**
+	 * Inspects a node.
+	 *
+	 * @param {Node} node - The node to inspect.
+	 */
+	inspect( /*node*/ ) { }
+
+	/**
+	 * When a compute operation is performed.
+	 *
+	 * @param {ComputeNode} computeNode - The compute node being executed.
+	 * @param {number|Array<number>} dispatchSizeOrCount - The dispatch size or count.
+	 */
+	computeAsync( /*computeNode, dispatchSizeOrCount*/ ) { }
+
+	/**
+	 * Called when a compute operation begins.
+	 *
+	 * @param {string} uid - A unique identifier for the render context.
+	 * @param {ComputeNode} computeNode - The compute node being executed.
+	 */
+	beginCompute( /*uid, computeNode*/ ) { }
+
+	/**
+	 * Called when a compute operation ends.
+	 *
+	 * @param {string} uid - A unique identifier for the render context.
+	 * @param {ComputeNode} computeNode - The compute node being executed.
+	 */
+	finishCompute( /*uid*/ ) { }
+
+	/**
+	 * Called whean a render operation begins.
+	 *
+	 * @param {string} uid - A unique identifier for the render context.
+	 * @param {Scene} scene - The scene being rendered.
+	 * @param {Camera} camera - The camera being used for rendering.
+	 * @param {?WebGLRenderTarget} renderTarget - The render target, if any.
+	 */
+	beginRender( /*uid, scene, camera, renderTarget*/ ) { }
+
+	/**
+	 * Called when an animation loop ends.
+	 *
+	 * @param {string} uid - A unique identifier for the render context.
+	 */
+	finishRender( /*uid*/ ) { }
+
+	/**
+	 * Called when a texture copy operation is performed.
+	 *
+	 * @param {Texture} srcTexture - The source texture.
+	 * @param {Texture} dstTexture - The destination texture.
+	 */
+	copyTextureToTexture( /*srcTexture, dstTexture*/ ) { }
+
+	/**
+	 * Called when a framebuffer copy operation is performed.
+	 *
+	 * @param {Texture} framebufferTexture - The texture associated with the framebuffer.
+	 */
+	copyFramebufferToTexture( /*framebufferTexture*/ ) { }
+
+}
+
+/**
  * InspectorNode is a wrapper node that allows inspection of node values during rendering.
  * It can be used to debug or analyze node outputs in the rendering pipeline.
  *
@@ -10601,6 +10799,12 @@ class InspectorNode extends Node {
 		if ( builder.context.inspector === true && this.callback !== null ) {
 
 			node = this.callback( node );
+
+		}
+
+		if ( builder.renderer.backend.isWebGPUBackend !== true && builder.renderer.inspector.constructor !== InspectorBase ) {
+
+			warnOnce( 'TSL: ".toInspector()" is only available with WebGPU.' );
 
 		}
 
@@ -17342,6 +17546,13 @@ class LoopNode extends Node {
 
 		this.getProperties( builder );
 
+		if ( builder.fnCall ) {
+
+			const shaderNodeData = builder.getDataFromNode( builder.fnCall.shaderNode );
+			shaderNodeData.hasLoop = true;
+
+		}
+
 	}
 
 	generate( builder ) {
@@ -17534,7 +17745,7 @@ class LoopNode extends Node {
  * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
-const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).toStack();
+const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
  * TSL function for creating a `Continue()` expression.
@@ -32192,9 +32403,7 @@ class StackNode extends Node {
 
 			if ( childNode.isVarNode && childNode.intent === true ) {
 
-				const properties = builder.getNodeProperties( childNode );
-
-				if ( properties.assign !== true ) {
+				if ( childNode.isAssign( builder ) !== true ) {
 
 					continue;
 
@@ -32233,9 +32442,7 @@ class StackNode extends Node {
 
 			if ( node.isVarNode && node.intent === true ) {
 
-				const properties = builder.getNodeProperties( node );
-
-				if ( properties.assign !== true ) {
+				if ( node.isAssign( builder ) !== true ) {
 
 					continue;
 
@@ -47269,6 +47476,14 @@ class NodeBuilder {
 		 */
 		this.subBuildFn = null;
 
+		/**
+		 * The current TSL function(Fn) call node.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.fnCall = null;
+
 	}
 
 	/**
@@ -47714,6 +47929,22 @@ class NodeBuilder {
 	getContext() {
 
 		return this.context;
+
+	}
+
+	/**
+	 * Adds context data to the builder's current context.
+	 *
+	 * @param {Object} context - The context to add.
+	 * @return {Object} The previous context.
+	 */
+	addContext( context ) {
+
+		const previousContext = this.getContext();
+
+		this.setContext( { ...this.context, ...context } );
+
+		return previousContext;
 
 	}
 
@@ -54186,151 +54417,6 @@ function onAnimationFrame( time, frame ) {
 	}
 
 	this._xrFrame = null;
-
-}
-
-/**
- * InspectorBase is the base class for all inspectors.
- *
- * @class InspectorBase
- */
-class InspectorBase {
-
-	/**
-	 * Creates a new InspectorBase.
-	 */
-	constructor() {
-
-		/**
-		 * The renderer associated with this inspector.
-		 *
-		 * @type {WebGLRenderer}
-		 * @private
-		 */
-		this._renderer = null;
-
-		/**
-		 * The current frame being processed.
-		 *
-		 * @type {Object}
-		 */
-		this.currentFrame = null;
-
-	}
-
-	/**
-	 * Returns the node frame for the current renderer.
-	 *
-	 * @return {Object} The node frame.
-	 */
-	get nodeFrame() {
-
-		return this._renderer._nodes.nodeFrame;
-
-	}
-
-	/**
-	 * Sets the renderer for this inspector.
-	 *
-	 * @param {WebGLRenderer} renderer - The renderer to associate with this inspector.
-	 * @return {InspectorBase} This inspector instance.
-	 */
-	setRenderer( renderer ) {
-
-		this._renderer = renderer;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the renderer associated with this inspector.
-	 *
-	 * @return {WebGLRenderer} The associated renderer.
-	 */
-	getRenderer() {
-
-		return this._renderer;
-
-	}
-
-	/**
-	 * Initializes the inspector.
-	 */
-	init() { }
-
-	/**
-	 * Called when a frame begins.
-	 */
-	begin() { }
-
-	/**
-	 * Called when a frame ends.
-	 */
-	finish() { }
-
-	/**
-	 * Inspects a node.
-	 *
-	 * @param {Node} node - The node to inspect.
-	 */
-	inspect( /*node*/ ) { }
-
-	/**
-	 * When a compute operation is performed.
-	 *
-	 * @param {ComputeNode} computeNode - The compute node being executed.
-	 * @param {number|Array<number>} dispatchSizeOrCount - The dispatch size or count.
-	 */
-	computeAsync( /*computeNode, dispatchSizeOrCount*/ ) { }
-
-	/**
-	 * Called when a compute operation begins.
-	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @param {ComputeNode} computeNode - The compute node being executed.
-	 */
-	beginCompute( /*uid, computeNode*/ ) { }
-
-	/**
-	 * Called when a compute operation ends.
-	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @param {ComputeNode} computeNode - The compute node being executed.
-	 */
-	finishCompute( /*uid*/ ) { }
-
-	/**
-	 * Called whean a render operation begins.
-	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 * @param {Scene} scene - The scene being rendered.
-	 * @param {Camera} camera - The camera being used for rendering.
-	 * @param {?WebGLRenderTarget} renderTarget - The render target, if any.
-	 */
-	beginRender( /*uid, scene, camera, renderTarget*/ ) { }
-
-	/**
-	 * Called when an animation loop ends.
-	 *
-	 * @param {string} uid - A unique identifier for the render context.
-	 */
-	finishRender( /*uid*/ ) { }
-
-	/**
-	 * Called when a texture copy operation is performed.
-	 *
-	 * @param {Texture} srcTexture - The source texture.
-	 * @param {Texture} dstTexture - The destination texture.
-	 */
-	copyTextureToTexture( /*srcTexture, dstTexture*/ ) { }
-
-	/**
-	 * Called when a framebuffer copy operation is performed.
-	 *
-	 * @param {Texture} framebufferTexture - The texture associated with the framebuffer.
-	 */
-	copyFramebufferToTexture( /*framebufferTexture*/ ) { }
 
 }
 
@@ -61022,6 +61108,12 @@ class Backend {
 
 	}
 
+	/**
+	 * Returns all timestamp frames for the given type.
+	 *
+	 * @param {string} type - The type of the time stamp.
+	 * @return {Array<number>} The timestamp frames.
+	 */
 	getTimestampFrames( type ) {
 
 		const queryPool = this.timestampQueryPool[ type ];
@@ -61030,12 +61122,46 @@ class Backend {
 
 	}
 
-	getTimestamp( uid ) {
+	/**
+	 * Returns the query pool for the given uid.
+	 *
+	 * @param {string} uid - The unique identifier.
+	 * @return {TimestampQueryPool} The query pool.
+	 */
+	_getQueryPool( uid ) {
 
 		const type = uid.startsWith( 'c:' ) ? TimestampQuery.COMPUTE : TimestampQuery.RENDER;
 		const queryPool = this.timestampQueryPool[ type ];
 
+		return queryPool;
+
+	}
+
+	/**
+	 * Returns the timestamp for the given uid.
+	 *
+	 * @param {string} uid - The unique identifier.
+	 * @return {number} The timestamp.
+	 */
+	getTimestamp( uid ) {
+
+		const queryPool = this._getQueryPool( uid );
+
 		return queryPool.getTimestamp( uid );
+
+	}
+
+	/**
+	 * Returns `true` if a timestamp for the given uid is available.
+	 *
+	 * @param {string} uid - The unique identifier.
+	 * @return {boolean} Whether the timestamp is available or not.
+	 */
+	hasTimestamp( uid ) {
+
+		const queryPool = this._getQueryPool( uid );
+
+		return queryPool.hasTimestamp( uid );
 
 	}
 
@@ -63194,7 +63320,7 @@ class WebGLTextureUtils {
 
 			if ( gl[ internalFormatName ] !== undefined ) return gl[ internalFormatName ];
 
-			warn( 'WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
+			warn( 'WebGLBackend: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
 
 		}
 
@@ -63565,7 +63691,7 @@ class WebGLTextureUtils {
 
 						} else {
 
-							warn( 'WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+							warn( 'WebGLBackend: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 						}
 
@@ -63583,7 +63709,7 @@ class WebGLTextureUtils {
 
 					} else {
 
-						warn( 'Unsupported compressed texture format' );
+						warn( 'WebGLBackend: Unsupported compressed texture format' );
 
 					}
 
@@ -64483,8 +64609,8 @@ const GLFeatureName = {
 	'WEBGL_compressed_texture_etc1': 'texture-compression-etc1',
 	'WEBGL_compressed_texture_pvrtc': 'texture-compression-pvrtc',
 	'WEBKIT_WEBGL_compressed_texture_pvrtc': 'texture-compression-pvrtc',
-	'WEBGL_compressed_texture_s3tc': 'texture-compression-bc',
-	'EXT_texture_compression_bptc': 'texture-compression-bptc',
+	'WEBGL_compressed_texture_s3tc': 'texture-compression-s3tc',
+	'EXT_texture_compression_bptc': 'texture-compression-bc',
 	'EXT_disjoint_timer_query_webgl2': 'timestamp-query',
 	'OVR_multiview2': 'OVR_multiview2'
 
@@ -64743,6 +64869,18 @@ class TimestampQueryPool {
 		}
 
 		return timestamp;
+
+	}
+
+	/**
+	 * Returns whether a timestamp is available for a given render context.
+	 *
+	 * @param {string} uid - A unique identifier for the render context.
+	 * @return {boolean} True if a timestamp is available, false otherwise.
+	 */
+	hasTimestamp( uid ) {
+
+		return this.timestamps.has( uid );
 
 	}
 
@@ -66231,7 +66369,7 @@ class WebGLBackend extends Backend {
 
 				} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
 
-					warnOnce( 'WebGLRenderer: WEBGL_multi_draw not supported.' );
+					warnOnce( 'WebGLBackend: WEBGL_multi_draw not supported.' );
 
 				} else {
 
@@ -68054,6 +68192,11 @@ const GPUFeatureName = {
 	Subgroups: 'subgroups',
 	TextureFormatsTier1: 'texture-formats-tier1',
 	TextureFormatsTier2: 'texture-formats-tier2'
+};
+
+const GPUFeatureMap = {
+	'texture-compression-s3tc': 'texture-compression-bc',
+	'texture-compression-etc1': 'texture-compression-etc2'
 };
 
 /**
@@ -77083,6 +77226,8 @@ class WebGPUBackend extends Backend {
 	 * @return {boolean} Whether the feature is supported or not.
 	 */
 	hasFeature( name ) {
+
+		if ( GPUFeatureMap[ name ] !== undefined ) name = GPUFeatureMap[ name ];
 
 		return this.device.features.has( name );
 
