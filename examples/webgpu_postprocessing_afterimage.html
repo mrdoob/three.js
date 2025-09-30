@@ -4,13 +4,21 @@
 		<title>three.js webgpu - postprocessing afterimage</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - postprocessing - after image<br />
-			Based on <a href="https://oosmoxiecode.com/archive/js_webgl/spiral/" target="_blank" rel="noopener">Particle Spiral</a>
-			by <a href="https://github.com/oosmoxiecode" target="_blank" rel="noopener">oosmoxiecode</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>After Image</span>
+			</div>
+
+			<small>
+				Based on <a href="https://oosmoxiecode.com/archive/js_webgl/spiral/" target="_blank" rel="noopener">Particle Spiral</a>
+				by <a href="https://github.com/oosmoxiecode" target="_blank" rel="noopener">oosmoxiecode</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -30,10 +38,9 @@
 			import { instancedBufferAttribute, uniform, mod, pass, texture, float, time, vec2, vec3, vec4, sin, cos } from 'three/tsl';
 			import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, particles, stats;
+			let camera, scene, renderer, particles;
 			let postProcessing, afterImagePass, scenePass;
 
 			const params = {
@@ -51,6 +58,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -123,14 +131,9 @@
 
 				//
 
-				const gui = new GUI( { title: 'Damp setting' } );
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( afterImagePass.damp, 'value', 0.25, 1 );
 				gui.add( params, 'enabled' ).onChange( updatePassChain );
-
-				//
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -183,8 +186,6 @@
 				particles.rotation.z = time * 0.001;
 
 				postProcessing.render();
-
-				stats.update();
 
 			}
 

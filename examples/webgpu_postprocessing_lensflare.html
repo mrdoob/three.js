@@ -4,15 +4,23 @@
 		<title>three.js webgpu - postprocessing lensflares</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing lensflares<br />
-			<a href="https://skfb.ly/6SqUF" target="_blank" rel="noopener">Space Ship Hallway</a> by 
-			<a href="https://sketchfab.com/yeeyeeman" target="_blank" rel="noopener">yeeyeeman</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
-			<a href="https://www.spacespheremaps.com/planetary-spheremaps/" target="_blank" rel="noopener">Ice Planet Close</a> from <a href="https://www.spacespheremaps.com/" target="_blank" rel="noopener">Space Spheremaps</a>.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Lensflares</span>
+			</div>
+
+			<small>
+				Bloom based Lensflares via Post Processing.<br />
+				<a href="https://skfb.ly/6SqUF" target="_blank" rel="noopener">Space Ship Hallway</a> by 
+				<a href="https://sketchfab.com/yeeyeeman" target="_blank" rel="noopener">yeeyeeman</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
+				<a href="https://www.spacespheremaps.com/planetary-spheremaps/" target="_blank" rel="noopener">Ice Planet Close</a> from <a href="https://www.spacespheremaps.com/" target="_blank" rel="noopener">Space Spheremaps</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -39,18 +47,14 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, controls, stats;
+			let camera, scene, renderer, controls;
 			let postProcessing;
 
 			init();
 
 			async function init() {
-
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				//
 
@@ -92,7 +96,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				container.appendChild( renderer.domElement );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
 
 				//
 
@@ -102,10 +107,10 @@
 					emissive
 				} ) );
 
-				const outputPass = scenePass.getTextureNode();
-				const emissivePass = scenePass.getTextureNode( 'emissive' );
+				const outputPass = scenePass.getTextureNode().toInspector( 'Color' );
+				const emissivePass = scenePass.getTextureNode( 'emissive' ).toInspector( 'Emissive' );
 
-				const bloomPass = bloom( emissivePass, 1, 1 );
+				const bloomPass = bloom( emissivePass, 1, 1 ).toInspector( 'Bloom' );
 
 				const threshold = uniform( 0.5 );
 				const ghostAttenuationFactor = uniform( 25 );
@@ -136,12 +141,7 @@
 
 				//
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
-				//
-
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				const bloomFolder = gui.addFolder( 'bloom' );
 				bloomFolder.add( bloomPass.strength, 'value', 0.0, 2.0 ).name( 'strength' );
@@ -169,8 +169,6 @@
 			//
 
 			function render() {
-
-				stats.update();
 
 				controls.update();
 
