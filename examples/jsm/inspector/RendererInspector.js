@@ -186,7 +186,16 @@ export class RendererInspector extends InspectorBase {
 
 									for ( const stats of frame.computes ) {
 
-										stats.gpu = renderer.backend.getTimestamp( stats.uid );
+										if ( renderer.backend.hasTimestamp( stats.uid ) ) {
+
+											stats.gpu = renderer.backend.getTimestamp( stats.uid );
+
+										} else {
+
+											stats.gpu = 0;
+											stats.gpuNotAvailable = true;
+
+										}
 
 									}
 
@@ -212,7 +221,16 @@ export class RendererInspector extends InspectorBase {
 
 									for ( const stats of frame.renders ) {
 
-										stats.gpu = renderer.backend.getTimestamp( stats.uid );
+										if ( renderer.backend.hasTimestamp( stats.uid ) ) {
+
+											stats.gpu = renderer.backend.getTimestamp( stats.uid );
+
+										} else {
+
+											stats.gpu = 0;
+											stats.gpuNotAvailable = true;
+
+										}
 
 									}
 
@@ -254,7 +272,7 @@ export class RendererInspector extends InspectorBase {
 
 		const renderer = this.getRenderer();
 
-		return renderer !== null && renderer.backend.isWebGPUBackend;
+		return renderer !== null;
 
 	}
 
