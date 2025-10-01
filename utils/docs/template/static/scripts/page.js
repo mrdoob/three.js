@@ -60,6 +60,8 @@
 
 } )();
 
+//
+
 const panel = document.getElementById( 'panel' );
 const panelScrim = document.getElementById( 'panelScrim' );
 const expandButton = document.getElementById( 'expandButton' );
@@ -215,3 +217,11 @@ console.log( [
 	'                                         / __/  /  \\__  \\',
 	'                                         \\/____/\\/_____/'
 ].join( '\n' ) );
+
+// console sandbox
+
+import( '/build/three.module.js' ).then( THREE => {
+
+	window.THREE = THREE;
+
+} );
