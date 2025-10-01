@@ -56,6 +56,39 @@ class ParametersGroup {
 
 	}
 
+	_addParameter( object, property, editor, subItem ) {
+
+		editor.name = ( name ) => {
+
+			subItem.data[ 0 ].textContent = name;
+
+			return editor;
+
+		};
+
+		editor.listen = () => {
+
+			const update = () => {
+
+				const value = editor.getValue();
+				const propertyValue = object[ property ];
+
+				if ( value !== propertyValue ) {
+
+					editor.setValue( propertyValue );
+
+				}
+
+				requestAnimationFrame( update );
+
+			};
+
+			requestAnimationFrame( update );
+
+		};
+
+	}
+
 	addFolder( name ) {
 
 		const group = new ParametersGroup( this.parameters, name );
@@ -105,13 +138,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -139,13 +166,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -173,13 +194,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -207,13 +222,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -242,13 +251,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
