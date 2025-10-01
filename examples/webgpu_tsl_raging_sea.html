@@ -4,14 +4,20 @@
 		<title>three.js webgpu - raging sea</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - raging sea
-			<br>
-			Based on <a href="https://threejs-journey.com/lessons/raging-sea" target="_blank" rel="noopener">Three.js Journey</a> lesson
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Raging Sea</span>
+			</div>
+
+			<small>
+				Based on <a href="https://threejs-journey.com/lessons/raging-sea" target="_blank" rel="noopener">Three.js Journey</a> lesson.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -31,7 +37,8 @@
 			import { float, mx_noise_float, Loop, color, positionLocal, sin, vec2, vec3, mul, time, uniform, Fn, transformNormalToView } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls;
 
@@ -135,9 +142,26 @@
 				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.y = - 0.25;
+				controls.enableDamping = true;
+				controls.minDistance = 0.1;
+				controls.maxDistance = 50;
+
 				// debug
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.addColor( { color: material.color.getHex( THREE.SRGBColorSpace ) }, 'color' ).name( 'color' ).onChange( value => material.color.set( value ) );
 				gui.add( material, 'roughness', 0, 1, 0.001 );
@@ -159,21 +183,7 @@
 				wavesGui.add( smallWavesMultiplier, 'value', 0, 1 ).name( 'smallMultiplier' );
 				wavesGui.add( normalComputeShift, 'value', 0, 0.1, 0.0001 ).name( 'normalComputeShift' );
 
-				// renderer
-
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				document.body.appendChild( renderer.domElement );
-
-				// controls
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.y = - 0.25;
-				controls.enableDamping = true;
-				controls.minDistance = 0.1;
-				controls.maxDistance = 50;
+				// events
 
 				window.addEventListener( 'resize', onWindowResize );
 
