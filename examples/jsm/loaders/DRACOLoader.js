@@ -6,7 +6,9 @@ import {
 	FileLoader,
 	Loader,
 	LinearSRGBColorSpace,
-	SRGBColorSpace
+	SRGBColorSpace,
+	InterleavedBuffer,
+	InterleavedBufferAttribute
 } from 'three';
 
 const _taskCache = new WeakMap();
@@ -273,12 +275,21 @@ class DRACOLoader extends Loader {
 
 		for ( let i = 0; i < geometryData.attributes.length; i ++ ) {
 
-			const result = geometryData.attributes[ i ];
-			const name = result.name;
-			const array = result.array;
-			const itemSize = result.itemSize;
+			const { name, array, count, itemSize, stride } = geometryData.attributes[ i ];
 
-			const attribute = new BufferAttribute( array, itemSize );
+			let attribute;
+
+			if ( itemSize === stride ) {
+
+				attribute = new BufferAttribute( array, itemSize );
+
+			} else {
+
+				const buffer = new InterleavedBuffer( array, stride );
+
+				attribute = new InterleavedBufferAttribute( buffer, itemSize, 0 );
+
+			}
 
 			if ( name === 'color' ) {
 
@@ -646,30 +657,70 @@ function DRACOWorker() {
 
 	}
 
-	function decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) {
+	function decodeAttribute( draco, decoder, dracoGeometry, attributeName, TypedArray, attribute ) {
 
-		const numComponents = attribute.num_components();
-		const numPoints = dracoGeometry.num_points();
-		const numValues = numPoints * numComponents;
-		const byteLength = numValues * attributeType.BYTES_PER_ELEMENT;
-		const dataType = getDracoDataType( draco, attributeType );
+		const count = dracoGeometry.num_points();
+		const itemSize = attribute.num_components();
+		const dracoDataType = getDracoDataType( draco, TypedArray );
 
-		const ptr = draco._malloc( byteLength );
-		decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, dataType, byteLength, ptr );
-		const array = new attributeType( draco.HEAPF32.buffer, ptr, numValues ).slice();
+		// Reference: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#data-alignment
+		const srcByteStride = itemSize * TypedArray.BYTES_PER_ELEMENT;
+		const dstByteStride = Math.ceil( srcByteStride / 4 ) * 4;
+
+		const dstStride = dstByteStride / TypedArray.BYTES_PER_ELEMENT
+
+		const srcByteLength = count * srcByteStride;
+		const dstByteLength = count * dstByteStride;
+
+		const ptr = draco._malloc( srcByteLength );
+		decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, dracoDataType, srcByteLength, ptr );
+
+		const srcArray = new TypedArray( draco.HEAPF32.buffer, ptr, srcByteLength / TypedArray.BYTES_PER_ELEMENT );
+		let dstArray;
+
+		if ( srcByteStride === dstByteStride ) {
+
+			// THREE.BufferAttribute
+
+			dstArray = srcArray.slice();
+
+		} else {
+
+			// THREE.InterleavedBufferAttribute
+
+			dstArray = new TypedArray( dstByteLength / TypedArray.BYTES_PER_ELEMENT );
+
+			let dstOffset = 0
+
+			for ( let i = 0, il = srcArray.length; i < il; i++ ) {
+
+				for ( let j = 0; j < itemSize; j++ ) {
+
+					dstArray[ dstOffset + j ] = srcArray[ i * itemSize + j ]
+
+				}
+
+				dstOffset += dstStride;
+
+			}
+
+		}
+
 		draco._free( ptr );
 
 		return {
 			name: attributeName,
-			array: array,
-			itemSize: numComponents
+			count: count,
+			itemSize: itemSize,
+			array: dstArray,
+			stride: dstStride
 		};
 
 	}
 
-	function getDracoDataType( draco, attributeType ) {
+	function getDracoDataType( draco, TypedArray ) {
 
-		switch ( attributeType ) {
+		switch ( TypedArray ) {
 
 			case Float32Array: return draco.DT_FLOAT32;
 			case Int8Array: return draco.DT_INT8;
