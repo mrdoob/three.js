@@ -21,7 +21,7 @@ a {
 	grid-template-columns: 50px auto;
 	grid-template-rows: auto auto;
 	column-gap: 10px;
-	align-items: center;
+	align-items: start;
 	color: #e0e0e0;
 	text-shadow: 1px 1px 5px rgba(0, 0, 0, .7);
 	font: 400 14px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -38,17 +38,21 @@ a {
 }
 
 .title-wrapper {
-	grid-column: 2;
-	grid-row: 1;
-	display: flex;
-	align-items: center;
+	position: absolute;
+    left: 60px;
+    top: 0px;
+    display: flex;
+    width: 300px;
 }
 
 #info > small {
-	grid-column: 2;
-	grid-row: 2;
 	font-size: 12px;
 	color: #e0e0e0;
+	position: absolute;
+	left: 60px;
+	top: 30px;
+	width: calc( 100vw - 250px );
+	line-height: 20px;
 }
 
 .title-wrapper > a {
