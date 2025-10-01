@@ -107,10 +107,10 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
         </ul></dd>
     <?js } ?>
 
-    <?js if (data.meta && self.outputSourceFiles) {?>
+    <?js if (data.meta) {?>
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <?js= self.linkto(meta.shortpath) ?>, <?js= self.linkto(meta.shortpath, 'line ' + meta.lineno, null, 'line' + meta.lineno) ?>
+        <a href="https://github.com/mrdoob/three.js/blob/master/<?js= meta.shortpath ?>#L<?js= meta.lineno ?>" target="_blank" rel="noopener"><?js= meta.shortpath ?>, line <?js= meta.lineno ?></a>
     </li></ul></dd>
     <?js } ?>
 
