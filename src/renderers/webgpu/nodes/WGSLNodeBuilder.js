@@ -2068,11 +2068,7 @@ ${ flowData.code }
 		const codeNode = wgslPolyfill[ name ];
 		codeNode.build( this );
 
-		if ( this.currentFunctionNode !== null ) {
-
-			this.currentFunctionNode.includes.push( codeNode );
-
-		}
+		this.addInclude( codeNode );
 
 		return codeNode;
 
