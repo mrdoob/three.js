@@ -24,26 +24,22 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
 
 	<?js if (data.version) {?>
 	<dt class="tag-version">Version:</dt>
-	<dd class="tag-version"><ul class="dummy"><li><?js= version ?></li></ul></dd>
+	<dd class="tag-version"><?js= version ?></dd>
 	<?js } ?>
 
 	<?js if (data.since) {?>
 	<dt class="tag-since">Since:</dt>
-	<dd class="tag-since"><ul class="dummy"><li><?js= since ?></li></ul></dd>
+	<dd class="tag-since"><?js= since ?></dd>
 	<?js } ?>
 
 	<?js if (data.inherited && data.inherits && !data.overrides) { ?>
 	<dt class="inherited-from">Inherited From:</dt>
-	<dd class="inherited-from"><ul class="dummy"><li>
-		<?js= this.linkto(data.inherits, this.htmlsafe(data.inherits)) ?>
-	</li></ul></dd>
+	<dd class="inherited-from"><?js= this.linkto(data.inherits, this.htmlsafe(data.inherits)) ?></dd>
 	<?js } ?>
 
 	<?js if (data.overrides) { ?>
 	<dt class="tag-overrides">Overrides:</dt>
-	<dd class="tag-overrides"><ul class="dummy"><li>
-		<?js= this.linkto(data.overrides, this.htmlsafe(data.overrides)) ?>
-	</li></ul></dd>
+	<dd class="tag-overrides"><?js= this.linkto(data.overrides, this.htmlsafe(data.overrides)) ?></dd>
 	<?js } ?>
 
 	<?js if (data.implementations && data.implementations.length) { ?>
@@ -76,8 +72,8 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
 
 	<?js if (data.deprecated) { ?>
 		<dt class="important tag-deprecated">Deprecated:</dt><?js
-			if (data.deprecated === true) { ?><dd class="yes-def tag-deprecated"><ul class="dummy"><li>Yes</li></ul></dd><?js }
-			else { ?><dd><ul class="dummy"><li><?js= data.deprecated ?></li></ul></dd><?js }
+			if (data.deprecated === true) { ?><dd class="yes-def tag-deprecated">Yes</dd><?js }
+			else { ?><dd><?js= data.deprecated ?></dd><?js }
 		?>
 	<?js } ?>
 
@@ -92,26 +88,24 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
 
 	<?js if (data.copyright) {?>
 	<dt class="tag-copyright">Copyright:</dt>
-	<dd class="tag-copyright"><ul class="dummy"><li><?js= copyright ?></li></ul></dd>
+	<dd class="tag-copyright"><?js= copyright ?></dd>
 	<?js } ?>
 
 	<?js if (data.license) {?>
 	<dt class="tag-license">License:</dt>
-	<dd class="tag-license"><ul class="dummy"><li><?js= license ?></li></ul></dd>
+	<dd class="tag-license"><?js= license ?></dd>
 	<?js } ?>
 
 	<?js if (data.defaultvalue) {?>
-	<dt class="tag-default">Default Value:</dt>
-	<dd class="tag-default"><ul class="dummy">
-			<li<?js= defaultObjectClass ?>><?js= data.defaultvalue ?></li>
-		</ul></dd>
+	<dt class="tag-default">Default:</dt>
+	<dd class="tag-default"<?js= defaultObjectClass ?>><?js= data.defaultvalue ?></dd>
 	<?js } ?>
 
 	<?js if (data.meta) {?>
 	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source"><ul class="dummy"><li>
+	<dd class="tag-source">
 		<a href="https://github.com/mrdoob/three.js/blob/master/<?js= meta.shortpath ?>#L<?js= meta.lineno ?>" target="_blank" rel="noopener"><?js= meta.shortpath ?>, line <?js= meta.lineno ?></a>
-	</li></ul></dd>
+	</dd>
 	<?js } ?>
 
 	<?js if (data.tutorials && tutorials.length) {?>
