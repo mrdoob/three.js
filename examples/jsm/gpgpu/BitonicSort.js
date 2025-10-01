@@ -79,9 +79,9 @@ export class BitonicSort {
 	/**
 	 * Constructs a new light probe helper.
 	 *
-	 * @param {Renderer} renderer - The current scene's renderer.
+	 * @param {Renderer} renderer - A renderer with the ability to execute compute operations.
 	 * @param {StorageBufferNode} dataBuffer - The data buffer to sort.
-	 * @param {Object} [options={}] - Options that modify the bitonic sort.
+	 * @param {Object} [options={}] - Options that modify the behavior of the bitonic sort.
 	 */
 	constructor( renderer, dataBuffer, options = {} ) {
 

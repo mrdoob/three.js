@@ -238,6 +238,7 @@ export const inverseSqrt = TSL.inverseSqrt;
 export const inversesqrt = TSL.inversesqrt;
 export const invocationLocalIndex = TSL.invocationLocalIndex;
 export const invocationSubgroupIndex = TSL.invocationSubgroupIndex;
+export const invocationSubgroupMetaIndex = TSL.invocationSubgroupMetaIndex;
 export const ior = TSL.ior;
 export const iridescence = TSL.iridescence;
 export const iridescenceIOR = TSL.iridescenceIOR;

@@ -364,9 +364,6 @@ MathNode.FWIDTH = 'fwidth';
 MathNode.TRANSPOSE = 'transpose';
 MathNode.DETERMINANT = 'determinant';
 MathNode.INVERSE = 'inverse';
-MathNode.COUNT_TRAILING_ZEROS = 'countTrailingZeros';
-MathNode.COUNT_LEADING_ZEROS = 'countLeadingZeros';
-MathNode.COUNT_ONE_BITS = 'countOneBits';
 
 // 2 inputs
 
@@ -1102,50 +1099,10 @@ export const atan2 = ( y, x ) => { // @deprecated, r172
 
 };
 
-
-/**
- * Finds the number of consecutive 0 bits from the least significant bit of the input value,
- * which is also the index of the least significant bit of the input value.
- *
- * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
- *
- * @tsl
- * @function
- * @param {Node | number} x - The input value.
- * @returns {Node}
- */
-export const countTrailingZeros = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COUNT_TRAILING_ZEROS ).setParameterLength( 1 );
-
-/**
- * Finds the number of consecutive 0 bits starting from the most significant bit of the input value.
- *
- * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
- *
- * @tsl
- * @function
- * @param {Node | number} x - The input value.
- * @returns {Node}
- */
-export const countLeadingZeros = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COUNT_LEADING_ZEROS ).setParameterLength( 1 );
-
-/**
- * Finds the number of '1' bits set in the input value
- *
- * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
- *
- * @tsl
- * @function
- * @returns {Node}
- */
-export const countOneBits = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COUNT_ONE_BITS ).setParameterLength( 1 );
-
 // GLSL alias function
 
 export const faceforward = faceForward;
 export const inversesqrt = inverseSqrt;
-export const findLSB = countTrailingZeros;
-export const findMSB = countLeadingZeros;
-export const bitCount = countOneBits;
 
 // Method chaining
 
@@ -1208,6 +1165,3 @@ addMethodChaining( 'transpose', transpose );
 addMethodChaining( 'determinant', determinant );
 addMethodChaining( 'inverse', inverse );
 addMethodChaining( 'rand', rand );
-addMethodChaining( 'countTrailingZeros', countTrailingZeros );
-addMethodChaining( 'countLeadingZeros', countLeadingZeros );
-addMethodChaining( 'countOneBits', countOneBits );

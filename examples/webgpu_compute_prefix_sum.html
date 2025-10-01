@@ -1,0 +1,339 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - compute reduction</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body> 
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<br /> This example demonstrates a prefix sum operation on a buffer of data.
+			<br /> Reference implementations are translated from the WGSL code present in <a href="https://github.com/b0nes164/GPUPrefixSums/blob/main/GPUPrefixSumsWebGPUapis/SharedShaders/rts.wgsl"><i>GPUPrefixSums</i></a> by <a href="https://github.com/b0nes164">b0nes164</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { instancedArray, If, vec3, clamp, uv, uint, float, Fn, vec2, uvec2, floor, instanceIndex } from 'three/tsl';
+
+			import { PrefixSum } from 'three/addons/gpgpu/PrefixSum.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			const effectController = {
+				currentStep: 'Reduce',
+				loggedBuffer: 'Reduction',
+				displayedBuffer: 'Reduction',
+			};
+
+			const PREFIX_SUM_BUFFER_TYPES = {
+				INPUT_UNVECTORIZED: 'Input Unvectorized',
+				INPUT_VECTORIZED: 'Input Vectorized',
+				REDUCTION: 'Reduction',
+				OUTPUT: 'Output'
+			};
+
+			const gui = new GUI();
+
+			const size = 32768;
+
+			// Set up canvas
+			const canvas = document.createElement( 'canvas' );
+			const canvasDim = 1000;
+			canvas.width = canvasDim;
+			canvas.height = canvasDim;
+
+			const canvasContext = canvas.getContext( '2d' );
+			canvasContext.font = '100px serif';
+			canvasContext.textBaseline = 'alphabetic';
+			canvasContext.textAlign = 'center';
+
+
+			const canvasTemplateImage = new Image();
+
+			const getGridDimensions = ( reductionArray ) => {
+
+				const gridWidth = Math.sqrt( reductionArray.length ) % 2 === 0
+      	? Math.floor( Math.sqrt( reductionArray.length ) )
+      	: Math.floor( Math.sqrt( reductionArray.length / 2 ) );
+
+				const gridHeight = reductionArray.length / gridWidth;
+
+				return { gridWidth, gridHeight };
+
+			};
+
+			const createCanvasTemplate = ( reductionArray ) => {
+
+				canvasContext.fillStyle = '#FFFFFF';
+				canvasContext.fillRect( 0, 0, canvasDim, canvasDim );
+
+				canvasContext.strokeStyle = 'black';
+				canvasContext.lineWidth = 2;
+
+				const { gridWidth, gridHeight } = getGridDimensions( reductionArray );
+
+				const blockHeight = canvasDim / gridHeight;
+				const blockWidth = canvasDim / gridWidth;
+
+				canvasContext.beginPath();
+
+				for ( let i = 0; i < gridHeight - 1; i ++ ) {
+
+					const horizontalLineOffsetY = blockHeight * ( i + 1 );
+
+					canvasContext.moveTo( 0, horizontalLineOffsetY );
+					canvasContext.lineTo( canvasDim, horizontalLineOffsetY );
+
+				}
+
+				for ( let i = 0; i < gridWidth - 1; i ++ ) {
+
+					const verticalLineOffsetX = blockWidth * ( i + 1 );
+
+					canvasContext.moveTo( verticalLineOffsetX, 0 );
+					canvasContext.lineTo( verticalLineOffsetX, canvasDim );
+
+				}
+
+				canvasContext.stroke();
+
+				canvasTemplateImage.src = canvas.toDataURL( 'image/png' );
+
+			};
+
+			const updateCanvas = ( reductionArray = [ 1, 1, 1, 1, 1, 1, 1, 1 ] ) => {
+
+				canvasContext.clearRect( 0, 0, canvasDim, canvasDim );
+				canvasContext.drawImage( canvasTemplateImage, 0, 0 );
+
+				const { gridWidth, gridHeight } = getGridDimensions( reductionArray );
+
+				const blockHeight = canvasDim / gridHeight;
+				const blockWidth = canvasDim / gridWidth;
+				const halfBlockWidth = blockWidth / 2;
+				const halfBlockHeight = blockHeight / 2;
+
+				for ( let i = 0; i < reductionArray.length; i ++ ) {
+
+					const metrics = canvasContext.measureText( `${reductionArray[ i ]}` );
+
+					const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+					const verticalOffset = textHeight / 2 - metrics.actualBoundingBoxDescent;
+
+					console.log( verticalOffset );
+
+					const xGridCoord = i % gridWidth;
+					const yGridCoord = Math.floor( i / gridWidth );
+
+					canvasContext.fillText(
+						`${reductionArray[ i ]}`,
+						( blockWidth * xGridCoord ) + ( halfBlockWidth + metrics.width / 2 ),
+						( blockHeight * yGridCoord ) + ( halfBlockHeight + verticalOffset )
+					);
+
+				}
+
+				canvasContext.fillStyle = 'blue';
+				//canvasContext.fillRect( 0, 0, 20, 20 );
+
+			};
+
+			createCanvasTemplate( [ 1, 1, 1, 1, 1, 1, 1, 1 ] );
+
+			let bufferOutput;
+			
+			async function init() {
+
+				const aspect = window.innerWidth / window.innerHeight;
+				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
+				camera.position.z = 1;
+
+				const scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x212121 );
+
+				const dynamicArray = [];
+
+				for ( let i = 0; i < size; i ++ ) {
+
+					dynamicArray.push( 1 );
+
+				}
+
+				const renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				await renderer.init();
+
+				const prefixSumModule = new PrefixSum( renderer, dynamicArray, 'uint', {
+					workgroupSize: 256
+				} );
+
+				const canvasMap = new THREE.CanvasTexture( canvas );
+
+				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicNodeMaterial( { map: canvasMap } ) );
+				scene.add( plane );
+
+				const animate = () => {
+
+					renderer.render( scene, camera );
+
+				};
+
+				const debugFolder = gui.addFolder( 'Debug' );
+				debugFolder.add( effectController, 'displayedBuffer', Object.values( PREFIX_SUM_BUFFER_TYPES ) ).name( 'Buffer to Display' ).onChange( async () => {
+
+					updateCanvas();
+
+					plane.material.map.needsUpdate = true;
+
+					if ( effectController.displayedBuffer === 'Reduction' ) {
+
+						bufferOutput = new Uint32Array( await renderer.getArrayBufferAsync( prefixSumModule.storageBuffers.reductionBuffer.value ) );
+
+					} else {
+
+						bufferOutput = [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ];
+			
+					}
+
+				} );
+				debugFolder.add( effectController, 'loggedBuffer', Object.values( PREFIX_SUM_BUFFER_TYPES ) ).name( 'Buffer to Log' );
+				const logFunctionName = 'Log Selected Buffer';
+				const functionObj = {};
+				functionObj[ logFunctionName ] = async() => {
+
+					let selectedBuffer;
+
+					if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.REDUCTION ) {
+
+						selectedBuffer = prefixSumModule.storageBuffers.reductionBuffer;
+
+					} else if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.INPUT_UNVECTORIZED ) {
+
+						selectedBuffer = prefixSumModule.storageBuffers.unvectorizedDataBuffer;
+
+					} else if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.INPUT_VECTORIZED ) {
+
+						selectedBuffer = prefixSumModule.storageBuffers.dataBuffer;
+
+					} else {
+
+						selectedBuffer = prefixSumModule.storageBuffers.outputBuffer;
+
+					}
+
+					console.log( new Uint32Array( await renderer.getArrayBufferAsync( selectedBuffer.value ) ) );
+
+				};
+
+				functionObj[ 'Log Prefix Sum Class' ] = () => {
+
+					console.log( prefixSumModule );
+
+				};
+
+				debugFolder.add( functionObj, 'Log Selected Buffer' );
+				debugFolder.add( functionObj, 'Log Prefix Sum Class' );
+
+				prefixSumModule.computeReduce();
+				prefixSumModule.computeSpineScan();
+				prefixSumModule.computeDownsweep();
+
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				/*const stepAnimation = async function () {
+
+					switch ( effectController.currentStep ) {
+
+						case 'Reduce': {
+
+							prefixSumModule.computeReduce();
+
+						}
+
+						case 'Spine_Scan': {
+
+							prefixSumModule.computeSpineScan();
+
+						}
+
+						case 'Downsweep': {
+
+							prefixSumModule.computeDownsweep();
+
+						}
+
+						case 'Step_Full': {
+
+							prefixSumModule.computeStep();
+
+						}
+
+					}
+
+					prefixSumModule.computeStep();
+
+
+					renderer.render( scene, camera );
+					renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
+
+					setTimeout( stepAnimation, 1000 );
+
+				}; */
+
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function onWindowResize() {
+
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+					const aspect = window.innerWidth / window.innerHeight;
+
+					const frustumHeight = camera.top - camera.bottom;
+
+					camera.left = - frustumHeight * aspect / 2;
+					camera.right = frustumHeight * aspect / 2;
+
+					camera.updateProjectionMatrix();
+
+					renderer.render( scene, camera );
+
+				}
+
+				//setTimeout( stepAnimation, 1000 );
+
+			}
+
+			init();
+
+		</script>
+	</body>
+</html>

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { float, Fn, If, nodeProxyIntent, uint, int, uvec2, uvec3, uvec4, ivec2, ivec3, ivec4 } from '../tsl/TSLCore.js';
+=======
+import { addMethodChaining, float, Fn, If, nodeProxyIntent, uint, int, uvec2, uvec3, uvec4, ivec2, ivec3, ivec4 } from '../tsl/TSLCore.js';
+>>>>>>> 277001d084 (sketch out solve)
 import { bitcast, floatBitsToUint } from './BitcastNode.js';
 import MathNode, { negate } from './MathNode.js';
 
@@ -41,7 +45,10 @@ class BitcountNode extends MathNode {
 	/**
 	 * Casts the input value of the function to an integer if necessary.
 	 *
+<<<<<<< HEAD
 	 * @private
+=======
+>>>>>>> 277001d084 (sketch out solve)
 	 * @param {Node<uint>|Node<int>} inputNode - The input value.
 	 * @param {Node<uint>} outputNode - The output value.
 	 * @param {string} elementType - The type of the input value.
@@ -60,6 +67,25 @@ class BitcountNode extends MathNode {
 
 	}
 
+<<<<<<< HEAD
+=======
+	_returnBaseDataNode( elementType ) {
+
+		if ( elementType === 'uint' ) {
+
+			return uint;
+
+		}
+
+		if ( elementType === 'int' ) {
+
+			return int;
+
+		}
+
+	}
+
+>>>>>>> 277001d084 (sketch out solve)
 	_returnDataNode( inputType ) {
 
 		switch ( inputType ) {
@@ -112,6 +138,7 @@ class BitcountNode extends MathNode {
 
 			}
 
+<<<<<<< HEAD
 		}
 
 	}
@@ -124,6 +151,15 @@ class BitcountNode extends MathNode {
 	 * @param {string} elementType - The type of the input value.
 	 * @returns {Function} - The generated function
 	 */
+=======
+
+		}
+
+
+
+	}
+
+>>>>>>> 277001d084 (sketch out solve)
 	_createTrailingZerosBaseLayout( method, elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
@@ -153,6 +189,7 @@ class BitcountNode extends MathNode {
 
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Creates and registers a reusable GLSL function that emulates the behavior of countLeadingZeros.
 	 *
@@ -161,6 +198,8 @@ class BitcountNode extends MathNode {
 	 * @param {string} elementType - The type of the input value.
 	 * @returns {Function} - The generated function
 	 */
+=======
+>>>>>>> 277001d084 (sketch out solve)
 	_createLeadingZerosBaseLayout( method, elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
@@ -225,6 +264,7 @@ class BitcountNode extends MathNode {
 
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Creates and registers a reusable GLSL function that emulates the behavior of countOneBits.
 	 *
@@ -233,12 +273,18 @@ class BitcountNode extends MathNode {
 	 * @param {string} elementType - The type of the input value.
 	 * @returns {Function} - The generated function
 	 */
+=======
+>>>>>>> 277001d084 (sketch out solve)
 	_createOneBitsBaseLayout( method, elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
 
 		const fnDef = Fn( ( [ value ] ) => {
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 277001d084 (sketch out solve)
 			const v = uint( 0.0 );
 
 			this._resolveElementType( value, v, elementType );
