@@ -1,4 +1,4 @@
-( function handleLegacyRedirect() {
+( function handleLegacyURLs() {
 
 	const hash = window.location.hash;
 
