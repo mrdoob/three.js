@@ -743,8 +743,8 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 	view.outputSourceFiles = outputSourceFiles;
 	view.ignoreInheritedSymbols = themeOpts.ignoreInheritedSymbols;
 
-	// once for all
-	view.nav = buildNav( members );
+	// Empty nav in templates - will be loaded from nav.html client-side
+	view.nav = '';
 
 	// generate the pretty-printed source files first so other pages can link to them
 	if ( outputSourceFiles ) {
@@ -794,6 +794,13 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 		}
 
 	} );
+
+	// Write navigation to separate file
+	fs.writeFileSync(
+		path.join( outdir, 'nav.html' ),
+		buildNav( members ),
+		'utf8'
+	);
 
 	// search
 

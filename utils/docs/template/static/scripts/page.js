@@ -40,6 +40,26 @@
 
 } )();
 
+// Load navigation from separate file
+( function loadNavigation() {
+
+	const navContainer = document.querySelector( '#content nav' );
+
+	if ( navContainer ) {
+
+		fetch( 'nav.html' )
+			.then( response => response.text() )
+			.then( html => {
+
+				navContainer.innerHTML = html;
+
+			} )
+			.catch( err => console.error( 'Failed to load navigation:', err ) );
+
+	}
+
+} )();
+
 const panel = document.getElementById( 'panel' );
 const panelScrim = document.getElementById( 'panelScrim' );
 const expandButton = document.getElementById( 'expandButton' );
