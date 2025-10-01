@@ -4,14 +4,23 @@
 		<title>three.js webgpu - sss</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - sss
-			<br/>Fast subsurface scattering<br/>
-			[Thanks for the art support from <a href="https://github.com/shaochun" target="_blank" rel="noopener">Shaochun Lin</a>]
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSS</span>
+			</div>
+
+			<small>
+				<br/>Fast subsurface scattering<br/>
+				[Thanks for the art support from <a href="https://github.com/shaochun" target="_blank" rel="noopener">Shaochun Lin</a>]
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -30,13 +39,12 @@
 			import * as THREE from 'three/webgpu';
 			import { texture, uniform, vec3 } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-			let container, stats;
+			let container;
 			let camera, scene, renderer;
 			let model;
 
@@ -77,13 +85,15 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.inspector.domElement );
+
+				//
 
 				const controls = new OrbitControls( camera, container );
 				controls.minDistance = 500;
@@ -133,7 +143,7 @@
 
 			function initGUI( material ) {
 
-				const gui = new GUI( { title: 'Thickness Control' } );
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				const ThicknessControls = function () {
 
@@ -147,32 +157,31 @@
 
 				const thicknessControls = new ThicknessControls();
 
-				gui.add( thicknessControls, 'distortion' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
+				gui.add( thicknessControls, 'distortion', 0.01, 1, 0.01 ).onChange( function () {
 
 					material.thicknessDistortionNode.value = thicknessControls.distortion;
-					console.log( 'distortion' );
 
 				} );
 
-				gui.add( thicknessControls, 'ambient' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+				gui.add( thicknessControls, 'ambient', 0.01, 5.0, 0.05 ).onChange( function () {
 
 					material.thicknessAmbientNode.value = thicknessControls.ambient;
 
 				} );
 
-				gui.add( thicknessControls, 'attenuation' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+				gui.add( thicknessControls, 'attenuation', 0.01, 5.0, 0.05 ).onChange( function () {
 
 					material.thicknessAttenuationNode.value = thicknessControls.attenuation;
 
 				} );
 
-				gui.add( thicknessControls, 'power' ).min( 0.01 ).max( 16.0 ).step( 0.1 ).onChange( function () {
+				gui.add( thicknessControls, 'power', 0.01, 16.0, 0.1 ).onChange( function () {
 
 					material.thicknessPowerNode.value = thicknessControls.power;
 
 				} );
 
-				gui.add( thicknessControls, 'scale' ).min( 0.01 ).max( 50.0 ).step( 0.1 ).onChange( function () {
+				gui.add( thicknessControls, 'scale', 0.01, 50.0, 0.1 ).onChange( function () {
 
 					material.thicknessScaleNode.value = thicknessControls.scale;
 
@@ -190,14 +199,6 @@
 			}
 
 			//
-
-			function animate() {
-
-				render();
-
-				stats.update();
-
-			}
 
 			function render() {
 
