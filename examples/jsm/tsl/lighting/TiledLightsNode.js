@@ -392,7 +392,7 @@ class TiledLightsNode extends LightsNode {
 
 			} );
 
-		} )().compute( count );
+		} )().compute( count ).setName( 'Update Tiled Lights' );
 
 		// screen coordinate lighting indexes
 
