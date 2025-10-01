@@ -2,7 +2,7 @@ import { RenderTarget, Vector2, QuadMesh, NodeMaterial, RendererUtils, TempNode,
 import { nodeObject, Fn, float, uv, texture, passTexture, sign, max, convertToTexture } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
-const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
 
@@ -144,10 +144,11 @@ class AfterImageNode extends TempNode {
 		this.textureNodeOld.value = this._oldRT.texture;
 
 		// comp
-		_quadMeshComp.material = this._materialComposed;
+		_quadMesh.material = this._materialComposed;
+		_quadMesh.name = 'AfterImage';
 
 		renderer.setRenderTarget( this._compRT );
-		_quadMeshComp.render( renderer );
+		_quadMesh.render( renderer );
 
 		// Swap the textures
 

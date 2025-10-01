@@ -4,14 +4,20 @@
 		<title>three.js webgpu - postprocessing anamorphic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing anamorphic<br />
-			Battle Damaged Sci-fi Helmet by
-			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Anamorphic Lensflares</span>
+			</div>
+
+			<small>
+				Battle Damaged Sci-fi Helmet by <a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -36,7 +42,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			let postProcessing;
@@ -78,6 +84,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = 1;
+				renderer.inspector = new Inspector();
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
@@ -94,7 +101,7 @@
 				const intensity = uniform( 1 );
 				const samples = 64;
 
-				const anamorphicPass = anamorphic( scenePass.getTextureNode(), threshold, scaleNode, samples );
+				const anamorphicPass = anamorphic( scenePass.getTextureNode().toInspector( 'Color' ), threshold, scaleNode, samples ).toInspector( 'Anamorphic' );
 				anamorphicPass.resolutionScale = params.resolutionScale; // 1 = full resolution
 
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -103,7 +110,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( intensity, 'value', 0, 4, 0.1 ).name( 'intensity' );
 				gui.add( threshold, 'value', .8, 3, .001 ).name( 'threshold' );
 				gui.add( scaleNode, 'value', 1, 10, 0.1 ).name( 'scale' );

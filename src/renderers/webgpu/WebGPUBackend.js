@@ -2,7 +2,7 @@
 import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
 //*/
 
-import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension } from './utils/WebGPUConstants.js';
+import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension, GPUFeatureMap } from './utils/WebGPUConstants.js';
 
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
@@ -2239,6 +2239,8 @@ class WebGPUBackend extends Backend {
 	 * @return {boolean} Whether the feature is supported or not.
 	 */
 	hasFeature( name ) {
+
+		if ( GPUFeatureMap[ name ] !== undefined ) name = GPUFeatureMap[ name ];
 
 		return this.device.features.has( name );
 

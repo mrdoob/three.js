@@ -4,11 +4,19 @@
 		<title>three.js webgpu - masking</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
-		<div id="container"></div>
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Masking</span>
+			</div>
+
+			<small>Masking via Post Processing.</small>
+		</div>
 
 		<script type="importmap">
 			{
@@ -25,6 +33,7 @@
 
 			import * as THREE from 'three/webgpu';
 			import { pass, texture } from 'three/tsl';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, postProcessing, renderer;
 			let box, torus;
@@ -67,6 +76,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

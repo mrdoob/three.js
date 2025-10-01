@@ -87,6 +87,12 @@ export class RendererInspector extends InspectorBase {
 
 	}
 
+	getParent() {
+
+		return this.currentRender || this.getFrame();
+
+	}
+
 	begin() {
 
 		this.currentFrame = this._createFrame();
@@ -186,7 +192,16 @@ export class RendererInspector extends InspectorBase {
 
 									for ( const stats of frame.computes ) {
 
-										stats.gpu = renderer.backend.getTimestamp( stats.uid );
+										if ( renderer.backend.hasTimestamp( stats.uid ) ) {
+
+											stats.gpu = renderer.backend.getTimestamp( stats.uid );
+
+										} else {
+
+											stats.gpu = 0;
+											stats.gpuNotAvailable = true;
+
+										}
 
 									}
 
@@ -212,7 +227,16 @@ export class RendererInspector extends InspectorBase {
 
 									for ( const stats of frame.renders ) {
 
-										stats.gpu = renderer.backend.getTimestamp( stats.uid );
+										if ( renderer.backend.hasTimestamp( stats.uid ) ) {
+
+											stats.gpu = renderer.backend.getTimestamp( stats.uid );
+
+										} else {
+
+											stats.gpu = 0;
+											stats.gpuNotAvailable = true;
+
+										}
 
 									}
 
@@ -254,7 +278,7 @@ export class RendererInspector extends InspectorBase {
 
 		const renderer = this.getRenderer();
 
-		return renderer !== null && renderer.backend.isWebGPUBackend;
+		return renderer !== null;
 
 	}
 
@@ -295,7 +319,7 @@ export class RendererInspector extends InspectorBase {
 
 		const currentCompute = new ComputeStats( uid, computeNode );
 		currentCompute.timestamp = performance.now();
-		currentCompute.parent = this.currentRender;
+		currentCompute.parent = this.currentCompute || this.getParent();
 
 		frame.computes.push( currentCompute );
 
@@ -322,7 +346,7 @@ export class RendererInspector extends InspectorBase {
 		const currentCompute = this.currentCompute;
 		currentCompute.cpu = performance.now() - currentCompute.timestamp;
 
-		this.currentCompute = null;
+		this.currentCompute = currentCompute.parent.isComputeStats ? currentCompute.parent : null;
 
 	}
 
@@ -334,7 +358,7 @@ export class RendererInspector extends InspectorBase {
 
 		const currentRender = new RenderStats( uid, scene, camera, renderTarget );
 		currentRender.timestamp = performance.now();
-		currentRender.parent = this.currentRender;
+		currentRender.parent = this.getParent();
 
 		frame.renders.push( currentRender );
 

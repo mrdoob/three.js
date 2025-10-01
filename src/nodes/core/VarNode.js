@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, getCurrentStack, nodeProxy } from '../tsl/TSLCore.js';
+import { error } from '../../utils.js';
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -148,10 +149,6 @@ class VarNode extends Node {
 
 	isAssign( builder ) {
 
-		if ( this.intent !== true ) return true;
-
-		//
-
 		const properties = builder.getNodeProperties( this );
 
 		let assign = properties.assign;
@@ -160,19 +157,13 @@ class VarNode extends Node {
 
 			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
 
-				if ( builder.context.fnCall && builder.context.fnCall.shaderNode ) {
+				if ( builder.fnCall && builder.fnCall.shaderNode ) {
 
-					const nodeType = this.node.getNodeType( builder );
+					const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
 
-					if ( nodeType !== 'void' ) {
+					if ( shaderNodeData.hasLoop ) {
 
-						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-						if ( shaderNodeData.hasLoop ) {
-
-							assign = true;
-
-						}
+						assign = true;
 
 					}
 
@@ -222,7 +213,23 @@ class VarNode extends Node {
 
 		}
 
-		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
+		const nodeType = this.getNodeType( builder );
+
+		if ( nodeType == 'void' ) {
+
+			if ( this.intent !== true ) {
+
+				error( 'TSL: ".toVar()" can not be used with void type.' );
+
+			}
+
+			const snippet = node.build( builder );
+
+			return snippet;
+
+		}
+
+		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );

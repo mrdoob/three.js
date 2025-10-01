@@ -261,9 +261,13 @@ class StackNode extends Node {
 
 		for ( const childNode of this.getChildren() ) {
 
-			if ( childNode.isVarNode && childNode.isAssign( builder ) !== true ) {
+			if ( childNode.isVarNode && childNode.intent === true ) {
 
-				continue;
+				if ( childNode.isAssign( builder ) !== true ) {
+
+					continue;
+
+				}
 
 			}
 
@@ -296,9 +300,13 @@ class StackNode extends Node {
 
 		for ( const node of this.nodes ) {
 
-			if ( node.isVarNode && node.isAssign( builder ) !== true ) {
+			if ( node.isVarNode && node.intent === true ) {
 
-				continue;
+				if ( node.isAssign( builder ) !== true ) {
+
+					continue;
+
+				}
 
 			}
 

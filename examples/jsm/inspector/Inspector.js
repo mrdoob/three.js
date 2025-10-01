@@ -27,6 +27,7 @@ class Inspector extends RendererInspector {
 		profiler.addTab( parameters );
 
 		const viewer = new Viewer();
+		viewer.hide();
 		profiler.addTab( viewer );
 
 		const performance = new Performance();
@@ -79,7 +80,7 @@ class Inspector extends RendererInspector {
 
 		if ( renderer.info.frame > 1 && animationLoop !== null ) {
 
-			this.resolveConsoleOnce( 'info', 'TIP: "computeAsync()" was called while a "setAnimationLoop()" is active. This is probably not necessary, use "compute()" instead.' );
+			this.resolveConsoleOnce( 'log', 'TIP: "computeAsync()" was called while a "setAnimationLoop()" is active. This is probably not necessary, use "compute()" instead.' );
 
 		}
 
@@ -91,7 +92,7 @@ class Inspector extends RendererInspector {
 
 		if ( this.once[ key ] !== true ) {
 
-			this.resolveConsole( 'log', message );
+			this.resolveConsole( type, message );
 			this.once[ key ] = true;
 
 		}
@@ -303,8 +304,26 @@ class Inspector extends RendererInspector {
 	resolveViewer() {
 
 		const nodes = this.currentNodes;
-
 		const renderer = this.getRenderer();
+
+		if ( nodes.length === 0 ) return;
+
+		if ( ! renderer.backend.isWebGPUBackend ) {
+
+			this.resolveConsoleOnce( 'warn', 'Inspector: Viewer is only available with WebGPU.' );
+
+			return;
+
+		}
+
+		//
+
+		if ( ! this.viewer.isVisible ) {
+
+			this.viewer.show();
+
+		}
+
 		const canvasDataList = nodes.map( node => this.getCanvasDataByNode( node ) );
 
 		this.viewer.update( renderer, canvasDataList );

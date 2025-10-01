@@ -139,9 +139,9 @@ class LoopNode extends Node {
 
 		this.getProperties( builder );
 
-		if ( builder.context.fnCall ) {
+		if ( builder.fnCall ) {
 
-			const shaderNodeData = builder.getDataFromNode( builder.context.fnCall.shaderNode );
+			const shaderNodeData = builder.getDataFromNode( builder.fnCall.shaderNode );
 			shaderNodeData.hasLoop = true;
 
 		}
