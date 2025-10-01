@@ -40,7 +40,7 @@ a {
 .title-wrapper {
 	position: absolute;
     left: 60px;
-    top: 0px;
+    top: 2px;
     display: flex;
     width: 300px;
 }
@@ -50,7 +50,7 @@ a {
 	color: #e0e0e0;
 	position: absolute;
 	left: 60px;
-	top: 30px;
+	top: 25px;
 	width: calc( 100vw - 250px );
 	line-height: 20px;
 }
