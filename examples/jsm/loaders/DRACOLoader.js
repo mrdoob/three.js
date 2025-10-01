@@ -275,7 +275,7 @@ class DRACOLoader extends Loader {
 
 		for ( let i = 0; i < geometryData.attributes.length; i ++ ) {
 
-			const { name, array, itemSize, stride } = geometryData.attributes[ i ];
+			const { name, array, itemSize, stride, vertexColorSpace } = geometryData.attributes[ i ];
 
 			let attribute;
 
@@ -293,7 +293,7 @@ class DRACOLoader extends Loader {
 
 			if ( name === 'color' ) {
 
-				this._assignVertexColorSpace( attribute, result.vertexColorSpace );
+				this._assignVertexColorSpace( attribute, vertexColorSpace );
 
 				attribute.normalized = ( array instanceof Float32Array ) === false;
 
