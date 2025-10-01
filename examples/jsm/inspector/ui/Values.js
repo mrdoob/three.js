@@ -386,6 +386,10 @@ class ValueColor extends Value {
 
 			color = `#${ color.toString( 16 ) }`;
 
+		} else if ( color[ 0 ] !== '#' ) {
+
+			color = '#' + color;
+
 		}
 
 		return color;
