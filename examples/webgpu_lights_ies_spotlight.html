@@ -4,12 +4,20 @@
 		<title>three.js webgpu - ies spotlight</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - ies spotlight<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>IES Spot Light</span>
+			</div>
+
+			<small>
+				IES Spot Light with IES texture files.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -31,7 +39,7 @@
 
 			import { IESLoader } from 'three/addons/loaders/IESLoader.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let renderer, scene, camera;
 			let lights;
@@ -138,6 +146,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, .1, 100 );
@@ -164,7 +173,7 @@
 
 				//
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( { helper: false }, 'helper' ).onChange( ( v ) => setHelperVisible( v ) );
 

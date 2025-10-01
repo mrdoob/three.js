@@ -35,7 +35,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { positionLocal, time, mod, instancedBufferAttribute, rotate, screenUV, color, vec2 } from 'three/tsl';
 
@@ -82,50 +82,36 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// GUI
 
 				const layers = {
-
-					'toggle red': function () {
-
-						camera.layers.toggle( 0 );
-
-					},
-
-					'toggle yellow': function () {
-
-						camera.layers.toggle( 1 );
-
-					},
-
-					'toggle green': function () {
-
-						camera.layers.toggle( 2 );
-
-					},
-
-					'enable all': function () {
-
-						camera.layers.enableAll();
-
-					},
-
-					'disable all': function () {
-
-						camera.layers.disableAll();
-
-					}
-
+					'Red': true,
+					'Yellow': true,
+					'Green': true
 				};
 
-				const gui = new GUI();
-				gui.add( layers, 'toggle red' );
-				gui.add( layers, 'toggle yellow' );
-				gui.add( layers, 'toggle green' );
-				gui.add( layers, 'enable all' );
-				gui.add( layers, 'disable all' );
+				const gui = renderer.inspector.createParameters( 'Layers' );
+
+				gui.add( layers, 'Red' ).onChange( () => {
+
+					camera.layers.toggle( 0 );
+
+				} );
+
+				gui.add( layers, 'Yellow' ).onChange( () => {
+
+					camera.layers.toggle( 1 );
+
+				} );
+
+				gui.add( layers, 'Green' ).onChange( () => {
+
+					camera.layers.toggle( 2 );
+
+				} );
 
 				//
 
