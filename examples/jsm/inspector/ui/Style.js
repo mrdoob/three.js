@@ -6,7 +6,7 @@ export class Style {
 
 		const css = `
 :root {
-	--profiler-bg: #1e1e24f1;
+	--profiler-bg: #1e1e24f5;
 	--profiler-header-bg: #2a2a33aa;
 	--profiler-header: #2a2a33;
 	--profiler-border: #4a4a5a;
