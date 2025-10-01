@@ -134,6 +134,23 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	_include( name ) {
+
+		// Collect the array of functions needed to polyfill the specified functionality
+		const polyfill = glslPolyfills[ name ];
+
+		for ( const codeNode of polyfill.codeNodes ) {
+
+			// Build and include each relevant function
+			codeNode.build( this );
+			this.addInclude( codeNode );
+
+		}
+
+		return polyfill.entryIndex ? polyfill.codeNodes[ polyfill.entryIndex ] : polyfill.codeNodes[ 0 ];
+
+	}
+
 	/**
 	 * Includes the given method name into the current
 	 * function node.
@@ -1320,6 +1337,8 @@ ${vars}
 	 */
 	_getGLSLVertexCode( shaderData ) {
 
+		console.log( shaderData );
+
 		return `#version 300 es
 
 ${ this.getSignature() }
@@ -1368,6 +1387,8 @@ void main() {
 	 * @return {string} The vertex shader.
 	 */
 	_getGLSLFragmentCode( shaderData ) {
+
+		console.log( shaderData );
 
 		return `#version 300 es
 
@@ -1478,6 +1499,8 @@ void main() {
 
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
+			console.log( this.vertexShader );
+			console.log( this.fragmentShader );
 
 		} else {
 
