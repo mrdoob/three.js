@@ -299,6 +299,9 @@ function generate( title, docs, filename, resolveLinks ) {
 
 	}
 
+	// Remove lines that only contain whitespace
+	html = html.replace( /^\s*\n/gm, '' );
+
 	fs.writeFileSync( outpath, html, 'utf8' );
 
 }
