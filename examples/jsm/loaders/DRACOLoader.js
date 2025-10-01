@@ -275,7 +275,7 @@ class DRACOLoader extends Loader {
 
 		for ( let i = 0; i < geometryData.attributes.length; i ++ ) {
 
-			const { name, array, count, itemSize, stride } = geometryData.attributes[ i ];
+			const { name, array, itemSize, stride } = geometryData.attributes[ i ];
 
 			let attribute;
 
