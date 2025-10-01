@@ -154,8 +154,8 @@
 				box.material = materials[ options.material ];
 
 				const gui = renderer.inspector.createParameters( 'Scene settings' );
-				gui.add( box.scale, 'x', 0.1, 2 ).step( 0.01 ).name( 'box scale x' );
-				gui.add( box.scale, 'y', 0.1, 2 ).step( 0.01 ).name( 'box scale y' );
+				gui.add( box.scale, 'x', 0.1, 2, 0.01 ).name( 'box scale x' );
+				gui.add( box.scale, 'y', 0.1, 2, 0.01 ).name( 'box scale y' );
 				gui.add( options, 'material', Object.keys( materials ) ).onChange( name => {
 
 					box.material = materials[ name ];
