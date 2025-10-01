@@ -1,3 +1,45 @@
+( function handleLegacyURLs() {
+
+	const hash = window.location.hash;
+
+	if ( hash.startsWith( '#api/' ) || hash.startsWith( '#examples/' ) ) {
+
+		const mappings = {
+
+			'3DMLoader': 'Rhino3dmLoader',
+
+			'BufferGeometryUtils': 'module-BufferGeometryUtils',
+			'CameraUtils': 'module-CameraUtils',
+			'SceneUtils': 'module-SceneUtils',
+			'SkeletonUtils': 'module-SkeletonUtils',
+			'UniformsUtils': 'module-UniformsUtils',
+
+			'DefaultLoadingManager': 'LoadingManager',
+			'Interpolations': 'module-Interpolations',
+
+			'Animation': 'global',
+			'BufferAttributeUsage': 'global',
+			'Core': 'global',
+			'CustomBlendingEquations': 'global',
+			'Materials': 'global',
+			'Textures': 'global'
+		};
+
+		const parts = hash.split( '/' );
+		let className = parts[ parts.length - 1 ];
+
+		if ( className ) {
+
+			if ( className in mappings ) className = mappings[ className ];
+
+			window.location.href = `${className}.html`;
+
+		}
+
+	}
+
+} )();
+
 const panel = document.getElementById( 'panel' );
 const panelScrim = document.getElementById( 'panelScrim' );
 const expandButton = document.getElementById( 'expandButton' );
