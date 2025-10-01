@@ -21,9 +21,12 @@ export class Style {
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Fira+Code&display=swap');
 
-#profiler-panel * {
+#profiler-panel *, #profiler-toggle * {
 	text-transform: initial;
 	line-height: normal;
+	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 #profiler-toggle {
