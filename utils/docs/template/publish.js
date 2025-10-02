@@ -201,34 +201,9 @@ function addSignatureParams( f ) {
 
 function addSignatureReturns( f ) {
 
-	const attribs = [];
-	let attribsString = '';
 	let returnTypes = [];
 	let returnTypesString = '';
 	const source = f.yields || f.returns;
-
-	// jam all the return-type attributes into an array. this could create odd results (for example,
-	// if there are both nullable and non-nullable return types), but let's assume that most people
-	// who use multiple @return tags aren't using Closure Compiler type annotations, and vice-versa.
-	if ( source ) {
-
-		source.forEach( item => {
-
-			helper.getAttribs( item ).forEach( attrib => {
-
-				if ( ! attribs.includes( attrib ) ) {
-
-					attribs.push( attrib );
-
-				}
-
-			} );
-
-		} );
-
-		attribsString = buildAttribsString( attribs );
-
-	}
 
 	if ( source ) {
 
@@ -238,7 +213,7 @@ function addSignatureReturns( f ) {
 
 	if ( returnTypes.length ) {
 
-		returnTypesString = util.format( ' : %s%s', attribsString, returnTypes.join( ' | ' ) );
+		returnTypesString = util.format( ' : %s', returnTypes.join( ' | ' ) );
 
 	}
 
