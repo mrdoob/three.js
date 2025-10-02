@@ -2289,6 +2289,12 @@ class NodeBuilder {
 	/**
 	 * Executes the node in a specific build stage.
 	 *
+	 * This function can be used to arbitrarily execute the specified build stage
+	 * outside of the standard build process. For instance, if a node's type depends
+	 * on properties created by the 'setup' stage, then flowBuidStage('setup')
+	 * can be used to execute the setup build stage and access its generated nodes
+	 * before the standard build process begins.
+	 *
 	 * @param {Node} node - The node to execute.
 	 * @param {string} buildStage - The build stage to execute the node in.
 	 * @param {?(Node|string)} [output=null] - Expected output type. For example 'vec3'.
