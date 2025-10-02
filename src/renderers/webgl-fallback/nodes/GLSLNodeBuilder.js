@@ -1,4 +1,4 @@
-import { GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
+import { GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents, CodeNode } from '../../../nodes/Nodes.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
@@ -9,6 +9,11 @@ import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat,
 import { DataTexture } from '../../../textures/DataTexture.js';
 import { error } from '../../../utils.js';
 
+const glslPolyfills = {
+	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( int x ) { return floatBitsToInt( uintBitsToFloat( x ) ); }' ),
+	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' )
+};
+
 const glslMethods = {
 	textureDimensions: 'textureSize',
 	equals: 'equal',
@@ -16,6 +21,8 @@ const glslMethods = {
 	bitcast_int_float: 'intBitsToFloat',
 	bitcast_uint_float: 'uintBitsToFloat',
 	bitcast_float_uint: 'floatBitsToUint',
+	bitcast_uint_int: 'tsl_bitcast_uint_to_int',
+	bitcast_int_uint: 'tsl_bitcast_int_to_uint'
 };
 
 const precisionLib = {
@@ -128,12 +135,37 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Includes the given method name into the current
+	 * function node.
+	 *
+	 * @private
+	 * @param {string} name - The method name to include.
+	 * @return {CodeNode} The respective code node.
+	 */
+	_include( name ) {
+
+		const codeNode = glslPolyfills[ name ];
+		codeNode.build( this );
+
+		this.addInclude( codeNode );
+
+		return codeNode;
+
+	}
+
+	/**
 	 * Returns the native shader method name for a given generic name.
 	 *
 	 * @param {string} method - The method name to resolve.
 	 * @return {string} The resolved GLSL method name.
 	 */
 	getMethod( method ) {
+
+		if ( glslPolyfills[ method ] !== undefined ) {
+
+			this._include( method );
+
+		}
 
 		return glslMethods[ method ] || method;
 
@@ -148,7 +180,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 */
 	getBitcastMethod( type, inputType ) {
 
-		return glslMethods[ `bitcast_${ inputType }_${ type }` ];
+		return this.getMethod( `bitcast_${ inputType }_${ type }` );
 
 	}
 

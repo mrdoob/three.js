@@ -6,7 +6,8 @@ export class Style {
 
 		const css = `
 :root {
-	--profiler-bg: #1e1e24;
+	--profiler-bg: #1e1e24f5;
+	--profiler-header-bg: #2a2a33aa;
 	--profiler-header: #2a2a33;
 	--profiler-border: #4a4a5a;
 	--text-primary: #e0e0e0;
@@ -99,6 +100,7 @@ export class Style {
 	right: 0;
 	height: 350px;
 	background-color: var(--profiler-bg);
+	backdrop-filter: blur(8px);
 	border-top: 2px solid var(--profiler-border);
 	color: var(--text-primary);
 	display: flex;
@@ -135,7 +137,7 @@ export class Style {
 
 .profiler-header {
 	display: flex;
-	background-color: var(--profiler-header);
+	background-color: var(--profiler-header-bg);
 	border-bottom: 1px solid var(--profiler-border);
 	flex-shrink: 0;
 	justify-content: space-between;
@@ -156,7 +158,7 @@ export class Style {
 	right: 0;
 	top: 0;
 	height: 38px;
-	background: var(--profiler-header);
+	background: var(--profiler-header-bg);
 	border-bottom: 1px solid var(--profiler-border);
 }
 

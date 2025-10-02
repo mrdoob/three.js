@@ -34333,7 +34333,13 @@ class ReflectorBaseNode extends Node {
 
 		} else {
 
+			const previousName = scene.name;
+
+			scene.name = ( scene.name || 'Scene' ) + ' [ Reflector ]'; // TODO: Add bounce index
+
 			renderer.render( scene, virtualCamera );
+
+			scene.name = previousName;
 
 			this.hasOutput = true;
 
@@ -36999,6 +37005,7 @@ class PassNode extends TempNode {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
+		const currentAutoClear = renderer.autoClear;
 		const currentMask = camera.layers.mask;
 
 		this._cameraNear.value = camera.near;
@@ -37018,6 +37025,7 @@ class PassNode extends TempNode {
 
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
+		renderer.autoClear = true;
 
 		const currentSceneName = scene.name;
 
@@ -37029,6 +37037,7 @@ class PassNode extends TempNode {
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
+		renderer.autoClear = currentAutoClear;
 
 		camera.layers.mask = currentMask;
 
@@ -59105,6 +59114,11 @@ class NodeSampledTexture3D extends NodeSampledTexture {
 
 }
 
+const glslPolyfills = {
+	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( int x ) { return floatBitsToInt( uintBitsToFloat( x ) ); }' ),
+	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' )
+};
+
 const glslMethods = {
 	textureDimensions: 'textureSize',
 	equals: 'equal',
@@ -59112,6 +59126,8 @@ const glslMethods = {
 	bitcast_int_float: 'intBitsToFloat',
 	bitcast_uint_float: 'uintBitsToFloat',
 	bitcast_float_uint: 'floatBitsToUint',
+	bitcast_uint_int: 'tsl_bitcast_uint_to_int',
+	bitcast_int_uint: 'tsl_bitcast_int_to_uint'
 };
 
 const precisionLib = {
@@ -59224,12 +59240,37 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Includes the given method name into the current
+	 * function node.
+	 *
+	 * @private
+	 * @param {string} name - The method name to include.
+	 * @return {CodeNode} The respective code node.
+	 */
+	_include( name ) {
+
+		const codeNode = glslPolyfills[ name ];
+		codeNode.build( this );
+
+		this.addInclude( codeNode );
+
+		return codeNode;
+
+	}
+
+	/**
 	 * Returns the native shader method name for a given generic name.
 	 *
 	 * @param {string} method - The method name to resolve.
 	 * @return {string} The resolved GLSL method name.
 	 */
 	getMethod( method ) {
+
+		if ( glslPolyfills[ method ] !== undefined ) {
+
+			this._include( method );
+
+		}
 
 		return glslMethods[ method ] || method;
 
@@ -59244,7 +59285,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 */
 	getBitcastMethod( type, inputType ) {
 
-		return glslMethods[ `bitcast_${ inputType }_${ type }` ];
+		return this.getMethod( `bitcast_${ inputType }_${ type }` );
 
 	}
 
@@ -72592,11 +72633,7 @@ ${ flowData.code }
 		const codeNode = wgslPolyfill[ name ];
 		codeNode.build( this );
 
-		if ( this.currentFunctionNode !== null ) {
-
-			this.currentFunctionNode.includes.push( codeNode );
-
-		}
+		this.addInclude( codeNode );
 
 		return codeNode;
 
