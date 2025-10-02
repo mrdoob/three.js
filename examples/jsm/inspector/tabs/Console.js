@@ -104,6 +104,10 @@ class Console extends Tab {
 
 			icon = '✨';
 
+		} else if ( subType === 'webgpurenderer' ) {
+
+			icon = '🎨';
+
 		} else if ( type === 'warn' ) {
 
 			icon = '⚠️';
