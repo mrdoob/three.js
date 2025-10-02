@@ -1379,6 +1379,9 @@ ${shaderData.extensions}
 // precision
 ${ defaultPrecisions }
 
+// structs
+${shaderData.structs}
+
 // uniforms
 ${shaderData.uniforms}
 
@@ -1387,9 +1390,6 @@ ${shaderData.varyings}
 
 // codes
 ${shaderData.codes}
-
-// structs
-${shaderData.structs}
 
 void main() {
 
