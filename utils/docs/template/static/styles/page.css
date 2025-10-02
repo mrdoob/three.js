@@ -272,10 +272,22 @@
 }
 
 @media (prefers-color-scheme: dark) {
-	
+
 	#page {
 		--text-color: #bbb;
 		--border-style: 1px solid #444;
+
+		h2 {
+			color: var(--text-color);
+		}
+
+		h3.name {
+			color: var(--text-color);
+		}
+
+		h3.name .signature {
+			color: var(--text-color);
+		}
 
 		.link-anchor {
 			color: #555;
@@ -288,7 +300,7 @@
 		code {
 			background-color: #444;
 		}
-	
+
 	}
 
 }
