@@ -37,23 +37,11 @@ var self = this;
 		</ul>
 	<?js } ?>
 
-	<?js if (data['this']) { ?>
-		<h5>This:</h5>
-		<ul><li><?js= this.linkto(data['this'], data['this']) ?></li></ul>
-	<?js } ?>
-
 	<?js if (data.params && params.length && !data.hideconstructor) { ?>
 		<?js= this.partial('params.tmpl', params) ?>
 	<?js } ?>
 
 	<?js= this.partial('details.tmpl', data) ?>
-
-	<?js if (data.kind !== 'module' && data.requires && data.requires.length) { ?>
-	<h5>Requires:</h5>
-	<ul><?js data.requires.forEach(function(r) { ?>
-		<li><?js= self.linkto(r) ?></li>
-	<?js }); ?></ul>
-	<?js } ?>
 
 	<?js if (data.fires && fires.length) { ?>
 	<h5>Fires:</h5>
@@ -61,44 +49,6 @@ var self = this;
 		<li><?js= self.linkto(f) ?></li>
 	<?js }); ?></ul>
 	<?js } ?>
-
-	<?js if (data.listens && listens.length) { ?>
-	<h5>Listens to Events:</h5>
-	<ul><?js listens.forEach(function(f) { ?>
-		<li><?js= self.linkto(f) ?></li>
-	<?js }); ?></ul>
-	<?js } ?>
-
-	<?js if (data.listeners && listeners.length) { ?>
-	<h5>Listeners of This Event:</h5>
-	<ul><?js listeners.forEach(function(f) { ?>
-		<li><?js= self.linkto(f) ?></li>
-	<?js }); ?></ul>
-	<?js } ?>
-
-	<?js if (data.modifies && modifies.length) {?>
-	<h5>Modifies:</h5>
-	<?js if (modifies.length > 1) { ?><ul><?js
-		modifies.forEach(function(m) { ?>
-			<li><?js= self.partial('modifies.tmpl', m) ?></li>
-		<?js });
-	?></ul><?js } else {
-		modifies.forEach(function(m) { ?>
-			<?js= self.partial('modifies.tmpl', m) ?>
-		<?js });
-	} } ?>
-
-	<?js if (data.exceptions && exceptions.length) { ?>
-	<h5>Throws:</h5>
-	<?js if (exceptions.length > 1) { ?><ul><?js
-		exceptions.forEach(function(r) { ?>
-			<li><?js= self.partial('exceptions.tmpl', r) ?></li>
-		<?js });
-	?></ul><?js } else {
-		exceptions.forEach(function(r) { ?>
-			<?js= self.partial('exceptions.tmpl', r) ?>
-		<?js });
-	} } ?>
 
 	<?js if (data.returns && returns.length) { ?>
 	<?js if (returns.length > 1) { ?>
