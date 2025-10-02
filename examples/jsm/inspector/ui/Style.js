@@ -356,7 +356,6 @@ export class Style {
 .list-children-container {
 	padding-left: 1.5em;
 	overflow: hidden;
-	max-height: 1000px;
 	transition: max-height 0.1s ease-out;
 	margin-top: 2px;
 }
