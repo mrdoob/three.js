@@ -85,6 +85,8 @@ class ParametersGroup {
 
 			requestAnimationFrame( update );
 
+			return editor;
+
 		};
 
 	}
