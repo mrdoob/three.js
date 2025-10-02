@@ -4,13 +4,21 @@
 		<title>three.js webgpu - matcap material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - matcap material<br />
-			Drag-and-drop JPG, PNG, WebP, AVIF, or EXR MatCap image files<br/>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Matcap Material</span>
+			</div>
+
+			<small>
+				Drag-and-drop JPG, PNG, WebP, AVIF, or EXR MatCap image files.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -28,7 +36,8 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
@@ -48,6 +57,8 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// tone mapping
@@ -98,26 +109,23 @@
 				} );
 
 				// gui
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.addColor( API, 'color' )
 					.listen()
 					.onChange( function () {
 
 						mesh.material.color.set( API.color );
-						render();
 
 					} );
 
 				gui.add( API, 'exposure', 0, 2 )
+					.listen()
 					.onChange( function () {
 
 						renderer.toneMappingExposure = API.exposure;
-						render();
 
 					} );
-
-				gui.domElement.style.webkitUserSelect = 'none';
 
 				// drag 'n drop
 				initDragAndDrop();
@@ -132,8 +140,6 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
-				render();
 
 			}
 
@@ -160,8 +166,6 @@
 				texture.needsUpdate = true;
 
 				mesh.material.needsUpdate = true; // because the color space can change
-
-				render();
 
 			}
 

@@ -22,9 +22,12 @@ export class Style {
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Fira+Code&display=swap');
 
-#profiler-panel * {
+#profiler-panel *, #profiler-toggle * {
 	text-transform: initial;
 	line-height: normal;
+	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 #profiler-toggle {
@@ -353,7 +356,6 @@ export class Style {
 .list-children-container {
 	padding-left: 1.5em;
 	overflow: hidden;
-	max-height: 1000px;
 	transition: max-height 0.1s ease-out;
 	margin-top: 2px;
 }

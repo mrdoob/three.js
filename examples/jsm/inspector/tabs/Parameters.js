@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan } from '../ui/utils.js';
-import { ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor } from '../ui/Values.js';
+import { ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor, ValueButton } from '../ui/Values.js';
 
 class ParametersGroup {
 
@@ -50,9 +50,48 @@ class ParametersGroup {
 
 			item = this.addBoolean( object, property );
 
+		} else if ( type === 'function' ) {
+
+			item = this.addButton( object, property, ...params );
+
 		}
 
 		return item;
+
+	}
+
+	_addParameter( object, property, editor, subItem ) {
+
+		editor.name = ( name ) => {
+
+			subItem.data[ 0 ].textContent = name;
+
+			return editor;
+
+		};
+
+		editor.listen = () => {
+
+			const update = () => {
+
+				const value = editor.getValue();
+				const propertyValue = object[ property ];
+
+				if ( value !== propertyValue ) {
+
+					editor.setValue( propertyValue );
+
+				}
+
+				requestAnimationFrame( update );
+
+			};
+
+			requestAnimationFrame( update );
+
+			return editor;
+
+		};
 
 	}
 
@@ -105,13 +144,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -139,13 +172,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -173,13 +200,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -207,13 +228,7 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
-
-			description.textContent = name;
-
-			return editor;
-
-		};
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -242,13 +257,33 @@ class ParametersGroup {
 
 		// extend object property
 
-		editor.name = ( name ) => {
+		this._addParameter( object, property, editor, subItem );
 
-			description.textContent = name;
+		return editor;
 
-			return editor;
+	}
 
-		};
+	addButton( object, property ) {
+
+		const value = object[ property ];
+
+		const editor = new ValueButton( { text: property, value } );
+		editor.addEventListener( 'change', ( { value } ) => {
+
+			object[ property ] = value;
+
+		} );
+
+		const subItem = new Item( editor.domElement );
+		subItem.itemRow.childNodes[ 0 ].style.gridColumn = '1 / -1';
+		this.paramList.add( subItem );
+
+		const itemRow = subItem.domElement.firstChild;
+		itemRow.classList.add( 'actionable' );
+
+		// extend object property
+
+		this._addParameter( object, property, editor, subItem );
 
 		return editor;
 

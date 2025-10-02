@@ -386,6 +386,10 @@ class ValueColor extends Value {
 
 			color = `#${ color.toString( 16 ) }`;
 
+		} else if ( color[ 0 ] !== '#' ) {
+
+			color = '#' + color;
+
 		}
 
 		return color;
@@ -408,4 +412,19 @@ class ValueColor extends Value {
 
 }
 
-export { Value, ValueNumber, ValueCheckbox, ValueSlider, ValueSelect, ValueColor };
+class ValueButton extends Value {
+
+	constructor( { text = 'Button', value = () => {} } ) {
+
+		super();
+
+		const button = document.createElement( 'button' );
+		button.textContent = text;
+		button.onclick = value;
+		this.domElement.appendChild( button );
+
+	}
+
+}
+
+export { Value, ValueNumber, ValueCheckbox, ValueSlider, ValueSelect, ValueColor, ValueButton };

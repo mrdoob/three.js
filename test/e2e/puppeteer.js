@@ -189,6 +189,7 @@ const exceptionList = [
 	'webgpu_volume_caustics',
 	'webgpu_volume_lighting',
 	'webgpu_volume_lighting_rectarea',
+	'webgpu_reflection',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_cloth',

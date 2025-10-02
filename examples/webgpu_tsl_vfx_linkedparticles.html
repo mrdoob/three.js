@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - VFX Linked particles</title>
+		<title>three.js webgpu - vfx linked particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - VFX Linked particles
-			<br>
-			Based on <a href="https://github.com/ULuIQ12/webgpu-tsl-linkedparticles" target="_blank" rel="noopener">this experiment</a> by Christophe Choffel
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>VFX Linked Particles</span>
+			</div>
+
+			<small>
+				Based on <a href="https://github.com/ULuIQ12/webgpu-tsl-linkedparticles" target="_blank" rel="noopener">this experiment</a> by Christophe Choffel.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -32,7 +38,9 @@
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			let camera, scene, renderer, postProcessing, controls, timer, light;
@@ -95,6 +103,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
@@ -298,7 +307,7 @@
 
 					} );
 
-				} )().compute( nbParticles );
+				} )().compute( nbParticles ).setName( 'Update Particles' );
 
 				spawnParticles = /*#__PURE__*/ Fn( () => {
 
@@ -325,7 +334,7 @@
 					// start in that direction
 					velocity.assign( rDir.mul( 5.0 ) );
 
-				} )().compute( nbToSpawn.value );
+				} )().compute( nbToSpawn.value ).setName( 'Spawn Particles' );
 
 
 				// background , an inverted icosahedron
@@ -368,7 +377,7 @@
 
 				// GUI
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.add( controls, 'autoRotate' ).name( 'Auto Rotate' );
 				gui.add( controls, 'autoRotateSpeed', - 10.0, 10.0, 0.01 ).name( 'Auto Rotate Speed' );

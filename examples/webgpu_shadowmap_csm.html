@@ -4,14 +4,22 @@
 		<title>three.js webgpu - cascaded shadow maps</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - cascaded shadow maps<br>
-			by <a href="https://github.com/strandedkitty/" target="_blank" rel="noopener">StrandedKitty</a> (<a href="https://github.com/strandedkitty/three-csm" target="_blank" rel="noopener">original repository</a>)
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Cascaded Shadow Maps</span>
+			</div>
+
+			<small>
+				By <a href="https://github.com/strandedkitty/" target="_blank" rel="noopener">StrandedKitty</a> (<a href="https://github.com/strandedkitty/three-csm" target="_blank" rel="noopener">original repository</a>).
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -30,7 +38,9 @@
 			import * as THREE from 'three/webgpu';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { CSMShadowNode } from 'three/addons/csm/CSMShadowNode.js';
 			import { CSMHelper } from 'three/addons/csm/CSMHelper.js';
 
@@ -84,9 +94,13 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				document.body.appendChild( renderer.domElement );
+
 				renderer.shadowMap.enabled = params.shadows;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+				renderer.inspector = new Inspector();
+
+				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI / 2;
@@ -158,7 +172,7 @@
 
 				}
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( params, 'orthographic' ).onChange( function ( value ) {
 
