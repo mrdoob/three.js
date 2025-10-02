@@ -38,8 +38,7 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
 	<?js } ?>
 
 	<?js if (data.overrides) { ?>
-	<dt class="tag-overrides">Overrides:</dt>
-	<dd class="tag-overrides"><?js= this.linkto(data.overrides, this.htmlsafe(data.overrides)) ?></dd>
+	<dt class="tag-overrides"><strong>Overrides:</strong> <?js= this.linkto(data.overrides, this.htmlsafe(data.overrides)) ?></dt>
 	<?js } ?>
 
 	<?js if (data.implementations && data.implementations.length) { ?>
@@ -71,10 +70,10 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
 	<?js } ?>
 
 	<?js if (data.deprecated) { ?>
-		<dt class="important tag-deprecated">Deprecated:</dt><?js
-			if (data.deprecated === true) { ?><dd class="yes-def tag-deprecated">Yes</dd><?js }
-			else { ?><dd><?js= data.deprecated ?></dd><?js }
-		?>
+		<dt class="important tag-deprecated"><strong>Deprecated:</strong> <?js
+			if (data.deprecated === true) { ?>Yes<?js }
+			else { ?><?js= data.deprecated ?><?js }
+		?></dt>
 	<?js } ?>
 
 	<?js if (data.author && author.length) {?>
@@ -95,12 +94,6 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
 	<dt class="tag-license">License:</dt>
 	<dd class="tag-license"><?js= license ?></dd>
 	<?js } ?>
-
-	<?js if (data.defaultvalue) {?>
-	<dt class="tag-default">Default:</dt>
-	<dd class="tag-default"<?js= defaultObjectClass ?>><?js= data.defaultvalue ?></dd>
-	<?js } ?>
-
 
 	<?js if (data.tutorials && tutorials.length) {?>
 	<dt class="tag-tutorial">Tutorials:</dt>

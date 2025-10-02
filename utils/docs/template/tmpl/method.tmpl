@@ -8,10 +8,7 @@ var self = this;
 	<?js } ?>
 
 	<?js if (data.kind !== 'namespace') { ?>
-	<h4 class="name name-method" id="<?js= id ?>"><?js= data.attribs + (kind === 'class' ? 'new ' : '') +
-	name + (data.signature || '') ?>
-	<a href="#<?js= id ?>" class="link-anchor">#</a>
-	</h4>
+	<h3 class="name name-method" id="<?js= id ?>"><?js= (kind === 'class' ? 'new ' : '.') ?><a href="#<?js= id ?>"><?js= name ?></a><?js= (data.signature || '') ?> <?js= data.attribs ?></h3>
 	<?js } ?>
 
 	<?js if (data.summary) { ?>
@@ -46,7 +43,6 @@ var self = this;
 	<?js } ?>
 
 	<?js if (data.params && params.length && !data.hideconstructor) { ?>
-		<h5>Parameters:</h5>
 		<?js= this.partial('params.tmpl', params) ?>
 	<?js } ?>
 
@@ -105,16 +101,18 @@ var self = this;
 	} } ?>
 
 	<?js if (data.returns && returns.length) { ?>
-	<h5>Returns:</h5>
-	<?js if (returns.length > 1) { ?><ul><?js
-		returns.forEach(function(r) { ?>
+	<?js if (returns.length > 1) { ?>
+		<h5>Returns:</h5>
+		<ul><?js returns.forEach(function(r) { ?>
 			<li><?js= self.partial('returns.tmpl', r) ?></li>
-		<?js });
-	?></ul><?js } else {
-		returns.forEach(function(r) { ?>
-			<?js= self.partial('returns.tmpl', r) ?>
-		<?js });
-	} } ?>
+		<?js }); ?></ul>
+	<?js } else { ?>
+		<dl class="details">
+		<?js returns.forEach(function(r) { ?>
+			<dt class="tag-returns"><strong>Returns:</strong> <?js= self.partial('returns.tmpl', r) ?></dt>
+		<?js }); ?>
+		</dl>
+	<?js } } ?>
 
 	<?js if (data.yields && yields.length) { ?>
 	<h5>Yields:</h5>

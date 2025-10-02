@@ -1,6 +1,22 @@
-h3 {
-	margin-top: 16px;
-	margin-bottom: 16px;
+@font-face {
+	font-family: 'Roboto Mono';
+	src: local('Roboto Mono'), local('RobotoMono-Regular'), url('/files/RobotoMono-Regular.woff2') format('woff2');
+	font-style: normal;
+	font-weight: 400;
+}
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Inter-Regular'), url("/files/Inter-Regular.woff2?v=3.6") format("woff2");
+}
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 600;
+	src: local('Inter-SemiBold'), url("/files/Inter-SemiBold.woff2?v=3.6") format("woff2");
 }
 
 /* Below CSS should only affect the page section */
@@ -13,38 +29,19 @@ h3 {
 	--max-width: 960px;
 	--icon-size: 20px;
 	--border-style: 1px solid #E8E8E8;
-	
+	--text-color: #444;
+
+	font-family: 'Inter', sans-serif;
 	color: var(--text-color);
 	tab-size: 4;
 	overflow: auto;
-	max-width: var(--max-width);
+	max-width: 760px;
 	margin: 0 auto;
 	padding-top: var(--page-padding);
 	padding-bottom: var(--page-padding);
 	padding-right: var(--page-padding);
 	padding-left: var(--page-padding);
 	word-break: break-word;
-	
-	@font-face {
-		font-family: 'Roboto Mono';
-		src: local('Roboto Mono'), local('RobotoMono-Regular'), url('/files/RobotoMono-Regular.woff2') format('woff2');
-		font-style: normal;
-		font-weight: 400;
-	}
-	
-	@font-face {
-		font-family: 'Inter';
-		font-style: normal;
-		font-weight: 400;
-		src: local('Inter-Regular'), url("/files/Inter-Regular.woff2?v=3.6") format("woff2");
-	}
-	
-	@font-face {
-		font-family: 'Inter';
-		font-style: normal;
-		font-weight: 600;
-		src: local('Inter-SemiBold'), url("/files/Inter-SemiBold.woff2?v=3.6") format("woff2");
-	}
 
 	a {
 		color: var(--color-blue);
@@ -58,22 +55,25 @@ h3 {
 		font-weight: normal;
 		margin-left: -2px;
 		margin-top: 16px;
+		margin-bottom: -8px;
 	}
-	
+
 	h2 {
 		font-size: 28px;
 		line-height: 36px;
 		font-weight: normal;
 		margin-left: -1px;
 		margin-top: 28px;
+		margin-bottom: -8px;
+		color: #000;
 	}
-	
+
 	h3 {
 		font-size: 20px;
 		line-height: 28px;
 		font-weight: normal;
-		margin-top: 32px;
-		margin-bottom: 32px;
+		margin-top: 24px;
+		margin-bottom: -8px;
 	}
 
 	p,
@@ -117,10 +117,12 @@ h3 {
 	table td {
 		text-align: left;
 		vertical-align: top;
-		padding: 16px 8px;
-		border-bottom: var(--border-style);
-		max-width: 480px;
-		min-width: 120px;
+		padding: 8px 6px;
+	}
+
+	table td.name,
+	table th.name {
+		white-space: nowrap;
 	}
 	
 	table th {
@@ -154,9 +156,14 @@ h3 {
 		color: var(--text-color);
 	}
 
+	.inheritance {
+		color: #999;
+		margin-bottom: 0;
+	}
+
 	.method,
 	.member {
-		margin-bottom: 64px;
+		margin-bottom: 32px;
 	}
 
 	ol.linenums {
@@ -192,13 +199,35 @@ h3 {
 		padding: 0px 5px;
 	}
 
-	.link-anchor {
-		color: #ddd;
-		visibility: hidden;
+	h3.name {
+		color: #000;
 	}
 
-	.name:hover .link-anchor {
-		visibility: visible;
+	h3.name a {
+		color: var(--color-blue);
+		text-decoration: none;
+	}
+
+	h3.name .signature {
+		color: #000;
+		font-weight: normal;
+	}
+
+	h3.name .type-signature {
+		color: #999;
+		font-weight: normal;
+	}
+
+	h3.name .type-signature a {
+		color: #999;
+	}
+
+	h3.name .param-type {
+		color: #999;
+	}
+
+	h3.name .param-type a {
+		color: #999;
 	}
 
 	.search-result-item {
@@ -262,14 +291,14 @@ h3 {
 }
 
 @media all and ( min-width: 1700px ) {
-	
+
 	#page {
 		--panel-width: 360px;
 		--font-size: 18px;
 		--line-height: 28px;
-		--max-width: 1080px;
 		--page-padding: 28px;
 		--icon-size: 24px;
+		max-width: 880px;
 
 		h1 {
 			font-size: 42px;

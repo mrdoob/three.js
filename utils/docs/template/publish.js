@@ -106,7 +106,20 @@ function updateItemName( item ) {
 
 function addParamAttributes( params ) {
 
-	return params.filter( ( { name } ) => name && ! name.includes( '.' ) ).map( updateItemName );
+	return params.filter( ( { name } ) => name && ! name.includes( '.' ) ).map( param => {
+
+		let itemName = updateItemName( param );
+
+		if ( param.type && param.type.names && param.type.names.length ) {
+
+			const escapedTypes = param.type.names.map( name => htmlsafe( name ) );
+			itemName += ' : <span class="param-type">' + escapedTypes.join( ' | ' ) + '</span>';
+
+		}
+
+		return itemName;
+
+	} );
 
 }
 
@@ -182,7 +195,7 @@ function addSignatureParams( f ) {
 
 	const params = f.params ? addParamAttributes( f.params ) : [];
 
-	f.signature = util.format( '%s(%s)', ( f.signature || '' ), params.join( ', ' ) );
+	f.signature = util.format( '%s( %s )', ( f.signature || '' ), params.join( ', ' ) );
 
 }
 
@@ -225,7 +238,7 @@ function addSignatureReturns( f ) {
 
 	if ( returnTypes.length ) {
 
-		returnTypesString = util.format( ' &rarr; %s{%s}', attribsString, returnTypes.join( '|' ) );
+		returnTypesString = util.format( ' : %s%s', attribsString, returnTypes.join( ' | ' ) );
 
 	}
 
@@ -237,13 +250,13 @@ function addSignatureTypes( f ) {
 
 	const types = f.type ? buildItemTypeStrings( f ) : [];
 
-	f.signature = `${f.signature || ''}<span class="type-signature">${types.length ? ` :${types.join( '|' )}` : ''}</span>`;
+	f.signature = `${f.signature || ''}<span class="type-signature">${types.length ? ` : ${types.join( ' | ' )}` : ''}</span>`;
 
 }
 
 function addAttribs( f ) {
 
-	const attribs = helper.getAttribs( f );
+	const attribs = helper.getAttribs( f ).filter( attrib => attrib !== 'static' );
 	const attribsString = buildAttribsString( attribs );
 
 	f.attribs = util.format( '<span class="type-signature">%s</span>', attribsString );
@@ -287,7 +300,8 @@ function generate( title, docs, filename, resolveLinks ) {
 	const docData = {
 		env: env,
 		title: title,
-		docs: docs
+		docs: docs,
+		augments: docs && docs[0] ? docs[0].augments : null
 	};
 
 	const outpath = path.join( outdir, filename );
