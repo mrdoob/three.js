@@ -40,6 +40,27 @@
 
 } )();
 
+( function loadNavigation() {
+
+	const navContainer = document.querySelector( '#content nav' );
+
+	if ( navContainer ) {
+
+		fetch( 'nav.html' )
+			.then( response => response.text() )
+			.then( html => {
+
+				navContainer.innerHTML = html;
+
+			} )
+			.catch( err => console.error( 'Failed to load navigation:', err ) );
+
+	}
+
+} )();
+
+//
+
 const panel = document.getElementById( 'panel' );
 const panelScrim = document.getElementById( 'panelScrim' );
 const expandButton = document.getElementById( 'expandButton' );
@@ -169,11 +190,9 @@ function updateNavigation() {
 
 	// select target and move into view
 
-	const liElement = document.querySelector( `li[data-name="${target}"]` );
+	const aElement = document.querySelector( `nav a[href="${filename}"], nav a[href="${filename}#${target}"]` );
 
-	if ( liElement !== null ) {
-
-		const aElement = liElement.firstChild;
+	if ( aElement !== null ) {
 
 		aElement.scrollIntoView( { block: 'center' } );
 		aElement.classList.add( 'selected' );
@@ -195,3 +214,11 @@ console.log( [
 	'                                         / __/  /  \\__  \\',
 	'                                         \\/____/\\/_____/'
 ].join( '\n' ) );
+
+// console sandbox
+
+import( '/build/three.module.js' ).then( THREE => {
+
+	window.THREE = THREE;
+
+} );
