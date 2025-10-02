@@ -4,18 +4,26 @@
 		<title>three.js webgpu - video material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="overlay">
 			<button id="startButton">Play</button>
 		</div>
+
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - video material<br/>
-			playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Video Material</span>
+			</div>
+
+			<small>
+				Playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer.
+			</small>
 		</div>
 
 		<video id="video" loop crossOrigin="anonymous" playsinline style="display:none">
