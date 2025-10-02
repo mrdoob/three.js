@@ -94,7 +94,7 @@
 
 				// reflection
 
-				const reflection = reflector( { resolution: .5, bounces: false, generateMipmaps: true } ); // 0.5 is half of the rendering view
+				const reflection = reflector( { resolutionScale: .5, bounces: false, generateMipmaps: true } ); // 0.5 is half of the rendering view
 				reflection.target.rotateX( - Math.PI / 2 );
 				scene.add( reflection.target );
 
