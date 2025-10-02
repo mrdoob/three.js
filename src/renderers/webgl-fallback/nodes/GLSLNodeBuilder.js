@@ -10,8 +10,8 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 import { error } from '../../../utils.js';
 
 const glslPolyfills = {
-	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( int x ) { return floatBitsToInt( uintBitsToFloat( x ) ); }' ),
-	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' )
+	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
+	bitcast_uint_int: new CodeNode( /* glsl */'int tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat( x ) ); }' )
 };
 
 const glslMethods = {
@@ -134,20 +134,22 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	/**
+	 * Includes the given method name into the current
+	 * function node.
+	 *
+	 * @private
+	 * @param {string} name - The method name to include.
+	 * @return {CodeNode} The respective code node.
+	 */
 	_include( name ) {
 
-		// Collect the array of functions needed to polyfill the specified functionality
-		const polyfill = glslPolyfills[ name ];
+		const codeNode = glslPolyfills[ name ];
+		codeNode.build( this );
 
-		for ( const codeNode of polyfill.codeNodes ) {
+		this.addInclude( codeNode );
 
-			// Build and include each relevant function
-			codeNode.build( this );
-			this.addInclude( codeNode );
-
-		}
-
-		return polyfill.entryIndex ? polyfill.codeNodes[ polyfill.entryIndex ] : polyfill.codeNodes[ 0 ];
+		return codeNode;
 
 	}
 
@@ -1337,8 +1339,6 @@ ${vars}
 	 */
 	_getGLSLVertexCode( shaderData ) {
 
-		console.log( shaderData );
-
 		return `#version 300 es
 
 ${ this.getSignature() }
@@ -1387,8 +1387,6 @@ void main() {
 	 * @return {string} The vertex shader.
 	 */
 	_getGLSLFragmentCode( shaderData ) {
-
-		console.log( shaderData );
 
 		return `#version 300 es
 
@@ -1499,8 +1497,6 @@ void main() {
 
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
-			console.log( this.vertexShader );
-			console.log( this.fragmentShader );
 
 		} else {
 

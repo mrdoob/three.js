@@ -20,6 +20,7 @@ export * from './core/MRTNode.js';
 
 // math
 export * from './math/BitcastNode.js';
+export * from './math/BitcountNode.js';
 export * from './math/Hash.js';
 export * from './math/MathUtils.js';
 export * from './math/TriNoise3D.js';
