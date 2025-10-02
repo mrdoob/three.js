@@ -1674,6 +1674,11 @@ class NodeBuilder {
 	/**
 	 * Returns the properties for the given node and shader stage.
 	 *
+	 * Properties are typically used within a build stage to reference nodes or parameters
+	 * created in a separate build stage. A typical usage pattern would be
+	 * assigning dependency nodes to the current node's properties in the setup stage
+	 * and building those properties in the generate stage.
+	 *
 	 * @param {Node} node - The node to get the properties for.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage='any'] - The shader stage.
 	 * @return {Object} The node properties.
