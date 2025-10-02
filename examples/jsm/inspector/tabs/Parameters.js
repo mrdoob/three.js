@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
 import { createValueSpan } from '../ui/utils.js';
-import { ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor } from '../ui/Values.js';
+import { ValueNumber, ValueSlider, ValueSelect, ValueCheckbox, ValueColor, ValueButton } from '../ui/Values.js';
 
 class ParametersGroup {
 
@@ -49,6 +49,10 @@ class ParametersGroup {
 		} else if ( type === 'boolean' ) {
 
 			item = this.addBoolean( object, property );
+
+		} else if ( type === 'function' ) {
+
+			item = this.addButton( object, property, ...params );
 
 		}
 
@@ -246,6 +250,32 @@ class ParametersGroup {
 		description.textContent = property;
 
 		const subItem = new Item( description, editor.domElement );
+		this.paramList.add( subItem );
+
+		const itemRow = subItem.domElement.firstChild;
+		itemRow.classList.add( 'actionable' );
+
+		// extend object property
+
+		this._addParameter( object, property, editor, subItem );
+
+		return editor;
+
+	}
+
+	addButton( object, property ) {
+
+		const value = object[ property ];
+
+		const editor = new ValueButton( { text: property, value } );
+		editor.addEventListener( 'change', ( { value } ) => {
+
+			object[ property ] = value;
+
+		} );
+
+		const subItem = new Item( editor.domElement );
+		subItem.itemRow.childNodes[ 0 ].style.gridColumn = '1 / -1';
 		this.paramList.add( subItem );
 
 		const itemRow = subItem.domElement.firstChild;
