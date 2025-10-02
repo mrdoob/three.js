@@ -198,9 +198,9 @@
 				const gui = renderer.inspector.createParameters( 'Accumulation Settings' );
 				gui.add( params, 'Enable' );
 				gui.add( params, 'Blur Edges' );
-				gui.add( params, 'Blend Window', 1, 500 ).step( 1 );
-				gui.add( params, 'Light Radius', 0, 200 ).step( 10 );
-				gui.add( params, 'Ambient Weight', 0, 1 ).step( 0.1 );
+				gui.add( params, 'Blend Window', 1, 500, 1 );
+				gui.add( params, 'Light Radius', 0, 200, 10 );
+				gui.add( params, 'Ambient Weight', 0, 1, 0.1 );
 				gui.add( params, 'Debug Lightmap' ).onChange( ( value ) => progressiveSurfacemap.showDebugLightmap( value ) );
 
 			}

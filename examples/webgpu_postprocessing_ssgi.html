@@ -224,8 +224,8 @@
 
 				const gui = renderer.inspector.createParameters( 'SSGI settings' );
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
-				gui.add( giPass.sliceCount, 'value', 1, 4 ).step( 1 ).name( 'slice count' );
-				gui.add( giPass.stepCount, 'value', 1, 32 ).step( 1 ).name( 'step count' );
+				gui.add( giPass.sliceCount, 'value', 1, 4, 1 ).name( 'slice count' );
+				gui.add( giPass.stepCount, 'value', 1, 32, 1 ).name( 'step count' );
 				gui.add( giPass.radius, 'value', 1, 25 ).name( 'radius' );
 				gui.add( giPass.expFactor, 'value', 1, 3 ).name( 'exp factor' );
 				gui.add( giPass.thickness, 'value', 0.01, 10 ).name( 'thickness' );

@@ -97,13 +97,6 @@ class ValueNumber extends Value {
 
 	}
 
-	step( value ) {
-
-		this.input.step = value;
-		return this;
-
-	}
-
 	addDragHandler() {
 
 		let isDragging = false;
