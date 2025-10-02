@@ -146,6 +146,7 @@ export class Style {
 	overflow-x: auto;
 	overflow-y: hidden;
 	width: calc(100% - 89px);
+	height: 38px;
 }
 
 .profiler-tabs {
