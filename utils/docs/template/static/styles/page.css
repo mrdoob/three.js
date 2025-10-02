@@ -105,8 +105,10 @@
 	}
 
 	table {
-		width: 100%;
+		width: calc(100% - 40px);
 		border-collapse: collapse;
+		margin-left: 20px;
+		margin-right: 20px;
 	}
 	
 	.desc {
@@ -123,6 +125,7 @@
 	table td.name,
 	table th.name {
 		white-space: nowrap;
+		width: 150px;
 	}
 	
 	table th {
