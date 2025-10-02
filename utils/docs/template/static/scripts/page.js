@@ -40,7 +40,6 @@
 
 } )();
 
-// Load navigation from separate file
 ( function loadNavigation() {
 
 	const navContainer = document.querySelector( '#content nav' );
@@ -191,11 +190,9 @@ function updateNavigation() {
 
 	// select target and move into view
 
-	const liElement = document.querySelector( `li[data-name="${target}"]` );
+	const aElement = document.querySelector( `nav a[href="${filename}"], nav a[href="${filename}#${target}"]` );
 
-	if ( liElement !== null ) {
-
-		const aElement = liElement.firstChild;
+	if ( aElement !== null ) {
 
 		aElement.scrollIntoView( { block: 'center' } );
 		aElement.classList.add( 'selected' );

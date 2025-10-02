@@ -366,7 +366,7 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 
 				}
 
-				itemNav += `<li data-name="${item.name}">${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
+				itemNav += `<li>${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
 
 				itemsSeen[ item.longname ] = true;
 
@@ -392,13 +392,13 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 
 		for ( const [ mainCategory, map ] of hierarchy ) {
 
-			nav += `<h2>${mainCategory}</h2>`;
+			nav += `<h2>${mainCategory}</h2>\n`;
 
 			const sortedMap = new Map( [ ...map.entries() ].sort() ); // sort sub categories
 
 			for ( const [ subCategory, links ] of sortedMap ) {
 
-				nav += `<h3>${subCategory}</h3>`;
+				nav += `<h3>${subCategory}</h3>\n`;
 
 				let navItems = '';
 
@@ -406,11 +406,11 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 
 				for ( const link of links ) {
 
-					navItems += link;
+					navItems += link + '\n';
 
 				}
 
-				nav += `<ul>${navItems}</ul>`;
+				nav += `<ul>\n${navItems}</ul>\n`;
 
 			}
 
@@ -441,7 +441,7 @@ function buildGlobalsNav( globals, seen ) {
 
 				if ( tslTag !== undefined ) {
 
-					tslNav += `<li data-name="${longname}">${linkto( longname, name )}</li>`;
+					tslNav += `<li>${linkto( longname, name )}</li>\n`;
 
 					seen[ longname ] = true;
 
@@ -451,7 +451,7 @@ function buildGlobalsNav( globals, seen ) {
 
 		} );
 
-		nav += `<h2>TSL</h2><ul>${tslNav}</ul>`;
+		nav += `<h2>TSL</h2>\n<ul>\n${tslNav}</ul>\n`;
 
 		// Globals
 
@@ -461,7 +461,7 @@ function buildGlobalsNav( globals, seen ) {
 
 			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) ) {
 
-				globalNav += `<li data-name="${longname}">${linkto( longname, name )}</li>`;
+				globalNav += `<li>${linkto( longname, name )}</li>\n`;
 
 			}
 
@@ -472,11 +472,11 @@ function buildGlobalsNav( globals, seen ) {
 		if ( ! globalNav ) {
 
 			// turn the heading into a link so you can actually get to the global page
-			nav += `<h3>${linkto( 'global', 'Global' )}</h3>`;
+			nav += `<h3>${linkto( 'global', 'Global' )}</h3>\n`;
 
 		} else {
 
-			nav += `<h2>Global</h2><ul>${globalNav}</ul>`;
+			nav += `<h2>Global</h2>\n<ul>\n${globalNav}</ul>\n`;
 
 		}
 
