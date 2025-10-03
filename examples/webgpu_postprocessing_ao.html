@@ -161,7 +161,7 @@
 				//
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'samples', 4, 32 ).step( 1 ).onChange( updateParameters );
+				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters );
 				gui.add( params, 'distanceExponent', 1, 2 ).onChange( updateParameters );
 				gui.add( params, 'distanceFallOff', 0.01, 1 ).onChange( updateParameters );
 				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );

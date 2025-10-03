@@ -135,7 +135,7 @@ class Inspector extends RendererInspector {
 
 		const renderer = this.getRenderer();
 
-		let sign = `🚀 "WebGPURenderer" - ${ REVISION } [ "`;
+		let sign = `THREE.WebGPURenderer: ${ REVISION } [ "`;
 
 		if ( renderer.backend.isWebGPUBackend ) {
 

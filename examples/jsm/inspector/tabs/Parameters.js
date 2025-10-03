@@ -283,7 +283,13 @@ class ParametersGroup {
 
 		// extend object property
 
-		this._addParameter( object, property, editor, subItem );
+		editor.name = ( name ) => {
+
+			editor.domElement.childNodes[ 0 ].textContent = name;
+
+			return editor;
+
+		};
 
 		return editor;
 

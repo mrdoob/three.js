@@ -181,7 +181,7 @@
 			const gui = renderer.inspector.createParameters( 'Settings' );
 			const ssrFolder = gui.addFolder( 'SSR' );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'blurQuality', 1, 3 ).step( 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'blurQuality', 1, 3, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'maxDistance', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'opacity', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
