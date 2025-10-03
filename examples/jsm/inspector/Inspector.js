@@ -5,12 +5,10 @@ import { Performance } from './tabs/Performance.js';
 import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
 import { Viewer } from './tabs/Viewer.js';
-import { setText, ease, splitPath, splitCamelCase } from './ui/utils.js';
+import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
 import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
 import { renderOutput, vec3, vec4 } from 'three/tsl';
-
-const EASE_FACTOR = 0.1;
 
 class Inspector extends RendererInspector {
 
@@ -40,9 +38,6 @@ class Inspector extends RendererInspector {
 
 		//
 
-		this.deltaTime = 0;
-		this.softDeltaTime = 0;
-
 		this.statsData = new Map();
 		this.canvasNodes = new Map();
 		this.profiler = profiler;
@@ -60,7 +55,7 @@ class Inspector extends RendererInspector {
 			},
 			graph: {
 				needsUpdate: false,
-				duration: .05,
+				duration: .02,
 				time: 0
 			}
 		};
@@ -330,6 +325,26 @@ class Inspector extends RendererInspector {
 
 	}
 
+	getFPS() {
+
+		let frameSum = 0;
+		let timeSum = 0;
+
+		for ( let i = this.frames.length - 1; i >= 0; i -- ) {
+
+			const frame = this.frames[ i ];
+
+			frameSum ++;
+			timeSum += frame.deltaTime;
+
+			if ( timeSum >= 1000 ) break;
+
+		}
+
+		return ( frameSum * 1000 ) / timeSum;
+
+	}
+
 	resolveFrame( frame ) {
 
 		const nextFrame = this.getFrameById( frame.frameId + 1 );
@@ -367,21 +382,12 @@ class Inspector extends RendererInspector {
 
 		//
 
-		if ( this.softDeltaTime === 0 ) {
-
-			this.softDeltaTime = frame.deltaTime;
-
-		}
-
-		this.deltaTime = frame.deltaTime;
-		this.softDeltaTime = ease( this.softDeltaTime, frame.deltaTime, this.nodeFrame.deltaTime, EASE_FACTOR );
-
 		this.updateCycle( this.displayCycle.text );
 		this.updateCycle( this.displayCycle.graph );
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
-			setText( 'fps-counter', this.softFPS.toFixed() );
+			setText( 'fps-counter', this.getFPS().toFixed() );
 
 			this.performance.updateText( this, frame );
 
@@ -395,18 +401,6 @@ class Inspector extends RendererInspector {
 
 		this.displayCycle.text.needsUpdate = false;
 		this.displayCycle.graph.needsUpdate = false;
-
-	}
-
-	get fps() {
-
-		return 1000 / this.deltaTime;
-
-	}
-
-	get softFPS() {
-
-		return 1000 / this.softDeltaTime;
 
 	}
 

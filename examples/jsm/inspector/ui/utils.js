@@ -1,15 +1,3 @@
-export function ease( target, current, deltaTime, duration ) {
-
-	if ( duration <= 0 ) return current;
-
-	const t = Math.min( 1, deltaTime / duration );
-
-	target += ( current - target ) * t;
-
-	return target;
-
-}
-
 export function createValueSpan( id = null ) {
 
 	const span = document.createElement( 'span' );
