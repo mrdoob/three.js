@@ -18,12 +18,6 @@ let view;
 const outdir = path.normalize( env.opts.destination );
 const themeOpts = ( env.opts.themeOpts ) || {};
 
-function mkdirSync( filepath ) {
-
-	return fs.mkdirSync( filepath, { recursive: true } );
-
-}
-
 function find( spec ) {
 
 	return helper.find( data, spec );
@@ -138,28 +132,6 @@ function buildItemTypeStrings( item ) {
 	}
 
 	return types;
-
-}
-
-function buildSearchListForData() {
-
-	const searchList = [];
-
-	data().each( ( item ) => {
-
-		if ( item.kind !== 'package' && item.kind !== 'typedef' && ! item.inherited ) {
-
-			searchList.push( {
-				title: item.longname,
-				link: linkto( item.longname, item.name ),
-				description: item.description,
-			} );
-
-		}
-
-	} );
-
-	return searchList;
 
 }
 
@@ -792,19 +764,6 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 		path.join( outdir, 'nav.html' ),
 		buildNav( members ),
 		'utf8'
-	);
-
-	// search
-
-	const searchList = buildSearchListForData();
-
-	mkdirSync( path.join( outdir, 'data' ) );
-
-	fs.writeFileSync(
-		path.join( outdir, 'data', 'search.json' ),
-		JSON.stringify( {
-			list: searchList,
-		} )
 	);
 
 };

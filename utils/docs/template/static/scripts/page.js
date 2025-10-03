@@ -59,7 +59,7 @@
 
 			}
 
-			// Save scroll position when clicking nav links
+			// Save scroll position and preserve search query when clicking nav links
 			navContainer.addEventListener( 'click', function ( event ) {
 
 				const link = event.target.closest( 'a' );
@@ -68,6 +68,25 @@
 
 					sessionStorage.setItem( 'navScrollTop', content.scrollTop );
 
+					// Preserve search query in URL
+					const searchParams = new URLSearchParams( window.location.search );
+					const query = searchParams.get( 'q' );
+
+					if ( query ) {
+
+						const href = link.getAttribute( 'href' );
+
+						// Only modify if it doesn't already have a query parameter
+						if ( ! href.includes( '?' ) ) {
+
+							const [ path, hash ] = href.split( '#' );
+							const newHref = hash ? `${path}?q=${encodeURIComponent( query )}#${hash}` : `${path}?q=${encodeURIComponent( query )}`;
+							link.setAttribute( 'href', newHref );
+
+						}
+
+					}
+
 				}
 
 			} );
@@ -75,6 +94,31 @@
 			updateNavigation();
 
 			sessionStorage.removeItem( 'navScrollTop' );
+
+			// Execute search if query parameter exists
+			const urlParams = new URLSearchParams( window.location.search );
+			const searchQuery = urlParams.get( 'q' );
+
+			if ( searchQuery ) {
+
+				const filterInput = document.getElementById( 'filterInput' );
+				const panel = document.getElementById( 'panel' );
+
+				if ( filterInput ) {
+
+					filterInput.value = searchQuery;
+					// eslint-disable-next-line no-undef
+					search( searchQuery );
+
+					if ( panel ) {
+
+						panel.classList.add( 'searchFocused' );
+
+					}
+
+				}
+
+			}
 
 		} )
 		.catch( err => console.error( 'Failed to load navigation:', err ) );
@@ -177,9 +221,16 @@ filterInput.oninput = function () {
 clearSearchButton.onclick = function () {
 
 	filterInput.value = '';
-	filterInput.focus();
 	// eslint-disable-next-line no-undef
 	hideSearch(); // defined in search.js
+
+	// Remove query parameter from URL
+	const url = new URL( window.location );
+	url.searchParams.delete( 'q' );
+	window.history.replaceState( {}, '', url );
+
+	// Hide search UI
+	panel.classList.remove( 'searchFocused' );
 
 };
 

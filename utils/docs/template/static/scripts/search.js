@@ -1,159 +1,132 @@
-const contentContainer = document.querySelector( '#page-content' );
-const searchContainer = document.querySelector( '#search-content' );
-const resultBox = document.querySelector( '#search-result' );
-
 // eslint-disable-next-line no-unused-vars
 function hideSearch() {
 
-	searchContainer.style.display = 'none';
-	contentContainer.style.display = 'block';
+	const nav = document.querySelector( 'nav' );
+	const items = nav.querySelectorAll( 'li' );
+	const headers = nav.querySelectorAll( 'h2, h3' );
+	const lists = nav.querySelectorAll( 'ul' );
 
-
-}
-
-function showResultText( text ) {
-
-	resultBox.innerHTML = text;
-
-}
-
-function showSearch() {
-
-	searchContainer.style.display = 'block';
-	contentContainer.style.display = 'none';
+	items.forEach( item => item.style.display = '' );
+	headers.forEach( header => header.style.display = '' );
+	lists.forEach( list => list.style.display = '' );
 
 }
 
-function extractUrlBase( url ) {
-
-	const index = url.lastIndexOf( '/' );
-
-	if ( index === - 1 ) return './';
-
-	return url.slice( 0, index + 1 );
-
-}
-
-async function fetchAllData() {
-
-	const { origin, pathname } = location;
-
-	const baseURL = extractUrlBase( pathname );
-
-	const base = origin + baseURL;
-
-	const url = new URL( 'data/search.json', base );
-	const result = await fetch( url );
-	const { list } = await result.json();
-
-	return list;
-
-}
-
-
-function buildSearchResult( result ) {
-
-	let output = '';
-	const removeHTMLTagsRegExp = /(<([^>]+)>)/ig;
-
-	for ( const res of result ) {
-
-		const { title = '', description = '' } = res.item;
-
-		const _link = res.item.link.replace( '<a href="', '' ).replace( /">.*/, '' );
-		const _title = title.replace( removeHTMLTagsRegExp, '' );
-		const _description = description.replace( removeHTMLTagsRegExp, '' );
-
-		output += `
-    <a href="${_link}" class="search-result-item" onclick="hideSearch()">
-      <span class="search-result-item-title">${_title}</span>
-      <span class="search-result-item-description">- ${_description || 'No description available.'}</span>
-    </a>
-    `;
-
-	}
-
-	return output;
-
-}
-
-function getSearchResult( list, keys, searchKey ) {
-
-	const defaultOptions = {
-		shouldSort: true,
-		threshold: 0.4,
-		location: 0,
-		distance: 100,
-		maxPatternLength: 32,
-		minMatchCharLength: 1,
-		keys: keys
-	};
-
-	const options = { ...defaultOptions };
-
-	// eslint-disable-next-line no-undef
-	const searchIndex = Fuse.createIndex( options.keys, list );
-
-	// eslint-disable-next-line no-undef
-	const fuse = new Fuse( list, options, searchIndex );
-
-	const result = fuse.search( searchKey );
-
-	if ( result.length > 20 ) {
-
-		return result.slice( 0, 20 );
-
-	}
-
-	return result;
-
-}
-
-let searchData;
 
 // eslint-disable-next-line no-unused-vars
-async function search( value ) {
+function search( value ) {
+
+	const nav = document.querySelector( 'nav' );
+	const items = nav.querySelectorAll( 'li' );
+
+	// Update URL
+	const url = new URL( window.location );
 
 	if ( value === '' ) {
 
+		url.searchParams.delete( 'q' );
 		hideSearch();
-		return;
+
+	} else {
+
+		url.searchParams.set( 'q', value );
+
+		const searchLower = value.toLowerCase();
+
+		items.forEach( item => {
+
+			const text = item.textContent.toLowerCase();
+
+			if ( text.includes( searchLower ) ) {
+
+				item.style.display = '';
+
+			} else {
+
+				item.style.display = 'none';
+
+			}
+
+		} );
+
+		// Show/hide h3 headers based on matches and visible items
+		const h3Headers = nav.querySelectorAll( 'h3' );
+
+		h3Headers.forEach( header => {
+
+			const headerText = header.textContent.toLowerCase();
+			const headerMatches = headerText.includes( searchLower );
+			const nextElement = header.nextElementSibling;
+
+			if ( nextElement && nextElement.tagName === 'UL' ) {
+
+				const visibleItems = nextElement.querySelectorAll( 'li:not([style*="display: none"])' );
+
+				// Show section if header matches OR has visible items
+				if ( headerMatches || visibleItems.length > 0 ) {
+
+					header.style.display = '';
+					nextElement.style.display = '';
+
+					// If header matches, show all items in this section
+					if ( headerMatches ) {
+
+						const allItems = nextElement.querySelectorAll( 'li' );
+						allItems.forEach( item => item.style.display = '' );
+
+					}
+
+				} else {
+
+					header.style.display = 'none';
+					nextElement.style.display = 'none';
+
+				}
+
+			}
+
+		} );
+
+		// Show/hide h2 headers (main categories) if they have visible content
+		const h2Headers = nav.querySelectorAll( 'h2' );
+
+		h2Headers.forEach( header => {
+
+			let hasVisibleContent = false;
+			let currentElement = header.nextElementSibling;
+
+			// Check all following elements until next h2 or end
+			while ( currentElement && currentElement.tagName !== 'H2' ) {
+
+				// Check for visible h3 sections OR visible ul with items
+				if ( currentElement.tagName === 'H3' && currentElement.style.display !== 'none' ) {
+
+					hasVisibleContent = true;
+					break;
+
+				} else if ( currentElement.tagName === 'UL' && currentElement.style.display !== 'none' ) {
+
+					const visibleItems = currentElement.querySelectorAll( 'li:not([style*="display: none"])' );
+
+					if ( visibleItems.length > 0 ) {
+
+						hasVisibleContent = true;
+						break;
+
+					}
+
+				}
+
+				currentElement = currentElement.nextElementSibling;
+
+			}
+
+			header.style.display = hasVisibleContent ? '' : 'none';
+
+		} );
 
 	}
 
-	showSearch();
-
-	const keys = [ 'title', 'description' ];
-
-	if ( searchData === undefined ) {
-
-		showResultText( 'Loading...' );
-
-		try {
-
-			searchData = await fetchAllData();
-
-		} catch ( e ) {
-
-			console.log( e );
-			showResultText( 'Failed to load result.' );
-
-			return;
-
-		}
-
-	}
-
-	const result = getSearchResult( searchData, keys, value );
-
-	if ( ! result.length ) {
-
-		showResultText( 'No result found! Try some different combination.' );
-
-		return;
-
-	}
-
-	resultBox.innerHTML = buildSearchResult( result );
+	window.history.replaceState( {}, '', url );
 
 }
