@@ -36,48 +36,18 @@
 	});
 
 	/* determine if we need extra columns, "attributes" and "default" */
-	params.hasAttributes = false;
-	params.hasDefault = false;
 	params.hasName = false;
 
 	params.forEach(function(param) {
 		if (!param) { return; }
 
-		if (param.optional || param.nullable || param.variable) {
-			params.hasAttributes = true;
-		}
-
 		if (param.name) {
 			params.hasName = true;
-		}
-
-		if (typeof param.defaultvalue !== 'undefined') {
-			params.hasDefault = true;
 		}
 	});
 ?>
 
 <table class="params">
-	<thead>
-	<tr>
-		<?js if (params.hasName) {?>
-		<th>Name</th>
-		<?js } ?>
-
-		<th>Type</th>
-
-		<?js if (params.hasAttributes) {?>
-		<th>Attributes</th>
-		<?js } ?>
-
-		<?js if (params.hasDefault) {?>
-		<th>Default</th>
-		<?js } ?>
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
 	<tbody>
 	<?js
 		var self = this;
@@ -90,37 +60,18 @@
 				<td class="name"><code><?js= param.name ?></code></td>
 			<?js } ?>
 
-			<td class="type">
-			<?js if (param.type && param.type.names) {?>
-				<?js= self.partial('type.tmpl', param.type.names) ?>
-			<?js } ?>
-			</td>
-
-			<?js if (params.hasAttributes) {?>
-				<td class="attributes">
-				<?js if (param.optional) { ?>
-					&lt;optional><br>
-				<?js } ?>
-
-				<?js if (param.nullable) { ?>
-					&lt;nullable><br>
-				<?js } ?>
-
-				<?js if (param.variable) { ?>
-					&lt;repeatable><br>
-				<?js } ?>
-				</td>
-			<?js } ?>
-
-			<?js if (params.hasDefault) {?>
-				<td class="default">
-				<?js if (typeof param.defaultvalue !== 'undefined') { ?>
-					<?js= self.htmlsafe(param.defaultvalue) ?>
-				<?js } ?>
-				</td>
-			<?js } ?>
-
-			<td class="description last"><?js= param.description ?><?js if (param.subparams) { ?>
+			<td class="description last"><?js
+				var desc = param.description;
+				if (typeof param.defaultvalue !== 'undefined') {
+					var defaultText = '<br/>Default is <code>' + self.htmlsafe(param.defaultvalue) + '</code>.';
+					// If description ends with </p>, insert default before closing tag
+					if (desc.trim().endsWith('</p>')) {
+						desc = desc.trim().slice(0, -4) + defaultText + '</p>';
+					} else {
+						desc = desc + defaultText;
+					}
+				}
+			?><?js= desc ?><?js if (param.subparams) { ?>
 				<h6>Properties</h6>
 				<?js= self.partial('params.tmpl', param.subparams) ?>
 			<?js } ?></td>

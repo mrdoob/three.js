@@ -42,20 +42,42 @@
 
 ( function loadNavigation() {
 
-	const navContainer = document.querySelector( '#content nav' );
+	const content = document.getElementById( 'content' );
+	const navContainer = content.querySelector( 'nav' );
 
-	if ( navContainer ) {
+	fetch( 'nav.html' )
+		.then( response => response.text() )
+		.then( html => {
 
-		fetch( 'nav.html' )
-			.then( response => response.text() )
-			.then( html => {
+			navContainer.innerHTML = html;
 
-				navContainer.innerHTML = html;
+			const savedScrollTop = sessionStorage.getItem( 'navScrollTop' );
 
-			} )
-			.catch( err => console.error( 'Failed to load navigation:', err ) );
+			if ( savedScrollTop !== null ) {
 
-	}
+				content.scrollTop = parseInt( savedScrollTop, 10 );
+
+			}
+
+			// Save scroll position when clicking nav links
+			navContainer.addEventListener( 'click', function ( event ) {
+
+				const link = event.target.closest( 'a' );
+
+				if ( link ) {
+
+					sessionStorage.setItem( 'navScrollTop', content.scrollTop );
+
+				}
+
+			} );
+
+			updateNavigation();
+
+			sessionStorage.removeItem( 'navScrollTop' );
+
+		} )
+		.catch( err => console.error( 'Failed to load navigation:', err ) );
 
 } )();
 
@@ -163,7 +185,6 @@ clearSearchButton.onclick = function () {
 
 //
 
-window.addEventListener( 'DOMContentLoaded', updateNavigation );
 window.addEventListener( 'hashchange', updateNavigation );
 
 function updateNavigation() {
@@ -194,7 +215,14 @@ function updateNavigation() {
 
 	if ( aElement !== null ) {
 
-		aElement.scrollIntoView( { block: 'center' } );
+		const savedScrollTop = sessionStorage.getItem( 'navScrollTop' );
+
+		if ( savedScrollTop === null ) {
+
+			aElement.scrollIntoView( { block: 'center' } );
+
+		}
+
 		aElement.classList.add( 'selected' );
 
 	}
