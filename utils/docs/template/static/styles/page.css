@@ -238,9 +238,13 @@
 		display: block;
 		padding: 16px 0;
 	}
-	
+
 	.search-result-item-description {
 		color: var(--text-color);
+	}
+
+	h2.subsection-title + p {
+		margin-top: 24px;
 	}
 
 	.copy-btn {
