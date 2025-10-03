@@ -302,7 +302,7 @@ class Textures extends DataMap {
 
 					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
-					const skipAutoGeneration = texture.isStorageTexture === true && texture.manualMipmaps === true;
+					const skipAutoGeneration = texture.isStorageTexture === true && texture.mipmapsAutoUpdate === false;
 
 					if ( options.needsMipmaps && texture.mipmaps.length === 0 && ! skipAutoGeneration ) {
 
