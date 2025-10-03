@@ -436,22 +436,6 @@ class SSGINode extends TempNode {
 			]
 		} );
 
-		/*const bitCount = Fn( ( [ value ] ) => {
-
-			const v = uint( value );
-			v.assign( v.sub( v.shiftRight( uint( 1 ) ).bitAnd( uint( 0x55555555 ) ) ) );
-			v.assign( v.bitAnd( uint( 0x33333333 ) ).add( v.shiftRight( uint( 2 ) ).bitAnd( uint( 0x33333333 ) ) ) );
-
-			return v.add( v.shiftRight( uint( 4 ) ) ).bitAnd( uint( 0xF0F0F0F ) ).mul( uint( 0x1010101 ) ).shiftRight( uint( 24 ) );
-
-		} ).setLayout( {
-			name: 'bitCount',
-			type: 'uint',
-			inputs: [
-				{ name: 'value', type: 'uint' }
-			]
-		} ); */
-
 		const horizonSampling = Fn( ( [ directionIsRight, RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
 
 			const STEP_COUNT = this.stepCount.toConst();

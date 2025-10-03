@@ -217,8 +217,6 @@ class MathNode extends TempNode {
 
 	generate( builder, output ) {
 
-		console.log( this.method );
-
 		const properties = builder.getNodeProperties( this );
 
 		if ( properties.outputNode ) {

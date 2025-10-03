@@ -1,7 +1,9 @@
-import TempNode from '../core/TempNode.js';
 import { addMethodChaining, Fn, nodeProxyIntent, uint } from '../tsl/TSLCore.js';
 import { bitcast } from './BitcastNode.js';
 import MathNode from './MathNode.js';
+
+const registeredBitcountFunctions = {};
+
 /**
  * This node represents an operation that reinterprets the bit representation of a value
  * in one type as a value in another type.
@@ -61,13 +63,10 @@ class BitcountNode extends MathNode {
 
 		}
 
-		const inputType = this.getInputType();
+		const inputType = this.getInputType( builder );
 		const elementType = builder.getElementType( inputType );
 
-		const typeLength = builder.getTypeLength();
-
-		console.log( inputType, elementType, typeLength );
-
+		const typeLength = builder.getTypeLength( inputType );
 
 		if ( method === BitcountNode.COUNT_LEADING_ZEROS ) {
 
@@ -80,79 +79,98 @@ class BitcountNode extends MathNode {
 
 		} else if ( method === BitcountNode.COUNT_ONE_BITS ) {
 
-			const bitCountBase = Fn( ( [ value ] ) => {
+			const bitcountBaseMethod = `bitcount_base_${elementType}`;
 
-				const v = uint( 0.0 );
+			let bitCountBaseFn = registeredBitcountFunctions[ bitcountBaseMethod ];
 
-				if ( elementType === 'int' ) {
+			if ( bitCountBaseFn === undefined ) {
 
-					v.assign( bitcast( value, 'uint' ) );
+				bitCountBaseFn = Fn( ( [ value ] ) => {
 
-				}
+					const v = uint( 0.0 );
 
-				v.assign( v.sub( v.shiftRight( uint( 1 ) ).bitAnd( uint( 0x55555555 ) ) ) );
-				v.assign( v.bitAnd( uint( 0x33333333 ) ).add( v.shiftRight( uint( 2 ) ).bitAnd( uint( 0x33333333 ) ) ) );
+					if ( elementType === 'int' ) {
 
-				return v.add( v.shiftRight( uint( 4 ) ) ).bitAnd( uint( 0xF0F0F0F ) ).mul( uint( 0x1010101 ) ).shiftRight( uint( 24 ) );
+						v.assign( bitcast( value, 'uint' ) );
 
-			} ).setLayout( {
-				name: `bitcount_${elementType}`,
-				type: 'uint',
-				inputs: [
-					{ name: 'value', type: elementType }
-				]
-			} );
+					} else {
 
-
-			const bitCountFn = Fn( ( [ value ] ) => {
-
-				const v = uint( 0.0 );
-
-				if ( typeLength === 1 ) {
-
-					v.addAssign( bitCountBase( value ) );
-
-				} else {
-
-					const components = [ 'x', 'y', 'z', 'w' ];
-
-					for ( let i = 0; i < typeLength; i ++ ) {
-
-						const component = components[ i ];
-
-						v.addAssign( bitCountBase( value[ component ] ) );
+						v.assign( value );
 
 					}
 
-				}
+					v.assign( v.sub( v.shiftRight( uint( 1 ) ).bitAnd( uint( 0x55555555 ) ) ) );
+					v.assign( v.bitAnd( uint( 0x33333333 ) ).add( v.shiftRight( uint( 2 ) ).bitAnd( uint( 0x33333333 ) ) ) );
 
-				return v;
+					return v.add( v.shiftRight( uint( 4 ) ) ).bitAnd( uint( 0xF0F0F0F ) ).mul( uint( 0x1010101 ) ).shiftRight( uint( 24 ) );
 
-			} ).setLayout( {
-				name: `bitcount_main_${this.nodeType}`,
-				type: 'uint',
-				inputs: [
-					{ name: 'value', type: inputType }
-				]
+				} ).setLayout( {
+					name: bitcountBaseMethod,
+					type: 'uint',
+					inputs: [
+						{ name: 'value', type: elementType }
+					]
+				} );
+
+
+				registeredBitcountFunctions[ bitcountBaseMethod ] = bitCountBaseFn;
+
+			}
+
+			const bitCountMethod = `bitcount_${inputType}`;
+
+			let bitCountFn = registeredBitcountFunctions[ bitCountMethod ];
+
+			if ( bitCountFn === undefined ) {
+
+				bitCountFn = Fn( ( [ value ] ) => {
+
+					const v = uint( 0.0 );
+
+					if ( typeLength === 1 ) {
+
+						v.addAssign( bitCountBaseFn( value ) );
+
+					} else {
+
+						const components = [ 'x', 'y', 'z', 'w' ];
+
+						for ( let i = 0; i < typeLength; i ++ ) {
+
+							const component = components[ i ];
+
+							v.addAssign( bitCountBaseFn( value[ component ] ) );
+
+						}
+
+					}
+
+					return v;
+
+				} ).setLayout( {
+					name: bitCountMethod,
+					type: 'uint',
+					inputs: [
+						{ name: 'value', type: inputType }
+					]
+				} );
+
+				registeredBitcountFunctions[ bitCountMethod ] = bitCountFn;
+
+
+			}
+
+			const methodFn = Fn( () => {
+
+				return bitCountFn(
+					aNode,
+				);
+
 			} );
 
-			console.log( 'test' );
-
-			const exec = bitCountFn( aNode ).toVar( 'testVar' );
-
-			return exec;
+			return methodFn();
 
 		}
-
-	}
-
-	generate( builder ) {
-
-		this.method += 'test';
-
-		super.generate( builder );
-
-
 
 	}
 
