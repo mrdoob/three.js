@@ -30,4 +30,4 @@ export const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1
  * @param {Node<vec2>} xy - The X,Y coordinates of the normal.
  * @return {Node<vec3>} The resulting normal.
  */
-export const unpackNormalZ = ( xy ) => vec3( xy, sqrt( saturate( float( 1.0 ).sub( dot( xy, xy ) ) ) ) );
+export const unpackNormal = ( xy ) => vec3( xy, sqrt( saturate( float( 1.0 ).sub( dot( xy, xy ) ) ) ) );

@@ -6,7 +6,7 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
 import { directionToFaceDirection } from './FrontFacingNode.js';
-import { unpackNormalZ } from '../utils/Packing.js';
+import { unpackNormal } from '../utils/Packing.js';
 import { error } from '../../utils.js';
 
 /**
@@ -65,37 +65,37 @@ class NormalMapNode extends TempNode {
 		 * @type {string}
 		 * @default NoNormalPacking
 		 */
-		this.unpackNormal = NoNormalPacking;
+		this.unpackNormalMode = NoNormalPacking;
 
 	}
 
 	setup( { material } ) {
 
-		const { normalMapType, scaleNode, unpackNormal } = this;
+		const { normalMapType, scaleNode, unpackNormalMode } = this;
 
 		let normalMap = this.node.mul( 2.0 ).sub( 1.0 );
 
 		if ( normalMapType === TangentSpaceNormalMap ) {
 
-			if ( unpackNormal == NormalRGPacking ) {
+			if ( unpackNormalMode == NormalRGPacking ) {
 
-				normalMap = unpackNormalZ( normalMap.xy );
+				normalMap = unpackNormal( normalMap.xy );
 
-			} else if ( unpackNormal == NormalGAPacking ) {
+			} else if ( unpackNormalMode == NormalGAPacking ) {
 
-				normalMap = unpackNormalZ( normalMap.yw );
+				normalMap = unpackNormal( normalMap.yw );
 
-			} else if ( unpackNormal != NoNormalPacking ) {
+			} else if ( unpackNormalMode != NoNormalPacking ) {
 
-				console.error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormal }` );
+				console.error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormalMode }` );
 
 			}
 
 		} else {
 
-			if ( unpackNormal != NoNormalPacking ) {
+			if ( unpackNormalMode != NoNormalPacking ) {
 
-				console.error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormal }'` );
+				console.error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormalMode }'` );
 
 			}
 
