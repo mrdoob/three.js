@@ -223,18 +223,29 @@ class Inspector extends RendererInspector {
 
 			data.cpu = stats.cpu;
 			data.gpu = stats.gpu;
+			data.stats = [];
 
 			data.initialized = true;
 
 		}
 
-		// TODO: Smooth values
+		// store stats
 
-		data.cpu = stats.cpu; // ease( .. )
-		data.gpu = stats.gpu;
+		if ( data.stats.length > this.maxFrames ) {
+
+			data.stats.shift();
+
+		}
+
+		data.stats.push( stats );
+
+		// compute averages
+
+		data.cpu = this.getAverageDeltaTime( data, 'cpu' );
+		data.gpu = this.getAverageDeltaTime( data, 'gpu' );
 		data.total = data.cpu + data.gpu;
 
-		//
+		// children
 
 		for ( const child of stats.children ) {
 
@@ -325,23 +336,30 @@ class Inspector extends RendererInspector {
 
 	}
 
-	getFPS() {
+	getAverageDeltaTime( statsData, property, frames = this.fps ) {
 
-		let frameSum = 0;
-		let timeSum = 0;
+		const statsArray = statsData.stats;
 
-		for ( let i = this.frames.length - 1; i >= 0; i -- ) {
+		let sum = 0;
+		let count = 0;
 
-			const frame = this.frames[ i ];
+		for ( let i = statsArray.length - 1; i >= 0 && count < frames; i -- ) {
 
-			frameSum ++;
-			timeSum += frame.deltaTime;
+			const stats = statsArray[ i ];
+			const value = stats[ property ];
 
-			if ( timeSum >= 1000 ) break;
+			if ( value > 0 ) {
+
+				// ignore invalid values
+
+				sum += value;
+				count ++;
+
+			}
 
 		}
 
-		return ( frameSum * 1000 ) / timeSum;
+		return sum / count;
 
 	}
 
@@ -387,7 +405,7 @@ class Inspector extends RendererInspector {
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
-			setText( 'fps-counter', this.getFPS().toFixed() );
+			setText( 'fps-counter', this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
 

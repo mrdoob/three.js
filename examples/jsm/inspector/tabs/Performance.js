@@ -162,7 +162,7 @@ class Performance extends Tab {
 
 	updateGraph( inspector/*, frame*/ ) {
 
-		this.graph.addPoint( 'fps', inspector.getFPS() );
+		this.graph.addPoint( 'fps', inspector.fps );
 		this.graph.update();
 
 	}
@@ -243,7 +243,7 @@ class Performance extends Tab {
 
 		//
 
-		setText( 'graph-fps-counter', inspector.getFPS().toFixed() + ' FPS' );
+		setText( 'graph-fps-counter', inspector.fps.toFixed() + ' FPS' );
 
 		//
 
