@@ -34325,6 +34325,10 @@ class ReflectorBaseNode extends Node {
 		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = true;
 
+		const previousName = scene.name;
+
+		scene.name = ( scene.name || 'Scene' ) + ' [ Reflector ]'; // TODO: Add bounce index
+
 		if ( needsClear ) {
 
 			renderer.clear();
@@ -34333,17 +34337,13 @@ class ReflectorBaseNode extends Node {
 
 		} else {
 
-			const previousName = scene.name;
-
-			scene.name = ( scene.name || 'Scene' ) + ' [ Reflector ]'; // TODO: Add bounce index
-
 			renderer.render( scene, virtualCamera );
-
-			scene.name = previousName;
 
 			this.hasOutput = true;
 
 		}
+
+		scene.name = previousName;
 
 		renderer.setMRT( currentMRT );
 		renderer.setRenderTarget( currentRenderTarget );
@@ -37274,6 +37274,14 @@ class ToonOutlinePassNode extends PassNode {
 		 * @type {WeakMap<Material, NodeMaterial>}
 		 */
 		this._materialCache = new WeakMap();
+
+		/**
+		 * The name of this pass.
+		 *
+		 * @type {string}
+		 * @default 'Outline Pass'
+		 */
+		this.name = 'Outline Pass';
 
 	}
 
@@ -60484,6 +60492,9 @@ ${shaderData.extensions}
 // precision
 ${ defaultPrecisions }
 
+// structs
+${shaderData.structs}
+
 // uniforms
 ${shaderData.uniforms}
 
@@ -60492,9 +60503,6 @@ ${shaderData.varyings}
 
 // codes
 ${shaderData.codes}
-
-// structs
-${shaderData.structs}
 
 void main() {
 
