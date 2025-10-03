@@ -6,7 +6,7 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
 import { directionToFaceDirection } from './FrontFacingNode.js';
-import { reconstructZ } from '../utils/Packing.js';
+import { unpackNormalZ } from '../utils/Packing.js';
 import { error } from '../../utils.js';
 
 /**
@@ -79,11 +79,11 @@ class NormalMapNode extends TempNode {
 
 			if ( unpackNormal == NormalRGPacking ) {
 
-				normalMap = reconstructZ( normalMap.xy );
+				normalMap = unpackNormalZ( normalMap.xy );
 
 			} else if ( unpackNormal == NormalGAPacking ) {
 
-				normalMap = reconstructZ( normalMap.yw );
+				normalMap = unpackNormalZ( normalMap.yw );
 
 			} else if ( unpackNormal != NoNormalPacking ) {
 
