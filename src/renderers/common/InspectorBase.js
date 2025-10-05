@@ -110,7 +110,7 @@ class InspectorBase {
 	finishCompute( /*uid*/ ) { }
 
 	/**
-	 * Called whean a render operation begins.
+	 * Called when a render operation begins.
 	 *
 	 * @param {string} uid - A unique identifier for the render context.
 	 * @param {Scene} scene - The scene being rendered.
