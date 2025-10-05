@@ -396,7 +396,7 @@
 
 				const scene = new THREE.Scene();
 
-				const infoArray = new Uint32Array( 3, 2, 2 );
+				const infoArray = new Uint32Array( [ 3, 2, 2 ] );
 				const infoBuffer = new THREE.StorageInstancedBufferAttribute( infoArray, 1 );
 				const infoStorage = storage( infoBuffer, 'uint', infoBuffer.count ).setPBO( true ).setName( 'TheInfo' );
 
