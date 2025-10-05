@@ -136,7 +136,7 @@ export class BitonicSort {
 		}
 
 		/**
-		 * A node representing a storage buffer used for transfering the result of the global sort back to the original data buffer.
+		 * A node representing a storage buffer used for transferring the result of the global sort back to the original data buffer.
 		 *
 		 * @type {StorageBufferNode}
 		*/
@@ -668,7 +668,7 @@ export class BitonicSort {
 
 		if ( this.currentDispatch === this.stepCount ) {
 
-			// If our last swap addressed only addressed the temp buffer, then re-allign it with the data buffer
+			// If our last swap addressed only addressed the temp buffer, then re-align it with the data buffer
 			// to fulfill the requirement of an in-place sort.
 			if ( this.readBufferName === 'Temp' ) {
 

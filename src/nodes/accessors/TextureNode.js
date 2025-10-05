@@ -126,7 +126,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * By default the `update()` method is not executed. Depending on
 		 * whether a uv transformation matrix and/or flipY is applied, `update()`
-		 * is exeucted per object.
+		 * is executed per object.
 		 *
 		 * @type {string}
 		 * @default 'none'
