@@ -238,7 +238,7 @@ jobs:
           echo "WEBGPU_NODES_TREESHAKEN_DIFF_GZIP=$WEBGPU_NODES_TREESHAKEN_DIFF_GZIP" >> $GITHUB_OUTPUT
 
       - name: Find existing comment
-        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
         id: find-comment
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
