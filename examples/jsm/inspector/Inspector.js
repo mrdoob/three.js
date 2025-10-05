@@ -5,12 +5,10 @@ import { Performance } from './tabs/Performance.js';
 import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
 import { Viewer } from './tabs/Viewer.js';
-import { setText, ease, splitPath, splitCamelCase } from './ui/utils.js';
+import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
 import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
 import { renderOutput, vec3, vec4 } from 'three/tsl';
-
-const EASE_FACTOR = 0.1;
 
 class Inspector extends RendererInspector {
 
@@ -40,9 +38,6 @@ class Inspector extends RendererInspector {
 
 		//
 
-		this.deltaTime = 0;
-		this.softDeltaTime = 0;
-
 		this.statsData = new Map();
 		this.canvasNodes = new Map();
 		this.profiler = profiler;
@@ -60,7 +55,7 @@ class Inspector extends RendererInspector {
 			},
 			graph: {
 				needsUpdate: false,
-				duration: .05,
+				duration: .02,
 				time: 0
 			}
 		};
@@ -228,18 +223,29 @@ class Inspector extends RendererInspector {
 
 			data.cpu = stats.cpu;
 			data.gpu = stats.gpu;
+			data.stats = [];
 
 			data.initialized = true;
 
 		}
 
-		// TODO: Smooth values
+		// store stats
 
-		data.cpu = stats.cpu; // ease( .. )
-		data.gpu = stats.gpu;
+		if ( data.stats.length > this.maxFrames ) {
+
+			data.stats.shift();
+
+		}
+
+		data.stats.push( stats );
+
+		// compute averages
+
+		data.cpu = this.getAverageDeltaTime( data, 'cpu' );
+		data.gpu = this.getAverageDeltaTime( data, 'gpu' );
 		data.total = data.cpu + data.gpu;
 
-		//
+		// children
 
 		for ( const child of stats.children ) {
 
@@ -330,6 +336,33 @@ class Inspector extends RendererInspector {
 
 	}
 
+	getAverageDeltaTime( statsData, property, frames = this.fps ) {
+
+		const statsArray = statsData.stats;
+
+		let sum = 0;
+		let count = 0;
+
+		for ( let i = statsArray.length - 1; i >= 0 && count < frames; i -- ) {
+
+			const stats = statsArray[ i ];
+			const value = stats[ property ];
+
+			if ( value > 0 ) {
+
+				// ignore invalid values
+
+				sum += value;
+				count ++;
+
+			}
+
+		}
+
+		return sum / count;
+
+	}
+
 	resolveFrame( frame ) {
 
 		const nextFrame = this.getFrameById( frame.frameId + 1 );
@@ -367,21 +400,12 @@ class Inspector extends RendererInspector {
 
 		//
 
-		if ( this.softDeltaTime === 0 ) {
-
-			this.softDeltaTime = frame.deltaTime;
-
-		}
-
-		this.deltaTime = frame.deltaTime;
-		this.softDeltaTime = ease( this.softDeltaTime, frame.deltaTime, this.nodeFrame.deltaTime, EASE_FACTOR );
-
 		this.updateCycle( this.displayCycle.text );
 		this.updateCycle( this.displayCycle.graph );
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
-			setText( 'fps-counter', this.softFPS.toFixed() );
+			setText( 'fps-counter', this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
 
@@ -395,18 +419,6 @@ class Inspector extends RendererInspector {
 
 		this.displayCycle.text.needsUpdate = false;
 		this.displayCycle.graph.needsUpdate = false;
-
-	}
-
-	get fps() {
-
-		return 1000 / this.deltaTime;
-
-	}
-
-	get softFPS() {
-
-		return 1000 / this.softDeltaTime;
 
 	}
 

@@ -11,6 +11,7 @@ class ObjectStats {
 		this.timestamp = 0;
 		this.cpu = 0;
 		this.gpu = 0;
+		this.fps = 0;
 
 		this.children = [];
 		this.parent = null;
@@ -111,6 +112,8 @@ export class RendererInspector extends InspectorBase {
 
 		this.addFrame( frame );
 
+		this.fps = this._getFPS();
+
 		this.lastFrame = frame;
 
 		this.currentFrame = null;
@@ -118,6 +121,26 @@ export class RendererInspector extends InspectorBase {
 		this.currentNodes = null;
 
 		this._lastFinishTime = now;
+
+	}
+
+	_getFPS() {
+
+		let frameSum = 0;
+		let timeSum = 0;
+
+		for ( let i = this.frames.length - 1; i >= 0; i -- ) {
+
+			const frame = this.frames[ i ];
+
+			frameSum ++;
+			timeSum += frame.deltaTime;
+
+			if ( timeSum >= 1000 ) break;
+
+		}
+
+		return ( frameSum * 1000 ) / timeSum;
 
 	}
 
