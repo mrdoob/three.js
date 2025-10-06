@@ -408,7 +408,7 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	setupShadow( builder ) {
 
-		const { renderer } = builder;
+		const { renderer, camera } = builder;
 
 		const { light, shadow } = this;
 
@@ -416,6 +416,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
 
+		shadow.camera.coordinateSystem = camera.coordinateSystem;
 		shadow.camera.updateProjectionMatrix();
 
 		// VSM
