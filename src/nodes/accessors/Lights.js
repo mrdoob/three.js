@@ -32,6 +32,9 @@ export function lightShadowMatrix( light ) {
 
 	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( ( frame ) => {
 
+		// normally, shadow matrices are updated in ShadowNode. However, if the shadow matrix is used outside
+		// of shadow rendering (like in ProjectorLightNode), the shadow matrix still requires an update.
+
 		if ( light.castShadow !== true || frame.renderer.shadowMap.enabled === false ) {
 
 			light.shadow.updateMatrices( light );
