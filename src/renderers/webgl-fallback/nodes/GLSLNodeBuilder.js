@@ -154,25 +154,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
-	 * Includes the given method name into the current
-	 * function node.
-	 *
-	 * @private
-	 * @param {string} name - The method name to include.
-	 * @return {CodeNode} The respective code node.
-	 */
-	_include( name ) {
-
-		const codeNode = glslPolyfills[ name ];
-		codeNode.build( this );
-
-		this.addInclude( codeNode );
-
-		return codeNode;
-
-	}
-
-	/**
 	 * Returns the native shader method name for a given generic name.
 	 *
 	 * @param {string} method - The method name to resolve.
