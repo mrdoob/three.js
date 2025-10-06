@@ -1,6 +1,6 @@
-import { addMethodChaining, Fn, nodeProxyIntent, uint } from '../tsl/TSLCore.js';
-import { bitcast } from './BitcastNode.js';
-import MathNode from './MathNode.js';
+import { addMethodChaining, float, Fn, If, int, nodeProxyIntent, uint } from '../tsl/TSLCore.js';
+import { bitcast, floatBitsToUint } from './BitcastNode.js';
+import MathNode, { negate } from './MathNode.js';
 
 const registeredBitcountFunctions = {};
 
@@ -21,7 +21,7 @@ class BitcountNode extends MathNode {
 	/**
 	 * Constructs a new math node.
 	 *
-	 * @param {string} method - The method name.
+	 * @param {'countTrailingZeros'|'countLeadingZeros'|'countOneBits'} method - The method name.
 	 * @param {Node} aNode - The first input.
 	 */
 	constructor( method, aNode ) {
@@ -42,6 +42,266 @@ class BitcountNode extends MathNode {
 	getNodeType( /*builder*/ ) {
 
 		return 'uint';
+
+	}
+
+	/**
+	 * Casts the input value of the function to an integer if necessary.
+	 *
+	 * @param {Node<uint>|Node<int>} inputNode - The input value.
+	 * @param {Node<uint>} outputNode - The output value.
+	 * @param {string} elementType - The type of the input value.
+	 */
+	_resolveElementType( inputNode, outputNode, elementType ) {
+
+		if ( elementType === 'int' ) {
+
+			outputNode.assign( bitcast( inputNode, 'uint' ) );
+
+		} else {
+
+			outputNode.assign( inputNode );
+
+		}
+
+	}
+
+	_constructTrailingZerosBaseLayout( method, elementType ) {
+
+		const fnDef = Fn( ( [ value ] ) => {
+
+			const v = uint( 0.0 );
+
+			this._resolveElementType( value, v, elementType );
+
+			const f = float( v.bitAnd( negate( v ) ) );
+			const uintBits = floatBitsToUint( f );
+
+			return ( uintBits.shiftRight( 23 ) ).sub( 127 );
+
+		} ).setLayout( {
+			name: method,
+			type: 'uint',
+			inputs: [
+				{ name: 'value', type: elementType }
+			]
+		} );
+
+		return fnDef;
+
+	}
+
+	_constructTrailingZerosMainLayout( method, inputType, typeLength, baseFn ) {
+
+		const fnDef = Fn( ( [ value ] ) => {
+
+			const v = uint( 0.0 );
+
+			if ( typeLength === 1 ) {
+
+				v.addAssign( baseFn( value ) );
+
+			} else {
+
+				const components = [ 'x', 'y', 'z', 'w' ];
+				for ( let i = 0; i < typeLength; i ++ ) {
+
+					const component = components[ i ];
+
+					v.addAssign( baseFn( value[ component ] ) );
+
+					// Continue loop only if it's not the maximumn number
+					If( v.equal( 32 * i ), () => {
+
+						return v;
+
+					} );
+
+				}
+
+			}
+
+			return v;
+
+		} ).setLayout( {
+			name: method,
+			type: 'uint',
+			inputs: [
+				{ name: 'value', type: inputType }
+			]
+		} );
+
+		return fnDef;
+
+	}
+
+	_constructLeadingZerosBaseLayout( method, elementType ) {
+
+		const fnDef = Fn( ( [ value ] ) => {
+
+			If( value.equal( uint( 0 ) ), () => {
+
+				return uint( 32 );
+
+			} );
+
+			const v = uint( 0 );
+			const n = uint( 0 );
+			this._resolveElementType( value, v, elementType );
+
+			If( v.shiftRight( 16 ).equal( 0 ), () => {
+
+				n.addAssign( 16 );
+				v.shiftLeftAssign( 16 );
+
+			} );
+
+			If( v.shiftRight( 24 ).equal( 0 ), () => {
+
+				n.addAssign( 8 );
+				v.shiftLeftAssign( 8 );
+
+			} );
+
+			If( v.shiftRight( 28 ).equal( 0 ), () => {
+
+				n.addAssign( 4 );
+				v.shiftLeftAssign( 4 );
+
+			} );
+
+			If( v.shiftRight( 30 ).equal( 0 ), () => {
+
+				n.addAssign( 2 );
+				v.shiftLeftAssign( 2 );
+
+			} );
+
+			If( v.shiftRight( 31 ).equal( 0 ), () => {
+
+				n.addAssign( 1 );
+
+			} );
+
+			return n;
+
+		} ).setLayout( {
+			name: method,
+			type: 'uint',
+			inputs: [
+				{ name: 'value', type: elementType }
+			]
+		} );
+
+		return fnDef;
+
+	}
+
+	_constructLeadingZerosMainLayout( method, inputType, typeLength, baseFn ) {
+
+		const fnDef = Fn( ( [ value ] ) => {
+
+			const v = uint( 0.0 );
+
+			if ( typeLength === 1 ) {
+
+				v.addAssign( baseFn( value ) );
+
+			} else {
+
+				const components = [ 'w', 'z', 'y', 'x' ];
+				for ( let i = 0; i < typeLength; i ++ ) {
+
+					const component = components[ i ];
+
+					v.addAssign( baseFn( value[ component ] ) );
+
+					If( v.notEqual( 32 * i ), () => {
+
+						return v;
+
+					} );
+
+				}
+
+			}
+
+			return v;
+
+		} ).setLayout( {
+			name: method,
+			type: 'uint',
+			inputs: [
+				{ name: 'value', type: inputType }
+			]
+		} );
+
+		return fnDef;
+
+
+	}
+
+	_constructOneBitsBaseLayout( method, elementType ) {
+
+		const fnDef = Fn( ( [ value ] ) => {
+
+			const v = uint( 0.0 );
+
+			this._resolveElementType( value, v, elementType );
+
+			v.assign( v.sub( v.shiftRight( uint( 1 ) ).bitAnd( uint( 0x55555555 ) ) ) );
+			v.assign( v.bitAnd( uint( 0x33333333 ) ).add( v.shiftRight( uint( 2 ) ).bitAnd( uint( 0x33333333 ) ) ) );
+
+			return v.add( v.shiftRight( uint( 4 ) ) ).bitAnd( uint( 0xF0F0F0F ) ).mul( uint( 0x1010101 ) ).shiftRight( uint( 24 ) );
+
+		} ).setLayout( {
+			name: method,
+			type: 'uint',
+			inputs: [
+				{ name: 'value', type: elementType }
+			]
+		} );
+
+		return fnDef;
+
+	}
+
+	_constructOneBitsMainLayout( method, inputType, typeLength, baseFn ) {
+
+		const fnDef = Fn( ( [ value ] ) => {
+
+			const v = uint( 0.0 );
+
+			if ( typeLength === 1 ) {
+
+				v.addAssign( baseFn( value ) );
+
+			} else {
+
+				const components = [ 'x', 'y', 'z', 'w' ];
+
+				for ( let i = 0; i < typeLength; i ++ ) {
+
+					const component = components[ i ];
+
+					v.addAssign( baseFn( value[ component ] ) );
+
+				}
+
+			}
+
+			return v;
+
+		} ).setLayout( {
+			name: method,
+			type: 'uint',
+			inputs: [
+				{ name: 'value', type: inputType }
+			]
+		} );
+
+		return fnDef;
+
 
 	}
 
@@ -68,109 +328,84 @@ class BitcountNode extends MathNode {
 
 		const typeLength = builder.getTypeLength( inputType );
 
-		if ( method === BitcountNode.COUNT_LEADING_ZEROS ) {
+		const baseMethod = `${method}_base_${elementType}`;
+		const newMethod = `${method}_${inputType}`;
 
+		let baseFn = registeredBitcountFunctions[ baseMethod ];
 
+		if ( baseFn === undefined ) {
 
+			switch ( method ) {
 
-		} else if ( method === BitcountNode.COUNT_TRAILING_ZEROS ) {
+				case BitcountNode.COUNT_LEADING_ZEROS: {
 
+					baseFn = this._constructLeadingZerosBaseLayout( baseMethod, elementType );
+					break;
 
+				}
 
-		} else if ( method === BitcountNode.COUNT_ONE_BITS ) {
+				case BitcountNode.COUNT_TRAILING_ZEROS: {
 
-			const bitcountBaseMethod = `bitcount_base_${elementType}`;
+					baseFn = this._constructTrailingZerosBaseLayout( baseMethod, elementType );
+					break;
 
-			let bitCountBaseFn = registeredBitcountFunctions[ bitcountBaseMethod ];
+				}
 
-			if ( bitCountBaseFn === undefined ) {
+				case BitcountNode.COUNT_ONE_BITS: {
 
-				bitCountBaseFn = Fn( ( [ value ] ) => {
+					baseFn = this._constructOneBitsBaseLayout( baseMethod, elementType );
+					break;
 
-					const v = uint( 0.0 );
-
-					if ( elementType === 'int' ) {
-
-						v.assign( bitcast( value, 'uint' ) );
-
-					} else {
-
-						v.assign( value );
-
-					}
-
-					v.assign( v.sub( v.shiftRight( uint( 1 ) ).bitAnd( uint( 0x55555555 ) ) ) );
-					v.assign( v.bitAnd( uint( 0x33333333 ) ).add( v.shiftRight( uint( 2 ) ).bitAnd( uint( 0x33333333 ) ) ) );
-
-					return v.add( v.shiftRight( uint( 4 ) ) ).bitAnd( uint( 0xF0F0F0F ) ).mul( uint( 0x1010101 ) ).shiftRight( uint( 24 ) );
-
-				} ).setLayout( {
-					name: bitcountBaseMethod,
-					type: 'uint',
-					inputs: [
-						{ name: 'value', type: elementType }
-					]
-				} );
-
-
-				registeredBitcountFunctions[ bitcountBaseMethod ] = bitCountBaseFn;
+				}
 
 			}
 
-			const bitCountMethod = `bitcount_${inputType}`;
-
-			let bitCountFn = registeredBitcountFunctions[ bitCountMethod ];
-
-			if ( bitCountFn === undefined ) {
-
-				bitCountFn = Fn( ( [ value ] ) => {
-
-					const v = uint( 0.0 );
-
-					if ( typeLength === 1 ) {
-
-						v.addAssign( bitCountBaseFn( value ) );
-
-					} else {
-
-						const components = [ 'x', 'y', 'z', 'w' ];
-
-						for ( let i = 0; i < typeLength; i ++ ) {
-
-							const component = components[ i ];
-
-							v.addAssign( bitCountBaseFn( value[ component ] ) );
-
-						}
-
-					}
-
-					return v;
-
-				} ).setLayout( {
-					name: bitCountMethod,
-					type: 'uint',
-					inputs: [
-						{ name: 'value', type: inputType }
-					]
-				} );
-
-				registeredBitcountFunctions[ bitCountMethod ] = bitCountFn;
-
-
-			}
-
-			const methodFn = Fn( () => {
-
-				return bitCountFn(
-					aNode,
-				);
-
-			} );
-
-			return methodFn();
+			registeredBitcountFunctions[ baseMethod ] = baseFn;
 
 		}
+
+		let fn = registeredBitcountFunctions[ newMethod ];
+
+		if ( fn === undefined ) {
+
+			switch ( method ) {
+
+				case BitcountNode.COUNT_LEADING_ZEROS: {
+
+					fn = this._constructLeadingZerosMainLayout( newMethod, inputType, typeLength, baseFn );
+					break;
+
+				}
+
+				case BitcountNode.COUNT_TRAILING_ZEROS: {
+
+					fn = this._constructTrailingZerosMainLayout( newMethod, inputType, typeLength, baseFn );
+					break;
+
+				}
+
+				case BitcountNode.COUNT_ONE_BITS: {
+
+					fn = this._constructOneBitsMainLayout( newMethod, inputType, typeLength, baseFn );
+					break;
+
+				}
+
+			}
+
+			registeredBitcountFunctions[ newMethod ] = fn;
+
+		}
+
+		const output = Fn( () => {
+
+			return fn(
+				aNode,
+			);
+
+		} );
+
+		return output();
 
 	}
 
