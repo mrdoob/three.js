@@ -44,10 +44,9 @@
 
 			let camera, scene, renderer;
 
-			init();
-			render();
+			init().then( render );
 
-			function init() {
+			async function init() {
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -90,6 +89,8 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
@@ -116,7 +117,7 @@
 
 			function render() {
 
-				renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

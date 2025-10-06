@@ -51,7 +51,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.35;
 				document.body.appendChild( renderer.domElement );
@@ -65,7 +65,6 @@
 				controls.target.set( 0, - 0.08, 0.11 );
 				controls.minDistance = 0.1;
 				controls.maxDistance = 2;
-				controls.addEventListener( 'change', render );
 				controls.update();
 
 				const hdrLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
@@ -102,9 +101,9 @@
 
 			}
 
-			function render() {
+			function animate() {
 
-				renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

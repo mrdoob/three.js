@@ -46,9 +46,9 @@
 			let camera, scene, renderer;
 			let postProcessing;
 
-			init();
+			init().then( render );
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.6, 2.7 );
@@ -60,6 +60,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.NoToneMapping; // apply tone mapping in post processing, instead
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				// post processing
 
@@ -135,7 +137,7 @@
 
 			function render() {
 
-				postProcessing.renderAsync();
+				postProcessing.render();
 
 			}
 

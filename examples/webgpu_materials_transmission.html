@@ -68,7 +68,6 @@
 					hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
 
 					init();
-					render();
 
 				} );
 
@@ -77,7 +76,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
@@ -245,9 +244,9 @@
 
 			}
 
-			function render() {
+			function animate() {
 
-				renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

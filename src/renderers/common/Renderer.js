@@ -35,7 +35,7 @@ import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearF
 import { float, vec3, vec4 } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
-import { error, warn } from '../../utils.js';
+import { error, warn, warnOnce } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
@@ -971,15 +971,16 @@ class Renderer {
 	 * Renders the scene in an async fashion.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {Object3D} scene - The scene or 3D object to render.
 	 * @param {Camera} camera - The camera.
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
 	async renderAsync( scene, camera ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r182
 
-		this._renderScene( scene, camera );
+		this.render( scene, camera );
 
 	}
 

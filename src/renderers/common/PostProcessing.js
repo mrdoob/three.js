@@ -3,6 +3,7 @@ import { ColorManagement } from '../../math/ColorManagement.js';
 import { vec4, renderOutput } from '../../nodes/TSL.js';
 import { NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
+import { warnOnce } from '../../utils.js';
 
 /**
  * This module is responsible to manage the post processing setups in apps.
@@ -207,37 +208,14 @@ class PostProcessing {
 	 * its animation loop (not the one from the renderer).
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
 	async renderAsync() {
 
-		this._update();
+		warnOnce( 'PostProcessing: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r182
 
-		if ( this._context.onBeforePostProcessing !== null ) this._context.onBeforePostProcessing();
-
-		const renderer = this.renderer;
-
-		const toneMapping = renderer.toneMapping;
-		const outputColorSpace = renderer.outputColorSpace;
-
-		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = ColorManagement.workingColorSpace;
-
-		//
-
-		const currentXR = renderer.xr.enabled;
-		renderer.xr.enabled = false;
-
-		await this._quadMesh.renderAsync( renderer );
-
-		renderer.xr.enabled = currentXR;
-
-		//
-
-		renderer.toneMapping = toneMapping;
-		renderer.outputColorSpace = outputColorSpace;
-
-		if ( this._context.onAfterPostProcessing !== null ) this._context.onAfterPostProcessing();
+		this.render();
 
 	}
 

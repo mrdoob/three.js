@@ -100,6 +100,7 @@
 				const renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: forceWebGL } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 
 				document.body.appendChild( renderer.domElement );
 				renderer.domElement.style.position = 'absolute';
@@ -122,15 +123,11 @@
 
 				//
 
+				function animate() {
 
-				 const animate = async function () {
-
-					await renderer.renderAsync( scene, camera );
-
+					renderer.render( scene, camera );
 			
-				};
-
-				renderer.setAnimationLoop( animate );
+				}
 
 				window.addEventListener( 'resize', onWindowResize );
 
