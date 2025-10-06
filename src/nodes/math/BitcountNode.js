@@ -38,12 +38,6 @@ class BitcountNode extends MathNode {
 
 	}
 
-	getNodeType( /*builder*/ ) {
-
-		return 'uint';
-
-	}
-
 	/**
 	 * Casts the input value of the function to an integer if necessary.
 	 *
