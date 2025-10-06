@@ -1099,8 +1099,10 @@ export const atan2 = ( y, x ) => { // @deprecated, r172
 
 };
 
+// GLSL alias function
 
-
+export const faceforward = faceForward;
+export const inversesqrt = inverseSqrt;
 
 // Method chaining
 

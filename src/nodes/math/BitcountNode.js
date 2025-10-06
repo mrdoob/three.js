@@ -66,7 +66,7 @@ class BitcountNode extends MathNode {
 
 	}
 
-	_constructTrailingZerosBaseLayout( method, elementType ) {
+	_createTrailingZerosBaseLayout( method, elementType ) {
 
 		const fnDef = Fn( ( [ value ] ) => {
 
@@ -91,7 +91,7 @@ class BitcountNode extends MathNode {
 
 	}
 
-	_constructTrailingZerosMainLayout( method, inputType, typeLength, baseFn ) {
+	_createTrailingZerosMainLayout( method, inputType, typeLength, baseFn ) {
 
 		const fnDef = Fn( ( [ value ] ) => {
 
@@ -135,7 +135,7 @@ class BitcountNode extends MathNode {
 
 	}
 
-	_constructLeadingZerosBaseLayout( method, elementType ) {
+	_createLeadingZerosBaseLayout( method, elementType ) {
 
 		const fnDef = Fn( ( [ value ] ) => {
 
@@ -197,7 +197,7 @@ class BitcountNode extends MathNode {
 
 	}
 
-	_constructLeadingZerosMainLayout( method, inputType, typeLength, baseFn ) {
+	_createLeadingZerosMainLayout( method, inputType, typeLength, baseFn ) {
 
 		const fnDef = Fn( ( [ value ] ) => {
 
@@ -241,7 +241,7 @@ class BitcountNode extends MathNode {
 
 	}
 
-	_constructOneBitsBaseLayout( method, elementType ) {
+	_createOneBitsBaseLayout( method, elementType ) {
 
 		const fnDef = Fn( ( [ value ] ) => {
 
@@ -266,7 +266,7 @@ class BitcountNode extends MathNode {
 
 	}
 
-	_constructOneBitsMainLayout( method, inputType, typeLength, baseFn ) {
+	_createOneBitsMainLayout( method, inputType, typeLength, baseFn ) {
 
 		const fnDef = Fn( ( [ value ] ) => {
 
@@ -339,21 +339,21 @@ class BitcountNode extends MathNode {
 
 				case BitcountNode.COUNT_LEADING_ZEROS: {
 
-					baseFn = this._constructLeadingZerosBaseLayout( baseMethod, elementType );
+					baseFn = this._createLeadingZerosBaseLayout( baseMethod, elementType );
 					break;
 
 				}
 
 				case BitcountNode.COUNT_TRAILING_ZEROS: {
 
-					baseFn = this._constructTrailingZerosBaseLayout( baseMethod, elementType );
+					baseFn = this._createTrailingZerosBaseLayout( baseMethod, elementType );
 					break;
 
 				}
 
 				case BitcountNode.COUNT_ONE_BITS: {
 
-					baseFn = this._constructOneBitsBaseLayout( baseMethod, elementType );
+					baseFn = this._createOneBitsBaseLayout( baseMethod, elementType );
 					break;
 
 				}
@@ -372,21 +372,21 @@ class BitcountNode extends MathNode {
 
 				case BitcountNode.COUNT_LEADING_ZEROS: {
 
-					fn = this._constructLeadingZerosMainLayout( newMethod, inputType, typeLength, baseFn );
+					fn = this._createLeadingZerosMainLayout( newMethod, inputType, typeLength, baseFn );
 					break;
 
 				}
 
 				case BitcountNode.COUNT_TRAILING_ZEROS: {
 
-					fn = this._constructTrailingZerosMainLayout( newMethod, inputType, typeLength, baseFn );
+					fn = this._createTrailingZerosMainLayout( newMethod, inputType, typeLength, baseFn );
 					break;
 
 				}
 
 				case BitcountNode.COUNT_ONE_BITS: {
 
-					fn = this._constructOneBitsMainLayout( newMethod, inputType, typeLength, baseFn );
+					fn = this._createOneBitsMainLayout( newMethod, inputType, typeLength, baseFn );
 					break;
 
 				}
