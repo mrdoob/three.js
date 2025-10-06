@@ -72,7 +72,10 @@
 				scene.environment = pmremGenerator.fromScene( environment ).texture;
 
 				const ktx2Loader = await new KTX2Loader()
-					.setTranscoderPath( 'jsm/libs/basis/' )
+					.setTranscoderPath( {
+						js: 'jsm/libs/basis/basis_transcoder.js',
+						wasm: 'jsm/libs/basis/basis_transcoder.wasm'
+					} )
 					.detectSupportAsync( renderer );
 
 				new GLTFLoader()

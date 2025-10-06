@@ -74,7 +74,10 @@
 				textureDisplace.wrapT = THREE.RepeatWrapping;
 
 				const ktxLoader = await new KTX2Loader()
-					.setTranscoderPath( 'jsm/libs/basis/' )
+					.setTranscoderPath( {
+						js: 'jsm/libs/basis/basis_transcoder.js',
+						wasm: 'jsm/libs/basis/basis_transcoder.wasm'
+					} )
 					.detectSupportAsync( renderer );
 
 				const ktxTexture = await ktxLoader.loadAsync( './textures/ktx2/2d_uastc.ktx2' );
