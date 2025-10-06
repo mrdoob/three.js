@@ -1674,10 +1674,10 @@ class NodeBuilder {
 	/**
 	 * Returns the properties for the given node and shader stage.
 	 *
-	 * Properties are typically used within a build stage to reference nodes or parameters
-	 * created in a separate build stage. A typical usage pattern would be
-	 * assigning dependency nodes to the current node's properties in the setup stage
-	 * and building those properties in the generate stage.
+	 * Properties are typically used within a build stage to reference a node's
+	 * child nodes or nodes manually assigned to the properties in a separate build stage.
+	 * A typical usage pattern for defining nodes manually would be assigning dependency nodes
+	 * to the current node's properties in the setup stage and building those properties in the generate stage.
 	 *
 	 * @param {Node} node - The node to get the properties for.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage='any'] - The shader stage.
@@ -2291,7 +2291,7 @@ class NodeBuilder {
 	 *
 	 * This function can be used to arbitrarily execute the specified build stage
 	 * outside of the standard build process. For instance, if a node's type depends
-	 * on properties created by the 'setup' stage, then flowBuidStage('setup')
+	 * on properties created by the 'setup' stage, then flowBuildStage('setup')
 	 * can be used to execute the setup build stage and access its generated nodes
 	 * before the standard build process begins.
 	 *
