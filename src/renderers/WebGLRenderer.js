@@ -54,6 +54,8 @@ import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createCanvasElement, probeAsync, warnOnce, error, warn, log } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
+import { transmissionMesh } from './TransmissionUtils.js';
+import { DepthTexture } from '../textures/DepthTexture.js';
 
 /**
  * This renderer uses WebGL 2 to display scenes.
@@ -1657,6 +1659,19 @@ class WebGLRenderer {
 
 				if ( _renderBackground ) background.render( scene );
 
+				const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget[ camera.id ];
+				if ( transmissiveObjects.length > 0 ) {
+
+					currentRenderList.opaque.length = 0;
+
+					const geometry = objects.update( transmissionMesh );
+					const material = transmissionMesh.material;
+					material.map = transmissionRenderTarget.texture;
+					material.depthMap = transmissionRenderTarget.depthTexture;
+					renderObject( transmissionMesh, scene, camera, geometry, material, null );
+
+				}
+
 				renderScene( currentRenderList, scene, camera );
 
 			}
@@ -1871,9 +1886,9 @@ class WebGLRenderer {
 					minFilter: LinearMipmapLinearFilter,
 					samples: 4,
 					stencilBuffer: stencil,
-					resolveDepthBuffer: false,
 					resolveStencilBuffer: false,
 					colorSpace: ColorManagement.workingColorSpace,
+					depthTexture: new DepthTexture(),
 				} );
 
 				// debug
