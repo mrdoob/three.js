@@ -35,7 +35,7 @@ import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearF
 import { float, vec3, vec4 } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
-import { error, warn } from '../../utils.js';
+import { error, warn, warnOnce } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
@@ -971,15 +971,16 @@ class Renderer {
 	 * Renders the scene in an async fashion.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {Object3D} scene - The scene or 3D object to render.
 	 * @param {Camera} camera - The camera.
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
 	async renderAsync( scene, camera ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		this._renderScene( scene, camera );
+		this.render( scene, camera );
 
 	}
 
@@ -1203,23 +1204,24 @@ class Renderer {
 
 	/**
 	 * Renders the scene or 3D object with the given camera. This method can only be called
-	 * if the renderer has been initialized.
+	 * if the renderer has been initialized. When using `render()` inside an animation loop,
+	 * it's guaranteed the renderer will be initialized. The animation loop must be defined
+	 * with {@link Renderer#setAnimationLoop} though.
+	 *
+	 * For all other use cases (like when using on-demand rendering), you must call
+	 * {@link Renderer#init} before rendering.
 	 *
 	 * The target of the method is the default framebuffer (meaning the canvas)
 	 * or alternatively a render target when specified via `setRenderTarget()`.
 	 *
 	 * @param {Object3D} scene - The scene or 3D object to render.
 	 * @param {Camera} camera - The camera to render the scene with.
-	 * @return {?Promise} A Promise that resolve when the scene has been rendered.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	render( scene, camera ) {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
-
-			return this.renderAsync( scene, camera );
+			throw new Error( 'Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
 
 		}
 

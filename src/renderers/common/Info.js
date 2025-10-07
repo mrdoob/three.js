@@ -54,7 +54,7 @@ class Info {
 		 * @property {number} triangles - The number of rendered triangle primitives of the current frame.
 		 * @property {number} points - The number of rendered point primitives of the current frame.
 		 * @property {number} lines - The number of rendered line primitives of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame when using `renderer.renderAsync()`.
+		 * @property {number} timestamp - The timestamp of the frame.
 		 */
 		this.render = {
 			calls: 0,

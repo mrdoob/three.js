@@ -58,6 +58,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NoToneMapping; // apply tone mapping in post processing, instead
 				document.body.appendChild( renderer.domElement );
 
@@ -91,7 +92,6 @@
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
-
 						scene.environment = texture;
 
 						// model
@@ -100,8 +100,6 @@
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 							scene.add( gltf.scene );
-
-							render();
 
 						} );
 
@@ -114,7 +112,6 @@
 				controls.maxDistance = 5;
 				controls.target.set( 0, - 0.1, - 0.2 );
 				controls.update();
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -127,15 +124,13 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				render();
-
 			}
 
 			//
 
-			function render() {
+			function animate() {
 
-				postProcessing.renderAsync();
+				postProcessing.render();
 
 			}
 
