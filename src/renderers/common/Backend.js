@@ -576,16 +576,6 @@ class Backend {
 	}
 
 	/**
-	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
-	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
-	 *
-	 * @async
-	 * @abstract
-	 * @return {Promise} A Promise that resolves when synchronization has been finished.
-	 */
-	async waitForGPU() {}
-
-	/**
 	 * This method performs a readback operation by moving buffer data from
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *

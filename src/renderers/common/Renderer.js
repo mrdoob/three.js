@@ -983,11 +983,12 @@ class Renderer {
 	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when synchronization has been finished.
 	 */
 	async waitForGPU() {
 
-		await this.backend.waitForGPU();
+		error( 'Renderer: waitForGPU() has been removed. Read https://github.com/mrdoob/three.js/issues/32012 for more information.' );
 
 	}
 
