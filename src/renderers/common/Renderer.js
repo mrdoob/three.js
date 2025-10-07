@@ -722,12 +722,6 @@ class Renderer {
 	 */
 	async init() {
 
-		if ( this._initialized ) {
-
-			throw new Error( 'Renderer: Backend has already been initialized.' );
-
-		}
-
 		if ( this._initPromise !== null ) {
 
 			return this._initPromise;
@@ -2024,16 +2018,12 @@ class Renderer {
 	 * @param {boolean} [color=true] - Whether the color buffer should be cleared or not.
 	 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
 	 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
-	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	clear( color = true, depth = true, stencil = true ) {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
-
-			return this.clearAsync( color, depth, stencil );
+			throw new Error( 'Renderer: .clear() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -2074,37 +2064,28 @@ class Renderer {
 
 	/**
 	 * Performs a manual clear operation of the color buffer. This method ignores `autoClear` properties.
-	 *
-	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	clearColor() {
 
-		return this.clear( true, false, false );
+		this.clear( true, false, false );
 
 	}
 
 	/**
 	 * Performs a manual clear operation of the depth buffer. This method ignores `autoClear` properties.
-	 *
-	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	clearDepth() {
 
-		return this.clear( false, true, false );
+		this.clear( false, true, false );
 
 	}
 
 	/**
 	 * Performs a manual clear operation of the stencil buffer. This method ignores `autoClear` properties.
-	 *
-	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	clearStencil() {
 
-		return this.clear( false, false, true );
+		this.clear( false, false, true );
 
 	}
 
@@ -2112,6 +2093,7 @@ class Renderer {
 	 * Async version of {@link Renderer#clear}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {boolean} [color=true] - Whether the color buffer should be cleared or not.
 	 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
 	 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
@@ -2119,7 +2101,7 @@ class Renderer {
 	 */
 	async clearAsync( color = true, depth = true, stencil = true ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "clearAsync()" has been deprecated. Use "clear()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
 		this.clear( color, depth, stencil );
 
@@ -2129,11 +2111,14 @@ class Renderer {
 	 * Async version of {@link Renderer#clearColor}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearColorAsync() {
 
-		this.clearAsync( true, false, false );
+		warnOnce( 'Renderer: "clearColorAsync()" has been deprecated. Use "clearColor()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( true, false, false );
 
 	}
 
@@ -2141,11 +2126,14 @@ class Renderer {
 	 * Async version of {@link Renderer#clearDepth}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearDepthAsync() {
 
-		this.clearAsync( false, true, false );
+		warnOnce( 'Renderer: "clearDepthAsync()" has been deprecated. Use "clearDepth()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( false, true, false );
 
 	}
 
@@ -2153,11 +2141,14 @@ class Renderer {
 	 * Async version of {@link Renderer#clearStencil}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearStencilAsync() {
 
-		this.clearAsync( false, false, true );
+		warnOnce( 'Renderer: "clearStencilAsync()" has been deprecated. Use "clearStencil()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( false, false, true );
 
 	}
 
@@ -2550,14 +2541,15 @@ class Renderer {
 	 * Checks if the given feature is supported by the selected backend.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {string} name - The feature's name.
 	 * @return {Promise<boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
 	 */
 	async hasFeatureAsync( name ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "hasFeatureAsync()" has been deprecated. Use "hasFeature()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		return this.backend.hasFeature( name );
+		return this.hasFeature( name );
 
 	}
 
@@ -2580,9 +2572,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
-
-			return false;
+			throw new Error( 'Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -2606,14 +2596,15 @@ class Renderer {
 	 * (which can cause noticeable lags due to decode and GPU upload overhead).
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {Texture} texture - The texture.
 	 * @return {Promise} A Promise that resolves when the texture has been initialized.
 	 */
 	async initTextureAsync( texture ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "initTextureAsync()" has been deprecated. Use "initTexture()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		this._textures.updateTexture( texture );
+		this.initTexture( texture );
 
 	}
 
@@ -2629,7 +2620,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
+			throw new Error( 'Renderer: .initTexture() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 

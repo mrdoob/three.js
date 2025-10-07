@@ -168,9 +168,9 @@ class Inspector extends RendererInspector {
 
 				renderer.backend.trackTimestamp = true;
 
-				renderer.hasFeatureAsync( 'timestamp-query' ).then( ( available ) => {
+				renderer.init().then( () => {
 
-					if ( available !== true ) {
+					if ( renderer.hasFeature( 'timestamp-query' ) !== true ) {
 
 						this.console.addMessage( 'error', 'THREE.Inspector: GPU Timestamp Queries not available.' );
 
