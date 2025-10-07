@@ -722,7 +722,7 @@ class Renderer {
 	 */
 	async init() {
 
-		if ( this._initialized === true || this._initPromise !== null ) {
+		if ( this._initPromise !== null ) {
 
 			return this._initPromise;
 
