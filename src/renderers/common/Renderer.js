@@ -978,7 +978,7 @@ class Renderer {
 	 */
 	async renderAsync( scene, camera ) {
 
-		warnOnce( 'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r182
+		warnOnce( 'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
 		this.render( scene, camera );
 
