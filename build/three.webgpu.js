@@ -10679,7 +10679,7 @@ class InspectorBase {
 	finishCompute( /*uid*/ ) { }
 
 	/**
-	 * Called whean a render operation begins.
+	 * Called when a render operation begins.
 	 *
 	 * @param {string} uid - A unique identifier for the render context.
 	 * @param {Scene} scene - The scene being rendered.
@@ -11297,7 +11297,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * By default the `update()` method is not executed. Depending on
 		 * whether a uv transformation matrix and/or flipY is applied, `update()`
-		 * is exeucted per object.
+		 * is executed per object.
 		 *
 		 * @type {string}
 		 * @default 'none'
@@ -12073,7 +12073,7 @@ const uniformTexture = ( value = EmptyTexture$1 ) => texture( value );
  */
 const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
 
-//export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
+const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
 
 /**
  * Converts a texture or texture node to a sampler.
@@ -29505,7 +29505,7 @@ class Info {
 		 * @property {number} triangles - The number of rendered triangle primitives of the current frame.
 		 * @property {number} points - The number of rendered point primitives of the current frame.
 		 * @property {number} lines - The number of rendered line primitives of the current frame.
-		 * @property {number} timestamp - The timestamp of the frame when using `renderer.renderAsync()`.
+		 * @property {number} timestamp - The timestamp of the frame.
 		 */
 		this.render = {
 			calls: 0,
@@ -30587,7 +30587,7 @@ class Bindings extends DataMap {
 
 				}
 
-				if ( texture.isStorageTexture === true ) {
+				if ( texture.isStorageTexture === true && texture.mipmapsAutoUpdate === true ) {
 
 					const textureData = this.get( texture );
 
@@ -31776,7 +31776,13 @@ class Textures extends DataMap {
 
 					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
-					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
+					const skipAutoGeneration = texture.isStorageTexture === true && texture.mipmapsAutoUpdate === false;
+
+					if ( options.needsMipmaps && texture.mipmaps.length === 0 && ! skipAutoGeneration ) {
+
+						backend.generateMipmaps( texture );
+
+					}
 
 					if ( texture.onUpdate ) texture.onUpdate( texture );
 
@@ -34478,12 +34484,15 @@ class QuadMesh extends Mesh {
 	 * Async version of `render()`.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {Renderer} renderer - The renderer.
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
 	async renderAsync( renderer ) {
 
-		return renderer.renderAsync( this, _camera );
+		warnOnce( 'QuadMesh: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		renderer.render( this, _camera );
 
 	}
 
@@ -35427,6 +35436,14 @@ class StorageTextureNode extends TextureNode {
 		this.storeNode = storeNode;
 
 		/**
+		 * The mip level to write to for storage textures.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.mipLevel = 0;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -35477,6 +35494,19 @@ class StorageTextureNode extends TextureNode {
 	setAccess( value ) {
 
 		this.access = value;
+		return this;
+
+	}
+
+	/**
+	 * Sets the mip level to write to.
+	 *
+	 * @param {number} level - The mip level.
+	 * @return {StorageTextureNode} A reference to this node.
+	 */
+	setMipLevel( level ) {
+
+		this.mipLevel = level;
 		return this;
 
 	}
@@ -35566,6 +35596,7 @@ class StorageTextureNode extends TextureNode {
 
 		const newNode = super.clone();
 		newNode.storeNode = this.storeNode;
+		newNode.mipLevel = this.mipLevel;
 		return newNode;
 
 	}
@@ -40475,7 +40506,17 @@ function lightShadowMatrix( light ) {
 
 	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( ( frame ) => {
 
+		// normally, shadow matrices are updated in ShadowNode. However, if the shadow matrix is used outside
+		// of shadow rendering (like in ProjectorLightNode), the shadow matrix still requires an update
+
 		if ( light.castShadow !== true || frame.renderer.shadowMap.enabled === false ) {
+
+			if ( light.shadow.camera.coordinateSystem !== frame.camera.coordinateSystem ) {
+
+				light.shadow.camera.coordinateSystem = frame.camera.coordinateSystem;
+				light.shadow.camera.updateProjectionMatrix();
+
+			}
 
 			light.shadow.updateMatrices( light );
 
@@ -41949,7 +41990,7 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	setupShadow( builder ) {
 
-		const { renderer } = builder;
+		const { renderer, camera } = builder;
 
 		const { light, shadow } = this;
 
@@ -41957,6 +41998,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
 
+		shadow.camera.coordinateSystem = camera.coordinateSystem;
 		shadow.camera.updateProjectionMatrix();
 
 		// VSM
@@ -45442,6 +45484,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	textureBicubic: textureBicubic,
 	textureBicubicLevel: textureBicubicLevel,
 	textureCubeUV: textureCubeUV,
+	textureLevel: textureLevel,
 	textureLoad: textureLoad,
 	textureSize: textureSize,
 	textureStore: textureStore,
@@ -55457,12 +55500,6 @@ class Renderer {
 	 */
 	async init() {
 
-		if ( this._initialized ) {
-
-			throw new Error( 'Renderer: Backend has already been initialized.' );
-
-		}
-
 		if ( this._initPromise !== null ) {
 
 			return this._initPromise;
@@ -55706,15 +55743,16 @@ class Renderer {
 	 * Renders the scene in an async fashion.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {Object3D} scene - The scene or 3D object to render.
 	 * @param {Camera} camera - The camera.
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
 	async renderAsync( scene, camera ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		this._renderScene( scene, camera );
+		this.render( scene, camera );
 
 	}
 
@@ -55723,11 +55761,12 @@ class Renderer {
 	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when synchronization has been finished.
 	 */
 	async waitForGPU() {
 
-		await this.backend.waitForGPU();
+		error( 'Renderer: waitForGPU() has been removed. Read https://github.com/mrdoob/three.js/issues/32012 for more information.' );
 
 	}
 
@@ -55938,23 +55977,24 @@ class Renderer {
 
 	/**
 	 * Renders the scene or 3D object with the given camera. This method can only be called
-	 * if the renderer has been initialized.
+	 * if the renderer has been initialized. When using `render()` inside an animation loop,
+	 * it's guaranteed the renderer will be initialized. The animation loop must be defined
+	 * with {@link Renderer#setAnimationLoop} though.
+	 *
+	 * For all other use cases (like when using on-demand rendering), you must call
+	 * {@link Renderer#init} before rendering.
 	 *
 	 * The target of the method is the default framebuffer (meaning the canvas)
 	 * or alternatively a render target when specified via `setRenderTarget()`.
 	 *
 	 * @param {Object3D} scene - The scene or 3D object to render.
 	 * @param {Camera} camera - The camera to render the scene with.
-	 * @return {?Promise} A Promise that resolve when the scene has been rendered.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	render( scene, camera ) {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
-
-			return this.renderAsync( scene, camera );
+			throw new Error( 'Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
 
 		}
 
@@ -56757,16 +56797,12 @@ class Renderer {
 	 * @param {boolean} [color=true] - Whether the color buffer should be cleared or not.
 	 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
 	 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
-	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	clear( color = true, depth = true, stencil = true ) {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
-
-			return this.clearAsync( color, depth, stencil );
+			throw new Error( 'Renderer: .clear() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -56807,37 +56843,28 @@ class Renderer {
 
 	/**
 	 * Performs a manual clear operation of the color buffer. This method ignores `autoClear` properties.
-	 *
-	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	clearColor() {
 
-		return this.clear( true, false, false );
+		this.clear( true, false, false );
 
 	}
 
 	/**
 	 * Performs a manual clear operation of the depth buffer. This method ignores `autoClear` properties.
-	 *
-	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	clearDepth() {
 
-		return this.clear( false, true, false );
+		this.clear( false, true, false );
 
 	}
 
 	/**
 	 * Performs a manual clear operation of the stencil buffer. This method ignores `autoClear` properties.
-	 *
-	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
-	 * Only returned when the renderer has not been initialized.
 	 */
 	clearStencil() {
 
-		return this.clear( false, false, true );
+		this.clear( false, false, true );
 
 	}
 
@@ -56845,6 +56872,7 @@ class Renderer {
 	 * Async version of {@link Renderer#clear}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {boolean} [color=true] - Whether the color buffer should be cleared or not.
 	 * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
 	 * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
@@ -56852,7 +56880,7 @@ class Renderer {
 	 */
 	async clearAsync( color = true, depth = true, stencil = true ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "clearAsync()" has been deprecated. Use "clear()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
 		this.clear( color, depth, stencil );
 
@@ -56862,11 +56890,14 @@ class Renderer {
 	 * Async version of {@link Renderer#clearColor}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearColorAsync() {
 
-		this.clearAsync( true, false, false );
+		warnOnce( 'Renderer: "clearColorAsync()" has been deprecated. Use "clearColor()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( true, false, false );
 
 	}
 
@@ -56874,11 +56905,14 @@ class Renderer {
 	 * Async version of {@link Renderer#clearDepth}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearDepthAsync() {
 
-		this.clearAsync( false, true, false );
+		warnOnce( 'Renderer: "clearDepthAsync()" has been deprecated. Use "clearDepth()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( false, true, false );
 
 	}
 
@@ -56886,11 +56920,14 @@ class Renderer {
 	 * Async version of {@link Renderer#clearStencil}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the clear operation has been executed.
 	 */
 	async clearStencilAsync() {
 
-		this.clearAsync( false, false, true );
+		warnOnce( 'Renderer: "clearStencilAsync()" has been deprecated. Use "clearStencil()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		this.clear( false, false, true );
 
 	}
 
@@ -57283,14 +57320,15 @@ class Renderer {
 	 * Checks if the given feature is supported by the selected backend.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {string} name - The feature's name.
 	 * @return {Promise<boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
 	 */
 	async hasFeatureAsync( name ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "hasFeatureAsync()" has been deprecated. Use "hasFeature()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		return this.backend.hasFeature( name );
+		return this.hasFeature( name );
 
 	}
 
@@ -57313,9 +57351,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
-
-			return false;
+			throw new Error( 'Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -57339,14 +57375,15 @@ class Renderer {
 	 * (which can cause noticeable lags due to decode and GPU upload overhead).
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {Texture} texture - The texture.
 	 * @return {Promise} A Promise that resolves when the texture has been initialized.
 	 */
 	async initTextureAsync( texture ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "initTextureAsync()" has been deprecated. Use "initTexture()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		this._textures.updateTexture( texture );
+		this.initTexture( texture );
 
 	}
 
@@ -57362,7 +57399,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .initTexture() called before the backend is initialized. Try using .initTextureAsync() instead.' );
+			throw new Error( 'Renderer: .initTexture() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
@@ -58971,6 +59008,14 @@ class SampledTexture extends Sampler {
 		 * @default false
 		 */
 		this.store = false;
+
+		/**
+		 * The mip level to bind for storage textures.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.mipLevel = 0;
 
 		/**
 		 * This flag can be used for type testing.
@@ -61258,16 +61303,6 @@ class Backend {
 		return duration;
 
 	}
-
-	/**
-	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
-	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
-	 *
-	 * @async
-	 * @abstract
-	 * @return {Promise} A Promise that resolves when synchronization has been finished.
-	 */
-	async waitForGPU() {}
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
@@ -65632,19 +65667,6 @@ class WebGLBackend extends Backend {
 	async getArrayBufferAsync( attribute ) {
 
 		return await this.attributeUtils.getArrayBufferAsync( attribute );
-
-	}
-
-	/**
-	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
-	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
-	 *
-	 * @async
-	 * @return {Promise} A Promise that resolves when synchronization has been finished.
-	 */
-	async waitForGPU() {
-
-		await this.utils._clientWaitAsync();
 
 	}
 
@@ -71524,7 +71546,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-				texture.store = node.isStorageTextureNode === true;
+				// Only mark as storage binding when actually writing (storeNode is set)
+				texture.store = node.isStorageTextureNode === true && node.storeNode !== null;
+				texture.mipLevel = texture.store ? node.mipLevel : 0;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				if ( this.isUnfilterable( node.value ) === false && texture.store === false ) {
@@ -73910,6 +73934,7 @@ class WebGPUBindingUtils {
 				} else {
 
 					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
+					const baseMipLevel = binding.store ? binding.mipLevel : 0;
 					let propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }`;
 
 					if ( textureData.texture.depthOrArrayLayers > 1 ) {
@@ -73918,7 +73943,7 @@ class WebGPUBindingUtils {
 
 					}
 
-					propertyName += `-${ mipLevelCount }`;
+					propertyName += `-${ mipLevelCount }-${ baseMipLevel }`;
 
 					resourceGPU = textureData[ propertyName ];
 
@@ -73946,7 +73971,7 @@ class WebGPUBindingUtils {
 
 						}
 
-						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount } );
+						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount, baseMipLevel } );
 
 					}
 
@@ -76467,19 +76492,6 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	/**
-	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
-	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
-	 *
-	 * @async
-	 * @return {Promise} A Promise that resolves when synchronization has been finished.
-	 */
-	async waitForGPU() {
-
-		await this.device.queue.onSubmittedWorkDone();
-
-	}
-
 	// render object
 
 	/**
@@ -78019,37 +78031,14 @@ class PostProcessing {
 	 * its animation loop (not the one from the renderer).
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
 	async renderAsync() {
 
-		this._update();
+		warnOnce( 'PostProcessing: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		if ( this._context.onBeforePostProcessing !== null ) this._context.onBeforePostProcessing();
-
-		const renderer = this.renderer;
-
-		const toneMapping = renderer.toneMapping;
-		const outputColorSpace = renderer.outputColorSpace;
-
-		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = ColorManagement.workingColorSpace;
-
-		//
-
-		const currentXR = renderer.xr.enabled;
-		renderer.xr.enabled = false;
-
-		await this._quadMesh.renderAsync( renderer );
-
-		renderer.xr.enabled = currentXR;
-
-		//
-
-		renderer.toneMapping = toneMapping;
-		renderer.outputColorSpace = outputColorSpace;
-
-		if ( this._context.onAfterPostProcessing !== null ) this._context.onAfterPostProcessing();
+		this.render();
 
 	}
 
@@ -78106,8 +78095,16 @@ class StorageTexture extends Texture {
 		 */
 		this.isStorageTexture = true;
 
-	}
+		/**
+		 * When `true`, mipmaps will be auto-generated after compute writes.
+		 * When `false`, mipmaps must be written manually via compute shaders.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.mipmapsAutoUpdate = true;
 
+	}
 	/**
 	 * Sets the size of the storage texture.
 	 *
