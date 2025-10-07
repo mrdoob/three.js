@@ -194,22 +194,17 @@ class KTX2Loader extends Loader {
 	 * Async version of {@link KTX2Loader#detectSupport}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @return {Promise} A Promise that resolves when the support has been detected.
 	 */
 	async detectSupportAsync( renderer ) {
 
-		this.workerConfig = {
-			astcSupported: await renderer.hasFeatureAsync( 'texture-compression-astc' ),
-			astcHDRSupported: false, // https://github.com/gpuweb/gpuweb/issues/3856
-			etc1Supported: await renderer.hasFeatureAsync( 'texture-compression-etc1' ),
-			etc2Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
-			dxtSupported: await renderer.hasFeatureAsync( 'texture-compression-s3tc' ),
-			bptcSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
-			pvrtcSupported: await renderer.hasFeatureAsync( 'texture-compression-pvrtc' )
-		};
+		console.warn( 'KTX2Loader: "detectSupportAsync()" has been deprecated. Use "detectSupport()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		return this;
+		await renderer.init();
+
+		return this.detectSupport( renderer );
 
 	}
 

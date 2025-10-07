@@ -722,13 +722,7 @@ class Renderer {
 	 */
 	async init() {
 
-		if ( this._initialized ) {
-
-			throw new Error( 'Renderer: Backend has already been initialized.' );
-
-		}
-
-		if ( this._initPromise !== null ) {
+		if ( this._initialized === true || this._initPromise !== null ) {
 
 			return this._initPromise;
 
@@ -2547,14 +2541,15 @@ class Renderer {
 	 * Checks if the given feature is supported by the selected backend.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {string} name - The feature's name.
 	 * @return {Promise<boolean>} A Promise that resolves with a bool that indicates whether the feature is supported or not.
 	 */
 	async hasFeatureAsync( name ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "hasFeatureAsync()" has been deprecated. Use "hasFeature()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		return this.backend.hasFeature( name );
+		return this.hasFeature( name );
 
 	}
 
@@ -2577,9 +2572,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
-
-			return false;
+			throw new Error( 'Renderer: .hasFeature() called before the backend is initialized. Use "await renderer.init();" before before using this method.' );
 
 		}
 
