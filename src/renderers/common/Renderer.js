@@ -1221,7 +1221,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			error( 'Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
+			throw new Error( 'Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
 
 		}
 
