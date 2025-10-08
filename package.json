@@ -48,7 +48,6 @@
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json",
-    "postinstall": "node utils/docs/apply-patch.cjs",
     "dev": "node utils/build/dev.js && servez -p 8080",
     "dev-ssl": "node utils/build/dev.js && servez -p 8080 --ssl",
     "preview": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
