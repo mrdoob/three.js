@@ -1,5 +1,5 @@
 import { NearestFilter, Vector4, TempNode, NodeUpdateType, PassNode } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property } from 'three/tsl';
+import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView } from 'three/tsl';
 
 /**
  * A inner node definition that implements the actual pixelation TSL code.
@@ -127,7 +127,7 @@ class PixelationNode extends TempNode {
 
 		const depthEdgeIndicator = ( depth ) => {
 
-			const diff = property( 'float', 'diff' );
+			const diff = float().toVar( 'diff' );
 			diff.addAssign( clamp( sampleDepth( 1, 0 ).sub( depth ) ) );
 			diff.addAssign( clamp( sampleDepth( - 1, 0 ).sub( depth ) ) );
 			diff.addAssign( clamp( sampleDepth( 0, 1 ).sub( depth ) ) );
@@ -158,7 +158,7 @@ class PixelationNode extends TempNode {
 
 		const normalEdgeIndicator = ( depth, normal ) => {
 
-			const indicator = property( 'float', 'indicator' );
+			const indicator = float().toVar( 'indicator' );
 
 			indicator.addAssign( neighborNormalEdgeIndicator( 0, - 1, depth, normal ) );
 			indicator.addAssign( neighborNormalEdgeIndicator( 0, 1, depth, normal ) );
@@ -173,8 +173,8 @@ class PixelationNode extends TempNode {
 
 			const texel = sampleTexture();
 
-			const depth = property( 'float', 'depth' );
-			const normal = property( 'vec3', 'normal' );
+			const depth = float().toVar( 'depth' );
+			const normal = vec3().toVar( 'normal' );
 
 			If( this.depthEdgeStrength.greaterThan( 0.0 ).or( this.normalEdgeStrength.greaterThan( 0.0 ) ), () => {
 
@@ -183,7 +183,7 @@ class PixelationNode extends TempNode {
 
 			} );
 
-			const dei = property( 'float', 'dei' );
+			const dei = float().toVar( 'dei' );
 
 			If( this.depthEdgeStrength.greaterThan( 0.0 ), () => {
 
@@ -191,7 +191,7 @@ class PixelationNode extends TempNode {
 
 			} );
 
-			const nei = property( 'float', 'nei' );
+			const nei = float().toVar( 'nei' );
 
 			If( this.normalEdgeStrength.greaterThan( 0.0 ), () => {
 
