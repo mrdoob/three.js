@@ -268,6 +268,8 @@ function getPathFromDoclet( { meta } ) {
 
 function generate( title, docs, filename, resolveLinks ) {
 
+	let html;
+
 	resolveLinks = resolveLinks !== false;
 
 	const docData = {
@@ -278,8 +280,7 @@ function generate( title, docs, filename, resolveLinks ) {
 	};
 
 	const outpath = path.join( outdir, filename );
-
-	let html = view.render( 'container.tmpl', docData );
+	html = view.render( 'container.tmpl', docData );
 
 	if ( resolveLinks ) {
 
