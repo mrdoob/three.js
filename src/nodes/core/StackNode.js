@@ -97,7 +97,7 @@ class StackNode extends Node {
 	 * @param {Node} node - The node to add.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	add( node ) {
+	addToStack( node ) {
 
 		if ( node.isNode !== true ) {
 
