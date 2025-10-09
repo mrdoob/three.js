@@ -83,25 +83,19 @@ function TubePainter() {
 	let size1 = 1;
 	let size2 = 1;
 
-	const capNormal = new Vector3();
-
 	function addCap( position, matrix, isEndCap, capSize ) {
 
 		let count = geometry.drawRange.count;
 
 		const points = getPoints( capSize );
 
-		capNormal.set(
-			matrix.elements[ 8 ],
-			matrix.elements[ 9 ],
-			matrix.elements[ 10 ]
+		const normalSign = isEndCap ? - 1 : 1;
+
+		normal.set(
+			matrix.elements[ 8 ] * normalSign,
+			matrix.elements[ 9 ] * normalSign,
+			matrix.elements[ 10 ] * normalSign
 		).normalize();
-
-		if ( isEndCap ) {
-
-			capNormal.negate();
-
-		}
 
 		for ( let i = 0, il = points.length; i < il; i ++ ) {
 
@@ -109,26 +103,16 @@ function TubePainter() {
 			const vertex2 = points[ ( i + 1 ) % il ];
 
 			vector1.copy( position );
-
-			if ( isEndCap ) {
-
-				vector2.copy( vertex1 ).applyMatrix4( matrix ).add( position );
-				vector3.copy( vertex2 ).applyMatrix4( matrix ).add( position );
-
-			} else {
-
-				vector2.copy( vertex2 ).applyMatrix4( matrix ).add( position );
-				vector3.copy( vertex1 ).applyMatrix4( matrix ).add( position );
-
-			}
+			vector2.copy( isEndCap ? vertex1 : vertex2 ).applyMatrix4( matrix ).add( position );
+			vector3.copy( isEndCap ? vertex2 : vertex1 ).applyMatrix4( matrix ).add( position );
 
 			vector1.toArray( positions.array, ( count + 0 ) * 3 );
 			vector2.toArray( positions.array, ( count + 1 ) * 3 );
 			vector3.toArray( positions.array, ( count + 2 ) * 3 );
 
-			capNormal.toArray( normals.array, ( count + 0 ) * 3 );
-			capNormal.toArray( normals.array, ( count + 1 ) * 3 );
-			capNormal.toArray( normals.array, ( count + 2 ) * 3 );
+			normal.toArray( normals.array, ( count + 0 ) * 3 );
+			normal.toArray( normals.array, ( count + 1 ) * 3 );
+			normal.toArray( normals.array, ( count + 2 ) * 3 );
 
 			color1.toArray( colors.array, ( count + 0 ) * 3 );
 			color1.toArray( colors.array, ( count + 1 ) * 3 );
@@ -148,7 +132,7 @@ function TubePainter() {
 
 		const points = getPoints( capSize );
 
-		capNormal.set(
+		normal.set(
 			- matrix.elements[ 8 ],
 			- matrix.elements[ 9 ],
 			- matrix.elements[ 10 ]
@@ -169,9 +153,9 @@ function TubePainter() {
 			vector2.toArray( positions.array, ( count + 1 ) * 3 );
 			vector3.toArray( positions.array, ( count + 2 ) * 3 );
 
-			capNormal.toArray( normals.array, ( count + 0 ) * 3 );
-			capNormal.toArray( normals.array, ( count + 1 ) * 3 );
-			capNormal.toArray( normals.array, ( count + 2 ) * 3 );
+			normal.toArray( normals.array, ( count + 0 ) * 3 );
+			normal.toArray( normals.array, ( count + 1 ) * 3 );
+			normal.toArray( normals.array, ( count + 2 ) * 3 );
 
 			color1.toArray( colors.array, ( count + 0 ) * 3 );
 			color1.toArray( colors.array, ( count + 1 ) * 3 );
@@ -261,14 +245,14 @@ function TubePainter() {
 	const prevDirection = new Vector3( 0, 0, 1 );
 	const rotationAxis = new Vector3();
 
-	let hasSegments = false;
+	let isPainting = false;
 
 	let endCapStartIndex = null;
 	let endCapVertexCount = 0;
 
 	function calculateRMF() {
 
-		if ( hasSegments === false ) {
+		if ( isPainting === false ) {
 
 			if ( Math.abs( direction.y ) < 0.99 ) {
 
@@ -307,7 +291,7 @@ function TubePainter() {
 		side.crossVectors( direction, normal ).normalize();
 		normal.crossVectors( side, direction ).normalize();
 
-		if ( hasSegments === true ) {
+		if ( isPainting === true ) {
 
 			const smoothFactor = 0.3;
 
@@ -330,7 +314,7 @@ function TubePainter() {
 
 		lastNormal.set( 0, 1, 0 );
 
-		hasSegments = false;
+		isPainting = false;
 
 		endCapStartIndex = null;
 		endCapVertexCount = 0;
@@ -351,7 +335,7 @@ function TubePainter() {
 
 		calculateRMF();
 
-		if ( hasSegments === false ) {
+		if ( isPainting === false ) {
 
 			color2.copy( color1 );
 			size2 = size1;
@@ -377,7 +361,7 @@ function TubePainter() {
 		color2.copy( color1 );
 		size2 = size1;
 
-		hasSegments = true;
+		isPainting = true;
 
 	}
 
