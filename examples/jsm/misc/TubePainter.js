@@ -288,7 +288,7 @@ function TubePainter() {
 
 			} else {
 
-				vector.copy( direction ).multiplyScalar( direction.x )
+				vector.copy( direction ).multiplyScalar( direction.x );
 				normal.set( 1, 0, 0 ).sub( vector ).normalize();
 
 			}
