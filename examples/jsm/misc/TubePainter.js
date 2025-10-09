@@ -42,9 +42,7 @@ function TubePainter() {
 	geometry.setAttribute( 'color', colors );
 	geometry.drawRange.count = 0;
 
-	const material = new MeshStandardMaterial( {
-		vertexColors: true
-	} );
+	const material = new MeshStandardMaterial( { vertexColors: true } );
 
 	const mesh = new Mesh( geometry, material );
 	mesh.frustumCulled = false;
@@ -72,72 +70,104 @@ function TubePainter() {
 
 	//
 
+	const vector = new Vector3();
+
 	const vector1 = new Vector3();
 	const vector2 = new Vector3();
 	const vector3 = new Vector3();
 	const vector4 = new Vector3();
 
-	const color = new Color( 0xffffff );
-	let size = 1;
+	const color1 = new Color( 0xffffff );
+	const color2 = new Color( 0xffffff );
+
+	let size1 = 1;
+	let size2 = 1;
 
 	function addCap( position, matrix, isEndCap, capSize ) {
 
 		let count = geometry.drawRange.count;
 
 		const points = getPoints( capSize );
-		const center = position.clone();
 
-		const capNormal = new Vector3();
-		capNormal.set(
-			matrix.elements[ 8 ],
-			matrix.elements[ 9 ],
-			matrix.elements[ 10 ]
-		);
+		const normalSign = isEndCap ? - 1 : 1;
 
-		if ( isEndCap ) {
-
-			capNormal.negate();
-
-		}
-
-		capNormal.normalize();
+		normal.set(
+			matrix.elements[ 8 ] * normalSign,
+			matrix.elements[ 9 ] * normalSign,
+			matrix.elements[ 10 ] * normalSign
+		).normalize();
 
 		for ( let i = 0, il = points.length; i < il; i ++ ) {
 
 			const vertex1 = points[ i ];
 			const vertex2 = points[ ( i + 1 ) % il ];
 
-			if ( isEndCap ) {
-
-				vector1.copy( center );
-				vector2.copy( vertex1 ).applyMatrix4( matrix ).add( position );
-				vector3.copy( vertex2 ).applyMatrix4( matrix ).add( position );
-
-			} else {
-
-				vector1.copy( center );
-				vector2.copy( vertex2 ).applyMatrix4( matrix ).add( position );
-				vector3.copy( vertex1 ).applyMatrix4( matrix ).add( position );
-
-			}
+			vector1.copy( position );
+			vector2.copy( isEndCap ? vertex1 : vertex2 ).applyMatrix4( matrix ).add( position );
+			vector3.copy( isEndCap ? vertex2 : vertex1 ).applyMatrix4( matrix ).add( position );
 
 			vector1.toArray( positions.array, ( count + 0 ) * 3 );
 			vector2.toArray( positions.array, ( count + 1 ) * 3 );
 			vector3.toArray( positions.array, ( count + 2 ) * 3 );
 
-			capNormal.toArray( normals.array, ( count + 0 ) * 3 );
-			capNormal.toArray( normals.array, ( count + 1 ) * 3 );
-			capNormal.toArray( normals.array, ( count + 2 ) * 3 );
+			normal.toArray( normals.array, ( count + 0 ) * 3 );
+			normal.toArray( normals.array, ( count + 1 ) * 3 );
+			normal.toArray( normals.array, ( count + 2 ) * 3 );
 
-			color.toArray( colors.array, ( count + 0 ) * 3 );
-			color.toArray( colors.array, ( count + 1 ) * 3 );
-			color.toArray( colors.array, ( count + 2 ) * 3 );
+			color1.toArray( colors.array, ( count + 0 ) * 3 );
+			color1.toArray( colors.array, ( count + 1 ) * 3 );
+			color1.toArray( colors.array, ( count + 2 ) * 3 );
 
 			count += 3;
 
 		}
 
 		geometry.drawRange.count = count;
+
+	}
+
+	function updateEndCap( position, matrix, capSize ) {
+
+		if ( endCapStartIndex === null ) return;
+
+		const points = getPoints( capSize );
+
+		normal.set(
+			- matrix.elements[ 8 ],
+			- matrix.elements[ 9 ],
+			- matrix.elements[ 10 ]
+		).normalize();
+
+		let count = endCapStartIndex;
+
+		for ( let i = 0, il = points.length; i < il; i ++ ) {
+
+			const vertex1 = points[ i ];
+			const vertex2 = points[ ( i + 1 ) % il ];
+
+			vector1.copy( position );
+			vector2.copy( vertex1 ).applyMatrix4( matrix ).add( position );
+			vector3.copy( vertex2 ).applyMatrix4( matrix ).add( position );
+
+			vector1.toArray( positions.array, ( count + 0 ) * 3 );
+			vector2.toArray( positions.array, ( count + 1 ) * 3 );
+			vector3.toArray( positions.array, ( count + 2 ) * 3 );
+
+			normal.toArray( normals.array, ( count + 0 ) * 3 );
+			normal.toArray( normals.array, ( count + 1 ) * 3 );
+			normal.toArray( normals.array, ( count + 2 ) * 3 );
+
+			color1.toArray( colors.array, ( count + 0 ) * 3 );
+			color1.toArray( colors.array, ( count + 1 ) * 3 );
+			color1.toArray( colors.array, ( count + 2 ) * 3 );
+
+			count += 3;
+
+		}
+
+		positions.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
+		normals.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
+		colors.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
 
 	}
 
@@ -183,13 +213,13 @@ function TubePainter() {
 			vector3.toArray( normals.array, ( count + 4 ) * 3 );
 			vector4.toArray( normals.array, ( count + 5 ) * 3 );
 
-			color.toArray( colors.array, ( count + 0 ) * 3 );
-			color.toArray( colors.array, ( count + 1 ) * 3 );
-			color.toArray( colors.array, ( count + 2 ) * 3 );
+			color2.toArray( colors.array, ( count + 0 ) * 3 );
+			color2.toArray( colors.array, ( count + 1 ) * 3 );
+			color1.toArray( colors.array, ( count + 2 ) * 3 );
 
-			color.toArray( colors.array, ( count + 3 ) * 3 );
-			color.toArray( colors.array, ( count + 4 ) * 3 );
-			color.toArray( colors.array, ( count + 5 ) * 3 );
+			color2.toArray( colors.array, ( count + 3 ) * 3 );
+			color1.toArray( colors.array, ( count + 4 ) * 3 );
+			color1.toArray( colors.array, ( count + 5 ) * 3 );
 
 			count += 6;
 
@@ -202,8 +232,8 @@ function TubePainter() {
 	//
 
 	const direction = new Vector3();
-	const side = new Vector3();
 	const normal = new Vector3();
+	const side = new Vector3();
 
 	const point1 = new Vector3();
 	const point2 = new Vector3();
@@ -211,45 +241,44 @@ function TubePainter() {
 	const matrix1 = new Matrix4();
 	const matrix2 = new Matrix4();
 
-	const lastNormal = new Vector3( 0, 1, 0 );
-	const prevDirection = new Vector3( 0, 0, 1 );
+	const lastNormal = new Vector3();
+	const prevDirection = new Vector3();
 	const rotationAxis = new Vector3();
 
 	let isFirstSegment = true;
-	let isDrawing = false;
-	let hasSegments = false;
 
-	let segmentStartIndex = null;
-	let lastSegmentPosition = new Vector3();
-	let lastSegmentSize = 1;
-	let nextSegmentStartSize = 1;
+	let endCapStartIndex = null;
+	let endCapVertexCount = 0;
 
-	function calculateRMF( applySmoothing ) {
+	function calculateRMF() {
 
 		if ( isFirstSegment === true ) {
 
 			if ( Math.abs( direction.y ) < 0.99 ) {
 
-				normal.set( 0, 1, 0 ).sub( direction.clone().multiplyScalar( direction.y ) ).normalize();
+				vector.copy( direction ).multiplyScalar( direction.y );
+				normal.set( 0, 1, 0 ).sub( vector ).normalize();
 
 			} else {
 
-				normal.set( 1, 0, 0 ).sub( direction.clone().multiplyScalar( direction.x ) ).normalize();
+				vector.copy( direction ).multiplyScalar( direction.x );
+				normal.set( 1, 0, 0 ).sub( vector ).normalize();
 
 			}
 
 		} else {
 
 			rotationAxis.crossVectors( prevDirection, direction );
+
 			const rotAxisLength = rotationAxis.length();
 
 			if ( rotAxisLength > 0.0001 ) {
 
 				rotationAxis.divideScalar( rotAxisLength );
+				vector.addVectors( prevDirection, direction );
 				const c1 = - 2.0 / ( 1.0 + prevDirection.dot( direction ) );
-				const temp = new Vector3().addVectors( prevDirection, direction );
-				const dot = lastNormal.dot( temp );
-				normal.copy( lastNormal ).addScaledVector( temp, c1 * dot );
+				const dot = lastNormal.dot( vector );
+				normal.copy( lastNormal ).addScaledVector( vector, c1 * dot );
 
 			} else {
 
@@ -262,9 +291,10 @@ function TubePainter() {
 		side.crossVectors( direction, normal ).normalize();
 		normal.crossVectors( side, direction ).normalize();
 
-		if ( applySmoothing === true && isFirstSegment === false ) {
+		if ( isFirstSegment === false ) {
 
 			const smoothFactor = 0.3;
+
 			normal.lerp( lastNormal, smoothFactor ).normalize();
 			side.crossVectors( direction, normal ).normalize();
 			normal.crossVectors( side, direction ).normalize();
@@ -274,224 +304,76 @@ function TubePainter() {
 		lastNormal.copy( normal );
 		prevDirection.copy( direction );
 
-		matrix1.makeBasis( side, normal, direction.clone().negate() );
+		matrix1.makeBasis( side, normal, vector.copy( direction ).negate() );
 
 	}
 
 	function moveTo( position ) {
 
-		if ( isDrawing ) {
-
-			if ( segmentStartIndex !== null ) {
-
-				addCap( point1, matrix1, true, size );
-
-			} else {
-
-				addCap( point2, matrix2, true, size );
-
-			}
-
-			update();
-
-			isDrawing = false;
-
-		}
-
 		point2.copy( position );
 
 		lastNormal.set( 0, 1, 0 );
 
-		segmentStartIndex = null;
-		lastSegmentPosition.copy( position );
-		lastSegmentSize = size;
-
 		isFirstSegment = true;
-		hasSegments = false;
+
+		endCapStartIndex = null;
+		endCapVertexCount = 0;
 
 	}
 
 	function lineTo( position ) {
 
-		isDrawing = true;
-
-		point1.copy( position );
-
-		const fromPos = segmentStartIndex === null ? point2 : lastSegmentPosition;
-		direction.subVectors( point1, fromPos );
-		const length = direction.length();
-
-		if ( length === 0 ) return;
-
-		const minDistance = 0.01 * size;
-		const shouldCommit = length >= minDistance;
-
-		if ( segmentStartIndex === null ) {
-
-			nextSegmentStartSize = isFirstSegment ? size : lastSegmentSize;
-
-			lineToInternal( point1 );
-			const afterCount = geometry.drawRange.count;
-
-			const points = getPoints( size );
-			const segmentVertices = points.length * 6;
-			segmentStartIndex = afterCount - segmentVertices;
-
-			if ( shouldCommit === false ) {
-
-				lastSegmentPosition.copy( fromPos );
-
-			}
-
-		} else {
-
-			updatePendingSegment( point1 );
-
-		}
-
-		if ( shouldCommit ) {
-
-			if ( hasSegments ) {
-
-				smoothConnectionNormals();
-
-			}
-
-			point2.copy( point1 );
-			matrix2.copy( matrix1 );
-
-			lastSegmentPosition.copy( point1 );
-			lastSegmentSize = size;
-			segmentStartIndex = null;
-			hasSegments = true;
-
-		}
-
-	}
-
-	function smoothConnectionNormals() {
-
-		if ( segmentStartIndex === null ) return;
-
-		const points = getPoints( size );
-		const segmentVertexCount = points.length * 6;
-
-		const prevSegmentIndex = segmentStartIndex - segmentVertexCount;
-
-		for ( let i = 0; i < points.length; i ++ ) {
-
-			const prevIdx1 = prevSegmentIndex + i * 6 + 2;
-			const prevIdx2 = prevSegmentIndex + i * 6 + 5;
-			const currIdx1 = segmentStartIndex + i * 6 + 0;
-
-			const avgNormal = new Vector3();
-
-			avgNormal.set(
-				normals.array[ prevIdx1 * 3 + 0 ],
-				normals.array[ prevIdx1 * 3 + 1 ],
-				normals.array[ prevIdx1 * 3 + 2 ]
-			);
-
-			avgNormal.add( new Vector3(
-				normals.array[ currIdx1 * 3 + 0 ],
-				normals.array[ currIdx1 * 3 + 1 ],
-				normals.array[ currIdx1 * 3 + 2 ]
-			) );
-
-			avgNormal.normalize();
-
-			avgNormal.toArray( normals.array, prevIdx1 * 3 );
-			avgNormal.toArray( normals.array, prevIdx2 * 3 );
-			avgNormal.toArray( normals.array, currIdx1 * 3 );
-
-		}
-
-		normals.addUpdateRange( prevSegmentIndex * 3, segmentVertexCount * 3 );
-		normals.addUpdateRange( segmentStartIndex * 3, segmentVertexCount * 3 );
-		normals.needsUpdate = true;
-
-	}
-
-	function updatePendingSegment( position ) {
-
 		point1.copy( position );
 
 		direction.subVectors( point1, point2 );
+
 		const length = direction.length();
 
 		if ( length === 0 ) return;
 
-		direction.divideScalar( length );
+		direction.normalize();
 
-		calculateRMF( true );
-
-		const currentPoints = getPoints( size );
-		const previousPoints = getPoints( nextSegmentStartSize );
-		let vertexIndex = segmentStartIndex;
-
-		for ( let i = 0, il = currentPoints.length; i < il; i ++ ) {
-
-			const currentVertex1 = currentPoints[ i ];
-			const currentVertex2 = currentPoints[ ( i + 1 ) % il ];
-			const previousVertex1 = previousPoints[ i ];
-			const previousVertex2 = previousPoints[ ( i + 1 ) % il ];
-
-			vector1.copy( previousVertex1 ).applyMatrix4( matrix2 ).add( point2 );
-			vector2.copy( previousVertex2 ).applyMatrix4( matrix2 ).add( point2 );
-			vector3.copy( currentVertex2 ).applyMatrix4( matrix1 ).add( point1 );
-			vector4.copy( currentVertex1 ).applyMatrix4( matrix1 ).add( point1 );
-
-			vector1.toArray( positions.array, ( vertexIndex + 0 ) * 3 );
-			vector2.toArray( positions.array, ( vertexIndex + 1 ) * 3 );
-			vector4.toArray( positions.array, ( vertexIndex + 2 ) * 3 );
-
-			vector2.toArray( positions.array, ( vertexIndex + 3 ) * 3 );
-			vector3.toArray( positions.array, ( vertexIndex + 4 ) * 3 );
-			vector4.toArray( positions.array, ( vertexIndex + 5 ) * 3 );
-
-			vertexIndex += 6;
-
-		}
-
-		positions.addUpdateRange( segmentStartIndex * 3, ( vertexIndex - segmentStartIndex ) * 3 );
-		positions.needsUpdate = true;
-
-	}
-
-	function lineToInternal( position ) {
-
-		point1.copy( position );
-
-		direction.subVectors( point1, point2 );
-		const length = direction.length();
-
-		if ( length === 0 ) return;
-
-		direction.divideScalar( length );
-
-		calculateRMF( true );
+		calculateRMF();
 
 		if ( isFirstSegment === true ) {
 
+			color2.copy( color1 );
+			size2 = size1;
+
 			matrix2.copy( matrix1 );
-			addCap( point2, matrix2, false, nextSegmentStartSize );
-			isFirstSegment = false;
+
+			addCap( point2, matrix2, false, size2 );
+
+			// End cap is added immediately after start cap and updated in-place
+			endCapStartIndex = geometry.drawRange.count;
+			addCap( point1, matrix1, true, size1 );
+			endCapVertexCount = geometry.drawRange.count - endCapStartIndex;
 
 		}
 
-		stroke( point1, point2, matrix1, matrix2, size, nextSegmentStartSize );
+		stroke( point1, point2, matrix1, matrix2, size1, size2 );
+
+		updateEndCap( point1, matrix1, size1 );
+
+		point2.copy( point1 );
+		matrix2.copy( matrix1 );
+
+		color2.copy( color1 );
+		size2 = size1;
+
+		isFirstSegment = false;
 
 	}
 
 	function setSize( value ) {
 
-		size = value;
+		size1 = value;
 
 	}
 
 	function setColor( value ) {
 
-		color.copy( value );
+		color1.copy( value );
 
 	}
 
@@ -515,7 +397,7 @@ function TubePainter() {
 		colors.addUpdateRange( start * 3, ( end - start ) * 3 );
 		colors.needsUpdate = true;
 
-		count = geometry.drawRange.count;
+		count = end;
 
 	}
 
