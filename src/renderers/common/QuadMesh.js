@@ -90,6 +90,8 @@ class QuadMesh extends Mesh {
 
 		warnOnce( 'QuadMesh: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
+		await renderer.init();
+
 		renderer.render( this, _camera );
 
 	}

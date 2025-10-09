@@ -974,6 +974,8 @@ class Renderer {
 
 		warnOnce( 'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
+		await this.init();
+
 		this.render( scene, camera );
 
 	}
@@ -2104,6 +2106,8 @@ class Renderer {
 
 		warnOnce( 'Renderer: "clearAsync()" has been deprecated. Use "clear()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
+		await this.init();
+
 		this.clear( color, depth, stencil );
 
 	}
@@ -2550,6 +2554,8 @@ class Renderer {
 
 		warnOnce( 'Renderer: "hasFeatureAsync()" has been deprecated. Use "hasFeature()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
+		await this.init();
+
 		return this.hasFeature( name );
 
 	}
@@ -2604,6 +2610,8 @@ class Renderer {
 	async initTextureAsync( texture ) {
 
 		warnOnce( 'Renderer: "initTextureAsync()" has been deprecated. Use "initTexture()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		await this.init();
 
 		this.initTexture( texture );
 
