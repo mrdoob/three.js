@@ -215,6 +215,8 @@ class PostProcessing {
 
 		warnOnce( 'PostProcessing: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
+		await this.renderer.init();
+
 		this.render();
 
 	}
