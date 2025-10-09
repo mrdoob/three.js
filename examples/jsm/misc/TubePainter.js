@@ -241,8 +241,8 @@ function TubePainter() {
 	const matrix1 = new Matrix4();
 	const matrix2 = new Matrix4();
 
-	const lastNormal = new Vector3( 0, 1, 0 );
-	const prevDirection = new Vector3( 0, 0, 1 );
+	const lastNormal = new Vector3();
+	const prevDirection = new Vector3();
 	const rotationAxis = new Vector3();
 
 	let isFirstSegment = true;
