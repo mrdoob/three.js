@@ -386,19 +386,18 @@ function TubePainter() {
 		const start = count;
 		const end = geometry.drawRange.count;
 
-		if ( start !== end ) {
+		if ( start === end ) return;
 
-			positions.addUpdateRange( start * 3, ( end - start ) * 3 );
-			normals.addUpdateRange( start * 3, ( end - start ) * 3 );
-			colors.addUpdateRange( start * 3, ( end - start ) * 3 );
+		positions.addUpdateRange( start * 3, ( end - start ) * 3 );
+		positions.needsUpdate = true;
 
-			count = end;
+		normals.addUpdateRange( start * 3, ( end - start ) * 3 );
+		normals.needsUpdate = true;
 
-		}
+		colors.addUpdateRange( start * 3, ( end - start ) * 3 );
+		colors.needsUpdate = true;
 
-		if ( positions.updateRanges.length > 0 ) positions.needsUpdate = true;
-		if ( normals.updateRanges.length > 0 ) normals.needsUpdate = true;
-		if ( colors.updateRanges.length > 0 ) colors.needsUpdate = true;
+		count = end;
 
 	}
 
