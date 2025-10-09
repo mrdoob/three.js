@@ -107,7 +107,9 @@
 
 					this.userData.isSqueezing = true;
 					this.userData.positionAtSqueezeStart = this.position.y;
-					this.userData.scaleAtSqueezeStart = this.scale.x;
+					
+					const pivot = this.getObjectByName( 'pivot' );
+					this.userData.scaleAtSqueezeStart = pivot.scale.x;
 
 				}
 
