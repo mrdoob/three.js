@@ -372,7 +372,26 @@ function TubePainter() {
 			color2.copy( hasSegments ? lastSegmentColor : color1 );
 			size2 = hasSegments ? lastSegmentSize : size1;
 
-			_lineTo( point1 );
+			direction.subVectors( point1, point2 );
+			direction.normalize();
+
+			calculateRMF();
+
+			if ( hasSegments === false ) {
+
+				matrix2.copy( matrix1 );
+
+				addCap( point2, matrix2, false, size2 );
+
+				// End cap is added immediately after start cap and updated in-place
+				endCapStartIndex = geometry.drawRange.count;
+				addCap( point1, matrix1, true, size1 );
+				endCapVertexCount = geometry.drawRange.count - endCapStartIndex;
+
+			}
+
+			stroke( point1, point2, matrix1, matrix2, size1, size2 );
+
 			const afterCount = geometry.drawRange.count;
 
 			const points = getPoints( size1 );
@@ -512,36 +531,6 @@ function TubePainter() {
 		colors.needsUpdate = true;
 
 		updateEndCap( point1, matrix1, size1 );
-
-	}
-
-	function _lineTo( position ) {
-
-		point1.copy( position );
-
-		direction.subVectors( point1, point2 );
-		const length = direction.length();
-
-		if ( length === 0 ) return;
-
-		direction.divideScalar( length );
-
-		calculateRMF();
-
-		if ( hasSegments === false ) {
-
-			matrix2.copy( matrix1 );
-
-			addCap( point2, matrix2, false, size2 );
-
-			// End cap is added immediately after start cap and updated in-place
-			endCapStartIndex = geometry.drawRange.count;
-			addCap( point1, matrix1, true, size1 );
-			endCapVertexCount = geometry.drawRange.count - endCapStartIndex;
-
-		}
-
-		stroke( point1, point2, matrix1, matrix2, size1, size2 );
 
 	}
 
