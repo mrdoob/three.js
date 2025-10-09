@@ -183,13 +183,8 @@ function TubePainter() {
 		}
 
 		positions.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
-		positions.needsUpdate = true;
-
 		normals.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
-		normals.needsUpdate = true;
-
 		colors.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
-		colors.needsUpdate = true;
 
 	}
 
@@ -404,6 +399,8 @@ function TubePainter() {
 
 			}
 
+			updateEndCap( point1, matrix1, size1 );
+
 		} else {
 
 			updateCurrentSegment( point1 );
@@ -471,7 +468,6 @@ function TubePainter() {
 
 		normals.addUpdateRange( prevSegmentIndex * 3, segmentVertexCount * 3 );
 		normals.addUpdateRange( segmentStartIndex * 3, segmentVertexCount * 3 );
-		normals.needsUpdate = true;
 
 	}
 
@@ -525,10 +521,7 @@ function TubePainter() {
 		}
 
 		positions.addUpdateRange( segmentStartIndex * 3, ( vertexIndex - segmentStartIndex ) * 3 );
-		positions.needsUpdate = true;
-
 		colors.addUpdateRange( segmentStartIndex * 3, ( vertexIndex - segmentStartIndex ) * 3 );
-		colors.needsUpdate = true;
 
 		updateEndCap( point1, matrix1, size1 );
 
@@ -555,18 +548,33 @@ function TubePainter() {
 		const start = count;
 		const end = geometry.drawRange.count;
 
-		if ( start === end ) return;
+		if ( start !== end ) {
 
-		positions.addUpdateRange( start * 3, ( end - start ) * 3 );
-		positions.needsUpdate = true;
+			positions.addUpdateRange( start * 3, ( end - start ) * 3 );
+			normals.addUpdateRange( start * 3, ( end - start ) * 3 );
+			colors.addUpdateRange( start * 3, ( end - start ) * 3 );
 
-		normals.addUpdateRange( start * 3, ( end - start ) * 3 );
-		normals.needsUpdate = true;
+			count = geometry.drawRange.count;
 
-		colors.addUpdateRange( start * 3, ( end - start ) * 3 );
-		colors.needsUpdate = true;
+		}
 
-		count = geometry.drawRange.count;
+		if ( positions.updateRanges.length > 0 ) {
+
+			positions.needsUpdate = true;
+
+		}
+
+		if ( normals.updateRanges.length > 0 ) {
+
+			normals.needsUpdate = true;
+
+		}
+
+		if ( colors.updateRanges.length > 0 ) {
+
+			colors.needsUpdate = true;
+
+		}
 
 	}
 
