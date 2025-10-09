@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
+			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -110,7 +110,7 @@
 			}
 
 			// TODO: Fix example with WebGL backend
-			
+
 			if ( WebGPU.isAvailable() === false ) {
 
 				document.body.appendChild( WebGPU.getErrorMessage() );
@@ -293,7 +293,7 @@
 					// Define consts
 					const PI = float( 3.141592653589793 );
 					const PI_2 = PI.mul( 2.0 );
-					const limit = property( 'float', 'limit' ).assign( SPEED_LIMIT );
+					const limit = float( SPEED_LIMIT ).toVar( 'limit' );
 
 					// Destructure uniforms
 					const { alignment, separation, cohesion, deltaTime, rayOrigin, rayDirection } = effectController;
@@ -337,7 +337,7 @@
 						If( i.equal( birdIndex ), () => {
 
 							Continue();
-			
+
 						} );
 
 						// Cache bird's position and velocity
