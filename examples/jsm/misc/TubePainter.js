@@ -245,14 +245,14 @@ function TubePainter() {
 	const prevDirection = new Vector3( 0, 0, 1 );
 	const rotationAxis = new Vector3();
 
-	let isPainting = false;
+	let isFirstSegment = true;
 
 	let endCapStartIndex = null;
 	let endCapVertexCount = 0;
 
 	function calculateRMF() {
 
-		if ( isPainting === false ) {
+		if ( isFirstSegment === true ) {
 
 			if ( Math.abs( direction.y ) < 0.99 ) {
 
@@ -291,7 +291,7 @@ function TubePainter() {
 		side.crossVectors( direction, normal ).normalize();
 		normal.crossVectors( side, direction ).normalize();
 
-		if ( isPainting === true ) {
+		if ( isFirstSegment === false ) {
 
 			const smoothFactor = 0.3;
 
@@ -314,7 +314,7 @@ function TubePainter() {
 
 		lastNormal.set( 0, 1, 0 );
 
-		isPainting = false;
+		isFirstSegment = true;
 
 		endCapStartIndex = null;
 		endCapVertexCount = 0;
@@ -335,7 +335,7 @@ function TubePainter() {
 
 		calculateRMF();
 
-		if ( isPainting === false ) {
+		if ( isFirstSegment === true ) {
 
 			color2.copy( color1 );
 			size2 = size1;
@@ -361,7 +361,7 @@ function TubePainter() {
 		color2.copy( color1 );
 		size2 = size1;
 
-		isPainting = true;
+		isFirstSegment = false;
 
 	}
 
