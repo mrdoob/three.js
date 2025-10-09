@@ -70,19 +70,20 @@ function TubePainter() {
 
 	//
 
+	const vector = new Vector3();
+
 	const vector1 = new Vector3();
 	const vector2 = new Vector3();
 	const vector3 = new Vector3();
 	const vector4 = new Vector3();
 
-	const vector = new Vector3();
-
-	const capNormal = new Vector3();
 	const color1 = new Color( 0xffffff );
 	const color2 = new Color( 0xffffff );
 
 	let size1 = 1;
 	let size2 = 1;
+
+	const capNormal = new Vector3();
 
 	function addCap( position, matrix, isEndCap, capSize ) {
 
@@ -180,6 +181,9 @@ function TubePainter() {
 
 		}
 
+		positions.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
+		normals.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
+		colors.addUpdateRange( endCapStartIndex * 3, endCapVertexCount * 3 );
 
 	}
 
@@ -391,11 +395,26 @@ function TubePainter() {
 
 	//
 
+	let count = 0;
+
 	function update() {
 
-		positions.needsUpdate = true;
-		normals.needsUpdate = true;
-		colors.needsUpdate = true;
+		const start = count;
+		const end = geometry.drawRange.count;
+
+		if ( start !== end ) {
+
+			positions.addUpdateRange( start * 3, ( end - start ) * 3 );
+			normals.addUpdateRange( start * 3, ( end - start ) * 3 );
+			colors.addUpdateRange( start * 3, ( end - start ) * 3 );
+
+			count = end;
+
+		}
+
+		if ( positions.updateRanges.length > 0 ) positions.needsUpdate = true;
+		if ( normals.updateRanges.length > 0 ) normals.needsUpdate = true;
+		if ( colors.updateRanges.length > 0 ) colors.needsUpdate = true;
 
 	}
 
