@@ -79,7 +79,7 @@ class RenderOutputNode extends TempNode {
 
 	}
 
-		/**
+	/**
 	 * Sets the tone mapping type.
 	 *
 	 * @param {number} value - The tone mapping type.
