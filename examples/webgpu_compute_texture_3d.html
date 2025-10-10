@@ -69,6 +69,8 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
@@ -202,8 +204,7 @@
 
 				//
 
-				await renderer.init();
-				await renderer.computeAsync( computeNode );
+				renderer.compute( computeNode );
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( threshold, 'value', 0, 1, 0.01 ).name( 'threshold' );
@@ -226,7 +227,7 @@
 
 			function animate() {
 
-				renderer.computeAsync( computeNode );
+				renderer.compute( computeNode );
 				renderer.render( scene, camera );
 
 			}
