@@ -633,6 +633,16 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
+		 * An array of textures that require mipmap generation after a render pass.
+		 * Meaning after `finishRender()` has been executed. The array is automatically
+		 * resetted after the mipmap generation process.
+		 *
+		 * @private
+		 * @type {Array<Texture>}
+		 */
+		this._mipmapQueue = [];
+
+		/**
 		 * Whether the renderer should render transparent render objects or not.
 		 *
 		 * @type {boolean}
@@ -1558,6 +1568,18 @@ class Renderer {
 
 		this.backend.finishRender( renderContext );
 
+		// process mipmap queue
+
+		for ( let i = 0; i < this._mipmapQueue.length; i ++ ) {
+
+			const texture = this._mipmapQueue[ i ];
+
+			this.backend.generateMipmaps( texture );
+
+		}
+
+		this._mipmapQueue.length = 0;
+
 		// restore render tree
 
 		nodeFrame.renderId = previousRenderId;
@@ -1630,6 +1652,19 @@ class Renderer {
 		this.autoClear = currentAutoClear;
 		this.xr.enabled = currentXR;
 
+
+	}
+
+	/**
+	 * Pushes a texture to the mipmap queue. The renderer will generate mipmaps for these
+	 * textures after the main render pass.
+	 *
+	 * @private
+	 * @param {Texture} texture - The texture that requires mipmap generation.
+	 */
+	_pushTextureToMipmapQueue( texture ) {
+
+		this._mipmapQueue.push( texture );
 
 	}
 

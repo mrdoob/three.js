@@ -182,11 +182,13 @@ class ViewportTextureNode extends TextureNode {
 		//
 
 		const currentGenerateMipmaps = framebufferTexture.generateMipmaps;
-		framebufferTexture.generateMipmaps = this.generateMipmaps;
+		framebufferTexture.generateMipmaps = false; // always set this flag to false since mipmaps must be generated after the main render pass
 
 		renderer.copyFramebufferToTexture( framebufferTexture );
 
 		framebufferTexture.generateMipmaps = currentGenerateMipmaps;
+
+		if ( this.generateMipmaps ) renderer._pushTextureToMipmapQueue( framebufferTexture ); // defer mipmap generation
 
 	}
 
