@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js docs</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)" />
+		<link rel="stylesheet" type="text/css" href="/files/main.css">
+		<link type="text/css" rel="stylesheet" href="styles/page.css">
+	</head>
+	<body>
+		<div id="panel">
+
+			<div id="header">
+				<h1><a href="https://threejs.org">three.js</a></h1>
+
+				<div id="sections">
+					<span class="selected">docs</span>
+					<a href="/examples/#webgl_animation_keyframes">examples</a>
+				</div>
+
+				<div id="expandButton"></div>
+			</div>
+
+			<div id="panelScrim"></div>
+
+			<div id="contentWrapper">
+				<div id="inputWrapper">
+					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="clearSearchButton"></div>
+				</div>
+				<div id="content"><!--NAV_PLACEHOLDER--></div>
+			</div>
+
+		</div>
+
+		<iframe id="viewer" name="viewer"></iframe>
+
+		<script>
+
+		// Handle legacy URLs from old documentation structure
+		( function handleLegacyURLs() {
+
+			const hash = window.location.hash;
+
+			if ( hash.startsWith( '#api/' ) || hash.startsWith( '#examples/' ) ) {
+
+				const mappings = {
+
+					'3DMLoader': 'Rhino3dmLoader',
+
+					'BufferGeometryUtils': 'module-BufferGeometryUtils',
+					'CameraUtils': 'module-CameraUtils',
+					'SceneUtils': 'module-SceneUtils',
+					'SkeletonUtils': 'module-SkeletonUtils',
+					'UniformsUtils': 'module-UniformsUtils',
+
+					'DefaultLoadingManager': 'LoadingManager',
+					'Interpolations': 'module-Interpolations',
+
+					'Animation': 'global',
+					'BufferAttributeUsage': 'global',
+					'Core': 'global',
+					'CustomBlendingEquations': 'global',
+					'Materials': 'global',
+					'Textures': 'global'
+				};
+
+				const parts = hash.split( '/' );
+				let className = parts[ parts.length - 1 ];
+
+				if ( className ) {
+
+					if ( className in mappings ) className = mappings[ className ];
+
+					window.location.hash = className;
+
+				}
+
+			}
+
+		} )();
+
+		const panel = document.getElementById( 'panel' );
+		const content = document.getElementById( 'content' );
+		const expandButton = document.getElementById( 'expandButton' );
+		const clearSearchButton = document.getElementById( 'clearSearchButton' );
+		const panelScrim = document.getElementById( 'panelScrim' );
+		const filterInput = document.getElementById( 'filterInput' );
+		let iframe = document.getElementById( 'viewer' );
+
+		const pageLinks = {};
+		let navigation;
+		let isUserClick = false;
+
+		init();
+
+		function init() {
+
+			const hash = window.location.hash.substring( 1 );
+
+			// Functionality for hamburger button (on small devices)
+
+			expandButton.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			};
+
+			panelScrim.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			};
+
+			// Functionality for search/filter input field
+
+			filterInput.onfocus = function () {
+
+				panel.classList.add( 'searchFocused' );
+
+			};
+
+			filterInput.onblur = function () {
+
+				if ( filterInput.value === '' ) {
+
+					panel.classList.remove( 'searchFocused' );
+
+				}
+
+			};
+
+			filterInput.oninput = function () {
+
+				updateFilter();
+
+			};
+
+			clearSearchButton.onclick = function () {
+
+				filterInput.value = '';
+				updateFilter();
+				filterInput.focus();
+
+			};
+
+			// Activate content and title change on browser navigation
+
+			window.onpopstate = createNewIframe;
+
+			// Setup the navigation panel and configure the iframe
+
+			setupNavigation();
+			createNewIframe();
+
+			// Handle search query
+
+			filterInput.value = extractQuery();
+
+			if ( filterInput.value !== '' ) {
+
+				panel.classList.add( 'searchFocused' );
+
+				updateFilter();
+
+			}
+
+		}
+
+		// Navigation Panel
+
+		function setupNavigation() {
+
+			// Navigation HTML is already embedded in the page
+			navigation = content;
+
+			const selectedPage = window.location.hash.substring( 1 );
+
+			// Convert all links to work with the iframe
+			const links = navigation.querySelectorAll( 'a' );
+			links.forEach( link => {
+
+				const href = link.getAttribute( 'href' );
+
+				if ( href && href.endsWith( '.html' ) ) {
+
+					// Extract page name from href
+					const pageName = href.replace( /\.html.*$/, '' );
+					const pageURL = 'pages/' + href;
+
+					// Update the href to point to the pages subdirectory
+					link.setAttribute( 'href', pageURL );
+					link.setAttribute( 'target', 'viewer' );
+					link.addEventListener( 'click', function ( event ) {
+
+						if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+
+						event.preventDefault();
+						isUserClick = true;
+						window.location.hash = pageName;
+						panel.classList.remove( 'open' );
+
+						// Remove selected class from all links
+						navigation.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+							item.classList.remove( 'selected' );
+
+						} );
+
+						link.classList.add( 'selected' );
+
+					} );
+
+					// Store link for later use
+					pageLinks[ pageName ] = {
+						linkElement: link,
+						pageURL: pageURL,
+						href: href
+					};
+
+					// Select current page
+					if ( pageName === selectedPage ) {
+
+						link.classList.add( 'selected' );
+
+						// Scroll the selected link into view (centered)
+						link.scrollIntoView( { block: 'center' } );
+
+					}
+
+				}
+
+			} );
+
+		}
+
+		// Filtering
+
+		function extractQuery() {
+
+			const search = window.location.search;
+
+			if ( search.indexOf( '?q=' ) !== - 1 ) {
+
+				return decodeURI( search.slice( 3 ) );
+
+			}
+
+			return '';
+
+		}
+
+		function escapeRegExp( string ) {
+
+			string = string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+			return '(?=.*' + string.split( ' ' ).join( ')(?=.*' ) + ')';
+
+		}
+
+		function updateFilter() {
+
+			let v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' );
+
+			if ( v !== '' ) {
+
+				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
+			} else {
+
+				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+
+			}
+
+			const regExp = new RegExp( escapeRegExp( v ), 'gi' );
+
+			for ( let pageName in pageLinks ) {
+
+				const linkElement = pageLinks[ pageName ].linkElement;
+				const parent = linkElement.parentElement;
+
+				if ( parent ) {
+
+					const filterResults = pageName.match( regExp );
+
+					if ( filterResults !== null && filterResults.length > 0 ) {
+
+						parent.classList.remove( 'hidden' );
+
+					} else {
+
+						parent.classList.add( 'hidden' );
+
+					}
+
+				}
+
+			}
+
+			displayFilteredPanel();
+
+		}
+
+		function displayFilteredPanel() {
+
+			// Show/hide sections depending on their content
+			const sections = navigation.querySelectorAll( 'ul' );
+
+			sections.forEach( function ( section ) {
+
+				const items = section.children;
+				const sectionContainer = section.parentElement;
+
+				let hideSection = true;
+
+				for ( let i = 0; i < items.length; i ++ ) {
+
+					if ( ! items[ i ].classList.contains( 'hidden' ) ) {
+
+						hideSection = false;
+						break;
+
+					}
+
+				}
+
+				if ( hideSection ) {
+
+					sectionContainer.classList.add( 'hidden' );
+
+				} else {
+
+					sectionContainer.classList.remove( 'hidden' );
+
+				}
+
+			} );
+
+		}
+
+		// Routing
+
+		function createNewIframe() {
+
+			const hash = window.location.hash.substring( 1 );
+			const splitHash = hash.split( '#' );
+			const pageName = splitHash[ 0 ];
+			const anchor = splitHash[ 1 ] ? '#' + splitHash[ 1 ] : '';
+
+			let subtitle = '';
+
+			const oldIframe = iframe;
+			iframe = oldIframe.cloneNode();
+
+			iframe.style.display = 'none';
+
+			if ( hash && pageLinks[ pageName ] ) {
+
+				iframe.onload = function () {
+
+					iframe.style.display = 'unset';
+
+					// Intercept clicks on internal documentation links in the iframe
+					setupIframeLinks();
+
+				};
+
+				iframe.src = pageLinks[ pageName ].pageURL + anchor;
+				subtitle = pageName + anchor + ' – ';
+
+				// Update navigation selection and scroll into view
+				navigation.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+					item.classList.remove( 'selected' );
+
+				} );
+
+				if ( pageLinks[ pageName ] && pageLinks[ pageName ].linkElement ) {
+
+					pageLinks[ pageName ].linkElement.classList.add( 'selected' );
+
+					// Only scroll if this is not a user click (user clicks handle their own smooth scrolling)
+					if ( ! isUserClick ) {
+
+						pageLinks[ pageName ].linkElement.scrollIntoView( { block: 'center' } );
+
+					}
+
+					isUserClick = false;
+
+				}
+
+			} else {
+
+				iframe.src = '';
+				subtitle = '';
+
+			}
+
+			document.body.replaceChild( iframe, oldIframe );
+			document.title = subtitle + 'three.js docs';
+
+		}
+
+		function setupIframeLinks() {
+
+			try {
+
+				// Get the iframe's document
+				const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+				// Find all links in the iframe that point to .html files
+				const links = iframeDoc.querySelectorAll( 'a[href$=".html"]' );
+
+				links.forEach( function ( link ) {
+
+					link.addEventListener( 'click', function ( event ) {
+
+						const href = link.getAttribute( 'href' );
+
+						// Only handle relative links to .html files
+						if ( href && ! href.startsWith( 'http' ) && href.endsWith( '.html' ) ) {
+
+							event.preventDefault();
+
+							// Extract the page name from the href (e.g., "Light.html" -> "Light")
+							const pageName = href.replace( /\.html.*$/, '' );
+
+							// Update the parent page's hash
+							window.location.hash = pageName;
+
+						}
+
+					} );
+
+				} );
+
+			} catch ( e ) {
+
+				// Ignore cross-origin errors
+				console.error( 'Could not set up iframe links:', e );
+
+			}
+
+		}
+
+		</script>
+
+	</body>
+
+</html>

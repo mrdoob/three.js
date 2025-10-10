@@ -279,7 +279,10 @@ function generate( title, docs, filename, resolveLinks ) {
 		augments: docs && docs[0] ? docs[0].augments : null
 	};
 
-	const outpath = path.join( outdir, filename );
+	// Put HTML files in pages/ subdirectory
+	const pagesDir = path.join( outdir, 'pages' );
+	mkdirSync( pagesDir );
+	const outpath = path.join( pagesDir, filename );
 	html = view.render( 'container.tmpl', docData );
 
 	if ( resolveLinks ) {
@@ -787,10 +790,19 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	} );
 
-	// Write navigation to separate file
+	// Build navigation HTML
+	const navHtml = buildNav( members );
+
+	// Generate index.html with embedded navigation
+	const indexTemplatePath = path.join( templatePath, 'static', 'index.html' );
+	let indexHtml = fs.readFileSync( indexTemplatePath, 'utf8' );
+
+	// Replace placeholder with actual navigation
+	indexHtml = indexHtml.replace( '<!--NAV_PLACEHOLDER-->', navHtml );
+
 	fs.writeFileSync(
-		path.join( outdir, 'nav.html' ),
-		buildNav( members ),
+		path.join( outdir, 'index.html' ),
+		indexHtml,
 		'utf8'
 	);
 
