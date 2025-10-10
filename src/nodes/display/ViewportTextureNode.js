@@ -188,7 +188,7 @@ class ViewportTextureNode extends TextureNode {
 
 		framebufferTexture.generateMipmaps = currentGenerateMipmaps;
 
-		if ( this.generateMipmaps ) renderer._pushTextureToMipmapQueue( framebufferTexture ); // defer mipmap generation
+		if ( this.generateMipmaps ) renderer._pushTextureToMipmapQueue( framebufferTexture ); // defer mipmap generation, see #32035
 
 	}
 
