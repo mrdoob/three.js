@@ -8,6 +8,11 @@
 		<link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="/files/main.css">
 		<link type="text/css" rel="stylesheet" href="styles/page.css">
+		<!-- console sandbox -->
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			window.THREE = THREE;
+		</script>
 	</head>
 	<body>
 		<div id="panel">
@@ -447,6 +452,19 @@
 			}
 
 		}
+
+		//
+
+		console.log( [
+			'    __     __',
+			' __/ __\\  / __\\__   ____   _____   _____',
+			'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
+			'\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
+			'/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
+			'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
+			'                                         / __/  /  \\__  \\',
+			'                                         \\/____/\\/_____/'
+		].join( '\n' ) );
 
 		</script>
 
