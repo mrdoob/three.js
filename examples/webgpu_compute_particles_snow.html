@@ -155,7 +155,12 @@
 					const velocity = particleData.y;
 					const random = particleData.w;
 
-					const rippleOnSurface = texture( collisionPosRT.texture, getCoord( position.xz ) );
+					const rippleOnSurface = texture( collisionPosRT.texture, getCoord( position.xz ) ).toInspector( 'Collision Test', () => {
+
+						return texture( collisionPosRT.texture ).y; // .div( collisionCamera.position.y );
+
+					} );
+
 					const rippleFloorArea = rippleOnSurface.y.add( scale.x.mul( surfaceOffset ) );
 
 					If( position.y.greaterThan( rippleFloorArea ), () => {
@@ -312,10 +317,10 @@
 
 				// compose
 
-				let totalPass = scenePass;
+				let totalPass = scenePass.toInspector( 'Scene' );
 				totalPass = totalPass.add( scenePassColorBlurred.mul( .1 ) );
 				totalPass = totalPass.mul( vignette );
-				totalPass = totalPass.add( teapotTreePass.mul( 10 ).add( teapotTreePassBlurred ) );
+				totalPass = totalPass.add( teapotTreePass.mul( 10 ).add( teapotTreePassBlurred ).toInspector( 'Teapot Blur' ) );
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = totalPass;
