@@ -42,7 +42,7 @@
 
 			init();
 
-			async function init() {
+			function init() {
 
 				const aspect = window.innerWidth / window.innerHeight;
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
@@ -83,8 +83,6 @@
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				await renderer.init();
 
 				// gui
 
