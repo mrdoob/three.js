@@ -111,7 +111,7 @@
 
 				// TSL function
 				// current color from index
-				getInstanceColor = /*#__PURE__*/ Fn( ( [ i ] ) => {
+				getInstanceColor = Fn( ( [ i ] ) => {
 
 					return hue( color( 0x0000ff ), colorOffset.add( mx_fractal_noise_float( i.toFloat().mul( .1 ), 2, 2.0, 0.5, colorVariance ) ) );
 
@@ -123,7 +123,7 @@
 				const particleVelocities = storage( new THREE.StorageInstancedBufferAttribute( nbParticles, 4 ), 'vec4', nbParticles );
 
 				// init particles buffers
-				renderer.compute( /*#__PURE__*/ Fn( () => {
+				renderer.compute( Fn( () => {
 
 					particlePositions.element( instanceIndex ).xyz.assign( vec3( 10000.0 ) );
 					particlePositions.element( instanceIndex ).w.assign( vec3( - 1.0 ) ); // life is stored in w component; x<0 means dead
@@ -141,7 +141,7 @@
 				particleMaterial.scaleNode = vec2( particleSize );
 				particleMaterial.rotationNode = atan( particleVelocities.toAttribute().y, particleVelocities.toAttribute().x );
 
-				particleMaterial.colorNode = /*#__PURE__*/ Fn( () => {
+				particleMaterial.colorNode = Fn( () => {
 
 					const life = particlePositions.toAttribute().w;
 					const modLife = pcurve( life.oneMinus(), 8.0, 1.0 );
@@ -155,7 +155,7 @@
 
 				} )();
 
-				particleMaterial.opacityNode = /*#__PURE__*/ Fn( () => {
+				particleMaterial.opacityNode = Fn( () => {
 
 					const circle = step( uv().xy.sub( 0.5 ).length(), 0.5 );
 					const life = particlePositions.toAttribute().w;
@@ -210,7 +210,7 @@
 				scene.add( linksMesh );
 
 				// compute nodes
-				updateParticles = /*#__PURE__*/ Fn( () => {
+				updateParticles = Fn( () => {
 
 					const position = particlePositions.element( instanceIndex ).xyz;
 					const life = particlePositions.element( instanceIndex ).w;
@@ -311,7 +311,7 @@
 
 				} )().compute( nbParticles ).setName( 'Update Particles' );
 
-				spawnParticles = /*#__PURE__*/ Fn( () => {
+				spawnParticles = Fn( () => {
 
 					const particleIndex = spawnIndex.add( instanceIndex ).mod( nbParticles ).toInt();
 					const position = particlePositions.element( particleIndex ).xyz;
