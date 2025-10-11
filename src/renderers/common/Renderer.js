@@ -2534,9 +2534,9 @@ class Renderer {
 	 */
 	async computeAsync( computeNodes, dispatchSizeOrCount = null ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "computeAsync()" has been deprecated. Use "compute()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		this._inspector.computeAsync( computeNodes, dispatchSizeOrCount );
+		await this.init();
 
 		this.compute( computeNodes, dispatchSizeOrCount );
 
