@@ -2,6 +2,7 @@
 
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
+[![CodeQL][codeql]][codeql-url]
 [![NPM Downloads][npm-downloads]][npmtrends-url]
 [![Discord][discord]][discord-url]
 [![DeepWiki][deepwiki]][deepwiki-url]
@@ -77,6 +78,8 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [npm-url]: https://www.npmjs.com/package/three
 [build-size]: https://badgen.net/bundlephobia/minzip/three
 [build-size-url]: https://bundlephobia.com/result?p=three
+[codeql]: https://github.com/mrdoob/three.js/actions/workflows/codeql-code-scanning.yml/badge.svg
+[codeql-url]: https://github.com/mrdoob/three.js/actions/workflows/codeql-code-scanning.yml
 [npm-downloads]: https://img.shields.io/npm/dw/three
 [npmtrends-url]: https://www.npmtrends.com/three
 [discord]: https://img.shields.io/discord/685241246557667386
