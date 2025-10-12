@@ -571,7 +571,16 @@ function buildGlobalsNav( globals, seen ) {
 
 function pushNavItem( hierarchy, mainCategory, subCategory, itemNav ) {
 
-	subCategory = subCategory[ 0 ].toUpperCase() + subCategory.slice( 1 ); // capitalize
+	// Special case for TSL - keep it all uppercase
+	if ( subCategory.toLowerCase() === 'tsl' ) {
+
+		subCategory = 'TSL';
+
+	} else {
+
+		subCategory = subCategory[ 0 ].toUpperCase() + subCategory.slice( 1 ); // capitalize
+
+	}
 
 	if ( hierarchy.get( mainCategory ).get( subCategory ) === undefined ) {
 
