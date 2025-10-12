@@ -797,7 +797,7 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	} );
 
-	// prepare import statements
+	// prepare import statements and demo tags
 	data().each( doclet => {
 
 		if ( doclet.kind === 'class' || doclet.kind === 'module' ) {
@@ -808,6 +808,9 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 				const importTag = tags.find( tag => tag.title === 'three_import' );
 				doclet.import = ( importTag !== undefined ) ? importTag.text : null;
+
+				const demoTag = tags.find( tag => tag.title === 'demo' );
+				doclet.demo = ( demoTag !== undefined ) ? demoTag.text : null;
 
 			}
 
