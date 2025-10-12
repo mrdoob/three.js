@@ -189,14 +189,21 @@
 
 				const href = link.getAttribute( 'href' );
 
-				if ( href && href.endsWith( '.html' ) ) {
+				if ( href && href.includes( '.html' ) ) {
 
-					// Extract page name from href
-					const pageName = href.replace( /\.html.*$/, '' );
-					const pageURL = 'pages/' + href;
+					// Extract page name and anchor from href (e.g., "global.html#Break" -> pageName: "global", anchor: "#Break")
+					const match = href.match( /^([^#]+\.html)(#.*)?$/ );
+					if ( ! match ) return;
+
+					const htmlFile = match[ 1 ];
+					const anchor = match[ 2 ] || '';
+					const pageName = htmlFile.replace( /\.html$/, '' );
+					// Convert "global.html#Break" to "global.Break" for the URL hash
+					const fullPageName = pageName + anchor.replace( '#', '.' );
+					const pageURL = 'pages/' + htmlFile;
 
 					// Update the href to point to the pages subdirectory
-					link.setAttribute( 'href', pageURL );
+					link.setAttribute( 'href', pageURL + anchor );
 					link.setAttribute( 'target', 'viewer' );
 					link.addEventListener( 'click', function ( event ) {
 
@@ -204,7 +211,7 @@
 
 						event.preventDefault();
 						isUserClick = true;
-						window.location.hash = pageName;
+						window.location.hash = fullPageName;
 						panel.classList.remove( 'open' );
 
 						// Remove selected class from all links
@@ -218,15 +225,28 @@
 
 					} );
 
-					// Store link for later use
-					pageLinks[ pageName ] = {
+					// Store link for later use (store both with and without anchor)
+					pageLinks[ fullPageName ] = {
 						linkElement: link,
 						pageURL: pageURL,
+						anchor: anchor,
 						href: href
 					};
 
+					// Also store without anchor for backwards compatibility
+					if ( ! pageLinks[ pageName ] ) {
+
+						pageLinks[ pageName ] = {
+							linkElement: link,
+							pageURL: pageURL,
+							anchor: '',
+							href: htmlFile
+						};
+
+					}
+
 					// Select current page
-					if ( pageName === selectedPage ) {
+					if ( fullPageName === selectedPage || pageName === selectedPage ) {
 
 						link.classList.add( 'selected' );
 
@@ -388,9 +408,19 @@
 		function createNewIframe() {
 
 			const hash = window.location.hash.substring( 1 );
-			const splitHash = hash.split( '#' );
-			const pageName = splitHash[ 0 ];
-			const anchor = splitHash[ 1 ] ? '#' + splitHash[ 1 ] : '';
+
+			// Parse hash: "global.Break" -> pageName: "global", anchor: "#Break"
+			// or "BoxHelper" -> pageName: "BoxHelper", anchor: ""
+			let pageName, anchor;
+			const dotIndex = hash.indexOf( '.' );
+
+			if ( dotIndex !== -1 ) {
+				pageName = hash.substring( 0, dotIndex );
+				anchor = '#' + hash.substring( dotIndex + 1 );
+			} else {
+				pageName = hash;
+				anchor = '';
+			}
 
 			let subtitle = '';
 
@@ -399,7 +429,11 @@
 
 			iframe.style.display = 'none';
 
-			if ( hash && pageLinks[ pageName ] ) {
+			// Try to find the page link - first with full hash (e.g., "global.Break"), then without anchor
+			const fullPageName = hash;
+			const pageLink = pageLinks[ fullPageName ] || pageLinks[ pageName ];
+
+			if ( hash && pageLink ) {
 
 				iframe.onload = function () {
 
@@ -410,8 +444,10 @@
 
 				};
 
-				iframe.src = pageLinks[ pageName ].pageURL + anchor;
-				subtitle = pageName + anchor + ' – ';
+				// Use the stored anchor if available, otherwise use the parsed one
+				const iframeAnchor = pageLink.anchor || anchor;
+				iframe.src = pageLink.pageURL + iframeAnchor;
+				subtitle = hash + ' – ';
 
 				// Update navigation selection and scroll into view
 				navigation.querySelectorAll( 'a' ).forEach( function ( item ) {
@@ -420,14 +456,14 @@
 
 				} );
 
-				if ( pageLinks[ pageName ] && pageLinks[ pageName ].linkElement ) {
+				if ( pageLink && pageLink.linkElement ) {
 
-					pageLinks[ pageName ].linkElement.classList.add( 'selected' );
+					pageLink.linkElement.classList.add( 'selected' );
 
 					// Only scroll if this is not a user click (user clicks handle their own smooth scrolling)
 					if ( ! isUserClick ) {
 
-						pageLinks[ pageName ].linkElement.scrollIntoView( { block: 'center' } );
+						pageLink.linkElement.scrollIntoView( { block: 'center' } );
 
 					}
 
@@ -454,8 +490,8 @@
 				// Get the iframe's document
 				const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-				// Find all links in the iframe that point to .html files
-				const links = iframeDoc.querySelectorAll( 'a[href$=".html"]' );
+				// Find all links in the iframe
+				const links = iframeDoc.querySelectorAll( 'a' );
 
 				links.forEach( function ( link ) {
 
@@ -463,16 +499,25 @@
 
 						const href = link.getAttribute( 'href' );
 
-						// Only handle relative links to .html files
-						if ( href && ! href.startsWith( 'http' ) && href.endsWith( '.html' ) ) {
+						// Only handle relative links to .html files (with or without anchors)
+						if ( href && ! href.startsWith( 'http' ) && href.includes( '.html' ) ) {
 
 							event.preventDefault();
 
-							// Extract the page name from the href (e.g., "Light.html" -> "Light")
-							const pageName = href.replace( /\.html.*$/, '' );
+							// Parse href: "global.html#Break" -> "global.Break" or "Light.html" -> "Light"
+							const match = href.match( /^([^#]+\.html)(#.*)?$/ );
+							if ( match ) {
 
-							// Update the parent page's hash
-							window.location.hash = pageName;
+								const htmlFile = match[ 1 ];
+								const anchor = match[ 2 ] || '';
+								const pageName = htmlFile.replace( /\.html$/, '' );
+								// Convert to dot notation: "global.html#Break" -> "global.Break"
+								const fullHash = pageName + anchor.replace( '#', '.' );
+
+								// Update the parent page's hash
+								window.location.hash = fullHash;
+
+							}
 
 						}
 
