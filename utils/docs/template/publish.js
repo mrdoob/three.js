@@ -141,7 +141,7 @@ function buildItemTypeStrings( item ) {
 
 }
 
-function buildSearchListForData() {
+function buildSearchList() {
 
 	const searchList = [];
 
@@ -149,11 +149,41 @@ function buildSearchListForData() {
 
 		if ( item.kind !== 'package' && item.kind !== 'typedef' && ! item.inherited ) {
 
-			searchList.push( {
-				title: item.longname,
-				link: linkto( item.longname, item.name ),
-				kind: item.kind
-			} );
+			// Extract the class name from the longname (e.g., "Animation#getAnimationLoop" -> "Animation")
+			const parts = item.longname.split( /[#~]/ );
+			const className = parts[ 0 ];
+
+			// If this item is a member/method of a class, check if the parent class exists
+			if ( parts.length > 1 ) {
+
+				// Find the parent class/module
+				const parentClass = find( { longname: className, kind: [ 'class', 'module' ] } );
+
+				// Only include if parent exists and is not private
+				if ( parentClass && parentClass.length > 0 && parentClass[ 0 ].access !== 'private' ) {
+
+					searchList.push( {
+						title: item.longname,
+						link: linkto( item.longname, item.name ),
+						kind: item.kind
+					} );
+
+				}
+
+			} else {
+
+				// This is a top-level class/module/function - include if not private
+				if ( item.access !== 'private' ) {
+
+					searchList.push( {
+						title: item.longname,
+						link: linkto( item.longname, item.name ),
+						kind: item.kind
+					} );
+
+				}
+
+			}
 
 		}
 
@@ -837,7 +867,7 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	// search
 
-	const searchList = buildSearchListForData();
+	const searchList = buildSearchList();
 
 	mkdirSync( path.join( outdir, 'data' ) );
 
