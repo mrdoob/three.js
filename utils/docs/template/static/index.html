@@ -7,7 +7,6 @@
 		<link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
 		<link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="/files/main.css">
-		<link type="text/css" rel="stylesheet" href="styles/page.css">
 		<!-- console sandbox -->
 		<script type="module">
 			import * as THREE from '../build/three.module.js';
@@ -246,13 +245,26 @@
 					if ( fullPageName === selectedPage || pageName === selectedPage ) {
 
 						link.classList.add( 'selected' );
-						link.scrollIntoView( { block: 'center' } );
+						scrollIntoViewVertical( link );
 
 					}
 
 				}
 
 			} );
+
+		}
+
+		function scrollIntoViewVertical( element ) {
+
+			const container = document.getElementById( 'content' );
+			const elementTop = element.offsetTop;
+			const elementHeight = element.offsetHeight;
+			const viewportHeight = window.innerHeight;
+
+			// Scroll to center the element vertically using viewport height
+			const scrollTop = elementTop - ( viewportHeight / 2 ) + ( elementHeight / 2 );
+			container.scrollTop = scrollTop;
 
 		}
 
@@ -501,7 +513,7 @@
 						pageInfo.linkElement.classList.add( 'selected' );
 
 						// Scroll the link into view
-						pageInfo.linkElement.scrollIntoView( { block: 'center' } );
+						scrollIntoViewVertical( pageInfo.linkElement );
 
 					}
 
@@ -590,7 +602,7 @@
 					// Only scroll if this is not a user click (user clicks handle their own smooth scrolling)
 					if ( ! isUserClick ) {
 
-						pageLink.linkElement.scrollIntoView( { block: 'center' } );
+						scrollIntoViewVertical( pageLink.linkElement );
 
 					}
 
