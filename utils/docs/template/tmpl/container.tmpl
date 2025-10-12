@@ -1,6 +1,7 @@
 <?js
 	var self = this;
 	var isGlobalPage;
+	var isTSLPage;
 
 	docs.forEach(function(doc, i) {
 ?>
@@ -9,6 +10,7 @@
 		// we only need to check this once
 		if (typeof isGlobalPage === 'undefined') {
 			isGlobalPage = (doc.kind === 'globalobj');
+			isTSLPage = (doc.isTSL === true);
 		}
 	?>
 	<?js if (doc.kind === 'mainpage' || (doc.kind === 'package')) { ?>
@@ -76,7 +78,18 @@
 					// symbols that are assigned to module.exports are not globals, even though they're not a memberof anything
 					if (isGlobalPage && members && members.length && members.forEach) {
 						members = members.filter(function(m) {
-							return m.longname && m.longname.indexOf('module:') !== 0;
+							if (m.longname && m.longname.indexOf('module:') === 0) return false;
+
+							// Filter based on whether this is TSL or Global page
+							var hasTslTag = m.tags && m.tags.some(function(tag) { return tag.title === 'tsl'; });
+							var isFromNodes = m.meta && m.meta.shortpath && m.meta.shortpath.startsWith('src/nodes');
+							var isTSLItem = hasTslTag || isFromNodes;
+
+							if (isTSLPage) {
+								return isTSLItem;
+							} else {
+								return !isTSLItem;
+							}
 						});
 					}
 					if (members && members.length && members.forEach) {
@@ -88,6 +101,22 @@
 				<?js } ?>
 				<?js
 					var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
+
+					// Filter methods for TSL vs Global
+					if (isGlobalPage && methods && methods.length) {
+						methods = methods.filter(function(m) {
+							var hasTslTag = m.tags && m.tags.some(function(tag) { return tag.title === 'tsl'; });
+							var isFromNodes = m.meta && m.meta.shortpath && m.meta.shortpath.startsWith('src/nodes');
+							var isTSLItem = hasTslTag || isFromNodes;
+
+							if (isTSLPage) {
+								return isTSLItem;
+							} else {
+								return !isTSLItem;
+							}
+						});
+					}
+
 					var staticMethods = methods.filter(function(m) { return m.scope === 'static'; });
 					var instanceMethods = methods.filter(function(m) { return m.scope !== 'static'; });
 

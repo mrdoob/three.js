@@ -17,6 +17,7 @@ let view;
 
 const outdir = path.normalize( env.opts.destination );
 const themeOpts = ( env.opts.themeOpts ) || {};
+const categoryMap = {}; // Maps class names to their categories (Core, Addons, TSL)
 
 function mkdirSync( filepath ) {
 
@@ -143,7 +144,12 @@ function buildItemTypeStrings( item ) {
 
 function buildSearchList() {
 
-	const searchList = [];
+	const searchByCategory = {
+		'Core': [],
+		'Addons': [],
+		'Global': [],
+		'TSL': []
+	};
 
 	data().each( ( item ) => {
 
@@ -162,11 +168,17 @@ function buildSearchList() {
 				// Only include if parent exists and is not private
 				if ( parentClass && parentClass.length > 0 && parentClass[ 0 ].access !== 'private' ) {
 
-					searchList.push( {
+					const category = categoryMap[ className ];
+					const entry = {
 						title: item.longname,
-						link: linkto( item.longname, item.name ),
 						kind: item.kind
-					} );
+					};
+
+					if ( category && searchByCategory[ category ] ) {
+
+						searchByCategory[ category ].push( entry );
+
+					}
 
 				}
 
@@ -175,11 +187,33 @@ function buildSearchList() {
 				// This is a top-level class/module/function - include if not private
 				if ( item.access !== 'private' ) {
 
-					searchList.push( {
+					let category = categoryMap[ className ];
+
+					// If not in categoryMap, determine category from file path
+					if ( ! category ) {
+
+						if ( item.meta && item.meta.shortpath && item.meta.shortpath.startsWith( 'src/nodes' ) ) {
+
+							category = 'TSL';
+
+						} else {
+
+							category = 'Global';
+
+						}
+
+					}
+
+					const entry = {
 						title: item.longname,
-						link: linkto( item.longname, item.name ),
 						kind: item.kind
-					} );
+					};
+
+					if ( category && searchByCategory[ category ] ) {
+
+						searchByCategory[ category ].push( entry );
+
+					}
 
 				}
 
@@ -189,7 +223,7 @@ function buildSearchList() {
 
 	} );
 
-	return searchList;
+	return searchByCategory;
 
 }
 
@@ -428,12 +462,14 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 					const subCategory = path.split( '/' )[ 1 ];
 
 					pushNavItem( hierarchy, 'Core', subCategory, itemNav );
+					categoryMap[ item.longname ] = 'Core';
 
 				} else if ( path.startsWith( addonsDirectory ) ) {
 
 					const subCategory = path.split( '/' )[ 2 ];
 
 					pushNavItem( hierarchy, 'Addons', subCategory, itemNav );
+					categoryMap[ item.longname ] = 'Addons';
 
 				}
 
@@ -809,7 +845,44 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	if ( members.globals.length ) {
 
-		generate( 'Global', [ { kind: 'globalobj' } ], globalUrl );
+		// Split globals into TSL and non-TSL
+		const tslGlobals = [];
+		const nonTslGlobals = [];
+		const originalGlobals = members.globals;
+
+		originalGlobals.forEach( item => {
+
+			const hasTslTag = Array.isArray( item.tags ) && item.tags.some( tag => tag.title === 'tsl' );
+			const isFromNodes = item.meta && item.meta.shortpath && item.meta.shortpath.startsWith( 'src/nodes' );
+
+			if ( hasTslTag || isFromNodes ) {
+
+				tslGlobals.push( item );
+
+				// Register each TSL item to link to TSL.html
+				helper.registerLink( item.longname, 'TSL.html#' + item.name );
+
+			} else {
+
+				nonTslGlobals.push( item );
+
+			}
+
+		} );
+
+		// Generate TSL.html for TSL functions
+		if ( tslGlobals.length ) {
+
+			generate( 'TSL', [ { kind: 'globalobj', isTSL: true } ], 'TSL.html' );
+
+		}
+
+		// Generate global.html for remaining globals
+		if ( nonTslGlobals.length ) {
+
+			generate( 'Global', [ { kind: 'globalobj' } ], globalUrl );
+
+		}
 
 	}
 
@@ -873,9 +946,7 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	fs.writeFileSync(
 		path.join( outdir, 'data', 'search.json' ),
-		JSON.stringify( {
-			list: searchList,
-		} )
+		JSON.stringify( searchList, null, '\t' )
 	);
 
 };
