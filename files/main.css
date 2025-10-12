@@ -304,6 +304,57 @@ hr {
 		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
 	}
 
+	#panel #searchResults {
+		flex: 1;
+		overflow-y: auto;
+		overflow-x: hidden;
+		-webkit-overflow-scrolling: touch;
+		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
+	}
+
+		#panel #searchResults .search-result-group {
+			margin-bottom: 12px;
+		}
+
+		#panel #searchResults .search-result-class {
+			display: block;
+			color: var(--text-color);
+			font-weight: 500;
+			margin-bottom: 2px;
+		}
+
+		#panel #searchResults .search-result-class:hover {
+			color: var(--color-blue);
+		}
+
+		#panel #searchResults .search-result-class-name {
+			display: block;
+			color: var(--text-color);
+			font-weight: 500;
+			margin-bottom: 2px;
+		}
+
+		#panel #searchResults .search-result-member {
+			display: block;
+			color: var(--text-color);
+			margin-left: 16px;
+			margin-bottom: 1px;
+		}
+
+		#panel #searchResults .search-result-member:hover {
+			color: var(--color-blue);
+		}
+
+		#panel #searchResults .search-result-class.selected,
+		#panel #searchResults .search-result-member.selected {
+			color: var(--color-blue);
+			text-decoration: underline;
+		}
+
+		#panel #searchResults strong {
+			font-weight: 600;
+		}
+
 		#panel #content ul {
 			list-style-type: none;
 			padding: 0px;

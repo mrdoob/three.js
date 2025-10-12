@@ -152,7 +152,7 @@ function buildSearchListForData() {
 			searchList.push( {
 				title: item.longname,
 				link: linkto( item.longname, item.name ),
-				description: item.description,
+				kind: item.kind
 			} );
 
 		}

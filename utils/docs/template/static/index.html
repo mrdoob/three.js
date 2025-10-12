@@ -35,6 +35,7 @@
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
 					<div id="clearSearchButton"></div>
 				</div>
+				<div id="searchResults" style="display: none;"></div>
 				<div id="content"><!--NAV_PLACEHOLDER--></div>
 			</div>
 
@@ -96,14 +97,31 @@
 		let iframe = document.getElementById( 'viewer' );
 
 		const pageLinks = {};
+		const pageCategories = {};
 		let navigation;
 		let isUserClick = false;
+		let searchData = [];
+		let searchDataLoaded = false;
+
+		fetch( 'data/search.json' )
+			.then( response => response.json() )
+			.then( data => {
+
+				searchData = data.list;
+				searchDataLoaded = true;
+
+				if ( filterInput.value !== '' ) {
+
+					updateFilter();
+
+				}
+
+			} )
+			.catch( err => console.error( 'Failed to load search data:', err ) );
 
 		init();
 
 		function init() {
-
-			// Functionality for hamburger button (on small devices)
 
 			expandButton.onclick = function ( event ) {
 
@@ -118,8 +136,6 @@
 				panel.classList.toggle( 'open' );
 
 			};
-
-			// Functionality for search/filter input field
 
 			filterInput.onfocus = function () {
 
@@ -151,24 +167,16 @@
 
 			};
 
-			// Activate content and title change on browser navigation
-
 			window.onpopstate = createNewIframe;
-
-			// Setup the navigation panel and configure the iframe
 
 			setupNavigation();
 			createNewIframe();
-
-			// Handle search query
 
 			filterInput.value = extractQuery();
 
 			if ( filterInput.value !== '' ) {
 
 				panel.classList.add( 'searchFocused' );
-
-				updateFilter();
 
 			}
 
@@ -178,31 +186,57 @@
 
 		function setupNavigation() {
 
-			// Navigation HTML is already embedded in the page
 			navigation = content;
 
 			const selectedPage = window.location.hash.substring( 1 );
 
-			// Convert all links to work with the iframe
+			// Build category mapping
+			let currentCategory = '';
+			const allElements = navigation.querySelectorAll( 'h2, a' );
+			allElements.forEach( el => {
+
+				if ( el.tagName === 'H2' ) {
+
+					currentCategory = el.textContent;
+
+				} else if ( el.tagName === 'A' ) {
+
+					const href = el.getAttribute( 'href' );
+
+					if ( href && href.includes( '.html' ) ) {
+
+						const match = href.match( /^([^#]+\.html)/ );
+
+						if ( match ) {
+
+							const pageName = match[ 1 ].replace( /\.html$/, '' );
+							pageCategories[ pageName ] = currentCategory;
+
+						}
+
+					}
+
+				}
+
+			} );
+
 			const links = navigation.querySelectorAll( 'a' );
+
 			links.forEach( link => {
 
 				const href = link.getAttribute( 'href' );
 
 				if ( href && href.includes( '.html' ) ) {
 
-					// Extract page name and anchor from href (e.g., "global.html#Break" -> pageName: "global", anchor: "#Break")
 					const match = href.match( /^([^#]+\.html)(#.*)?$/ );
 					if ( ! match ) return;
 
 					const htmlFile = match[ 1 ];
 					const anchor = match[ 2 ] || '';
 					const pageName = htmlFile.replace( /\.html$/, '' );
-					// Convert "global.html#Break" to "global.Break" for the URL hash
 					const fullPageName = pageName + anchor.replace( '#', '.' );
 					const pageURL = 'pages/' + htmlFile;
 
-					// Update the href to point to the pages subdirectory
 					link.setAttribute( 'href', pageURL + anchor );
 					link.setAttribute( 'target', 'viewer' );
 					link.addEventListener( 'click', function ( event ) {
@@ -214,7 +248,6 @@
 						window.location.hash = fullPageName;
 						panel.classList.remove( 'open' );
 
-						// Remove selected class from all links
 						navigation.querySelectorAll( 'a' ).forEach( function ( item ) {
 
 							item.classList.remove( 'selected' );
@@ -225,7 +258,6 @@
 
 					} );
 
-					// Store link for later use (store both with and without anchor)
 					pageLinks[ fullPageName ] = {
 						linkElement: link,
 						pageURL: pageURL,
@@ -233,7 +265,6 @@
 						href: href
 					};
 
-					// Also store without anchor for backwards compatibility
 					if ( ! pageLinks[ pageName ] ) {
 
 						pageLinks[ pageName ] = {
@@ -245,12 +276,9 @@
 
 					}
 
-					// Select current page
 					if ( fullPageName === selectedPage || pageName === selectedPage ) {
 
 						link.classList.add( 'selected' );
-
-						// Scroll the selected link into view (centered)
 						link.scrollIntoView( { block: 'center' } );
 
 					}
@@ -260,8 +288,6 @@
 			} );
 
 		}
-
-		// Filtering
 
 		function extractQuery() {
 
@@ -289,42 +315,211 @@
 			let v = filterInput.value.trim();
 			v = v.replace( /\s+/gi, ' ' );
 
+			const searchResults = document.getElementById( 'searchResults' );
+			const content = document.getElementById( 'content' );
+
 			if ( v !== '' ) {
 
 				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
+				// Show search results, hide navigation
+				searchResults.style.display = 'block';
+				content.style.display = 'none';
+
+				// Check if search data is loaded
+				if ( ! searchDataLoaded ) {
+
+					searchResults.innerHTML = '<div style="padding: 16px; color: #999;">Loading search data...</div>';
+					return;
+		
+		}
+
+				// Search through the search data
+				const regExp = new RegExp( escapeRegExp( v ), 'gi' );
+				const results = searchData.filter( item => {
+
+					return item.title.match( regExp );
+		
+		} );
+
+				// Create a simpler regex for highlighting (not the lookahead version)
+				const highlightRegExp = new RegExp( v.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ), 'gi' );
+
+				// Display results
+				if ( results.length > 0 ) {
+
+					// Group results by class
+					const grouped = {};
+					results.forEach( item => {
+
+						// Parse title: "BoxHelper#update" or "BoxHelper" or "global#Break"
+						const parts = item.title.split( /[#~]/ );
+						const className = parts[ 0 ];
+						const memberName = parts[ 1 ];
+
+						if ( ! grouped[ className ] ) {
+
+							grouped[ className ] = {
+								class: null,
+								members: []
+							};
+		
+						}
+
+						// Extract the link target from the anchor tag
+						const linkMatch = item.link.match( /href="([^"]+)"/ );
+						if ( linkMatch ) {
+
+							const href = linkMatch[ 1 ];
+							// Convert href to our dot notation
+							const hashMatch = href.match( /^([^#]+\.html)(#.*)?$/ );
+							if ( hashMatch ) {
+
+								const htmlFile = hashMatch[ 1 ];
+								const anchor = hashMatch[ 2 ] || '';
+								const pageName = htmlFile.replace( /\.html$/, '' );
+								const fullHash = pageName + anchor.replace( '#', '.' );
+
+								if ( memberName ) {
+
+									// This is a member (property/method) - only add if the member name matches the search
+									if ( memberName.match( regExp ) ) {
+
+										grouped[ className ].members.push( {
+											name: memberName,
+											fullName: item.title.replace( '#', '.' ).replace( '~', '.' ),
+											hash: fullHash,
+											kind: item.kind
+										} );
+		
+									}
+		
+								} else {
+
+									// This is the class itself
+									grouped[ className ].class = {
+										name: className,
+										hash: fullHash
+									};
+		
+								}
+		
+							}
+		
+						}
+		
+					} );
+
+					// Helper function to highlight matching text
+					function highlightMatch( text, regExp ) {
+
+						return text.replace( regExp, match => `<strong>${match}</strong>` );
+		
+					}
+
+					// Group by category
+					const byCategory = {};
+					for ( const className in grouped ) {
+
+						const group = grouped[ className ];
+						const category = pageCategories[ className ] || 'Other';
+
+						if ( ! byCategory[ category ] ) {
+
+							byCategory[ category ] = {};
+
+						}
+
+						byCategory[ category ][ className ] = group;
+
+					}
+
+					// Render grouped results with category headers
+					const currentHash = window.location.hash.substring( 1 );
+					let html = '';
+
+					for ( const category in byCategory ) {
+
+						html += `<h2>${category}</h2>`;
+
+						for ( const className in byCategory[ category ] ) {
+
+							const group = byCategory[ category ][ className ];
+
+							if ( group.class ) {
+
+								html += '<div class="search-result-group">';
+								const selectedClass = group.class.hash === currentHash ? ' selected' : '';
+								const highlightedName = highlightMatch( group.class.name, highlightRegExp );
+								html += `<a href="#${group.class.hash}" class="search-result-class${selectedClass}">${highlightedName}</a>`;
+
+							}
+
+							if ( group.members.length > 0 ) {
+
+								if ( ! group.class ) {
+
+									html += '<div class="search-result-group">';
+									html += `<a href="#${className}" class="search-result-class">${className}</a>`;
+
+								}
+
+								group.members.forEach( member => {
+
+									const selectedClass = member.hash === currentHash ? ' selected' : '';
+									const highlightedName = highlightMatch( member.name, highlightRegExp );
+									const suffix = member.kind === 'function' ? '()' : '';
+									html += `<a href="#${member.hash}" class="search-result-member${selectedClass}">.${highlightedName}${suffix}</a>`;
+
+								} );
+
+							}
+
+							if ( group.class || group.members.length > 0 ) {
+
+								html += '</div>';
+
+							}
+
+						}
+
+					}
+
+					searchResults.innerHTML = html;
+
+					// Add click handlers to update selection
+					searchResults.querySelectorAll( 'a' ).forEach( link => {
+
+						link.addEventListener( 'click', function () {
+
+							// Remove selected class from all links
+							searchResults.querySelectorAll( 'a' ).forEach( item => {
+
+								item.classList.remove( 'selected' );
+		
+							} );
+							// Add selected class to clicked link
+							link.classList.add( 'selected' );
+		
+						} );
+		
+					} );
+
+				} else {
+
+					searchResults.innerHTML = '<div style="padding: 16px; color: #999;">No results found.</div>';
+
+				}
 
 			} else {
 
 				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
 
-			}
-
-			const regExp = new RegExp( escapeRegExp( v ), 'gi' );
-
-			for ( let pageName in pageLinks ) {
-
-				const linkElement = pageLinks[ pageName ].linkElement;
-				const parent = linkElement.parentElement;
-
-				if ( parent ) {
-
-					const filterResults = pageName.match( regExp );
-
-					if ( filterResults !== null && filterResults.length > 0 ) {
-
-						parent.classList.remove( 'hidden' );
-
-					} else {
-
-						parent.classList.add( 'hidden' );
-
-					}
-
-				}
+				// Hide search results, show navigation
+				searchResults.style.display = 'none';
+				content.style.display = 'block';
 
 			}
-
-			displayFilteredPanel();
 
 		}
 
@@ -414,13 +609,17 @@
 			let pageName, anchor;
 			const dotIndex = hash.indexOf( '.' );
 
-			if ( dotIndex !== -1 ) {
+			if ( dotIndex !== - 1 ) {
+
 				pageName = hash.substring( 0, dotIndex );
 				anchor = '#' + hash.substring( dotIndex + 1 );
-			} else {
+		
+	} else {
+
 				pageName = hash;
 				anchor = '';
-			}
+		
+	}
 
 			let subtitle = '';
 
