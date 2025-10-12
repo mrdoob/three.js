@@ -144,7 +144,7 @@ function buildItemTypeStrings( item ) {
 
 function buildSearchList() {
 
-	const searchByCategory = {
+	const categories = {
 		'Core': [],
 		'Addons': [],
 		'Global': [],
@@ -176,7 +176,7 @@ function buildSearchList() {
 
 					if ( category ) {
 
-						searchByCategory[ category ].push( entry );
+						categories[ category ].push( entry );
 
 					}
 
@@ -209,7 +209,7 @@ function buildSearchList() {
 						kind: item.kind
 					};
 
-					searchByCategory[ category ].push( entry );
+					categories[ category ].push( entry );
 
 				}
 
@@ -219,7 +219,7 @@ function buildSearchList() {
 
 	} );
 
-	return searchByCategory;
+	return categories;
 
 }
 
