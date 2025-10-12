@@ -30,6 +30,8 @@ const _shadowRenderObjectKeys = [];
 /**
  * Creates a function to render shadow objects in a scene.
  *
+ * @tsl
+ * @function
  * @param {Renderer} renderer - The renderer.
  * @param {LightShadow} shadow - The light shadow object containing shadow properties.
  * @param {number} shadowType - The type of shadow map (e.g., BasicShadowMap).
