@@ -194,8 +194,9 @@ function addNonParamAttributes( items ) {
 function addSignatureParams( f ) {
 
 	const params = f.params ? addParamAttributes( f.params ) : [];
+	const paramsString = params.join( ', ' );
 
-	f.signature = util.format( '%s( %s )', ( f.signature || '' ), params.join( ', ' ) );
+	f.signature = util.format( '%s(%s)', ( f.signature || '' ), paramsString ? ' ' + paramsString + ' ' : '' );
 
 }
 

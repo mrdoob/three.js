@@ -519,6 +519,34 @@
 				searchResults.style.display = 'none';
 				content.style.display = 'block';
 
+				// Highlight and scroll to current page in navigation
+				const currentHash = window.location.hash.substring( 1 );
+				if ( currentHash ) {
+
+					// Extract the base page name (before the first dot for members)
+					const basePage = currentHash.split( '.' )[ 0 ];
+
+					// Find and highlight the link in navigation
+					const pageInfo = pageLinks[ basePage ];
+					if ( pageInfo ) {
+
+						// Remove selected class from all links
+						navigation.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+							item.classList.remove( 'selected' );
+
+						} );
+
+						// Add selected class to current page
+						pageInfo.linkElement.classList.add( 'selected' );
+
+						// Scroll the link into view
+						pageInfo.linkElement.scrollIntoView( { block: 'center' } );
+
+					}
+
+				}
+
 			}
 
 		}
