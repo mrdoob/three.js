@@ -448,7 +448,7 @@ iframe#viewer {
 }
 
 #viewer {
-	padding-left: var(--panel-width);
+	padding-left: 0;
 }
 
 #button {
