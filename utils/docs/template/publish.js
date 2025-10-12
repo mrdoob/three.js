@@ -292,7 +292,7 @@ function addSignatureTypes( f ) {
 
 function addAttribs( f ) {
 
-	const attribs = helper.getAttribs( f ).filter( attrib => attrib !== 'static' );
+	const attribs = helper.getAttribs( f ).filter( attrib => attrib !== 'static' && attrib !== 'nullable' );
 	const attribsString = buildAttribsString( attribs );
 
 	f.attribs = attribsString ? util.format( '<span class="type-signature">%s</span>', attribsString ) : '';
