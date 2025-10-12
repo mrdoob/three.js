@@ -174,7 +174,7 @@ function buildSearchList() {
 						kind: item.kind
 					};
 
-					if ( category && searchByCategory[ category ] ) {
+					if ( category ) {
 
 						searchByCategory[ category ].push( entry );
 
@@ -209,11 +209,7 @@ function buildSearchList() {
 						kind: item.kind
 					};
 
-					if ( category && searchByCategory[ category ] ) {
-
-						searchByCategory[ category ].push( entry );
-
-					}
+					searchByCategory[ category ].push( entry );
 
 				}
 
