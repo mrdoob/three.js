@@ -34,6 +34,10 @@
 				<?js if (doc.demo) { ?>
 				<iframe id="viewer" src="../<?js= doc.demo ?>"></iframe>
 				<?js } ?>
+				<?js if (doc.codeExample) { ?>
+				<h2>Code Example</h2>
+				<?js= doc.codeExample ?>
+				<?js } ?>
 			</header>
 			<article>
 				<div class="container-overview">

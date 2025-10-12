@@ -797,7 +797,7 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	} );
 
-	// prepare import statements and demo tags
+	// prepare import statements, demo tags, and extract code examples
 	data().each( doclet => {
 
 		if ( doclet.kind === 'class' || doclet.kind === 'module' ) {
@@ -811,6 +811,22 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 				const demoTag = tags.find( tag => tag.title === 'demo' );
 				doclet.demo = ( demoTag !== undefined ) ? demoTag.text : null;
+
+			}
+
+			// Extract code example from classdesc
+			if ( doclet.classdesc ) {
+
+				const codeBlockRegex = /<pre class="prettyprint source[^"]*"><code>([\s\S]*?)<\/code><\/pre>/;
+				const match = doclet.classdesc.match( codeBlockRegex );
+
+				if ( match ) {
+
+					doclet.codeExample = match[ 0 ];
+					// Remove the code example from classdesc
+					doclet.classdesc = doclet.classdesc.replace( codeBlockRegex, '' ).trim();
+
+				}
 
 			}
 
