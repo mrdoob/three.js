@@ -89,14 +89,7 @@
 
 							// Filter based on whether this is TSL or Global page
 							var hasTslTag = m.tags && m.tags.some(function(tag) { return tag.title === 'tsl'; });
-							var isFromNodes = m.meta && m.meta.shortpath && m.meta.shortpath.startsWith('src/nodes');
-							var isTSLItem = hasTslTag || isFromNodes;
-
-							if (isTSLPage) {
-								return isTSLItem;
-							} else {
-								return !isTSLItem;
-							}
+							return isTSLPage ? hasTslTag : !hasTslTag;
 						});
 					}
 					if (members && members.length && members.forEach) {
@@ -113,14 +106,7 @@
 					if (isGlobalPage && methods && methods.length) {
 						methods = methods.filter(function(m) {
 							var hasTslTag = m.tags && m.tags.some(function(tag) { return tag.title === 'tsl'; });
-							var isFromNodes = m.meta && m.meta.shortpath && m.meta.shortpath.startsWith('src/nodes');
-							var isTSLItem = hasTslTag || isFromNodes;
-
-							if (isTSLPage) {
-								return isTSLItem;
-							} else {
-								return !isTSLItem;
-							}
+							return isTSLPage ? hasTslTag : !hasTslTag;
 						});
 					}
 

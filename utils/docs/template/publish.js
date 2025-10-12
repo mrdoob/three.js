@@ -189,10 +189,12 @@ function buildSearchListForData() {
 
 					let category = categoryMap[ className ];
 
-					// If not in categoryMap, determine category from file path
+					// If not in categoryMap, determine category from @tsl tag
 					if ( ! category ) {
 
-						if ( item.meta && item.meta.shortpath && item.meta.shortpath.startsWith( 'src/nodes' ) ) {
+						const hasTslTag = Array.isArray( item.tags ) && item.tags.some( tag => tag.title === 'tsl' );
+
+						if ( hasTslTag ) {
 
 							category = 'TSL';
 
@@ -518,11 +520,11 @@ function buildGlobalsNav( globals, seen ) {
 
 		globals.forEach( ( { kind, longname, name, tags } ) => {
 
-			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) && Array.isArray( tags ) ) {
+			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) ) {
 
-				const tslTag = tags.find( tag => tag.title === 'tsl' );
+				const hasTslTag = Array.isArray( tags ) && tags.some( tag => tag.title === 'tsl' );
 
-				if ( tslTag !== undefined ) {
+				if ( hasTslTag ) {
 
 					tslNav += `<li>${linkto( longname, name )}</li>\n`;
 
@@ -877,9 +879,8 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 		originalGlobals.forEach( item => {
 
 			const hasTslTag = Array.isArray( item.tags ) && item.tags.some( tag => tag.title === 'tsl' );
-			const isFromNodes = item.meta && item.meta.shortpath && item.meta.shortpath.startsWith( 'src/nodes' );
 
-			if ( hasTslTag || isFromNodes ) {
+			if ( hasTslTag ) {
 
 				tslGlobals.push( item );
 
