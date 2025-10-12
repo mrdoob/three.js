@@ -259,6 +259,7 @@ export default DenoiseNode;
 /**
  * Generates denoise samples based on the given parameters.
  *
+ * @private
  * @param {number} numSamples - The number of samples.
  * @param {number} numRings - The number of rings.
  * @param {number} radiusExponent - The radius exponent.
@@ -283,6 +284,7 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 /**
  * Generates a default noise texture for the given size.
  *
+ * @private
  * @param {number} [size=64] - The texture size.
  * @return {DataTexture} The generated noise texture.
  */

@@ -11,6 +11,7 @@ import { CylinderGeometry } from './CylinderGeometry.js';
  * ```
  *
  * @augments CylinderGeometry
+ * @demo scenes/geometry-browser.html#ConeGeometry
  */
 class ConeGeometry extends CylinderGeometry {
 
