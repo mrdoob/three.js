@@ -311,13 +311,15 @@
 		function displayFilteredPanel() {
 
 			// Show/hide sections depending on their content
-			const sections = navigation.querySelectorAll( 'ul' );
+			const h3Elements = navigation.querySelectorAll( 'h3' );
 
-			sections.forEach( function ( section ) {
+			h3Elements.forEach( function ( h3 ) {
 
-				const items = section.children;
-				const sectionContainer = section.parentElement;
+				const ul = h3.nextElementSibling;
 
+				if ( ! ul || ul.tagName !== 'UL' ) return;
+
+				const items = ul.children;
 				let hideSection = true;
 
 				for ( let i = 0; i < items.length; i ++ ) {
@@ -333,11 +335,47 @@
 
 				if ( hideSection ) {
 
-					sectionContainer.classList.add( 'hidden' );
+					h3.classList.add( 'hidden' );
+					ul.classList.add( 'hidden' );
 
 				} else {
 
-					sectionContainer.classList.remove( 'hidden' );
+					h3.classList.remove( 'hidden' );
+					ul.classList.remove( 'hidden' );
+
+				}
+
+			} );
+
+			// Show/hide main category headers (h2)
+			const h2Elements = navigation.querySelectorAll( 'h2' );
+
+			h2Elements.forEach( function ( h2 ) {
+
+				let hasVisibleContent = false;
+				let sibling = h2.nextElementSibling;
+
+				// Check all siblings until the next h2
+				while ( sibling && sibling.tagName !== 'H2' ) {
+
+					if ( sibling.tagName === 'H3' && ! sibling.classList.contains( 'hidden' ) ) {
+
+						hasVisibleContent = true;
+						break;
+
+					}
+
+					sibling = sibling.nextElementSibling;
+
+				}
+
+				if ( hasVisibleContent ) {
+
+					h2.classList.remove( 'hidden' );
+
+				} else {
+
+					h2.classList.add( 'hidden' );
 
 				}
 

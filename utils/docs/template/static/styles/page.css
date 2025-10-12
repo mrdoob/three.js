@@ -22,20 +22,23 @@
 /* Below CSS should only affect the page section */
 
 #page {
+	--color-blue: #049EF4;
 	--font-size: 16px;
 	--line-height: 26px;
 	--panel-width: 300px;
 	--page-padding: 24px;
-	--max-width: 960px;
+	--max-width: 760px;
 	--icon-size: 20px;
 	--border-style: 1px solid #E8E8E8;
 	--text-color: #444;
 
 	font-family: 'Inter', sans-serif;
+	font-size: var(--font-size);
+	line-height: var(--line-height);
 	color: var(--text-color);
 	tab-size: 4;
 	overflow: auto;
-	max-width: 760px;
+	max-width: var(--max-width);
 	margin: 0 auto;
 	padding-top: var(--page-padding);
 	padding-bottom: var(--page-padding);
@@ -162,6 +165,9 @@
 	.inheritance {
 		color: #999;
 		margin-bottom: 0;
+		font-size: var(--font-size);
+		line-height: var(--line-height);
+		margin-top: 0;
 	}
 
 	.method,
