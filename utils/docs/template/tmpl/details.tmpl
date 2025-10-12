@@ -16,6 +16,7 @@
 						<h5 class="subsection-title">Properties:</h5>
 						<?js= this.partial('properties.tmpl', data) ?>
 	<?js } ?>
+	<?js if (data.overrides || data.deprecated || (data.see && see.length)) { ?>
 						<dl class="details">
 							<?js if (data.overrides) { ?>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <?js= this.linkto(data.overrides, this.htmlsafe(data.overrides)) ?></dt>
@@ -37,3 +38,4 @@
 							</dd>
 							<?js } ?>
 						</dl>
+	<?js } ?>

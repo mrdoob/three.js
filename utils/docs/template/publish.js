@@ -217,7 +217,7 @@ function addSignatureReturns( f ) {
 
 	}
 
-	f.signature = `<span class="signature">${f.signature || ''}</span><span class="type-signature">${returnTypesString}</span>`;
+	f.signature = `<span class="signature">${f.signature || ''}</span>${returnTypesString ? `<span class="type-signature">${returnTypesString}</span>` : ''}`;
 
 }
 
@@ -225,7 +225,7 @@ function addSignatureTypes( f ) {
 
 	const types = f.type ? buildItemTypeStrings( f ) : [];
 
-	f.signature = `${f.signature || ''}<span class="type-signature">${types.length ? ` : ${types.join( ' | ' )}` : ''}</span>`;
+	f.signature = `${f.signature || ''}${types.length ? `<span class="type-signature"> : ${types.join( ' | ' )}</span>` : ''}`;
 
 }
 
@@ -234,7 +234,7 @@ function addAttribs( f ) {
 	const attribs = helper.getAttribs( f ).filter( attrib => attrib !== 'static' );
 	const attribsString = buildAttribsString( attribs );
 
-	f.attribs = util.format( '<span class="type-signature">%s</span>', attribsString );
+	f.attribs = attribsString ? util.format( '<span class="type-signature">%s</span>', attribsString ) : '';
 
 }
 
