@@ -229,12 +229,6 @@ body {
 	font-weight: 600;
 }
 
-#page a.permalink {
-	float: right;
-	margin-left: 5px;
-	display: none;
-}
-
 #page a.param,
 #page span.param {
 	color: #999;
@@ -294,16 +288,6 @@ body {
 
 #page h3.name .param-type a {
 	color: #999;
-}
-
-#page .search-result-item {
-	border-bottom: var(--border-style);
-	display: block;
-	padding: 16px 0;
-}
-
-#page .search-result-item-description {
-	color: var(--text-color);
 }
 
 #page h2.subsection-title + p {

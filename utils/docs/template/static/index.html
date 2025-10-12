@@ -331,16 +331,16 @@
 
 					searchResults.innerHTML = '<div style="padding: 16px; color: #999;">Loading search data...</div>';
 					return;
-		
-		}
+
+				}
 
 				// Search through the search data
 				const regExp = new RegExp( escapeRegExp( v ), 'gi' );
 				const results = searchData.filter( item => {
 
 					return item.title.match( regExp );
-		
-		} );
+
+				} );
 
 				// Create a simpler regex for highlighting (not the lookahead version)
 				const highlightRegExp = new RegExp( v.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ), 'gi' );
@@ -363,7 +363,7 @@
 								class: null,
 								members: []
 							};
-		
+
 						}
 
 						// Extract the link target from the anchor tag
@@ -391,9 +391,9 @@
 											hash: fullHash,
 											kind: item.kind
 										} );
-		
+
 									}
-		
+
 								} else {
 
 									// This is the class itself
@@ -401,20 +401,20 @@
 										name: className,
 										hash: fullHash
 									};
-		
+
 								}
-		
+
 							}
-		
+
 						}
-		
+
 					} );
 
 					// Helper function to highlight matching text
 					function highlightMatch( text, regExp ) {
 
 						return text.replace( regExp, match => `<strong>${match}</strong>` );
-		
+
 					}
 
 					// Group by category
@@ -496,13 +496,13 @@
 							searchResults.querySelectorAll( 'a' ).forEach( item => {
 
 								item.classList.remove( 'selected' );
-		
+
 							} );
 							// Add selected class to clicked link
 							link.classList.add( 'selected' );
-		
+
 						} );
-		
+
 					} );
 
 				} else {
@@ -551,81 +551,6 @@
 
 		}
 
-		function displayFilteredPanel() {
-
-			// Show/hide sections depending on their content
-			const h3Elements = navigation.querySelectorAll( 'h3' );
-
-			h3Elements.forEach( function ( h3 ) {
-
-				const ul = h3.nextElementSibling;
-
-				if ( ! ul || ul.tagName !== 'UL' ) return;
-
-				const items = ul.children;
-				let hideSection = true;
-
-				for ( let i = 0; i < items.length; i ++ ) {
-
-					if ( ! items[ i ].classList.contains( 'hidden' ) ) {
-
-						hideSection = false;
-						break;
-
-					}
-
-				}
-
-				if ( hideSection ) {
-
-					h3.classList.add( 'hidden' );
-					ul.classList.add( 'hidden' );
-
-				} else {
-
-					h3.classList.remove( 'hidden' );
-					ul.classList.remove( 'hidden' );
-
-				}
-
-			} );
-
-			// Show/hide main category headers (h2)
-			const h2Elements = navigation.querySelectorAll( 'h2' );
-
-			h2Elements.forEach( function ( h2 ) {
-
-				let hasVisibleContent = false;
-				let sibling = h2.nextElementSibling;
-
-				// Check all siblings until the next h2
-				while ( sibling && sibling.tagName !== 'H2' ) {
-
-					if ( sibling.tagName === 'H3' && ! sibling.classList.contains( 'hidden' ) ) {
-
-						hasVisibleContent = true;
-						break;
-
-					}
-
-					sibling = sibling.nextElementSibling;
-
-				}
-
-				if ( hasVisibleContent ) {
-
-					h2.classList.remove( 'hidden' );
-
-				} else {
-
-					h2.classList.add( 'hidden' );
-
-				}
-
-			} );
-
-		}
-
 		// Routing
 
 		function createNewIframe() {
@@ -641,13 +566,13 @@
 
 				pageName = hash.substring( 0, dotIndex );
 				anchor = '#' + hash.substring( dotIndex + 1 );
-		
-	} else {
+
+			} else {
 
 				pageName = hash;
 				anchor = '';
-		
-	}
+
+			}
 
 			let subtitle = '';
 

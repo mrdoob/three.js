@@ -327,13 +327,6 @@ hr {
 			color: var(--color-blue);
 		}
 
-		#panel #searchResults .search-result-class-name {
-			display: block;
-			color: var(--text-color);
-			font-weight: 500;
-			margin-bottom: 2px;
-		}
-
 		#panel #searchResults .search-result-member {
 			display: block;
 			color: var(--text-color);
