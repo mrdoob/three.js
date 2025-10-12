@@ -40,6 +40,11 @@
 				<?js } ?>
 			</header>
 			<article>
+				<?js if (doc.import) { ?>
+				<h2 class="subsection-title">Import</h2>
+				<p><?js= doc.name ?> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre class="prettyprint source lang-js"><code><?js= doc.import ?></code></pre>
+				<?js } ?>
 				<div class="container-overview">
 					<?js if (doc.kind === 'module' && doc.modules) { ?>
 						<?js if (doc.description) { ?>
@@ -61,11 +66,6 @@
 						<?js } ?>
 					<?js } ?>
 				</div>
-				<?js if (doc.import) { ?>
-				<h2 class="subsection-title">Import</h2>
-				<p><?js= doc.name ?> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js"><code><?js= doc.import ?></code></pre>
-				<?js } ?>
 				<?js
 					var ignoreInheritedSymbols = { ...(self.ignoreInheritedSymbols ? { inherited: {isUndefined: true} } : {}) };
 					var classes = self.find({kind: 'class', memberof: doc.longname});
