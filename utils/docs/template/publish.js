@@ -266,6 +266,34 @@ function getPathFromDoclet( { meta } ) {
 
 }
 
+function getFullAugmentsChain( doclet ) {
+
+	const chain = [];
+
+	if ( ! doclet || ! doclet.augments || ! doclet.augments.length ) {
+
+		return chain;
+
+	}
+
+	// Start with the immediate parent
+	const parentName = doclet.augments[0];
+	chain.push( parentName );
+
+	// Recursively find the parent's ancestors
+	const parentDoclet = find( { longname: parentName } );
+
+	if ( parentDoclet && parentDoclet.length > 0 ) {
+
+		const parentChain = getFullAugmentsChain( parentDoclet[0] );
+		chain.unshift( ...parentChain );
+
+	}
+
+	return chain;
+
+}
+
 function generate( title, docs, filename, resolveLinks ) {
 
 	let html;
@@ -276,7 +304,7 @@ function generate( title, docs, filename, resolveLinks ) {
 		env: env,
 		title: title,
 		docs: docs,
-		augments: docs && docs[0] ? docs[0].augments : null
+		augments: docs && docs[0] ? getFullAugmentsChain( docs[0] ) : null
 	};
 
 	// Put HTML files in pages/ subdirectory
