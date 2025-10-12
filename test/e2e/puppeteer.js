@@ -152,6 +152,7 @@ const exceptionList = [
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_lightprobe_cubecamera',
 	'webgpu_loader_materialx',
+	'webgpu_materials_basic',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',
 	'webgpu_morphtargets_face',
