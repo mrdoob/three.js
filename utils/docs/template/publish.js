@@ -142,7 +142,7 @@ function buildItemTypeStrings( item ) {
 
 }
 
-function buildSearchList() {
+function buildSearchListForData() {
 
 	const categories = {
 		'Core': [],
@@ -936,12 +936,10 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	// search
 
-	const searchList = buildSearchList();
-
-	mkdirSync( path.join( outdir, 'data' ) );
+	const searchList = buildSearchListForData();
 
 	fs.writeFileSync(
-		path.join( outdir, 'data', 'search.json' ),
+		path.join( outdir, 'search.json' ),
 		JSON.stringify( searchList, null, '\t' )
 	);
 
