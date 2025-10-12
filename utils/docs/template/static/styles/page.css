@@ -52,11 +52,6 @@ html {
 }
 
 body {
-	margin: 0;
-	padding: 0;
-}
-
-#page {
 	color: var(--text-color);
 	tab-size: 4;
 	overflow: auto;
@@ -69,13 +64,13 @@ body {
 	word-break: break-word;
 }
 
-#page a {
+body a {
 	color: var(--color-blue);
 	cursor: pointer;
 	text-decoration: none;
 }
 
-#page h1 {
+body h1 {
 	font-size: 40px;
 	line-height: 48px;
 	font-weight: normal;
@@ -84,7 +79,7 @@ body {
 	margin-bottom: -8px;
 }
 
-#page h2 {
+body h2 {
 	font-size: 28px;
 	line-height: 36px;
 	font-weight: normal;
@@ -93,7 +88,7 @@ body {
 	margin-bottom: -8px;
 }
 
-#page h3 {
+body h3 {
 	font-size: 20px;
 	line-height: 28px;
 	font-weight: normal;
@@ -101,40 +96,40 @@ body {
 	margin-bottom: -8px;
 }
 
-#page p,
-#page div,
-#page table,
-#page ol,
-#page ul,
-#page summary {
+body p,
+body div,
+body table,
+body ol,
+body ul,
+body summary {
 	margin-top: 16px;
 	margin-bottom: 16px;
 }
 
-#page summary:hover {
+body summary:hover {
 	cursor: pointer;
 }
 
-#page p {
+body p {
 	padding-right: 16px;
 }
 
-#page ul, #page ol {
+body ul, body ol {
 	box-sizing: border-box;
 	padding-left: 24px;
 }
-#page ul li,
-#page ol li {
+body ul li,
+body ol li {
 	padding-left: 4px;
 	margin-bottom: 4px;
 }
 
-#page li ul,
-#page li ol {
+body li ul,
+body li ol {
 	margin-top: 4px;
 }
 
-#page code {
+body code {
 	display: inline-block;
 	vertical-align: middle;
 	border-radius: 4px;
@@ -142,12 +137,12 @@ body {
 	background: #F5F5F5;
 }
 
-#page pre {
+body pre {
 	position: relative;
 	margin: 16px calc(-1 * var(--page-padding));
 }
 
-#page pre code {
+body pre code {
 	display: block;
 	font-size: calc(var(--font-size) - 1px);
 	line-height: calc(var(--line-height) - 1px);
@@ -159,12 +154,12 @@ body {
 	border-radius: 0;
 }
 
-#page ol code,
-#page ul code {
+body ol code,
+body ul code {
 	margin: 0;
 }
 
-#page .copy-btn {
+body .copy-btn {
 	cursor: pointer;
 	position: absolute;
 	top: 16px;
@@ -180,65 +175,65 @@ body {
 	border: none;
 }
 
-#page .copy-btn:hover {
+body .copy-btn:hover {
 	opacity: 1;
 }
 
-#page .copy-btn.copied {
+body .copy-btn.copied {
 	pointer-events: none;
 	opacity: 1;
 	background-image: url('/files/ic_tick_green_24dp.svg');
 }
 
-#page table {
+body table {
 	width: 100%;
 	border-collapse: collapse;
 }
 
-#page .desc {
+body .desc {
 	padding-left: 0px;
 }
 
-#page table th,
-#page table td {
+body table th,
+body table td {
 	text-align: left;
 	vertical-align: top;
 	padding: 8px 6px;
 	border-bottom: var(--border-style);
 }
 
-#page table th {
+body table th {
 	text-decoration: none;
 }
-#page table th:first-child,
-#page table td:first-child {
+body table th:first-child,
+body table td:first-child {
 	padding-left: 0;
 }
 
-#page table code {
+body table code {
 	padding: 0px;
 	margin: 0px;
 	width: auto;
 }
 
-#page table p {
+body table p {
 	margin: 0;
 }
 
-#page strong {
+body strong {
 	font-weight: 600;
 }
 
-#page a.param,
-#page span.param {
+body a.param,
+body span.param {
 	color: #999;
 }
 
-#page a.param:hover {
+body a.param:hover {
 	color: var(--text-color);
 }
 
-#page .inheritance {
+body .inheritance {
 	color: #999;
 	margin-bottom: 0;
 	font-size: var(--font-size);
@@ -246,55 +241,55 @@ body {
 	margin-top: 0;
 }
 
-#page .method,
-#page .member {
+body .method,
+body .member {
 	margin-bottom: 32px;
 }
 
-#page ol.linenums {
+body ol.linenums {
 	padding-left: 64px;
 }
 
-#page ol.linenums .selected {
+body ol.linenums .selected {
 	background-color: #ddd;
 }
 
-#page h3.name {
+body h3.name {
 	color: #000;
 }
 
-#page h3.name a {
+body h3.name a {
 	color: var(--color-blue);
 	text-decoration: none;
 }
 
-#page h3.name .signature {
+body h3.name .signature {
 	color: #000;
 	font-weight: normal;
 }
 
-#page h3.name .type-signature {
+body h3.name .type-signature {
 	color: #999;
 	font-weight: normal;
 }
 
-#page h3.name .type-signature a {
+body h3.name .type-signature a {
 	color: #999;
 }
 
-#page h3.name .param-type {
+body h3.name .param-type {
 	color: #999;
 }
 
-#page h3.name .param-type a {
+body h3.name .param-type a {
 	color: #999;
 }
 
-#page h2.subsection-title + p {
+body h2.subsection-title + p {
 	margin-top: 24px;
 }
 
-#page iframe#viewer {
+body iframe#viewer {
 	width: 100%;
 	height: 400px;
 	border: none;
@@ -304,31 +299,31 @@ body {
 
 @media (prefers-color-scheme: dark) {
 
-	#page h2 {
+	body h2 {
 		color: var(--text-color);
 	}
 
-	#page h3.name {
+	body h3.name {
 		color: var(--text-color);
 	}
 
-	#page h3.name .signature {
+	body h3.name .signature {
 		color: var(--text-color);
 	}
 
-	#page .link-anchor {
+	body .link-anchor {
 		color: #555;
 	}
 
-	#page ol.linenums .selected {
+	body ol.linenums .selected {
 		background-color: #444;
 	}
 
-	#page code {
+	body code {
 		background: #444;
 	}
 
-	#page pre code {
+	body pre code {
 		background: #444;
 	}
 
@@ -345,17 +340,17 @@ body {
 		--icon-size: 24px;
 	}
 
-	#page h1 {
+	body h1 {
 		font-size: 42px;
 		line-height: 50px;
 	}
 
-	#page h2 {
+	body h2 {
 		font-size: 32px;
 		line-height: 40px;
 	}
 
-	#page h3 {
+	body h3 {
 		font-size: 24px;
 		line-height: 32px;
 	}
@@ -371,29 +366,29 @@ body {
 		--icon-size: 24px;
 	}
 
-	#page {
+	body {
 		padding: var(--page-padding);
 	}
 
-	#page h1 {
+	body h1 {
 		font-size: 28px;
 		line-height: 36px;
 		padding-right: 20px;
 		margin-top: 0;
 	}
 
-	#page h2 {
+	body h2 {
 		font-size: 24px;
 		line-height: 32px;
 		margin-top: 24px;
 	}
 
-	#page h3 {
+	body h3 {
 		font-size: 20px;
 		line-height: 28px;
 	}
 
-	#page .copy-btn {
+	body .copy-btn {
 		top: 12px;
 		right: 8px;
 		width: 20px;
