@@ -51,7 +51,7 @@ class SSGINode extends TempNode {
 	/**
 	 * Constructs a new SSGI node.
 	 *
-	 * @param {TextureNode} beautyNode - The texture node that represents the input of the effect.
+	 * @param {TextureNode} beautyNode - A texture node that represents the beauty or scene pass.
 	 * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
 	 * @param {TextureNode} normalNode - A texture node that represents the scene's normals.
 	 * @param {PerspectiveCamera} camera - The camera the scene is rendered with.
@@ -61,7 +61,7 @@ class SSGINode extends TempNode {
 		super( 'vec4' );
 
 		/**
-		 * A node that represents the scene's depth.
+		 * A texture node that represents the beauty or scene pass.
 		 *
 		 * @type {TextureNode}
 		 */
