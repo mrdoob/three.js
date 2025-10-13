@@ -16,9 +16,9 @@
 	<?js if (augments && augments.length) {
 		var self = this;
 	?>
-		<p class="inheritance"><?js augments.forEach(function(a, i) { ?><?js= self.linkto(a, a) ?><?js if (i < augments.length - 1) { ?> → <?js } ?><?js }); ?> → </p>
+		<p class="inheritance" translate="no"><?js augments.forEach(function(a, i) { ?><?js= self.linkto(a, a) ?><?js if (i < augments.length - 1) { ?> → <?js } ?><?js }); ?> → </p>
 	<?js } ?>
-	<h1><?js= title ?></h1>
+	<h1 translate="no"><?js= title ?></h1>
 	<?js= content ?>
 
 <script src="../scripts/linenumber.js"></script>
