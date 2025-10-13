@@ -63,7 +63,7 @@ class SSGINode extends TempNode {
 		/**
 		 * A node that represents the scene's depth.
 		 *
-		 * @type {Node<float>}
+		 * @type {TextureNode}
 		 */
 		this.beautyNode = beautyNode;
 
