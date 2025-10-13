@@ -6,7 +6,7 @@
 		<?js if (data.kind === 'class' && data.classdesc) { ?>
 					<h2>Constructor</h2>
 		<?js } ?>
-					<h3 class="name name-method" id="<?js= id ?>"><?js= (kind === 'class' ? 'new ' : '.') ?><a href="#<?js= id ?>"><?js= name ?></a><?js= (data.signature || '') ?> <?js= data.attribs ?></h3>
+					<h3 class="name name-method" id="<?js= id ?>" translate="no"><?js= (kind === 'class' ? 'new ' : '.') ?><a href="#<?js= id ?>"><?js= name ?></a><?js= (data.signature || '') ?> <?js= data.attribs ?></h3>
 		<?js if (data.summary) { ?>
 					<p class="summary"><?js= summary ?></p>
 		<?js } ?>
