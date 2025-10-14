@@ -1,0 +1,288 @@
+race3d/
+  index.html
+  assets/     (opcional, aquí puedes poner texturas o modelos .glb si los usas)
+
+index.html<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Race3D - Prototype</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <style>
+    html,body { height:100%; margin:0; overflow:hidden; font-family:Arial, sans-serif; }
+    #ui {
+      position: absolute; left: 10px; top: 10px; z-index: 10;
+      background: rgba(0,0,0,0.4); color: white; padding:8px; border-radius:6px;
+    }
+    /* Touch controls */
+    .touch-controls {
+      position: absolute; right:10px; bottom:10px; z-index: 10;
+      display: flex; gap:8px;
+      pointer-events: none; /* allow pointer events individually */
+    }
+    .btn {
+      width:72px; height:72px; border-radius:12px; background: rgba(0,0,0,0.45);
+      display:flex; align-items:center; justify-content:center; color:white;
+      font-size:18px; pointer-events: auto;
+      user-select:none;
+      touch-action: none;
+    }
+    #hudSpeed { font-weight:700; }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    Speed: <span id="hudSpeed">0</span><br/>
+    Lap: <span id="hudLap">1</span>
+  </div>
+
+  <div class="touch-controls" id="touchControls">
+    <div class="btn" id="leftBtn">◀</div>
+    <div class="btn" id="accelBtn">▲</div>
+    <div class="btn" id="rightBtn">▶</div>
+  </div>
+
+  <!-- Three.js desde CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+  // ---------- Escena básica ----------
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0xaaaaaa, 0.002);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  document.body.appendChild(renderer.domElement);
+
+  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+  camera.position.set(0, 6, -12);
+
+  // Luz
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7);
+  hemi.position.set(0, 50, 0);
+  scene.add(hemi);
+
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+  dir.position.set(10, 20, 10);
+  scene.add(dir);
+
+  // ---------- Suelo y pista ----------
+  const groundMat = new THREE.MeshStandardMaterial({ color: 0x404040, roughness: 0.9 });
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(500,500), groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Crear pista usando curva (CatmullRom) y TubeGeometry
+  const points = [];
+  const R = 60;
+  for (let i=0;i<16;i++){
+    const a = i / 16 * Math.PI * 2;
+    const jitter = (Math.random() - 0.5) * 6;
+    points.push(new THREE.Vector3(Math.cos(a) * (R + jitter), 0, Math.sin(a) * (R + jitter)));
+  }
+  // cerrar la curva
+  points.push(points[0].clone());
+  const trackCurve = new THREE.CatmullRomCurve3(points, true, 'catmullrom', 0.5);
+
+  const tubeGeo = new THREE.TubeGeometry(trackCurve, 400, 4, 8, true);
+  const trackMat = new THREE.MeshStandardMaterial({ color: 0x222222, metalness:0.2, roughness:0.7 });
+  const track = new THREE.Mesh(tubeGeo, trackMat);
+  track.rotation.x = -Math.PI/2; // ajusta para que quede plano
+  // tube geometry oriented along curve; we will place helper planes for collision
+  scene.add(track);
+
+  // pista visual central (línea)
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+  const lineGeo = new THREE.BufferGeometry().setFromPoints(trackCurve.getPoints(400));
+  const centerLine = new THREE.Line(lineGeo, lineMat);
+  centerLine.rotation.x = -Math.PI/2;
+  scene.add(centerLine);
+
+  // ---------- Coche (placeholder) ----------
+  const car = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.5, 3), new THREE.MeshStandardMaterial({ color: 0xff3333 }));
+  body.position.y = 0.4;
+  car.add(body);
+
+  // ruedas (visual)
+  const wheelGeo = new THREE.BoxGeometry(0.4, 0.3, 0.8);
+  const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+  const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.position.set(0.8, 0.15, 0.9); car.add(w1);
+  const w2 = w1.clone(); w2.position.set(-0.8, 0.15, 0.9); car.add(w2);
+  const w3 = w1.clone(); w3.position.set(0.8, 0.15, -0.9); car.add(w3);
+  const w4 = w1.clone(); w4.position.set(-0.8, 0.15, -0.9); car.add(w4);
+
+  car.position.set(trackCurve.getPointAt(0).x, 0.5, trackCurve.getPointAt(0).z);
+  scene.add(car);
+
+  // ---------- Obstáculos y aceleradores ----------
+  const obstacles = [];
+  const boosts = []; // objetos que aumentan velocidad
+
+  // crea obstáculos a lo largo de la pista
+  for (let i=0;i<20;i++){
+    const t = Math.random(); // posición a lo largo de la curva
+    const p = trackCurve.getPointAt(t);
+    const ob = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), new THREE.MeshStandardMaterial({ color: 0x3366ff }));
+    ob.position.set(p.x + (Math.random()-0.5)*8, 1, p.z + (Math.random()-0.5)*8);
+    scene.add(ob);
+    obstacles.push(ob);
+  }
+
+  // crea pads de aceleración (boost pads)
+  for (let i=0;i<8;i++){
+    const t = Math.random();
+    const p = trackCurve.getPointAt(t);
+    const pad = new THREE.Mesh(new THREE.PlaneGeometry(4, 6), new THREE.MeshStandardMaterial({ color: 0x00ff44, side: THREE.DoubleSide, transparent:true, opacity:0.7 }));
+    pad.rotation.x = -Math.PI/2;
+    pad.position.set(p.x, 0.01, p.z);
+    scene.add(pad);
+    boosts.push(pad);
+  }
+
+  // ---------- Variables de "física" ligera ----------
+  let velocity = 0;
+  let direction = new THREE.Vector3(0,0,1); // dirección local (forward)
+  let angle = 0; // rotación Y del coche
+  const maxSpeed = 2.5;
+  const acceleration = 0.06;
+  const brake = 0.12;
+  const steerSpeed = 0.035;
+
+  // HUD
+  const hudSpeed = document.getElementById('hudSpeed');
+  const hudLap = document.getElementById('hudLap');
+  let lap = 1;
+
+  // Controls
+  const keys = { ArrowUp:false, ArrowDown:false, ArrowLeft:false, ArrowRight:false, w:false, a:false, s:false, d:false };
+
+  window.addEventListener('keydown', (e)=>{ keys[e.key] = true; });
+  window.addEventListener('keyup', (e)=>{ keys[e.key] = false; });
+
+  // Touch buttons
+  const leftBtn = document.getElementById('leftBtn');
+  const rightBtn = document.getElementById('rightBtn');
+  const accelBtn = document.getElementById('accelBtn');
+
+  function addTouchListeners(btn, downKey){
+    btn.addEventListener('pointerdown', e => { e.preventDefault(); keys[downKey] = true; btn.style.background = "rgba(255,255,255,0.15)"; });
+    btn.addEventListener('pointerup',   e => { e.preventDefault(); keys[downKey] = false; btn.style.background = ""; });
+    btn.addEventListener('pointerout',  e => { e.preventDefault(); keys[downKey] = false; btn.style.background = ""; });
+  }
+  addTouchListeners(leftBtn, 'ArrowLeft');
+  addTouchListeners(rightBtn, 'ArrowRight');
+  addTouchListeners(accelBtn, 'ArrowUp');
+
+  // Cámara que sigue
+  function updateCamera() {
+    // cámara ligeramente por detrás y arriba del coche
+    const offset = new THREE.Vector3(-Math.sin(angle)*6, 3.5, -Math.cos(angle)*6);
+    camera.position.copy(car.position).add(offset);
+    camera.position.y += 1.0;
+    camera.lookAt(car.position.x, car.position.y+0.6, car.position.z);
+  }
+
+  // bounding boxes helper (para colisiones simples)
+  const carBox = new THREE.Box3();
+  const tempBox = new THREE.Box3();
+
+  // utilidad para detectar si estamos en boost pad
+  function intersectsPlaneXZ(planeMesh, pos) {
+    const d = planeMesh.position.clone().sub(pos);
+    const dist = Math.sqrt(d.x*d.x + d.z*d.z);
+    return dist < 3.5; // tamaño aproximado del pad
+  }
+
+  // ---------- Loop ----------
+  let last = performance.now();
+  function animate(t) {
+    const dt = Math.min(0.05, (t - last)/1000);
+    last = t;
+
+    // controles
+    let forward = keys.ArrowUp || keys.w;
+    let backward = keys.ArrowDown || keys.s;
+    let left = keys.ArrowLeft || keys.a;
+    let right = keys.ArrowRight || keys.d;
+
+    // aceleración / frenado
+    if (forward) velocity += acceleration;
+    else velocity -= brake * 0.3; // frena suave si no aceleras
+    if (backward) velocity -= acceleration * 0.6;
+
+    // clamp velocidad
+    velocity = Math.max(-1.0, Math.min(maxSpeed, velocity));
+
+    // giro (más lento si vas hacia atrás)
+    const steerFactor = (velocity >= 0) ? 1 : -1;
+    if (left) angle += steerSpeed * steerFactor;
+    if (right) angle -= steerSpeed * steerFactor;
+
+    // posición nueva
+    car.rotation.y = angle;
+    const forwardVec = new THREE.Vector3(-Math.sin(angle),0,-Math.cos(angle));
+    car.position.add(forwardVec.multiplyScalar(velocity));
+
+    // simple colisión con obstáculos (rebote)
+    carBox.setFromObject(car);
+    for (let ob of obstacles) {
+      tempBox.setFromObject(ob);
+      if (carBox.intersectsBox(tempBox)) {
+        // rebote simple: retroceder y reducir velocidad
+        car.position.add(forwardVec.multiplyScalar(-velocity*4));
+        velocity *= -0.3;
+      }
+    }
+
+    // boosters (aumentan velocidad momentáneamente)
+    for (let pad of boosts) {
+      if (intersectsPlaneXZ(pad, car.position)) {
+        velocity = Math.min(maxSpeed*1.8, velocity + 0.15);
+        // efecto visual ligero: aumentar brillo
+        pad.material.opacity = 1.0;
+      } else {
+        pad.material.opacity = 0.7;
+      }
+    }
+
+    // actualiza cámara y HUD
+    updateCamera();
+    hudSpeed.innerText = (Math.abs(velocity)).toFixed(2);
+
+    // detectar vuelta (si pasamos por punto cercano al inicio)
+    const startPos = trackCurve.getPointAt(0);
+    const dstart = car.position.distanceTo(new THREE.Vector3(startPos.x, car.position.y, startPos.z));
+    if (dstart < 4 && (Math.abs(velocity) > 0.5)) {
+      // incrementa lap si pasamos cruzando con dirección similar (simple)
+      if (!car._nearStart) {
+        lap++;
+        hudLap.innerText = lap;
+        car._nearStart = true;
+        setTimeout(()=> car._nearStart = false, 1000);
+      }
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+  // resize handler
+  window.addEventListener('resize', ()=> {
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+
+  // Para depuración: orbitar libremente con mouse si presionas Shift
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enabled = false;
+  window.addEventListener('keydown', e => { if (e.key === 'Shift') controls.enabled = true; });
+  window.addEventListener('keyup', e => { if (e.key === 'Shift') controls.enabled = false; });
+
+  </script>
+</body>
+</html>
