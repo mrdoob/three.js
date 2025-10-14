@@ -109,7 +109,7 @@ class Font {
 	 *
 	 * @param {string} text - The text.
 	 * @param {number} [size=100] - The text size.
-	 * @param {string} direction - Char direction: ltr(left to right), rtl(right to left) & tb(top bottom).
+	 * @param {string} [direction='ltr'] - Char direction: ltr(left to right), rtl(right to left) & tb(top bottom).
 	 * @return {Array<Shape>} An array of shapes representing the text.
 	 */
 	generateShapes( text, size = 100, direction = 'ltr' ) {
