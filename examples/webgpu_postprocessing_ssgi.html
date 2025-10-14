@@ -119,7 +119,7 @@
 
 				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( gi ) ) ), scenePassColor.a );
 				compositePass.name = 'Composite';
-			
+
 				// traa
 
 				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
@@ -129,7 +129,7 @@
 
 				// Walls
 				const wallGeometry = new THREE.PlaneGeometry( 1, 1 );
-			
+
 				// Left wall - red
 				const redWallMaterial = new THREE.MeshPhysicalMaterial( { color: '#ff0000' } );
 				const leftWall = new THREE.Mesh( wallGeometry, redWallMaterial );
@@ -150,7 +150,7 @@
 
 				// White walls and boxes
 				const whiteMaterial = new THREE.MeshPhysicalMaterial( { color: '#fff' } );
-			
+
 				// Floor
 				const floor = new THREE.Mesh( wallGeometry, whiteMaterial );
 				floor.scale.set( 20, 20, 1 );
@@ -224,14 +224,14 @@
 
 				const gui = renderer.inspector.createParameters( 'SSGI settings' );
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
-				gui.add( giPass.sliceCount, 'value', 1, 4 ).step( 1 ).name( 'slice count' );
-				gui.add( giPass.stepCount, 'value', 1, 32 ).step( 1 ).name( 'step count' );
+				gui.add( giPass.sliceCount, 'value', 1, 4, 1 ).name( 'slice count' );
+				gui.add( giPass.stepCount, 'value', 1, 32, 1 ).name( 'step count' );
 				gui.add( giPass.radius, 'value', 1, 25 ).name( 'radius' );
 				gui.add( giPass.expFactor, 'value', 1, 3 ).name( 'exp factor' );
 				gui.add( giPass.thickness, 'value', 0.01, 10 ).name( 'thickness' );
 				gui.add( giPass.backfaceLighting, 'value', 0, 1 ).name( 'backface lighting' );
-				gui.add( giPass.aoIntensity, 'value', 0, 4 ).name( 'AO intenstiy' );
-				gui.add( giPass.giIntensity, 'value', 0, 100 ).name( 'GI intenstiy' );
+				gui.add( giPass.aoIntensity, 'value', 0, 4 ).name( 'AO intensity' );
+				gui.add( giPass.giIntensity, 'value', 0, 100 ).name( 'GI intensity' );
 				gui.add( giPass.useLinearThickness, 'value' ).name( 'use linear thickness' );
 				gui.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
 				gui.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );

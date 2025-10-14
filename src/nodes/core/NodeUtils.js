@@ -50,6 +50,7 @@ function cyrb53( value, seed = 0 ) {
 /**
  * Computes a hash for the given string.
  *
+ * @private
  * @method
  * @param {string} str - The string to be hashed.
  * @return {number} The hash.
@@ -59,6 +60,7 @@ export const hashString = ( str ) => cyrb53( str );
 /**
  * Computes a hash for the given array.
  *
+ * @private
  * @method
  * @param {Array<number>} array - The array to be hashed.
  * @return {number} The hash.
@@ -68,6 +70,7 @@ export const hashArray = ( array ) => cyrb53( array );
 /**
  * Computes a hash for the given list of parameters.
  *
+ * @private
  * @method
  * @param {...number} params - A list of parameters.
  * @return {number} The hash.
@@ -77,6 +80,7 @@ export const hash = ( ...params ) => cyrb53( params );
 /**
  * Computes a cache key for the given node.
  *
+ * @private
  * @method
  * @param {Object|Node} object - The object to be hashed.
  * @param {boolean} [force=false] - Whether to force a cache key computation or not.
@@ -106,6 +110,7 @@ export function getCacheKey( object, force = false ) {
  * This generator function can be used to iterate over the node children
  * of the given object.
  *
+ * @private
  * @generator
  * @param {Object} node - The object to be hashed.
  * @param {boolean} [toJSON=false] - Whether to return JSON or not.
@@ -175,6 +180,7 @@ const dataFromObject = /*@__PURE__*/ new WeakMap();
 /**
  * Returns the data type for the given the length.
  *
+ * @private
  * @method
  * @param {number} length - The length.
  * @return {string} The data type.
@@ -188,6 +194,7 @@ export function getTypeFromLength( length ) {
 /**
  * Returns the typed array for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {TypedArray} The typed array.
@@ -221,6 +228,7 @@ export function getTypedArrayFromType( type ) {
 /**
  * Returns the length for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {number} The length.
@@ -242,6 +250,7 @@ export function getLengthFromType( type ) {
 /**
  * Returns the gpu memory length for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {number} The length.
@@ -263,6 +272,7 @@ export function getMemoryLengthFromType( type ) {
 /**
  * Returns the byte boundary for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {number} The byte boundary.
@@ -284,6 +294,7 @@ export function getByteBoundaryFromType( type ) {
 /**
  * Returns the data type for the given value.
  *
+ * @private
  * @method
  * @param {any} value - The value.
  * @return {?string} The data type.
@@ -355,6 +366,7 @@ export function getValueType( value ) {
 /**
  * Returns the value/object for the given data type and parameters.
  *
+ * @private
  * @method
  * @param {string} type - The given type.
  * @param {...any} params - A parameter list.
@@ -425,6 +437,7 @@ export function getValueFromType( type, ...params ) {
 /**
  * Gets the object data that can be shared between different rendering steps.
  *
+ * @private
  * @param {Object} object - The object to get the data for.
  * @return {Object} The object data.
  */
@@ -446,6 +459,7 @@ export function getDataFromObject( object ) {
 /**
  * Converts the given array buffer to a Base64 string.
  *
+ * @private
  * @method
  * @param {ArrayBuffer} arrayBuffer - The array buffer.
  * @return {string} The Base64 string.
@@ -469,6 +483,7 @@ export function arrayBufferToBase64( arrayBuffer ) {
 /**
  * Converts the given Base64 string to an array buffer.
  *
+ * @private
  * @method
  * @param {string} base64 - The Base64 string.
  * @return {ArrayBuffer} The array buffer.

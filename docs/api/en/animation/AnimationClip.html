@@ -20,7 +20,7 @@
 		<h2>Constructor</h2>
 
 		<h3>
-			[name]( [param:String name], [param:Number duration], [param:Array tracks] )
+			[name]( [param:String name], [param:Number duration], [param:Array tracks], [param:Number blendMode] )
 		</h3>
 		<p>
 			[page:String name] - a name for this clip.<br />
@@ -28,8 +28,8 @@
 			negative value is passed, the duration will be calculated from the passed
 			`tracks` array.<br />
 			[page:Array tracks] - an array of [page:KeyframeTrack KeyframeTracks].<br />
-			[page:Number blendMode] - defines how the animation is blended/combined
-			when two or more animations are simultaneously played.<br /><br />
+			[page:Number blendMode] (optional) - defines how the animation is blended/combined
+			when two or more animations are simultaneously played. Default is *NormalAnimationBlendMode*.<br /><br />
 
 			Note: Instead of instantiating an AnimationClip directly with the
 			constructor, you can use one of its static methods to create

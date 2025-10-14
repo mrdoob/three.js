@@ -12,18 +12,19 @@
 		<p class="desc">
 			动画剪辑（AnimationClip）是一个可重用的关键帧轨道集，它代表动画。<br /><br />
 
-			在使用手册的“下一步”章节中，“动画系统”一文对three.js动画系统中的不同元素作出了概述
+			在使用手册的“下一步”章节中，“动画系统”一文对three.js动画系统中的不同元素作出了概述。
 		</p>
 
 
 		<h2>构造器</h2>
 
 
-		<h3>[name]( [param:String name], [param:Number duration], [param:Array tracks] )</h3>
+		<h3>[name]( [param:String name], [param:Number duration], [param:Array tracks], [param:Number blendMode] )</h3>
 		<p>
 			[page:String name] - 此剪辑的名称<br />
 			[page:Number duration] - 持续时间 (单位秒). 如果传入负数, 持续时间将会从传入的数组中计算得到。<br />
-			[page:Array tracks] - 一个由关键帧轨道（[page:KeyframeTrack KeyframeTracks]）组成的数组。<br /><br />
+			[page:Array tracks] - 一个由关键帧轨道（[page:KeyframeTrack KeyframeTracks]）组成的数组。<br />
+			[page:Number blendMode] (optional)- 定义当同时播放两个或多个动画时如何混合/组合动画。默认值为 *NormalAnimationBlendMode*。<br /><br />
 
 			说明: 与其直接调用构造函数实例化一个动画剪辑, 不如使用其静态方法中的一个来创建：
 			用JSON ([page:.parse parse]), 用变形目标序列([page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence],
@@ -34,6 +35,11 @@
 
 		<h2>属性</h2>
 
+		<h3>[property:Number blendMode]</h3>
+		<p>
+			定义当同时播放两个或多个动画时如何混合/组合动画。有效值是 *NormalAnimationBlendMode*
+			(default) 和 *AdditiveAnimationBlendMode*。
+		</p>
 
 		<h3>[property:Number duration]</h3>
 		<p>

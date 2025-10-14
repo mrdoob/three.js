@@ -9,7 +9,7 @@
 	<body>
 		[page:CompressedTexture] &rarr;
 
-		<h1>[name]</h1>
+		<h1>压缩的数组纹理（[name]）</h1>
 
 		<p class="desc">
 		基于压缩形式的数据（例如从[link:https://en.wikipedia.org/wiki/DirectDraw_Surface DDS]文件）创建纹理2D数组<br /><br />
@@ -42,7 +42,7 @@
 
 
 		<h2>属性</h2>
-		有关常见属性，请参阅基本[page:CompressedTexture CompressedTexture]类。
+		<p>有关常见属性，请参阅基本[page:CompressedTexture CompressedTexture]类。</p>
 
 		<h3>[property:number wrapR]</h3>
 		<p>
@@ -50,6 +50,16 @@
 		默认值为[page:Textures THREE.ClampToEdgeWrapping]，其中边缘被紧贴到外边缘纹素上。 
 		另外两个选择是[page:Textures THREE.RepeatWrapping]和[page:Textures THREE.MirroredRepeatWrapping]。 
 		有关详细信息，请参阅[page:Textures texture constants]页面。
+		这定义了纹理在深度方向上的包裹方式。<br />
+		</p>
+
+		<h3>[property:Object image]</h3>
+		<p>用包含宽度、高度和深度的对象覆盖。</p>
+
+		<h3>[property:Set layerUpdates]</h3>
+		<p>
+			纹理中需要更新的所有图层的集合(set)。
+			查看 [Page:CompressedTextureArray.addLayerUpdate addLayerUpdate]。
 		</p>
 
 		<h3>[property:Boolean isCompressedArrayTexture]</h3>
@@ -61,6 +71,18 @@
 
 		<p>
 		有关常用方法，请参阅基本[page:CompressedTexture CompressedTexture]类。
+		</p>
+		
+		<h3>[method:addLayerUpdate addLayerUpdate]( layerIndex )</h3>
+		<p>
+			描述需要更新纹理的特定层。通常，当 [page:Texture.needsUpdate needsUpdate] 设置为 true 时，整个压缩纹理数组都会发送到 GPU。
+			标记特定层将仅传输数组中与特定深度相关的所有 mipmap 的子集，这通常可以提高性能。
+		</p>
+
+		<h3>[method:clearLayerUpdates clearLayerUpdates]()</h3>
+		<p>
+			清除图层更新记录。
+			查看 [Page:CompressedTextureArray.addLayerUpdate addLayerUpdate]。
 		</p>
 
 		<h2>源代码</h2>

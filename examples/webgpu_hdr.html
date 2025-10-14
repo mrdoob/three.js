@@ -4,8 +4,11 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 	<title>three.js webgpu - HDR Draw</title>
-	<link type="text/css" rel="stylesheet" href="main.css" />
+	<link type="text/css" rel="stylesheet" href="example.css">
 	<style>
+		body {
+			background-color: #fff;
+		}
 		#no-hdr {
 			position: absolute;
 			font-family: monospace;
@@ -24,9 +27,18 @@
 	</head>
 	<body>
 
-		<div id="info" style="color: #000">
-			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - HDR Draw
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>HDR</span>
+			</div>
+
+			<small>
+				The demo produces a color output intended for HDR monitors.
+			</small>
 		</div>
+
 		<div id="no-hdr" style="display: none">
 			<div>
 			The browser says your device or monitor doesn't support HDR.<br />
@@ -53,7 +65,7 @@
 			import { pass, uv, uniform } from 'three/tsl';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { ExtendedSRGBColorSpace, ExtendedSRGBColorSpaceImpl } from 'three/addons/math/ColorSpaces.js';
 
@@ -95,6 +107,7 @@
 			renderer.outputColorSpace = ExtendedSRGBColorSpace;
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.inspector = new Inspector();
 			document.body.appendChild( renderer.domElement );
 
 			const camera = new THREE.OrthographicCamera( 0, window.innerWidth, window.innerHeight, 0, 1, 2 );
@@ -152,24 +165,17 @@
 			renderer.domElement.addEventListener( 'touchend', ( e ) => e.preventDefault(), { passive: false } );
 
 			// GUI setup
-			const gui = new GUI();
+			const gui = renderer.inspector.createParameters( 'Settings' );
 
 			const colorFolder = gui.addFolder( 'HDR' );
 			colorFolder.add( params.intensity, 'value', 0, 10, 0.1 ).name( 'Intensity' );
-			colorFolder.open();
 
 			const brushFolder = gui.addFolder( 'Brush Settings' );
 			brushFolder.add( params.hardness, 'value', 0, 0.99, 0.01 ).name( 'Hardness' );
 			brushFolder.add( params.radius, 'value', 0.1, 2.0, 0.01 ).name( 'Radius' );
-			brushFolder.open();
 
 			const effectFolder = gui.addFolder( 'Effects' );
-			effectFolder
-				.add( params.afterImageDecay, 'value', 0.9, 0.999, 0.001 )
-				.name( 'After Image Decay' );
-			effectFolder.open();
-
-			gui.open();
+			effectFolder.add( params.afterImageDecay, 'value', 0.9, 0.999, 0.001 ).name( 'After Image Decay' );
 
 			// Resize handling
 			function onResize() {

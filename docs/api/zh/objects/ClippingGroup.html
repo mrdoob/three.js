@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Group] &rarr;
+
+		<h1>裁剪组([name])</h1>
+
+		<p class="desc">
+			Group 对象的特殊版本，能够统一管理其所有子对象的裁剪效果。多个裁剪组可以嵌套使用，裁剪平面会按交集或并集规则叠加生效。
+		</p>
+
+		<p>注意：ClippingGroup 仅支持 WebGPURenderer。</p>
+
+		<h2>构造器</h2>
+
+		<h3>[name]( )</h3>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Group]。</p>
+
+		<h3>[property:Boolean isClippingGroup]</h3>
+		<p>只读属性，用于检查给定对象是否为 [name] 类型。</p>
+
+		<h3>[property:Array clippingPlanes]</h3>
+		<p>
+			用户定义的剪切平面，指定为世界空间中的 THREE.Plane 对象。这些平面应用于此 [name] 的子对象。
+			空间中与平面有向距离为负的点将被剪切（不渲染）。请参阅 [example:webgpu_clipping webgpu / clipping] 示例。默认值为 `[]`。
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>确定是否应用此对象定义的裁剪平面。默认值为 `true`。</p>
+
+		<h3>[property:Boolean clipIntersection]</h3>
+		<p>
+			改变裁剪平面的行为，以便只裁剪它们的交点，而不是它们的并点。默认值为 `false`。
+		</p>
+
+		<h3>[property:Boolean clipShadows]</h3>
+		<p>
+			定义是否根据此 [name] 指定的裁剪平面裁剪阴影。
+			默认值为 `false`。
+		</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类 [page:Object3D]。</p>
+
+		<h2>源代码</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

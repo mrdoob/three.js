@@ -16,7 +16,7 @@
 		</p>
 
 		<p>
-			Note: After the initial use of a texture, the video cannot be changed. Instead, call [page:.dispose]() on the texture and instantiate a new one.
+			注意：首次使用纹理后，视频将无法更改。请对纹理调用 [page:.dispose]() 并实例化一个新的纹理。
 		</p>
 
 		<h2>代码示例</h2>
@@ -57,14 +57,14 @@ const texture = new THREE.VideoTexture( video );
 		[page:Constant minFilter] -- 当一个纹素覆盖小于一个像素时，贴图将如何采样。
 		其默认值为[page:Textures THREE.LinearFilter]。请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其它选项。<br />
 
-		[page:Constant format] -- The default is [page:Textures THREE.RGBAFormat].
+		[page:Constant format] -- 默认值是 [page:Textures THREE.RGBAFormat]。
 	 	请参阅[page:Textures format constants]（格式常量）来了解各个选项。<br />
 
 		[page:Constant type] -- 默认值是[page:Textures THREE.UnsignedByteType].
 	 	请参阅[page:Textures type constants]（类型常量）来了解其他选项。<br />
 
 		[page:Number anisotropy] -- 沿着轴，通过具有最高纹素密度的像素的采样数。
-		默认情况下，这个值为1。设置一个较高的值将会比基本的mipmap产生更清晰的效果，代价是需要使用更多纹理样本。
+		默认情况下，这个值为 `1`。设置一个较高的值将会比基本的mipmap产生更清晰的效果，代价是需要使用更多纹理样本。
 		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。<br /><br />
 		</p>
 
@@ -77,7 +77,7 @@ const texture = new THREE.VideoTexture( video );
 
 		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
-		Whether to generate mipmaps. `false` by default.
+		是否为纹理生成 mipmap（如果可能）。默认为 `false`。
 		</p>
 
 		<h3>[property:Boolean isVideoTexture]</h3>
@@ -99,7 +99,7 @@ const texture = new THREE.VideoTexture( video );
 	<h3>[method:undefined update]()</h3>
 		<p>
 		在每一次新的一帧可用时，这个方法将被自动调用，
-		并将[property:Boolean needsUpdate]设置为*true*。
+		并将[page:VideoTexture.needsUpdate .needsUpdate]设置为*true*。
 		</p>
 
 

@@ -14,11 +14,42 @@
 		</p>
 
 		<p>
-			对 [name] 实例进行遍历将按相应的顺序生成它的分量 (r, g, b)。
+			[name] 实例由线性 <i>工作颜色空间</i> 中的 RGB 分量表示，默认为 `LinearSRGBColorSpace`。
+			常规使用 `SRGBColorSpace` (例如十六进制和 CSS 字符串) 的输入被自动转换到工作颜色空间。
+		</p>
+
+		<p>
+			<code>
+// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
+const color = new THREE.Color().setHex( 0x112233 );
+			</code>
+		</p>
+
+		<p>
+			可以明确指定源颜色空间，以确保正确转换。
+		</p>
+
+		<p>
+			<code>
+// assumed already LinearSRGBColorSpace; no conversion
+const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5 );
+
+// converted explicitly from SRGBColorSpace to LinearSRGBColorSpace
+const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
+			</code>
+		</p>
+
+		<p>
+			如果禁用 THREE.ColorManagement ，则不会发生任何转换。详情请参阅 <i>Color management</i>。
+		</p>
+
+		<p>
+			迭代 Color 实例将按相应的顺序生成其分量 (r, g, b)。
 		</p>
 
 		<h2>代码示例</h2>
-		颜色可以用以下任意一种方式初始化。
+
+		<p>颜色可以用以下任意一种方式初始化。</p>
 		<code>
 		//empty constructor - will default white
 		const color1 = new THREE.Color();
@@ -112,6 +143,11 @@
 
 		<h3>[method:this addScalar]( [param:Number s] ) </h3>
 		<p>给现有的RGB值都加上 [page:Number s] 。</p>
+
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>
+			将变换 [page:Matrix3 m] 应用于此颜色的 RGB 分量。
+		</p>
 
 		<h3>[method:Color clone]() </h3>
 		<p>返回一个与当前颜色的 [page:.r r], [page:.g g] 和 [page:.b b] 相同的颜色。</p>
@@ -235,13 +271,17 @@
 
 		<h3>[method:this set]( [param:Color_Hex_or_String r], [param:Float g], [param:Float b] )</h3>
 		<p>
-			[page:Color_Hex_or_String r] - (optional) If arguments [page:Float g] and [page:Float b] are defined, the red component of the color. If they are
-			not defined, it can be a [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended),  a CSS-style string, or another `Color` instance.<br />
-			[page:Float g] - (optional) If it is defined, the green component of the color.<br />
-			[page:Float b] - (optional) If it is defined, the blue component of the color.<br /><br />
+			[page:Color_Hex_or_String r] - (optional) 如果定义了参数 [page:Float g] 和 [page:Float b]，则为颜色的红色分量。 
+			如果未定义，则可以是 [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (推荐)，CSS 样式字符串或其他 `Color` 实例。<br />
+			[page:Float g] - (optional) 如果定义了，则为颜色的绿色分量。<br />
+			[page:Float b] - (optional) 如果定义了，则为颜色的蓝色分量。<br /><br />
 
-			See the Constructor above for full details about possible arguments. Delegates to [page:.copy],
-			[page:.setStyle], [page:.setRGB] or [page:.setHex] depending on input type.
+			有关可能的参数的完整详细信息，请参阅上面的构造函数。根据输入类型，委托给 [page:.copy]、[page:.setStyle]、[page:.setRGB] 或 [page:.setHex]。
+		</p>
+
+		<h3>[method:this setFromVector3]( [param:Vector3 vector] )</h3>
+		<p>
+			根据指定 [page:Vector3 vector] 的 x、y 和 z 分量设置此颜色的 [page:.r r]、[page:.g g] 和 [page:.b b] 分量。
 		</p>
 
 		<h3>[method:this setHex]( [param:Integer hex], [param:string colorSpace] = SRGBColorSpace ) </h3>
@@ -320,7 +360,7 @@
 
 		<h3>[method:Number toJSON]()</h3>
 		<p>
-		This methods defines the serialization result of [name]. Returns the color as a hexadecimal value.
+		此方法定义 [name] 的序列化结果。以十六进制值的形式返回颜色。
 		</p>
 
 		<h2>源码（Source）</h2>

@@ -9,6 +9,11 @@
                 "ignoreInheritedSymbols": true
             }
     },
+    "templates": {
+        "default": {
+            "outputSourceFiles": false
+        }
+    },
     "plugins": [ "plugins/markdown" ],
     "source": {
         "include": [

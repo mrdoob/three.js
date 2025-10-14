@@ -4,12 +4,18 @@
 		<title>three.js webgpu - compute cloth</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - compute cloth<br />
-			Simple cloth simulation with a verlet system running in compute shaders
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Compute Cloth</span>
+			</div>
+
+			<small>Simple cloth simulation with a verlet system running in compute shaders.</small>
 		</div>
 
 		<script type="importmap">
@@ -29,7 +35,8 @@
 
 			import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, uint, Loop, float, transformNormalToView, cross, triNoise3D, time } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
@@ -87,6 +94,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 1;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -110,7 +118,7 @@
 
 				setupCloth();
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( stiffnessUniform, 'value', 0.1, 0.5, 0.01 ).name( 'stiffness' );
 				gui.add( params, 'wireframe' );
 				gui.add( params, 'sphere' );
@@ -317,7 +325,7 @@
 					const force = dist.sub( restLength ).mul( stiffnessUniform ).mul( delta ).mul( 0.5 ).div( dist );
 					springForceBuffer.element( instanceIndex ).assign( force );
 
-				} )().compute( springCount );
+				} )().compute( springCount ).setName( 'Spring Forces' );
 
 				// 2. computeVertexForces:
 				// This shader accumulates the force for each vertex.
@@ -381,7 +389,7 @@
 					vertexForceBuffer.element( instanceIndex ).assign( force );
 					vertexPositionBuffer.element( instanceIndex ).addAssign( force );
 
-				} )().compute( vertexCount );
+				} )().compute( vertexCount ).setName( 'Vertex Forces' );
 
 			}
 
@@ -569,12 +577,12 @@
 					timestamp += timePerStep;
 					timeSinceLastStep -= timePerStep;
 					updateSphere();
-					await renderer.computeAsync( computeSpringForces );
-					await renderer.computeAsync( computeVertexForces );
+					renderer.compute( computeSpringForces );
+					renderer.compute( computeVertexForces );
 
 				}
 
-				await renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

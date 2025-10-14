@@ -681,6 +681,12 @@ ${ this.tab }} )`;
 
 		}
 
+		if ( node.needsToVar ) {
+
+			varStr = varStr + '.toVar()';
+
+		}
+
 		return varStr;
 
 	}
@@ -750,6 +756,7 @@ ${ this.tab }} )`;
 			const mutableParam = new VariableDeclaration( param.type, param.name, new Accessor( param.name + '_immutable' ), null, true );
 			mutableParam.parent = param.parent; // link to the original node
 			mutableParam.linker.assignments.push( mutableParam );
+			mutableParam.needsToVar = true; // force var declaration
 
 			node.body.unshift( mutableParam );
 

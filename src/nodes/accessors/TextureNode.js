@@ -126,7 +126,7 @@ class TextureNode extends UniformNode {
 		/**
 		 * By default the `update()` method is not executed. Depending on
 		 * whether a uv transformation matrix and/or flipY is applied, `update()`
-		 * is exeucted per object.
+		 * is executed per object.
 		 *
 		 * @type {string}
 		 * @default 'none'
@@ -349,9 +349,9 @@ class TextureNode extends UniformNode {
 
 		//
 
-		let uvNode = Fn( () => {
+		const uvNode = Fn( () => {
 
-			uvNode = this.uvNode;
+			let uvNode = this.uvNode;
 
 			if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
@@ -904,7 +904,7 @@ export const uniformTexture = ( value = EmptyTexture ) => texture( value );
  */
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
 
-//export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
+export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
 
 /**
  * Converts a texture or texture node to a sampler.

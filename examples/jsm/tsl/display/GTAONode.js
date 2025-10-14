@@ -253,6 +253,7 @@ class GTAONode extends TempNode {
 		this.setSize( size.width, size.height );
 
 		_quadMesh.material = this._material;
+		_quadMesh.name = 'AO';
 
 		// clear
 

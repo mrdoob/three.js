@@ -25,21 +25,31 @@
 	<h2>代码示例</h2>
 
 	<code>
-		const box = new THREE.BoxGeometry( 1, 1, 1 );
-		const sphere = new THREE.BoxGeometry( 1, 1, 1 );
-		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+	const box = new THREE.BoxGeometry( 1, 1, 1 );
+	const sphere = new THREE.SphereGeometry( 1, 12, 12 );
+	const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
-		// initialize and add geometries into the batched mesh
-		const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
-		const boxId = batchedMesh.addGeometry( box );
-		const sphereId = batchedMesh.addGeometry( sphere );
+	// initialize and add geometries into the batched mesh
+	const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
+	const boxGeometryId = batchedMesh.addGeometry( box );
+	const sphereGeometryId = batchedMesh.addGeometry( sphere );
 
-		// position the geometries
-		batchedMesh.setMatrixAt( boxId, boxMatrix );
-		batchedMesh.setMatrixAt( sphereId, sphereMatrix );
+	// create instances of those geometries
+	const boxInstancedId1 = batchedMesh.addInstance( boxGeometryId );
+	const boxInstancedId2 = batchedMesh.addInstance( boxGeometryId );
 
-		scene.add( batchedMesh );
-		</code>
+	const sphereInstancedId1 = batchedMesh.addInstance( sphereGeometryId );
+	const sphereInstancedId2 = batchedMesh.addInstance( sphereGeometryId );
+
+	// position the geometries
+	batchedMesh.setMatrixAt( boxInstancedId1, boxMatrix1 );
+	batchedMesh.setMatrixAt( boxInstancedId2, boxMatrix2 );
+
+	batchedMesh.setMatrixAt( sphereInstancedId1, sphereMatrix1 );
+	batchedMesh.setMatrixAt( sphereInstancedId2, sphereMatrix2 );
+
+	scene.add( batchedMesh );
+	</code>
 
 	<h2>例子</h2>
 	<p>
@@ -117,6 +127,13 @@
 	</p>
 
 	<h3>
+		[method:undefined getColorAt]( [param:Integer instanceId], [param:Color target] )
+	</h3>
+	<p>
+		[page:Integer instanceId]: The id of an instance to get the color of.
+	</p>
+
+	<h3>
 		[method:Matrix4 getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
 	</h3>
 	<p>
@@ -135,6 +152,38 @@
 	</p>
 	<p>获取给定实例是否标记为“可见”。</p>
 
+	<h3>
+		[method:Object getGeometryRangeAt]( [param:Integer geometryId], [param:Object target] )
+	</h3>
+	<p>
+		[page:Integer geometryId]: 要获取范围的 geometryId。
+	</p>
+	<p>
+		[page:Object target]: 将范围复制到的可选目标对象。
+	</p>
+	<p>获取表示与附着几何体相关的三角形子集的范围，指示起始偏移和计数，如果无效，则为 `null`。</p>
+	<p>返回以下形式的对象：</p>
+	<code>{ start: Integer, count: Integer }</code>
+
+	<h3>
+		[method:Integer getGeometryIdAt]( [param:Integer instanceId] )
+	</h3>
+	<p>
+		[page:Integer instanceId]: 要获取几何索引的实例的 id。
+	</p>
+	<p>获取定义实例的几何索引。</p>
+
+	<h3>
+		[method:undefined setColorAt]( [param:Integer instanceId], [param:Color color] )
+	</h3>
+	<p>
+		[page:Integer instanceId]: 要设置颜色的实例的 id。
+	</p>
+	<p>[page:Color color]: 设置实例的颜色。</p>
+	<p>
+		将给定的颜色设置为定义的几何实例。
+	</p>
+	
 	<h3>
 		[method:this setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
 	</h3>
@@ -162,6 +211,19 @@
 	</p>
 
 	<h3>
+		[method:this setGeometryIdAt]( [param:Integer instanceId], [param:Integer geometryId] )
+	</h3>
+	<p>
+		[page:Integer instanceId]: 要设置几何索引的实例的 id。
+	</p>
+	<p>
+		[page:Integer geometryId]: 实例要使用的几何索引。
+	</p>
+	<p>
+		在给定索引处设置实例的几何索引。
+	</p>
+
+	<h3>
 		[method:Integer addGeometry]( [param:BufferGeometry geometry], [param:Integer reservedVertexRange], [param:Integer
 		reservedIndexRange] )
 	</h3>
@@ -179,6 +241,33 @@
 	</p>
 
 	<h3>
+		[method:Integer deleteGeometry]( [param:Integer geometryId] )
+	</h3>
+	<p>
+		[page:Integer geometryId]: 需要从 [name] 中移除的 geometryId，该几何体之前已通过 "addGeometry" 添加。
+		任何引用此几何体的实例也将被移除。
+	</p>
+
+	<h3>
+		[method:Integer addInstance]( [param:Integer geometryId] )
+	</h3>
+	<p>
+		[page:Integer geometryId]: 通过 "addGeometry" 添加的先前 geometryId，将其添加到 [name] 中进行渲染。
+	</p>
+	<p>
+		使用给定的 geometryId 的几何图形向 [name] 添加一个新实例，并返回一个指向新实例的新 id，以供其他函数使用。
+	</p>
+	<h3>
+		[method:Integer deleteInstance]( [param:Integer instanceId] )
+	</h3>
+	<p>
+		[page:Integer instanceId]: 要从之前通过 "addInstance" 添加的 [name] 中移除的实例的 id。
+	</p>
+	<p>
+		使用给定的 instanceId 从 [name] 中删除现有实例。
+	</p>
+
+	<h3>
 		[method:Integer setGeometryAt]( [param:Integer index], [param:BufferGeometry geometry] )
 	</h3>
 	<p>
@@ -192,27 +281,32 @@
 	</p>
 
 	<h3>
-		[method:Integer getInstanceCountAt]( [param:Integer index] )
+		[method:this optimize]()
 	</h3>
 	<p>
-		[page:Integer index]: The index of an instance. Values have to be in the
-		range [0, count].
-	</p>
-	<p>
-		Gets the instance count of the geometry at `index`. Returns `null` if instance counts are not configured.
+		重新打包 [name] 中的子几何体，以删除先前删除的几何体剩余的任何未使用的空间，释放空间来添加新的几何体。
 	</p>
 
 	<h3>
-		[method:Integer setInstanceCountAt]( [param:Integer index], [param:Integer instanceCount ] )
+		[method:this setGeometrySize]( maxVertexCount, maxIndexCount )
 	</h3>
 	<p>
-		[page:Integer index]: Which geometry index to configure an instance count for.
+		将 [name] 顶点和索引缓冲区属性中的可用空间调整为指定的大小。
+		如果提供的参数缩小了几何缓冲区，但几何属性末尾没有足够的未使用空间，则会抛出错误。
 	</p>
 	<p>
-		[page:Integer instanceCount]: The number of instances to render of the given geometry index.
+		[page:Integer maxVertexCount] - 所有唯一几何体调整大小时所使用的最大顶点数。<br />
+		[page:Integer maxIndexCount] - 所有唯一几何图形调整大小时使用的最大索引数。<br />
+	</p>
+
+	<h3>
+		[method:this setInstanceCount]( maxInstanceCount )
+	</h3>
+	<p>
+		调整必要的缓冲区大小以支持指定的实例数量。如果提供的参数减少了实例数量，但列表末尾没有足够的未使用 id，则会抛出错误。
 	</p>
 	<p>
-		Sets an instance count of the geometry at `index`.
+		[page:Integer maxInstanceCount] - [name] 可以添加和渲染的最大单个实例数。<br />
 	</p>
 
 	<h2>源代码</h2>

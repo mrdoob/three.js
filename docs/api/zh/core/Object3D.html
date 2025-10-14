@@ -118,9 +118,8 @@
 
 	<h3>[property:Function onAfterShadow]</h3>
 	<p>
-		An optional callback that is executed immediately after a 3D object is
-		rendered to a shadow map. This function is called with the following parameters: renderer,
-		scene, camera, shadowCamera, geometry, depthMaterial, group.
+		可选回调函数，在 3D 对象渲染到阴影贴图后立即执行。
+		此函数使用以下参数调用：renderer、scene、camera、shadowCamera、geometry、depthMaterial 和 group。
 	</p>
 	<p>
 		注意此回调函数只会在*可渲染*的3D物体上执行。可渲染的3D物体指的是那种拥有视觉表现的、定义了几何体与材质的物体，例如像是[page:Mesh]、[page:Line]、[page:Points] 或者[page:Sprite]。
@@ -130,7 +129,7 @@
 	<h3>[property:Function onBeforeRender]</h3>
 	<p>
 		一个可选的回调函数，在Object3D渲染之前直接执行。
-		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
+		此函数使用以下参数调用：renderer，scene，camera，geometry，material，group。
 	</p>
 	<p>
 	注意此回调函数只会在*可渲染*的3D物体上执行。可渲染的3D物体指的是那种拥有视觉表现的、定义了几何体与材质的物体，例如像是[page:Mesh]、[page:Line]、[page:Points] 或者[page:Sprite]。
@@ -139,8 +138,7 @@
 
 	<h3>[property:Function onBeforeShadow]</h3>
 	<p>
-		An optional callback that is executed immediately before a 3D object is
-		rendered to a shadow map. This function is called with the following parameters: renderer,
+		可选回调函数，在 3D 对象渲染到阴影贴图之前立即执行。此函数使用以下参数调用：renderer,
 		scene, camera, shadowCamera, geometry, depthMaterial, group.
 	</p>
 	<p>
@@ -246,6 +244,9 @@
 
 	<h3>[method:this attach]( [param:Object3D object] )</h3>
 	<p>将*object*作为子级来添加到该对象中，同时保持该object的世界变换。</p>
+	
+	<h3>[method:this clear]()</h3>
+	<p>清除所有子对象。</p>
 
 	<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
 	<p>
@@ -290,9 +291,7 @@
 	<p>
 		name —— 将要用于查找的属性的名称。<br />
 		value —— 给定的属性的值。 <br />
-		optionalTarget -- (optional) target to set the result.
-		Otherwise a new Array is instantiated. If set, you must clear this
-		array prior to each call (i.e., array.length = 0;). <br /><br />
+		optionalTarget -- (optional) 目标设置结果。否则，将实例化一个新的数组。如果设置了，则必须在每次调用之前清除此数组（即 array.length = 0;）。 <br /><br />
 		从此对象开始，搜索一个对象及其子对象，返回包含给定属性的匹配值的所有子对象。
 	</p>
 
@@ -349,7 +348,7 @@
 
 	<h3>[method:this removeFromParent]()</h3>
 	<p>
-	Removes this object from its current parent.
+	将此对象从其当前父级中移除。
 	</p>
 
 	<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
@@ -484,6 +483,28 @@
 		vector - 一个表示在世界空间中位置的向量。<br /><br />
 
 		将该向量从世界空间转换到物体的局部空间。
+	</p>
+	
+	<h2>事件</h2>
+
+	<h3>added</h3>
+	<p>
+		当对象被添加到其父对象时触发。
+	</p>
+
+	<h3>removed</h3>
+	<p>
+		当对象从其父对象中移除时触发。
+	</p>
+
+	<h3>childadded</h3>
+	<p>
+		当添加新的子对象时触发。
+	</p>
+
+	<h3>childremoved</h3>
+	<p>
+		当新的子对象被移除时触发。
 	</p>
 
 	<h2>源代码</h2>

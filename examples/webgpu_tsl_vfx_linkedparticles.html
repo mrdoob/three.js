@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - VFX Linked particles</title>
+		<title>three.js webgpu - vfx linked particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - VFX Linked particles
-			<br>
-			Based on <a href="https://github.com/ULuIQ12/webgpu-tsl-linkedparticles" target="_blank" rel="noopener">this experiment</a> by Christophe Choffel
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>VFX Linked Particles</span>
+			</div>
+
+			<small>
+				Based on <a href="https://github.com/ULuIQ12/webgpu-tsl-linkedparticles" target="_blank" rel="noopener">this experiment</a> by Christophe Choffel.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -32,7 +38,9 @@
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			let camera, scene, renderer, postProcessing, controls, timer, light;
@@ -70,7 +78,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -95,12 +103,15 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				// TSL function
 				// current color from index
-				getInstanceColor = /*#__PURE__*/ Fn( ( [ i ] ) => {
+				getInstanceColor = Fn( ( [ i ] ) => {
 
 					return hue( color( 0x0000ff ), colorOffset.add( mx_fractal_noise_float( i.toFloat().mul( .1 ), 2, 2.0, 0.5, colorVariance ) ) );
 
@@ -112,7 +123,7 @@
 				const particleVelocities = storage( new THREE.StorageInstancedBufferAttribute( nbParticles, 4 ), 'vec4', nbParticles );
 
 				// init particles buffers
-				renderer.computeAsync( /*#__PURE__*/ Fn( () => {
+				renderer.compute( Fn( () => {
 
 					particlePositions.element( instanceIndex ).xyz.assign( vec3( 10000.0 ) );
 					particlePositions.element( instanceIndex ).w.assign( vec3( - 1.0 ) ); // life is stored in w component; x<0 means dead
@@ -130,7 +141,7 @@
 				particleMaterial.scaleNode = vec2( particleSize );
 				particleMaterial.rotationNode = atan( particleVelocities.toAttribute().y, particleVelocities.toAttribute().x );
 
-				particleMaterial.colorNode = /*#__PURE__*/ Fn( () => {
+				particleMaterial.colorNode = Fn( () => {
 
 					const life = particlePositions.toAttribute().w;
 					const modLife = pcurve( life.oneMinus(), 8.0, 1.0 );
@@ -144,7 +155,7 @@
 
 				} )();
 
-				particleMaterial.opacityNode = /*#__PURE__*/ Fn( () => {
+				particleMaterial.opacityNode = Fn( () => {
 
 					const circle = step( uv().xy.sub( 0.5 ).length(), 0.5 );
 					const life = particlePositions.toAttribute().w;
@@ -199,7 +210,7 @@
 				scene.add( linksMesh );
 
 				// compute nodes
-				updateParticles = /*#__PURE__*/ Fn( () => {
+				updateParticles = Fn( () => {
 
 					const position = particlePositions.element( instanceIndex ).xyz;
 					const life = particlePositions.element( instanceIndex ).w;
@@ -298,9 +309,9 @@
 
 					} );
 
-				} )().compute( nbParticles );
+				} )().compute( nbParticles ).setName( 'Update Particles' );
 
-				spawnParticles = /*#__PURE__*/ Fn( () => {
+				spawnParticles = Fn( () => {
 
 					const particleIndex = spawnIndex.add( instanceIndex ).mod( nbParticles ).toInt();
 					const position = particlePositions.element( particleIndex ).xyz;
@@ -325,7 +336,7 @@
 					// start in that direction
 					velocity.assign( rDir.mul( 5.0 ) );
 
-				} )().compute( nbToSpawn.value );
+				} )().compute( nbToSpawn.value ).setName( 'Spawn Particles' );
 
 
 				// background , an inverted icosahedron
@@ -368,7 +379,7 @@
 
 				// GUI
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.add( controls, 'autoRotate' ).name( 'Auto Rotate' );
 				gui.add( controls, 'autoRotateSpeed', - 10.0, 10.0, 0.01 ).name( 'Auto Rotate Speed' );

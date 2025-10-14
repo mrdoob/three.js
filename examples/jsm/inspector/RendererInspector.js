@@ -11,6 +11,7 @@ class ObjectStats {
 		this.timestamp = 0;
 		this.cpu = 0;
 		this.gpu = 0;
+		this.fps = 0;
 
 		this.children = [];
 		this.parent = null;
@@ -74,6 +75,7 @@ export class RendererInspector extends InspectorBase {
 		this.currentFrame = null;
 		this.currentRender = null;
 		this.currentNodes = null;
+		this.lastFrame = null;
 
 		this.frames = [];
 		this.framesLib = {};
@@ -83,6 +85,12 @@ export class RendererInspector extends InspectorBase {
 		this._resolveTimestampPromise = null;
 
 		this.isRendererInspector = true;
+
+	}
+
+	getParent() {
+
+		return this.currentRender || this.getFrame();
 
 	}
 
@@ -104,11 +112,35 @@ export class RendererInspector extends InspectorBase {
 
 		this.addFrame( frame );
 
+		this.fps = this._getFPS();
+
+		this.lastFrame = frame;
+
 		this.currentFrame = null;
 		this.currentRender = null;
 		this.currentNodes = null;
 
 		this._lastFinishTime = now;
+
+	}
+
+	_getFPS() {
+
+		let frameSum = 0;
+		let timeSum = 0;
+
+		for ( let i = this.frames.length - 1; i >= 0; i -- ) {
+
+			const frame = this.frames[ i ];
+
+			frameSum ++;
+			timeSum += frame.deltaTime;
+
+			if ( timeSum >= 1000 ) break;
+
+		}
+
+		return ( frameSum * 1000 ) / timeSum;
 
 	}
 
@@ -131,7 +163,7 @@ export class RendererInspector extends InspectorBase {
 
 	getFrame() {
 
-		return this.currentFrame;
+		return this.currentFrame || this.lastFrame;
 
 	}
 
@@ -183,7 +215,16 @@ export class RendererInspector extends InspectorBase {
 
 									for ( const stats of frame.computes ) {
 
-										stats.gpu = renderer.backend.getTimestamp( stats.uid );
+										if ( renderer.backend.hasTimestamp( stats.uid ) ) {
+
+											stats.gpu = renderer.backend.getTimestamp( stats.uid );
+
+										} else {
+
+											stats.gpu = 0;
+											stats.gpuNotAvailable = true;
+
+										}
 
 									}
 
@@ -209,7 +250,16 @@ export class RendererInspector extends InspectorBase {
 
 									for ( const stats of frame.renders ) {
 
-										stats.gpu = renderer.backend.getTimestamp( stats.uid );
+										if ( renderer.backend.hasTimestamp( stats.uid ) ) {
+
+											stats.gpu = renderer.backend.getTimestamp( stats.uid );
+
+										} else {
+
+											stats.gpu = 0;
+											stats.gpuNotAvailable = true;
+
+										}
 
 									}
 
@@ -251,7 +301,7 @@ export class RendererInspector extends InspectorBase {
 
 		const renderer = this.getRenderer();
 
-		return renderer !== null && renderer.backend.isWebGPUBackend;
+		return renderer !== null;
 
 	}
 
@@ -292,7 +342,7 @@ export class RendererInspector extends InspectorBase {
 
 		const currentCompute = new ComputeStats( uid, computeNode );
 		currentCompute.timestamp = performance.now();
-		currentCompute.parent = this.currentRender;
+		currentCompute.parent = this.currentCompute || this.getParent();
 
 		frame.computes.push( currentCompute );
 
@@ -319,7 +369,7 @@ export class RendererInspector extends InspectorBase {
 		const currentCompute = this.currentCompute;
 		currentCompute.cpu = performance.now() - currentCompute.timestamp;
 
-		this.currentCompute = null;
+		this.currentCompute = currentCompute.parent.isComputeStats ? currentCompute.parent : null;
 
 	}
 
@@ -327,9 +377,11 @@ export class RendererInspector extends InspectorBase {
 
 		const frame = this.getFrame();
 
+		if ( ! frame ) return;
+
 		const currentRender = new RenderStats( uid, scene, camera, renderTarget );
 		currentRender.timestamp = performance.now();
-		currentRender.parent = this.currentRender;
+		currentRender.parent = this.getParent();
 
 		frame.renders.push( currentRender );
 
@@ -348,6 +400,10 @@ export class RendererInspector extends InspectorBase {
 	}
 
 	finishRender() {
+
+		const frame = this.getFrame();
+
+		if ( ! frame ) return;
 
 		const currentRender = this.currentRender;
 		currentRender.cpu = performance.now() - currentRender.timestamp;

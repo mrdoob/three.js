@@ -310,6 +310,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
+				await renderer.init();
+
 				const animate = () => {
 
 					renderer.render( scene, camera );
@@ -325,7 +327,6 @@
 					currentElementsStorage,
 					{
 						workgroupSize: 64,
-						sideEffectBuffers: [ 2, 3 ]
 					}
 				);
 
@@ -335,31 +336,9 @@
 				const computeInit = computeInitFn().compute( size );
 				const computeReset = computeResetBuffersFn().compute( size );
 
-				await renderer.computeAsync( computeInit );
+				renderer.compute( computeInit );
 
-				gui.add( effectController, 'stepBitonic' ).onChange( async () => {
-
-					if ( currentStep < bitonicSortModule.stepCount ) {
-
-						await bitonicSortModule.computeStep( renderer );
-
-						currentStep ++;
-
-					} else {
-
-						await renderer.computeAsync( computeReset );
-
-						currentStep = 0;
-
-					}
-
-					timestamps[ 'local_swap' ].innerHTML = constructInnerHTML( false, localColors );
-
-				} );
-
-
-
-				 const stepAnimation = async function () {
+				const stepAnimation = async function () {
 
 					renderer.info.reset();
 
@@ -419,7 +398,7 @@
 
 				const scene = new THREE.Scene();
 
-				const infoArray = new Uint32Array( 3, 2, 2 );
+				const infoArray = new Uint32Array( [ 3, 2, 2 ] );
 				const infoBuffer = new THREE.StorageInstancedBufferAttribute( infoArray, 1 );
 				const infoStorage = storage( infoBuffer, 'uint', infoBuffer.count ).setPBO( true ).setName( 'TheInfo' );
 
@@ -564,6 +543,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
+				await renderer.init();
+
 				const animate = () => {
 
 					renderer.render( scene, camera );
@@ -575,9 +556,9 @@
 				renderer.domElement.style.left = '50%';
 				scene.background = new THREE.Color( 0x212121 );
 
-				await renderer.computeAsync( computeInit );
+				renderer.compute( computeInit );
 
-				 const stepAnimation = async function () {
+				const stepAnimation = async function () {
 
 					if ( currentStep !== MAX_STEPS ) {
 

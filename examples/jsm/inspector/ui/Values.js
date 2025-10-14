@@ -25,6 +25,14 @@ class Value extends EventDispatcher {
 
 	}
 
+	setValue( /*val*/ ) {
+
+		this.dispatchChange();
+
+		return this;
+
+	}
+
 	getValue() {
 
 		return null;
@@ -86,13 +94,6 @@ class ValueNumber extends Value {
 		}
 
 		this.dispatchChange();
-
-	}
-
-	step( value ) {
-
-		this.input.step = value;
-		return this;
 
 	}
 
@@ -240,6 +241,15 @@ class ValueSlider extends Value {
 
 	}
 
+	setValue( val ) {
+
+		this.slider.value = val;
+		this.numberInput.value = val;
+
+		return super.setValue( val );
+
+	}
+
 	getValue() {
 
 		return parseFloat( this.slider.value );
@@ -264,12 +274,11 @@ class ValueSelect extends Value {
 		super();
 
 		const select = document.createElement( 'select' );
-		const type = typeof value;
 
 		const createOption = ( name, optionValue ) => {
 
 			const optionEl = document.createElement( 'option' );
-			optionEl.value = optionValue;
+			optionEl.value = name;
 			optionEl.textContent = name;
 
 			if ( optionValue == value ) optionEl.selected = true;
@@ -300,20 +309,24 @@ class ValueSelect extends Value {
 
 		} );
 
+		this.options = options;
 		this.select = select;
-		this.type = type;
 
 	}
 
 	getValue() {
 
-		const value = this.select.value;
-		const type = this.type;
+		const options = this.options;
 
-		if ( type === 'number' ) return parseFloat( value );
-		if ( type === 'boolean' ) return value === 'true';
+		if ( Array.isArray( options ) ) {
 
-		return value;
+			return options[ this.select.selectedIndex ];
+
+		} else {
+
+			return options[ this.select.value ];
+
+		}
 
 	}
 
@@ -366,6 +379,10 @@ class ValueColor extends Value {
 
 			color = `#${ color.toString( 16 ) }`;
 
+		} else if ( color[ 0 ] !== '#' ) {
+
+			color = '#' + color;
+
 		}
 
 		return color;
@@ -374,10 +391,33 @@ class ValueColor extends Value {
 
 	getValue() {
 
-		return this._value;
+		let value = this._value;
+
+		if ( typeof value === 'string' ) {
+
+			value = parseInt( value.slice( 1 ), 16 );
+
+		}
+
+		return value;
 
 	}
 
 }
 
-export { Value, ValueNumber, ValueCheckbox, ValueSlider, ValueSelect, ValueColor };
+class ValueButton extends Value {
+
+	constructor( { text = 'Button', value = () => {} } ) {
+
+		super();
+
+		const button = document.createElement( 'button' );
+		button.textContent = text;
+		button.onclick = value;
+		this.domElement.appendChild( button );
+
+	}
+
+}
+
+export { Value, ValueNumber, ValueCheckbox, ValueSlider, ValueSelect, ValueColor, ValueButton };

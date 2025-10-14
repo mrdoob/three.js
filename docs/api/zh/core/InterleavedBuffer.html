@@ -67,11 +67,20 @@
 
 		<h3>[property:Usage usage]</h3>
 		<p>
-			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+			定义数据存储的预期使用模式，以实现优化目的。对应 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]() 的 *usage* 参数。
 		</p>
 
 		<h2>方法</h2>
+
+		<h3>[method:this addUpdateRange]( [param:Integer start], [param:Integer count] )</h3>
+		<p>
+			在数据数组中添加要在 GPU 上更新的数据范围。将描述该范围的对象添加到 [page:InterleavedBuffer.updateRanges updateRanges] 数组。
+		</p>
+
+		<h3>[method:this clearUpdateRanges]()</h3>
+		<p>
+			清除 [page:InterleavedBuffer.updateRanges updateRanges] 数组。
+		</p>
 
 		<h3>[method:this copy]( [param:InterleavedBuffer source] ) </h3>
 		<p>
@@ -91,19 +100,19 @@
 
 		<h3>[method:InterleavedBuffer clone]( [param:Object data] ) </h3>
 		<p>
-			data - This object holds shared array buffers required for properly cloning geometries with interleaved attributes.<br/><br />
+			data - 该对象保存正确克隆具有交错属性的几何图形所需的共享数组缓冲区。<br/><br />
 
-			Creates a clone of this [name].
+			创建此 [name] 的克隆。
 		</p>
 
 		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
-		<p>Set [page:InterleavedBuffer.usage usage] to value.</p>
+		<p>设置 [page:InterleavedBuffer.usage usage] 的值。</p>
 
 		<h3>[method:Object toJSON]( [param:Object data] ) </h3>
 		<p>
-			data - This object holds shared array buffers required for properly serializing geometries with interleaved attributes.<br/><br />
+			data - 该对象包含正确序列化具有交错属性的几何图形所需的共享数组缓冲区。<br/><br />
 
-			Serializes this [name].
+			序列化这个 [name]。
 		</p>
 
 		<h2>源代码</h2>

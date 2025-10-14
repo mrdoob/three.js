@@ -12,7 +12,7 @@
 		<h1>深度纹理([name])</h1>
 
 		<p class="desc">
-		This class can be used to automatically save the depth information of a rendering into a texture.
+		此类可用于自动将渲染的深度信息保存到纹理中。
 		</p>
 
 		<h2>例子</h2>
@@ -48,7 +48,7 @@
 
 		[page:Number anisotropy] -- 沿着轴，通过具有最高纹素密度的像素的样本数。
 		默认情况下，这个值为1。设置一个较高的值将会产生比基本的mipmap更清晰的效果，代价是需要使用更多纹理样本。
-		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。<br /><br />
+		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。<br />
 
 		[page:Constant format] -- 这个值必须是[page:Textures DepthFormat]（默认值）或者[page:Textures DepthStencilFormat]。
 		请参阅[page:Textures format constants]（格式常量）来了解详细信息。<br />
@@ -70,8 +70,11 @@
 
 		<h3>[page:Texture.type type]</h3>
 		<p>
-		Default is [page:Textures THREE.UnsignedIntType] when using [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
-		请参阅[page:Textures format constants]来了解详细信息。<br />
+		默认为 THREE.UnsignedIntType。
+		以下是选项以及它们如何根据模板格式映射到内部 gl 深度格式类型：
+		THREE.UnsignedIntType——内部使用 DEPTH_COMPONENT24 或 DEPTH24_STENCIL8。
+		THREE.FloatType——内部使用 DEPTH_COMPONENT32F 或 DEPTH32F_STENCIL8。
+		THREE.UnsignedShortType——内部使用 DEPTH_COMPONENT16。使用此类型时，模板缓冲区不受支持。
 		</p>
 
 		<h3>[page:Texture.magFilter magFilter]</h3>
@@ -95,12 +98,19 @@
 
 		<h3>[page:Texture.generateMipmaps generateMipmaps]</h3>
 		<p>
-		深度贴图不使用mipmap。
+		深度贴图不使用mipmap，因此其默认值为*false*。
 		</p>
 
 		<h3>[property:Boolean isDepthTexture]</h3>
 		<p>
-            只读属性，用于检查给定对象是否为[name]类型。
+    只读属性，用于检查给定对象是否为[name]类型。
+		</p>
+		
+		<h3>[property:number compareFunction]</h3>
+		<p>
+		用于定义将深度纹理中的纹素与深度缓冲区中的值进行比较时使用的比较函数。默认值为 `null`，表示禁用比较。​​<br /><br/>
+
+		有关其他函数的详细信息，请参阅纹理常量页面 [page:Textures texture constants]。
 		</p>
 
 		<h2>方法</h2>

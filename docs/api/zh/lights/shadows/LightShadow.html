@@ -28,8 +28,7 @@
 
 		<h3>[property:Boolean autoUpdate]</h3>
 		<p>
-			Enables automatic updates of the light's shadow. Default is *true*.
-			If you do not require dynamic lighting / shadows, you may set this to *false*.
+			启用光源阴影的自动更新。默认值为 *true*。如果您不需要动态光照/阴影，可以将其设置为 *false*。
 		</p>
 
 		<h3>[property:Camera camera]</h3>
@@ -45,23 +44,22 @@
 
 		<h3>[property:Integer blurSamples]</h3>
 		<p>
-			The amount of samples to use when blurring a VSM shadow map.
+			模糊 VSM 阴影贴图时使用的样本数量。
 		</p>
 
 		<h3>[property:Float intensity]</h3>
 		<p>
-			The intensity of the shadow. The default is `1`. Valid values are in the range `[0, 1]`.
+			阴影的强度。默认值为 `1`。有效值范围为 `[0, 1]`。
 		</p>
 
 		<h3>[property:WebGLRenderTarget map]</h3>
 		<p>
-			使用内置摄像头生成的深度图;超出像素深度的位置在阴影中。在渲染期间内部计算。
+			使用内置相机生成的深度图;超出像素深度的位置在阴影中。在渲染期间内部计算。
 		</p>
 
 		<h3>[property:WebGLRenderTarget mapPass]</h3>
 		<p>
-			The distribution map generated using the internal camera; an occlusion is calculated based
-			on the distribution of depths. Computed internally during rendering.
+			使用内部相机生成的分布图；遮挡是根据深度分布计算的。渲染期间进行内部计算。
 		</p>
 
 		<h3>[property:Vector2 mapSize]</h3>
@@ -81,14 +79,14 @@
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-			When set to *true*, shadow maps will be updated in the next *render* call. Default is *false*.
-			If you have set [page:.autoUpdate] to *false*, you will need to set this property to *true* and then make a render call to update the light's shadow.
+			设置为 *true* 时，阴影贴图将在下一次渲染调用中更新。
+			默认值为 *false*。如果您已将 [page:.autoUpdate] 设置为 *false*，则需要将此属性设置为 *true*，然后进行渲染调用来更新光源的阴影。
 		</p>
 
 		<h3>[property:Float normalBias]</h3>
 		<p>
-			Defines how much the position used to query the shadow map is offset along the object normal.
-			The default is 0. Increasing this value can be used to reduce shadow acne especially in large scenes where light shines onto geometry at a shallow angle. The cost is that shadows may appear distorted.
+			定义用于查询阴影贴图的位置沿对象法线的偏移量。默认值为 0。
+			增加此值可用于减少阴影瑕疵，尤其是在光线以较小角度照射几何体的大型场景中。但代价是阴影可能会出现扭曲。
 		</p>
 
 		<h3>[property:Float radius]</h3>
@@ -96,8 +94,7 @@
 			将此值设置为大于1的值将模糊阴影的边缘。<br />
 
 			较高的值会在阴影中产生不必要的条带效果 - 更大的[page:.mapSize mapSize]将允许在这些效果变得可见之前使用更高的值。<br />
-			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], radius has
-			no effect and it is recommended to increase softness by decreasing [page:.mapSize mapSize] instead.<br /><br />
+			如果 [page:WebGLRenderer.shadowMap.type] 设置为 [page:Renderer PCFSoftShadowMap]，则半径无效，建议通过减小 [page:.mapSize mapSize] 来增加柔和度。<br /><br />
 
 			请注意，如果[page：WebGLRenderer.shadowMap.type]设置为[page:Renderer BasicShadowMap]，将会无效。
 		</p>
@@ -107,24 +104,24 @@
 
 		<h3>[method:Vector2 getFrameExtents]()</h3>
 		<p>
-		Used internally by the renderer to extend the shadow map to contain all viewports
+		由渲染器内部使用，以扩展阴影贴图以包含所有视口。
 		</p>
 
 		<h3>[method:undefined updateMatrices]( [param:Light light] )</h3>
 		<p>
-		Update the matrices for the camera and shadow, used internally by the renderer.<br /><br />
+		更新渲染器内部使用的相机和阴影的矩阵。<br /><br />
 
-		light -- the light for which the shadow is being rendered.
+		light -- 渲染阴影的光源。
 		</p>
 
 		<h3>[method:Frustum getFrustum]()</h3>
 		<p>
-		Gets the shadow cameras frustum. Used internally by the renderer to cull objects.
+		获取阴影摄像机的视锥体。渲染器内部使用它来剔除对象。
 		</p>
 
 		<h3>[method:number getViewportCount]()</h3>
 		<p>
-		Used internally by the renderer to get the number of viewports that need to be rendered for this shadow.
+		由渲染器内部使用，以获取需要为此阴影渲染的视口数量。
 		</p>
 
 		<h3>[method:this copy]( [param:LightShadow source] )</h3>

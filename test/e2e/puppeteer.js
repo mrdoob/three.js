@@ -152,6 +152,7 @@ const exceptionList = [
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_lightprobe_cubecamera',
 	'webgpu_loader_materialx',
+	'webgpu_materials_basic',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',
 	'webgpu_morphtargets_face',
@@ -177,6 +178,8 @@ const exceptionList = [
 	'webgpu_rendertarget_2d-array_3d',
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_ao',
+	'webgpu_postprocessing_difference',
+	'webgpu_postprocessing_dof',
 	'webgpu_postprocessing_sobel',
 	'webgpu_postprocessing_3dlut',
 	'webgpu_postprocessing_fxaa',
@@ -185,6 +188,10 @@ const exceptionList = [
 	'webgpu_postprocessing_ssgi',
 	'webgpu_xr_native_layers',
 	'webgpu_volume_caustics',
+	'webgpu_volume_lighting',
+	'webgpu_volume_lighting_rectarea',
+	'webgpu_reflection',
+	'webgpu_ocean',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_cloth',

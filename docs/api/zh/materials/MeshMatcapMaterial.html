@@ -99,8 +99,7 @@
 
 		<h3>[property:Texture normalMap]</h3>
 		<p> 用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
-			In case the material has a normal map authored using the left handed convention, the y component of normalScale
-			should be negated to compensate for the different handedness.
+			如果材质的法线贴图使用左手惯例编写，则应将 normalScale 的 y 分量取反以补偿不同的手性。
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>
@@ -110,6 +109,15 @@
 
 		<h3>[property:Vector2 normalScale]</h3>
 		<p> 法线贴图对材质的影响程度。典型范围是0-1。默认值是[page:Vector2]设置为（1,1）。
+		</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p> 将几何体渲染为线框。默认值为*false*（即渲染为平滑着色）。</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>控制线框宽度。默认值为1。<br /><br />
+		由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+		与大多数平台上[page:WebGLRenderer WebGL]渲染器限制，无论如何设置该值，线宽始终为1。
 		</p>
 
 		<h2>方法(Methods)</h2>
