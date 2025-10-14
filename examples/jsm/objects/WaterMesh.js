@@ -161,7 +161,7 @@ class WaterMesh extends Mesh {
 
 			const mirrorSampler = reflector();
 			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
-			mirrorSampler.resolution = this.resolution;
+			mirrorSampler.reflector.resolutionScale = this.resolution;
 
 			this.add( mirrorSampler.target );
 
