@@ -2376,7 +2376,7 @@ function addUnknownExtensionsToUserData( knownExtensions, object, objectDef ) {
 /**
  *
  * @private
- * @param {Object3D|Material|BufferGeometry|Object|AnimationClip} object
+ * @param {Object3D|Material|BufferGeometry|Object|AnimationClip|Texture} object
  * @param {GLTF.definition} gltfDef
  */
 function assignExtrasToUserData( object, gltfDef ) {
@@ -3336,13 +3336,15 @@ class GLTFParser {
 			}
 
 			const samplers = json.samplers || {};
-			const sampler = samplers[ textureDef.sampler ] || {};
+			const samplerDef = samplers[ textureDef.sampler ] || {};
 
-			texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || LinearFilter;
-			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || LinearMipmapLinearFilter;
-			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
-			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
+			texture.magFilter = WEBGL_FILTERS[ samplerDef.magFilter ] || LinearFilter;
+			texture.minFilter = WEBGL_FILTERS[ samplerDef.minFilter ] || LinearMipmapLinearFilter;
+			texture.wrapS = WEBGL_WRAPPINGS[ samplerDef.wrapS ] || RepeatWrapping;
+			texture.wrapT = WEBGL_WRAPPINGS[ samplerDef.wrapT ] || RepeatWrapping;
 			texture.generateMipmaps = ! texture.isCompressedTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
+
+			assignExtrasToUserData( texture, samplerDef );
 
 			parser.associations.set( texture, { textures: textureIndex } );
 
@@ -3430,8 +3432,6 @@ class GLTFParser {
 				URL.revokeObjectURL( sourceURI );
 
 			}
-
-			assignExtrasToUserData( texture, sourceDef );
 
 			texture.userData.mimeType = sourceDef.mimeType || getImageURIMimeType( sourceDef.uri );
 
