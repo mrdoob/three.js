@@ -128,8 +128,6 @@ export default /* glsl */`
 	#define cubeUV_m5 3.0
 	#define cubeUV_r6 0.21
 	#define cubeUV_m6 4.0
-	#define cubeUV_r7 0.155
-	#define cubeUV_m7 4.5
 
 	float roughnessToMip( float roughness ) {
 
@@ -150,10 +148,6 @@ export default /* glsl */`
 		} else if ( roughness >= cubeUV_r6 ) {
 
 			mip = ( cubeUV_r5 - roughness ) * ( cubeUV_m6 - cubeUV_m5 ) / ( cubeUV_r5 - cubeUV_r6 ) + cubeUV_m5;
-
-		} else if ( roughness >= cubeUV_r7 ) {
-
-			mip = ( cubeUV_r6 - roughness ) * ( cubeUV_m7 - cubeUV_m6 ) / ( cubeUV_r6 - cubeUV_r7 ) + cubeUV_m6;
 
 		} else {
 
