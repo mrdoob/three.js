@@ -1,16 +1,16 @@
 /**
- * DFG LUT Generator (32x32)
+ * DFG LUT Generator (16x16)
  *
  * Generates a precomputed lookup table for the split-sum approximation
- * used in Image-Based Lighting. The 32x32 resolution provides a good balance
- * between quality and size for DataTexture usage.
+ * used in Image-Based Lighting. The 16x16 resolution provides a minimal
+ * memory footprint for DataTexture usage.
  *
  * Reference: "Real Shading in Unreal Engine 4" by Brian Karis
  */
 
 import * as fs from 'fs';
 
-const LUT_SIZE = 32;
+const LUT_SIZE = 16;
 const SAMPLE_COUNT = 1024;
 
 // Utility functions
