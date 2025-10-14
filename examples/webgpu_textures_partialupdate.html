@@ -53,7 +53,7 @@
 				clock = new THREE.Clock();
 
 				const loader = new THREE.TextureLoader();
-				diffuseMap = loader.load( 'textures/carbon/Carbon.png', animate );
+				diffuseMap = loader.load( 'textures/carbon/Carbon.png' );
 				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
@@ -78,7 +78,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-
 				document.body.appendChild( renderer.domElement );
 
 				//

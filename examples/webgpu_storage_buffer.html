@@ -207,7 +207,7 @@
 				}
 
 
-				await renderer.computeAsync( computeInit );
+				renderer.compute( computeInit );
 
 				//
 
@@ -217,7 +217,7 @@
 
 					renderer.info.reset();
 
-					await renderer.computeAsync( compute );
+					renderer.compute( compute );
 					renderer.render( scene, camera );
 
 					renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );

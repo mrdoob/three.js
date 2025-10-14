@@ -12,6 +12,7 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#PlaneGeometry
  */
 class PlaneGeometry extends BufferGeometry {
 

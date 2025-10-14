@@ -17,6 +17,7 @@ let view;
 
 const outdir = path.normalize( env.opts.destination );
 const themeOpts = ( env.opts.themeOpts ) || {};
+const categoryMap = {}; // Maps class names to their categories (Core, Addons, TSL)
 
 function mkdirSync( filepath ) {
 
@@ -143,23 +144,84 @@ function buildItemTypeStrings( item ) {
 
 function buildSearchListForData() {
 
-	const searchList = [];
+	const categories = {
+		'Core': [],
+		'Addons': [],
+		'Global': [],
+		'TSL': []
+	};
 
 	data().each( ( item ) => {
 
 		if ( item.kind !== 'package' && item.kind !== 'typedef' && ! item.inherited ) {
 
-			searchList.push( {
-				title: item.longname,
-				link: linkto( item.longname, item.name ),
-				description: item.description,
-			} );
+			// Extract the class name from the longname (e.g., "Animation#getAnimationLoop" -> "Animation")
+			const parts = item.longname.split( /[#~]/ );
+			const className = parts[ 0 ];
+
+			// If this item is a member/method of a class, check if the parent class exists
+			if ( parts.length > 1 ) {
+
+				// Find the parent class/module
+				const parentClass = find( { longname: className, kind: [ 'class', 'module' ] } );
+
+				// Only include if parent exists and is not private
+				if ( parentClass && parentClass.length > 0 && parentClass[ 0 ].access !== 'private' ) {
+
+					const category = categoryMap[ className ];
+					const entry = {
+						title: item.longname,
+						kind: item.kind
+					};
+
+					if ( category ) {
+
+						categories[ category ].push( entry );
+
+					}
+
+				}
+
+			} else {
+
+				// This is a top-level class/module/function - include if not private
+				if ( item.access !== 'private' ) {
+
+					let category = categoryMap[ className ];
+
+					// If not in categoryMap, determine category from @tsl tag
+					if ( ! category ) {
+
+						const hasTslTag = Array.isArray( item.tags ) && item.tags.some( tag => tag.title === 'tsl' );
+
+						if ( hasTslTag ) {
+
+							category = 'TSL';
+
+						} else {
+
+							category = 'Global';
+
+						}
+
+					}
+
+					const entry = {
+						title: item.longname,
+						kind: item.kind
+					};
+
+					categories[ category ].push( entry );
+
+				}
+
+			}
 
 		}
 
 	} );
 
-	return searchList;
+	return categories;
 
 }
 
@@ -194,8 +256,9 @@ function addNonParamAttributes( items ) {
 function addSignatureParams( f ) {
 
 	const params = f.params ? addParamAttributes( f.params ) : [];
+	const paramsString = params.join( ', ' );
 
-	f.signature = util.format( '%s( %s )', ( f.signature || '' ), params.join( ', ' ) );
+	f.signature = util.format( '%s(%s)', ( f.signature || '' ), paramsString ? ' ' + paramsString + ' ' : '' );
 
 }
 
@@ -217,7 +280,7 @@ function addSignatureReturns( f ) {
 
 	}
 
-	f.signature = `<span class="signature">${f.signature || ''}</span><span class="type-signature">${returnTypesString}</span>`;
+	f.signature = `<span class="signature">${f.signature || ''}</span>${returnTypesString ? `<span class="type-signature">${returnTypesString}</span>` : ''}`;
 
 }
 
@@ -225,16 +288,16 @@ function addSignatureTypes( f ) {
 
 	const types = f.type ? buildItemTypeStrings( f ) : [];
 
-	f.signature = `${f.signature || ''}<span class="type-signature">${types.length ? ` : ${types.join( ' | ' )}` : ''}</span>`;
+	f.signature = `${f.signature || ''}${types.length ? `<span class="type-signature"> : ${types.join( ' | ' )}</span>` : ''}`;
 
 }
 
 function addAttribs( f ) {
 
-	const attribs = helper.getAttribs( f ).filter( attrib => attrib !== 'static' );
+	const attribs = helper.getAttribs( f ).filter( attrib => attrib !== 'static' && attrib !== 'nullable' );
 	const attribsString = buildAttribsString( attribs );
 
-	f.attribs = util.format( '<span class="type-signature">%s</span>', attribsString );
+	f.attribs = attribsString ? util.format( '<span class="type-signature">%s</span>', attribsString ) : '';
 
 }
 
@@ -266,6 +329,34 @@ function getPathFromDoclet( { meta } ) {
 
 }
 
+function getFullAugmentsChain( doclet ) {
+
+	const chain = [];
+
+	if ( ! doclet || ! doclet.augments || ! doclet.augments.length ) {
+
+		return chain;
+
+	}
+
+	// Start with the immediate parent
+	const parentName = doclet.augments[0];
+	chain.push( parentName );
+
+	// Recursively find the parent's ancestors
+	const parentDoclet = find( { longname: parentName } );
+
+	if ( parentDoclet && parentDoclet.length > 0 ) {
+
+		const parentChain = getFullAugmentsChain( parentDoclet[0] );
+		chain.unshift( ...parentChain );
+
+	}
+
+	return chain;
+
+}
+
 function generate( title, docs, filename, resolveLinks ) {
 
 	let html;
@@ -276,10 +367,13 @@ function generate( title, docs, filename, resolveLinks ) {
 		env: env,
 		title: title,
 		docs: docs,
-		augments: docs && docs[0] ? docs[0].augments : null
+		augments: docs && docs[0] ? getFullAugmentsChain( docs[0] ) : null
 	};
 
-	const outpath = path.join( outdir, filename );
+	// Put HTML files in pages/ subdirectory
+	const pagesDir = path.join( outdir, 'pages' );
+	mkdirSync( pagesDir );
+	const outpath = path.join( pagesDir, filename );
 	html = view.render( 'container.tmpl', docData );
 
 	if ( resolveLinks ) {
@@ -366,12 +460,14 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 					const subCategory = path.split( '/' )[ 1 ];
 
 					pushNavItem( hierarchy, 'Core', subCategory, itemNav );
+					categoryMap[ item.longname ] = 'Core';
 
 				} else if ( path.startsWith( addonsDirectory ) ) {
 
 					const subCategory = path.split( '/' )[ 2 ];
 
 					pushNavItem( hierarchy, 'Addons', subCategory, itemNav );
+					categoryMap[ item.longname ] = 'Addons';
 
 				}
 
@@ -424,11 +520,11 @@ function buildGlobalsNav( globals, seen ) {
 
 		globals.forEach( ( { kind, longname, name, tags } ) => {
 
-			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) && Array.isArray( tags ) ) {
+			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) ) {
 
-				const tslTag = tags.find( tag => tag.title === 'tsl' );
+				const hasTslTag = Array.isArray( tags ) && tags.some( tag => tag.title === 'tsl' );
 
-				if ( tslTag !== undefined ) {
+				if ( hasTslTag ) {
 
 					tslNav += `<li>${linkto( longname, name )}</li>\n`;
 
@@ -477,7 +573,16 @@ function buildGlobalsNav( globals, seen ) {
 
 function pushNavItem( hierarchy, mainCategory, subCategory, itemNav ) {
 
-	subCategory = subCategory[ 0 ].toUpperCase() + subCategory.slice( 1 ); // capitalize
+	// Special case for TSL - keep it all uppercase
+	if ( subCategory.toLowerCase() === 'tsl' ) {
+
+		subCategory = 'TSL';
+
+	} else {
+
+		subCategory = subCategory[ 0 ].toUpperCase() + subCategory.slice( 1 ); // capitalize
+
+	}
 
 	if ( hierarchy.get( mainCategory ).get( subCategory ) === undefined ) {
 
@@ -703,7 +808,7 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	} );
 
-	// prepare import statements
+	// prepare import statements, demo tags, and extract code examples
 	data().each( doclet => {
 
 		if ( doclet.kind === 'class' || doclet.kind === 'module' ) {
@@ -714,6 +819,25 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 				const importTag = tags.find( tag => tag.title === 'three_import' );
 				doclet.import = ( importTag !== undefined ) ? importTag.text : null;
+
+				const demoTag = tags.find( tag => tag.title === 'demo' );
+				doclet.demo = ( demoTag !== undefined ) ? demoTag.text : null;
+
+			}
+
+			// Extract code example from classdesc
+			if ( doclet.classdesc ) {
+
+				const codeBlockRegex = /<pre class="prettyprint source[^"]*"><code>([\s\S]*?)<\/code><\/pre>/;
+				const match = doclet.classdesc.match( codeBlockRegex );
+
+				if ( match ) {
+
+					doclet.codeExample = match[ 0 ];
+					// Remove the code example from classdesc
+					doclet.classdesc = doclet.classdesc.replace( codeBlockRegex, '' ).trim();
+
+				}
 
 			}
 
@@ -747,7 +871,43 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	if ( members.globals.length ) {
 
-		generate( 'Global', [ { kind: 'globalobj' } ], globalUrl );
+		// Split globals into TSL and non-TSL
+		const tslGlobals = [];
+		const nonTslGlobals = [];
+		const originalGlobals = members.globals;
+
+		originalGlobals.forEach( item => {
+
+			const hasTslTag = Array.isArray( item.tags ) && item.tags.some( tag => tag.title === 'tsl' );
+
+			if ( hasTslTag ) {
+
+				tslGlobals.push( item );
+
+				// Register each TSL item to link to TSL.html
+				helper.registerLink( item.longname, 'TSL.html#' + item.name );
+
+			} else {
+
+				nonTslGlobals.push( item );
+
+			}
+
+		} );
+
+		// Generate TSL.html for TSL functions
+		if ( tslGlobals.length ) {
+
+			generate( 'TSL', [ { kind: 'globalobj', isTSL: true } ], 'TSL.html' );
+
+		}
+
+		// Generate global.html for remaining globals
+		if ( nonTslGlobals.length ) {
+
+			generate( 'Global', [ { kind: 'globalobj' } ], globalUrl );
+
+		}
 
 	}
 
@@ -787,10 +947,19 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	} );
 
-	// Write navigation to separate file
+	// Build navigation HTML
+	const navHtml = buildNav( members );
+
+	// Generate index.html with embedded navigation
+	const indexTemplatePath = path.join( templatePath, 'static', 'index.html' );
+	let indexHtml = fs.readFileSync( indexTemplatePath, 'utf8' );
+
+	// Replace placeholder with actual navigation
+	indexHtml = indexHtml.replace( '<!--NAV_PLACEHOLDER-->', navHtml );
+
 	fs.writeFileSync(
-		path.join( outdir, 'nav.html' ),
-		buildNav( members ),
+		path.join( outdir, 'index.html' ),
+		indexHtml,
 		'utf8'
 	);
 
@@ -798,13 +967,9 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	const searchList = buildSearchListForData();
 
-	mkdirSync( path.join( outdir, 'data' ) );
-
 	fs.writeFileSync(
-		path.join( outdir, 'data', 'search.json' ),
-		JSON.stringify( {
-			list: searchList,
-		} )
+		path.join( outdir, 'search.json' ),
+		JSON.stringify( searchList, null, '\t' )
 	);
 
 };

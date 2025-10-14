@@ -68,19 +68,6 @@ class Inspector extends RendererInspector {
 
 	}
 
-	computeAsync() {
-
-		const renderer = this.getRenderer();
-		const animationLoop = renderer.getAnimationLoop();
-
-		if ( renderer.info.frame > 1 && animationLoop !== null ) {
-
-			this.resolveConsoleOnce( 'log', 'TIP: "computeAsync()" was called while a "setAnimationLoop()" is active. This is probably not necessary, use "compute()" instead.' );
-
-		}
-
-	}
-
 	resolveConsoleOnce( type, message ) {
 
 		const key = type + message;
