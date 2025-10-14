@@ -13,8 +13,6 @@ import * as fs from 'fs';
 const LUT_SIZE = 32;
 const SAMPLE_COUNT = 1024;
 
-// Utility functions
-
 // Van der Corput sequence
 function radicalInverse_VdC(bits) {
 	bits = (bits << 16) | (bits >>> 16);
