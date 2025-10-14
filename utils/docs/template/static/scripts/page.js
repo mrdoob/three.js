@@ -5,6 +5,45 @@ if ( typeof prettyPrint === 'function' ) {
 
 }
 
+// Scroll to hash on page load
+( function () {
+
+	const hash = window.location.hash.substring( 1 );
+
+	if ( hash ) {
+
+		const element = document.getElementById( hash );
+
+		if ( element ) element.scrollIntoView();
+
+	}
+
+} )();
+
+// Update URL hash when clicking on method/property links
+( function () {
+
+	const h1 = document.querySelector( 'h1' );
+	const className = h1 ? h1.textContent.trim() : null;
+
+	if ( ! className ) return;
+
+	document.addEventListener( 'click', function ( event ) {
+
+		const target = event.target.closest( 'a[href^="#"]' );
+
+		if ( ! target || ! target.hash ) return;
+
+		const hash = target.hash.substring( 1 );
+		const newHash = ( hash !== className ) ? `#${className}.${hash}` : `#${hash}`;
+		const targetWindow = ( window.parent !== window ) ? window.parent : window;
+
+		targetWindow.history.pushState( null, '', newHash );
+
+	} );
+
+} )();
+
 // Add code copy buttons
 ( function addCopyButtons() {
 

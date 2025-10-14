@@ -1,6 +1,8 @@
 :root {
 	color-scheme: light dark;
 
+	-webkit-font-smoothing: antialiased;
+
 	--color-blue: #049EF4;
 	--text-color: #444;
 

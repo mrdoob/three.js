@@ -17355,6 +17355,7 @@ class Material extends EventDispatcher {
  * This material is not affected by lights.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshBasicMaterial
  */
 class MeshBasicMaterial extends Material {
 
@@ -20755,6 +20756,7 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#BoxGeometry
  */
 class BoxGeometry extends BufferGeometry {
 
@@ -24815,6 +24817,7 @@ const _ray$2 = /*@__PURE__*/ new Ray();
  * or {@link FBXLoader } import respective models.
  *
  * @augments Mesh
+ * @demo scenes/bones-browser.html
  */
 class SkinnedMesh extends Mesh {
 
@@ -30187,6 +30190,7 @@ class ExternalTexture extends Texture {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#CapsuleGeometry
  */
 class CapsuleGeometry extends BufferGeometry {
 
@@ -30404,6 +30408,7 @@ class CapsuleGeometry extends BufferGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#CircleGeometry
  */
 class CircleGeometry extends BufferGeometry {
 
@@ -30533,6 +30538,7 @@ class CircleGeometry extends BufferGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#CylinderGeometry
  */
 class CylinderGeometry extends BufferGeometry {
 
@@ -30858,6 +30864,7 @@ class CylinderGeometry extends BufferGeometry {
  * ```
  *
  * @augments CylinderGeometry
+ * @demo scenes/geometry-browser.html#ConeGeometry
  */
 class ConeGeometry extends CylinderGeometry {
 
@@ -31266,6 +31273,7 @@ class PolyhedronGeometry extends BufferGeometry {
  * ```
  *
  * @augments PolyhedronGeometry
+ * @demo scenes/geometry-browser.html#DodecahedronGeometry
  */
 class DodecahedronGeometry extends PolyhedronGeometry {
 
@@ -35222,6 +35230,7 @@ function addContour( vertices, contour ) {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#ExtrudeGeometry
  */
 class ExtrudeGeometry extends BufferGeometry {
 
@@ -36096,6 +36105,7 @@ function toJSON$1( shapes, options, data ) {
  * ```
  *
  * @augments PolyhedronGeometry
+ * @demo scenes/geometry-browser.html#IcosahedronGeometry
  */
 class IcosahedronGeometry extends PolyhedronGeometry {
 
@@ -36170,6 +36180,7 @@ class IcosahedronGeometry extends PolyhedronGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#LatheGeometry
  */
 class LatheGeometry extends BufferGeometry {
 
@@ -36387,6 +36398,7 @@ class LatheGeometry extends BufferGeometry {
  * ```
  *
  * @augments PolyhedronGeometry
+ * @demo scenes/geometry-browser.html#OctahedronGeometry
  */
 class OctahedronGeometry extends PolyhedronGeometry {
 
@@ -36453,6 +36465,7 @@ class OctahedronGeometry extends PolyhedronGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#PlaneGeometry
  */
 class PlaneGeometry extends BufferGeometry {
 
@@ -36581,6 +36594,7 @@ class PlaneGeometry extends BufferGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#RingGeometry
  */
 class RingGeometry extends BufferGeometry {
 
@@ -36742,6 +36756,7 @@ class RingGeometry extends BufferGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#ShapeGeometry
  */
 class ShapeGeometry extends BufferGeometry {
 
@@ -36963,6 +36978,7 @@ function toJSON( shapes, data ) {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#SphereGeometry
  */
 class SphereGeometry extends BufferGeometry {
 
@@ -37132,6 +37148,7 @@ class SphereGeometry extends BufferGeometry {
  * ```
  *
  * @augments PolyhedronGeometry
+ * @demo scenes/geometry-browser.html#TetrahedronGeometry
  */
 class TetrahedronGeometry extends PolyhedronGeometry {
 
@@ -37195,6 +37212,7 @@ class TetrahedronGeometry extends PolyhedronGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#TorusGeometry
  */
 class TorusGeometry extends BufferGeometry {
 
@@ -37347,6 +37365,7 @@ class TorusGeometry extends BufferGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#TorusKnotGeometry
  */
 class TorusKnotGeometry extends BufferGeometry {
 
@@ -37559,6 +37578,7 @@ class TorusKnotGeometry extends BufferGeometry {
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#TubeGeometry
  */
 class TubeGeometry extends BufferGeometry {
 
@@ -38134,6 +38154,7 @@ class RawShaderMaterial extends ShaderMaterial {
  * (pdf), by Brent Burley.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshStandardMaterial
  */
 class MeshStandardMaterial extends Material {
 
@@ -38543,6 +38564,7 @@ class MeshStandardMaterial extends Material {
  * best results, always specify an environment map when using this material.
  *
  * @augments MeshStandardMaterial
+ * @demo scenes/material-browser.html#MeshPhysicalMaterial
  */
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
@@ -39061,6 +39083,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
  * some graphical accuracy.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshPhongMaterial
  */
 class MeshPhongMaterial extends Material {
 
@@ -39456,6 +39479,7 @@ class MeshPhongMaterial extends Material {
  * A material implementing toon shading.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshToonMaterial
  */
 class MeshToonMaterial extends Material {
 
@@ -39770,6 +39794,7 @@ class MeshToonMaterial extends Material {
  * A material that maps the normal vectors to RGB colors.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshNormalMaterial
  */
 class MeshNormalMaterial extends Material {
 
@@ -39950,6 +39975,7 @@ class MeshNormalMaterial extends Material {
  * {@link MeshPhysicalMaterial}, at the cost of some graphical accuracy.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshLambertMaterial
  */
 class MeshLambertMaterial extends Material {
 
@@ -40325,6 +40351,7 @@ class MeshLambertMaterial extends Material {
  * near and far plane. White is nearest, black is farthest.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshDepthMaterial
  */
 class MeshDepthMaterial extends Material {
 
@@ -40589,6 +40616,7 @@ class MeshDistanceMaterial extends Material {
  * shadows.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshMatcapMaterial
  */
 class MeshMatcapMaterial extends Material {
 

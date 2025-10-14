@@ -661,6 +661,7 @@ function cyrb53( value, seed = 0 ) {
 /**
  * Computes a hash for the given string.
  *
+ * @private
  * @method
  * @param {string} str - The string to be hashed.
  * @return {number} The hash.
@@ -670,6 +671,7 @@ const hashString = ( str ) => cyrb53( str );
 /**
  * Computes a hash for the given array.
  *
+ * @private
  * @method
  * @param {Array<number>} array - The array to be hashed.
  * @return {number} The hash.
@@ -679,6 +681,7 @@ const hashArray = ( array ) => cyrb53( array );
 /**
  * Computes a hash for the given list of parameters.
  *
+ * @private
  * @method
  * @param {...number} params - A list of parameters.
  * @return {number} The hash.
@@ -688,6 +691,7 @@ const hash$1 = ( ...params ) => cyrb53( params );
 /**
  * Computes a cache key for the given node.
  *
+ * @private
  * @method
  * @param {Object|Node} object - The object to be hashed.
  * @param {boolean} [force=false] - Whether to force a cache key computation or not.
@@ -717,6 +721,7 @@ function getCacheKey$1( object, force = false ) {
  * This generator function can be used to iterate over the node children
  * of the given object.
  *
+ * @private
  * @generator
  * @param {Object} node - The object to be hashed.
  * @param {boolean} [toJSON=false] - Whether to return JSON or not.
@@ -786,6 +791,7 @@ const dataFromObject = /*@__PURE__*/ new WeakMap();
 /**
  * Returns the data type for the given the length.
  *
+ * @private
  * @method
  * @param {number} length - The length.
  * @return {string} The data type.
@@ -799,6 +805,7 @@ function getTypeFromLength( length ) {
 /**
  * Returns the typed array for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {TypedArray} The typed array.
@@ -832,6 +839,7 @@ function getTypedArrayFromType( type ) {
 /**
  * Returns the length for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {number} The length.
@@ -853,6 +861,7 @@ function getLengthFromType( type ) {
 /**
  * Returns the gpu memory length for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {number} The length.
@@ -874,6 +883,7 @@ function getMemoryLengthFromType( type ) {
 /**
  * Returns the byte boundary for the given data type.
  *
+ * @private
  * @method
  * @param {string} type - The data type.
  * @return {number} The byte boundary.
@@ -895,6 +905,7 @@ function getByteBoundaryFromType( type ) {
 /**
  * Returns the data type for the given value.
  *
+ * @private
  * @method
  * @param {any} value - The value.
  * @return {?string} The data type.
@@ -966,6 +977,7 @@ function getValueType( value ) {
 /**
  * Returns the value/object for the given data type and parameters.
  *
+ * @private
  * @method
  * @param {string} type - The given type.
  * @param {...any} params - A parameter list.
@@ -1036,6 +1048,7 @@ function getValueFromType( type, ...params ) {
 /**
  * Gets the object data that can be shared between different rendering steps.
  *
+ * @private
  * @param {Object} object - The object to get the data for.
  * @return {Object} The object data.
  */
@@ -1057,6 +1070,7 @@ function getDataFromObject( object ) {
 /**
  * Converts the given array buffer to a Base64 string.
  *
+ * @private
  * @method
  * @param {ArrayBuffer} arrayBuffer - The array buffer.
  * @return {string} The Base64 string.
@@ -1080,6 +1094,7 @@ function arrayBufferToBase64( arrayBuffer ) {
 /**
  * Converts the given Base64 string to an array buffer.
  *
+ * @private
  * @method
  * @param {string} base64 - The Base64 string.
  * @return {ArrayBuffer} The array buffer.
@@ -5154,6 +5169,7 @@ const uniform = ( value, type ) => {
  * ] );
  *
  * const redColor = tintColors.element( 0 );
+ * ```
  *
  * @augments TempNode
  */
@@ -34492,6 +34508,8 @@ class QuadMesh extends Mesh {
 
 		warnOnce( 'QuadMesh: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
+		await renderer.init();
+
 		renderer.render( this, _camera );
 
 	}
@@ -40252,6 +40270,7 @@ SubgroupFunctionNode.QUAD_BROADCAST = 'quadBroadcast';
  * Returns true if this invocation has the lowest subgroup_invocation_id
  * among active invocations in the subgroup.
  *
+ * @tsl
  * @method
  * @return {bool} The result of the computation.
  */
@@ -40261,6 +40280,7 @@ const subgroupElect = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgr
  * Returns a set of bitfields where the bit corresponding to subgroup_invocation_id
  * is 1 if pred is true for that active invocation and 0 otherwise.
  *
+ * @tsl
  * @method
  * @param {bool} pred - A boolean that sets the bit corresponding to the invocations subgroup invocation id.
  * @return {vec4<u32>}- A bitfield corresponding to the pred value of each subgroup invocation.
@@ -40270,6 +40290,7 @@ const subgroupBallot = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subg
 /**
  * A reduction that adds e among all active invocations and returns that result.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the reduction by the current invocation.
  * @return {number} The accumulated result of the reduction operation.
@@ -40279,6 +40300,7 @@ const subgroupAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgrou
 /**
  * An inclusive scan returning the sum of e for all active invocations with subgroup_invocation_id less than or equal to this invocation.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the inclusive scan by the current invocation.
  * @return {number} The accumulated result of the inclusive scan operation.
@@ -40288,6 +40310,7 @@ const subgroupInclusiveAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode
 /**
  * An exclusive scan that returns the sum of e for all active invocations with subgroup_invocation_id less than this invocation.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the exclusive scan by the current invocation.
  * @return {number} The accumulated result of the exclusive scan operation.
@@ -40297,6 +40320,7 @@ const subgroupExclusiveAdd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode
 /**
  * A reduction that multiplies e among all active invocations and returns that result.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the reduction by the current invocation.
  * @return {number} The accumulated result of the reduction operation.
@@ -40306,6 +40330,7 @@ const subgroupMul = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgrou
 /**
  * An inclusive scan returning the product of e for all active invocations with subgroup_invocation_id less than or equal to this invocation.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the inclusive scan by the current invocation.
  * @return {number} The accumulated result of the inclusive scan operation.
@@ -40315,6 +40340,7 @@ const subgroupInclusiveMul = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode
 /**
  * An exclusive scan that returns the product of e for all active invocations with subgroup_invocation_id less than this invocation.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the exclusive scan by the current invocation.
  * @return {number} The accumulated result of the exclusive scan operation.
@@ -40324,6 +40350,7 @@ const subgroupExclusiveMul = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode
 /**
  * A reduction that performs a bitwise and of e among all active invocations and returns that result.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the reduction by the current invocation.
  * @return {number} The result of the reduction operation.
@@ -40333,6 +40360,7 @@ const subgroupAnd = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgrou
 /**
  * A reduction that performs a bitwise or of e among all active invocations and returns that result.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the reduction by the current invocation.
  * @return {number} The result of the reduction operation.
@@ -40342,6 +40370,7 @@ const subgroupOr = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgroup
 /**
  * A reduction that performs a bitwise xor of e among all active invocations and returns that result.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the reduction by the current invocation.
  * @return {number} The result of the reduction operation.
@@ -40351,6 +40380,7 @@ const subgroupXor = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgrou
 /**
  * A reduction that performs a min of e among all active invocations and returns that result.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the reduction by the current invocation.
  * @return {number} The result of the reduction operation.
@@ -40360,6 +40390,7 @@ const subgroupMin = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgrou
 /**
  * A reduction that performs a max of e among all active invocations and returns that result.
  *
+ * @tsl
  * @method
  * @param {number} e - The value provided to the reduction by the current invocation.
  * @return {number} The result of the reduction operation.
@@ -40369,6 +40400,7 @@ const subgroupMax = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgrou
 /**
  * Returns true if e is true for all active invocations in the subgroup.
  *
+ * @tsl
  * @method
  * @return {bool} The result of the computation.
  */
@@ -40377,6 +40409,7 @@ const subgroupAll = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgrou
 /**
  * Returns true if e is true for any active invocation in the subgroup
  *
+ * @tsl
  * @method
  * @return {bool} The result of the computation.
  */
@@ -40385,6 +40418,7 @@ const subgroupAny = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Subgrou
 /**
  * Broadcasts e from the active invocation with the lowest subgroup_invocation_id in the subgroup to all other active invocations.
  *
+ * @tsl
  * @method
  * @param {number} e - The value to broadcast from the lowest subgroup invocation.
  * @param {number} id - The subgroup invocation to broadcast from.
@@ -40395,6 +40429,7 @@ const subgroupBroadcastFirst = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNo
 /**
  * Swaps e between invocations in the quad in the X direction.
  *
+ * @tsl
  * @method
  * @param {number} e - The value to swap from the current invocation.
  * @return {number} The value received from the swap operation.
@@ -40404,6 +40439,7 @@ const quadSwapX = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupF
 /**
  * Swaps e between invocations in the quad in the Y direction.
  *
+ * @tsl
  * @method
  * @param {number} e - The value to swap from the current invocation.
  * @return {number} The value received from the swap operation.
@@ -40413,6 +40449,7 @@ const quadSwapY = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, SubgroupF
 /**
  * Swaps e between invocations in the quad diagonally.
  *
+ * @tsl
  * @method
  * @param {number} e - The value to swap from the current invocation.
  * @return {number} The value received from the swap operation.
@@ -40422,6 +40459,7 @@ const quadSwapDiagonal = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Su
 /**
  * Broadcasts e from the invocation whose subgroup_invocation_id matches id, to all active invocations.
  *
+ * @tsl
  * @method
  * @param {number} e - The value to broadcast from subgroup invocation 'id'.
  * @param {number} id - The subgroup invocation to broadcast from.
@@ -40432,6 +40470,7 @@ const subgroupBroadcast = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, S
 /**
  * Returns v from the active invocation whose subgroup_invocation_id matches id
  *
+ * @tsl
  * @method
  * @param {number} v - The value to return from subgroup invocation id^mask.
  * @param {number} id - The subgroup invocation which returns the value v.
@@ -40442,6 +40481,7 @@ const subgroupShuffle = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, Sub
 /**
  * Returns v from the active invocation whose subgroup_invocation_id matches subgroup_invocation_id ^ mask.
  *
+ * @tsl
  * @method
  * @param {number} v - The value to return from subgroup invocation id^mask.
  * @param {number} mask - A bitmask that determines the target invocation via a XOR operation.
@@ -40452,6 +40492,7 @@ const subgroupShuffleXor = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, 
 /**
  * Returns v from the active invocation whose subgroup_invocation_id matches subgroup_invocation_id - delta
  *
+ * @tsl
  * @method
  * @param {number} v - The value to return from subgroup invocation id^mask.
  * @param {number} delta - A value that offsets the current in.
@@ -40462,6 +40503,7 @@ const subgroupShuffleUp = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode, S
 /**
  * Returns v from the active invocation whose subgroup_invocation_id matches subgroup_invocation_id + delta
  *
+ * @tsl
  * @method
  * @param {number} v - The value to return from subgroup invocation id^mask.
  * @param {number} delta - A value that offsets the current subgroup invocation.
@@ -40472,6 +40514,7 @@ const subgroupShuffleDown = /*@__PURE__*/ nodeProxyIntent( SubgroupFunctionNode,
 /**
  * Broadcasts e from the quad invocation with id equal to id.
  *
+ * @tsl
  * @method
  * @param {number} e - The value to broadcast.
  * @return {number} The broadcast value.
@@ -41141,6 +41184,7 @@ const shadowPositionWorld = /*@__PURE__*/ property( 'vec3', 'shadowPositionWorld
  *
  * If not state object is provided, the function creates one.
  *
+ * @private
  * @function
  * @param {Renderer} renderer - The renderer.
  * @param {Object} [state={}] - The state.
@@ -41172,6 +41216,7 @@ function saveRendererState( renderer, state = {} ) {
  *
  * If not state object is provided, the function creates one.
  *
+ * @private
  * @function
  * @param {Renderer} renderer - The renderer.
  * @param {Object} [state={}] - The state.
@@ -41193,6 +41238,7 @@ function resetRendererState( renderer, state ) {
 /**
  * Restores the state of the given renderer from the given state object.
  *
+ * @private
  * @function
  * @param {Renderer} renderer - The renderer.
  * @param {Object} state - The state to restore.
@@ -41217,6 +41263,7 @@ function restoreRendererState( renderer, state ) {
  *
  * If not state object is provided, the function creates one.
  *
+ * @private
  * @function
  * @param {Scene} scene - The scene.
  * @param {Object} [state={}] - The state.
@@ -41238,6 +41285,7 @@ function saveSceneState( scene, state = {} ) {
  *
  * If not state object is provided, the function creates one.
  *
+ * @private
  * @function
  * @param {Scene} scene - The scene.
  * @param {Object} [state={}] - The state.
@@ -41258,6 +41306,7 @@ function resetSceneState( scene, state ) {
 /**
  * Restores the state of the given scene from the given state object.
  *
+ * @private
  * @function
  * @param {Scene} scene - The scene.
  * @param {Object} state - The state to restore.
@@ -41275,6 +41324,7 @@ function restoreSceneState( scene, state ) {
  *
  * If not state object is provided, the function creates one.
  *
+ * @private
  * @function
  * @param {Renderer} renderer - The renderer.
  * @param {Scene} scene - The scene.
@@ -41296,6 +41346,7 @@ function saveRendererAndSceneState( renderer, scene, state = {} ) {
  *
  * If not state object is provided, the function creates one.
  *
+ * @private
  * @function
  * @param {Renderer} renderer - The renderer.
  * @param {Scene} scene - The scene.
@@ -41314,6 +41365,7 @@ function resetRendererAndSceneState( renderer, scene, state ) {
 /**
  * Restores the state of the given renderer and scene from the given state object.
  *
+ * @private
  * @function
  * @param {Renderer} renderer - The renderer.
  * @param {Scene} scene - The scene.
@@ -41576,6 +41628,8 @@ const linearShadowDistance = ( light ) => {
  * If not, it creates a new `NodeMaterial` configured for shadow rendering and stores it
  * in the `shadowMaterialLib` for future use.
  *
+ * @tsl
+ * @function
  * @param {Light} light - The light source for which the shadow material is needed.
  *                         If the light is a point light, a depth node is calculated
  *                         using the linear shadow distance.
@@ -41612,6 +41666,8 @@ const _shadowRenderObjectKeys = [];
 /**
  * Creates a function to render shadow objects in a scene.
  *
+ * @tsl
+ * @function
  * @param {Renderer} renderer - The renderer.
  * @param {LightShadow} shadow - The light shadow object containing shadow properties.
  * @param {number} shadowType - The type of shadow map (e.g., BasicShadowMap).
@@ -48757,6 +48813,11 @@ class NodeBuilder {
 	/**
 	 * Returns the properties for the given node and shader stage.
 	 *
+	 * Properties are typically used within a build stage to reference a node's
+	 * child node or nodes manually assigned to the properties in a separate build stage.
+	 * A typical usage pattern for defining nodes manually would be assigning dependency nodes
+	 * to the current node's properties in the setup stage and building those properties in the generate stage.
+	 *
 	 * @param {Node} node - The node to get the properties for.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage='any'] - The shader stage.
 	 * @return {Object} The node properties.
@@ -49366,6 +49427,12 @@ class NodeBuilder {
 
 	/**
 	 * Executes the node in a specific build stage.
+	 *
+	 * This function can be used to arbitrarily execute the specified build stage
+	 * outside of the standard build process. For instance, if a node's type depends
+	 * on properties created by the 'setup' stage, then flowBuildStage(node, 'setup')
+	 * can be used to execute the setup build stage and access its generated nodes
+	 * before the standard build process begins.
 	 *
 	 * @param {Node} node - The node to execute.
 	 * @param {string} buildStage - The build stage to execute the node in.
@@ -55752,6 +55819,8 @@ class Renderer {
 
 		warnOnce( 'Renderer: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
+		await this.init();
+
 		this.render( scene, camera );
 
 	}
@@ -56882,6 +56951,8 @@ class Renderer {
 
 		warnOnce( 'Renderer: "clearAsync()" has been deprecated. Use "clear()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
+		await this.init();
+
 		this.clear( color, depth, stencil );
 
 	}
@@ -57308,9 +57379,9 @@ class Renderer {
 	 */
 	async computeAsync( computeNodes, dispatchSizeOrCount = null ) {
 
-		if ( this._initialized === false ) await this.init();
+		warnOnce( 'Renderer: "computeAsync()" has been deprecated. Use "compute()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		this._inspector.computeAsync( computeNodes, dispatchSizeOrCount );
+		await this.init();
 
 		this.compute( computeNodes, dispatchSizeOrCount );
 
@@ -57327,6 +57398,8 @@ class Renderer {
 	async hasFeatureAsync( name ) {
 
 		warnOnce( 'Renderer: "hasFeatureAsync()" has been deprecated. Use "hasFeature()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		await this.init();
 
 		return this.hasFeature( name );
 
@@ -57382,6 +57455,8 @@ class Renderer {
 	async initTextureAsync( texture ) {
 
 		warnOnce( 'Renderer: "initTextureAsync()" has been deprecated. Use "initTexture()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		await this.init();
 
 		this.initTexture( texture );
 
@@ -71546,8 +71621,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-				// Only mark as storage binding when actually writing (storeNode is set)
-				texture.store = node.isStorageTextureNode === true && node.storeNode !== null;
+				texture.store = node.isStorageTextureNode === true;
 				texture.mipLevel = texture.store ? node.mipLevel : 0;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
@@ -78037,6 +78111,8 @@ class PostProcessing {
 	async renderAsync() {
 
 		warnOnce( 'PostProcessing: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		await this.renderer.init();
 
 		this.render();
 
