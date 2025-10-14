@@ -1310,7 +1310,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-
+	// compute
 
 	/**
 	 * This method is executed at the beginning of a compute call and
