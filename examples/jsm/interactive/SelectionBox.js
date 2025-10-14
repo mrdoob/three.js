@@ -269,10 +269,10 @@ class SelectionBox {
 
 				this.batches[ object.uuid ] = [];
 
-
 				for ( let instanceId = 0, count = 0; count < object.instanceCount; instanceId ++ ) {
 
 					// skip invalid instances in the batchedMesh
+
 					if ( object.validateInstanceId( instanceId ) === false ) continue;
 
 					count ++;
@@ -280,6 +280,7 @@ class SelectionBox {
 					object.getMatrixAt( instanceId, _matrix );
 					_matrix.decompose( _center, _quaternion, _scale );
 					_center.applyMatrix4( object.matrixWorld );
+
 					if ( frustum.containsPoint( _center ) ) {
 
 						this.batches[ object.uuid ].push( instanceId );
