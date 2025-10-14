@@ -29,8 +29,6 @@
 			import { Font } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
 			let container;
 			let camera, cameraTarget, scene, renderer;
 			let group, textMesh1, textMesh2, textGeo, material;
@@ -38,14 +36,13 @@
 
 			let text = 'three.js';
 			const depth = 20,
+				size = 70,
 				hover = 30,
 				curveSegments = 4,
 				bevelThickness = 2,
 				bevelSize = 1.5;
 
 			let font = null;
-			let size = 50;
-			let textDirection = 'ltr';
 			const mirror = true;
 
 			let targetRotation = 0;
@@ -84,7 +81,7 @@
 
 				const dirLight2 = new THREE.DirectionalLight( 0xffffff, 2 );
 				dirLight2.position.set( 0, hover, 10 ).normalize();
-				dirLight2.color.setHSL( 0.5, 1, 0.5, THREE.SRGBColorSpace );
+				dirLight2.color.setHSL( Math.random(), 1, 0.5, THREE.SRGBColorSpace );
 				scene.add( dirLight2 );
 
 				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
@@ -96,7 +93,7 @@
 
 				const loader = new TTFLoader();
 
-				loader.load( 'fonts/ttf/MPLUSRounded1c/MPLUSRounded1c-Regular.ttf', function ( json ) {
+				loader.load( 'fonts/ttf/kenpixel.ttf', function ( json ) {
 
 					font = new Font( json );
 					createText();
@@ -124,38 +121,10 @@
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointerdown', onPointerDown );
 
+				document.addEventListener( 'keypress', onDocumentKeyPress );
+				document.addEventListener( 'keydown', onDocumentKeyDown );
+
 				window.addEventListener( 'resize', onWindowResize );
-
-				// GUI
-
-				const params = {
-					changeText: text,
-					direction: 'ltr',
-					changeSize: size
-				};
-
-				const gui = new GUI();
-
-				gui.add( params, 'changeText' ).name( 'Display text' ).onChange( value => {
-
-					text = value;
-					refreshText();
-
-				} );
-				gui.add( params, 'direction', { LeftToRight: 'ltr', RightToLeft: 'rtl', TopToBottom: 'tb' } ).name( 'Direction' ).onChange( value => {
-
-					textDirection = value;
-					refreshText();
-
-				} );
-				gui.add( params, 'changeSize' ).name( 'Size' ).onChange( value => {
-
-					size = value;
-					refreshText();
-
-				} );
-
-				gui.open();
 
 			}
 
@@ -170,13 +139,59 @@
 
 			}
 
+			function onDocumentKeyDown( event ) {
+
+				if ( firstLetter ) {
+
+					firstLetter = false;
+					text = '';
+
+				}
+
+				const keyCode = event.keyCode;
+
+				// backspace
+
+				if ( keyCode === 8 ) {
+
+					event.preventDefault();
+
+					text = text.substring( 0, text.length - 1 );
+					refreshText();
+
+					return false;
+
+				}
+
+			}
+
+			function onDocumentKeyPress( event ) {
+
+				const keyCode = event.which;
+
+				// backspace
+
+				if ( keyCode === 8 ) {
+
+					event.preventDefault();
+
+				} else {
+
+					const ch = String.fromCharCode( keyCode );
+					text += ch;
+
+					refreshText();
+
+				}
+
+			}
+
 			function createText() {
 
 				textGeo = new TextGeometry( text, {
 
 					font: font,
 
-					direction: textDirection,
 					size: size,
 					depth: depth,
 					curveSegments: curveSegments,
