@@ -18,10 +18,6 @@ function clamp(value, min, max) {
 	return Math.max(min, Math.min(max, value));
 }
 
-function saturate(x) {
-	return clamp(x, 0.0, 1.0);
-}
-
 // Van der Corput sequence
 function radicalInverse_VdC(bits) {
 	bits = (bits << 16) | (bits >>> 16);
