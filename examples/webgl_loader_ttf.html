@@ -84,7 +84,7 @@
 
 				const dirLight2 = new THREE.DirectionalLight( 0xffffff, 2 );
 				dirLight2.position.set( 0, hover, 10 ).normalize();
-				dirLight2.color.setHSL( Math.random(), 1, 0.5, THREE.SRGBColorSpace );
+				dirLight2.color.setHSL( 0.5, 1, 0.5, THREE.SRGBColorSpace );
 				scene.add( dirLight2 );
 
 				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
