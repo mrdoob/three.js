@@ -2512,8 +2512,8 @@ class WebGLRenderer {
 
 			}
 
-			// Set DFG LUT for materials with envMap
-			if ( envMap && m_uniforms.dfgLUT !== undefined ) {
+			// Set DFG LUT for physically-based materials
+			if ( m_uniforms.dfgLUT !== undefined ) {
 
 				m_uniforms.dfgLUT.value = getDFGLUT();
 

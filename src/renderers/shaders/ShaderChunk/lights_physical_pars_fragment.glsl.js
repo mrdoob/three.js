@@ -1,5 +1,7 @@
 export default /* glsl */`
 
+uniform sampler2D dfgLUT;
+
 struct PhysicalMaterial {
 
 	vec3 diffuseColor;

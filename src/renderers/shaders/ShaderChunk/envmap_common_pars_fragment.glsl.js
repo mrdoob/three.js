@@ -4,7 +4,6 @@ export default /* glsl */`
 	uniform float envMapIntensity;
 	uniform float flipEnvMap;
 	uniform mat3 envMapRotation;
-	uniform sampler2D dfgLUT;
 
 	#ifdef ENVMAP_TYPE_CUBE
 		uniform samplerCube envMap;
