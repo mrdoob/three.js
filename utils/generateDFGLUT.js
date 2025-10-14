@@ -13,6 +13,15 @@ import * as fs from 'fs';
 const LUT_SIZE = 32;
 const SAMPLE_COUNT = 1024;
 
+// Utility functions
+function clamp(value, min, max) {
+	return Math.max(min, Math.min(max, value));
+}
+
+function saturate(x) {
+	return clamp(x, 0.0, 1.0);
+}
+
 // Van der Corput sequence
 function radicalInverse_VdC(bits) {
 	bits = (bits << 16) | (bits >>> 16);
@@ -52,16 +61,11 @@ function importanceSampleGGX(xi, N, roughness) {
 	return normalize(sampleVec);
 }
 
-function geometrySchlickGGX(NdotV, roughness) {
-	const a = roughness;
-	const k = (a * a) / 2.0;
-	return NdotV / (NdotV * (1.0 - k) + k);
-}
-
-function geometrySmith(N, V, L, roughness) {
-	const NdotV = Math.max(dot(N, V), 0.0);
-	const NdotL = Math.max(dot(N, L), 0.0);
-	return geometrySchlickGGX(NdotV, roughness) * geometrySchlickGGX(NdotL, roughness);
+function V_SmithGGXCorrelated(NdotV, NdotL, roughness) {
+	const a2 = Math.pow(roughness, 4.0);
+	const GGXV = NdotL * Math.sqrt(NdotV * NdotV * (1.0 - a2) + a2);
+	const GGXL = NdotV * Math.sqrt(NdotL * NdotL * (1.0 - a2) + a2);
+	return 0.5 / (GGXV + GGXL);
 }
 
 function dot(a, b) {
@@ -114,16 +118,15 @@ function integrateBRDF(NdotV, roughness) {
 		const VdotH = Math.max(dot(V, H), 0.0);
 
 		if (NdotL > 0.0) {
-			const G = geometrySmith(N, V, L, roughness);
-			const G_Vis = (G * VdotH) / (NdotH * NdotV);
+			const V_pdf = V_SmithGGXCorrelated(NdotV, NdotL, roughness) * VdotH * NdotL / NdotH;
 			const Fc = Math.pow(1.0 - VdotH, 5.0);
 
-			A += (1.0 - Fc) * G_Vis;
-			B += Fc * G_Vis;
+			A += (1.0 - Fc) * V_pdf;
+			B += Fc * V_pdf;
 		}
 	}
 
-	return [A / SAMPLE_COUNT, B / SAMPLE_COUNT];
+	return [4.0 * A / SAMPLE_COUNT, 4.0 * B / SAMPLE_COUNT];
 }
 
 function generateDFGLUT() {
