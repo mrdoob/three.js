@@ -14,9 +14,6 @@ const LUT_SIZE = 32;
 const SAMPLE_COUNT = 1024;
 
 // Utility functions
-function clamp(value, min, max) {
-	return Math.max(min, Math.min(max, value));
-}
 
 // Van der Corput sequence
 function radicalInverse_VdC(bits) {
