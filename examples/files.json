@@ -160,6 +160,9 @@
 		"webgl_materials_video",
 		"webgl_materials_video_webcam",
 		"webgl_materials_wireframe",
+		"webgl_pmrem_cubemap",
+		"webgl_pmrem_equirectangular",
+		"webgl_pmrem_test",
 		"webgl_math_obb",
 		"webgl_math_orientation_transform",
 		"webgl_mesh_batch",
@@ -573,7 +576,6 @@
 	],
 	"tests": [
 		"webgl_furnace_test",
-		"webgl_pmrem_test",
 		"misc_uv_tests"
 	]
 }
