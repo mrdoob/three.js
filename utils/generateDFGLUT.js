@@ -10,7 +10,7 @@
 
 import * as fs from 'fs';
 
-const LUT_SIZE = 16;
+const LUT_SIZE = 32;
 const SAMPLE_COUNT = 1024;
 
 // Van der Corput sequence
@@ -108,6 +108,43 @@ function scale( v, s ) {
 
 }
 
+// Convert float32 to float16 (half float)
+function floatToHalf( float ) {
+
+	const floatView = new Float32Array( 1 );
+	const int32View = new Int32Array( floatView.buffer );
+
+	floatView[ 0 ] = float;
+	const x = int32View[ 0 ];
+
+	let bits = ( x >> 16 ) & 0x8000; // sign bit
+	let m = ( x >> 12 ) & 0x07ff; // mantissa
+	const e = ( x >> 23 ) & 0xff; // exponent
+
+	// Handle special cases
+	if ( e < 103 ) return bits; // Zero or denormal (too small)
+	if ( e > 142 ) {
+
+		bits |= 0x7c00; // Infinity
+		bits |= ( ( e == 255 ) ? 0 : ( x & 0x007fffff ) ) >> 13; // NaN if e == 255 and mantissa != 0
+		return bits;
+
+	}
+
+	if ( e < 113 ) {
+
+		m |= 0x0800; // Add implicit leading bit
+		bits |= ( m >> ( 114 - e ) ) + ( ( m >> ( 113 - e ) ) & 1 ); // Denormal with rounding
+		return bits;
+
+	}
+
+	bits |= ( ( e - 112 ) << 10 ) | ( m >> 1 );
+	bits += m & 1; // Rounding
+	return bits;
+
+}
+
 function integrateBRDF( NdotV, roughness ) {
 
 	const V = [
@@ -181,6 +218,15 @@ function generateDFGLUT() {
 // Save as JavaScript module
 function saveAsJavaScript( data ) {
 
+	// Convert float32 data to half floats (uint16)
+	const halfFloatData = [];
+
+	for ( let i = 0; i < data.length; i ++ ) {
+
+		halfFloatData.push( floatToHalf( data[ i ] ) );
+
+	}
+
 	const rows = [];
 
 	for ( let y = 0; y < LUT_SIZE; y ++ ) {
@@ -189,7 +235,7 @@ function saveAsJavaScript( data ) {
 		for ( let x = 0; x < LUT_SIZE; x ++ ) {
 
 			const idx = ( y * LUT_SIZE + x ) * 2;
-			rowData.push( data[ idx ].toFixed( 4 ), data[ idx + 1 ].toFixed( 4 ) );
+			rowData.push( `0x${halfFloatData[ idx ].toString( 16 ).padStart( 4, '0' )}`, `0x${halfFloatData[ idx + 1 ].toString( 16 ).padStart( 4, '0' )}` );
 
 		}
 
@@ -201,15 +247,15 @@ function saveAsJavaScript( data ) {
  * Precomputed DFG LUT for Image-Based Lighting
  * Resolution: ${LUT_SIZE}x${LUT_SIZE}
  * Samples: ${SAMPLE_COUNT} per texel
- * Format: RG (2 floats per texel: scale, bias)
+ * Format: RG16F (2 half floats per texel: scale, bias)
  */
 
 import { DataTexture } from '../../textures/DataTexture.js';
-import { RGFormat, FloatType, LinearFilter, ClampToEdgeWrapping } from '../../constants.js';
+import { RGFormat, HalfFloatType, LinearFilter, ClampToEdgeWrapping } from '../../constants.js';
 
 export const DFG_LUT_SIZE = ${LUT_SIZE};
 
-const DFG_LUT_DATA = new Float32Array( [
+const DFG_LUT_DATA = new Uint16Array( [
 ${rows.join( ',\n' )}
 ] );
 
@@ -219,7 +265,7 @@ export function getDFGLUT() {
 
 	if ( dfgLUTTexture === null ) {
 
-		dfgLUTTexture = new DataTexture( DFG_LUT_DATA, DFG_LUT_SIZE, DFG_LUT_SIZE, RGFormat, FloatType );
+		dfgLUTTexture = new DataTexture( DFG_LUT_DATA, DFG_LUT_SIZE, DFG_LUT_SIZE, RGFormat, HalfFloatType );
 		dfgLUTTexture.minFilter = LinearFilter;
 		dfgLUTTexture.magFilter = LinearFilter;
 		dfgLUTTexture.wrapS = ClampToEdgeWrapping;
@@ -245,5 +291,5 @@ saveAsJavaScript( lutData );
 
 console.log( '\nDFG LUT generation complete!' );
 console.log( `Size: ${LUT_SIZE}x${LUT_SIZE} = ${LUT_SIZE * LUT_SIZE} texels` );
-console.log( `Data size: ${( lutData.length * 4 / 1024 ).toFixed( 2 )} KB (Float32)` );
+console.log( `Data size: ${( lutData.length * 2 / 1024 ).toFixed( 2 )} KB (Uint16/Half Float)` );
 console.log( '\nThe LUT is used as a DataTexture in the renderer.' );
