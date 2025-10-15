@@ -71,40 +71,42 @@
 						points.name = file;
 						scene.add( points );
 
-							// If geometry has integer label attribute, colorize by label
-							const labelAttr = points.geometry.getAttribute( 'label' );
-							if ( labelAttr ) {
+						// If geometry has integer label attribute, colorize by label
+						const labelAttr = points.geometry.getAttribute( 'label' );
+						if ( labelAttr ) {
 
-								const count = labelAttr.count;
-								const colors = new Float32Array( count * 3 );
-								const labelToColor = new Map();
-								const tmp = new THREE.Color();
+							const count = labelAttr.count;
+							const colors = new Float32Array( count * 3 );
+							const labelToColor = new Map();
+							const tmp = new THREE.Color();
 
-								for ( let i = 0; i < count; i ++ ) {
+							for ( let i = 0; i < count; i ++ ) {
 
-									const label = labelAttr.getX( i );
-									let c = labelToColor.get( label );
-									if ( c === undefined ) {
-										// Deterministic label -> color mapping via HSL
-										const hue = ( ( ( label * 37 ) % 360 ) + 360 ) % 360 / 360; // [0,1)
-										tmp.setHSL( hue, 0.6, 0.5 );
-										c = tmp.clone();
-										labelToColor.set( label, c );
-									}
+								const label = labelAttr.getX( i );
+								let c = labelToColor.get( label );
+								if ( c === undefined ) {
 
-									colors[ i * 3 + 0 ] = c.r;
-									colors[ i * 3 + 1 ] = c.g;
-									colors[ i * 3 + 2 ] = c.b;
-
+									// Deterministic label -> color mapping via HSL
+									const hue = ( ( ( label * 37 ) % 360 ) + 360 ) % 360 / 360; // [0,1)
+									tmp.setHSL( hue, 0.6, 0.5 );
+									c = tmp.clone();
+									labelToColor.set( label, c );
+			
 								}
 
-								points.geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-								if ( points.material && 'vertexColors' in points.material ) points.material.vertexColors = true;
+								colors[ i * 3 + 0 ] = c.r;
+								colors[ i * 3 + 1 ] = c.g;
+								colors[ i * 3 + 2 ] = c.b;
 
 							}
 
+							points.geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+							if ( points.material && 'vertexColors' in points.material ) points.material.vertexColors = true;
+
+						}
+
 						// For car_scene (Z-up data), use Z-up camera and fit view
-						if ( zUpFiles.includes(file) ) {
+						if ( zUpFiles.includes( file ) ) {
 
 							// Use Z-up for camera and controls
 							camera.up.set( 0, 0, 1 );
@@ -136,7 +138,7 @@
 							controls.target.copy( center );
 
 							// Place camera in an oblique top view for Z-up
-							const viewDir = new THREE.Vector3( 0, -1, 0.5 ).normalize();
+							const viewDir = new THREE.Vector3( 0, - 1, 0.5 ).normalize();
 							camera.position.copy( center ).add( viewDir.multiplyScalar( distance ) );
 							camera.lookAt( center );
 							// Clamp polar angle to avoid flip; update matrices
@@ -144,8 +146,8 @@
 							controls.maxPolarAngle = Math.PI - 0.01;
 							controls.update();
 							camera.updateProjectionMatrix();
-						}
-						else {
+			
+						} else {
 
 							// Non car_scene: keep legacy rotateX(Math.PI) for display
 							points.geometry.rotateX( Math.PI );
@@ -161,12 +163,12 @@
 							controls = new OrbitControls( camera, renderer.domElement );
 							controls.addEventListener( 'change', render );
 							controls.minDistance = 0.5;
-							controls.maxDistance = 1000;
+							controls.maxDistance = 10;
 							controls.screenSpacePanning = true;
 
 							// Restore initial position and target
 							controls.target.set( 0, 0, 0 );
-							camera.position.set( 0, 0, 2 );
+							camera.position.set( 0, 0, 1 );
 							camera.lookAt( 0, 0, 0 );
 							controls.update();
 							camera.updateProjectionMatrix();
@@ -178,12 +180,16 @@
 						gui.add( points.material, 'size', 0.001, 0.01 ).onChange( render );
 						// Hide color control when geometry has label-based vertex colors
 						if ( ! labelAttr ) {
+
 							gui.addColor( points.material, 'color' ).onChange( render );
+			
 						}
+
 						gui.add( points, 'name', [
 							...yUpFiles,
 							...zUpFiles,
 						] ).name( 'type' ).onChange( e => {
+
 							gui.destroy();
 							scene.remove( points );
 							loadPointCloud( e );
@@ -197,9 +203,7 @@
 
 				};
 
-				// loadPointCloud( 'binary/Zaghetto.pcd' );
-
-				loadPointCloud( 'binary/fusion_lidar_scene.pcd' );
+	loadPointCloud( 'binary/Zaghetto.pcd' );
 
 				window.addEventListener( 'resize', onWindowResize );
 

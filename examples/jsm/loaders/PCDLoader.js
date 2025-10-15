@@ -515,11 +515,11 @@ class PCDLoader extends Loader {
 				}
 
 				if ( offset.label !== undefined ) {
-             
-					const labelIndex = PCDheader.fields.indexOf('label')
-                    const labelType = PCDheader.type[labelIndex]
-                    const labelSize = PCDheader.size[labelIndex]
-                    label.push(this._getDataView(dataview, (PCDheader.points * offset.label) + labelSize * i, labelType, labelSize))
+
+					const labelIndex = PCDheader.fields.indexOf( 'label' );
+					const labelType = PCDheader.type[ labelIndex ];
+					const labelSize = PCDheader.size[ labelIndex ];
+					label.push( this._getDataView( dataview, ( PCDheader.points * offset.label ) + labelSize * i, labelType, labelSize ) );
 
 				}
 
@@ -579,10 +579,10 @@ class PCDLoader extends Loader {
 
 				if ( offset.label !== undefined ) {
 
-					const labelIndex = PCDheader.fields.indexOf('label')
-                    const labelType = PCDheader.type[labelIndex]
-                    const labelSize = PCDheader.size[labelIndex]
-                    label.push(this._getDataView(dataview, row + offset.label, labelType, labelSize))
+					const labelIndex = PCDheader.fields.indexOf( 'label' );
+					const labelType = PCDheader.type[ labelIndex ];
+					const labelSize = PCDheader.size[ labelIndex ];
+					label.push( this._getDataView( dataview, row + offset.label, labelType, labelSize ) );
 
 				}
 
