@@ -32,14 +32,14 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, directionToColor, colorToDirection, sample, depth } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, directionToColor } from 'three/tsl';
 			import { meshblend } from 'three/addons/tsl/display/MeshBlendNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls, textureLoader, sphere1, sphere2, box, floor;
+			let camera, scene, renderer, postProcessing, controls, textureLoader, sphere1, sphere2, floor;
 
 			init();
 
@@ -49,7 +49,7 @@
 				camera.position.set( 0, 10, 30 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color("#33334C");
+				scene.background = new THREE.Color( '#33334C' );
 
 				renderer = new THREE.WebGPURenderer();
 				//renderer.setPixelRatio( window.devicePixelRatio ); // probably too costly for most hardware
@@ -68,9 +68,9 @@
 				controls.maxDistance = 100;
 				controls.update();
 
-				var directionalLight = new THREE.DirectionalLight(0xffffff);
-				directionalLight.position.set(1, 1, 1);
-				scene.add(directionalLight);
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight.position.set( 1, 1, 1 );
+				scene.add( directionalLight );
 				//
 
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -84,17 +84,12 @@
 				} ) );
 
 				const scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassDiffuse = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
 
 					return scenePass.getLinearDepthNode();
 
 				} );
 
-				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
-
-				// bandwidth optimization
 
 				const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
 				diffuseTexture.type = THREE.UnsignedByteType;
@@ -102,14 +97,8 @@
 				const normalTexture = scenePass.getTexture( 'normal' );
 				normalTexture.type = THREE.UnsignedByteType;
 
-				const sceneNormal = sample( ( uv ) => {
-
-					return colorToDirection( scenePassNormal.sample( uv ) );
-
-				} );
-
 				// Ambient light
-				const ambientLight = new THREE.AmbientLight(0x404040, 2);
+				const ambientLight = new THREE.AmbientLight( 0x404040, 2 );
 				scene.add( ambientLight );
 
 				textureLoader = new THREE.TextureLoader();
@@ -118,17 +107,17 @@
 				const texture2 = textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
 				texture2.colorSpace = THREE.SRGBColorSpace;
 
-				sphere1 = new THREE.Mesh(new THREE.SphereGeometry(3), new THREE.MeshPhongMaterial({ map: texture1 }));
-				sphere1.position.set(5, 5, 0);
-				scene.add(sphere1);
+				sphere1 = new THREE.Mesh( new THREE.SphereGeometry( 3 ), new THREE.MeshPhongMaterial( { map: texture1 } ) );
+				sphere1.position.set( 5, 5, 0 );
+				scene.add( sphere1 );
 
-				sphere2 = new THREE.Mesh(new THREE.SphereGeometry(3), new THREE.MeshPhongMaterial({ color: "orange"}));
-				sphere2.position.set(0, 5, 0);
-				scene.add(sphere2);
+				sphere2 = new THREE.Mesh( new THREE.SphereGeometry( 3 ), new THREE.MeshPhongMaterial( { color: 'orange' } ) );
+				sphere2.position.set( 0, 5, 0 );
+				scene.add( sphere2 );
 
-				floor = new THREE.Mesh(new THREE.BoxGeometry(50, 1, 50), new THREE.MeshPhongMaterial({ map: texture2 }));
-				scene.add(floor);
-				floor.position.set(0, 2.5, 0);
+				floor = new THREE.Mesh( new THREE.BoxGeometry( 50, 1, 50 ), new THREE.MeshPhongMaterial( { map: texture2 } ) );
+				scene.add( floor );
+				floor.position.set( 0, 2.5, 0 );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -136,17 +125,20 @@
 				postProcessing.outputNode = meshBlend;
 
 				const gui = renderer.inspector.createParameters( 'MeshBlend settings' );
-				gui.add( meshBlend.kernelSize, 'value', 1, 20 ).step( 1 ).name( 'kernel size' ).onChange(() => postProcessing.needsUpdate = true);
-				gui.add( meshBlend.blendFactor, 'value', 0.1, 10 ).step( 0.01 ).name( 'blend factor' ).onChange(() => {
+				gui.add( meshBlend.kernelSize, 'value', 1, 20 ).step( 1 ).name( 'kernel size' ).onChange( () => postProcessing.needsUpdate = true );
+				gui.add( meshBlend.blendFactor, 'value', 0.1, 10 ).step( 0.01 ).name( 'blend factor' ).onChange( () => {
+
 					meshBlend.kernelRadius.value = 0.01 * meshBlend.blendFactor.value;
 					meshBlend.depthFalloff.value = 0.0001 * meshBlend.blendFactor.value;
 					postProcessing.needsUpdate = true;
-				});
+			
+	} );
 				// gui.add( meshBlend.kernelRadius, 'value', 0.01, 1 ).step( 0.01 ).name( 'kernel radius' ).onChange(() => postProcessing.needsUpdate = true);
 				// gui.add( meshBlend.depthFalloff, 'value', 0.001, 0.1 ).step( 0.01 ).name( 'depth falloff' ).onChange(() => postProcessing.needsUpdate = true);
 
 				postProcessing.needsUpdate = true;
-			}
+
+}
 
 			function onWindowResize() {
 
