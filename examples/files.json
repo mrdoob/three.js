@@ -426,6 +426,7 @@
 		"webgpu_postprocessing_ssaa",
 		"webgpu_postprocessing_ssgi",
 		"webgpu_postprocessing_ssr",
+		"webgpu_postprocessing_sss",
 		"webgpu_postprocessing_traa",
 		"webgpu_postprocessing_transition",
 		"webgpu_postprocessing",
