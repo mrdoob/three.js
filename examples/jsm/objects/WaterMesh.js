@@ -51,7 +51,7 @@ class WaterMesh extends Mesh {
 		 * @type {number}
 		 * @default 0.5
 		 */
-		this.resolutionScale = options.resolutionScale !== undefined ? options.resolutionScale : undefined;
+		this.resolutionScale = options.resolutionScale !== undefined ? options.resolutionScale : 0.5;
 
 		// Uniforms
 
