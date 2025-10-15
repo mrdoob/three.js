@@ -29,7 +29,19 @@
 			import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer;
+			const yUpFiles = [
+				'ascii/simple.pcd',
+				'binary/Zaghetto.pcd',
+				'binary/Zaghetto_8bit.pcd',
+				'binary_compressed/pcl_logo.pcd'
+			];
+
+			const zUpFiles = [
+				'binary_compressed/lidar_scene.pcd',
+				'binary/fusion_lidar_scene.pcd'
+			];
+
+			let camera, scene, renderer, controls;
 
 			init();
 			render();
@@ -47,11 +59,6 @@
 				camera.position.set( 0, 0, 1 );
 				scene.add( camera );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.minDistance = 0.5;
-				controls.maxDistance = 10;
-
 				//scene.add( new THREE.AxesHelper( 1 ) );
 
 				const loader = new PCDLoader();
@@ -61,21 +68,122 @@
 					loader.load( './models/pcd/' + file, function ( points ) {
 
 						points.geometry.center();
-						points.geometry.rotateX( Math.PI );
 						points.name = file;
 						scene.add( points );
+
+							// If geometry has integer label attribute, colorize by label
+							const labelAttr = points.geometry.getAttribute( 'label' );
+							if ( labelAttr ) {
+
+								const count = labelAttr.count;
+								const colors = new Float32Array( count * 3 );
+								const labelToColor = new Map();
+								const tmp = new THREE.Color();
+
+								for ( let i = 0; i < count; i ++ ) {
+
+									const label = labelAttr.getX( i );
+									let c = labelToColor.get( label );
+									if ( c === undefined ) {
+										// Deterministic label -> color mapping via HSL
+										const hue = ( ( ( label * 37 ) % 360 ) + 360 ) % 360 / 360; // [0,1)
+										tmp.setHSL( hue, 0.6, 0.5 );
+										c = tmp.clone();
+										labelToColor.set( label, c );
+									}
+
+									colors[ i * 3 + 0 ] = c.r;
+									colors[ i * 3 + 1 ] = c.g;
+									colors[ i * 3 + 2 ] = c.b;
+
+								}
+
+								points.geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+								if ( points.material && 'vertexColors' in points.material ) points.material.vertexColors = true;
+
+							}
+
+						// For car_scene (Z-up data), use Z-up camera and fit view
+						if ( zUpFiles.includes(file) ) {
+
+							// Use Z-up for camera and controls
+							camera.up.set( 0, 0, 1 );
+
+							// Recreate OrbitControls to avoid roll from prior Y-up init
+							if ( controls ) controls.dispose();
+							controls = new OrbitControls( camera, renderer.domElement );
+							controls.addEventListener( 'change', render );
+							controls.minDistance = 0.5;
+							controls.maxDistance = 1000;
+							controls.screenSpacePanning = false; // Use world-up panning
+
+							// Compute bounding sphere
+							if ( ! points.geometry.boundingSphere ) points.geometry.computeBoundingSphere();
+							const sphere = points.geometry.boundingSphere;
+							const center = sphere.center.clone();
+							const radius = sphere.radius || 1;
+
+							// Compute distance by FOV to fully frame (fit view)
+							const fov = camera.fov * Math.PI / 180;
+							const distance = radius / Math.sin( fov / 2 );
+
+							// Set near/far to cover the whole cloud
+							camera.near = Math.max( 0.001, distance * 0.01 );
+							camera.far = distance * 10 + radius;
+							camera.updateProjectionMatrix();
+
+							// Set controls target to cloud center
+							controls.target.copy( center );
+
+							// Place camera in an oblique top view for Z-up
+							const viewDir = new THREE.Vector3( 0, -1, 0.5 ).normalize();
+							camera.position.copy( center ).add( viewDir.multiplyScalar( distance ) );
+							camera.lookAt( center );
+							// Clamp polar angle to avoid flip; update matrices
+							controls.minPolarAngle = 0.01;
+							controls.maxPolarAngle = Math.PI - 0.01;
+							controls.update();
+							camera.updateProjectionMatrix();
+						}
+						else {
+
+							// Non car_scene: keep legacy rotateX(Math.PI) for display
+							points.geometry.rotateX( Math.PI );
+
+							// Restore default camera (Y-up) and basic params
+							camera.up.set( 0, 1, 0 );
+							camera.near = 0.01;
+							camera.far = 40;
+							camera.updateProjectionMatrix();
+
+							// Recreate OrbitControls for default Y-up semantics
+							if ( controls ) controls.dispose();
+							controls = new OrbitControls( camera, renderer.domElement );
+							controls.addEventListener( 'change', render );
+							controls.minDistance = 0.5;
+							controls.maxDistance = 1000;
+							controls.screenSpacePanning = true;
+
+							// Restore initial position and target
+							controls.target.set( 0, 0, 0 );
+							camera.position.set( 0, 0, 2 );
+							camera.lookAt( 0, 0, 0 );
+							controls.update();
+							camera.updateProjectionMatrix();
+
+						}
 
 						const gui = new GUI();
 
 						gui.add( points.material, 'size', 0.001, 0.01 ).onChange( render );
-						gui.addColor( points.material, 'color' ).onChange( render );
+						// Hide color control when geometry has label-based vertex colors
+						if ( ! labelAttr ) {
+							gui.addColor( points.material, 'color' ).onChange( render );
+						}
 						gui.add( points, 'name', [
-							'ascii/simple.pcd',
-							'binary/Zaghetto.pcd',
-							'binary/Zaghetto_8bit.pcd',
-							'binary_compressed/pcl_logo.pcd',
+							...yUpFiles,
+							...zUpFiles,
 						] ).name( 'type' ).onChange( e => {
-
 							gui.destroy();
 							scene.remove( points );
 							loadPointCloud( e );
@@ -89,7 +197,9 @@
 
 				};
 
-				loadPointCloud( 'binary/Zaghetto.pcd' );
+				// loadPointCloud( 'binary/Zaghetto.pcd' );
+
+				loadPointCloud( 'binary/fusion_lidar_scene.pcd' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
