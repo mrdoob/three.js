@@ -399,6 +399,7 @@
 		"webgpu_pmrem_cubemap",
 		"webgpu_pmrem_equirectangular",
 		"webgpu_pmrem_scene",
+		"webgpu_pmrem_test",
 		"webgpu_portal",
 		"webgpu_postprocessing_3dlut",
 		"webgpu_postprocessing_afterimage",
