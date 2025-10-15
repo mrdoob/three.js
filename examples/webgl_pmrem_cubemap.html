@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - pmrem equirectangular</title>
+		<title>three.js webgl - pmrem cubemap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
@@ -11,9 +11,7 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.tsl.js",
+					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -21,10 +19,9 @@
 
 		<script type="module">
 
-			import * as THREE from 'three/webgpu';
-			import { normalWorldGeometry, uniform, pmremTexture } from 'three/tsl';
+			import * as THREE from 'three';
 
-			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -42,15 +39,11 @@
 
 				scene = new THREE.Scene();
 
-				const forceWebGL = false;
-
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-
-				await renderer.init();
 
 				container.appendChild( renderer.domElement );
 
@@ -59,13 +52,17 @@
 				controls.maxDistance = 10;
 				controls.update();
 
-				new HDRLoader()
-					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( map ) {
+				new HDRCubeTextureLoader()
+					.setPath( './textures/cube/pisaHDR/' )
+					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ], function ( map ) {
 
-						map.mapping = THREE.EquirectangularReflectionMapping;
+						const pmremGenerator = new THREE.PMREMGenerator( renderer );
+						const envMap = pmremGenerator.fromCubemap( map ).texture;
 
-						scene.backgroundNode = pmremTexture( map, normalWorldGeometry, uniform( 0.5 ) );
+						scene.background = envMap;
+						scene.backgroundBlurriness = 0.5;
+
+						pmremGenerator.dispose();
 
 						const geometry = new THREE.SphereGeometry( 0.4, 64, 64 );
 
@@ -73,10 +70,10 @@
 
 							for ( let j = 0; j < 5; j ++ ) {
 
-								const material = new THREE.MeshPhysicalNodeMaterial( {
+								const material = new THREE.MeshPhysicalMaterial( {
 									roughness: i / 5,
 									metalness: j / 4,
-									envMap: map
+									envMap: envMap
 								} );
 
 								const mesh = new THREE.Mesh( geometry, material );
