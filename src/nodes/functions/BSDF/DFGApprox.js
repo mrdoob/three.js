@@ -91,9 +91,8 @@ const integrateBRDF = /*@__PURE__*/ Fn( ( [ NdotV, roughness, sampleCount ] ) =>
 		0.0
 	).xyz;
 
-	let A = float( 0.0 ).toVar();
-	let B = float( 0.0 ).toVar();
-	const N = vec4( 0.0, 0.0, 1.0, 0.0 ).xyz;
+	const A = float( 0.0 ).toVar();
+	const B = float( 0.0 ).toVar();
 
 	for ( let i = 0; i < sampleCount; i ++ ) {
 
