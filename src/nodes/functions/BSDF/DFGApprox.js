@@ -1,30 +1,28 @@
-import { Fn, vec2, vec4 } from '../../tsl/TSLBase.js';
+import { Fn, vec2 } from '../../tsl/TSLBase.js';
+import { texture } from '../../accessors/TextureNode.js';
+import { getDFGLUT } from '../../../renderers/shaders/DFGLUTData.js';
 
-// Analytical approximation of the DFG LUT, one half of the
-// split-sum approximation used in indirect specular lighting.
-// via 'environmentBRDF' from "Physically Based Shading on Mobile"
-// https://www.unrealengine.com/blog/physically-based-shading-on-mobile
+// Cached DFG LUT texture
+
+let dfgLUT = null;
+
+// DFG LUT sampling for physically-based rendering.
+// Uses a precomputed lookup table for the split-sum approximation
+// used in indirect specular lighting.
+// Reference: "Real Shading in Unreal Engine 4" by Brian Karis
+
 const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
-	const c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
+	if ( dfgLUT === null ) {
 
-	const c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
+		dfgLUT = getDFGLUT();
 
-	const r = roughness.mul( c0 ).add( c1 );
+	}
 
-	const a004 = r.x.mul( r.x ).min( dotNV.mul( - 9.28 ).exp2() ).mul( r.x ).add( r.y );
+	const uv = vec2( roughness, dotNV );
 
-	const fab = vec2( - 1.04, 1.04 ).mul( a004 ).add( r.zw );
+	return texture( dfgLUT, uv ).rg;
 
-	return fab;
-
-} ).setLayout( {
-	name: 'DFGApprox',
-	type: 'vec2',
-	inputs: [
-		{ name: 'roughness', type: 'float' },
-		{ name: 'dotNV', type: 'vec3' }
-	]
 } );
 
 export default DFGApprox;
