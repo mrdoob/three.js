@@ -552,4 +552,35 @@ float computeSpecularOcclusion( const in float dotNV, const in float ambientOccl
 	return saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );
 
 }
+
+// Improved specular occlusion with horizon fading
+// Based on "Practical Real-Time Strategies for Accurate Indirect Occlusion"
+float computeSpecularOcclusionImproved( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {
+
+	// Start with the base specular occlusion formula
+	float baseOcclusion = computeSpecularOcclusion( dotNV, ambientOcclusion, roughness );
+
+	// Horizon fade term - slightly reduces AO influence at extreme grazing angles only
+	float horizonFade = saturate( 1.0 - pow( 1.0 - dotNV, 3.0 ) );
+
+	// Blend towards less occlusion at grazing angles, but keep most of the effect
+	return mix( baseOcclusion, 1.0, ( 1.0 - horizonFade ) * 0.3 );
+
+}
+
+// Multi-bounce ambient occlusion approximation
+// Adds energy back that would bounce in occluded areas
+vec3 computeMultiBounceAO( const in float ambientOcclusion, const in vec3 albedo ) {
+
+	vec3 a = 2.0 * albedo - 0.33;
+	vec3 b = -4.8 * albedo + 0.64;
+	vec3 c = 2.53 * albedo + 0.69;
+
+	float x = ambientOcclusion;
+	vec3 multiBounce = ( ( x * a + b ) * x + c ) * x;
+
+	// Blend between simple AO and multi-bounce (50/50) to keep it conservative
+	return mix( vec3( x ), max( vec3( x ), multiBounce ), 0.5 );
+
+}
 `;
