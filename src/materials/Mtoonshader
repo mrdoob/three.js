@@ -1,0 +1,155 @@
+import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../constants.js';
+import { Material } from './Material.js';
+import { Vector2, Vector3 } from '../math/Vector2.js'; // 补充 Vector3 用于描边方向
+import { Color } from '../math/Color.js';
+import { Euler } from '../math/Euler.js';
+
+/**
+ * 卡通化 PBR 材质：保留 PBR 物理属性，新增描边、硬边光影、边缘光
+ * @augments Material
+ */
+class MeshCartoonPBRMaterial extends Material {
+
+	constructor( parameters ) {
+		super();
+
+		/** 类型标识 */
+		this.isMeshCartoonPBRMaterial = true;
+		this.type = 'MeshCartoonPBRMaterial';
+
+		// 1. 保留原 PBR 核心定义与属性
+		this.defines = { 
+			'STANDARD': '', 
+			'CARTOON_MODE': '' // 新增卡通模式定义，用于着色器区分
+		};
+
+		// PBR 基础属性（完全继承自 MeshStandardMaterial）
+		this.color = new Color( 0xffffff );
+		this.roughness = 1.0;
+		this.metalness = 0.0;
+		this.map = null;
+		this.lightMap = null;
+		this.lightMapIntensity = 1.0;
+		this.aoMap = null;
+		this.aoMapIntensity = 1.0;
+		this.emissive = new Color( 0x000000 );
+		this.emissiveIntensity = 1.0;
+		this.emissiveMap = null;
+		this.bumpMap = null;
+		this.bumpScale = 1;
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
+		this.roughnessMap = null;
+		this.metalnessMap = null;
+		this.alphaMap = null;
+		this.envMap = null;
+		this.envMapRotation = new Euler();
+		this.envMapIntensity = 1.0;
+		this.wireframe = false;
+		this.wireframeLinewidth = 1;
+		this.wireframeLinecap = 'round';
+		this.wireframeLinejoin = 'round';
+		this.flatShading = false;
+		this.fog = true;
+
+		// 2. 新增【卡通描边】核心属性（参考 MToon 逻辑）
+		/** 描边颜色 */
+		this.outlineColor = new Color( 0x000000 ); // 默认黑色描边
+		/** 描边宽度（世界空间/屏幕空间适配） */
+		this.outlineWidth = 0.02; // 默认世界空间宽度，小模型建议 0.01-0.05
+		/** 描边宽度模式：0=世界空间（不随相机距离变化），1=屏幕空间（随距离缩放） */
+		this.outlineWidthMode = 0;
+		/** 描边剔除模式：0=剔除背面（仅外轮廓），1=剔除正面（仅内轮廓，极少用） */
+		this.outlineCullMode = 0;
+		/** 描边宽度纹理（控制局部描边粗细，如手指细、身体粗） */
+		this.outlineWidthMap = null;
+		/** 描边透明度 */
+		this.outlineAlpha = 1.0;
+
+		// 3. 新增【卡通光影分层】核心属性（参考 MeshToonMaterial）
+		/** 卡通梯度图：实现硬边阴影，需设置 NearestFilter */
+		this.gradientMap = null;
+		/** 阴影色：叠加在 gradientMap 暗部，增强卡通感 */
+		this.shadeColor = new Color( 0x888888 );
+		/** 光影分层强度：0=纯 PBR 平滑光影，1=完全卡通硬边 */
+		this.cartoonShadingIntensity = 1.0;
+
+		// 4. 新增【卡通边缘光】核心属性（原神角色常用）
+		/** 边缘光颜色（如头发边缘的高光色） */
+		this.rimColor = new Color( 0xffffff );
+		/** 边缘光强度 */
+		this.rimIntensity = 0.8;
+		/** 边缘光范围控制（值越大，边缘光越窄） */
+		this.rimPower = 5.0;
+		/** 边缘光遮罩纹理（控制局部边缘光显示，如仅头发显示） */
+		this.rimMaskMap = null;
+
+		// 应用参数配置
+		this.setValues( parameters );
+	}
+
+	// 继承 copy 方法，补充新增属性的复制逻辑
+	copy( source ) {
+		super.copy( source );
+
+		// 复制 PBR 基础属性
+		this.defines = { 'STANDARD': '', 'CARTOON_MODE': '' };
+		this.color.copy( source.color );
+		this.roughness = source.roughness;
+		this.metalness = source.metalness;
+		this.map = source.map;
+		this.lightMap = source.lightMap;
+		this.lightMapIntensity = source.lightMapIntensity;
+		this.aoMap = source.aoMap;
+		this.aoMapIntensity = source.aoMapIntensity;
+		this.emissive.copy( source.emissive );
+		this.emissiveMap = source.emissiveMap;
+		this.emissiveIntensity = source.emissiveIntensity;
+		this.bumpMap = source.bumpMap;
+		this.bumpScale = source.bumpScale;
+		this.normalMap = source.normalMap;
+		this.normalMapType = source.normalMapType;
+		this.normalScale.copy( source.normalScale );
+		this.displacementMap = source.displacementMap;
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
+		this.roughnessMap = source.roughnessMap;
+		this.metalnessMap = source.metalnessMap;
+		this.alphaMap = source.alphaMap;
+		this.envMap = source.envMap;
+		this.envMapRotation.copy( source.envMapRotation );
+		this.envMapIntensity = source.envMapIntensity;
+		this.wireframe = source.wireframe;
+		this.wireframeLinewidth = source.wireframeLinewidth;
+		this.wireframeLinecap = source.wireframeLinecap;
+		this.wireframeLinejoin = source.wireframeLinejoin;
+		this.flatShading = source.flatShading;
+		this.fog = source.fog;
+
+		// 复制新增的卡通属性
+		this.outlineColor.copy( source.outlineColor );
+		this.outlineWidth = source.outlineWidth;
+		this.outlineWidthMode = source.outlineWidthMode;
+		this.outlineCullMode = source.outlineCullMode;
+		this.outlineWidthMap = source.outlineWidthMap;
+		this.outlineAlpha = source.outlineAlpha;
+
+		this.gradientMap = source.gradientMap;
+		this.shadeColor.copy( source.shadeColor );
+		this.cartoonShadingIntensity = source.cartoonShadingIntensity;
+
+		this.rimColor.copy( source.rimColor );
+		this.rimIntensity = source.rimIntensity;
+		this.rimPower = source.rimPower;
+		this.rimMaskMap = source.rimMaskMap;
+
+		return this;
+	}
+
+}
+
+export { MeshCartoonPBRMaterial };
