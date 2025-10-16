@@ -54,7 +54,7 @@ class ComputeNode extends Node {
 		/**
 		 * TODO
 		 *
-		 * @type {number}
+		 * @type {number|Array<number>}
 		 */
 		this.count = null;
 
@@ -91,6 +91,12 @@ class ComputeNode extends Node {
 
 	}
 
+	/**
+	 * TODO
+	 *
+	 * @param {number|Array<number>} count - Array with [ x, y, z ] values for dispatch or a single number for the count
+	 * @return {ComputeNode}
+	 */
 	setCount( count ) {
 
 		this.count = count;
@@ -99,6 +105,11 @@ class ComputeNode extends Node {
 
 	}
 
+	/**
+	 * TODO
+	 *
+	 * @return {number|Array<number>}
+	 */
 	getCount() {
 
 		return this.count;
@@ -263,7 +274,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
  * @tsl
  * @function
  * @param {Node} node - TODO
- * @param {number} count - TODO.
+ * @param {number|Array<number>} count - TODO.
  * @param {Array<number>} [workgroupSize=[64]] - TODO.
  * @returns {AtomicFunctionNode}
  */
