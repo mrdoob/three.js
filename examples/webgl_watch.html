@@ -36,14 +36,12 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
 
 			let composer, camera, scene, renderer;
-			let gui, dirLight, pointLight, controls, bloomPass, fxaaPass;
+			let gui, dirLight, pointLight, controls, bloomPass, taaPass;
 			let ready = false;
 
 			const meshes = {};
@@ -217,27 +215,22 @@
 
 					if ( composer ) return;
 
-					const renderPass = new RenderPass( scene, camera );
-					const outputPass = new OutputPass();
-
 					bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 					bloomPass.threshold = setting.threshold;
 					bloomPass.strength = setting.strength;
 					bloomPass.radius = setting.radius;
 
-					fxaaPass = new ShaderPass( FXAAShader );
-					const pixelRatio = renderer.getPixelRatio();
-					fxaaPass.material.uniforms[ 'resolution' ].value.set( 1 / ( window.innerWidth * pixelRatio ), 1 / ( window.innerHeight * pixelRatio ) );
+					taaPass = new TAARenderPass( scene, camera );
+					taaPass.sampleLevel = 2;
+					taaPass.unbiased = false;
 
 					composer = new EffectComposer( renderer );
-					composer.setPixelRatio( pixelRatio );
+					composer.setPixelRatio( window.devicePixelRatio );
+					composer.setSize( window.innerWidth, window.innerHeight );
 
-					composer.addPass( renderPass );
+					composer.addPass( taaPass );
 					composer.addPass( bloomPass );
-					composer.addPass( fxaaPass );
-					composer.addPass( outputPass );
-					composer.addPass( fxaaPass );
-					composer.addPass( fxaaPass );
+					composer.addPass( new OutputPass() );
 
 				} else {
 
@@ -245,7 +238,7 @@
 					composer.dispose();
 					composer = null;
 					bloomPass = null;
-					fxaaPass = null;
+					taaPass = null;
 
 				}
 
@@ -316,12 +309,6 @@
 				if ( composer ) {
 
 					composer.setSize( width, height );
-					if ( fxaaPass ) {
-
-						const pr = renderer.getPixelRatio();
-						fxaaPass.material.uniforms[ 'resolution' ].value.set( 1 / ( width * pr ), 1 / ( height * pr ) );
-
-					}
 
 				}
 
