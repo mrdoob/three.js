@@ -1937,7 +1937,12 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			const isGenerateOnce = this.generate.length === 1;
+			// If generate has just one argument, it means the output type is not required.
+			// This means that the node does not handle output conversions internally,
+			// so the value is stored in a cache and the builder handles the conversion
+			// for all requested output types.
+
+			const isGenerateOnce = this.generate.length < 2;
 
 			if ( isGenerateOnce ) {
 
@@ -3270,7 +3275,7 @@ function addMethodChaining( name, nodeElement ) {
 
 			//if ( name === 'toVarIntent' ) return this;
 
-			return this.isStackNode ? this.add( nodeElement( ...params ) ) : nodeElement( this, ...params );
+			return this.isStackNode ? this.addToStack( nodeElement( ...params ) ) : nodeElement( this, ...params );
 
 		};
 
@@ -3309,7 +3314,7 @@ Node.prototype.assign = function ( ...params ) {
 
 		const nodeElement = NodeElements.get( 'assign' );
 
-		return this.add( nodeElement( ...params ) );
+		return this.addToStack( nodeElement( ...params ) );
 
 	}
 
@@ -4356,7 +4361,7 @@ const Switch = ( ...params ) => currentStack.Switch( ...params );
  */
 function Stack( node ) {
 
-	if ( currentStack ) currentStack.add( node );
+	if ( currentStack ) currentStack.addToStack( node );
 
 	return node;
 
@@ -9282,9 +9287,10 @@ class ToneMappingNode extends TempNode {
 		/**
 		 * The tone mapping type.
 		 *
+		 * @private
 		 * @type {number}
 		 */
-		this.toneMapping = toneMapping;
+		this._toneMapping = toneMapping;
 
 		/**
 		 * The tone mapping exposure.
@@ -9312,14 +9318,39 @@ class ToneMappingNode extends TempNode {
 	 */
 	customCacheKey() {
 
-		return hash$1( this.toneMapping );
+		return hash$1( this._toneMapping );
+
+	}
+
+	/**
+	 * Sets the tone mapping type.
+	 *
+	 * @param {number} value - The tone mapping type.
+	 * @return {ToneMappingNode} A reference to this node.
+	 */
+	setToneMapping( value ) {
+
+		this._toneMapping = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the tone mapping type.
+	 *
+	 * @returns {number} The tone mapping type.
+	 */
+	getToneMapping() {
+
+		return this._toneMapping;
 
 	}
 
 	setup( builder ) {
 
 		const colorNode = this.colorNode || builder.context.color;
-		const toneMapping = this.toneMapping;
+		const toneMapping = this._toneMapping;
 
 		if ( toneMapping === NoToneMapping ) return colorNode;
 
@@ -10440,9 +10471,10 @@ class RenderOutputNode extends TempNode {
 		/**
 		 * The tone mapping type.
 		 *
+		 * @private
 		 * @type {?number}
 		 */
-		this.toneMapping = toneMapping;
+		this._toneMapping = toneMapping;
 
 		/**
 		 * The output color space.
@@ -10462,13 +10494,38 @@ class RenderOutputNode extends TempNode {
 
 	}
 
+	/**
+	 * Sets the tone mapping type.
+	 *
+	 * @param {number} value - The tone mapping type.
+	 * @return {ToneMappingNode} A reference to this node.
+	 */
+	setToneMapping( value ) {
+
+		this._toneMapping = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the tone mapping type.
+	 *
+	 * @returns {number} The tone mapping type.
+	 */
+	getToneMapping() {
+
+		return this._toneMapping;
+
+	}
+
 	setup( { context } ) {
 
 		let outputNode = this.colorNode || context.color;
 
 		// tone mapping
 
-		const toneMapping = ( this.toneMapping !== null ? this.toneMapping : context.toneMapping ) || NoToneMapping;
+		const toneMapping = ( this._toneMapping !== null ? this._toneMapping : context.toneMapping ) || NoToneMapping;
 		const outputColorSpace = ( this.outputColorSpace !== null ? this.outputColorSpace : context.outputColorSpace ) || NoColorSpace;
 
 		if ( toneMapping !== NoToneMapping ) {
@@ -19988,7 +20045,7 @@ class NodeMaterial extends Material {
 
 			const outgoingLightNode = this.setupLighting( builder );
 
-			if ( clippingNode !== null ) builder.stack.add( clippingNode );
+			if ( clippingNode !== null ) builder.stack.addToStack( clippingNode );
 
 			// force unsigned floats - useful for RenderTargets
 
@@ -20082,7 +20139,7 @@ class NodeMaterial extends Material {
 
 			} else {
 
-				builder.stack.add( clipping() );
+				builder.stack.addToStack( clipping() );
 
 			}
 
@@ -20109,7 +20166,7 @@ class NodeMaterial extends Material {
 
 		if ( candidateCount > 0 && candidateCount <= 8 && builder.isAvailable( 'clipDistance' ) ) {
 
-			builder.stack.add( hardwareClipping() );
+			builder.stack.addToStack( hardwareClipping() );
 
 			this.hardwareClipping = true;
 
@@ -32259,7 +32316,7 @@ class StackNode extends Node {
 	 * @param {Node} node - The node to add.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	add( node ) {
+	addToStack( node ) {
 
 		if ( node.isNode !== true ) {
 
@@ -32286,7 +32343,7 @@ class StackNode extends Node {
 		const methodNode = new ShaderNode( method );
 		this._currentCond = select( boolNode, methodNode );
 
-		return this.add( this._currentCond );
+		return this.addToStack( this._currentCond );
 
 	}
 
@@ -32388,7 +32445,7 @@ class StackNode extends Node {
 
 			this._currentCond = condNode;
 
-			return this.add( this._currentCond );
+			return this.addToStack( this._currentCond );
 
 		} else {
 
@@ -68808,29 +68865,27 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureGPUDescriptor - The texture descriptor.
 	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
+	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0, encoder = null ) {
 
 		const textureData = this.get( textureGPU );
 
-		if ( textureData.useCount === undefined ) {
+		if ( textureData.layers === undefined ) {
 
-			textureData.useCount = 0;
 			textureData.layers = [];
 
 		}
 
 		const passes = textureData.layers[ baseArrayLayer ] || this._mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer );
 
-		const commandEncoder = this.device.createCommandEncoder( {} );
+		const commandEncoder = encoder || this.device.createCommandEncoder( { label: 'mipmapEncoder' } );
 
 		this._mipmapRunBundles( commandEncoder, passes );
 
-		this.device.queue.submit( [ commandEncoder.finish() ] );
+		if ( encoder === null ) this.device.queue.submit( [ commandEncoder.finish() ] );
 
-		if ( textureData.useCount !== 0 ) textureData.layers[ baseArrayLayer ] = passes;
-
-		textureData.useCount ++;
+		textureData.layers[ baseArrayLayer ] = passes;
 
 	}
 
@@ -69258,8 +69313,9 @@ class WebGPUTextureUtils {
 	 * Generates mipmaps for the given texture.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	generateMipmaps( texture ) {
+	generateMipmaps( texture, encoder = null ) {
 
 		const textureData = this.backend.get( texture );
 
@@ -69267,7 +69323,7 @@ class WebGPUTextureUtils {
 
 			for ( let i = 0; i < 6; i ++ ) {
 
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
 
 			}
 
@@ -69277,7 +69333,7 @@ class WebGPUTextureUtils {
 
 			for ( let i = 0; i < depth; i ++ ) {
 
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
 
 			}
 
@@ -69728,10 +69784,11 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureDescriptorGPU - The texture descriptor.
 	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
+	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0, encoder = null ) {
 
-		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
+		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer, encoder );
 
 	}
 
@@ -75908,8 +75965,7 @@ class WebGPUBackend extends Backend {
 
 			if ( renderContext.scissor ) {
 
-				const { x, y, width, height } = renderContext.scissorValue;
-				currentPass.setScissorRect( x, y, width, height );
+				this.updateScissor( renderContext );
 
 			}
 
@@ -76266,6 +76322,20 @@ class WebGPUBackend extends Backend {
 		const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
 
 		currentPass.setViewport( x, y, width, height, minDepth, maxDepth );
+
+	}
+
+	/**
+	 * Updates the scissor with the values from the given render context.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	updateScissor( renderContext ) {
+
+		const { currentPass } = this.get( renderContext );
+		const { x, y, width, height } = renderContext.scissorValue;
+
+		currentPass.setScissorRect( x, y, width, height );
 
 	}
 
@@ -77532,6 +77602,15 @@ class WebGPUBackend extends Backend {
 			]
 		);
 
+		// mipmaps must be genereated with the same encoder otherwise the copied texture data
+		// might be out-of-sync, see #31768
+
+		if ( texture.generateMipmaps ) {
+
+			this.textureUtils.generateMipmaps( texture, encoder );
+
+		}
+
 		if ( renderContextData.currentPass ) {
 
 			const { descriptor } = renderContextData;
@@ -77556,21 +77635,13 @@ class WebGPUBackend extends Backend {
 
 			if ( renderContext.scissor ) {
 
-				const { x, y, width, height } = renderContext.scissorValue;
-
-				renderContextData.currentPass.setScissorRect( x, y, width, height );
+				this.updateScissor( renderContext );
 
 			}
 
 		} else {
 
 			this.device.queue.submit( [ encoder.finish() ] );
-
-		}
-
-		if ( texture.generateMipmaps ) {
-
-			this.textureUtils.generateMipmaps( texture );
 
 		}
 

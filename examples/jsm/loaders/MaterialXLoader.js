@@ -1,5 +1,5 @@
 import {
-	FileLoader, Loader, TextureLoader, RepeatWrapping, MeshBasicNodeMaterial,
+	FileLoader, Loader, ImageBitmapLoader, Texture, RepeatWrapping, MeshBasicNodeMaterial,
 	MeshPhysicalNodeMaterial, DoubleSide,
 } from 'three/webgpu';
 
@@ -410,9 +410,15 @@ class MaterialXNode {
 	getTexture() {
 
 		const filePrefix = this.getRecursiveAttribute( 'fileprefix' ) || '';
+		const uri = filePrefix + this.value;
+
+		if ( this.materialX.textureCache.has( uri ) ) {
+
+			return this.materialX.textureCache.get( uri );
+
+		}
 
 		let loader = this.materialX.textureLoader;
-		const uri = filePrefix + this.value;
 
 		if ( uri ) {
 
@@ -421,9 +427,18 @@ class MaterialXNode {
 
 		}
 
-		const texture = loader.load( uri );
+		const texture = new Texture();
 		texture.wrapS = texture.wrapT = RepeatWrapping;
 		texture.flipY = false;
+
+		this.materialX.textureCache.set( uri, texture );
+
+		loader.load( uri, function ( imageBitmap ) {
+
+			texture.image = imageBitmap;
+			texture.needsUpdate = true;
+
+		} );
 
 		return texture;
 
@@ -1030,7 +1045,10 @@ class MaterialX {
 		this.nodesXLib = new Map();
 		//this.nodesXRefLib = new WeakMap();
 
-		this.textureLoader = new TextureLoader( manager );
+		this.textureLoader = new ImageBitmapLoader( manager );
+		this.textureLoader.setOptions( { imageOrientation: 'flipY' } );
+
+		this.textureCache = new Map();
 
 	}
 
