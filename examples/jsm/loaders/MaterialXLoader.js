@@ -429,7 +429,6 @@ class MaterialXNode {
 
 		const texture = new Texture();
 		texture.wrapS = texture.wrapT = RepeatWrapping;
-		texture.flipY = false;
 
 		this.materialX.textureCache.set( uri, texture );
 
