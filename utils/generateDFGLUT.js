@@ -243,7 +243,7 @@ function saveAsJavaScript( data ) {
 
 	}
 
-	const jsContent = `/**
+	const webgl = `/**
  * Precomputed DFG LUT for Image-Based Lighting
  * Resolution: ${LUT_SIZE}x${LUT_SIZE}
  * Samples: ${SAMPLE_COUNT} per texel
@@ -253,35 +253,78 @@ function saveAsJavaScript( data ) {
 import { DataTexture } from '../../textures/DataTexture.js';
 import { RGFormat, HalfFloatType, LinearFilter, ClampToEdgeWrapping } from '../../constants.js';
 
-export const DFG_LUT_SIZE = ${LUT_SIZE};
-
-const DFG_LUT_DATA = new Uint16Array( [
+const DATA = new Uint16Array( [
 ${rows.join( ',\n' )}
 ] );
 
-let dfgLUTTexture = null;
+let lut = null;
 
 export function getDFGLUT() {
 
-	if ( dfgLUTTexture === null ) {
+	if ( lut === null ) {
 
-		dfgLUTTexture = new DataTexture( DFG_LUT_DATA, DFG_LUT_SIZE, DFG_LUT_SIZE, RGFormat, HalfFloatType );
-		dfgLUTTexture.minFilter = LinearFilter;
-		dfgLUTTexture.magFilter = LinearFilter;
-		dfgLUTTexture.wrapS = ClampToEdgeWrapping;
-		dfgLUTTexture.wrapT = ClampToEdgeWrapping;
-		dfgLUTTexture.generateMipmaps = false;
-		dfgLUTTexture.needsUpdate = true;
+		lut = new DataTexture( DATA, ${LUT_SIZE}, ${LUT_SIZE}, RGFormat, HalfFloatType );
+		lut.minFilter = LinearFilter;
+		lut.magFilter = LinearFilter;
+		lut.wrapS = ClampToEdgeWrapping;
+		lut.wrapT = ClampToEdgeWrapping;
+		lut.generateMipmaps = false;
+		lut.needsUpdate = true;
 
 	}
 
-	return dfgLUTTexture;
+	return lut;
 
 }
 `;
 
-	fs.writeFileSync( './src/renderers/shaders/DFGLUTData.js', jsContent );
-	console.log( 'Saved JavaScript version to ./src/renderers/shaders/DFGLUTData.js' );
+	const webgpu = `import { Fn, vec2 } from '../../tsl/TSLBase.js';
+import { texture } from '../../accessors/TextureNode.js';
+
+import { DataTexture } from '../../../textures/DataTexture.js';
+import { RGFormat, HalfFloatType, LinearFilter, ClampToEdgeWrapping } from '../../../constants.js';
+
+/**
+ * Precomputed DFG LUT for Image-Based Lighting
+ * Resolution: ${LUT_SIZE}x${LUT_SIZE}
+ * Samples: ${SAMPLE_COUNT} per texel
+ * Format: RG16F (2 half floats per texel: scale, bias)
+ */
+
+const DATA = new Uint16Array( [
+${rows.join( ',\n' )}
+] );
+
+let lut = null;
+
+const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
+
+	if ( lut === null ) {
+
+		lut = new DataTexture( DATA, ${LUT_SIZE}, ${LUT_SIZE}, RGFormat, HalfFloatType );
+		lut.minFilter = LinearFilter;
+		lut.magFilter = LinearFilter;
+		lut.wrapS = ClampToEdgeWrapping;
+		lut.wrapT = ClampToEdgeWrapping;
+		lut.generateMipmaps = false;
+		lut.needsUpdate = true;
+
+	}
+
+	const uv = vec2( roughness, dotNV );
+
+	return texture( lut, uv ).rg;
+
+} );
+
+export default DFGApprox;
+`;
+
+	fs.writeFileSync( './src/renderers/shaders/DFGLUTData.js', webgl );
+	console.log( 'Saved WebGL version to ./src/renderers/shaders/DFGLUTData.js' );
+
+	fs.writeFileSync( './src/nodes/functions/BSDF/DFGApprox.js', webgpu );
+	console.log( 'Saved WebGPU version to ./src/nodes/functions/BSDF/DFGApprox.js' );
 
 }
 
