@@ -3746,30 +3746,7 @@ function WebGLExtensions( gl ) {
 
 		}
 
-		let extension;
-
-		switch ( name ) {
-
-			case 'WEBGL_depth_texture':
-				extension = gl.getExtension( 'WEBGL_depth_texture' ) || gl.getExtension( 'MOZ_WEBGL_depth_texture' ) || gl.getExtension( 'WEBKIT_WEBGL_depth_texture' );
-				break;
-
-			case 'EXT_texture_filter_anisotropic':
-				extension = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
-				break;
-
-			case 'WEBGL_compressed_texture_s3tc':
-				extension = gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
-				break;
-
-			case 'WEBGL_compressed_texture_pvrtc':
-				extension = gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
-				break;
-
-			default:
-				extension = gl.getExtension( name );
-
-		}
+		const extension = gl.getExtension( name );
 
 		extensions[ name ] = extension;
 
@@ -15018,6 +14995,21 @@ class WebGLRenderer {
 
 		}
 
+		const INTEGER_FORMATS = new Set( [
+			RGBAIntegerFormat,
+			RGIntegerFormat,
+			RedIntegerFormat
+		] );
+
+		const UNSIGNED_TYPES = new Set( [
+			UnsignedByteType,
+			UnsignedIntType,
+			UnsignedShortType,
+			UnsignedInt248Type,
+			UnsignedShort4444Type,
+			UnsignedShort5551Type
+		] );
+
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
 
@@ -15791,9 +15783,7 @@ class WebGLRenderer {
 				if ( _currentRenderTarget !== null ) {
 
 					const targetFormat = _currentRenderTarget.texture.format;
-					isIntegerFormat = targetFormat === RGBAIntegerFormat ||
-						targetFormat === RGIntegerFormat ||
-						targetFormat === RedIntegerFormat;
+					isIntegerFormat = INTEGER_FORMATS.has( targetFormat );
 
 				}
 
@@ -15802,12 +15792,7 @@ class WebGLRenderer {
 				if ( isIntegerFormat ) {
 
 					const targetType = _currentRenderTarget.texture.type;
-					const isUnsignedType = targetType === UnsignedByteType ||
-						targetType === UnsignedIntType ||
-						targetType === UnsignedShortType ||
-						targetType === UnsignedInt248Type ||
-						targetType === UnsignedShort4444Type ||
-						targetType === UnsignedShort5551Type;
+					const isUnsignedType = UNSIGNED_TYPES.has( targetType );
 
 					const clearColor = background.getClearColor();
 					const a = background.getClearAlpha();
@@ -16737,9 +16722,7 @@ class WebGLRenderer {
 
 		function renderScene( currentRenderList, scene, camera, viewport ) {
 
-			const opaqueObjects = currentRenderList.opaque;
-			const transmissiveObjects = currentRenderList.transmissive;
-			const transparentObjects = currentRenderList.transparent;
+			const { opaque: opaqueObjects, transmissive: transmissiveObjects, transparent: transparentObjects } = currentRenderList;
 
 			currentRenderState.setupLightsView( camera );
 
@@ -16844,10 +16827,7 @@ class WebGLRenderer {
 
 					const renderItem = transmissiveObjects[ i ];
 
-					const object = renderItem.object;
-					const geometry = renderItem.geometry;
-					const material = renderItem.material;
-					const group = renderItem.group;
+					const { object, geometry, material, group } = renderItem;
 
 					if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
 
@@ -16894,9 +16874,7 @@ class WebGLRenderer {
 
 				const renderItem = renderList[ i ];
 
-				const object = renderItem.object;
-				const geometry = renderItem.geometry;
-				const group = renderItem.group;
+				const { object, geometry, group } = renderItem;
 				let material = renderItem.material;
 
 				if ( material.allowOverride === true && overrideMaterial !== null ) {
