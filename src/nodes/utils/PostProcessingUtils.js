@@ -114,7 +114,7 @@ export const interleavedGradientNoise = Fn( ( [ position ] ) => {
 	return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
 
 } ).setLayout( {
-	name: 'gradientNoise',
+	name: 'interleavedGradientNoise',
 	type: 'float',
 	inputs: [
 		{ name: 'position', type: 'vec2' }
