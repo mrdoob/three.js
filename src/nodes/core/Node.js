@@ -749,12 +749,7 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			// If generate has just one argument, it means the output type is not required.
-			// This means that the node does not handle output conversions internally,
-			// so the value is stored in a cache and the builder handles the conversion
-			// for all requested output types.
-
-			const isGenerateOnce = this.generate.length < 2;
+			const isGenerateOnce = this.generate.length === 1;
 
 			if ( isGenerateOnce ) {
 

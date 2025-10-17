@@ -30,7 +30,7 @@ import {
 	BackSide,
 	LinearSRGBColorSpace
 } from '../../../constants.js';
-import { warn, error, warnOnce } from '../../../utils.js';
+import { warn, error } from '../../../utils.js';
 
 const LOD_MIN = 4;
 
@@ -146,7 +146,7 @@ class PMREMGenerator {
 	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
 	 * @param {?RenderTarget} [options.renderTarget=null] - The render target to use.
 	 * @return {RenderTarget} The resulting PMREM.
-	 * @see {@link PMREMGenerator#fromScene}
+	 * @see {@link PMREMGenerator#fromSceneAsync}
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
 
@@ -160,7 +160,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			warn( 'PMREMGenerator: ".fromScene()" called before the backend is initialized. Try using "await renderer.init()" instead.' );
+			warn( 'PMREMGenerator: .fromScene() called before the backend is initialized. Try using .fromSceneAsync() instead.' );
 
 			const cubeUVRenderTarget = renderTarget || this._allocateTarget();
 
@@ -204,7 +204,6 @@ class PMREMGenerator {
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
 	 *
-	 * @deprecated
 	 * @param {Scene} scene - The scene to be captured.
 	 * @param {number} [sigma=0] - The blur radius in radians.
 	 * @param {number} [near=0.1] - The near plane distance.
@@ -218,9 +217,7 @@ class PMREMGenerator {
 	 */
 	async fromSceneAsync( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
 
-		warnOnce( 'PMREMGenerator: ".fromSceneAsync()" is deprecated. Use "await renderer.init()" instead.' ); // @deprecated r181
-
-		await this._renderer.init();
+		if ( this._hasInitialized === false ) await this._renderer.init();
 
 		return this.fromScene( scene, sigma, near, far, options );
 
@@ -240,7 +237,7 @@ class PMREMGenerator {
 
 		if ( this._hasInitialized === false ) {
 
-			warn( 'PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using "await renderer.init()" instead.' );
+			warn( 'PMREMGenerator: .fromEquirectangular() called before the backend is initialized. Try using .fromEquirectangularAsync() instead.' );
 
 			this._setSizeFromTexture( equirectangular );
 
@@ -261,7 +258,6 @@ class PMREMGenerator {
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 *
-	 * @deprecated
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} The resulting PMREM.
@@ -269,9 +265,7 @@ class PMREMGenerator {
 	 */
 	async fromEquirectangularAsync( equirectangular, renderTarget = null ) {
 
-		warnOnce( 'PMREMGenerator: ".fromEquirectangularAsync()" is deprecated. Use "await renderer.init()" instead.' ); // @deprecated r181
-
-		await this._renderer.init();
+		if ( this._hasInitialized === false ) await this._renderer.init();
 
 		return this._fromTexture( equirectangular, renderTarget );
 
@@ -312,7 +306,6 @@ class PMREMGenerator {
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * with the 256 x 256 cubemap output.
 	 *
-	 * @deprecated
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?RenderTarget} [renderTarget=null] - The render target to use.
 	 * @return {Promise<RenderTarget>} The resulting PMREM.
@@ -320,9 +313,7 @@ class PMREMGenerator {
 	 */
 	async fromCubemapAsync( cubemap, renderTarget = null ) {
 
-		warnOnce( 'PMREMGenerator: ".fromCubemapAsync()" is deprecated. Use "await renderer.init()" instead.' ); // @deprecated r181
-
-		await this._renderer.init();
+		if ( this._hasInitialized === false ) await this._renderer.init();
 
 		return this._fromTexture( cubemap, renderTarget );
 

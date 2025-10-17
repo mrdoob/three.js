@@ -21,7 +21,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "./js/three.module.js"
+					"three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+					"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
 				}
 			}
 		</script>
@@ -29,8 +30,36 @@
 
 			import * as THREE from 'three';
 			import { APP } from './js/app.js';
+			
+			// Import all controls from CDN
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { MapControls } from 'three/addons/controls/MapControls.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { FlyControls } from 'three/addons/controls/FlyControls.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
+			import { DragControls } from 'three/addons/controls/DragControls.js';
+			import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+			
+			// Import loaders
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			window.THREE = THREE; // Used by APP Scripts.
+			
+			// Make controls available globally for APP.Player
+			window.OrbitControls = OrbitControls;
+			window.MapControls = MapControls;
+			window.TrackballControls = TrackballControls;
+			window.FlyControls = FlyControls;
+			window.FirstPersonControls = FirstPersonControls;
+			window.PointerLockControls = PointerLockControls;
+			window.TransformControls = TransformControls;
+			window.DragControls = DragControls;
+			window.ArcballControls = ArcballControls;
+			
+			// Make loaders available globally
+			window.GLTFLoader = GLTFLoader;
 
 			var loader = new THREE.FileLoader();
 			loader.load( 'app.json', function ( text ) {
@@ -53,5 +82,8 @@
 			/* edit button */
 
 		</script>
+		
+		<!-- Scene initialization and configuration from query string -->
+		<script type="module" src="./js/scene.js"></script>
 	</body>
 </html>

@@ -1,4 +1,4 @@
-# three.js
+# Rob's Enhanced Three.js Fork
 
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
@@ -6,20 +6,52 @@
 [![Discord][discord]][discord-url]
 [![DeepWiki][deepwiki]][deepwiki-url]
 
-#### JavaScript 3D library
+#### JavaScript 3D library with Enhanced Scene Editor
 
-The aim of the project is to create an easy-to-use, lightweight, cross-browser, general-purpose 3D library. The current builds only include WebGL and WebGPU renderers but SVG and CSS3D renderers are also available as addons.
+This is **Rob Higgins' fork** of the open-source [three.js](https://github.com/mrdoob/three.js) project, featuring significant enhancements to the built-in scene editor and new functionality for interactive 3D scene development.
 
-[Examples](https://threejs.org/examples/) &mdash;
-[Docs](https://threejs.org/docs/) &mdash;
-[Manual](https://threejs.org/manual/) &mdash;
-[Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
-[Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
-[Questions](https://stackoverflow.com/questions/tagged/three.js) &mdash;
-[Forum](https://discourse.threejs.org/) &mdash;
-[Discord](https://discord.gg/56GBJwAnUS)
+**Original three.js project:** The aim of the original project is to create an easy-to-use, lightweight, cross-browser, general-purpose 3D library. The current builds only include WebGL and WebGPU renderers but SVG and CSS3D renderers are also available as addons.
 
-### Usage
+## 🎯 Key Enhancements in This Fork
+
+### Enhanced Scene Editor Runtime Environment (`/editor/`)
+- **Remote GLB Loading Support**: Load multiple GLB/GLTF files into the scene with individual transforms (`target_0_glb`, `target_1_glb`, etc.), configured through URL parameters
+- **Advanced Camera Targeting**: Automatic camera centering on objects
+- **Interactive Drag Controls**: Y-axis constrained dragging with animated ground snapping
+- **Ground Plane System**: Dynamic ground plane with 38+ PBR material textures
+- **Save & Share Features**: 
+  - Screenshot export with timestamp
+  - QR code generation for scene sharing
+  - URL parameter encoding for all settings
+- **Control Systems**: 
+  - Orbit controls with object targeting
+  - FirstPerson mode with Y-position locking
+  - Drag controls with object filtering
+- **Asset Management**: Organized texture library under `/assets/textures/`
+
+### Technical Improvements
+- **Async Loading**: Proper handling of GLB loading with retry mechanisms
+- **URL Parameters**: Complete scene state encoding in query strings
+- **Form Integration**: Real-time settings synchronization
+- **Mobile Support**: Touch-friendly controls and responsive design
+
+## 🚀 Getting Started
+
+### Quick Start - Enhanced Editor
+```bash
+npm ci                    # Install dependencies
+npm start                 # Start development server
+```
+
+Navigate to `http://localhost:8080/editor/` to access the enhanced scene editor.
+
+### Editor URL Parameters
+The editor supports comprehensive URL parameter configuration:
+```
+?target=Target_0&controls=orbit&ground_material=GroundSand005&ground_texture_repeat=2
+```
+
+### Core Three.js Usage
 
 This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the `document.body` element. Finally, it animates the cube within the scene for the camera.
 
@@ -60,17 +92,81 @@ function animate( time ) {
 
 If everything goes well, you should see [this](https://jsfiddle.net/w43x5Lgh/).
 
+## 📁 Project Structure
+
+```
+three.js/
+├── editor/                     # Enhanced Scene Editor
+│   ├── assets/
+│   │   └── textures/          # 38+ PBR material textures
+│   ├── js/libs/
+│   │   ├── scene.js           # Scene configuration & GLB loading
+│   │   └── app.js             # Camera controls & targeting
+│   └── index.html             # Editor entry point
+├── examples/                   # Three.js examples
+├── src/                       # Core Three.js source
+├── build/                     # Generated builds
+└── docs/                      # API documentation
+```
+
+## 🔧 Development
+
+### Building
+```bash
+npm run build                  # Full production build
+npm run build-module          # ES6 module only
+```
+
+### Testing
+```bash
+npm test                       # Run all tests
+npm run test-e2e              # End-to-end testing
+npm run lint                  # Code linting
+```
+
+### Editor Development
+The enhanced editor includes:
+- Multi-target GLB loading system
+- Camera targeting with bounding box calculations
+- Drag controls with Y-axis constraints
+- Ground plane with material textures
+- QR code sharing functionality
+
+## 🌐 Links & Resources
+
+**Original Three.js:**
+[Examples](https://threejs.org/examples/) &mdash;
+[Docs](https://threejs.org/docs/) &mdash;
+[Manual](https://threejs.org/manual/) &mdash;
+[Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
+[Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
+[Questions](https://stackoverflow.com/questions/tagged/three.js) &mdash;
+[Forum](https://discourse.threejs.org/) &mdash;
+[Discord](https://discord.gg/56GBJwAnUS)
+
+**This Fork:**
+- Enhanced Editor: `/editor/index.html`
+- Original Repository: [mrdoob/three.js](https://github.com/mrdoob/three.js)
+
 ### Cloning this repository
 
 Cloning the repo with all its history results in a ~2 GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
 
 ```sh
-git clone --depth=1 https://github.com/mrdoob/three.js.git
+git clone --depth=1 https://github.com/higginsrob/three.js.git
 ```
 
 ### Change log
 
-[Releases](https://github.com/mrdoob/three.js/releases)
+**Fork Changes:**
+- Enhanced scene editor with multi-target support
+- Advanced camera targeting system
+- Interactive drag controls with constraints
+- Ground plane with PBR material library
+- Save/share functionality with QR codes
+- Comprehensive URL parameter system
+
+**Original Three.js:** [Releases](https://github.com/mrdoob/three.js/releases)
 
 
 [npm]: https://img.shields.io/npm/v/three

@@ -109,13 +109,12 @@ class Font {
 	 *
 	 * @param {string} text - The text.
 	 * @param {number} [size=100] - The text size.
-	 * @param {string} [direction='ltr'] - Char direction: ltr(left to right), rtl(right to left) & tb(top bottom).
 	 * @return {Array<Shape>} An array of shapes representing the text.
 	 */
-	generateShapes( text, size = 100, direction = 'ltr' ) {
+	generateShapes( text, size = 100 ) {
 
 		const shapes = [];
-		const paths = createPaths( text, size, this.data, direction );
+		const paths = createPaths( text, size, this.data );
 
 		for ( let p = 0, pl = paths.length; p < pl; p ++ ) {
 
@@ -129,7 +128,7 @@ class Font {
 
 }
 
-function createPaths( text, size, data, direction ) {
+function createPaths( text, size, data ) {
 
 	const chars = Array.from( text );
 	const scale = size / data.resolution;
@@ -138,12 +137,6 @@ function createPaths( text, size, data, direction ) {
 	const paths = [];
 
 	let offsetX = 0, offsetY = 0;
-
-	if ( direction == 'rtl' || direction == 'tb' ) {
-
-		chars.reverse();
-
-	}
 
 	for ( let i = 0; i < chars.length; i ++ ) {
 
@@ -157,18 +150,7 @@ function createPaths( text, size, data, direction ) {
 		} else {
 
 			const ret = createPath( char, scale, offsetX, offsetY, data );
-
-			if ( direction == 'tb' ) {
-
-				offsetX = 0;
-				offsetY += data.ascender * scale;
-
-			} else {
-
-				offsetX += ret.offsetX;
-
-			}
-
+			offsetX += ret.offsetX;
 			paths.push( ret.path );
 
 		}

@@ -89,7 +89,7 @@
 
 			const params = {
 
-				'line type': 1,
+				'line type': 0,
 				'world units': matLine.worldUnits,
 				'visualize threshold': matThresholdLine.visible,
 				'width': matLine.linewidth,
@@ -177,11 +177,13 @@
 				segments.computeLineDistances();
 				segments.scale.set( 1, 1, 1 );
 				scene.add( segments );
+				segments.visible = false;
 
 				thresholdSegments = new LineSegments2( segmentsGeometry, matThresholdLine );
 				thresholdSegments.computeLineDistances();
 				thresholdSegments.scale.set( 1, 1, 1 );
 				scene.add( thresholdSegments );
+				thresholdSegments.visible = false;
 
 				line = new Line2( lineGeometry, matLine );
 				line.computeLineDistances();
@@ -196,10 +198,6 @@
 				const geo = new THREE.BufferGeometry();
 				geo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-
-				//
-
-				switchLine( params[ 'line type' ] );
 
 				//
 
@@ -315,7 +313,7 @@
 
 					switchLine( val );
 
-				} );
+				} ).setValue( 1 );
 
 				gui.add( params, 'world units' ).onChange( function ( val ) {
 

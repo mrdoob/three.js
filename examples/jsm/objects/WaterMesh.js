@@ -51,7 +51,7 @@ class WaterMesh extends Mesh {
 		 * @type {number}
 		 * @default 0.5
 		 */
-		this.resolutionScale = options.resolutionScale !== undefined ? options.resolutionScale : 0.5;
+		this.resolution = options.resolution !== undefined ? options.resolution : 0.5;
 
 		// Uniforms
 
@@ -161,7 +161,7 @@ class WaterMesh extends Mesh {
 
 			const mirrorSampler = reflector();
 			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
-			mirrorSampler.reflector.resolutionScale = this.resolutionScale;
+			mirrorSampler.resolution = this.resolution;
 
 			this.add( mirrorSampler.target );
 
@@ -183,7 +183,7 @@ class WaterMesh extends Mesh {
  * Constructor options of `WaterMesh`.
  *
  * @typedef {Object} WaterMesh~Options
- * @property {number} [resolutionScale=0.5] - The resolution scale.
+ * @property {number} [resolution=0.5] - The resolution scale.
  * @property {?Texture} [waterNormals=null] - The water's normal map.
  * @property {number} [alpha=1] - The alpha value.
  * @property {number} [size=1] - The size value.

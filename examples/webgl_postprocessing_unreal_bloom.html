@@ -53,7 +53,7 @@
 			const params = {
 				threshold: 0,
 				strength: 1,
-				radius: 0.5,
+				radius: 0,
 				exposure: 1
 			};
 
@@ -92,7 +92,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
 				container.appendChild( renderer.domElement );
 
 				//

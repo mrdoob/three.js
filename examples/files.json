@@ -160,9 +160,6 @@
 		"webgl_materials_video",
 		"webgl_materials_video_webcam",
 		"webgl_materials_wireframe",
-		"webgl_pmrem_cubemap",
-		"webgl_pmrem_equirectangular",
-		"webgl_pmrem_test",
 		"webgl_math_obb",
 		"webgl_math_orientation_transform",
 		"webgl_mesh_batch",
@@ -402,7 +399,6 @@
 		"webgpu_pmrem_cubemap",
 		"webgpu_pmrem_equirectangular",
 		"webgpu_pmrem_scene",
-		"webgpu_pmrem_test",
 		"webgpu_portal",
 		"webgpu_postprocessing_3dlut",
 		"webgpu_postprocessing_afterimage",
@@ -426,7 +422,6 @@
 		"webgpu_postprocessing_ssaa",
 		"webgpu_postprocessing_ssgi",
 		"webgpu_postprocessing_ssr",
-		"webgpu_postprocessing_sss",
 		"webgpu_postprocessing_traa",
 		"webgpu_postprocessing_transition",
 		"webgpu_postprocessing",
@@ -577,6 +572,7 @@
 	],
 	"tests": [
 		"webgl_furnace_test",
+		"webgl_pmrem_test",
 		"misc_uv_tests"
 	]
 }

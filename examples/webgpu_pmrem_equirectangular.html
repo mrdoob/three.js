@@ -22,11 +22,13 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { normalWorldGeometry, uniform, pmremTexture } from 'three/tsl';
+			import { normalWorldGeometry, uniform, normalView, positionViewDirection, cameraViewMatrix, pmremTexture } from 'three/tsl';
 
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 
@@ -38,7 +40,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( 0, 0, 8 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
 
 				scene = new THREE.Scene();
 
@@ -49,12 +51,14 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
 
-				await renderer.init();
+				//await renderer.init();
 
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
 				controls.update();
@@ -65,28 +69,19 @@
 
 						map.mapping = THREE.EquirectangularReflectionMapping;
 
-						scene.backgroundNode = pmremTexture( map, normalWorldGeometry, uniform( 0.5 ) );
+						const reflectVec = positionViewDirection.negate().reflect( normalView ).transformDirection( cameraViewMatrix );
 
-						const geometry = new THREE.SphereGeometry( 0.4, 64, 64 );
+						const pmremRoughness = uniform( .5 );
+						const pmremNode = pmremTexture( map, reflectVec, pmremRoughness );
 
-						for ( let i = 0; i < 6; i ++ ) {
+						scene.backgroundNode = pmremTexture( map, normalWorldGeometry, pmremRoughness );
 
-							for ( let j = 0; j < 5; j ++ ) {
+						scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new THREE.MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
 
-								const material = new THREE.MeshPhysicalNodeMaterial( {
-									roughness: i / 5,
-									metalness: j / 4,
-									envMap: map
-								} );
+						// gui
 
-								const mesh = new THREE.Mesh( geometry, material );
-								mesh.position.x = i - 2.5;
-								mesh.position.y = j - 2;
-								scene.add( mesh );
-
-							}
-
-						}
+						const gui = renderer.inspector.createParameters( 'Settings' );
+						gui.add( pmremRoughness, 'value', 0, 1, 0.001 ).name( 'roughness' ).onChange( () => render() );
 
 					} );
 

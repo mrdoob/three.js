@@ -145,9 +145,7 @@ class UnrealBloomPass extends Pass {
 		// gaussian blur materials
 
 		this.separableBlurMaterials = [];
-		// These sizes have been changed to account for the altered coefficients-calculation to avoid blockiness,
-		// while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
-		const kernelSizeArray = [ 6, 10, 14, 18, 22 ];
+		const kernelSizeArray = [ 3, 5, 7, 9, 11 ];
 		resx = Math.round( this.resolution.x / 2 );
 		resy = Math.round( this.resolution.y / 2 );
 
@@ -378,11 +376,10 @@ class UnrealBloomPass extends Pass {
 	_getSeparableBlurMaterial( kernelRadius ) {
 
 		const coefficients = [];
-		const sigma = kernelRadius / 3;
 
 		for ( let i = 0; i < kernelRadius; i ++ ) {
 
-			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
+			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( kernelRadius * kernelRadius ) ) / kernelRadius );
 
 		}
 
@@ -423,9 +420,10 @@ class UnrealBloomPass extends Pass {
 						vec2 uvOffset = direction * invSize * x;
 						vec3 sample1 = texture2D( colorTexture, vUv + uvOffset ).rgb;
 						vec3 sample2 = texture2D( colorTexture, vUv - uvOffset ).rgb;
-						diffuseSum += ( sample1 + sample2 ) * w;
+						diffuseSum += (sample1 + sample2) * w;
+						weightSum += 2.0 * w;
 					}
-					gl_FragColor = vec4( diffuseSum, 1.0 );
+					gl_FragColor = vec4(diffuseSum/weightSum, 1.0);
 				}`
 		} );
 

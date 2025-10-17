@@ -67,21 +67,39 @@
 			import { Toolbar } from './js/Toolbar.js';
 			import { Script } from './js/Script.js';
 			import { Player } from './js/Player.js';
-			import { Sidebar } from './js/Sidebar.js';
-			import { Menubar } from './js/Menubar.js';
-			import { Resizer } from './js/Resizer.js';
+		import { Sidebar } from './js/Sidebar.js';
+		import { Menubar } from './js/Menubar.js';
+		import { Resizer } from './js/Resizer.js';
+		import { OrbitControls } from './js/OrbitControls.js';
+		import { MapControls } from './js/MapControls.js';
+		import { TrackballControls } from './js/TrackballControls.js';
+		import { FlyControls } from './js/FlyControls.js';
+		import { FirstPersonControls } from './js/FirstPersonControls.js';
+		import { PointerLockControls } from './js/PointerLockControls.js';
+		import { TransformControls } from './js/TransformControls.js';
+		import { DragControls } from './js/DragControls.js';
+		import { ArcballControls } from './js/ArcballControls.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			window.URL = window.URL || window.webkitURL;
-			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+		window.URL = window.URL || window.webkitURL;
+		window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
-			//
+		//
 
-			const editor = new Editor();
+		const editor = new Editor();
 
-			window.editor = editor; // Expose editor to Console
-			window.THREE = THREE; // Expose THREE to APP Scripts and Console
-
-			const viewport = new Viewport( editor );
+		window.editor = editor; // Expose editor to Console
+		window.THREE = THREE; // Expose THREE to APP Scripts and Console
+		window.OrbitControls = OrbitControls;
+		window.MapControls = MapControls;
+		window.TrackballControls = TrackballControls;
+		window.FlyControls = FlyControls;
+		window.FirstPersonControls = FirstPersonControls;
+		window.PointerLockControls = PointerLockControls;
+		window.TransformControls = TransformControls;
+		window.DragControls = DragControls;
+		window.ArcballControls = ArcballControls;
+		window.GLTFLoader = GLTFLoader;			const viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
 			const toolbar = new Toolbar( editor );
