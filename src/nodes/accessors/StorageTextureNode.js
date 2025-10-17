@@ -61,6 +61,14 @@ class StorageTextureNode extends TextureNode {
 		this.storeNode = storeNode;
 
 		/**
+		 * The mip level to write to for storage textures.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.mipLevel = 0;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -111,6 +119,19 @@ class StorageTextureNode extends TextureNode {
 	setAccess( value ) {
 
 		this.access = value;
+		return this;
+
+	}
+
+	/**
+	 * Sets the mip level to write to.
+	 *
+	 * @param {number} level - The mip level.
+	 * @return {StorageTextureNode} A reference to this node.
+	 */
+	setMipLevel( level ) {
+
+		this.mipLevel = level;
 		return this;
 
 	}
@@ -200,6 +221,7 @@ class StorageTextureNode extends TextureNode {
 
 		const newNode = super.clone();
 		newNode.storeNode = this.storeNode;
+		newNode.mipLevel = this.mipLevel;
 		return newNode;
 
 	}

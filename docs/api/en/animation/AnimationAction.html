@@ -24,17 +24,17 @@
 
 		<h3>
 			[name]( [param:AnimationMixer mixer], [param:AnimationClip clip],
-			[param:Object3D localRoot] )
+			[param:Object3D localRoot], [param:Number blendMode] )
 		</h3>
 		<p>
 			[page:AnimationMixer mixer] - the `AnimationMixer` that is controlled by
 			this action.<br />
 			[page:AnimationClip clip] - the `AnimationClip` that holds the animation
 			data for this action.<br />
-			[page:Object3D localRoot] - the root object on which this action is
-			performed.<br />
-			[page:Number blendMode] - defines how the animation is blended/combined
-			when two or more animations are simultaneously played.<br /><br />
+			[page:Object3D localRoot] (optional) - the root object on which this action is
+			performed. Default is `null`.<br />
+			[page:Number blendMode] (optional)- defines how the animation is blended/combined
+			when two or more animations are simultaneously played. Default is *clip.blendMode*.<br /><br />
 
 			Note: Instead of calling this constructor directly you should instantiate
 			an AnimationAction with [page:AnimationMixer.clipAction] since this method

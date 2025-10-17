@@ -737,6 +737,7 @@ class PassNode extends TempNode {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
+		const currentAutoClear = renderer.autoClear;
 		const currentMask = camera.layers.mask;
 
 		this._cameraNear.value = camera.near;
@@ -756,6 +757,7 @@ class PassNode extends TempNode {
 
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
+		renderer.autoClear = true;
 
 		const currentSceneName = scene.name;
 
@@ -767,6 +769,7 @@ class PassNode extends TempNode {
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
+		renderer.autoClear = currentAutoClear;
 
 		camera.layers.mask = currentMask;
 

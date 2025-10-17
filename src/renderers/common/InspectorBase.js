@@ -79,6 +79,13 @@ class InspectorBase {
 	finish() { }
 
 	/**
+	 * Inspects a node.
+	 *
+	 * @param {Node} node - The node to inspect.
+	 */
+	inspect( /*node*/ ) { }
+
+	/**
 	 * When a compute operation is performed.
 	 *
 	 * @param {ComputeNode} computeNode - The compute node being executed.
@@ -103,7 +110,7 @@ class InspectorBase {
 	finishCompute( /*uid*/ ) { }
 
 	/**
-	 * Called whean a render operation begins.
+	 * Called when a render operation begins.
 	 *
 	 * @param {string} uid - A unique identifier for the render context.
 	 * @param {Scene} scene - The scene being rendered.

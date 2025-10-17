@@ -4,13 +4,18 @@
 		<title>three.js webgpu - scenes transition</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu scene transitions.<br/>
-			Original implementation by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Scene Transitions</span>
+			</div>
+
+			<small>Original implementation by <a href="https://twitter.com/fernandojsg" target="_blank">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos" target="_blank">github</a>.</small>
 		</div>
 
 		<script type="importmap">
@@ -28,8 +33,10 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { uniform, pass } from 'three/tsl';
 			import { transition } from 'three/addons/tsl/display/TransitionNode.js';
 
@@ -154,6 +161,7 @@
 				}
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.inspector = new Inspector();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -168,7 +176,7 @@
 
 				postProcessing.outputNode = transitionPass;
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( effectController, 'animateScene' ).name( 'Animate Scene' );
 				gui.add( effectController, 'animateTransition' ).name( 'Animate Transition' );

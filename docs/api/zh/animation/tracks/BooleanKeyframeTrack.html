@@ -26,7 +26,9 @@
 			[page:Array times] - (必须) 关键帧的时间数组.<br />
 			[page:Array values] - 与时间数组中的时间点对应的值数组.<br />
 		</p>
-
+		<p>
+			此关键帧轨道类型没有插值参数，因为插值始终是 [page:Animation InterpolateDiscrete]。
+		</p>
 
 		<h2>属性</h2>
 
@@ -37,17 +39,17 @@
 
 		<h3>[property:Constant DefaultInterpolation]</h3>
 		<p>
-			默认的插值类型。 参见 [page:Animation InterpolateDiscrete].
+			默认的插值类型。只有 [page:Animation InterpolateDiscrete] 为有效值。
 		</p>
 
 		<h3>[property:Array ValueBufferType]</h3>
 		<p>
-			一个基本数组 (不是 Float32Array 类型, 与 [page:KeyframeTrack] 内的 *ValueBufferType* 属性不一样).
+			一个基本数组 (不是 Float32Array 类型, 与 [page:KeyframeTrack] 内的 `ValueBufferType` 属性不一样).
 		</p>
 
 		<h3>[property:String ValueTypeName]</h3>
 		<p>
-			String 'bool'.
+			字符串 'bool'。
 		</p>
 
 

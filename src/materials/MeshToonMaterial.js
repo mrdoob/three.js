@@ -7,6 +7,7 @@ import { Color } from '../math/Color.js';
  * A material implementing toon shading.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshToonMaterial
  */
 class MeshToonMaterial extends Material {
 

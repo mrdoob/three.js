@@ -17,7 +17,6 @@ import {
 	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
-import { DepthTexture } from '../../../textures/DepthTexture.js';
 import { Texture } from '../../../textures/Texture.js';
 import { warn, error } from '../../../utils.js';
 
@@ -86,23 +85,6 @@ class WebGPUTextureUtils {
 		 * @default null
 		 */
 		this.defaultVideoFrame = null;
-
-		this.frameBufferData = {
-			color: {
-				buffer: null, // TODO: Move to FramebufferTexture
-				width: 0,
-				height: 0,
-				samples: 0
-			},
-			depth: {
-				texture: new DepthTexture(),
-				width: 0,
-				height: 0,
-				samples: 0,
-				depth: false,
-				stencil: false
-			}
-		};
 
 		/**
 		 * A cache of shared texture samplers.
@@ -362,8 +344,9 @@ class WebGPUTextureUtils {
 	 * Generates mipmaps for the given texture.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	generateMipmaps( texture ) {
+	generateMipmaps( texture, encoder = null ) {
 
 		const textureData = this.backend.get( texture );
 
@@ -371,7 +354,7 @@ class WebGPUTextureUtils {
 
 			for ( let i = 0; i < 6; i ++ ) {
 
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
 
 			}
 
@@ -381,7 +364,7 @@ class WebGPUTextureUtils {
 
 			for ( let i = 0; i < depth; i ++ ) {
 
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
 
 			}
 
@@ -398,20 +381,22 @@ class WebGPUTextureUtils {
 	getColorBuffer() {
 
 		const backend = this.backend;
+		const canvasTarget = backend.renderer.getCanvasTarget();
 		const { width, height } = backend.getDrawingBufferSize();
 		const samples = backend.renderer.currentSamples;
 
-		const frameBufferColor = this.frameBufferData.color;
+		const colorTexture = canvasTarget.colorTexture;
+		const colorTextureData = backend.get( colorTexture );
 
-		if ( frameBufferColor.width === width && frameBufferColor.height === height && frameBufferColor.samples === samples ) {
+		if ( colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
 
-			return frameBufferColor.buffer;
+			return colorTextureData.texture;
 
 		}
 
 		// recreate
 
-		let colorBuffer = frameBufferColor.buffer;
+		let colorBuffer = colorTextureData.texture;
 
 		if ( colorBuffer ) colorBuffer.destroy();
 
@@ -429,10 +414,11 @@ class WebGPUTextureUtils {
 
 		//
 
-		frameBufferColor.buffer = colorBuffer;
-		frameBufferColor.width = width;
-		frameBufferColor.height = height;
-		frameBufferColor.samples = samples;
+		colorTexture.source.width = width;
+		colorTexture.source.height = height;
+		colorTexture.samples = samples;
+
+		colorTextureData.texture = colorBuffer;
 
 		return colorBuffer;
 
@@ -449,11 +435,11 @@ class WebGPUTextureUtils {
 	getDepthBuffer( depth = true, stencil = false ) {
 
 		const backend = this.backend;
+		const canvasTarget = backend.renderer.getCanvasTarget();
 		const { width, height } = backend.getDrawingBufferSize();
 		const samples = backend.renderer.currentSamples;
 
-		const frameBufferDepth = this.frameBufferData.depth;
-		const depthTexture = frameBufferDepth.texture;
+		const depthTexture = canvasTarget.depthTexture;
 
 		if ( depthTexture.width === width &&
 			depthTexture.height === height &&
@@ -485,7 +471,7 @@ class WebGPUTextureUtils {
 
 		if ( depthTextureGPU !== undefined ) {
 
-			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
+			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type && depthTexture.samples === samples ) {
 
 				return depthTextureGPU;
 
@@ -502,6 +488,7 @@ class WebGPUTextureUtils {
 		depthTexture.type = type;
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
+		depthTexture.samples = samples;
 
 		this.createTexture( depthTexture, { width, height } );
 
@@ -828,10 +815,11 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureDescriptorGPU - The texture descriptor.
 	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
+	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0, encoder = null ) {
 
-		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
+		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer, encoder );
 
 	}
 

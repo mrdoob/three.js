@@ -194,22 +194,17 @@ class KTX2Loader extends Loader {
 	 * Async version of {@link KTX2Loader#detectSupport}.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @return {Promise} A Promise that resolves when the support has been detected.
 	 */
 	async detectSupportAsync( renderer ) {
 
-		this.workerConfig = {
-			astcSupported: await renderer.hasFeatureAsync( 'texture-compression-astc' ),
-			astcHDRSupported: false, // https://github.com/gpuweb/gpuweb/issues/3856
-			etc1Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
-			etc2Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
-			dxtSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
-			bptcSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
-			pvrtcSupported: await renderer.hasFeatureAsync( 'texture-compression-pvrtc' )
-		};
+		console.warn( 'KTX2Loader: "detectSupportAsync()" has been deprecated. Use "detectSupport()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		return this;
+		await renderer.init();
+
+		return this.detectSupport( renderer );
 
 	}
 
@@ -227,9 +222,9 @@ class KTX2Loader extends Loader {
 			this.workerConfig = {
 				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
 				astcHDRSupported: false, // https://github.com/gpuweb/gpuweb/issues/3856
-				etc1Supported: renderer.hasFeature( 'texture-compression-etc2' ),
+				etc1Supported: renderer.hasFeature( 'texture-compression-etc1' ),
 				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
-				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
+				dxtSupported: renderer.hasFeature( 'texture-compression-s3tc' ),
 				bptcSupported: renderer.hasFeature( 'texture-compression-bc' ),
 				pvrtcSupported: renderer.hasFeature( 'texture-compression-pvrtc' )
 			};
@@ -247,20 +242,20 @@ class KTX2Loader extends Loader {
 				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
 					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
 			};
-			
+
 			if ( typeof navigator !== 'undefined' &&
 				navigator.platform.indexOf( 'Linux' ) >= 0 && navigator.userAgent.indexOf( 'Firefox' ) >= 0 &&
-				this.workerConfig.astcSupported && this.workerConfig.etc2Supported && 
+				this.workerConfig.astcSupported && this.workerConfig.etc2Supported &&
 				this.workerConfig.bptcSupported && this.workerConfig.dxtSupported ) {
-					
+
 				// On Linux, Mesa drivers for AMD and Intel GPUs expose ETC2 and ASTC even though the hardware doesn't support these.
 				// Using these extensions will result in expensive software decompression on the main thread inside the driver, causing performance issues.
 				// When using ANGLE (e.g. via Chrome), these extensions are not exposed except for some specific Intel GPU models - however, Firefox doesn't perform this filtering.
 				// Since a granular filter is a little too fragile and we can transcode into other GPU formats, disable formats that are likely to be emulated.
-				
+
 				this.workerConfig.astcSupported = false;
 				this.workerConfig.etc2Supported = false;
-					
+
 			}
 
 		}

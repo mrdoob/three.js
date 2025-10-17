@@ -6,7 +6,8 @@ export class Style {
 
 		const css = `
 :root {
-	--profiler-bg: #1e1e24;
+	--profiler-bg: #1e1e24f5;
+	--profiler-header-bg: #2a2a33aa;
 	--profiler-header: #2a2a33;
 	--profiler-border: #4a4a5a;
 	--text-primary: #e0e0e0;
@@ -21,9 +22,12 @@ export class Style {
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Fira+Code&display=swap');
 
-#profiler-panel * {
+#profiler-panel *, #profiler-toggle * {
 	text-transform: initial;
 	line-height: normal;
+	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 #profiler-toggle {
@@ -96,6 +100,7 @@ export class Style {
 	right: 0;
 	height: 350px;
 	background-color: var(--profiler-bg);
+	backdrop-filter: blur(8px);
 	border-top: 2px solid var(--profiler-border);
 	color: var(--text-primary);
 	display: flex;
@@ -132,15 +137,30 @@ export class Style {
 
 .profiler-header {
 	display: flex;
-	background-color: var(--profiler-header);
+	background-color: var(--profiler-header-bg);
 	border-bottom: 1px solid var(--profiler-border);
 	flex-shrink: 0;
 	justify-content: space-between;
 	align-items: stretch;
+
+	overflow-x: auto;
+	overflow-y: hidden;
+	width: calc(100% - 89px);
+	height: 38px;
 }
 
 .profiler-tabs {
 	display: flex;
+}
+
+.profiler-controls {
+	display: flex;
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 38px;
+	background: var(--profiler-header-bg);
+	border-bottom: 1px solid var(--profiler-border);
 }
 
 .tab-btn {
@@ -337,7 +357,6 @@ export class Style {
 .list-children-container {
 	padding-left: 1.5em;
 	overflow: hidden;
-	max-height: 1000px;
 	transition: max-height 0.1s ease-out;
 	margin-top: 2px;
 }
@@ -348,7 +367,7 @@ export class Style {
 
 .item-toggler {
 	display: inline-block;
-	width: 1.5em;
+	margin-right: 0.8em;
 	text-align: left;
 }
 
@@ -391,7 +410,7 @@ export class Style {
 .graph-svg {
 	width: 100%;
 	height: 80px;
-	background-color: #2a2a33;
+	background-color: var(--profiler-header);
 	border: 1px solid var(--profiler-border);
 	border-radius: 4px;
 }

@@ -390,7 +390,7 @@
 			},
 
 			"Modifiers": {
-				"EdgeSplit": "examples/en/modifiers/EdgeSplitModifier"
+				"EdgeSplitModifier": "examples/en/modifiers/EdgeSplitModifier"
 			},
 
 			"ConvexHull": {
@@ -927,6 +927,7 @@
 				"Interpolant": "api/zh/math/Interpolant",
 				"Line3": "api/zh/math/Line3",
 				"MathUtils": "api/zh/math/MathUtils",
+				"Matrix2": "api/zh/math/Matrix2",
 				"Matrix3": "api/zh/math/Matrix3",
 				"Matrix4": "api/zh/math/Matrix4",
 				"Plane": "api/zh/math/Plane",
@@ -951,6 +952,7 @@
 			"物体": {
 				"BatchedMesh": "api/zh/objects/BatchedMesh",
 				"Bone": "api/zh/objects/Bone",
+				"ClippingGroup": "api/zh/objects/ClippingGroup",
 				"Group": "api/zh/objects/Group",
 				"InstancedMesh": "api/zh/objects/InstancedMesh",
 				"Line": "api/zh/objects/Line",
@@ -1001,6 +1003,7 @@
 				"FramebufferTexture": "api/zh/textures/FramebufferTexture",
 				"Source": "api/zh/textures/Source",
 				"Texture": "api/zh/textures/Texture",
+				"VideoFrameTexture": "api/zh/textures/VideoFrameTexture",
 				"VideoTexture": "api/zh/textures/VideoTexture"
 			}
 
@@ -1046,10 +1049,10 @@
 
 			"线段": {
 				"Line2": "examples/zh/lines/Line2",
-				"LineGeometry": "examples/en/lines/LineGeometry",
-				"LineMaterial": "examples/en/lines/LineMaterial",
-				"LineSegments2": "examples/en/lines/LineSegments2",
-				"LineSegmentsGeometry": "examples/en/lines/LineSegmentsGeometry"
+				"LineGeometry": "examples/zh/lines/LineGeometry",
+				"LineMaterial": "examples/zh/lines/LineMaterial",
+				"LineSegments2": "examples/zh/lines/LineSegments2",
+				"LineSegmentsGeometry": "examples/zh/lines/LineSegmentsGeometry"
 			},
 
 			"加载器": {
@@ -1065,6 +1068,7 @@
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
 				"PDBLoader": "examples/zh/loaders/PDBLoader",
+				"PLYLoader": "examples/zh/loaders/PLYLoader",
 				"SVGLoader": "examples/zh/loaders/SVGLoader",
 				"TGALoader": "examples/zh/loaders/TGALoader"
 			},
@@ -1082,9 +1086,11 @@
 				"DRACOExporter": "examples/zh/exporters/DRACOExporter",
 				"EXRExporter": "examples/zh/exporters/EXRExporter",
 				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
+				"KTX2Exporter": "examples/zh/exporters/KTX2Exporter",
 				"OBJExporter": "examples/zh/exporters/OBJExporter",
 				"PLYExporter": "examples/zh/exporters/PLYExporter",
-				"STLExporter": "examples/zh/exporters/STLExporter"
+				"STLExporter": "examples/zh/exporters/STLExporter",
+				"USDZExporter": "examples/zh/exporters/USDZExporter"
 			},
 
 			"数学库": {

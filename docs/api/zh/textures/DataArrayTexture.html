@@ -78,7 +78,7 @@
 			[example:webgl_rendertarget_texture2darray WebGL / rendertarget / texture2darray]
 		</p>
 
-		<h2>特性(Properties)</h2>
+		<h2>属性(Properties)</h2>
 
 		<p>
       请参阅基本[page:Texture Texture]类以了解通用属性
@@ -102,6 +102,11 @@
 		<h3>[property:Boolean isDataArrayTexture]</h3>
 		<p>
       只读标志，用于检查给定对象是否属于[name]类型。
+		</p>
+
+		<h3>[property:Set layerUpdates]</h3>
+		<p>
+			纹理中需要更新的所有图层的集合(set)。查看 [Page:DataArrayTexture.addLayerUpdate addLayerUpdate]。
 		</p>
 
 		<h3>[property:number magFilter]</h3>
@@ -140,7 +145,19 @@
 		<h2>方法(Methods)</h2>
 
 		<p>
-      有关常用方法， 请参见[page:Texture Texture]类。
+      有关常用方法，请参见 [page:Texture Texture] 类。
+		</p>
+		
+		<h3>[method:addLayerUpdate addLayerUpdate]( layerIndex )</h3>
+		<p>
+			描述需要更新纹理的特定层。通常，当 [page:Texture.needsUpdate needsUpdate] 设置为 true 时，整个压缩纹理数组都会发送到 GPU。
+			标记特定层将仅传输数组中与特定深度相关的所有 mipmap 的子集，这通常可以提高性能。
+		</p>
+
+		<h3>[method:clearLayerUpdates clearLayerUpdates]()</h3>
+		<p>
+			清除图层更新记录。
+			查看 [Page:DataArrayTexture.addLayerUpdate addLayerUpdate]。
 		</p>
 
 		<h2>源代码(Source)</h2>

@@ -4,7 +4,7 @@
 		<title>three.js webgpu - anisotropic texture filtering</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 			body {
 				color: #444;
@@ -42,8 +42,17 @@
 	</head>
 
 	<body>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - anisotropic texture filtering example
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Anisotropic Texture Filtering</span>
+			</div>
+
+			<small>
+				Anisotropic texture filtering example.
+			</small>
 		</div>
 
 		<div id="lbl_left" class="lbl">
@@ -69,9 +78,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			let container, stats;
+			let container;
 
 			let camera, scene1, scene2, renderer;
 
@@ -93,7 +100,7 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				renderer.autoClear = false;
 
 				renderer.domElement.style.position = 'relative';
@@ -170,10 +177,7 @@
 				scene1.add( mesh1 );
 				scene2.add( mesh2 );
 
-				// STATS1
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				//
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
@@ -197,14 +201,6 @@
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
-
-			}
-
-
-			function animate() {
-
-				render();
-				stats.update();
 
 			}
 

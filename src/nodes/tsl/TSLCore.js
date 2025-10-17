@@ -37,7 +37,7 @@ export function addMethodChaining( name, nodeElement ) {
 
 			//if ( name === 'toVarIntent' ) return this;
 
-			return this.isStackNode ? this.add( nodeElement( ...params ) ) : nodeElement( this, ...params );
+			return this.isStackNode ? this.addToStack( nodeElement( ...params ) ) : nodeElement( this, ...params );
 
 		};
 
@@ -76,7 +76,7 @@ Node.prototype.assign = function ( ...params ) {
 
 		const nodeElement = NodeElements.get( 'assign' );
 
-		return this.add( nodeElement( ...params ) );
+		return this.addToStack( nodeElement( ...params ) );
 
 	}
 
@@ -488,8 +488,10 @@ class ShaderCallNodeInternal extends Node {
 		//
 
 		const previousSubBuildFn = builder.subBuildFn;
+		const previousFnCall = builder.fnCall;
 
 		builder.subBuildFn = subBuild;
+		builder.fnCall = this;
 
 		let result = null;
 
@@ -565,6 +567,7 @@ class ShaderCallNodeInternal extends Node {
 		}
 
 		builder.subBuildFn = previousSubBuildFn;
+		builder.fnCall = previousFnCall;
 
 		if ( shaderNode.once ) {
 
@@ -607,6 +610,10 @@ class ShaderCallNodeInternal extends Node {
 
 		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
+
+		const previousFnCall = builder.fnCall;
+
+		builder.fnCall = this;
 
 		if ( buildStage === 'setup' ) {
 
@@ -654,6 +661,8 @@ class ShaderCallNodeInternal extends Node {
 			result = outputNode.build( builder, output ) || '';
 
 		}
+
+		builder.fnCall = previousFnCall;
 
 		return result;
 
@@ -788,9 +797,15 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	getLayout() {
+
+		return this.layout;
+
+	}
+
 	call( rawInputs = null ) {
 
-		return nodeObject( new ShaderCallNodeInternal( this, rawInputs ) );
+		return new ShaderCallNodeInternal( this, rawInputs );
 
 	}
 
@@ -1114,7 +1129,7 @@ export const Switch = ( ...params ) => currentStack.Switch( ...params );
  */
 export function Stack( node ) {
 
-	if ( currentStack ) currentStack.add( node );
+	if ( currentStack ) currentStack.addToStack( node );
 
 	return node;
 
@@ -1206,4 +1221,3 @@ addMethodChaining( 'append', ( node ) => { // @deprecated, r176
 	return Stack( node );
 
 } );
-

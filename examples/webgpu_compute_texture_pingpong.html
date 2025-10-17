@@ -1,14 +1,23 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Ping/Pong Texture</title>
+		<title>three.js webgpu - compute ping/pong texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Ping/Pong Texture
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute Ping/Pong Texture</span>
+			</div>
+
+			<small>
+				Compute ping/pong texture using GPU.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -40,7 +49,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -162,11 +171,13 @@
 				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				// compute init
 
-				renderer.computeAsync( computeInitNode );
+				renderer.compute( computeInitNode );
 
 			}
 

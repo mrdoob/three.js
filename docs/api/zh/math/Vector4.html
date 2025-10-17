@@ -145,6 +145,9 @@
 			将所传入Vector4的[page:.x x]、[page:.y y]、[page:.z z]和[page:.w w]属性复制给这一Vector4。
 		</p>
 
+		<h3>[method:this divide]( [param:Vector4 v] )</h3>
+		<p>将此向量除以 [page:Vector4 v]。</p>
+
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
 		将该向量除以标量[page:Float s]。
@@ -253,6 +256,11 @@
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>将该向量与所传入的标量[page:Float s]进行相乘。</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+		将该向量的每个分量(x、y、z、w)设置为介于 0 和 1 之间的伪随机数，不包括 1。
+		</p>
+
 		<h3>[method:this round]()</h3>
 		<p>向量中的分量四舍五入取整为最接近的整数值。</p>
 
@@ -329,11 +337,6 @@
 		[page:Integer offset] - （可选） 数组中元素的偏移量。<br /><br />
 
 		返回一个数组[x, y, z, w]，或者将x、y、z和w复制到所传入的[page:Array array]中。
-		</p>
-
-		<h3>[method:this random]()</h3>
-		<p>
-		将该向量的每个分量(x、y、z、w)设置为介于 0 和 1 之间的伪随机数，不包括 1。
 		</p>
 
 		<h2>源代码</h2>

@@ -4,14 +4,21 @@
 		<title>three.js webgpu - reflection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - reflection<br/>
-			Based on <a href="https://oosmoxiecode.com/archive/js_webgl/recursive_tree_cubes/" target="_blank" rel="noopener">Recursive Tree Cubes</a>
-			by <a href="https://github.com/oosmoxiecode" target="_blank" rel="noopener">oosmoxiecode</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Reflection + Recursive Tree Cubes</span>
+			</div>
+
+			<small>
+				Based on <a href="https://oosmoxiecode.com/archive/js_webgl/recursive_tree_cubes/" target="_blank" rel="noopener">Recursive Tree Cubes</a>
+				by <a href="https://github.com/oosmoxiecode" target="_blank" rel="noopener">oosmoxiecode</a>
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -34,13 +41,13 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import TWEEN from 'three/addons/libs/tween.module.js';
 
 			let camera, scene, renderer;
 			let postProcessing;
 			let controls;
-			let stats;
 
 			// below uniforms will be animated via TWEEN.js
 
@@ -122,10 +129,8 @@
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				// controls
 
@@ -184,8 +189,6 @@
 			}
 
 			function animate() {
-
-				stats.update();
 
 				controls.update();
 

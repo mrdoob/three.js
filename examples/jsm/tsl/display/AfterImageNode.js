@@ -1,8 +1,8 @@
 import { RenderTarget, Vector2, QuadMesh, NodeMaterial, RendererUtils, TempNode, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, texture, passTexture, uniform, sign, max, convertToTexture } from 'three/tsl';
+import { nodeObject, Fn, float, uv, texture, passTexture, sign, max, convertToTexture } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
-const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
 
@@ -24,9 +24,9 @@ class AfterImageNode extends TempNode {
 	 * Constructs a new after image node.
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
-	 * @param {number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+	 * @param {Node<float>} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
 	 */
-	constructor( textureNode, damp = 0.96 ) {
+	constructor( textureNode, damp = float( 0.96 ) ) {
 
 		super( 'vec4' );
 
@@ -49,9 +49,9 @@ class AfterImageNode extends TempNode {
 		 * persists longer, while a lower value means it fades faster. Should be in
 		 * the range `[0, 1]`.
 		 *
-		 * @type {UniformNode<float>}
+		 * @type {Node<float>}
 		 */
-		this.damp = uniform( damp );
+		this.damp = damp;
 
 		/**
 		 * The render target used for compositing the effect.
@@ -144,10 +144,11 @@ class AfterImageNode extends TempNode {
 		this.textureNodeOld.value = this._oldRT.texture;
 
 		// comp
-		_quadMeshComp.material = this._materialComposed;
+		_quadMesh.material = this._materialComposed;
+		_quadMesh.name = 'AfterImage';
 
 		renderer.setRenderTarget( this._compRT );
-		_quadMeshComp.render( renderer );
+		_quadMesh.render( renderer );
 
 		// Swap the textures
 
@@ -234,9 +235,9 @@ class AfterImageNode extends TempNode {
  * @tsl
  * @function
  * @param {Node<vec4>} node - The node that represents the input of the effect.
- * @param {number} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
+ * @param {(Node<float>|number)} [damp=0.96] - The damping intensity. A higher value means a stronger after image effect.
  * @returns {AfterImageNode}
  */
-export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), damp ) );
+export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), nodeObject( damp ) ) );
 
 export default AfterImageNode;

@@ -57,7 +57,7 @@ class Performance extends Tab {
 		const frameStats = new Item( 'Frame Stats', createValueSpan(), createValueSpan(), createValueSpan() );
 		perfList.add( frameStats );
 
-		const miscellaneous = new Item( 'Miscellaneous / Idle', createValueSpan(), createValueSpan(), createValueSpan() );
+		const miscellaneous = new Item( 'Miscellaneous & Idle', createValueSpan(), createValueSpan(), createValueSpan() );
 		miscellaneous.domElement.firstChild.style.backgroundColor = '#00ff0b1a';
 		miscellaneous.domElement.firstChild.classList.add( 'no-hover' );
 		frameStats.add( miscellaneous );
@@ -129,9 +129,17 @@ class Performance extends Tab {
 
 		}
 
-		setText( item.data[ 0 ], item.userData.name );
+		let name = item.userData.name;
+
+		if ( stats.isComputeStats ) {
+
+			name += ' [ Compute ]';
+
+		}
+
+		setText( item.data[ 0 ], name );
 		setText( item.data[ 1 ], data.cpu.toFixed( 2 ) );
-		setText( item.data[ 2 ], data.gpu.toFixed( 2 ) );
+		setText( item.data[ 2 ], stats.gpuNotAvailable === true ? '-' : data.gpu.toFixed( 2 ) );
 		setText( item.data[ 3 ], data.total.toFixed( 2 ) );
 
 		//
@@ -154,7 +162,7 @@ class Performance extends Tab {
 
 	updateGraph( inspector/*, frame*/ ) {
 
-		this.graph.addPoint( 'fps', inspector.softFPS );
+		this.graph.addPoint( 'fps', inspector.fps );
 		this.graph.update();
 
 	}
@@ -248,6 +256,7 @@ class Performance extends Tab {
 		setText( this.miscellaneous.data[ 1 ], frame.miscellaneous.toFixed( 2 ) );
 		setText( this.miscellaneous.data[ 2 ], '-' );
 		setText( this.miscellaneous.data[ 3 ], frame.miscellaneous.toFixed( 2 ) );
+
 		//
 
 		this.currentItem = null;

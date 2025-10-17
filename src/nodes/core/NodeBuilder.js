@@ -451,6 +451,14 @@ class NodeBuilder {
 		 */
 		this.subBuildFn = null;
 
+		/**
+		 * The current TSL function(Fn) call node.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.fnCall = null;
+
 	}
 
 	/**
@@ -900,6 +908,22 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Adds context data to the builder's current context.
+	 *
+	 * @param {Object} context - The context to add.
+	 * @return {Object} The previous context.
+	 */
+	addContext( context ) {
+
+		const previousContext = this.getContext();
+
+		this.setContext( { ...this.context, ...context } );
+
+		return previousContext;
+
+	}
+
+	/**
 	 * Gets a context used in shader construction that can be shared across different materials.
 	 * This is necessary since the renderer cache can reuse shaders generated in one material and use them in another.
 	 *
@@ -979,7 +1003,8 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the instanceIndex input variable as a native shader string.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @abstract
 	 * @return {string} The instanceIndex shader string.
@@ -1649,6 +1674,11 @@ class NodeBuilder {
 	/**
 	 * Returns the properties for the given node and shader stage.
 	 *
+	 * Properties are typically used within a build stage to reference a node's
+	 * child node or nodes manually assigned to the properties in a separate build stage.
+	 * A typical usage pattern for defining nodes manually would be assigning dependency nodes
+	 * to the current node's properties in the setup stage and building those properties in the generate stage.
+	 *
 	 * @param {Node} node - The node to get the properties for.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage='any'] - The shader stage.
 	 * @return {Object} The node properties.
@@ -2258,6 +2288,12 @@ class NodeBuilder {
 
 	/**
 	 * Executes the node in a specific build stage.
+	 *
+	 * This function can be used to arbitrarily execute the specified build stage
+	 * outside of the standard build process. For instance, if a node's type depends
+	 * on properties created by the 'setup' stage, then flowBuildStage(node, 'setup')
+	 * can be used to execute the setup build stage and access its generated nodes
+	 * before the standard build process begins.
 	 *
 	 * @param {Node} node - The node to execute.
 	 * @param {string} buildStage - The build stage to execute the node in.

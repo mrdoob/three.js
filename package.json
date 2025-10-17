@@ -69,7 +69,6 @@
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-e2e-webgpu": "node test/e2e/puppeteer.js --webgpu",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
-    "test-circular-deps": "dpdm --no-warning --no-tree --exit-code circular:1 src/nodes/Nodes.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
@@ -98,21 +97,19 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.0",
     "concurrently": "^9.0.0",
-    "dpdm": "^3.14.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^6.0.0",
     "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
     "jimp": "^1.6.0",
-    "jsdoc": "^4.0.4",
+    "jsdoc": "^4.0.5",
     "magic-string": "^0.30.0",
     "pixelmatch": "^7.0.0",
     "puppeteer": "^22.0.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
     "rollup-plugin-filesize": "^10.0.0",
-    "rollup-plugin-visualizer": "^6.0.0",
     "servez": "^2.2.4"
   },
   "overrides": {

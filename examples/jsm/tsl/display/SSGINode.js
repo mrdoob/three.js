@@ -20,7 +20,7 @@ let _rendererState;
  *
  * The quality and performance of the effect mainly depend on `sliceCount` and `stepCount`.
  * The total number of samples taken per pixel is `sliceCount` * `stepCount` * `2`. Here are some
- * recommened presets depending on whether temporal filtering is used or not.
+ * recommended presets depending on whether temporal filtering is used or not.
  *
  * With temporal filtering (recommended):
  *
@@ -28,7 +28,7 @@ let _rendererState;
  * - Medium: `sliceCount` of `2`, `stepCount` of `8`.
  * - High: `sliceCount` of `3`, `stepCount` of `16`.
  *
- * Use for a higher slice count if you notice temporal instabilties like flickering. Reduce the sample
+ * Use for a higher slice count if you notice temporal instabilities like flickering. Reduce the sample
  * count then to mitigate the performance lost.
  *
  * Without temporal filtering:
@@ -51,7 +51,7 @@ class SSGINode extends TempNode {
 	/**
 	 * Constructs a new SSGI node.
 	 *
-	 * @param {TextureNode} beautyNode - The texture node that represents the input of the effect.
+	 * @param {TextureNode} beautyNode - A texture node that represents the beauty or scene pass.
 	 * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
 	 * @param {TextureNode} normalNode - A texture node that represents the scene's normals.
 	 * @param {PerspectiveCamera} camera - The camera the scene is rendered with.
@@ -61,9 +61,9 @@ class SSGINode extends TempNode {
 		super( 'vec4' );
 
 		/**
-		 * A node that represents the scene's depth.
+		 * A texture node that represents the beauty or scene pass.
 		 *
-		 * @type {Node<float>}
+		 * @type {TextureNode}
 		 */
 		this.beautyNode = beautyNode;
 
@@ -96,7 +96,7 @@ class SSGINode extends TempNode {
 		 * Number of per-pixel hemisphere slices. This has a big performance cost and should be kept as low as possible.
 		 * Should be in the range `[1, 4]`.
 		 *
-		 * @type {UniformNode<int>}
+		 * @type {UniformNode<uint>}
 		 * @default 1
 		 */
 		this.sliceCount = uniform( 1, 'uint' );
@@ -105,7 +105,7 @@ class SSGINode extends TempNode {
 		 * Number of samples taken along one side of a given hemisphere slice. This has a big performance cost and should
 		 * be kept as low as possible.  Should be in the range `[1, 32]`.
 		 *
-		 * @type {UniformNode<int>}
+		 * @type {UniformNode<uint>}
 		 * @default 12
 		 */
 		this.stepCount = uniform( 12, 'uint' );
@@ -180,7 +180,7 @@ class SSGINode extends TempNode {
 
 		/**
 		 * Whether to use temporal filtering or not. Setting this property to
-		 * `true` requires the usage of `TRAANode`. This will help to reduce noice
+		 * `true` requires the usage of `TRAANode`. This will help to reduce noise
 		 * although it introduces typical TAA artifacts like ghosting and temporal
 		 * instabilities.
 		 *
@@ -218,7 +218,7 @@ class SSGINode extends TempNode {
 		/**
 		 * Temporal offset added to the initial ray step.
 		 *
-		 * @type {UniformNode<vec2>}
+		 * @type {UniformNode<float>}
 		 */
 		this._temporalOffset = uniform( 0 );
 
@@ -476,7 +476,7 @@ class SSGINode extends TempNode {
 
 			} ).Else( () => {
 
-				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is requried
+				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is required
 
 			} );
 
