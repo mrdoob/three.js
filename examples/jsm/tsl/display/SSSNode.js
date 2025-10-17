@@ -1,5 +1,5 @@
 import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
-import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, dot, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix } from 'three/tsl';
+import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, nodeObject, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -371,20 +371,6 @@ class SSSNode extends TempNode {
 
 		};
 
-		// Interleaved gradient function from Jimenez 2014 http://goo.gl/eomGso
-
-		const gradientNoise = Fn( ( [ position ] ) => {
-
-			return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
-
-		} ).setLayout( {
-			name: 'gradientNoise',
-			type: 'float',
-			inputs: [
-				{ name: 'position', type: 'vec2' }
-			]
-		} );
-
 		const sss = Fn( () => {
 
 			const depth = sampleDepth( uvNode ).toVar();
@@ -419,7 +405,7 @@ class SSSNode extends TempNode {
 			const ySpan = yLen.div( totalStep ).toVar();
 
 			// compute noise based ray offset
-			const noise = gradientNoise( screenCoordinate );
+			const noise = interleavedGradientNoise( screenCoordinate );
 			const offset = fract( noise.add( this._temporalOffset ) ).add( rand( uvNode.add( this._frameId ) ) ).toConst( 'offset' );
 
 			const occlusion = float( 0 ).toVar();

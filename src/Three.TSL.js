@@ -198,6 +198,7 @@ export const getDirection = TSL.getDirection;
 export const getDistanceAttenuation = TSL.getDistanceAttenuation;
 export const getGeometryRoughness = TSL.getGeometryRoughness;
 export const getNormalFromDepth = TSL.getNormalFromDepth;
+export const interleavedGradientNoise = TSL.interleavedGradientNoise;
 export const getParallaxCorrectNormal = TSL.getParallaxCorrectNormal;
 export const getRoughness = TSL.getRoughness;
 export const getScreenPosition = TSL.getScreenPosition;

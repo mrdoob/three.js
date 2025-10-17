@@ -1,4 +1,4 @@
-import { abs, cross, float, Fn, normalize, ivec2, sub, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
+import { abs, cross, float, Fn, normalize, ivec2, sub, vec2, vec3, vec4, fract, dot } from '../tsl/TSLBase.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { textureLoad } from '../accessors/TextureNode.js';
 import { WebGPUCoordinateSystem } from '../../constants.js';
@@ -92,4 +92,31 @@ export const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projec
 
 	return normalize( cross( dpdx, dpdy ) );
 
+} );
+
+/**
+ * Interleaved Gradient Noise (IGN) from Jimenez 2014.
+ *
+ * IGN has "low discrepancy" resulting in evenly distributed samples. It's superior compared to
+ * default white noise, blue noise or Bayer.
+ *
+ * References:
+ * - {@link https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/}
+ * - {@link https://blog.demofox.org/2022/01/01/interleaved-gradient-noise-a-different-kind-of-low-discrepancy-sequence/}
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} position - The input position, usually screen coordinates.
+ * @return {Node<float>} The noise value.
+ */
+export const interleavedGradientNoise = Fn( ( [ position ] ) => {
+
+	return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
+
+} ).setLayout( {
+	name: 'interleavedGradientNoise',
+	type: 'float',
+	inputs: [
+		{ name: 'position', type: 'vec2' }
+	]
 } );
