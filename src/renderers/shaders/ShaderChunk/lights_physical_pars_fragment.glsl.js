@@ -546,10 +546,31 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_Physical
 #define RE_IndirectSpecular		RE_IndirectSpecular_Physical
 
+// Multi-bounce approximation for ambient occlusion.
+// Accumulates light from multiple surface bounces based on albedo.
+// ref: https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf
+vec3 gtaoMultiBounce( const in float ao, const in vec3 albedo ) {
+
+	vec3 a = 2.0404 * albedo - 0.3324;
+	vec3 b = -4.7951 * albedo + 0.6417;
+	vec3 c = 2.7552 * albedo + 0.6903;
+
+	return max( vec3( ao ), ( ( ao * a + b ) * ao + c ) * ao );
+
+}
+
+// Improved specular occlusion with better roughness handling.
 // ref: https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {
 
-	return saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );
+	float a = roughness * roughness;
+	float specularOcclusion = saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * a - 1.0 ) ) - 1.0 + ambientOcclusion );
+
+	// Reduce occlusion for very rough surfaces
+	float roughnessFactor = a * a;
+	specularOcclusion = mix( specularOcclusion, ambientOcclusion, roughnessFactor );
+
+	return specularOcclusion;
 
 }
 `;
