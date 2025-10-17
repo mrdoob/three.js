@@ -97,7 +97,7 @@ class StackNode extends Node {
 	 * @param {Node} node - The node to add.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	add( node ) {
+	addToStack( node ) {
 
 		if ( node.isNode !== true ) {
 
@@ -124,7 +124,7 @@ class StackNode extends Node {
 		const methodNode = new ShaderNode( method );
 		this._currentCond = select( boolNode, methodNode );
 
-		return this.add( this._currentCond );
+		return this.addToStack( this._currentCond );
 
 	}
 
@@ -226,7 +226,7 @@ class StackNode extends Node {
 
 			this._currentCond = condNode;
 
-			return this.add( this._currentCond );
+			return this.addToStack( this._currentCond );
 
 		} else {
 

@@ -4,24 +4,43 @@
 	<title>three.js webgpu - renderbundle</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css" rel="stylesheet" href="main.css">
-	<style>
-		#info {
-			background-color: rgba(0,0,0,0.75);
-		}
-	</style>
+	<link type="text/css" rel="stylesheet" href="example.css">
 </head>
+
 <body>
 
-	<div id="info">
+	<style>
 
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - renderbundle
-		<br />
-		(WebGL uses 10 times fewer meshes to prevent performance issues.)
+		#backend {
+			position: absolute;
+			top: 70px;
+			left: 0;
+			color: #fff;
+			background-color: rgba( 0, 0, 0, 0.75 );
+			padding: 5px;
+			width: 100%;
+			font-size: 13px;
+			text-align: center;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			z-index: 1;
+		}
 
+	</style>
+
+	<div id="info" class="invert">
+		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+		<div class="title-wrapper">
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+			<span>Render Bundle</span>
+		</div>
+
+		<small>
+			(WebGL uses 10 times fewer meshes to prevent performance issues.)
+		</small>
 	</div>
 
-	<div id="backend" style="position: absolute; top: 200px; left: 0; color: #fff; background-color: rgba(0,0,0,0.75); padding: 5px;">
+	<div id="backend">
 		Draw Calls: 0
 	</div>
 
@@ -41,14 +60,12 @@
 
 		import * as THREE from 'three/webgpu';
 
-		import Stats from 'stats-gl';
-
-		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 		let camera, scene, renderer;
-		let controls, stats;
+		let controls;
 		let gui;
 		let geometries, group;
 
@@ -185,7 +202,6 @@
 
 				renderer.dispose();
 				controls.dispose();
-				document.body.removeChild( stats.dom );
 				document.body.removeChild( renderer.domElement );
 
 			}
@@ -202,7 +218,7 @@
 			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
+			renderer.inspector = new Inspector();
 			renderer.setAnimationLoop( animate );
 
 			// scene
@@ -225,21 +241,10 @@
 			controls.autoRotate = true;
 			controls.autoRotateSpeed = 1.0;
 
-			// stats
-
-			stats = new Stats( {
-				precision: 3,
-				horizontal: false,
-				trackGPU: true,
-			} );
-			stats.init( renderer );
-			document.body.appendChild( stats.dom );
-			stats.dom.style.position = 'absolute';
-
 			// gui
 
-			gui = new GUI();
-			gui.add( api, 'renderBundle' ).onChange( () => {
+			gui = renderer.inspector.createParameters( 'Settings' );
+			gui.add( api, 'renderBundle' ).name( 'render bundle' ).onChange( () => {
 
 				init( ! api.webgpu );
 
@@ -289,9 +294,6 @@
 				if ( renderTimeAverages.length > 60 ) renderTimeAverages.shift();
 		
 				const average = renderTimeAverages.reduce( ( a, b ) => a + b, 0 ) / renderTimeAverages.length;
-
-				renderer.resolveTimestampsAsync();
-				stats.update();
 
 				document.getElementById( 'backend' ).innerText = `Average Render Time ${api.renderBundle ? '(Bundle)' : ''}: ` + average.toFixed( 2 ) + 'ms';
 

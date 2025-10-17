@@ -17,6 +17,7 @@ import { Euler } from '../math/Euler.js';
  * some graphical accuracy.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshPhongMaterial
  */
 class MeshPhongMaterial extends Material {
 

@@ -990,8 +990,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
+				await renderer.init();
+
 				// Unfortunately, need to arbitrarily run compute shader to get access to device limits
-				await renderer.computeAsync( computeResetBuffer );
+				renderer.compute( computeResetBuffer );
 
 
 				if ( renderer.backend.device !== null ) {
@@ -1254,8 +1256,8 @@
 
 					if ( state === 'Reset' ) {
 
-						renderer.computeAsync( computeResetBuffer );
-						renderer.computeAsync( computeResetWorkgroupSums );
+						renderer.compute( computeResetBuffer );
+						renderer.compute( computeResetWorkgroupSums );
 
 					} else if ( state === 'Run Algo' ) {
 
@@ -1275,7 +1277,7 @@
 
 									const reduce0 = reduce0Calls[ i ];
 									// Do a reduction step
-									renderer.computeAsync( reduce0 );
+									renderer.compute( reduce0 );
 									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 									m /= 2;
@@ -1293,7 +1295,7 @@
 
 								for ( let i = 0; i < currentAlgoCalls.length; i ++ ) {
 
-									renderer.computeAsync( currentAlgoCalls[ i ] );
+									renderer.compute( currentAlgoCalls[ i ] );
 									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 								}

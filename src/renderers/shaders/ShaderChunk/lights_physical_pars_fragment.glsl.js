@@ -1,5 +1,7 @@
 export default /* glsl */`
 
+uniform sampler2D dfgLUT;
+
 struct PhysicalMaterial {
 
 	vec3 diffuseColor;
@@ -370,25 +372,15 @@ float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float 
 
 }
 
-// Analytical approximation of the DFG LUT, one half of the
-// split-sum approximation used in indirect specular lighting.
-// via 'environmentBRDF' from "Physically Based Shading on Mobile"
-// https://www.unrealengine.com/blog/physically-based-shading-on-mobile
+// DFG LUT sampling for physically-based rendering.
+// Uses a precomputed lookup table for the split-sum approximation
+// used in indirect specular lighting.
+// Reference: "Real Shading in Unreal Engine 4" by Brian Karis
 vec2 DFGApprox( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {
 
 	float dotNV = saturate( dot( normal, viewDir ) );
-
-	const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
-
-	const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
-
-	vec4 r = roughness * c0 + c1;
-
-	float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
-
-	vec2 fab = vec2( - 1.04, 1.04 ) * a004 + r.zw;
-
-	return fab;
+	vec2 uv = vec2( roughness, dotNV );
+	return texture2D( dfgLUT, uv ).rg;
 
 }
 

@@ -31,7 +31,7 @@
 		<code>
 		const light = new THREE.RectAreaLight( 0xffffbb, 1.0, 5, 5 );
 		const helper = new RectAreaLightHelper( light );
-		scene.add( helper );
+		light.add( helper ); // 辅助对象必须作为子对象添加到灯光中
 		</code>
 
 

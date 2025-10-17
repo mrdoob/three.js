@@ -49,7 +49,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -171,11 +171,13 @@
 				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				// compute init
 
-				renderer.computeAsync( computeInitNode );
+				renderer.compute( computeInitNode );
 
 			}
 

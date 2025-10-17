@@ -951,8 +951,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-				// Only mark as storage binding when actually writing (storeNode is set)
-				texture.store = node.isStorageTextureNode === true && node.storeNode !== null;
+				texture.store = node.isStorageTextureNode === true;
 				texture.mipLevel = texture.store ? node.mipLevel : 0;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 

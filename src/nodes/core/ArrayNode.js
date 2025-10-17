@@ -11,6 +11,7 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  * ] );
  *
  * const redColor = tintColors.element( 0 );
+ * ```
  *
  * @augments TempNode
  */

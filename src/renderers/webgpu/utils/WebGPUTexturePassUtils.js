@@ -310,29 +310,27 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureGPUDescriptor - The texture descriptor.
 	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
+	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0, encoder = null ) {
 
 		const textureData = this.get( textureGPU );
 
-		if ( textureData.useCount === undefined ) {
+		if ( textureData.layers === undefined ) {
 
-			textureData.useCount = 0;
 			textureData.layers = [];
 
 		}
 
 		const passes = textureData.layers[ baseArrayLayer ] || this._mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer );
 
-		const commandEncoder = this.device.createCommandEncoder( {} );
+		const commandEncoder = encoder || this.device.createCommandEncoder( { label: 'mipmapEncoder' } );
 
 		this._mipmapRunBundles( commandEncoder, passes );
 
-		this.device.queue.submit( [ commandEncoder.finish() ] );
+		if ( encoder === null ) this.device.queue.submit( [ commandEncoder.finish() ] );
 
-		if ( textureData.useCount !== 0 ) textureData.layers[ baseArrayLayer ] = passes;
-
-		textureData.useCount ++;
+		textureData.layers[ baseArrayLayer ] = passes;
 
 	}
 

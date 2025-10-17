@@ -53,7 +53,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				const { innerWidth, innerHeight } = window;
 
@@ -291,9 +291,11 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
 				//
 
-				renderer.computeAsync( computeInit );
+				renderer.compute( computeInit );
 
 				//
 

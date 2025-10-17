@@ -13,6 +13,7 @@ import { Color } from '../math/Color.js';
  * shadows.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshMatcapMaterial
  */
 class MeshMatcapMaterial extends Material {
 

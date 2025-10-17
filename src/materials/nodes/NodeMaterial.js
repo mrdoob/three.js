@@ -541,7 +541,7 @@ class NodeMaterial extends Material {
 
 			const outgoingLightNode = this.setupLighting( builder );
 
-			if ( clippingNode !== null ) builder.stack.add( clippingNode );
+			if ( clippingNode !== null ) builder.stack.addToStack( clippingNode );
 
 			// force unsigned floats - useful for RenderTargets
 
@@ -635,7 +635,7 @@ class NodeMaterial extends Material {
 
 			} else {
 
-				builder.stack.add( clipping() );
+				builder.stack.addToStack( clipping() );
 
 			}
 
@@ -662,7 +662,7 @@ class NodeMaterial extends Material {
 
 		if ( candidateCount > 0 && candidateCount <= 8 && builder.isAvailable( 'clipDistance' ) ) {
 
-			builder.stack.add( hardwareClipping() );
+			builder.stack.addToStack( hardwareClipping() );
 
 			this.hardwareClipping = true;
 
