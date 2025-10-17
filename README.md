@@ -14,7 +14,8 @@ This is **Rob Higgins' fork** of the open-source [three.js](https://github.com/m
 
 ## 🎯 Key Enhancements in This Fork
 
-### Enhanced Scene Editor Runtime Environment (`/editor/`)
+### Enhanced Scene Editor (`/editor/`)
+- **Enhanced Scene Runtime Environment**: Configure and populate any scene you create in the three.js editor through URL parameters durning scene load (after pressing play button in editor). Published scenes are self contained web apps that can also be configured from query string. This allows you to build, experiement, share and link to scenes with a simple URL, and in advanced use cases you can write scritps to automate the rendering of 3D scenes into images and videos.
 - **Remote GLB Loading Support**: Load multiple GLB/GLTF files into the scene with individual transforms (`target_0_glb`, `target_1_glb`, etc.), configured through URL parameters
 - **Advanced Camera Targeting**: Automatic camera centering on objects
 - **Interactive Drag Controls**: Y-axis constrained dragging with animated ground snapping
@@ -37,13 +38,16 @@ This is **Rob Higgins' fork** of the open-source [three.js](https://github.com/m
 
 ## 🚀 Getting Started
 
-### Quick Start - Enhanced Editor
+### 🌐 Live Demo
+Experience the enhanced editor online: **[https://higginsrob.github.io/three.js/editor/](https://higginsrob.github.io/three.js/editor/)**
+
+### Quick Start - Local Development
 ```bash
 npm ci                    # Install dependencies
 npm start                 # Start development server
 ```
 
-Navigate to `http://localhost:8080/editor/` to access the enhanced scene editor.
+Navigate to `http://localhost:8080/editor/` to access the enhanced scene editor locally.
 
 ### Editor URL Parameters
 The editor supports comprehensive URL parameter configuration:
@@ -132,6 +136,14 @@ The enhanced editor includes:
 - Ground plane with material textures
 - QR code sharing functionality
 
+### CI/CD & Deployment
+This fork uses GitHub Actions for continuous integration and deployment:
+- **Automatic deployment** to GitHub Pages on push to `experiment` branch
+- **Automated testing** on pull requests
+- **Manual workflow** for comprehensive testing with E2E options
+
+See [.github/workflows/README.md](.github/workflows/README.md) for detailed workflow documentation.
+
 ## 🌐 Links & Resources
 
 **Original Three.js:**
@@ -145,8 +157,11 @@ The enhanced editor includes:
 [Discord](https://discord.gg/56GBJwAnUS)
 
 **This Fork:**
-- Enhanced Editor: `/editor/index.html`
-- Original Repository: [mrdoob/three.js](https://github.com/mrdoob/three.js)
+- 🌐 **Live Demo**: [https://higginsrob.github.io/three.js/](https://higginsrob.github.io/three.js/)
+- 🎬 **Enhanced Editor**: [https://higginsrob.github.io/three.js/editor/](https://higginsrob.github.io/three.js/editor/)
+- 📚 **Examples**: [https://higginsrob.github.io/three.js/examples/](https://higginsrob.github.io/three.js/examples/)
+- 💻 **Repository**: [github.com/higginsrob/three.js](https://github.com/higginsrob/three.js)
+- 📖 **Original**: [mrdoob/three.js](https://github.com/mrdoob/three.js)
 
 ### Cloning this repository
 

@@ -1,0 +1,74 @@
+name: Manual Test & Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_e2e_tests:
+        description: 'Run E2E tests (takes longer)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test-unit
+
+      - name: Run unit tests (addons)
+        run: npm run test-unit-addons
+
+      - name: Build three.js
+        run: npm run build
+
+      - name: Test tree-shaking
+        run: npm run test-treeshake
+
+      - name: Run E2E tests
+        if: inputs.run_e2e_tests
+        run: npm run test-e2e
+
+      - name: Upload E2E screenshots
+        if: inputs.run_e2e_tests && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: test/e2e/output-screenshots
+          if-no-files-found: ignore
+
+      - name: Build summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Linting: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Unit Tests: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Build: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Tree-shaking: Validated" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ inputs.run_e2e_tests }}" == "true" ]; then
+            echo "✅ E2E Tests: Completed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Build Sizes" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          ls -lh build/*.js | tail -n +2 >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
