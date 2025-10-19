@@ -172,7 +172,7 @@
 					output: 0
 				};
 
-				const types = { 'Sceen with Shadow Maps + SSS': 0, 'Scene with Shadow Maps': 1, 'SSS': 2, };
+				const types = { 'Scene with Shadow Maps + SSS': 0, 'Scene with Shadow Maps': 1, 'SSS': 2, };
 
 				const gui = renderer.inspector.createParameters( 'SSS settings' );
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
@@ -182,13 +182,13 @@
 				gui.add( sssPass.thickness, 'value', 0.01, 0.1 ).name( 'thickness' );
 				gui.add( sssPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updatePostprocessing );
 
-				function updatePostprocessing( value ) {
+				function updatePostprocessing() {
 
-					if ( value === 1 ) {
+					if ( params.output === 1 ) {
 
 						postProcessing.outputNode = scenePassColor;
 
-					} else if ( value === 2 ) {
+					} else if ( params.output === 2 ) {
 
 						postProcessing.outputNode = vec4( vec3( sssPass.r ), 1 );
 
