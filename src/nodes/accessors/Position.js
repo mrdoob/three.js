@@ -1,5 +1,6 @@
 import { attribute } from '../core/AttributeNode.js';
 import { Fn } from '../tsl/TSLCore.js';
+import { vec3 } from '../tsl/TSLBase.js';
 import { modelWorldMatrix } from './ModelNode.js';
 
 /**
@@ -71,4 +72,16 @@ export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {VaryingNode<vec3>}
  */
-export const positionViewDirection = /*@__PURE__*/ positionView.negate().toVarying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
+export const positionViewDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( builder.camera.isOrthographicCamera ) {
+
+		return vec3( 0, 0, 1 ).toVar( 'positionViewDirection' );
+
+	} else {
+
+		return positionView.negate().toVarying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
+
+	}
+
+}, 'vec3' ).once( [ 'POSITION' ] ) )();
