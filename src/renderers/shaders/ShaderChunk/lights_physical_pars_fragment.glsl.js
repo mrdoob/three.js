@@ -426,42 +426,9 @@ void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const 
 
 }
 
-// Improved multi-scattering energy compensation for direct lighting
+// GGX BRDF with multi-scattering energy compensation for direct lighting
 // Based on "Practical Multiple Scattering Compensation for Microfacet Models"
 // https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
-vec3 getMultiScatteringCompensation( const in vec3 f0, const in float f90, const in float roughness, const in float dotNV, const in float dotNL ) {
-
-	// Precomputed DFG values for view and light directions
-	vec2 dfgV = DFGApprox( vec3(0.0, 0.0, 1.0), vec3(sqrt(1.0 - dotNV * dotNV), 0.0, dotNV), roughness );
-	vec2 dfgL = DFGApprox( vec3(0.0, 0.0, 1.0), vec3(sqrt(1.0 - dotNL * dotNL), 0.0, dotNL), roughness );
-
-	// Single-scattering energy for view and light
-	vec3 FssEss_V = f0 * dfgV.x + f90 * dfgV.y;
-	vec3 FssEss_L = f0 * dfgL.x + f90 * dfgL.y;
-
-	float Ess_V = dfgV.x + dfgV.y;
-	float Ess_L = dfgL.x + dfgL.y;
-
-	// Energy lost to multiple scattering
-	float Ems_V = 1.0 - Ess_V;
-	float Ems_L = 1.0 - Ess_L;
-
-	// Average Fresnel reflectance
-	vec3 Favg = f0 + ( 1.0 - f0 ) * 0.047619; // 1/21
-
-	// Multiple scattering contribution
-	// Uses geometric mean of view and light contributions for better energy distribution
-	vec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg * Favg + EPSILON );
-
-	// Energy compensation factor
-	float compensationFactor = Ems_V * Ems_L;
-
-	return Fms * compensationFactor;
-
-}
-
-// GGX BRDF with multi-scattering energy compensation for direct lighting
-// This provides more accurate energy conservation, especially for rough materials
 vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {
 
 	// Single-scattering BRDF (standard GGX)
@@ -471,13 +438,31 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 	float dotNL = saturate( dot( normal, lightDir ) );
 	float dotNV = saturate( dot( normal, viewDir ) );
 
-	vec3 multiScatter = getMultiScatteringCompensation(
-		material.specularColor,
-		material.specularF90,
-		material.roughness,
-		dotNV,
-		dotNL
-	);
+	// Precomputed DFG values for view and light directions
+	vec2 dfgV = DFGApprox( vec3(0.0, 0.0, 1.0), vec3(sqrt(1.0 - dotNV * dotNV), 0.0, dotNV), material.roughness );
+	vec2 dfgL = DFGApprox( vec3(0.0, 0.0, 1.0), vec3(sqrt(1.0 - dotNL * dotNL), 0.0, dotNL), material.roughness );
+
+	// Single-scattering energy for view and light
+	vec3 FssEss_V = material.specularColor * dfgV.x + material.specularF90 * dfgV.y;
+	vec3 FssEss_L = material.specularColor * dfgL.x + material.specularF90 * dfgL.y;
+
+	float Ess_V = dfgV.x + dfgV.y;
+	float Ess_L = dfgL.x + dfgL.y;
+
+	// Energy lost to multiple scattering
+	float Ems_V = 1.0 - Ess_V;
+	float Ems_L = 1.0 - Ess_L;
+
+	// Average Fresnel reflectance
+	vec3 Favg = material.specularColor + ( 1.0 - material.specularColor ) * 0.047619; // 1/21
+
+	// Multiple scattering contribution
+	vec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg * Favg + EPSILON );
+
+	// Energy compensation factor
+	float compensationFactor = Ems_V * Ems_L;
+
+	vec3 multiScatter = Fms * compensationFactor;
 
 	return singleScatter + multiScatter;
 
@@ -547,7 +532,6 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 	#endif
 
-	// Use multi-scattering BRDF for improved energy conservation
 	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
