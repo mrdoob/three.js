@@ -35,7 +35,7 @@
 
 			setTimeout( function () {
 
-				requestAnimationFrame( cb );
+				RAF( cb );
 
 			}, 50 );
 
