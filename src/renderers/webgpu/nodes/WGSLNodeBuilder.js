@@ -17,6 +17,7 @@ import VarNode from '../../../nodes/core/VarNode.js';
 import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 
 import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
+import { warn, error } from '../../../utils.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
@@ -321,7 +322,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					code += `\t\tcoord.${ axis }`;
 
-					console.warn( `WebGPURenderer: Unsupported texture wrap type "${ wrap }" for vertex shader.` );
+					warn( `WebGPURenderer: Unsupported texture wrap type "${ wrap }" for vertex shader.` );
 
 				}
 
@@ -497,7 +498,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		const coordSnippet = `${ vecType }<u32>( ${ wrapFunction }( ${ uvSnippet } ) * ${ vecType }<f32>( ${ textureDimension } ) )`;
 
-		return this.generateTextureLoad( texture, textureProperty, coordSnippet, depthSnippet, null, levelSnippet );
+		return this.generateTextureLoad( texture, textureProperty, coordSnippet, levelSnippet, depthSnippet, null );
 
 	}
 
@@ -507,20 +508,22 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {string} [levelSnippet='0u'] - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0u' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
-		let snippet;
+		if ( levelSnippet === null ) levelSnippet = '0u';
 
 		if ( offsetSnippet ) {
 
 			uvIndexSnippet = `${ uvIndexSnippet } + ${ offsetSnippet }`;
 
 		}
+
+		let snippet;
 
 		if ( depthSnippet ) {
 
@@ -653,7 +656,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.TextureNode.gradient() does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.TextureNode.gradient() does not support ${ shaderStage } shader.` );
 
 		}
 
@@ -698,7 +701,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
 
 		}
 
@@ -766,7 +769,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.TextureNode.biasNode does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.TextureNode.biasNode does not support ${ shaderStage } shader.` );
 
 		}
 
@@ -866,7 +869,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( node.isAtomic === true ) {
 
-				console.warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+				warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
 
 				return NodeAccess.READ_WRITE;
 
@@ -949,6 +952,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 				}
 
 				texture.store = node.isStorageTextureNode === true;
+				texture.mipLevel = texture.store ? node.mipLevel : 0;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				if ( this.isUnfilterable( node.value ) === false && texture.store === false ) {
@@ -1112,7 +1116,8 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the instance index builtin.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @return {string} The instance index.
 	 */
@@ -1128,8 +1133,9 @@ ${ flowData.code }
 
 	}
 
+
 	/**
-	 * Returns the invocation local index builtin.
+	 * Returns a builtin representing the index of a compute invocation within the scope of a workgroup load.
 	 *
 	 * @return {string} The invocation local index.
 	 */
@@ -1140,7 +1146,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the subgroup size builtin.
+	 * Returns a builtin representing the size of a subgroup within the current shader.
 	 *
 	 * @return {string} The subgroup size.
 	 */
@@ -1153,7 +1159,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the invocation subgroup index builtin.
+	 * Returns a builtin representing the index of a compute invocation within the scope of a subgroup.
 	 *
 	 * @return {string} The invocation subgroup index.
 	 */
@@ -1166,7 +1172,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the subgroup index builtin.
+	 * Returns a builtin representing the index of a compute invocation's subgroup within its workgroup.
 	 *
 	 * @return {string} The subgroup index.
 	 */
@@ -2063,11 +2069,7 @@ ${ flowData.code }
 		const codeNode = wgslPolyfill[ name ];
 		codeNode.build( this );
 
-		if ( this.currentFunctionNode !== null ) {
-
-			this.currentFunctionNode.includes.push( codeNode );
-
-		}
+		this.addInclude( codeNode );
 
 		return codeNode;
 

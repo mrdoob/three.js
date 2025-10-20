@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import puppeteer from 'puppeteer';
 import express from 'express';
 import path from 'path';
@@ -133,6 +132,7 @@ const exceptionList = [
 	'webgpu_compute_texture_pingpong',
 	'webgpu_compute_water',
 	'webgpu_materials',
+	'webgpu_multiple_canvas',
 	'webgpu_video_panorama',
 	'webgpu_postprocessing_bloom_emissive',
 	'webgpu_lights_tiled',
@@ -144,6 +144,7 @@ const exceptionList = [
 	'webgpu_compute_sort_bitonic',
 	'webgpu_compute_reduce',
 	'webgpu_struct_drawindirect',
+	'webgpu_hdr',
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_backdrop_water',
@@ -151,6 +152,7 @@ const exceptionList = [
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_lightprobe_cubecamera',
 	'webgpu_loader_materialx',
+	'webgpu_materials_basic',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',
 	'webgpu_morphtargets_face',
@@ -176,13 +178,21 @@ const exceptionList = [
 	'webgpu_rendertarget_2d-array_3d',
 	'webgpu_materials_envmaps_bpcem',
 	'webgpu_postprocessing_ao',
+	'webgpu_postprocessing_difference',
+	'webgpu_postprocessing_dof',
 	'webgpu_postprocessing_sobel',
 	'webgpu_postprocessing_3dlut',
 	'webgpu_postprocessing_fxaa',
 	'webgpu_postprocessing_afterimage',
 	'webgpu_postprocessing_ca',
+	'webgpu_postprocessing_ssgi',
+	'webgpu_postprocessing_sss',
 	'webgpu_xr_native_layers',
 	'webgpu_volume_caustics',
+	'webgpu_volume_lighting',
+	'webgpu_volume_lighting_rectarea',
+	'webgpu_reflection',
+	'webgpu_ocean',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_cloth',
@@ -214,9 +224,9 @@ const height = 250;
 const viewScale = 2;
 const jpgQuality = 95;
 
-console.red = msg => console.log( chalk.red( msg ) );
-console.yellow = msg => console.log( chalk.yellow( msg ) );
-console.green = msg => console.log( chalk.green( msg ) );
+console.red = msg => console.log( `\x1b[31m${msg}\x1b[39m` );
+console.green = msg => console.log( `\x1b[32m${msg}\x1b[39m` );
+console.yellow = msg => console.log( `\x1b[33m${msg}\x1b[39m` );
 
 let browser;
 
@@ -308,7 +318,8 @@ async function main() {
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
-		protocolTimeout: 0
+		protocolTimeout: 0,
+		userDataDir: './.puppeteer_profile'
 	} );
 
 	// this line is intended to stop the script if the browser (in headful mode) is closed by user (while debugging)

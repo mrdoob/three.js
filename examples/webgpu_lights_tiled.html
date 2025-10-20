@@ -4,12 +4,20 @@
 		<title>three.js webgpu - tiled lighting</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - Compute-based Tiled Lighting<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Tiled Lighting</span>
+			</div>
+
+			<small>
+				Custom compute-based Tiled Lighting.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -31,9 +39,7 @@
 
 			import { TiledLighting } from 'three/addons/lighting/TiledLighting.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -41,7 +47,7 @@
 
 			let camera, scene, renderer,
 				lights, lightDummy,
-				stats, controls,
+				controls,
 				compose, tileInfluence,
 				lighting,
 				count,
@@ -148,6 +154,7 @@
 				renderer.lighting = lighting; // set lighting system
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 5;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// controls
@@ -155,10 +162,7 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxDistance = 400;
 
-				// stats
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				// events
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -178,7 +182,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( tileInfluence, 'value', 0, 1 ).name( 'tile indexes debug' );
 
 			}
@@ -224,8 +228,6 @@
 				}
 
 				postProcessing.render();
-
-				stats.update();
 
 			}
 

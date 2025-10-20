@@ -72,6 +72,14 @@ class ToonOutlinePassNode extends PassNode {
 		 */
 		this._materialCache = new WeakMap();
 
+		/**
+		 * The name of this pass.
+		 *
+		 * @type {string}
+		 * @default 'Outline Pass'
+		 */
+		this.name = 'Outline Pass';
+
 	}
 
 	updateBefore( frame ) {

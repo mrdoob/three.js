@@ -20,6 +20,9 @@
 			每个继承自 [page:Object3D] 的对象都有一个 [page:Object3D.layers] 对象。
 		</p>
 
+		<h2>例子</h2>
+
+		<p>[example:webgpu_layers WebGPU / layers]</p>
 
 		<h2>构造函数</h2>
 
@@ -33,7 +36,7 @@
 
 		<h3>[property:Integer mask]</h3>
 		<p>
-			用 bit mask 表示当前图层对象与 0 - 31 中的哪些图层相对应。所属层所对应的比特位为 1，其他位位 0。
+			用 bit mask 表示当前图层对象与 0 - 31 中的哪些图层相对应。
 		</p>
 
 
@@ -69,9 +72,9 @@
 
 		<h3>[method:Boolean isEnabled]( [param:Integer layer] )</h3>
 		<p>
-			layer - an integer from 0 to 31.<br /><br />
+			layer - 一个 0 - 31 的整数。<br /><br />
 
-			Returns true if the given layer is enabled.
+			如果给定的层已启用，则返回 true。
 		</p>
 
 		<h3>[method:undefined toggle]( [param:Integer layer] )</h3>
@@ -83,12 +86,12 @@
 
 		<h3>[method:undefined enableAll]()</h3>
 		<p>
-			Add membership to all layers.
+			启用所有图层。
 		</p>
 
  		<h3>[method:undefined disableAll]()</h3>
 		<p>
-			Remove membership from all layers.
+			禁用所有图层。
 		</p>
 
 		<h2>源代码</h2>

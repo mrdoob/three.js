@@ -95,7 +95,7 @@
 
 		<h3>[property:Object view]</h3>
 		<p>
-			Frustum window specification or null.
+			视锥窗口规范或为空(null)。
 			这个值使用[page:PerspectiveCamera.setViewOffset .setViewOffset]方法来进行设置，使用[page:PerspectiveCamera.clearViewOffset .clearViewOffset]方法来进行清除。
 		</p>
 
@@ -131,6 +131,17 @@
 			通过相对于当前[page:PerspectiveCamera.filmGauge .filmGauge]的焦距，设置FOV。
 		<br /><br />
 			默认情况下，焦距是为35mm（全画幅）摄像机而指定的。</p>
+
+		<h3>[method:undefined getViewBounds]( [param:Float distance], [param:Vector2 minTarget], [param:Vector2 maxTarget] )
+		</h3>
+		<p>
+			计算沿观察方向给定距离的相机可视矩形的二维边界。将 minTarget 和 maxTarget 设置为视图矩形左下角和右上角的坐标。
+		</p>
+
+		<h3>[method:Vector2 getViewSize]( [param:Float distance], [param:Vector2 target] )</h3>
+		<p>
+			计算沿视角方向给定距离处相机可视矩形的宽度和高度。将结果复制到目标 Vector2 中，其中 x 为宽度，y 为高度。
+		</p>
 
 		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>

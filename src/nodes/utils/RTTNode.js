@@ -202,8 +202,8 @@ class RTTNode extends TextureNode {
 			const pixelRatio = renderer.getPixelRatio();
 			const size = renderer.getSize( _size );
 
-			const effectiveWidth = size.width * pixelRatio;
-			const effectiveHeight = size.height * pixelRatio;
+			const effectiveWidth = Math.floor( size.width * pixelRatio );
+			const effectiveHeight = Math.floor( size.height * pixelRatio );
 
 			if ( effectiveWidth !== this.renderTarget.width || effectiveHeight !== this.renderTarget.height ) {
 
@@ -217,7 +217,17 @@ class RTTNode extends TextureNode {
 
 		//
 
+		let name = 'RTT';
+
+		if ( this.node.name ) {
+
+			name = this.node.name + ' [ ' + name + ' ]';
+
+		}
+
+
 		this._quadMesh.material.fragmentNode = this._rttNode;
+		this._quadMesh.name = name;
 
 		//
 

@@ -1,4 +1,4 @@
-import { GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
+import { GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents, CodeNode } from '../../../nodes/Nodes.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
@@ -7,6 +7,12 @@ import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from
 
 import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType } from '../../../constants.js';
 import { DataTexture } from '../../../textures/DataTexture.js';
+import { error } from '../../../utils.js';
+
+const glslPolyfills = {
+	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( int x ) { return floatBitsToInt( uintBitsToFloat( x ) ); }' ),
+	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' )
+};
 
 const glslMethods = {
 	textureDimensions: 'textureSize',
@@ -15,6 +21,8 @@ const glslMethods = {
 	bitcast_int_float: 'intBitsToFloat',
 	bitcast_uint_float: 'uintBitsToFloat',
 	bitcast_float_uint: 'floatBitsToUint',
+	bitcast_uint_int: 'tsl_bitcast_uint_to_int',
+	bitcast_int_uint: 'tsl_bitcast_int_to_uint'
 };
 
 const precisionLib = {
@@ -127,12 +135,37 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Includes the given method name into the current
+	 * function node.
+	 *
+	 * @private
+	 * @param {string} name - The method name to include.
+	 * @return {CodeNode} The respective code node.
+	 */
+	_include( name ) {
+
+		const codeNode = glslPolyfills[ name ];
+		codeNode.build( this );
+
+		this.addInclude( codeNode );
+
+		return codeNode;
+
+	}
+
+	/**
 	 * Returns the native shader method name for a given generic name.
 	 *
 	 * @param {string} method - The method name to resolve.
 	 * @return {string} The resolved GLSL method name.
 	 */
 	getMethod( method ) {
+
+		if ( glslPolyfills[ method ] !== undefined ) {
+
+			this._include( method );
+
+		}
 
 		return glslMethods[ method ] || method;
 
@@ -147,7 +180,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 */
 	getBitcastMethod( type, inputType ) {
 
-		return glslMethods[ `bitcast_${ inputType }_${ type }` ];
+		return this.getMethod( `bitcast_${ inputType }_${ type }` );
 
 	}
 
@@ -367,7 +400,7 @@ ${ flowData.code }
 			const channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
 			const uvSnippet = `ivec2(${indexSnippet} % ${ propertySizeName }, ${indexSnippet} / ${ propertySizeName })`;
 
-			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, null, '0' );
+			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, '0', null, null );
 
 			//
 
@@ -400,12 +433,14 @@ ${ flowData.code }
 	 * @param {?Texture} texture - The texture.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} uvIndexSnippet - A GLSL snippet that represents texture coordinates used for sampling.
+	 * @param {?string} levelSnippet - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A GLSL snippet that represents the 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {string} [levelSnippet='0u'] - A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, offsetSnippet, levelSnippet = '0' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
+
+		if ( levelSnippet === null ) levelSnippet = '0';
 
 		let snippet;
 
@@ -578,7 +613,7 @@ ${ flowData.code }
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+			error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
 
 		}
 
@@ -960,7 +995,8 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the instance index builtin.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @return {string} The instance index.
 	 */
@@ -971,7 +1007,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Returns the invocation local index builtin.
+	 * Returns a builtin representing the index of an invocation within its workgroup.
 	 *
 	 * @return {string} The invocation local index.
 	 */
@@ -982,6 +1018,33 @@ ${ flowData.code }
 		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
 
 		return `uint( gl_InstanceID ) % ${size}u`;
+
+	}
+
+	/**
+	 * Returns a builtin representing the size of a subgroup within the current shader.
+	 */
+	getSubgroupSize() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the subgroupSize node' );
+
+	}
+
+	/**
+	 * Returns a builtin representing the index of an invocation within its subgroup.
+	 */
+	getInvocationSubgroupIndex() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the invocationSubgroupIndex node' );
+
+	}
+
+	/**
+	 * Returns a builtin representing the index of the current invocation's subgroup within its workgroup.
+	 */
+	getSubgroupIndex() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support the subgroupIndex node' );
 
 	}
 
@@ -1316,6 +1379,9 @@ ${shaderData.extensions}
 // precision
 ${ defaultPrecisions }
 
+// structs
+${shaderData.structs}
+
 // uniforms
 ${shaderData.uniforms}
 
@@ -1324,9 +1390,6 @@ ${shaderData.varyings}
 
 // codes
 ${shaderData.codes}
-
-// structs
-${shaderData.structs}
 
 void main() {
 

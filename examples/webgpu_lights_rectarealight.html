@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webGPU - rect area light</title>
+		<title>three.js webgpu - rect area light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - rect area light<br/>
-			by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Rect Area Light</span>
+			</div>
+
+			<small>
+				Rect area light by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -28,14 +35,14 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 			import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';
 
 			let renderer, scene, camera;
-			let stats, meshKnot;
+			let meshKnot;
 
 			init();
 
@@ -47,6 +54,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animation );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -89,9 +97,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 			}
 
 			function onWindowResize() {
@@ -107,8 +112,6 @@
 				meshKnot.rotation.y = time / 1000;
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

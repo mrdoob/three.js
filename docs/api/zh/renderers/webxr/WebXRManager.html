@@ -35,6 +35,17 @@
 
 		<h2>方法(Methods)</h2>
 
+		<h3>[method:XRWebGLLayer getBaseLayer]()</h3>
+		<p>
+			返回当前基础层。如果目标 XR 设备支持 [link:https://www.w3.org/TR/webxrlayers-1/ WebXR Layers API]，则返回 [link:https://developer.mozilla.org/en-US/docs/Web/API/XRProjectionLayer XRProjectionLayer]；如果不支持，则返回 [link:https://developer.mozilla.org/en-US/docs/Web/API/XRWebGLLayer XRWebGLLayer]。
+		</p>
+
+		<h3>[method:XRWebGLBinding getBinding]()</h3>
+		<p>
+			返回当前的 [link:https://developer.mozilla.org/en-US/docs/Web/API/XRWebGLBinding XRWebGLBinding]。<br /><br />
+			如果浏览器支持，且尚未创建 `XRWebGLBinding`，则此方法将创建一个新的 `XRWebGLBinding`。
+		</p>
+
 		<h3>[method:ArrayCamera getCamera]()</h3>
 		<p>
 			返回表示活动XR会话的XR相机的[page:ArrayCamera]实例。
@@ -43,6 +54,15 @@
 		<p>
 			当前未使用相机的*fov*，不反映 XR 相机的 fov。
 			如果您需要应用级别的fov，则必须从XR相机的投影矩阵中手动计算。
+		</p>
+
+		<h3>[method:Texture getCameraTexture]( [param:XRCamera xrCamera] )</h3>
+		<p>
+			[page:XRCamera xrCamera] — 要查询的 [link:https://immersive-web.github.io/raw-camera-access/#xr-camera-section XRCamera]。<br /><br />
+
+			从查询的 `XRCamera` 返回不透明纹理。仅在当前动画循环期间可用。<br /><br />
+
+			查看 [example:webxr_ar_camera_access webxr / ar / camera_access] 示例。
 		</p>
 
 		<h3>[method:Group getController]( [param:Integer index] )</h3>
@@ -67,6 +87,26 @@
 			这个想法是在同一个WebXR控制器的两个不同坐标空间中有两个不同的组。
 		</p>
 
+		<h3>[method:Mesh getDepthSensingMesh]()</h3>
+		<p>
+			如果可用，则返回表示用户环境计算深度的纹理，否则返回 `null`。
+		</p>
+
+		<h3>[method:ExternalTexture getDepthTexture]()</h3>
+		<p>
+			如果可用，则返回表示用户环境计算深度的纹理，否则返回 `null`。
+		</p>
+
+		<h3>[method:Float getFoveation]()</h3>
+		<p>
+			返回 XR 合成器用于投影层的注视点渲染强度。
+		</p>
+
+		<h3>[method:XRFrame getFrame]()</h3>
+		<p>
+			返回当前的 [link:https://developer.mozilla.org/en-US/docs/Web/API/XRFrame XRFrame]。如果在没有正在进行的 XR 会话的情况下，则返回 `null`。
+		</p>
+
 		<h3>[method:Group getHand]( [param:Integer index] )</h3>
 		<p>
 		[page:Integer index] — 控制器的索引。 <br /><br />
@@ -82,6 +122,18 @@
 		<h3>[method:XRSession getSession]()</h3>
 		<p>
 		返回*XRSession*对象，它允许在应用程序级别更细粒度地管理活动的WebXR会话。
+		</p>
+
+		<h3>[method:Boolean hasDepthSensing]()</h3>
+		<p>
+			如果 XR 设备提供了深度感知数据，则返回 `true`。
+		</p>
+
+		<h3>[method:undefined setFoveation]( [param:Float foveation] )</h3>
+		<p>
+			[page:Float foveation] — 要设置的注视点渲染强度。<br /><br />
+
+			指定 XR 合成器为该图层使用的注视点渲染强度。必须为介于 `0` 和 `1` 之间的值。
 		</p>
 
 		<h3>[method:undefined setFramebufferScaleFactor]( [param:Float factor], [param:Boolean limited] )</h3>

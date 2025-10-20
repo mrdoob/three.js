@@ -16,6 +16,7 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
+import { warn } from '../../utils.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
@@ -506,7 +507,7 @@ class XRManager extends EventDispatcher {
 
 		if ( this.isPresenting === true ) {
 
-			console.warn( 'THREE.XRManager: Cannot change framebuffer scale while presenting.' );
+			warn( 'XRManager: Cannot change framebuffer scale while presenting.' );
 
 		}
 
@@ -536,7 +537,7 @@ class XRManager extends EventDispatcher {
 
 		if ( this.isPresenting === true ) {
 
-			console.warn( 'THREE.XRManager: Cannot change reference space type while presenting.' );
+			warn( 'XRManager: Cannot change reference space type while presenting.' );
 
 		}
 
@@ -1040,7 +1041,7 @@ class XRManager extends EventDispatcher {
 				// fallback to XRWebGLLayer
 
 				const layerInit = {
-					antialias: renderer.samples > 0,
+					antialias: renderer.currentSamples > 0,
 					alpha: true,
 					depth: renderer.depth,
 					stencil: renderer.stencil,
@@ -1380,6 +1381,9 @@ function onSessionEnd() {
 
 	this._session = null;
 	this._xrRenderTarget = null;
+	this._glBinding = null;
+	this._glBaseLayer = null;
+	this._glProjLayer = null;
 
 	// switch layers back to emulated
 	if ( this._sessionUsesLayers === true ) {

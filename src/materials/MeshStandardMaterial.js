@@ -36,6 +36,7 @@ import { Euler } from '../math/Euler.js';
  * (pdf), by Brent Burley.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshStandardMaterial
  */
 class MeshStandardMaterial extends Material {
 

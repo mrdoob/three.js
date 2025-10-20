@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { warn } from '../../utils.js';
 
 /**
  * This node can be used as a context management component for another node.
@@ -93,9 +94,7 @@ class ContextNode extends Node {
 
 	analyze( builder ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		this.node.build( builder );
 
@@ -105,9 +104,7 @@ class ContextNode extends Node {
 
 	setup( builder ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		this.node.build( builder );
 
@@ -117,9 +114,7 @@ class ContextNode extends Node {
 
 	generate( builder, output ) {
 
-		const previousContext = builder.getContext();
-
-		builder.setContext( { ...builder.context, ...this.value } );
+		const previousContext = builder.addContext( this.value );
 
 		const snippet = this.node.build( builder, output );
 
@@ -177,7 +172,7 @@ export const setName = ( node, name ) => context( node, { nodeName: name } );
  */
 export function label( node, name ) {
 
-	console.warn( 'THREE.TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+	warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
 
 	return setName( node, name );
 

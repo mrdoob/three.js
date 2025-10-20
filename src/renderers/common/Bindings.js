@@ -154,6 +154,40 @@ class Bindings extends DataMap {
 	}
 
 	/**
+	 * Deletes the bindings for the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
+	deleteForCompute( computeNode ) {
+
+		const bindings = this.nodes.getForCompute( computeNode ).bindings;
+
+		for ( const bindGroup of bindings ) {
+
+			this.delete( bindGroup );
+
+		}
+
+	}
+
+	/**
+	 * Deletes the bindings for the given renderObject node.
+	 *
+	 * @param {RenderObject} renderObject - The renderObject.
+	 */
+	deleteForRender( renderObject ) {
+
+		const bindings = renderObject.getBindings();
+
+		for ( const bindGroup of bindings ) {
+
+			this.delete( bindGroup );
+
+		}
+
+	}
+
+	/**
 	 * Updates the given array of bindings.
 	 *
 	 * @param {Array<BindGroup>} bindings - The bind groups.
@@ -180,6 +214,10 @@ class Bindings extends DataMap {
 			if ( binding.isSampledTexture ) {
 
 				this.textures.updateTexture( binding.texture );
+
+			} else if ( binding.isSampler ) {
+
+				this.textures.updateSampler( binding.texture );
 
 			} else if ( binding.isStorageBuffer ) {
 
@@ -286,7 +324,7 @@ class Bindings extends DataMap {
 
 				}
 
-				if ( texture.isStorageTexture === true ) {
+				if ( texture.isStorageTexture === true && texture.mipmapsAutoUpdate === true ) {
 
 					const textureData = this.get( texture );
 
@@ -306,7 +344,23 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampler ) {
 
-				binding.update();
+				const updated = binding.update();
+
+				if ( updated ) {
+
+					const samplerKey = this.textures.updateSampler( binding.texture );
+
+					if ( binding.samplerKey !== samplerKey ) {
+
+						binding.samplerKey = samplerKey;
+
+						needsBindingsUpdate = true;
+
+						cacheBindings = false;
+
+					}
+
+				}
 
 			}
 

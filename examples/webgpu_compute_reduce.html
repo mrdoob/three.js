@@ -936,7 +936,7 @@
 				} ) );
 
 				// Represents array of data as uints in compute shader.
-				const inputStorage = instancedArray( array, 'uint', size ).setPBO( true ).setName( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const inputStorage = instancedArray( array, 'uint' ).setPBO( true ).setName( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
 				// Represents array of data as vec4s in compute shader;
 				const inputVec4BufferAttribute = new THREE.StorageInstancedBufferAttribute( array, 4 );
 				const inputVectorizedStorage = storage( inputVec4BufferAttribute, 'uvec4', vecSize ).setPBO( true ).setName( `CurrentVectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
@@ -947,9 +947,9 @@
 				const rowSize = divRoundUp( size, numRows );
 
 				const workgroupSumsArray = new Uint32Array( numRows );
-				const workgroupSumsStorage = instancedArray( workgroupSumsArray, 'uint', numRows ).setPBO( true ).setName( `WorkgroupSums_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const workgroupSumsStorage = instancedArray( workgroupSumsArray, 'uint' ).setPBO( true ).setName( `WorkgroupSums_${leftSideDisplay ? 'Left' : 'Right'}` );
 				const debugArray = new Uint32Array( 1024 );
-				const debugStorage = instancedArray( debugArray, 'uint', 1024 ).setPBO( true ).setName( `Debug_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const debugStorage = instancedArray( debugArray, 'uint' ).setPBO( true ).setName( `Debug_${leftSideDisplay ? 'Left' : 'Right'}` );
 
 				const buffers = {
 					'Input Buffer': inputStorage,
@@ -990,8 +990,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
+				await renderer.init();
+
 				// Unfortunately, need to arbitrarily run compute shader to get access to device limits
-				await renderer.computeAsync( computeResetBuffer );
+				renderer.compute( computeResetBuffer );
 
 
 				if ( renderer.backend.device !== null ) {
@@ -1254,8 +1256,8 @@
 
 					if ( state === 'Reset' ) {
 
-						renderer.computeAsync( computeResetBuffer );
-						renderer.computeAsync( computeResetWorkgroupSums );
+						renderer.compute( computeResetBuffer );
+						renderer.compute( computeResetWorkgroupSums );
 
 					} else if ( state === 'Run Algo' ) {
 
@@ -1275,7 +1277,7 @@
 
 									const reduce0 = reduce0Calls[ i ];
 									// Do a reduction step
-									renderer.computeAsync( reduce0 );
+									renderer.compute( reduce0 );
 									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 									m /= 2;
@@ -1293,7 +1295,7 @@
 
 								for ( let i = 0; i < currentAlgoCalls.length; i ++ ) {
 
-									renderer.computeAsync( currentAlgoCalls[ i ] );
+									renderer.compute( currentAlgoCalls[ i ] );
 									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 								}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>二维矩阵（[name]）</h1>
+
+		<p class="desc">
+			一个表示 2x2 矩阵 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix] 的类。
+		</p>
+
+		<h2>代码示例</h2>
+		<code>
+const m = new Matrix2(); 
+		</code>
+
+		<h2>注意行优先列优先的顺序。</h2>
+		<p>
+			构造函数和 [page:set]() 方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
+			而它们在内部是用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]顺序存储在 [page:.elements elements] 数组当中。<br /><br />
+			这意味着
+			<code>
+m.set( 11, 12,
+       21, 22 );
+		</code>
+			元素数组[page:.elements elements]将存储为:
+			<code> 
+m.elements = [ 11, 21,
+			   12, 22 ];
+			</code>
+		在内部，所有的计算都是使用列优先顺序进行的。然而，由于实际的排序在数学上没有什么不同，
+		而且大多数人习惯于以行优先顺序考虑矩阵，所以three.js文档以行为主的顺序显示矩阵。
+		请记住，如果您正在阅读源代码，您必须对这里列出的任何矩阵进行转置[link:https://en.wikipedia.org/wiki/Transpose transpose]，以理解计算。
+		</p>
+
+		<h2>构造器（Constructor）</h2>
+
+		<h3>[name]( [param:Number n11], [param:Number n12],
+			[param:Number n21], [param:Number n22] )</h3>
+		<p>
+			根据给定的参数，按行优先顺序创建一个 2x2 矩阵。如果没有提供参数，构造函数会将 [name] 初始化为 2x2 单位矩阵([link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix])。
+		</p>
+
+		<h2>属性（Properties）</h2>
+
+		<h3>[property:Array elements]</h3>
+		<p>
+			矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
+		</p>
+
+		<h2>方法（Methods）</h2>
+
+		<h3>
+			[method:this fromArray]( [param:Array array], [param:Integer offset] )
+		</h3>
+		<p>
+		[page:Array array] - 用来存储设置元素数据的数组<br />
+		[page:Integer offset] - (optional) 数组的偏移量，默认值为 0。<br /><br />
+
+		使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
+		</p>
+
+		<h3>[method:this identity]()</h3>
+		<p>
+			将此矩阵重置为 2x2 单位矩阵:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<h3>
+			[method:this set]( [param:Float n11], [param:Float n12], [param:Float n21], [param:Float n22] )
+		</h3>
+		<p>
+			使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>n11</mi></mtd>
+						<mtd><mi>n12</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n21</mi></mtd>
+						<mtd><mi>n22</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<h2>源码（Source）</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

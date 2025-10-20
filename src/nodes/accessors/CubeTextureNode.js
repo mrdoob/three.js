@@ -6,6 +6,7 @@ import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } 
 import { materialEnvRotation } from './MaterialProperties.js';
 
 import { CubeTexture } from '../../textures/CubeTexture.js';
+import { error } from '../../utils.js';
 
 const EmptyTexture = /*@__PURE__*/ new CubeTexture();
 
@@ -76,7 +77,7 @@ class CubeTextureNode extends TextureNode {
 
 		} else {
 
-			console.error( 'THREE.CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
+			error( 'CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
 
 			return vec3( 0, 0, 0 );
 
@@ -123,7 +124,7 @@ class CubeTextureNode extends TextureNode {
 	 */
 	generateUV( builder, cubeUV ) {
 
-		return cubeUV.build( builder, 'vec3' );
+		return cubeUV.build( builder, this.sampler === true ? 'vec3' : 'ivec3' );
 
 	}
 

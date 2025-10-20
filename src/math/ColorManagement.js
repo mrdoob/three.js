@@ -147,7 +147,7 @@ function createColorManagement() {
 
 		fromWorkingColorSpace: function ( color, targetColorSpace ) {
 
-			warnOnce( 'THREE.ColorManagement: .fromWorkingColorSpace() has been renamed to .workingToColorSpace().' ); // @deprecated, r177
+			warnOnce( 'ColorManagement: .fromWorkingColorSpace() has been renamed to .workingToColorSpace().' ); // @deprecated, r177
 
 			return ColorManagement.workingToColorSpace( color, targetColorSpace );
 
@@ -155,7 +155,7 @@ function createColorManagement() {
 
 		toWorkingColorSpace: function ( color, sourceColorSpace ) {
 
-			warnOnce( 'THREE.ColorManagement: .toWorkingColorSpace() has been renamed to .colorSpaceToWorking().' ); // @deprecated, r177
+			warnOnce( 'ColorManagement: .toWorkingColorSpace() has been renamed to .colorSpaceToWorking().' ); // @deprecated, r177
 
 			return ColorManagement.colorSpaceToWorking( color, sourceColorSpace );
 

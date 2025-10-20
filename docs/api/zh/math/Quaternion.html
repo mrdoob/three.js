@@ -147,6 +147,9 @@
 		<h3>[method:this premultiply]( [param:Quaternion q] )</h3>
 		<p>使用 [page:Quaternion q] 乘以该四元数。</p>
 
+		<h3>[method:this random]()</h3>
+		<p>将此四元数设置为均匀随机的、归一化的四元数。</p>
+
 		<h3>[method:this rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
 		<p>
 			[page:Quaternion q] - 目标四元数<br />
@@ -209,7 +212,7 @@
 
 		<h3>[method:Array toJSON]()</h3>
 		<p>
-		This methods defines the serialization result of [name]. 在形如[x, y, z, w]的数组中，返回四元数中的数字元素。
+		此方法定义了 [name] 的序列化结果。在形如[x, y, z, w]的数组中，返回四元数中的数字元素。
 		</p>
 
 		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
@@ -232,19 +235,19 @@
 		[page:Integer srcOffset1] - 数组 *src1* 的偏移量<br />
 		[page:Float t] - 归一化插值因子(介于 0 和 1 之间)<br /><br />
 
-		This SLERP implementation assumes the quaternion data are managed in flat arrays.
+		该 SLERP 实现假设四元数数据在平面数组中管理。
 		</p>
 
 		<h3>[method:Array multiplyQuaternionsFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1] )</h3>
 		<p>
-		[page:Array dst] - The output array.<br />
-		[page:Integer dstOffset] - An offset into the output array.<br />
-		[page:Array src0] - The source array of the starting quaternion.<br />
-		[page:Integer srcOffset0] - An offset into the array *src0*.<br />
-		[page:Array src1] - The source array of the target quaternion.<br />
-		[page:Integer srcOffset1] - An offset into the array *src1*.<br /><br />
+		[page:Array dst] - 输出数组<br />
+		[page:Integer dstOffset] - 输出数组的偏移量<br />
+		[page:Array src0] - 起始四元数的源数组<br />
+		[page:Integer srcOffset0] - 数组 *src0* 的偏移量<br />
+		[page:Array src1] - 目标四元数的源数组<br />
+		[page:Integer srcOffset1] - 数组 *src1* 的偏移量<br /><br />
 
-		This multiplication implementation assumes the quaternion data are managed in flat arrays.
+		该乘法实现假设四元数数据在平面数组中管理。
 		</p>
 
 		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->

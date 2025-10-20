@@ -305,17 +305,26 @@
 			class.
 		</p>
 
-		<h3>[method:undefined updateMatrix]()</h3>
+		<h3>[method:undefined addUpdateRange]( [param:number start], [param:number count] )</h3>
 		<p>
-			Update the texture's uv-transform [page:Texture.matrix .matrix] from the
-			texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat], 
-			[page:Texture.rotation .rotation], and [page:Texture.center .center].
+			Adds a range of data in the data texture to be updated on the GPU.
+		</p>
+
+		<h3>[method:undefined clearUpdateRanges]()</h3>
+		<p>
+			Clears the update ranges.
 		</p>
 
 		<h3>[method:Texture clone]()</h3>
 		<p>
 			Make copy of the texture. Note this is not a "deep copy", the image is
 			shared. Cloning the texture automatically marks it for texture upload.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -325,12 +334,6 @@
 			[link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
 		</p>
 
-		<h3>[method:undefined dispose]()</h3>
-		<p>
-			Frees the GPU-related resources allocated by this instance. Call this
-			method whenever this instance is no longer used in your app.
-		</p>
-
 		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>
 		<p>
 			Transform the uv based on the value of this texture's [page:Texture.offset .offset], 
@@ -338,14 +341,11 @@
 			[page:Texture.wrapT .wrapT] and [page:Texture.flipY .flipY] properties.
 		</p>
 
-		<h3>[method:undefined addUpdateRange]( [param:number start], [param:number count] )</h3>
+		<h3>[method:undefined updateMatrix]()</h3>
 		<p>
-			Adds a range of data in the data texture to be updated on the GPU.
-		</p>
-
-		<h3>[method:undefined clearUpdateRanges]()</h3>
-		<p>
-			Clears the update ranges.
+			Update the texture's uv-transform [page:Texture.matrix .matrix] from the
+			texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat], 
+			[page:Texture.rotation .rotation], and [page:Texture.center .center].
 		</p>
 
 		<h2>Source</h2>

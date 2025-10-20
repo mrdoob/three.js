@@ -1,6 +1,7 @@
 import Node from './Node.js';
 import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
+import { error } from '../../utils.js';
 
 /**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
@@ -96,11 +97,11 @@ class StackNode extends Node {
 	 * @param {Node} node - The node to add.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	add( node ) {
+	addToStack( node ) {
 
 		if ( node.isNode !== true ) {
 
-			console.error( 'THREE.TSL: Invalid node added to stack.' );
+			error( 'TSL: Invalid node added to stack.' );
 			return this;
 
 		}
@@ -123,7 +124,7 @@ class StackNode extends Node {
 		const methodNode = new ShaderNode( method );
 		this._currentCond = select( boolNode, methodNode );
 
-		return this.add( this._currentCond );
+		return this.addToStack( this._currentCond );
 
 	}
 
@@ -198,7 +199,7 @@ class StackNode extends Node {
 
 		} else {
 
-			console.error( 'THREE.TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
 
 		}
 
@@ -225,7 +226,7 @@ class StackNode extends Node {
 
 			this._currentCond = condNode;
 
-			return this.add( this._currentCond );
+			return this.addToStack( this._currentCond );
 
 		} else {
 
@@ -262,9 +263,7 @@ class StackNode extends Node {
 
 			if ( childNode.isVarNode && childNode.intent === true ) {
 
-				const properties = builder.getNodeProperties( childNode );
-
-				if ( properties.assign !== true ) {
+				if ( childNode.isAssign( builder ) !== true ) {
 
 					continue;
 
@@ -303,9 +302,7 @@ class StackNode extends Node {
 
 			if ( node.isVarNode && node.intent === true ) {
 
-				const properties = builder.getNodeProperties( node );
-
-				if ( properties.assign !== true ) {
+				if ( node.isAssign( builder ) !== true ) {
 
 					continue;
 

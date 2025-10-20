@@ -15,6 +15,11 @@
 			此类最常见的用例是当某种 GPGPU 计算干扰甚至产生有问题的 VBO 时。
 		</p>
 
+		<h2>例子</h2>
+		<p>
+			[example:webgl_buffergeometry_glbufferattribute Points with custom buffers]<br />
+		</p>
+
 		<h2>构造方法（Constructor）</h2>
 		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count], [param:Boolean normalized] )</h3>
 		<p>
@@ -36,19 +41,11 @@
 		</ul>
 		*count* — VBO 中预期的顶点数。
 		<br />
-		*normalized* — (optional) Applies to integer data only.
-			Indicates how the underlying data in the buffer maps to the values in the
-			GLSL code. For instance, if [page:WebGLBuffer buffer] contains data of
-			`gl.UNSIGNED_SHORT`, and [page:Boolean normalized] is true, the values `0 -
-			+65535` in the buffer data will be mapped to 0.0f - +1.0f in the GLSL
-			attribute. A `gl.SHORT` (signed) would map from -32768 - +32767 to -1.0f
-			- +1.0f. If [page:Boolean normalized] is false, the values will be
-			converted to floats unmodified, i.e. 32767 becomes 32767.0f.
-		</p>
-
-		<h2>Examples</h2>
-		<p>
-			[example:webgl_buffergeometry_glbufferattribute Points with custom buffers]<br />
+		*normalized* — (optional) 仅适用于整数数据。指示缓冲区中的底层数据如何映射到 GLSL 代码中的值。
+		例如，如果 [page:WebGLBuffer buffer] 包含 `gl.UNSIGNED_SHORT` 的数据，
+		且 [page:Boolean normalized] 为 true，则缓冲区数据中的值 `0 -
+			+65535` 将映射到 GLSL 属性中的 0.0f - +1.0f 。 `gl.SHORT` (有符号) 将映射为 -32768 - +32767 到 -1.0f
+			- +1.0f。如果 [page:Boolean normalized] 为 false， 则值将转换为未修改的浮点数，即 32767 变为 32767.0f。
 		</p>
 
 		<h2>特性（Properties）</h2>

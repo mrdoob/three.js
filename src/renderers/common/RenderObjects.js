@@ -185,7 +185,7 @@ class RenderObjects {
 		renderObject.onDispose = () => {
 
 			this.pipelines.delete( renderObject );
-			this.bindings.delete( renderObject );
+			this.bindings.deleteForRender( renderObject );
 			this.nodes.delete( renderObject );
 
 			chainMap.delete( renderObject.getChainArray() );

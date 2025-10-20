@@ -62,6 +62,7 @@
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 			const BLOOM_SCENE = 1;
 
@@ -78,13 +79,15 @@
 			const darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } );
 			const materials = {};
 
-			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: false } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.toneMapping = THREE.ReinhardToneMapping;
+			renderer.toneMapping = THREE.NeutralToneMapping;
 			document.body.appendChild( renderer.domElement );
 
 			const scene = new THREE.Scene();
+			const pmremGenerator = new THREE.PMREMGenerator( renderer );
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
 			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 			camera.position.set( 0, 0, 20 );
@@ -103,7 +106,8 @@
 			bloomPass.strength = params.strength;
 			bloomPass.radius = params.radius;
 
-			const bloomComposer = new EffectComposer( renderer );
+			const bloomRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType } );
+			const bloomComposer = new EffectComposer( renderer, bloomRenderTarget );
 			bloomComposer.renderToScreen = false;
 			bloomComposer.addPass( renderScene );
 			bloomComposer.addPass( bloomPass );
@@ -123,7 +127,8 @@
 
 			const outputPass = new OutputPass();
 
-			const finalComposer = new EffectComposer( renderer );
+			const finalRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType, samples: 4 } );
+			const finalComposer = new EffectComposer( renderer, finalRenderTarget );
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( mixPass );
 			finalComposer.addPass( outputPass );
@@ -216,7 +221,7 @@
 					const color = new THREE.Color();
 					color.setHSL( Math.random(), 0.7, Math.random() * 0.2 + 0.05 );
 
-					const material = new THREE.MeshBasicMaterial( { color: color } );
+					const material = new THREE.MeshStandardMaterial( { color: color, roughness: 1, metalness: 1 } );
 					const sphere = new THREE.Mesh( geometry, material );
 					sphere.position.x = Math.random() * 10 - 5;
 					sphere.position.y = Math.random() * 10 - 5;

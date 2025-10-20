@@ -5,6 +5,7 @@ import {
 
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
+import { error } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing bindings.
@@ -222,7 +223,7 @@ class WebGPUBindingUtils {
 
 			} else {
 
-				console.error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
+				error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
 
 			}
 
@@ -414,6 +415,7 @@ class WebGPUBindingUtils {
 				} else {
 
 					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
+					const baseMipLevel = binding.store ? binding.mipLevel : 0;
 					let propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }`;
 
 					if ( textureData.texture.depthOrArrayLayers > 1 ) {
@@ -422,7 +424,7 @@ class WebGPUBindingUtils {
 
 					}
 
-					propertyName += `-${ mipLevelCount }`;
+					propertyName += `-${ mipLevelCount }-${ baseMipLevel }`;
 
 					resourceGPU = textureData[ propertyName ];
 
@@ -450,7 +452,7 @@ class WebGPUBindingUtils {
 
 						}
 
-						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount } );
+						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount, baseMipLevel } );
 
 					}
 

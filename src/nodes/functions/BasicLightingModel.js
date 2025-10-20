@@ -4,6 +4,7 @@ import { MultiplyOperation, MixOperation, AddOperation } from '../../constants.j
 import { materialSpecularStrength, materialReflectivity } from '../accessors/MaterialNode.js';
 import { mix } from '../math/MathNode.js';
 import { vec4 } from '../tsl/TSLBase.js';
+import { warn } from '../../utils.js';
 
 /**
  * Represents the lighting model for unlit materials. The only light contribution
@@ -85,7 +86,7 @@ class BasicLightingModel extends LightingModel {
 					break;
 
 				default:
-					console.warn( 'THREE.BasicLightingModel: Unsupported .combine value:', material.combine );
+					warn( 'BasicLightingModel: Unsupported .combine value:', material.combine );
 					break;
 
 			}

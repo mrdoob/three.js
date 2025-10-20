@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { warn } from '../../utils.js';
 
 /**
  * Represents a logical `if/else` statement. Can be used as an alternative
@@ -99,9 +100,9 @@ class ConditionalNode extends Node {
 
 	setup( builder ) {
 
-		const condNode = this.condNode.cache();
-		const ifNode = this.ifNode.cache();
-		const elseNode = this.elseNode ? this.elseNode.cache() : null;
+		const condNode = this.condNode;
+		const ifNode = this.ifNode.isolate();
+		const elseNode = this.elseNode ? this.elseNode.isolate() : null;
 
 		//
 
@@ -173,7 +174,7 @@ class ConditionalNode extends Node {
 
 				if ( functionNode === null ) {
 
-					console.warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+					warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
 
 					ifSnippet = '// ' + ifSnippet;
 
@@ -203,7 +204,7 @@ class ConditionalNode extends Node {
 
 					if ( functionNode === null ) {
 
-						console.warn( 'THREE.TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
+						warn( 'TSL: Return statement used in an inline \'Fn()\'. Define a layout struct to allow return values.' );
 
 						elseSnippet = '// ' + elseSnippet;
 
