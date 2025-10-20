@@ -1,6 +1,5 @@
 import BRDF_GGX from './BRDF_GGX.js';
 import DFGApprox from './DFGApprox.js';
-import { specularColor, specularF90, roughness } from '../../core/PropertyNode.js';
 import { normalView } from '../../accessors/Normal.js';
 import { positionViewDirection } from '../../accessors/Position.js';
 import { Fn, float } from '../../tsl/TSLBase.js';
