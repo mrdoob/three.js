@@ -318,7 +318,8 @@ async function main() {
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
-		protocolTimeout: 0
+		protocolTimeout: 0,
+		userDataDir: './.puppeteer_profile'
 	} );
 
 	// this line is intended to stop the script if the browser (in headful mode) is closed by user (while debugging)
