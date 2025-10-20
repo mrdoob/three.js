@@ -17,7 +17,7 @@
 	window.performance._now = performance.now;
 
 	let frameId = 0;
-	const now = () => frameId * 16;
+	const now = () => 0; // frameId * 16;
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
 	window.performance.now = now;

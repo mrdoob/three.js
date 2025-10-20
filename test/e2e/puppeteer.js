@@ -215,6 +215,8 @@ const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
+const numPages = 8; // use 8 browser pages
+
 const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
 const width = 400;
@@ -337,22 +339,22 @@ async function main() {
 		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
 	};
 
-	/* Prepare page */
+	/* Prepare pages */
 
 	const errorMessagesCache = [];
 
-	const page = await browser.newPage();
-	await preparePage( page, injection, builds, errorMessagesCache );
+	const pages = await browser.pages();
+	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
+
+	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
 
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	for ( const file of files ) {
-
-		await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file );
-
-	}
+	const queue = new PromiseQueue( makeAttempt, pages, failedScreenshots, cleanPage, isMakeScreenshot );
+	for ( const file of files ) queue.add( file );
+	await queue.waitForAll();
 
 	/* Finish */
 
@@ -497,11 +499,31 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+
+	const page = await new Promise( ( resolve, reject ) => {
+
+		const interval = setInterval( () => {
+
+			for ( const page of pages ) {
+
+				if ( page.file === undefined ) {
+
+					page.file = file; // acquire lock
+					clearInterval( interval );
+					resolve( page );
+					break;
+
+				}
+
+			}
+
+		}, 100 );
+
+	} );
 
 	try {
 
-		page.file = file;
 		page.pageSize = 0;
 		page.error = undefined;
 
@@ -657,7 +679,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 		} else {
 
 			console.yellow( `${ e }, another attempt...` );
-			await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
+			this.add( file, attemptID + 1 );
 
 		}
 
