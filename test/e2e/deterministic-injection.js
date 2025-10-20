@@ -38,8 +38,8 @@
 				if ( window._renderStarted === true ) {
 
 					cb( now() );
-					clearInterval( intervalId );
 
+					clearInterval( intervalId );
 					window._renderFinished = true;
 
 				}
