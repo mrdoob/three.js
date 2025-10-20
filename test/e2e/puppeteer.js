@@ -77,7 +77,6 @@ class PagePool {
 
 const idleTime = 15; // 15 seconds - for how long there should be no network requests
 const parseTime = 6; // 6 seconds per megabyte
-const settlingTime = 150; // 150ms - time to wait after render finishes for GPU to settle
 
 const exceptionList = [
 
@@ -589,32 +588,41 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 				idleTime: idleTime * 1000
 			} );
 
-			await page.evaluate( async ( renderTimeout, parseTime, settlingTime ) => {
+			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
-				/* Resolve render promise */
+				/* Start deterministic rendering */
 
 				window._renderStarted = true;
 
 				await new Promise( function ( resolve, reject ) {
 
 					const renderStart = performance._now();
-					const timeout = renderTimeout > 0
-						? setTimeout( () => reject( 'Render timeout exceeded' ), 1000 * renderTimeout )
-						: null;
+					let timeout = null;
+
+					if ( renderTimeout > 0 ) {
+
+						timeout = setTimeout( () => reject( 'Render timeout exceeded' ), 1000 * renderTimeout );
+
+					}
 
 					function checkRender() {
 
 						if ( window._renderFinished ) {
 
 							if ( timeout ) clearTimeout( timeout );
-							// Add settling time for GPU to complete all operations
-							setTimeout( resolve, settlingTime );
+							// Wait one more frame to ensure render is fully complete
+							requestAnimationFrame( resolve );
 
 						} else if ( renderTimeout === 0 || performance._now() - renderStart <= 1000 * renderTimeout ) {
 
 							requestAnimationFrame( checkRender );
+
+						} else {
+
+							if ( timeout ) clearTimeout( timeout );
+							reject( 'Render timeout exceeded' );
 
 						}
 
@@ -624,7 +632,7 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 
 				} );
 
-			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000, settlingTime );
+			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
 		} catch ( e ) {
 
@@ -645,10 +653,10 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 
 			for ( const canvas of canvases ) {
 
-				// Try WebGL first
+				// Try WebGL
 				const gl = canvas.getContext( 'webgl2' ) || canvas.getContext( 'webgl' );
 
-				if ( gl && gl.finish ) {
+				if ( gl && typeof gl.finish === 'function' ) {
 
 					gl.finish(); // Force GPU to complete all pending operations
 
@@ -657,7 +665,7 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 				// Try WebGPU
 				const gpu = canvas.getContext( 'webgpu' );
 
-				if ( gpu && gpu.device ) {
+				if ( gpu && gpu.device && gpu.device.queue ) {
 
 					// Wait for all queued GPU operations to complete
 					await gpu.device.queue.onSubmittedWorkDone();
@@ -665,6 +673,10 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 				}
 
 			}
+
+			// Wait for next frame to ensure all rendering is complete and stable
+			// This ensures we're capturing at a consistent point in the render cycle
+			await new Promise( resolve => requestAnimationFrame( () => requestAnimationFrame( resolve ) ) );
 
 		} );
 

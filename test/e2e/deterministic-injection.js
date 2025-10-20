@@ -28,7 +28,7 @@
 	window._renderStarted = false;
 	window._renderFinished = false;
 
-	const maxFrameId = 2;
+	const maxFrameId = 5;
 	window.requestAnimationFrame = function ( cb ) {
 
 		if ( ! window._renderStarted ) {
@@ -43,8 +43,9 @@
 
 			RAF( function () {
 
-				if ( frameId ++ < maxFrameId ) {
+				if ( frameId < maxFrameId ) {
 
+					frameId ++;
 					cb( now() );
 
 				} else {
@@ -65,13 +66,15 @@
 
 	HTMLVideoElement.prototype.play = async function () {
 
-		play.call( this );
-		this.addEventListener( 'timeupdate', () => this.pause() );
+		const video = this;
+
+		play.call( video );
+		video.addEventListener( 'timeupdate', () => video.pause() );
 
 		function renew() {
 
-			this.load();
-			play.call( this );
+			video.load();
+			play.call( video );
 			RAF( renew );
 
 		}
