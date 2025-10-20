@@ -24,41 +24,27 @@
 
 	/* Deterministic RAF */
 
-	const RAF = window.requestAnimationFrame;
 	window._renderStarted = false;
 	window._renderFinished = false;
 
-	const maxFrameId = 2;
 	window.requestAnimationFrame = function ( cb ) {
+
+		if ( window._renderFinished === true ) return
 
 		if ( window._renderStarted === false ) {
 
-			setTimeout( function () {
+			const intervalId = setInterval( function () {
 
-				RAF( cb );
-
-			}, 50 );
-
-		} else if ( window._renderFinished === false ) {
-
-			RAF( function () {
-
-				frameId ++;
-
-				if ( frameId <= maxFrameId ) {
-
-					if ( frameId === maxFrameId ) {
-
-						window._renderFinished = true;
-						return;
-
-					}
+				if ( window._renderStarted === true ) {
 
 					cb( now() );
+					clearInterval( intervalId );
+
+					window._renderFinished = true;
 
 				}
 
-			} );
+			}, 50 );
 
 		}
 
