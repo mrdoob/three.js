@@ -41,6 +41,7 @@ const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
 
+	/*
 	// tiles not loaded in time for screenshot
 	'webgl_loader_3dtiles',
 
@@ -201,6 +202,7 @@ const exceptionList = [
 	'webgpu_compute_particles_rain',
 	'webgpu_compute_particles_snow',
 	'webgpu_compute_points'
+	*/
 
 ];
 
