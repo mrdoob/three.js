@@ -2,6 +2,7 @@ import BRDF_GGX from './BRDF_GGX.js';
 import DFGApprox from './DFGApprox.js';
 import { normalView } from '../../accessors/Normal.js';
 import { positionViewDirection } from '../../accessors/Position.js';
+import { EPSILON } from '../../math/MathNode.js';
 import { Fn, float } from '../../tsl/TSLBase.js';
 
 // GGX BRDF with multi-scattering energy compensation for direct lighting
@@ -37,7 +38,7 @@ const BRDF_GGX_Multiscatter = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, rou
 
 	// Multiple scattering contribution
 	// Uses geometric mean of view and light contributions for better energy distribution
-	const Fms = FssEss_V.mul( FssEss_L ).mul( Favg ).div( float( 1.0 ).sub( Ems_V.mul( Ems_L ).mul( Favg ).mul( Favg ) ).add( 1e-5 ) );
+	const Fms = FssEss_V.mul( FssEss_L ).mul( Favg ).div( float( 1.0 ).sub( Ems_V.mul( Ems_L ).mul( Favg ).mul( Favg ) ).add( EPSILON ) );
 
 	// Energy compensation factor
 	const compensationFactor = Ems_V.mul( Ems_L );
