@@ -463,9 +463,13 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 			console.yellow( text );
 
-		} else {
+		} else if ( type === 'error' ) {
 
 			page.error = text;
+
+		} else {
+
+			console.log( `[Browser] ${text}` ); // Print other console messages (log, info, debug)
 
 		}
 
