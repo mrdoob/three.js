@@ -439,6 +439,18 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		}
 
+		if ( text.includes( 'Timestamp tracking is disabled' ) ) {
+
+			return;
+
+		}
+
+		if ( text.includes( 'WebGPU is not available, running under WebGL2 backend' ) ) {
+
+			return;
+
+		}
+
 		if ( errorMessages.includes( text ) ) {
 
 			return;
