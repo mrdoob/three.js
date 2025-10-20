@@ -1,41 +1,40 @@
 import { Light } from './Light.js';
-import { RectAreaLightShadow } from './RectAreaLightShadow.js';
+import { CircleAreaLightShadow } from './CircleAreaLightShadow.js';
 
 /**
- * This class emits light uniformly across the face a rectangular plane.
- * This light type can be used to simulate light sources such as bright
- * windows or strip lighting.
+ * This class emits light uniformly across the face of a circular disc.
+ * This light type can be used to simulate light sources such as round ceiling
+ * lights or circular softboxes.
  *
  * Important Notes:
  *
  * - Only PBR materials are supported.
  * - You have to include `RectAreaLightUniformsLib` (`WebGLRenderer`) or `RectAreaLightTexturesLib` (`WebGPURenderer`)
- * into your app and init the uniforms/textures.
+ * into your app and init the uniforms/textures (CircleAreaLight uses the same LTC textures as RectAreaLight).
  *
  * ```js
  * RectAreaLightUniformsLib.init(); // only relevant for WebGLRenderer
  * THREE.RectAreaLightNode.setLTC( RectAreaLightTexturesLib.init() ); //  only relevant for WebGPURenderer
  *
- * const intensity = 1; const width = 10; const height = 10;
- * const rectLight = new THREE.RectAreaLight( 0xffffff, intensity, width, height );
- * rectLight.position.set( 5, 5, 0 );
- * rectLight.lookAt( 0, 0, 0 );
- * scene.add( rectLight )
+ * const intensity = 1; const radius = 5;
+ * const circleLight = new THREE.CircleAreaLight( 0xffffff, intensity, radius );
+ * circleLight.position.set( 5, 5, 0 );
+ * circleLight.lookAt( 0, 0, 0 );
+ * scene.add( circleLight )
  * ```
  *
  * @augments Light
  */
-class RectAreaLight extends Light {
+class CircleAreaLight extends Light {
 
 	/**
-	 * Constructs a new area light.
+	 * Constructs a new circular area light.
 	 *
 	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
 	 * @param {number} [intensity=1] - The light's strength/intensity.
-	 * @param {number} [width=10] - The width of the light.
-	 * @param {number} [height=10] - The height of the light.
+	 * @param {number} [radius=5] - The radius of the light.
 	 */
-	constructor( color, intensity, width = 10, height = 10 ) {
+	constructor( color, intensity, radius = 5 ) {
 
 		super( color, intensity );
 
@@ -46,32 +45,24 @@ class RectAreaLight extends Light {
 		 * @readonly
 		 * @default true
 		 */
-		this.isRectAreaLight = true;
+		this.isCircleAreaLight = true;
 
-		this.type = 'RectAreaLight';
-
-		/**
-		 * The width of the light.
-		 *
-		 * @type {number}
-		 * @default 10
-		 */
-		this.width = width;
+		this.type = 'CircleAreaLight';
 
 		/**
-		 * The height of the light.
+		 * The radius of the light.
 		 *
 		 * @type {number}
-		 * @default 10
+		 * @default 5
 		 */
-		this.height = height;
+		this.radius = radius;
 
 		/**
 		 * The shadow configuration.
 		 *
-		 * @type {RectAreaLightShadow}
+		 * @type {CircleAreaLightShadow}
 		 */
-		this.shadow = new RectAreaLightShadow();
+		this.shadow = new CircleAreaLightShadow();
 
 	}
 
@@ -84,14 +75,15 @@ class RectAreaLight extends Light {
 	get power() {
 
 		// compute the light's luminous power (in lumens) from its intensity (in nits)
-		return this.intensity * this.width * this.height * Math.PI;
+		// for a circular disc: area = π * r²
+		return this.intensity * Math.PI * this.radius * this.radius * Math.PI;
 
 	}
 
 	set power( power ) {
 
 		// set the light's intensity (in nits) from the desired luminous power (in lumens)
-		this.intensity = power / ( this.width * this.height * Math.PI );
+		this.intensity = power / ( Math.PI * this.radius * this.radius * Math.PI );
 
 	}
 
@@ -99,8 +91,7 @@ class RectAreaLight extends Light {
 
 		super.copy( source );
 
-		this.width = source.width;
-		this.height = source.height;
+		this.radius = source.radius;
 
 		return this;
 
@@ -110,8 +101,7 @@ class RectAreaLight extends Light {
 
 		const data = super.toJSON( meta );
 
-		data.object.width = this.width;
-		data.object.height = this.height;
+		data.object.radius = this.radius;
 
 		return data;
 
@@ -119,4 +109,4 @@ class RectAreaLight extends Light {
 
 }
 
-export { RectAreaLight };
+export { CircleAreaLight };

@@ -310,6 +310,52 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 
 }
 
+// Optimized LTC evaluation for 8-vertex polygon (octagon)
+// Unrolled loop version for better performance
+vec3 LTC_Evaluate_Octagon( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 vertices[ 8 ] ) {
+
+	// bail if point is on back side of plane of light
+	vec3 v1 = vertices[ 1 ] - vertices[ 0 ];
+	vec3 v2 = vertices[ 7 ] - vertices[ 0 ];
+	vec3 lightNormal = cross( v1, v2 );
+
+	if( dot( lightNormal, P - vertices[ 0 ] ) < 0.0 ) return vec3( 0.0 );
+
+	// construct orthonormal basis around N
+	vec3 T1, T2;
+	T1 = normalize( V - N * dot( V, N ) );
+	T2 = - cross( N, T1 );
+
+	// compute transform
+	mat3 mat = mInv * transpose( mat3( T1, T2, N ) );
+
+	// transform and project all vertices (unrolled for performance)
+	vec3 L0 = normalize( mat * ( vertices[ 0 ] - P ) );
+	vec3 L1 = normalize( mat * ( vertices[ 1 ] - P ) );
+	vec3 L2 = normalize( mat * ( vertices[ 2 ] - P ) );
+	vec3 L3 = normalize( mat * ( vertices[ 3 ] - P ) );
+	vec3 L4 = normalize( mat * ( vertices[ 4 ] - P ) );
+	vec3 L5 = normalize( mat * ( vertices[ 5 ] - P ) );
+	vec3 L6 = normalize( mat * ( vertices[ 6 ] - P ) );
+	vec3 L7 = normalize( mat * ( vertices[ 7 ] - P ) );
+
+	// calculate vector form factor for all 8 edges (unrolled)
+	vec3 vectorFormFactor = LTC_EdgeVectorFormFactor( L0, L1 );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( L1, L2 );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( L2, L3 );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( L3, L4 );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( L4, L5 );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( L5, L6 );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( L6, L7 );
+	vectorFormFactor += LTC_EdgeVectorFormFactor( L7, L0 );
+
+	// adjust for horizon clipping
+	float result = LTC_ClippedSphereFormFactor( vectorFormFactor );
+
+	return vec3( result );
+
+}
+
 // End Rect Area Light
 
 #if defined( USE_SHEEN )
@@ -541,8 +587,64 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 }
 
+#if NUM_CIRCLE_AREA_LIGHTS > 0
+
+	void RE_Direct_CircleArea_Physical( const in CircleAreaLight circleAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
+
+		// CircleAreaLight approximated as octagon (8-sided polygon)
+		// Uses reversed (CW) winding order to make light emit in -Z direction
+
+		vec3 N = geometryNormal;
+		vec3 V = geometryViewDir;
+		vec3 P = geometryPosition;
+		vec3 lightPos = circleAreaLight.position;
+		vec3 axisU = circleAreaLight.axisU;
+		vec3 axisV = circleAreaLight.axisV;
+		vec3 lightColor = circleAreaLight.color;
+
+		// LTC for specular
+		vec2 uv = LTC_Uv( N, V, material.roughness );
+		vec4 t1 = texture2D( ltc_1, uv );
+		vec4 t2 = texture2D( ltc_2, uv );
+
+		mat3 mInv = mat3(
+			vec3( t1.x, 0, t1.y ),
+			vec3( 0, 1, 0 ),
+			vec3( t1.z, 0, t1.w )
+		);
+
+		vec3 fresnel = ( material.specularColor * t2.x + ( vec3( 1.0 ) - material.specularColor ) * t2.y );
+
+		// Approximate circle as octagon - compute vertices in clockwise order
+		// Using cos/sin values for octagon (8 vertices at 45 degree intervals)
+		// cos(45°) = sin(45°) = sqrt(2)/2 ≈ 0.7071067811865476
+		const float c = 0.7071067811865476;
+
+		// Pre-compute diagonal vectors for efficiency
+		vec3 d1 = ( axisU + axisV ) * c; // diagonal at 45°
+		vec3 d2 = ( axisV - axisU ) * c; // diagonal at 135°
+
+		vec3 vertices[ 8 ];
+		vertices[ 0 ] = lightPos + axisU;
+		vertices[ 1 ] = lightPos + d1;
+		vertices[ 2 ] = lightPos + axisV;
+		vertices[ 3 ] = lightPos + d2;
+		vertices[ 4 ] = lightPos - axisU;
+		vertices[ 5 ] = lightPos - d1;
+		vertices[ 6 ] = lightPos - axisV;
+		vertices[ 7 ] = lightPos - d2;
+
+		// Evaluate octagon as a single polygon (much faster than 8 triangles)
+		reflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate_Octagon( N, V, P, mInv, vertices );
+		reflectedLight.directDiffuse += lightColor * material.diffuseColor * LTC_Evaluate_Octagon( N, V, P, mat3( 1.0 ), vertices );
+
+	}
+
+#endif
+
 #define RE_Direct				RE_Direct_Physical
 #define RE_Direct_RectArea		RE_Direct_RectArea_Physical
+#define RE_Direct_CircleArea	RE_Direct_CircleArea_Physical
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_Physical
 #define RE_IndirectSpecular		RE_IndirectSpecular_Physical
 

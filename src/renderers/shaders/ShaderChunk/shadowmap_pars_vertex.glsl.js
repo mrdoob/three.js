@@ -59,13 +59,41 @@ export default /* glsl */`
 
 	#endif
 
-	/*
-	#if NUM_RECT_AREA_LIGHTS > 0
+	#if NUM_RECT_AREA_LIGHT_SHADOWS > 0
 
-		// TODO (abelnation): uniforms for area light shadows
+		uniform mat4 rectAreaShadowMatrix[ NUM_RECT_AREA_LIGHT_SHADOWS ];
+		varying vec4 vRectAreaShadowCoord[ NUM_RECT_AREA_LIGHT_SHADOWS ];
+
+		struct RectAreaLightShadow {
+			float shadowIntensity;
+			float shadowBias;
+			float shadowNormalBias;
+			float shadowRadius;
+			vec2 shadowMapSize;
+			float lightSize;
+		};
+
+		uniform RectAreaLightShadow rectAreaLightShadows[ NUM_RECT_AREA_LIGHT_SHADOWS ];
 
 	#endif
-	*/
+
+	#if NUM_CIRCLE_AREA_LIGHT_SHADOWS > 0
+
+		uniform mat4 circleAreaShadowMatrix[ NUM_CIRCLE_AREA_LIGHT_SHADOWS ];
+		varying vec4 vCircleAreaShadowCoord[ NUM_CIRCLE_AREA_LIGHT_SHADOWS ];
+
+		struct CircleAreaLightShadow {
+			float shadowIntensity;
+			float shadowBias;
+			float shadowNormalBias;
+			float shadowRadius;
+			vec2 shadowMapSize;
+			float lightSize;
+		};
+
+		uniform CircleAreaLightShadow circleAreaLightShadows[ NUM_CIRCLE_AREA_LIGHT_SHADOWS ];
+
+	#endif
 
 #endif
 `;

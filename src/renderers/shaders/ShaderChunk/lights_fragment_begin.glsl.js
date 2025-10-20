@@ -155,12 +155,45 @@ IncidentLight directLight;
 #if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )
 
 	RectAreaLight rectAreaLight;
+	#if defined( USE_SHADOWMAP ) && NUM_RECT_AREA_LIGHT_SHADOWS > 0
+	RectAreaLightShadow rectAreaLightShadow;
+	#endif
 
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
 
 		rectAreaLight = rectAreaLights[ i ];
+
+		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_RECT_AREA_LIGHT_SHADOWS )
+		rectAreaLightShadow = rectAreaLightShadows[ i ];
+		rectAreaLight.color *= ( receiveShadow ) ? getShadowRectAreaPCSS( rectAreaShadowMap[ i ], rectAreaLightShadow.shadowMapSize, rectAreaLightShadow.shadowIntensity, rectAreaLightShadow.shadowBias, rectAreaLightShadow.lightSize, vRectAreaShadowCoord[ i ] ) : 1.0;
+		#endif
+
 		RE_Direct_RectArea( rectAreaLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );
+
+	}
+	#pragma unroll_loop_end
+
+#endif
+
+#if ( NUM_CIRCLE_AREA_LIGHTS > 0 ) && defined( RE_Direct_CircleArea )
+
+	CircleAreaLight circleAreaLight;
+	#if defined( USE_SHADOWMAP ) && NUM_CIRCLE_AREA_LIGHT_SHADOWS > 0
+	CircleAreaLightShadow circleAreaLightShadow;
+	#endif
+
+	#pragma unroll_loop_start
+	for ( int i = 0; i < NUM_CIRCLE_AREA_LIGHTS; i ++ ) {
+
+		circleAreaLight = circleAreaLights[ i ];
+
+		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_CIRCLE_AREA_LIGHT_SHADOWS )
+		circleAreaLightShadow = circleAreaLightShadows[ i ];
+		circleAreaLight.color *= ( receiveShadow ) ? getShadowRectAreaPCSS( circleAreaShadowMap[ i ], circleAreaLightShadow.shadowMapSize, circleAreaLightShadow.shadowIntensity, circleAreaLightShadow.shadowBias, circleAreaLightShadow.lightSize, vCircleAreaShadowCoord[ i ] ) : 1.0;
+		#endif
+
+		RE_Direct_CircleArea( circleAreaLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );
 
 	}
 	#pragma unroll_loop_end

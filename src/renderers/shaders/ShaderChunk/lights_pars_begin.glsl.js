@@ -170,6 +170,15 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 #endif
 
 
+#if NUM_RECT_AREA_LIGHTS > 0 || NUM_CIRCLE_AREA_LIGHTS > 0
+
+	// Pre-computed values of LinearTransformedCosine approximation of BRDF
+	// BRDF approximation Texture is 64x64
+	uniform sampler2D ltc_1; // RGBA Float
+	uniform sampler2D ltc_2; // RGBA Float
+
+#endif
+
 #if NUM_RECT_AREA_LIGHTS > 0
 
 	struct RectAreaLight {
@@ -179,12 +188,21 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 		vec3 halfHeight;
 	};
 
-	// Pre-computed values of LinearTransformedCosine approximation of BRDF
-	// BRDF approximation Texture is 64x64
-	uniform sampler2D ltc_1; // RGBA Float
-	uniform sampler2D ltc_2; // RGBA Float
-
 	uniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];
+
+#endif
+
+#if NUM_CIRCLE_AREA_LIGHTS > 0
+
+	struct CircleAreaLight {
+		vec3 color;
+		vec3 position;
+		vec3 axisU;
+		vec3 axisV;
+		float radius;
+	};
+
+	uniform CircleAreaLight circleAreaLights[ NUM_CIRCLE_AREA_LIGHTS ];
 
 #endif
 

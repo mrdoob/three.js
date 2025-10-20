@@ -194,6 +194,38 @@ const UniformsLib = {
 			height: {}
 		} },
 
+		rectAreaLightShadows: { value: [], properties: {
+			shadowIntensity: 1,
+			shadowBias: {},
+			shadowNormalBias: {},
+			shadowRadius: {},
+			shadowMapSize: {},
+			lightSize: {}
+		} },
+
+		rectAreaShadowMap: { value: [] },
+		rectAreaShadowMatrix: { value: [] },
+
+		circleAreaLights: { value: [], properties: {
+			color: {},
+			position: {},
+			axisU: {},
+			axisV: {},
+			radius: {}
+		} },
+
+		circleAreaLightShadows: { value: [], properties: {
+			shadowIntensity: 1,
+			shadowBias: {},
+			shadowNormalBias: {},
+			shadowRadius: {},
+			shadowMapSize: {},
+			lightSize: {}
+		} },
+
+		circleAreaShadowMap: { value: [] },
+		circleAreaShadowMatrix: { value: [] },
+
 		ltc_1: { value: null },
 		ltc_2: { value: null }
 

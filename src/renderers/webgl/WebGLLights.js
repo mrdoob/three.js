@@ -67,6 +67,16 @@ function UniformsCache() {
 					};
 					break;
 
+				case 'CircleAreaLight':
+					uniforms = {
+						color: new Color(),
+						position: new Vector3(),
+						axisU: new Vector3(),
+						axisV: new Vector3(),
+						radius: 0
+					};
+					break;
+
 			}
 
 			lights[ light.id ] = uniforms;
@@ -129,7 +139,25 @@ function ShadowUniformsCache() {
 					};
 					break;
 
-				// TODO (abelnation): set RectAreaLight shadow uniforms
+				case 'RectAreaLight':
+					uniforms = {
+						shadowIntensity: 1,
+						shadowBias: 0,
+						shadowNormalBias: 0,
+						shadowRadius: 1,
+						shadowMapSize: new Vector2()
+					};
+					break;
+
+				case 'CircleAreaLight':
+					uniforms = {
+						shadowIntensity: 1,
+						shadowBias: 0,
+						shadowNormalBias: 0,
+						shadowRadius: 1,
+						shadowMapSize: new Vector2()
+					};
+					break;
 
 			}
 
@@ -168,12 +196,15 @@ function WebGLLights( extensions ) {
 			pointLength: - 1,
 			spotLength: - 1,
 			rectAreaLength: - 1,
+			circleAreaLength: - 1,
 			hemiLength: - 1,
 
 			numDirectionalShadows: - 1,
 			numPointShadows: - 1,
 			numSpotShadows: - 1,
 			numSpotMaps: - 1,
+			numRectAreaShadows: - 1,
+			numCircleAreaShadows: - 1,
 
 			numLightProbes: - 1
 		},
@@ -190,8 +221,15 @@ function WebGLLights( extensions ) {
 		spotShadowMap: [],
 		spotLightMatrix: [],
 		rectArea: [],
+		rectAreaShadow: [],
+		rectAreaShadowMap: [],
+		rectAreaShadowMatrix: [],
 		rectAreaLTC1: null,
 		rectAreaLTC2: null,
+		circleArea: [],
+		circleAreaShadow: [],
+		circleAreaShadowMap: [],
+		circleAreaShadowMatrix: [],
 		point: [],
 		pointShadow: [],
 		pointShadowMap: [],
@@ -218,6 +256,7 @@ function WebGLLights( extensions ) {
 		let pointLength = 0;
 		let spotLength = 0;
 		let rectAreaLength = 0;
+		let circleAreaLength = 0;
 		let hemiLength = 0;
 
 		let numDirectionalShadows = 0;
@@ -225,6 +264,8 @@ function WebGLLights( extensions ) {
 		let numSpotShadows = 0;
 		let numSpotMaps = 0;
 		let numSpotShadowsWithMaps = 0;
+		let numRectAreaShadows = 0;
+		let numCircleAreaShadows = 0;
 
 		let numLightProbes = 0;
 
@@ -347,9 +388,74 @@ function WebGLLights( extensions ) {
 				uniforms.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
 				uniforms.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
 
-				state.rectArea[ rectAreaLength ] = uniforms;
 
-				rectAreaLength ++;
+			if ( light.castShadow ) {
+
+				const shadow = light.shadow;
+
+				const shadowUniforms = shadowCache.get( light );
+
+				shadowUniforms.shadowIntensity = shadow.intensity;
+				shadowUniforms.shadowBias = shadow.bias;
+				shadowUniforms.shadowNormalBias = shadow.normalBias;
+				shadowUniforms.shadowRadius = shadow.radius;
+				shadowUniforms.shadowMapSize = shadow.mapSize;
+				shadowUniforms.lightSize = ( light.width + light.height ) * 0.5;
+
+				state.rectAreaShadow[ rectAreaLength ] = shadowUniforms;
+				state.rectAreaShadowMap[ rectAreaLength ] = shadowMap;
+				state.rectAreaShadowMatrix[ rectAreaLength ] = light.shadow.matrix;
+
+				numRectAreaShadows ++;
+
+			}
+			state.rectArea[ rectAreaLength ] = uniforms;
+
+
+
+			rectAreaLength ++;
+
+			} else if ( light.isCircleAreaLight ) {
+
+				const uniforms = cache.get( light );
+
+				uniforms.color.copy( color ).multiplyScalar( intensity );
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+
+				// Circle lies in XY plane in local space, define orthogonal axes
+				// axisV is negated to work with reversed winding order for correct light direction
+				uniforms.axisU.set( light.radius, 0.0, 0.0 );
+				uniforms.axisV.set( 0.0, -light.radius, 0.0 );
+
+				uniforms.radius = light.radius;
+
+
+			if ( light.castShadow ) {
+
+				const shadow = light.shadow;
+
+				const shadowUniforms = shadowCache.get( light );
+
+				shadowUniforms.shadowIntensity = shadow.intensity;
+				shadowUniforms.shadowBias = shadow.bias;
+				shadowUniforms.shadowNormalBias = shadow.normalBias;
+				shadowUniforms.shadowRadius = shadow.radius;
+				shadowUniforms.shadowMapSize = shadow.mapSize;
+				shadowUniforms.lightSize = light.radius * 2.0; // Diameter as light size
+
+				state.circleAreaShadow[ circleAreaLength ] = shadowUniforms;
+				state.circleAreaShadowMap[ circleAreaLength ] = shadowMap;
+				state.circleAreaShadowMatrix[ circleAreaLength ] = light.shadow.matrix;
+
+				numCircleAreaShadows ++;
+
+			}
+			state.circleArea[ circleAreaLength ] = uniforms;
+
+
+
+			circleAreaLength ++;
 
 			} else if ( light.isPointLight ) {
 
@@ -426,16 +532,20 @@ function WebGLLights( extensions ) {
 			hash.pointLength !== pointLength ||
 			hash.spotLength !== spotLength ||
 			hash.rectAreaLength !== rectAreaLength ||
+			hash.circleAreaLength !== circleAreaLength ||
 			hash.hemiLength !== hemiLength ||
 			hash.numDirectionalShadows !== numDirectionalShadows ||
 			hash.numPointShadows !== numPointShadows ||
 			hash.numSpotShadows !== numSpotShadows ||
 			hash.numSpotMaps !== numSpotMaps ||
+			hash.numRectAreaShadows !== numRectAreaShadows ||
+			hash.numCircleAreaShadows !== numCircleAreaShadows ||
 			hash.numLightProbes !== numLightProbes ) {
 
 			state.directional.length = directionalLength;
 			state.spot.length = spotLength;
 			state.rectArea.length = rectAreaLength;
+			state.circleArea.length = circleAreaLength;
 			state.point.length = pointLength;
 			state.hemi.length = hemiLength;
 
@@ -445,9 +555,15 @@ function WebGLLights( extensions ) {
 			state.pointShadowMap.length = numPointShadows;
 			state.spotShadow.length = numSpotShadows;
 			state.spotShadowMap.length = numSpotShadows;
+			state.rectAreaShadow.length = numRectAreaShadows;
+			state.rectAreaShadowMap.length = numRectAreaShadows;
+			state.circleAreaShadow.length = numCircleAreaShadows;
+			state.circleAreaShadowMap.length = numCircleAreaShadows;
 			state.directionalShadowMatrix.length = numDirectionalShadows;
 			state.pointShadowMatrix.length = numPointShadows;
 			state.spotLightMatrix.length = numSpotShadows + numSpotMaps - numSpotShadowsWithMaps;
+			state.rectAreaShadowMatrix.length = numRectAreaShadows;
+			state.circleAreaShadowMatrix.length = numCircleAreaShadows;
 			state.spotLightMap.length = numSpotMaps;
 			state.numSpotLightShadowsWithMaps = numSpotShadowsWithMaps;
 			state.numLightProbes = numLightProbes;
@@ -456,12 +572,15 @@ function WebGLLights( extensions ) {
 			hash.pointLength = pointLength;
 			hash.spotLength = spotLength;
 			hash.rectAreaLength = rectAreaLength;
+			hash.circleAreaLength = circleAreaLength;
 			hash.hemiLength = hemiLength;
 
 			hash.numDirectionalShadows = numDirectionalShadows;
 			hash.numPointShadows = numPointShadows;
 			hash.numSpotShadows = numSpotShadows;
 			hash.numSpotMaps = numSpotMaps;
+			hash.numRectAreaShadows = numRectAreaShadows;
+			hash.numCircleAreaShadows = numCircleAreaShadows;
 
 			hash.numLightProbes = numLightProbes;
 
@@ -477,6 +596,7 @@ function WebGLLights( extensions ) {
 		let pointLength = 0;
 		let spotLength = 0;
 		let rectAreaLength = 0;
+		let circleAreaLength = 0;
 		let hemiLength = 0;
 
 		const viewMatrix = camera.matrixWorldInverse;
@@ -530,6 +650,27 @@ function WebGLLights( extensions ) {
 				uniforms.halfHeight.applyMatrix4( matrix42 );
 
 				rectAreaLength ++;
+
+			} else if ( light.isCircleAreaLight ) {
+
+				const uniforms = state.circleArea[ circleAreaLength ];
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				// extract local rotation of light to derive axis vectors
+				matrix42.identity();
+				matrix4.copy( light.matrixWorld );
+				matrix4.premultiply( viewMatrix );
+				matrix42.extractRotation( matrix4 );
+
+				uniforms.axisU.set( light.radius, 0.0, 0.0 );
+				uniforms.axisV.set( 0.0, -light.radius, 0.0 ); // negated for reversed winding
+
+				uniforms.axisU.applyMatrix4( matrix42 );
+				uniforms.axisV.applyMatrix4( matrix42 );
+
+				circleAreaLength ++;
 
 			} else if ( light.isPointLight ) {
 

@@ -34,6 +34,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -115,6 +116,8 @@
 
 					} );
 
+				gui.add( { exportGLB: exportGLB }, 'exportGLB' ).name( 'Export GLB' );
+
 			}
 
 			function createObjects() {
@@ -188,6 +191,31 @@
 			function render() {
 
 				renderer.render( scene, camera );
+
+			}
+
+			function exportGLB() {
+
+				const exporter = new GLTFExporter();
+
+				exporter.parse(
+					scene,
+					function ( result ) {
+
+						const blob = new Blob( [ result ], { type: 'application/octet-stream' } );
+						const link = document.createElement( 'a' );
+						link.href = URL.createObjectURL( blob );
+						link.download = 'pmrem_test_scene.glb';
+						link.click();
+
+					},
+					function ( error ) {
+
+						console.error( 'An error occurred during GLB export:', error );
+
+					},
+					{ binary: true }
+				);
 
 			}
 

@@ -65,6 +65,42 @@ export default /* glsl */`
 
 	#endif
 
+	#if NUM_RECT_AREA_LIGHT_SHADOWS > 0
+
+		uniform sampler2D rectAreaShadowMap[ NUM_RECT_AREA_LIGHT_SHADOWS ];
+		varying vec4 vRectAreaShadowCoord[ NUM_RECT_AREA_LIGHT_SHADOWS ];
+
+		struct RectAreaLightShadow {
+			float shadowIntensity;
+			float shadowBias;
+			float shadowNormalBias;
+			float shadowRadius;
+			vec2 shadowMapSize;
+			float lightSize;
+		};
+
+		uniform RectAreaLightShadow rectAreaLightShadows[ NUM_RECT_AREA_LIGHT_SHADOWS ];
+
+	#endif
+
+	#if NUM_CIRCLE_AREA_LIGHT_SHADOWS > 0
+
+		uniform sampler2D circleAreaShadowMap[ NUM_CIRCLE_AREA_LIGHT_SHADOWS ];
+		varying vec4 vCircleAreaShadowCoord[ NUM_CIRCLE_AREA_LIGHT_SHADOWS ];
+
+		struct CircleAreaLightShadow {
+			float shadowIntensity;
+			float shadowBias;
+			float shadowNormalBias;
+			float shadowRadius;
+			vec2 shadowMapSize;
+			float lightSize;
+		};
+
+		uniform CircleAreaLightShadow circleAreaLightShadows[ NUM_CIRCLE_AREA_LIGHT_SHADOWS ];
+
+	#endif
+
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 
 		float depth = unpackRGBAToDepth( texture2D( depths, uv ) );
@@ -212,6 +248,134 @@ export default /* glsl */`
 		return mix( 1.0, shadow, shadowIntensity );
 
 	}
+
+	// PCSS (Percentage-Closer Soft Shadows) for RectAreaLight and CircleAreaLight
+	#if NUM_RECT_AREA_LIGHT_SHADOWS > 0 || NUM_CIRCLE_AREA_LIGHT_SHADOWS > 0
+
+		#define BLOCKER_SEARCH_NUM_SAMPLES 32
+		#define PCSS_NUM_SAMPLES 32
+
+		// Poisson disk samples for blocker search and PCF (32 samples for high quality)
+		const vec2 poissonDisk[32] = vec2[](
+			vec2( -0.94201624, -0.39906216 ),
+			vec2( 0.94558609, -0.76890725 ),
+			vec2( -0.094184101, -0.92938870 ),
+			vec2( 0.34495938, 0.29387760 ),
+			vec2( -0.91588581, 0.45771432 ),
+			vec2( -0.81544232, -0.87912464 ),
+			vec2( -0.38277543, 0.27676845 ),
+			vec2( 0.97484398, 0.75648379 ),
+			vec2( 0.44323325, -0.97511554 ),
+			vec2( 0.53742981, -0.47373420 ),
+			vec2( -0.26496911, -0.41893023 ),
+			vec2( 0.79197514, 0.19090188 ),
+			vec2( -0.24188840, 0.99706507 ),
+			vec2( -0.81409955, 0.91437590 ),
+			vec2( 0.19984126, 0.78641367 ),
+			vec2( 0.14383161, -0.14100790 ),
+			vec2( -0.65607356, 0.08979656 ),
+			vec2( 0.51081722, 0.54806948 ),
+			vec2( 0.01330001, 0.61580825 ),
+			vec2( -0.43596888, -0.68276507 ),
+			vec2( 0.68866766, -0.24345277 ),
+			vec2( -0.11169554, 0.36159474 ),
+			vec2( 0.31261522, -0.30461493 ),
+			vec2( -0.46893163, 0.68088233 ),
+			vec2( 0.19000651, -0.61041021 ),
+			vec2( -0.57065642, -0.18034465 ),
+			vec2( 0.73607671, 0.29485054 ),
+			vec2( -0.25664163, -0.13645098 ),
+			vec2( 0.05781871, -0.00412393 ),
+			vec2( -0.03324192, -0.40658840 ),
+			vec2( 0.42046776, 0.08142974 ),
+			vec2( -0.20444609, 0.20162514 )
+		);
+
+		// Search for blockers in the shadow map
+		float findBlocker( sampler2D shadowMap, vec2 uv, float zReceiver, vec2 searchWidth ) {
+
+			float blockerDepthSum = 0.0;
+			float numBlockers = 0.0;
+
+			for ( int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; i++ ) {
+
+				vec2 offset = poissonDisk[i] * searchWidth;
+				float shadowMapDepth = unpackRGBAToDepth( texture2D( shadowMap, uv + offset ) );
+
+				if ( shadowMapDepth < zReceiver ) {
+
+					blockerDepthSum += shadowMapDepth;
+					numBlockers += 1.0;
+
+				}
+
+			}
+
+			if ( numBlockers == 0.0 ) return -1.0;
+
+			return blockerDepthSum / numBlockers;
+
+		}
+
+		// PCF with variable filter size
+		float PCF_Filter( sampler2D shadowMap, vec2 uv, float zReceiver, vec2 filterRadius ) {
+
+			float sum = 0.0;
+
+			for ( int i = 0; i < PCSS_NUM_SAMPLES; i++ ) {
+
+				vec2 offset = poissonDisk[i] * filterRadius;
+				sum += texture2DCompare( shadowMap, uv + offset, zReceiver );
+
+			}
+
+			return sum / float( PCSS_NUM_SAMPLES );
+
+		}
+
+		// PCSS shadow for RectAreaLight with soft penumbra
+		float getShadowRectAreaPCSS( sampler2D shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float lightSize, vec4 shadowCoord ) {
+
+			float shadow = 1.0;
+
+			shadowCoord.xyz /= shadowCoord.w;
+			shadowCoord.z += shadowBias;
+
+			bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;
+			bool frustumTest = inFrustum && shadowCoord.z <= 1.0;
+
+			if ( frustumTest ) {
+
+				vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+
+				// Step 1: Blocker search
+				// Search radius proportional to light size
+				vec2 searchWidth = texelSize * lightSize;
+				float avgBlockerDepth = findBlocker( shadowMap, shadowCoord.xy, shadowCoord.z, searchWidth );
+
+				// If no blocker found, fully lit
+				if ( avgBlockerDepth == -1.0 ) {
+
+					return 1.0;
+
+				}
+
+				// Step 2: Penumbra size calculation
+				// penumbra = (receiver - blocker) * lightSize / blocker
+				float penumbraSize = ( shadowCoord.z - avgBlockerDepth ) * lightSize / avgBlockerDepth;
+				penumbraSize = max( penumbraSize, 0.0 );
+
+				// Step 3: Variable-size PCF filtering
+				vec2 filterRadius = texelSize * penumbraSize;
+				shadow = PCF_Filter( shadowMap, shadowCoord.xy, shadowCoord.z, filterRadius );
+
+			}
+
+			return mix( 1.0, shadow, shadowIntensity );
+
+		}
+
+	#endif
 
 	// cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
 	// vector suitable for 2D texture mapping. This code uses the following layout for the

@@ -58,6 +58,7 @@ export { AudioLoader } from './loaders/AudioLoader.js';
 export { SpotLight } from './lights/SpotLight.js';
 export { PointLight } from './lights/PointLight.js';
 export { RectAreaLight } from './lights/RectAreaLight.js';
+export { CircleAreaLight } from './lights/CircleAreaLight.js';
 export { HemisphereLight } from './lights/HemisphereLight.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
 export { AmbientLight } from './lights/AmbientLight.js';

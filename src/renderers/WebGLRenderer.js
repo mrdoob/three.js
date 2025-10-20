@@ -2127,6 +2127,9 @@ class WebGLRenderer {
 				uniforms.spotLights.value = lights.state.spot;
 				uniforms.spotLightShadows.value = lights.state.spotShadow;
 				uniforms.rectAreaLights.value = lights.state.rectArea;
+				uniforms.rectAreaLightShadows.value = lights.state.rectAreaShadow;
+				uniforms.circleAreaLights.value = lights.state.circleArea;
+				uniforms.circleAreaLightShadows.value = lights.state.circleAreaShadow;
 				uniforms.ltc_1.value = lights.state.rectAreaLTC1;
 				uniforms.ltc_2.value = lights.state.rectAreaLTC2;
 				uniforms.pointLights.value = lights.state.point;
@@ -2140,7 +2143,10 @@ class WebGLRenderer {
 				uniforms.spotLightMap.value = lights.state.spotLightMap;
 				uniforms.pointShadowMap.value = lights.state.pointShadowMap;
 				uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
-				// TODO (abelnation): add area lights shadow info to uniforms
+				uniforms.rectAreaShadowMap.value = lights.state.rectAreaShadowMap;
+				uniforms.rectAreaShadowMatrix.value = lights.state.rectAreaShadowMatrix;
+				uniforms.circleAreaShadowMap.value = lights.state.circleAreaShadowMap;
+				uniforms.circleAreaShadowMatrix.value = lights.state.circleAreaShadowMatrix;
 
 			}
 

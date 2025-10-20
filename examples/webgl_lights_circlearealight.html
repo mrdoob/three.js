@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lights - rect area light</title>
+		<title>three.js webgl - lights - circle area light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,8 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - THREE.RectAreaLight with Shadows<br/>
-			by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - THREE.CircleAreaLight with Shadows<br/>
+			CircleAreaLight approximates circular light sources using LTC and PCSS
 		</div>
 
 		<script type="importmap">
@@ -30,12 +30,12 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+			import { CircleAreaLightHelper } from 'three/addons/helpers/CircleAreaLightHelper.js';
 			import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 
 			let renderer, scene, camera;
 			let stats, meshKnot, meshFloor;
-			let rectLight1, rectLight2, rectLight3;
+			let circleLight1, circleLight2, circleLight3;
 			let animateLights = true;
 
 			init();
@@ -55,68 +55,45 @@
 
 				scene = new THREE.Scene();
 
+				// CircleAreaLight uses the same LTC textures as RectAreaLight
 				RectAreaLightUniformsLib.init();
 
-				rectLight1 = new THREE.RectAreaLight( 0xff0000, 5, 4, 10 );
-				rectLight1.position.set( - 5, 5, 5 );
-				rectLight1.lookAt( 0, 0, 0 );
-				rectLight1.castShadow = true;
-				rectLight1.shadow.mapSize.width = 2048;
-				rectLight1.shadow.mapSize.height = 2048;
-				rectLight1.shadow.bias = 0;
-				scene.add( rectLight1 );
+				circleLight1 = new THREE.CircleAreaLight( 0xff0000, 5, 4 );
+				circleLight1.position.set( - 5, 5, 5 );
+				circleLight1.lookAt( 0, 0, 0 );
+				circleLight1.castShadow = true;
+				circleLight1.shadow.mapSize.width = 2048;
+				circleLight1.shadow.mapSize.height = 2048;
+				circleLight1.shadow.bias = - 0.001;
+				scene.add( circleLight1 );
 
-				rectLight2 = new THREE.RectAreaLight( 0x00ff00, 5, 4, 10 );
-				rectLight2.position.set( 0, 5, 5 );
-				rectLight2.lookAt( 0, 0, 0 );
-				rectLight2.castShadow = true;
-				rectLight2.shadow.mapSize.width = 2048;
-				rectLight2.shadow.mapSize.height = 2048;
-				rectLight2.shadow.bias = 0;
-				scene.add( rectLight2 );
+				circleLight2 = new THREE.CircleAreaLight( 0x00ff00, 5, 4 );
+				circleLight2.position.set( 0, 5, 5 );
+				circleLight2.lookAt( 0, 0, 0 );
+				circleLight2.castShadow = true;
+				circleLight2.shadow.mapSize.width = 2048;
+				circleLight2.shadow.mapSize.height = 2048;
+				circleLight2.shadow.bias = - 0.001;
+				scene.add( circleLight2 );
 
-				rectLight3 = new THREE.RectAreaLight( 0x0000ff, 5, 4, 10 );
-				rectLight3.position.set( 5, 5, 5 );
-				rectLight3.lookAt( 0, 0, 0 );
-				rectLight3.castShadow = true;
-				rectLight3.shadow.mapSize.width = 2048;
-				rectLight3.shadow.mapSize.height = 2048;
-				rectLight3.shadow.bias = 0;
-				scene.add( rectLight3 );
+				circleLight3 = new THREE.CircleAreaLight( 0x0000ff, 5, 4 );
+				circleLight3.position.set( 5, 5, 5 );
+				circleLight3.lookAt( 0, 0, 0 );
+				circleLight3.castShadow = true;
+				circleLight3.shadow.mapSize.width = 2048;
+				circleLight3.shadow.mapSize.height = 2048;
+				circleLight3.shadow.bias = - 0.001;
+				scene.add( circleLight3 );
 
-				scene.add( new RectAreaLightHelper( rectLight1 ) );
-				scene.add( new RectAreaLightHelper( rectLight2 ) );
-				scene.add( new RectAreaLightHelper( rectLight3 ) );
+				scene.add( new CircleAreaLightHelper( circleLight1 ) );
+				scene.add( new CircleAreaLightHelper( circleLight2 ) );
+				scene.add( new CircleAreaLightHelper( circleLight3 ) );
 
 				const geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
 				const matStdFloor = new THREE.MeshStandardMaterial( { color: 0xbcbcbc, roughness: 0.1, metalness: 0 } );
 				meshFloor = new THREE.Mesh( geoFloor, matStdFloor );
 				meshFloor.receiveShadow = true;
 				scene.add( meshFloor );
-
-				// Add static cubes on the floor
-				const geoCube = new THREE.BoxGeometry( 1, 1, 1 );
-				const matCube = new THREE.MeshStandardMaterial( { color: 0x808080, roughness: 0.5, metalness: 0.2 } );
-
-				const cubePositions = [
-					{ x: - 4, z: - 4 },
-					{ x: 4, z: - 4 },
-					{ x: - 4, z: 4 },
-					{ x: 4, z: 4 },
-					{ x: 0, z: - 6 },
-					{ x: 6, z: 0 },
-					{ x: - 6, z: 0 }
-				];
-
-				cubePositions.forEach( pos => {
-
-					const cube = new THREE.Mesh( geoCube, matCube );
-					cube.position.set( pos.x, 0.55, pos.z );
-					cube.castShadow = true;
-					cube.receiveShadow = true;
-					scene.add( cube );
-
-				} );
 
 				const geoKnot = new THREE.TorusKnotGeometry( 1.5, 0.5, 200, 16 );
 				const matKnot = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0, metalness: 0 } );
@@ -182,28 +159,25 @@
 					const height = 5;
 
 					// Light 1 - Red
-					rectLight1.position.x = Math.cos( t ) * radius;
-					rectLight1.position.z = Math.sin( t ) * radius;
-					rectLight1.position.y = height + Math.sin( t * 2 ) * 2;
-					rectLight1.width = 4 + Math.sin( t * 1.5 ) * 2;
-					rectLight1.height = 10 + Math.cos( t * 1.3 ) * 4;
-					rectLight1.lookAt( 0, 0, 0 );
+					circleLight1.position.x = Math.cos( t ) * radius;
+					circleLight1.position.z = Math.sin( t ) * radius;
+					circleLight1.position.y = height + Math.sin( t * 2 ) * 2;
+					circleLight1.radius = 3 + Math.sin( t * 1.5 ) * 1.5;
+					circleLight1.lookAt( 0, 0, 0 );
 
 					// Light 2 - Green (120 degrees offset)
-					rectLight2.position.x = Math.cos( t + Math.PI * 2 / 3 ) * radius;
-					rectLight2.position.z = Math.sin( t + Math.PI * 2 / 3 ) * radius;
-					rectLight2.position.y = height + Math.sin( ( t + Math.PI * 2 / 3 ) * 2 ) * 2;
-					rectLight2.width = 4 + Math.sin( ( t + Math.PI * 2 / 3 ) * 1.5 ) * 2;
-					rectLight2.height = 10 + Math.cos( ( t + Math.PI * 2 / 3 ) * 1.3 ) * 4;
-					rectLight2.lookAt( 0, 0, 0 );
+					circleLight2.position.x = Math.cos( t + Math.PI * 2 / 3 ) * radius;
+					circleLight2.position.z = Math.sin( t + Math.PI * 2 / 3 ) * radius;
+					circleLight2.position.y = height + Math.sin( ( t + Math.PI * 2 / 3 ) * 2 ) * 2;
+					circleLight2.radius = 3 + Math.sin( ( t + Math.PI * 2 / 3 ) * 1.5 ) * 1.5;
+					circleLight2.lookAt( 0, 0, 0 );
 
 					// Light 3 - Blue (240 degrees offset)
-					rectLight3.position.x = Math.cos( t + Math.PI * 4 / 3 ) * radius;
-					rectLight3.position.z = Math.sin( t + Math.PI * 4 / 3 ) * radius;
-					rectLight3.position.y = height + Math.sin( ( t + Math.PI * 4 / 3 ) * 2 ) * 2;
-					rectLight3.width = 4 + Math.sin( ( t + Math.PI * 4 / 3 ) * 1.5 ) * 2;
-					rectLight3.height = 10 + Math.cos( ( t + Math.PI * 4 / 3 ) * 1.3 ) * 4;
-					rectLight3.lookAt( 0, 0, 0 );
+					circleLight3.position.x = Math.cos( t + Math.PI * 4 / 3 ) * radius;
+					circleLight3.position.z = Math.sin( t + Math.PI * 4 / 3 ) * radius;
+					circleLight3.position.y = height + Math.sin( ( t + Math.PI * 4 / 3 ) * 2 ) * 2;
+					circleLight3.radius = 3 + Math.sin( ( t + Math.PI * 4 / 3 ) * 1.5 ) * 1.5;
+					circleLight3.lookAt( 0, 0, 0 );
 
 				}
 
