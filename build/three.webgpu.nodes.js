@@ -688,95 +688,6 @@ const hashArray = ( array ) => cyrb53( array );
  */
 const hash$1 = ( ...params ) => cyrb53( params );
 
-/**
- * Computes a cache key for the given node.
- *
- * @private
- * @method
- * @param {Object|Node} object - The object to be hashed.
- * @param {boolean} [force=false] - Whether to force a cache key computation or not.
- * @return {number} The hash.
- */
-function getCacheKey$1( object, force = false ) {
-
-	const values = [];
-
-	if ( object.isNode === true ) {
-
-		values.push( object.id );
-
-	}
-
-	for ( const { property, childNode } of getNodeChildren( object ) ) {
-
-		values.push( cyrb53( property.slice( 0, -4 ) ), childNode.getCacheKey( force ) );
-
-	}
-
-	return cyrb53( values );
-
-}
-
-/**
- * This generator function can be used to iterate over the node children
- * of the given object.
- *
- * @private
- * @generator
- * @param {Object} node - The object to be hashed.
- * @param {boolean} [toJSON=false] - Whether to return JSON or not.
- * @yields {Object} A result node holding the property, index (if available) and the child node.
- */
-function* getNodeChildren( node, toJSON = false ) {
-
-	for ( const property of Object.getOwnPropertyNames( node ) ) {
-
-		// Ignore private properties.
-		if ( property.startsWith( '_' ) === true ) continue;
-
-		const object = node[ property ];
-
-		if ( Array.isArray( object ) === true ) {
-
-			for ( let i = 0; i < object.length; i ++ ) {
-
-				const child = object[ i ];
-
-				if ( child && ( child.isNode === true || toJSON && typeof child.toJSON === 'function' ) ) {
-
-					yield { property, index: i, childNode: child };
-
-				}
-
-			}
-
-		} else if ( object && object.isNode === true ) {
-
-			yield { property, childNode: object };
-
-		} else if ( object && Object.getPrototypeOf( object ) === Object.prototype ) {
-
-			for ( const subProperty in object ) {
-
-				// Ignore private properties.
-				if ( subProperty.startsWith( '_' ) === true ) continue;
-
-				const child = object[ subProperty ];
-
-				if ( child && ( child.isNode === true || toJSON && typeof child.toJSON === 'function' ) ) {
-
-					yield { property, index: subProperty, childNode: child };
-
-				}
-
-			}
-
-		}
-
-	}
-
-}
-
 const typeFromLength = /*@__PURE__*/ new Map( [
 	[ 1, 'float' ],
 	[ 2, 'vec2' ],
@@ -1110,11 +1021,9 @@ var NodeUtils = /*#__PURE__*/Object.freeze({
 	arrayBufferToBase64: arrayBufferToBase64,
 	base64ToArrayBuffer: base64ToArrayBuffer,
 	getByteBoundaryFromType: getByteBoundaryFromType,
-	getCacheKey: getCacheKey$1,
 	getDataFromObject: getDataFromObject,
 	getLengthFromType: getLengthFromType,
 	getMemoryLengthFromType: getMemoryLengthFromType,
-	getNodeChildren: getNodeChildren,
 	getTypeFromLength: getTypeFromLength,
 	getTypedArrayFromType: getTypedArrayFromType,
 	getValueFromType: getValueFromType,
@@ -1465,7 +1374,7 @@ class Node extends EventDispatcher {
 	 */
 	* getChildren() {
 
-		for ( const { childNode } of getNodeChildren( this ) ) {
+		for ( const { childNode } of this._getChildren() ) {
 
 			yield childNode;
 
@@ -1508,18 +1417,99 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Returns the child nodes of this node.
+	 *
+	 * @private
+	 * @param {Set<Node>} [ignores=new Set()] - A set of nodes to ignore during the search to avoid circular references.
+	 * @returns {Array<Object>} An array of objects describing the child nodes.
+	 */
+	_getChildren( ignores = new Set() ) {
+
+		const children = [];
+
+		// avoid circular references
+		ignores.add( this );
+
+		for ( const property of Object.getOwnPropertyNames( this ) ) {
+
+			const object = this[ property ];
+
+			// Ignore private properties and ignored nodes.
+			if ( property.startsWith( '_' ) === true || ignores.has( object ) ) continue;
+
+			if ( Array.isArray( object ) === true ) {
+
+				for ( let i = 0; i < object.length; i ++ ) {
+
+					const child = object[ i ];
+
+					if ( child && child.isNode === true ) {
+
+						children.push( { property, index: i, childNode: child } );
+
+					}
+
+				}
+
+			} else if ( object && object.isNode === true ) {
+
+				children.push( { property, childNode: object } );
+
+			} else if ( object && Object.getPrototypeOf( object ) === Object.prototype ) {
+
+				for ( const subProperty in object ) {
+
+					// Ignore private sub-properties.
+					if ( subProperty.startsWith( '_' ) === true ) continue;
+
+					const child = object[ subProperty ];
+
+					if ( child && child.isNode === true ) {
+
+						children.push( { property, index: subProperty, childNode: child } );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		//
+
+		return children;
+
+	}
+
+	/**
 	 * Returns the cache key for this node.
 	 *
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of the cache key is forced.
+	 * @param {Set<Node>} [ignores=null] - A set of nodes to ignore during the computation of the cache key.
 	 * @return {number} The cache key of the node.
 	 */
-	getCacheKey( force = false ) {
+	getCacheKey( force = false, ignores = null ) {
 
 		force = force || this.version !== this._cacheKeyVersion;
 
 		if ( force === true || this._cacheKey === null ) {
 
-			this._cacheKey = hash$1( getCacheKey$1( this, force ), this.customCacheKey() );
+			if ( ignores === null ) ignores = new Set();
+
+			//
+
+			const values = [ this.id ];
+
+			for ( const { property, childNode } of this._getChildren( ignores ) ) {
+
+				values.push( hashString( property.slice( 0, -4 ) ), childNode.getCacheKey( force, ignores ) );
+
+			}
+
+			//
+
+			this._cacheKey = hash$1( hashArray( values ), this.customCacheKey() );
 			this._cacheKeyVersion = this.version;
 
 		}
@@ -2009,7 +1999,7 @@ class Node extends EventDispatcher {
 	 */
 	getSerializeChildren() {
 
-		return getNodeChildren( this );
+		return this._getChildren();
 
 	}
 
@@ -19957,6 +19947,34 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Returns an array of child nodes for this material.
+	 *
+	 * @private
+	 * @returns {Array<{property: string, childNode: Node}>}
+	 */
+	_getNodeChildren() {
+
+		const children = [];
+
+		for ( const property of Object.getOwnPropertyNames( this ) ) {
+
+			if ( property.startsWith( '_' ) === true ) continue;
+
+			const object = this[ property ];
+
+			if ( object && object.isNode === true ) {
+
+				children.push( { property, childNode: object } );
+
+			}
+
+		}
+
+		return children;
+
+	}
+
+	/**
 	 * Allows to define a custom cache key that influence the material key computation
 	 * for render objects.
 	 *
@@ -19964,7 +19982,15 @@ class NodeMaterial extends Material {
 	 */
 	customProgramCacheKey() {
 
-		return this.type + getCacheKey$1( this );
+		const values = [];
+
+		for ( const { property, childNode } of this._getNodeChildren() ) {
+
+			values.push( hashString( property.slice( 0, -4 ) ), childNode.getCacheKey() );
+
+		}
+
+		return this.type + hashArray( values );
 
 	}
 
@@ -20740,11 +20766,9 @@ class NodeMaterial extends Material {
 		}
 
 		const data = Material.prototype.toJSON.call( this, meta );
-		const nodeChildren = getNodeChildren( this );
-
 		data.inputNodes = {};
 
-		for ( const { property, childNode } of nodeChildren ) {
+		for ( const { property, childNode } of this._getNodeChildren() ) {
 
 			data.inputNodes[ property ] = childNode.toJSON( meta ).uuid;
 
@@ -34834,8 +34858,8 @@ class RTTNode extends TextureNode {
 			const pixelRatio = renderer.getPixelRatio();
 			const size = renderer.getSize( _size$1 );
 
-			const effectiveWidth = size.width * pixelRatio;
-			const effectiveHeight = size.height * pixelRatio;
+			const effectiveWidth = Math.floor( size.width * pixelRatio );
+			const effectiveHeight = Math.floor( size.height * pixelRatio );
 
 			if ( effectiveWidth !== this.renderTarget.width || effectiveHeight !== this.renderTarget.height ) {
 
@@ -35007,6 +35031,33 @@ const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projectionMat
 
 	return normalize( cross( dpdx, dpdy ) );
 
+} );
+
+/**
+ * Interleaved Gradient Noise (IGN) from Jimenez 2014.
+ *
+ * IGN has "low discrepancy" resulting in evenly distributed samples. It's superior compared to
+ * default white noise, blue noise or Bayer.
+ *
+ * References:
+ * - {@link https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/}
+ * - {@link https://blog.demofox.org/2022/01/01/interleaved-gradient-noise-a-different-kind-of-low-discrepancy-sequence/}
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} position - The input position, usually screen coordinates.
+ * @return {Node<float>} The noise value.
+ */
+const interleavedGradientNoise = Fn( ( [ position ] ) => {
+
+	return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
+
+} ).setLayout( {
+	name: 'interleavedGradientNoise',
+	type: 'float',
+	inputs: [
+		{ name: 'position', type: 'vec2' }
+	]
 } );
 
 /**
@@ -37217,8 +37268,8 @@ class PassNode extends TempNode {
 		this._width = width;
 		this._height = height;
 
-		const effectiveWidth = this._width * this._pixelRatio * this._resolutionScale;
-		const effectiveHeight = this._height * this._pixelRatio * this._resolutionScale;
+		const effectiveWidth = Math.floor( this._width * this._pixelRatio * this._resolutionScale );
+		const effectiveHeight = Math.floor( this._height * this._pixelRatio * this._resolutionScale );
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
@@ -45330,6 +45381,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	instancedMesh: instancedMesh,
 	int: int,
 	intBitsToFloat: intBitsToFloat,
+	interleavedGradientNoise: interleavedGradientNoise,
 	inverse: inverse,
 	inverseSqrt: inverseSqrt,
 	inversesqrt: inversesqrt,
