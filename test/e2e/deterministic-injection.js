@@ -28,10 +28,10 @@
 	window._renderStarted = false;
 	window._renderFinished = false;
 
-	const maxFrameId = 5;
+	const maxFrameId = 2;
 	window.requestAnimationFrame = function ( cb ) {
 
-		if ( ! window._renderStarted ) {
+		if ( window._renderStarted === false ) {
 
 			setTimeout( function () {
 
@@ -39,18 +39,22 @@
 
 			}, 50 );
 
-		} else {
+		} else if ( window._renderFinished === false ) {
 
 			RAF( function () {
 
-				if ( frameId < maxFrameId ) {
+				frameId ++;
 
-					frameId ++;
+				if ( frameId <= maxFrameId ) {
+
+					if ( frameId === maxFrameId ) {
+
+						window._renderFinished = true;
+						return;
+
+					}
+
 					cb( now() );
-
-				} else {
-
-					window._renderFinished = true;
 
 				}
 
@@ -66,15 +70,13 @@
 
 	HTMLVideoElement.prototype.play = async function () {
 
-		const video = this;
-
-		play.call( video );
-		video.addEventListener( 'timeupdate', () => video.pause() );
+		play.call( this );
+		this.addEventListener( 'timeupdate', () => this.pause() );
 
 		function renew() {
 
-			video.load();
-			play.call( video );
+			this.load();
+			play.call( this );
 			RAF( renew );
 
 		}

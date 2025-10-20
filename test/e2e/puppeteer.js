@@ -34,12 +34,10 @@ class PromiseQueue {
 
 }
 
-
-
 /* CONFIG VARIABLES START */
 
-const idleTime = 15; // 15 seconds - for how long there should be no network requests
-const parseTime = 6; // 6 seconds per megabyte
+const idleTime = 2; // 2 seconds - for how long there should be no network requests
+const parseTime = 1; // 1 second per megabyte
 
 const exceptionList = [
 
@@ -215,15 +213,15 @@ const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
-const numAttempts = 3; // perform 3 attempts before failing
+const numAttempts = 2; // perform 2 attempts before failing
 
 const numPages = 8; // use 8 browser pages
 
 const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
-const screenshotWidth = 400;
-const screenshotHeight = 250;
-const viewScale = 2; // Render at higher resolution then downscale for better quality
+const width = 400;
+const height = 250;
+const viewScale = 2;
 const jpgQuality = 95;
 
 console.red = msg => console.log( `\x1b[31m${msg}\x1b[39m` );
@@ -244,8 +242,8 @@ async function main() {
 
 	/* Create output directory */
 
-	await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } ).catch( () => {} );
-	await fs.mkdir( 'test/e2e/output-screenshots' ).catch( () => {} );
+	try { await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } ); } catch {}
+	try { await fs.mkdir( 'test/e2e/output-screenshots' ); } catch {}
 
 	/* Find files */
 
@@ -274,8 +272,8 @@ async function main() {
 	const isExactList = exactList.length !== 0;
 
 	let files = ( await fs.readdir( 'examples' ) )
-		.filter( s => s.endsWith( '.html' ) && s !== 'index.html' )
-		.map( s => s.slice( 0, - 5 ) )
+		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
+		.map( s => s.slice( 0, s.length - 5 ) )
 		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 	if ( isExactList ) {
@@ -309,40 +307,14 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars' ];
+	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
+	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
+	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
-	// Platform-specific rendering configuration
-	if ( process.platform === 'win32' ) {
-
-		// Windows CI: Use ANGLE with D3D11 backend (better than software rendering)
-		flags.push(
-			'--use-angle=d3d11', // Use Direct3D 11 via ANGLE (hardware-accelerated on Windows)
-			'--use-gl=angle', // Force ANGLE as GL implementation
-			'--enable-unsafe-webgpu' // Enable WebGPU support
-		);
-
-	} else if ( process.platform === 'linux' ) {
-
-		// Linux: Use software rendering
-		flags.push(
-			'--disable-dev-shm-usage',
-			'--no-sandbox',
-			'--use-angle=swiftshader',
-			'--enable-unsafe-webgpu',
-			'--use-webgpu-adapter=swiftshader'
-		);
-
-	} else {
-
-		// macOS: Use default (Metal backend, hardware-accelerated)
-		flags.push( '--enable-gpu' );
-
-	}
-
-	const viewport = { width: screenshotWidth * viewScale, height: screenshotHeight * viewScale };
+	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
-		headless: process.env.VISIBLE ? false : 'new',
+		headless: false, // process.env.VISIBLE ? false : 'new',
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
@@ -371,45 +343,43 @@ async function main() {
 
 	const errorMessagesCache = [];
 
+	const pages = await browser.pages();
+	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
+
+	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
+
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	const queue = new PromiseQueue( makeAttempt, browser, injection, builds, errorMessagesCache, failedScreenshots, cleanPage, isMakeScreenshot );
+	const queue = new PromiseQueue( makeAttempt, pages, failedScreenshots, cleanPage, isMakeScreenshot );
 	for ( const file of files ) queue.add( file );
 	await queue.waitForAll();
 
 	/* Finish */
 
 	failedScreenshots.sort();
+	const list = failedScreenshots.join( ' ' );
 
-	if ( failedScreenshots.length ) {
+	if ( isMakeScreenshot && failedScreenshots.length ) {
 
-		const list = failedScreenshots.join( ' ' );
 		console.red( 'List of failed screenshots: ' + list );
 		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
+		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated successfully.` );
 
-		if ( isMakeScreenshot ) {
+	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
 
-			console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated successfully.` );
+		console.green( `${ files.length } screenshots successfully generated.` );
 
-		} else {
+	} else if ( failedScreenshots.length ) {
 
-			console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ files.length } screenshots have not rendered correctly.` );
-
-		}
+		console.red( 'List of failed screenshots: ' + list );
+		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
+		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ files.length } screenshots have not rendered correctly.` );
 
 	} else {
 
-		if ( isMakeScreenshot ) {
-
-			console.green( `${ files.length } screenshots successfully generated.` );
-
-		} else {
-
-			console.green( `TEST PASSED! ${ files.length } screenshots rendered correctly.` );
-
-		}
+		console.green( `TEST PASSED! ${ files.length } screenshots rendered correctly.` );
 
 	}
 
@@ -430,7 +400,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		if ( type !== 'warning' && type !== 'error' ) {
 
-			return;
+			// return;
 
 		}
 
@@ -495,16 +465,11 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 			if ( response.status === 200 ) {
 
-				const buffer = await response.buffer();
-				page.pageSize += buffer.length;
+				await response.buffer().then( buffer => page.pageSize += buffer.length );
 
 			}
 
-		} catch ( error ) {
-
-			// Ignore errors from aborted requests or already-consumed responses
-
-		}
+		} catch {}
 
 	} );
 
@@ -534,16 +499,31 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( browser, injection, builds, errorMessages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
-	// Create a fresh page for each attempt - more robust than reusing
-	const page = await browser.newPage();
+	const page = await new Promise( ( resolve, reject ) => {
+
+		const interval = setInterval( () => {
+
+			for ( const page of pages ) {
+
+				if ( page.file === undefined ) {
+
+					page.file = file; // acquire lock
+					clearInterval( interval );
+					resolve( page );
+					break;
+
+				}
+
+			}
+
+		}, 100 );
+
+	} );
 
 	try {
 
-		await preparePage( page, injection, builds, errorMessages );
-
-		page.file = file;
 		page.pageSize = 0;
 		page.error = undefined;
 
@@ -577,43 +557,31 @@ async function makeAttempt( browser, injection, builds, errorMessages, failedScr
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
-				/* Start deterministic rendering */
+				/* Resolve render promise */
 
 				window._renderStarted = true;
 
 				await new Promise( function ( resolve, reject ) {
 
 					const renderStart = performance._now();
-					let timeout = null;
 
-					if ( renderTimeout > 0 ) {
+					const waitingLoop = setInterval( function () {
 
-						timeout = setTimeout( () => reject( 'Render timeout exceeded' ), 1000 * renderTimeout );
+						const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
 
-					}
+						if ( renderTimeoutExceeded ) {
 
-					function checkRender() {
-
-						if ( window._renderFinished ) {
-
-							if ( timeout ) clearTimeout( timeout );
-							// Wait one more frame to ensure render is fully complete
-							requestAnimationFrame( resolve );
-
-						} else if ( renderTimeout === 0 || performance._now() - renderStart <= 1000 * renderTimeout ) {
-
-							requestAnimationFrame( checkRender );
-
-						} else {
-
-							if ( timeout ) clearTimeout( timeout );
+							clearInterval( waitingLoop );
 							reject( 'Render timeout exceeded' );
+
+						} else if ( window._renderFinished ) {
+
+							clearInterval( waitingLoop );
+							resolve();
 
 						}
 
-					}
-
-					requestAnimationFrame( checkRender );
+					}, 10 );
 
 				} );
 
@@ -621,49 +589,17 @@ async function makeAttempt( browser, injection, builds, errorMessages, failedScr
 
 		} catch ( e ) {
 
-			// Render timeout is acceptable - some examples don't use requestAnimationFrame
-			if ( ! e.includes || ! e.includes( 'Render timeout exceeded' ) ) {
+			if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
-			}
+			} /* else { // This can mean that the example doesn't use requestAnimationFrame loop
+
+				console.yellow( `Render timeout exceeded in file ${ file }` );
+
+			} */ // TODO: fix this
 
 		}
-
-		/* Ensure GPU has finished all operations before screenshot */
-
-		await page.evaluate( async () => {
-
-			const canvases = document.querySelectorAll( 'canvas' );
-
-			for ( const canvas of canvases ) {
-
-				// Try WebGL
-				const gl = canvas.getContext( 'webgl2' ) || canvas.getContext( 'webgl' );
-
-				if ( gl && typeof gl.finish === 'function' ) {
-
-					gl.finish(); // Force GPU to complete all pending operations
-
-				}
-
-				// Try WebGPU
-				const gpu = canvas.getContext( 'webgpu' );
-
-				if ( gpu && gpu.device && gpu.device.queue ) {
-
-					// Wait for all queued GPU operations to complete
-					await gpu.device.queue.onSubmittedWorkDone();
-
-				}
-
-			}
-
-			// Wait for next frame to ensure all rendering is complete and stable
-			// This ensures we're capturing at a consistent point in the render cycle
-			await new Promise( resolve => requestAnimationFrame( () => requestAnimationFrame( resolve ) ) );
-
-		} );
 
 		const screenshot = ( await Jimp.read( await page.screenshot(), { quality: jpgQuality } ) ).scale( 1 / viewScale );
 
@@ -742,18 +678,14 @@ async function makeAttempt( browser, injection, builds, errorMessages, failedScr
 
 		} else {
 
-			const backoffMs = Math.min( 500 * Math.pow( 2, attemptID ), 3000 );
-			console.yellow( `${ e }` );
-			console.yellow( `Retrying ${ file } in ${ backoffMs }ms (attempt ${ attemptID + 2 }/${ numAttempts })...` );
-			await new Promise( resolve => setTimeout( resolve, backoffMs ) );
+			console.yellow( `${ e }, another attempt...` );
 			this.add( file, attemptID + 1 );
 
 		}
 
 	} finally {
 
-		// Close the page - fresh page for each attempt is more robust
-		await page.close().catch( () => {} );
+		page.file = undefined; // release lock
 
 	}
 
