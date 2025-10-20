@@ -398,12 +398,6 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		const type = msg.type();
 
-		if ( type !== 'warning' && type !== 'error' ) {
-
-			// return;
-
-		}
-
 		const file = page.file;
 
 		if ( file === undefined ) {
@@ -430,24 +424,6 @@ async function preparePage( page, injection, builds, errorMessages ) {
 		if ( text === `${ file }: JSHandle@error` ) {
 
 			text = `${ file }: Unknown error`;
-
-		}
-
-		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
-
-			return;
-
-		}
-
-		if ( text.includes( 'Timestamp tracking is disabled' ) ) {
-
-			return;
-
-		}
-
-		if ( text.includes( 'WebGPU is not available, running under WebGL2 backend' ) ) {
-
-			return;
 
 		}
 
