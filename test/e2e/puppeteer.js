@@ -258,7 +258,7 @@ const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
-const numPages = 8; // use 8 browser pages
+const numPages = 4; // use 4 browser pages
 
 const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
@@ -352,10 +352,9 @@ async function main() {
 
 	const flags = [
 		'--hide-scrollbars',
-		'--no-sandbox',
-		'--disable-setuid-sandbox',
-		'--disable-gpu',
-		'--use-gl=swiftshader'
+		'--use-angle=swiftshader',
+		'--enable-unsafe-swiftshader',
+		'--no-sandbox'
 	];
 	
 	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
