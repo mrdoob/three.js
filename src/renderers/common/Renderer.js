@@ -2419,7 +2419,7 @@ class Renderer {
 	 * Execute a single or an array of compute nodes. This method can only be called
 	 * if the renderer has been initialized.
 	 *
-	 * @param {ComputeNode|Array<ComputeNode>} computeNodes - The compute node(s).
+	 * @param {ComputeNode|Array<ComputeNode>} computeNodes - The compute node(s) to be executed.
 	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
