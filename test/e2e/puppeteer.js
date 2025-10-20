@@ -350,7 +350,7 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars', '--use-angle=swiftshader', '--enable-unsafe-swiftshader' ];
+	const flags = [ '--hide-scrollbars', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox' ];
 	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
 	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
