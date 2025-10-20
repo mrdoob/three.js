@@ -5,6 +5,49 @@ import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
+class PagePool {
+
+	constructor( pages ) {
+
+		this.pages = pages;
+		this.available = [ ...pages ];
+		this.waiting = [];
+
+	}
+
+	async acquire() {
+
+		if ( this.available.length > 0 ) {
+
+			return this.available.shift();
+
+		}
+
+		return new Promise( ( resolve ) => {
+
+			this.waiting.push( resolve );
+
+		} );
+
+	}
+
+	release( page ) {
+
+		if ( this.waiting.length > 0 ) {
+
+			const resolve = this.waiting.shift();
+			resolve( page );
+
+		} else {
+
+			this.available.push( page );
+
+		}
+
+	}
+
+}
+
 class PromiseQueue {
 
 	constructor( func, ...args ) {
@@ -348,11 +391,13 @@ async function main() {
 
 	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
 
+	const pagePool = new PagePool( pages );
+
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	const queue = new PromiseQueue( makeAttempt, pages, failedScreenshots, cleanPage, isMakeScreenshot );
+	const queue = new PromiseQueue( makeAttempt, pagePool, failedScreenshots, cleanPage, isMakeScreenshot );
 	for ( const file of files ) queue.add( file );
 	await queue.waitForAll();
 
@@ -491,31 +536,13 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
-	const page = await new Promise( ( resolve, reject ) => {
-
-		const interval = setInterval( () => {
-
-			for ( const page of pages ) {
-
-				if ( page.file === undefined ) {
-
-					page.file = file; // acquire lock
-					clearInterval( interval );
-					resolve( page );
-					break;
-
-				}
-
-			}
-
-		}, 100 );
-
-	} );
+	const page = await pagePool.acquire();
 
 	try {
 
+		page.file = file;
 		page.pageSize = 0;
 		page.error = undefined;
 
@@ -678,6 +705,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 	} finally {
 
 		page.file = undefined; // release lock
+		pagePool.release( page );
 
 	}
 
