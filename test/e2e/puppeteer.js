@@ -592,6 +592,13 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 
 		try {
 
+			// If this is a retry, reload about:blank first to ensure clean state
+			if ( attemptID > 0 ) {
+
+				await page.goto( 'about:blank', { waitUntil: 'load', timeout: 5000 } ).catch( () => {} );
+
+			}
+
 			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
 				timeout: networkTimeout * 60000
@@ -794,12 +801,25 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 	} finally {
 
 		// Clean up page state before releasing
-		await page.evaluate( () => {
+		try {
 
-			localStorage.clear();
-			sessionStorage.clear();
+			// Only attempt cleanup if page is still connected
+			if ( ! page.isClosed() ) {
 
-		} ).catch( () => {} ); // Ignore cleanup errors
+				await page.evaluate( () => {
+
+					localStorage.clear();
+					sessionStorage.clear();
+
+				} );
+
+			}
+
+		} catch ( e ) {
+
+			// Ignore cleanup errors - page might be in bad state
+
+		}
 
 		page.file = undefined;
 		pagePool.release( page );
