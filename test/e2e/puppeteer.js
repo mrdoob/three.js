@@ -34,44 +34,7 @@ class PromiseQueue {
 
 }
 
-class PagePool {
 
-	constructor( pages ) {
-
-		this.pages = pages;
-		this.available = [ ...pages ];
-		this.waiting = [];
-
-	}
-
-	async acquire() {
-
-		if ( this.available.length > 0 ) {
-
-			return this.available.pop();
-
-		}
-
-		return new Promise( resolve => this.waiting.push( resolve ) );
-
-	}
-
-	release( page ) {
-
-		if ( this.waiting.length > 0 ) {
-
-			const resolve = this.waiting.shift();
-			resolve( page );
-
-		} else {
-
-			this.available.push( page );
-
-		}
-
-	}
-
-}
 
 /* CONFIG VARIABLES START */
 
@@ -408,18 +371,11 @@ async function main() {
 
 	const errorMessagesCache = [];
 
-	const pages = await browser.pages();
-	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
-
-	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
-
-	const pagePool = new PagePool( pages );
-
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	const queue = new PromiseQueue( makeAttempt, pagePool, failedScreenshots, cleanPage, isMakeScreenshot );
+	const queue = new PromiseQueue( makeAttempt, browser, injection, builds, errorMessagesCache, failedScreenshots, cleanPage, isMakeScreenshot );
 	for ( const file of files ) queue.add( file );
 	await queue.waitForAll();
 
@@ -578,11 +534,14 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function makeAttempt( browser, injection, builds, errorMessages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
-	const page = await pagePool.acquire();
+	// Create a fresh page for each attempt - more robust than reusing
+	const page = await browser.newPage();
 
 	try {
+
+		await preparePage( page, injection, builds, errorMessages );
 
 		page.file = file;
 		page.pageSize = 0;
@@ -591,13 +550,6 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 		/* Load target page */
 
 		try {
-
-			// If this is a retry, reload about:blank first to ensure clean state
-			if ( attemptID > 0 ) {
-
-				await page.goto( 'about:blank', { waitUntil: 'load', timeout: 5000 } ).catch( () => {} );
-
-			}
 
 			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
@@ -800,29 +752,8 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 
 	} finally {
 
-		// Clean up page state before releasing
-		try {
-
-			// Only attempt cleanup if page is still connected
-			if ( ! page.isClosed() ) {
-
-				await page.evaluate( () => {
-
-					localStorage.clear();
-					sessionStorage.clear();
-
-				} );
-
-			}
-
-		} catch ( e ) {
-
-			// Ignore cleanup errors - page might be in bad state
-
-		}
-
-		page.file = undefined;
-		pagePool.release( page );
+		// Close the page - fresh page for each attempt is more robust
+		await page.close().catch( () => {} );
 
 	}
 
