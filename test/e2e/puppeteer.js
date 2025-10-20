@@ -346,9 +346,35 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
-	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
-	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
+	const flags = [ '--hide-scrollbars' ];
+
+	// Platform-specific rendering configuration
+	if ( process.platform === 'win32' ) {
+
+		// Windows CI: Use ANGLE with D3D11 backend (better than software rendering)
+		flags.push(
+			'--use-angle=d3d11', // Use Direct3D 11 via ANGLE (hardware-accelerated on Windows)
+			'--use-gl=angle', // Force ANGLE as GL implementation
+			'--enable-unsafe-webgpu' // Enable WebGPU support
+		);
+
+	} else if ( process.platform === 'linux' ) {
+
+		// Linux: Use software rendering
+		flags.push(
+			'--disable-dev-shm-usage',
+			'--no-sandbox',
+			'--use-angle=swiftshader',
+			'--enable-unsafe-webgpu',
+			'--use-webgpu-adapter=swiftshader'
+		);
+
+	} else {
+
+		// macOS: Use default (Metal backend, hardware-accelerated)
+		flags.push( '--enable-gpu' );
+
+	}
 
 	const viewport = { width: screenshotWidth * viewScale, height: screenshotHeight * viewScale };
 
