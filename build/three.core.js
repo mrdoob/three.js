@@ -29613,6 +29613,8 @@ class VideoTexture extends Texture {
 
 			this.source.data.cancelVideoFrameCallback( this._requestVideoFrameCallbackId );
 
+			this._requestVideoFrameCallbackId = 0;
+
 		}
 
 		super.dispose();
