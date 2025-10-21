@@ -5,49 +5,6 @@ import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
-class PagePool {
-
-	constructor( pages ) {
-
-		this.pages = pages;
-		this.available = [ ...pages ];
-		this.waiting = [];
-
-	}
-
-	async acquire() {
-
-		if ( this.available.length > 0 ) {
-
-			return this.available.shift();
-
-		}
-
-		return new Promise( ( resolve ) => {
-
-			this.waiting.push( resolve );
-
-		} );
-
-	}
-
-	release( page ) {
-
-		if ( this.waiting.length > 0 ) {
-
-			const resolve = this.waiting.shift();
-			resolve( page );
-
-		} else {
-
-			this.available.push( page );
-
-		}
-
-	}
-
-}
-
 class PromiseQueue {
 
 	constructor( func, ...args ) {
@@ -270,8 +227,6 @@ const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
-const numPages = 1; // use 1 browser page
-
 const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
 const width = 400;
@@ -400,24 +355,22 @@ async function main() {
 		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
 	};
 
-	/* Prepare pages */
+	/* Prepare page */
 
 	const errorMessagesCache = [];
 
-	const pages = await browser.pages();
-	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
-
-	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
-
-	const pagePool = new PagePool( pages );
+	const page = await browser.newPage();
+	await preparePage( page, injection, builds, errorMessagesCache );
 
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	const queue = new PromiseQueue( makeAttempt, pagePool, failedScreenshots, cleanPage, isMakeScreenshot );
-	for ( const file of files ) queue.add( file );
-	await queue.waitForAll();
+	for ( const file of files ) {
+
+		await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file );
+
+	}
 
 	/* Finish */
 
@@ -554,9 +507,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
-
-	const page = await pagePool.acquire();
+async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
 	try {
 
@@ -716,14 +667,13 @@ async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreen
 		} else {
 
 			console.yellow( `${ e }, another attempt...` );
-			this.add( file, attemptID + 1 );
+			await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
 
 		}
 
 	} finally {
 
 		page.file = undefined; // release lock
-		pagePool.release( page );
 
 	}
 
