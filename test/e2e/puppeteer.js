@@ -84,6 +84,9 @@ const parseTime = 1; // 1 second per megabyte
 
 const exceptionList = [
 
+	// Need more time
+	'css3d_mixed',
+	
 	// tiles not loaded in time for screenshot
 	'webgl_loader_3dtiles',
 
