@@ -5,11 +5,6 @@ import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
-/* CONFIG VARIABLES START */
-
-const idleTime = 2; // 2 seconds - for how long there should be no network requests
-const parseTime = 1; // 1 second per megabyte
-
 const exceptionList = [
 
 	// Needs investigation
@@ -79,17 +74,18 @@ const exceptionList = [
 
 ];
 
-/* CONFIG VARIABLES END */
+/* Configuration */
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
+const idleTime = 2; // 2 seconds - for how long there should be no network requests
+const parseTime = 1; // 1 second per megabyte
+
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
-
 const numAttempts = 2; // perform 2 attempts before failing
-
 const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
 const width = 400;
@@ -186,9 +182,6 @@ async function main() {
 		'--enable-unsafe-swiftshader',
 		'--no-sandbox'
 	];
-	
-	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
-	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
@@ -200,10 +193,6 @@ async function main() {
 		protocolTimeout: 0,
 		userDataDir: './.puppeteer_profile'
 	} );
-
-	// this line is intended to stop the script if the browser (in headful mode) is closed by user (while debugging)
-	// browser.on( 'targetdestroyed', target => ( target.type() === 'other' ) ? close() : null );
-	// for some reason it randomly stops the script after about ~30 screenshots processed
 
 	/* Prepare injections */
 
