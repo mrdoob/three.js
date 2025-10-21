@@ -101,6 +101,8 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
  * The following glTF 2.0 extension is supported by an external user plugin:
  * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
  * - [MSFT_texture_dds]{@link https://github.com/takahirox/three-gltf-extensions}
+ * - [KHR_animation_pointer]{@link https://github.com/needle-tools/three-animation-pointer}
+ * - [NEEDLE_progressive]{@link https://github.com/needle-tools/gltf-progressive}
  *
  * ```js
  * const loader = new GLTFLoader();
