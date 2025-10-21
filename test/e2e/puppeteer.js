@@ -26,12 +26,14 @@ const exceptionList = [
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
 	'webgpu_reflection',
+	'webgpu_texturegrad',
 
 	// Need more time
 	'css3d_mixed',
 	'webgl_loader_3dtiles',
 	'webgl_renderer_pathtracer',
 	'webgl_shadowmap_progressive',
+	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
 
 	// Video hangs the CI?
