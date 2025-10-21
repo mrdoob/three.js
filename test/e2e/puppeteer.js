@@ -31,8 +31,11 @@ const exceptionList = [
 	// Need more time
 	'css3d_mixed',
 	'webgl_loader_3dtiles',
+	'webgl_loader_texture_lottie',
+	'webgl_morphtargets_face',
 	'webgl_renderer_pathtracer',
 	'webgl_shadowmap_progressive',
+	'webgpu_materials_matcap',
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
 
