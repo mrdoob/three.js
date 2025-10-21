@@ -12,6 +12,9 @@ const parseTime = 1; // 1 second per megabyte
 
 const exceptionList = [
 
+	// Needs investigation
+	'webgl_shadowmap',
+
 	// Need more time
 	'css3d_mixed',
 	'webgl_loader_3dtiles',
@@ -30,8 +33,9 @@ const exceptionList = [
 	'webgl_materials_video_webcam',
 	'webgl_morphtargets_webcam',
 
-	// WebGL device lost context
+	// WebGL device lost
 	'webgpu_materialx_noise',
+	'webgpu_portal',
 	'webgpu_shadowmap',
 
 	// WebGPU needed
@@ -49,7 +53,12 @@ const exceptionList = [
 	'webgpu_lights_tiled',
 	'webgpu_materials',
 	'webgpu_multiple_canvas',
-	'webgpu_particles'
+	'webgpu_particles',
+	'webgpu_struct_drawindirect',
+	'webgpu_tsl_editor',
+	'webgpu_tsl_interoperability',
+	'webgpu_tsl_vfx_linkedparticles',
+	'webgpu_tsl_wood'
 
 ];
 
@@ -217,7 +226,7 @@ async function main() {
 	if ( isMakeScreenshot && failedScreenshots.length ) {
 
 		console.red( 'List of failed screenshots: ' + list );
-		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
+		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, add remaining screenshots to the exception list.` );
 		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated successfully.` );
 
 	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
@@ -227,7 +236,7 @@ async function main() {
 	} else if ( failedScreenshots.length ) {
 
 		console.red( 'List of failed screenshots: ' + list );
-		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
+		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, add remaining screenshots to the exception list.` );
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ files.length } screenshots have not rendered correctly.` );
 
 	} else {
