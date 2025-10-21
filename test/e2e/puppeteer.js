@@ -26,7 +26,10 @@ const exceptionList = [
 	// Timeout
 	'webgl_test_memory2',
 
-	// Awaiting for WebGL backend support
+	// WebGL device lost context
+	'webgpu_materialx_noise',
+
+	// WebGPU only
 	'webgpu_compute_audio',
 	'webgpu_compute_birds',
 	'webgpu_compute_texture',
