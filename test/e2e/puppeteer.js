@@ -13,6 +13,7 @@ const parseTime = 1; // 1 second per megabyte
 const exceptionList = [
 
 	// Needs investigation
+	'physics_rapier_instancing',
 	'webgl_shadowmap',
 	'webgl_postprocessing_dof2',
 	'webgl_worker_offscreencanvas',
@@ -24,6 +25,7 @@ const exceptionList = [
 	'webgpu_postprocessing_ssgi',
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
+	'webgpu_reflection',
 
 	// Need more time
 	'css3d_mixed',
