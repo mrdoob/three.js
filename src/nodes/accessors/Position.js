@@ -74,14 +74,18 @@ export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
  */
 export const positionViewDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
 
+	let output;
+
 	if ( builder.camera.isOrthographicCamera ) {
 
-		return vec3( 0, 0, 1 ).toVar( 'positionViewDirection' );
+		output = vec3( 0, 0, 1 );
 
 	} else {
 
-		return positionView.negate().toVarying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
+		output = positionView.negate().toVarying( 'v_positionViewDirection' ).normalize();
 
 	}
+
+	return output.toVar( 'positionViewDirection' );
 
 }, 'vec3' ).once( [ 'POSITION' ] ) )();
