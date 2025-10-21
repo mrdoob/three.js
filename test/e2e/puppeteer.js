@@ -80,7 +80,7 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
-const idleTime = 1; // 1 second - for how long there should be no network requests
+const idleTime = 2; // 2 seconds - for how long there should be no network requests
 const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
