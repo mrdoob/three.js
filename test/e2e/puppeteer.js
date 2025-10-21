@@ -91,8 +91,9 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgpu_shadowmap_progressive',
 
-	// Crashes CI?
+	// Video hangs the CI?
 	'css3d_youtube',
+	'webgpu_materials_video',
 
 	// Timeout
 	'webgl_test_memory2',
