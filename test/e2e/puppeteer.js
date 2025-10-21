@@ -26,16 +26,30 @@ const exceptionList = [
 	// Timeout
 	'webgl_test_memory2',
 
+	// Webcam
+	'webgl_materials_video_webcam',
+	'webgl_morphtargets_webcam',
+
 	// WebGL device lost context
 	'webgpu_materialx_noise',
+	'webgpu_shadowmap',
 
-	// WebGPU only
+	// WebGPU needed
 	'webgpu_compute_audio',
 	'webgpu_compute_birds',
+	'webgpu_compute_cloth',
+	'webgpu_compute_particles_fluid',
+	'webgpu_compute_reduce',
+	'webgpu_compute_sort_bitonic',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_3d',
 	'webgpu_compute_texture_pingpong',
-	'webgpu_compute_water'
+	'webgpu_compute_water',
+	'webgpu_hdr',
+	'webgpu_lights_tiled',
+	'webgpu_materials',
+	'webgpu_multiple_canvas',
+	'webgpu_particles'
 
 ];
 
