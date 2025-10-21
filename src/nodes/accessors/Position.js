@@ -1,6 +1,5 @@
 import { attribute } from '../core/AttributeNode.js';
-import { Fn } from '../tsl/TSLCore.js';
-import { vec3 } from '../tsl/TSLBase.js';
+import { Fn, vec3 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
 
 /**
