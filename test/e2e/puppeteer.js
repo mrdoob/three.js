@@ -5,35 +5,6 @@ import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
-class PromiseQueue {
-
-	constructor( func, ...args ) {
-
-		this.func = func.bind( this, ...args );
-		this.promises = [];
-
-	}
-
-	add( ...args ) {
-
-		const promise = this.func( ...args );
-		this.promises.push( promise );
-		promise.then( () => this.promises.splice( this.promises.indexOf( promise ), 1 ) );
-
-	}
-
-	async waitForAll() {
-
-		while ( this.promises.length > 0 ) {
-
-			await Promise.all( this.promises );
-
-		}
-
-	}
-
-}
-
 /* CONFIG VARIABLES START */
 
 const idleTime = 2; // 2 seconds - for how long there should be no network requests
@@ -405,8 +376,6 @@ async function main() {
 
 async function preparePage( page, injection, builds, errorMessages ) {
 
-	/* let page.file, page.pageSize, page.error */
-
 	await page.evaluateOnNewDocument( injection );
 	await page.setRequestInterception( true );
 
@@ -461,7 +430,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		} else {
 
-			console.log( `[Browser] ${text}` ); // Print other console messages (log, info, debug)
+			console.log( `[Browser] ${text}` );
 
 		}
 
