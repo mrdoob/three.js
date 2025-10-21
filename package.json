@@ -106,7 +106,7 @@
     "jsdoc": "^4.0.5",
     "magic-string": "^0.30.0",
     "pixelmatch": "^7.0.0",
-    "puppeteer": "^22.0.0",
+    "puppeteer": "^24.25.0",
     "qunit": "^2.19.4",
     "rollup": "^4.6.0",
     "rollup-plugin-filesize": "^10.0.0",
