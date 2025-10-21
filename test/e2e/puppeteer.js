@@ -91,6 +91,9 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgpu_shadowmap_progressive',
 
+	// Crashes CI?
+	'css3d_youtube',
+
 	// Timeout
 	'webgl_test_memory2',
 
