@@ -4156,7 +4156,7 @@ const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altTy
 const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
 const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
 const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
-const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { intent: true, ...settings } );
+const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, intent: true } );
 
 let fnId = 0;
 
@@ -19723,7 +19723,7 @@ class NodeMaterial extends Material {
 		 * and `alphaMap` properties. This node property allows to overwrite the default
 		 * and define the opacity with a node instead.
 		 *
-		 * If you don't want to overwrite the normals but modify the existing
+		 * If you don't want to overwrite the opacity but modify the existing
 		 * value instead, use {@link materialOpacity}.
 		 *
 		 * @type {?Node<float>}
@@ -20818,6 +20818,7 @@ class NodeMaterial extends Material {
 
 		this.lightsNode = source.lightsNode;
 		this.envNode = source.envNode;
+		this.aoNode = source.aoNode;
 
 		this.colorNode = source.colorNode;
 		this.normalNode = source.normalNode;
@@ -22942,6 +22943,50 @@ const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 } );
 
+// GGX BRDF with multi-scattering energy compensation for direct lighting
+// This provides more accurate energy conservation, especially for rough materials
+// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
+// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
+const BRDF_GGX_Multiscatter = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness: _roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
+
+	// Single-scattering BRDF (standard GGX)
+	const singleScatter = BRDF_GGX( { lightDirection, f0, f90, roughness: _roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } );
+
+	// Multi-scattering compensation
+	const dotNL = normalView.dot( lightDirection ).clamp();
+	const dotNV = normalView.dot( positionViewDirection ).clamp();
+
+	// Precomputed DFG values for view and light directions
+	const dfgV = DFGApprox( { roughness: _roughness, dotNV } );
+	const dfgL = DFGApprox( { roughness: _roughness, dotNV: dotNL } );
+
+	// Single-scattering energy for view and light
+	const FssEss_V = f0.mul( dfgV.x ).add( f90.mul( dfgV.y ) );
+	const FssEss_L = f0.mul( dfgL.x ).add( f90.mul( dfgL.y ) );
+
+	const Ess_V = dfgV.x.add( dfgV.y );
+	const Ess_L = dfgL.x.add( dfgL.y );
+
+	// Energy lost to multiple scattering
+	const Ems_V = float( 1.0 ).sub( Ess_V );
+	const Ems_L = float( 1.0 ).sub( Ess_L );
+
+	// Average Fresnel reflectance
+	const Favg = f0.add( f0.oneMinus().mul( 0.047619 ) ); // 1/21
+
+	// Multiple scattering contribution
+	// Uses geometric mean of view and light contributions for better energy distribution
+	const Fms = FssEss_V.mul( FssEss_L ).mul( Favg ).div( float( 1.0 ).sub( Ems_V.mul( Ems_L ).mul( Favg ).mul( Favg ) ).add( EPSILON ) );
+
+	// Energy compensation factor
+	const compensationFactor = Ems_V.mul( Ems_L );
+
+	const multiScatter = Fms.mul( compensationFactor );
+
+	return singleScatter.add( multiScatter );
+
+} );
+
 const EnvironmentBRDF = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { dotNV, specularColor, specularF90, roughness } = inputs;
@@ -23818,7 +23863,7 @@ class PhysicalLightingModel extends LightingModel {
 		const Ess = fab.x.add( fab.y );
 		const Ems = Ess.oneMinus();
 
-		const Favg = specularColor.add( specularColor.oneMinus().mul( 0.047619 ) ); // 1/21
+		const Favg = Fr.add( Fr.oneMinus().mul( 0.047619 ) ); // 1/21
 		const Fms = FssEss.mul( Favg ).div( Ems.mul( Favg ).oneMinus() );
 
 		singleScatter.addAssign( FssEss );
@@ -23854,7 +23899,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
-		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness, iridescence: this.iridescence, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } ) ) );
+		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX_Multiscatter( { lightDirection, f0: specularColor, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } ) ) );
 
 	}
 
