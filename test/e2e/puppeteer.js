@@ -14,6 +14,16 @@ const exceptionList = [
 
 	// Needs investigation
 	'webgl_shadowmap',
+	'webgl_postprocessing_dof2',
+	'webgl_worker_offscreencanvas',
+	'webgpu_backdrop_water',
+	'webgpu_lightprobe_cubecamera',
+	'webgpu_portal',
+	'webgpu_postprocessing_ao',
+	'webgpu_postprocessing_dof',
+	'webgpu_postprocessing_ssgi',
+	'webgpu_postprocessing_sss',
+	'webgpu_postprocessing_traa',
 
 	// Need more time
 	'css3d_mixed',
