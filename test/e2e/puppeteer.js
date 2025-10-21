@@ -84,10 +84,24 @@ const parseTime = 1; // 1 second per megabyte
 
 const exceptionList = [
 
-	/*
-	// tiles not loaded in time for screenshot
+	// Need more time
 	'webgl_loader_3dtiles',
+	'webgl_renderer_pathtracer',
+	'webgl_shadowmap_progressive',
+	'webgpu_shadowmap_progressive',
 
+	// Timeout
+	'webgl_test_memory2',
+
+	// Awaiting for WebGL backend support
+	'webgpu_compute_audio',
+	'webgpu_compute_birds',
+	'webgpu_compute_texture',
+	'webgpu_compute_texture_3d',
+	'webgpu_compute_texture_pingpong',
+	'webgpu_compute_water',
+
+	/*
 	// video tag isn't deterministic enough?
 	'css3d_youtube',
 	'webgl_materials_video',
@@ -145,10 +159,7 @@ const exceptionList = [
 	'webgl_postprocessing_transition',
 	'webgl_postprocessing_glitch',
 	'webgl_postprocessing_dof2',
-	'webgl_renderer_pathtracer',
 	'webgl_shadowmap',
-	'webgl_shadowmap_progressive',
-	'webgpu_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_points_dynamic',
 	'webgpu_multisampled_renderbuffers',
@@ -169,12 +180,6 @@ const exceptionList = [
 	'physics_jolt_instancing',
 
 	// Awaiting for WebGL backend support
-	'webgpu_compute_audio',
-	'webgpu_compute_birds',
-	'webgpu_compute_texture',
-	'webgpu_compute_texture_3d',
-	'webgpu_compute_texture_pingpong',
-	'webgpu_compute_water',
 	'webgpu_materials',
 	'webgpu_multiple_canvas',
 	'webgpu_video_panorama',
