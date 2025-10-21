@@ -370,7 +370,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 		try {
 
 			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
-				waitUntil: 'load',
+				waitUntil: 'networkidle0',
 				timeout: networkTimeout * 60000
 			} );
 
