@@ -5,6 +5,49 @@ import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
+class PagePool {
+
+	constructor( pages ) {
+
+		this.pages = pages;
+		this.available = [ ...pages ];
+		this.waiting = [];
+
+	}
+
+	async acquire() {
+
+		if ( this.available.length > 0 ) {
+
+			return this.available.shift();
+
+		}
+
+		return new Promise( ( resolve ) => {
+
+			this.waiting.push( resolve );
+
+		} );
+
+	}
+
+	release( page ) {
+
+		if ( this.waiting.length > 0 ) {
+
+			const resolve = this.waiting.shift();
+			resolve( page );
+
+		} else {
+
+			this.available.push( page );
+
+		}
+
+	}
+
+}
+
 class PromiseQueue {
 
 	constructor( func, ...args ) {
@@ -36,8 +79,8 @@ class PromiseQueue {
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 12; // 9 seconds - for how long there should be no network requests
-const parseTime = 6; // 6 seconds per megabyte
+const idleTime = 2; // 2 seconds - for how long there should be no network requests
+const parseTime = 1; // 1 second per megabyte
 
 const exceptionList = [
 
@@ -217,7 +260,7 @@ const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
-const numPages = 8; // use 8 browser pages
+const numPages = 1; // use 1 browser page
 
 const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
@@ -309,7 +352,13 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
+	const flags = [
+		'--hide-scrollbars',
+		'--use-angle=swiftshader',
+		'--enable-unsafe-swiftshader',
+		'--no-sandbox'
+	];
+	
 	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
 	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
@@ -350,11 +399,13 @@ async function main() {
 
 	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
 
+	const pagePool = new PagePool( pages );
+
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	const queue = new PromiseQueue( makeAttempt, pages, failedScreenshots, cleanPage, isMakeScreenshot );
+	const queue = new PromiseQueue( makeAttempt, pagePool, failedScreenshots, cleanPage, isMakeScreenshot );
 	for ( const file of files ) queue.add( file );
 	await queue.waitForAll();
 
@@ -400,12 +451,6 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		const type = msg.type();
 
-		if ( type !== 'warning' && type !== 'error' ) {
-
-			return;
-
-		}
-
 		const file = page.file;
 
 		if ( file === undefined ) {
@@ -435,12 +480,6 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		}
 
-		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
-
-			return;
-
-		}
-
 		if ( errorMessages.includes( text ) ) {
 
 			return;
@@ -453,9 +492,13 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 			console.yellow( text );
 
-		} else {
+		} else if ( type === 'error' ) {
 
 			page.error = text;
+
+		} else {
+
+			console.log( `[Browser] ${text}` ); // Print other console messages (log, info, debug)
 
 		}
 
@@ -501,31 +544,13 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function makeAttempt( pagePool, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
-	const page = await new Promise( ( resolve, reject ) => {
-
-		const interval = setInterval( () => {
-
-			for ( const page of pages ) {
-
-				if ( page.file === undefined ) {
-
-					page.file = file; // acquire lock
-					clearInterval( interval );
-					resolve( page );
-					break;
-
-				}
-
-			}
-
-		}, 100 );
-
-	} );
+	const page = await pagePool.acquire();
 
 	try {
 
+		page.file = file;
 		page.pageSize = 0;
 		page.error = undefined;
 
@@ -685,9 +710,12 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-	}
+	} finally {
 
-	page.file = undefined; // release lock
+		page.file = undefined; // release lock
+		pagePool.release( page );
+
+	}
 
 }
 
