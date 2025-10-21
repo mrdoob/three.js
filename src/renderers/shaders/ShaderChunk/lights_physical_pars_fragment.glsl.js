@@ -588,6 +588,21 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_Physical
 #define RE_IndirectSpecular		RE_IndirectSpecular_Physical
 
+// Multi-bounce ambient occlusion approximation
+// Adds energy back that would bounce in occluded areas based on surface albedo
+// ref: https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf
+vec3 computeMultiBounceAO( const in float ambientOcclusion, const in vec3 albedo ) {
+
+	vec3 a = 2.0404 * albedo - 0.3324;
+	vec3 b = -4.7951 * albedo + 0.6417;
+	vec3 c = 2.7552 * albedo + 0.6903;
+
+	float x = ambientOcclusion;
+
+	return max( vec3( x ), ( ( x * a + b ) * x + c ) * x );
+
+}
+
 // ref: https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {
 
