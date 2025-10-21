@@ -85,6 +85,7 @@ const parseTime = 1; // 1 second per megabyte
 const exceptionList = [
 
 	// Need more time
+	'css3d_mixed',
 	'webgl_loader_3dtiles',
 	'webgl_renderer_pathtracer',
 	'webgl_shadowmap_progressive',
