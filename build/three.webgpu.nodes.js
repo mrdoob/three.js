@@ -25805,7 +25805,7 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 				reflectVec = positionViewDirection.negate().reflect( normalViewNode );
 
 				// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-				reflectVec = roughnessNode.mul( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
+				reflectVec = pow4( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
 
 				reflectVec = reflectVec.transformDirection( cameraViewMatrix );
 
