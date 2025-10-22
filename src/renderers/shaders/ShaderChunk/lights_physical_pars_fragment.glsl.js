@@ -534,12 +534,24 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
 
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+	// Energy-conserving diffuse term
+	// Account for energy taken by specular reflection to maintain physical correctness
+	float dotVH = saturate( dot( geometryViewDir, normalize( directLight.direction + geometryViewDir ) ) );
+	vec3 F = F_Schlick( material.specularColor, material.specularF90, dotVH );
+	vec3 energyConservation = vec3( 1.0 ) - F;
+	
+	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor ) * energyConservation;
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+	// Energy-conserving diffuse term for indirect lighting
+	// Use view-dependent Fresnel to account for specular reflection
+	float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
+	vec3 F = F_Schlick( material.specularColor, material.specularF90, dotNV );
+	vec3 energyConservation = vec3( 1.0 ) - F;
+	
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor ) * energyConservation;
 
 }
 
