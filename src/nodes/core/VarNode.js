@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { addMethodChaining, getCurrentStack, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { error } from '../../utils.js';
 
 /**
@@ -183,7 +183,7 @@ class VarNode extends Node {
 
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
-			if ( builder.context.nodeBlock && builder.getDataFromNode( this ).stack === undefined ) {
+			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.getDataFromNode( this ).stack === undefined ) {
 
 				builder.getBaseStack().addToStack( this );
 

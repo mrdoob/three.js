@@ -104,7 +104,7 @@ class LoopNode extends Node {
 
 		const fnCall = this.params[ this.params.length - 1 ]( inputs, builder );
 
-		properties.returnsNode = fnCall.context( { nodeBlock: fnCall } );
+		properties.returnsNode = fnCall.context( { nodeLoop: fnCall } );
 		properties.stackNode = stack;
 
 		const baseParam = this.params[ 0 ];
@@ -113,7 +113,7 @@ class LoopNode extends Node {
 
 			const fnUpdateCall = Fn( this.params[ 0 ].update )( inputs );
 
-			properties.updateNode = fnUpdateCall.context( { nodeBlock: fnUpdateCall } );
+			properties.updateNode = fnUpdateCall.context( { nodeLoop: fnUpdateCall } );
 
 		}
 
