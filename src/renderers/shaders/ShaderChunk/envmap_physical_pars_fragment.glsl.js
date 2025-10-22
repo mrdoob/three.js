@@ -26,8 +26,7 @@ export default /* glsl */`
 			vec3 reflectVec = reflect( - viewDir, normal );
 
 			// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-			float horizonFade = pow( roughness, 4.0 );
-			reflectVec = normalize( mix( reflectVec, normal, horizonFade ) );
+			reflectVec = normalize( mix( reflectVec, normal, pow4( roughness ) ) );
 
 			reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
 
