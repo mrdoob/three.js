@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Cube UV Performance Test</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			margin: 0;
+			overflow: hidden;
+			font-family: monospace;
+		}
+		#info {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			background: rgba(0,0,0,0.7);
+			color: #fff;
+			padding: 15px;
+			border-radius: 5px;
+			font-size: 14px;
+			line-height: 1.6;
+		}
+		.metric {
+			color: #0f0;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<div id="info">
+		<div>Cube UV Reflection Performance Test</div>
+		<div>FPS: <span class="metric" id="fps">--</span></div>
+		<div>Frame Time: <span class="metric" id="frameTime">--</span> ms</div>
+		<div>Render Time: <span class="metric" id="renderTime">--</span> ms</div>
+		<div>Objects: <span class="metric" id="objects">--</span></div>
+		<div>---</div>
+		<div>This test stresses cube UV sampling with:</div>
+		<div>• Multiple metallic spheres with varying roughness</div>
+		<div>• Environment map reflections (uses getFace, getUV)</div>
+		<div>• Constant camera rotation</div>
+	</div>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "./build/three.module.js",
+				"three/addons/": "./examples/jsm/"
+			}
+		}
+	</script>
+
+	<script type="module">
+		import * as THREE from 'three';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+
+		let camera, scene, renderer, controls;
+		let spheres = [];
+		let stats = {
+			fps: 0,
+			frameTime: 0,
+			renderTime: 0,
+			frames: 0,
+			lastTime: performance.now()
+		};
+
+		init();
+		animate();
+
+		function init() {
+			// Scene
+			scene = new THREE.Scene();
+
+			// Camera
+			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera.position.set( 0, 0, 30 );
+
+			// Renderer
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1;
+			document.body.appendChild( renderer.domElement );
+
+			// Controls
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.autoRotate = true;
+			controls.autoRotateSpeed = 1.0;
+
+			// Load environment map (requires HDRI file)
+			const pmremGenerator = new THREE.PMREMGenerator( renderer );
+			pmremGenerator.compileEquirectangularShader();
+
+			// For testing without HDRI, use a basic environment
+			const envTexture = createTestEnvironment();
+			const envMap = pmremGenerator.fromCubemap( envTexture ).texture;
+			scene.environment = envMap;
+			scene.background = envMap;
+
+			pmremGenerator.dispose();
+
+			// Create multiple spheres with varying roughness
+			// This stresses the cube UV sampling heavily
+			const rows = 6;
+			const cols = 6;
+			const spacing = 4;
+
+			for ( let i = 0; i < rows; i++ ) {
+				for ( let j = 0; j < cols; j++ ) {
+					const geometry = new THREE.SphereGeometry( 1.5, 64, 64 );
+					const material = new THREE.MeshStandardMaterial( {
+						metalness: 1.0,
+						roughness: ( i / ( rows - 1 ) ),
+						envMapIntensity: 1.5
+					} );
+
+					const sphere = new THREE.Mesh( geometry, material );
+					sphere.position.x = ( j - cols / 2 + 0.5 ) * spacing;
+					sphere.position.y = ( i - rows / 2 + 0.5 ) * spacing;
+					sphere.userData.speed = 0.5 + Math.random() * 0.5;
+					
+					scene.add( sphere );
+					spheres.push( sphere );
+				}
+			}
+
+			// Lights
+			const light = new THREE.DirectionalLight( 0xffffff, 1 );
+			light.position.set( 5, 10, 5 );
+			scene.add( light );
+
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+			// Window resize
+			window.addEventListener( 'resize', onWindowResize );
+
+			// Update info
+			document.getElementById( 'objects' ).textContent = spheres.length;
+		}
+
+		function createTestEnvironment() {
+			// Create a simple cube texture for testing
+			const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256 );
+			const cubeCamera = new THREE.CubeCamera( 0.1, 100, cubeRenderTarget );
+			
+			const testScene = new THREE.Scene();
+			testScene.background = new THREE.Color( 0x87CEEB );
+			
+			// Add some geometry to reflect
+			const geo = new THREE.BoxGeometry( 10, 10, 10 );
+			const mat = new THREE.MeshBasicMaterial( { color: 0xff6347 } );
+			testScene.add( new THREE.Mesh( geo, mat ) );
+			
+			cubeCamera.update( renderer, testScene );
+			
+			return cubeRenderTarget.texture;
+		}
+
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+		}
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			const now = performance.now();
+			const delta = now - stats.lastTime;
+
+			// Rotate spheres
+			spheres.forEach( sphere => {
+				sphere.rotation.y += 0.01 * sphere.userData.speed;
+			} );
+
+			// Update controls
+			controls.update();
+
+			// Measure render time
+			const renderStart = performance.now();
+			renderer.render( scene, camera );
+			const renderEnd = performance.now();
+			stats.renderTime = renderEnd - renderStart;
+
+			// Calculate stats
+			stats.frames++;
+			if ( delta >= 1000 ) {
+				stats.fps = Math.round( ( stats.frames * 1000 ) / delta );
+				stats.frameTime = delta / stats.frames;
+				stats.frames = 0;
+				stats.lastTime = now;
+
+				// Update display
+				document.getElementById( 'fps' ).textContent = stats.fps;
+				document.getElementById( 'frameTime' ).textContent = stats.frameTime.toFixed( 2 );
+				document.getElementById( 'renderTime' ).textContent = stats.renderTime.toFixed( 2 );
+			}
+		}
+	</script>
+</body>
+</html>

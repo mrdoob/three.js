@@ -12,64 +12,47 @@ export default /* glsl */`
 
 		vec3 absDirection = abs( direction );
 
-		float face = - 1.0;
-
-		if ( absDirection.x > absDirection.z ) {
-
-			if ( absDirection.x > absDirection.y )
-
-				face = direction.x > 0.0 ? 0.0 : 3.0;
-
-			else
-
-				face = direction.y > 0.0 ? 1.0 : 4.0;
-
-		} else {
-
-			if ( absDirection.z > absDirection.y )
-
-				face = direction.z > 0.0 ? 2.0 : 5.0;
-
-			else
-
-				face = direction.y > 0.0 ? 1.0 : 4.0;
-
-		}
-
-		return face;
+		// Determine major axis using branchless selection
+		float maxAxis = max( max( absDirection.x, absDirection.y ), absDirection.z );
+		
+		// Create masks for each axis being dominant
+		float isXDominant = step( absDirection.y, absDirection.x ) * step( absDirection.z, absDirection.x );
+		float isYDominant = step( absDirection.x, absDirection.y ) * step( absDirection.z, absDirection.y );
+		float isZDominant = 1.0 - isXDominant - isYDominant;
+		
+		// Compute face index for each case
+		float xFace = step( 0.0, direction.x ) * 0.0 + step( direction.x, 0.0 ) * 3.0; // 0 or 3
+		float yFace = step( 0.0, direction.y ) * 1.0 + step( direction.y, 0.0 ) * 4.0; // 1 or 4
+		float zFace = step( 0.0, direction.z ) * 2.0 + step( direction.z, 0.0 ) * 5.0; // 2 or 5
+		
+		// Select the appropriate face
+		return isXDominant * xFace + isYDominant * yFace + isZDominant * zFace;
 
 	}
 
 	// RH coordinate system; PMREM face-indexing convention
 	vec2 getUV( vec3 direction, float face ) {
 
-		vec2 uv;
-
-		if ( face == 0.0 ) {
-
-			uv = vec2( direction.z, direction.y ) / abs( direction.x ); // pos x
-
-		} else if ( face == 1.0 ) {
-
-			uv = vec2( - direction.x, - direction.z ) / abs( direction.y ); // pos y
-
-		} else if ( face == 2.0 ) {
-
-			uv = vec2( - direction.x, direction.y ) / abs( direction.z ); // pos z
-
-		} else if ( face == 3.0 ) {
-
-			uv = vec2( - direction.z, direction.y ) / abs( direction.x ); // neg x
-
-		} else if ( face == 4.0 ) {
-
-			uv = vec2( - direction.x, direction.z ) / abs( direction.y ); // neg y
-
-		} else {
-
-			uv = vec2( direction.x, direction.y ) / abs( direction.z ); // neg z
-
-		}
+		vec2 uv = vec2( 0.0 );
+		
+		// Branchless UV calculation using step functions
+		float isFace0 = step( abs( face - 0.0 ), 0.1 );
+		float isFace1 = step( abs( face - 1.0 ), 0.1 );
+		float isFace2 = step( abs( face - 2.0 ), 0.1 );
+		float isFace3 = step( abs( face - 3.0 ), 0.1 );
+		float isFace4 = step( abs( face - 4.0 ), 0.1 );
+		float isFace5 = 1.0 - isFace0 - isFace1 - isFace2 - isFace3 - isFace4;
+		
+		// Compute UV for each face
+		vec2 uv0 = vec2( direction.z, direction.y ) / abs( direction.x ); // pos x
+		vec2 uv1 = vec2( - direction.x, - direction.z ) / abs( direction.y ); // pos y
+		vec2 uv2 = vec2( - direction.x, direction.y ) / abs( direction.z ); // pos z
+		vec2 uv3 = vec2( - direction.z, direction.y ) / abs( direction.x ); // neg x
+		vec2 uv4 = vec2( - direction.x, direction.z ) / abs( direction.y ); // neg y
+		vec2 uv5 = vec2( direction.x, direction.y ) / abs( direction.z ); // neg z
+		
+		// Select the appropriate UV
+		uv = uv0 * isFace0 + uv1 * isFace1 + uv2 * isFace2 + uv3 * isFace3 + uv4 * isFace4 + uv5 * isFace5;
 
 		return 0.5 * ( uv + 1.0 );
 
@@ -87,13 +70,10 @@ export default /* glsl */`
 
 		highp vec2 uv = getUV( direction, face ) * ( faceSize - 2.0 ) + 1.0; // #25071
 
-		if ( face > 2.0 ) {
-
-			uv.y += faceSize;
-
-			face -= 3.0;
-
-		}
+		// Branchless adjustment for faces > 2
+		float faceOffset = step( 2.5, face );
+		uv.y += faceOffset * faceSize;
+		face -= faceOffset * 3.0;
 
 		uv.x += face * faceSize;
 
@@ -168,17 +148,12 @@ export default /* glsl */`
 
 		vec3 color0 = bilinearCubeUV( envMap, sampleDir, mipInt );
 
-		if ( mipF == 0.0 ) {
+		// Branchless mip interpolation
+		vec3 color1 = bilinearCubeUV( envMap, sampleDir, mipInt + 1.0 );
+		float needsBlend = step( 0.0001, mipF ); // Only blend if mipF is not zero
+		vec3 blendedColor = mix( color0, mix( color0, color1, mipF ), needsBlend );
 
-			return vec4( color0, 1.0 );
-
-		} else {
-
-			vec3 color1 = bilinearCubeUV( envMap, sampleDir, mipInt + 1.0 );
-
-			return vec4( mix( color0, color1, mipF ), 1.0 );
-
-		}
+		return vec4( blendedColor, 1.0 );
 
 	}
 
