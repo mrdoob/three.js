@@ -100,16 +100,20 @@ class LoopNode extends Node {
 
 		}
 
-		const stack = builder.addStack(); // TODO: cache() it
+		const stack = builder.addStack();
 
-		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder );
+		const fnCall = this.params[ this.params.length - 1 ]( inputs, builder );
+
+		properties.returnsNode = fnCall.context( { nodeBlock: fnCall } );
 		properties.stackNode = stack;
 
 		const baseParam = this.params[ 0 ];
 
 		if ( baseParam.isNode !== true && typeof baseParam.update === 'function' ) {
 
-			properties.updateNode = Fn( this.params[ 0 ].update )( inputs );
+			const fnUpdateCall = Fn( this.params[ 0 ].update )( inputs );
+
+			properties.updateNode = fnUpdateCall.context( { nodeBlock: fnUpdateCall } );
 
 		}
 

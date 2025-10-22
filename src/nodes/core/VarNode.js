@@ -179,13 +179,25 @@ class VarNode extends Node {
 
 	build( ...params ) {
 
-		if ( this.intent === true ) {
+		const builder = params[ 0 ];
 
-			const builder = params[ 0 ];
+		if ( this.intent === true ) {
 
 			if ( this.isAssign( builder ) !== true ) {
 
 				return this.node.build( ...params );
+
+			}
+
+		} else {
+
+			if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
+
+				if ( builder.context.nodeBlock && builder.getDataFromNode( this ).stack === undefined ) {
+
+					builder.getBaseStack().addToStack( this );
+
+				}
 
 			}
 
@@ -259,6 +271,14 @@ class VarNode extends Node {
 		builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
 
 		return propertyName;
+
+	}
+
+	_hasStack( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		return nodeData.stack !== undefined;
 
 	}
 
