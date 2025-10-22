@@ -273,6 +273,8 @@ class ShadowNode extends ShadowBaseNode {
 		 */
 		this._node = null;
 
+		this._builtShadowType = undefined;
+
 		this._cameraFrameId = new WeakMap();
 
 		/**
@@ -549,6 +551,15 @@ class ShadowNode extends ShadowBaseNode {
 
 		return Fn( () => {
 
+			const currentType = builder.renderer.shadowMap.type;
+
+			if ( this._builtShadowType !== undefined && this._builtShadowType !== currentType ) {
+
+				this.disposeShadowResources();
+				this._node = null;
+
+			}
+
 			let node = this._node;
 
 			this.setupShadowPosition( builder );
@@ -556,6 +567,7 @@ class ShadowNode extends ShadowBaseNode {
 			if ( node === null ) {
 
 				this._node = node = this.setupShadow( builder );
+				this._builtShadowType = currentType;
 
 			}
 
@@ -688,8 +700,23 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	dispose() {
 
-		this.shadowMap.dispose();
-		this.shadowMap = null;
+		this.disposeShadowResources();
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Frees the internal shadow map resources.
+	 */
+	disposeShadowResources() {
+
+		if ( this.shadowMap ) {
+
+			this.shadowMap.dispose();
+			this.shadowMap = null;
+
+		}
 
 		if ( this.vsmShadowMapVertical !== null ) {
 
@@ -710,8 +737,6 @@ class ShadowNode extends ShadowBaseNode {
 			this.vsmMaterialHorizontal = null;
 
 		}
-
-		super.dispose();
 
 	}
 
