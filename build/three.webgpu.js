@@ -13725,7 +13725,23 @@ const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {VaryingNode<vec3>}
  */
-const positionViewDirection = /*@__PURE__*/ positionView.negate().toVarying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
+const positionViewDirection = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	let output;
+
+	if ( builder.camera.isOrthographicCamera ) {
+
+		output = vec3( 0, 0, 1 );
+
+	} else {
+
+		output = positionView.negate().toVarying( 'v_positionViewDirection' ).normalize();
+
+	}
+
+	return output.toVar( 'positionViewDirection' );
+
+}, 'vec3' ).once( [ 'POSITION' ] ) )();
 
 /**
  * This node can be used to evaluate whether a primitive is front or back facing.
