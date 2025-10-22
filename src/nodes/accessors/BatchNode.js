@@ -91,17 +91,23 @@ class BatchNode extends Node {
 
 		const matricesTexture = this.batchMesh._matricesTexture;
 
-		const size = int( textureSize( textureLoad( matricesTexture ), 0 ).x );
-		const j = float( indirectId ).mul( 4 ).toInt().toVar();
+		let batchingMatrix = mat4();
 
-		const x = j.mod( size );
-		const y = j.div( size );
-		const batchingMatrix = mat4(
-			textureLoad( matricesTexture, ivec2( x, y ) ),
-			textureLoad( matricesTexture, ivec2( x.add( 1 ), y ) ),
-			textureLoad( matricesTexture, ivec2( x.add( 2 ), y ) ),
-			textureLoad( matricesTexture, ivec2( x.add( 3 ), y ) )
-		);
+		if ( matricesTexture !== null ) {
+
+			const size = int( textureSize( textureLoad( matricesTexture ), 0 ).x );
+			const j = float( indirectId ).mul( 4 ).toInt().toVar();
+
+			const x = j.mod( size );
+			const y = j.div( size );
+			batchingMatrix = mat4(
+				textureLoad( matricesTexture, ivec2( x, y ) ),
+				textureLoad( matricesTexture, ivec2( x.add( 1 ), y ) ),
+				textureLoad( matricesTexture, ivec2( x.add( 2 ), y ) ),
+				textureLoad( matricesTexture, ivec2( x.add( 3 ), y ) )
+			);
+
+		}
 
 
 		const colorsTexture = this.batchMesh._colorsTexture;
