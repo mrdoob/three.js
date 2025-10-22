@@ -181,23 +181,21 @@ class VarNode extends Node {
 
 		const builder = params[ 0 ];
 
+		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
+
+			if ( builder.context.nodeBlock && builder.getDataFromNode( this ).stack === undefined ) {
+
+				builder.getBaseStack().addToStack( this );
+
+			}
+
+		}
+
 		if ( this.intent === true ) {
 
 			if ( this.isAssign( builder ) !== true ) {
 
 				return this.node.build( ...params );
-
-			}
-
-		} else {
-
-			if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
-
-				if ( builder.context.nodeBlock && builder.getDataFromNode( this ).stack === undefined ) {
-
-					builder.getBaseStack().addToStack( this );
-
-				}
 
 			}
 
@@ -332,12 +330,6 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
  * @returns {VarNode}
  */
 export const VarIntent = ( node ) => {
-
-	if ( getCurrentStack() === null ) {
-
-		return node;
-
-	}
 
 	return createVar( node ).setIntent( true ).toStack();
 
