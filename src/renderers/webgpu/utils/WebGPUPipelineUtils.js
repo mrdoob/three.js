@@ -82,12 +82,15 @@ class WebGPUPipelineUtils {
 	}
 
 	/**
-	 * Creates a render pipeline for the given render object.
+	 * Builds a GPURenderPipelineDescriptor for the given render object.
 	 *
+	 * @private
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
+	 * @param {Object} [options={}] - Optional configuration.
+	 * @param {?boolean} [options.frontFaceCW=false] - Controls the primitive front-face orientation; defaults to CCW.
+	 * @return {Object} The render pipeline descriptor ready for createRenderPipeline.
 	 */
-	createRenderPipeline( renderObject, promises ) {
+	_buildRenderPipelineDescriptor( renderObject, { frontFaceCW = false } = {} ) {
 
 		const { object, material, geometry, pipeline } = renderObject;
 		const { vertexProgram, fragmentProgram } = pipeline;
@@ -96,7 +99,6 @@ class WebGPUPipelineUtils {
 		const device = backend.device;
 		const utils = backend.utils;
 
-		const pipelineData = backend.get( pipeline );
 
 		// bind group layouts
 
@@ -174,14 +176,15 @@ class WebGPUPipelineUtils {
 		const vertexModule = backend.get( vertexProgram ).module;
 		const fragmentModule = backend.get( fragmentProgram ).module;
 
-		const primitiveState = this._getPrimitiveState( object, geometry, material );
+		const primitiveState = this._getPrimitiveState( object, geometry, material, frontFaceCW );
+
 		const depthCompare = this._getDepthCompare( material );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 
 		const sampleCount = this._getSampleCount( renderObject.context );
 
 		const pipelineDescriptor = {
-			label: `renderPipeline_${ material.name || material.type }_${ material.id }`,
+			label: `renderPipeline_${ material.name || material.type }_${ material.id }${ frontFaceCW ? '_CW' : '' }`,
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
@@ -230,6 +233,26 @@ class WebGPUPipelineUtils {
 
 		}
 
+		return pipelineDescriptor;
+
+	}
+
+	/**
+	 * Creates a render pipeline for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Array<Promise>} promises - An array of compilation promises which are used in `compileAsync()`.
+	 */
+	createRenderPipeline( renderObject, promises ) {
+
+		const { pipeline } = renderObject;
+
+		const backend = this.backend;
+		const device = backend.device;
+
+		const pipelineData = backend.get( pipeline );
+
+		const pipelineDescriptor = this._buildRenderPipelineDescriptor( renderObject );
 
 		if ( promises === null ) {
 
@@ -251,6 +274,54 @@ class WebGPUPipelineUtils {
 			promises.push( p );
 
 		}
+
+	}
+
+	/**
+	 * Returns a render pipeline variant with the requested front-face orientation.
+	 * If necessary, a new pipeline is created lazily and cached.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {boolean} frontFaceCW - Whether the front face should be CW (true) or CCW (false).
+	 * @return {GPURenderPipeline} The pipeline for the requested orientation.
+	 */
+	getRenderPipelineVariant( renderObject, frontFaceCW ) {
+
+		const { material, pipeline } = renderObject;
+
+		const backend = this.backend;
+		const device = backend.device;
+
+		const pipelineData = backend.get( pipeline );
+
+		console.assert( pipelineData.pipeline !== undefined, 'Pipeline not created' );
+
+		// DoubleSide does not cull, orientation is irrelevant
+		if ( material.side === DoubleSide ) {
+
+			return pipelineData.pipeline;
+
+		}
+
+		// Default CCW pipeline already handled by createRenderPipeline()
+		if ( frontFaceCW === false ) {
+
+			return pipelineData.pipeline;
+
+		}
+
+		// Need CW variant
+		if ( pipelineData.pipelineCW !== undefined ) {
+
+			return pipelineData.pipelineCW;
+
+		}
+
+		// Build a CW-oriented pipeline by reusing the shared descriptor with frontFace override
+		const pipelineDescriptor = this._buildRenderPipelineDescriptor( renderObject, { frontFaceCW: true } );
+		pipelineData.pipelineCW = device.createRenderPipeline( pipelineDescriptor );
+
+		return pipelineData.pipelineCW;
 
 	}
 
@@ -666,9 +737,10 @@ class WebGPUPipelineUtils {
 	 * @param {Object3D} object - The 3D object.
 	 * @param {BufferGeometry} geometry - The geometry.
 	 * @param {Material} material - The material.
+	 * @param {?boolean} [frontFaceCW=false] - Primitive front-face orientation; false=CCW (default), true=CW.
 	 * @return {Object} The primitive state.
 	 */
-	_getPrimitiveState( object, geometry, material ) {
+	_getPrimitiveState( object, geometry, material, frontFaceCW = false ) {
 
 		const descriptor = {};
 		const utils = this.backend.utils;
@@ -685,9 +757,11 @@ class WebGPUPipelineUtils {
 
 		//
 
+		// Handle flip sided based on material side and object transformation
 		let flipSided = ( material.side === BackSide );
 
-		if ( object.isMesh && object.matrixWorld.determinant() < 0 ) flipSided = ! flipSided;
+		// Apply frontFaceCW parameter if specified
+		if ( frontFaceCW ) flipSided = ! flipSided;
 
 		descriptor.frontFace = ( flipSided === true ) ? GPUFrontFace.CW : GPUFrontFace.CCW;
 

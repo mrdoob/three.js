@@ -1458,10 +1458,19 @@ class WebGPUBackend extends Backend {
 	 */
 	draw( renderObject, info ) {
 
-		const { object, material, context, pipeline } = renderObject;
+		const { object, material, context } = renderObject;
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
-		const pipelineGPU = this.get( pipeline ).pipeline;
+
+		const computeFrontFaceCW = ( cam ) => {
+
+			if ( object.isMesh !== true ) return false;
+			const objectFlipped = object.matrixWorld.determinant() < 0;
+			const viewFlipped = cam.matrixWorld.determinant() < 0;
+			const projectionFlipped = cam.projectionMatrix.determinant() > 0; // A standard projection's determinant is negative; a positive determinant will flip face culling
+			return ( ( objectFlipped ^ viewFlipped ^ projectionFlipped ) !== 0 );
+
+		};
 
 		const index = renderObject.getIndex();
 		const hasIndex = ( index !== null );
@@ -1472,9 +1481,10 @@ class WebGPUBackend extends Backend {
 
 		// pipeline
 
-		const setPipelineAndBindings = ( passEncoderGPU, currentSets ) => {
+		const setPipelineAndBindings = ( passEncoderGPU, currentSets, frontFaceCW ) => {
 
-			// pipeline
+			// oriented pipeline (select orientation variant lazily)
+			const pipelineGPU = this.pipelineUtils.getRenderPipelineVariant( renderObject, frontFaceCW === true );
 			this.pipelineUtils.setPipeline( passEncoderGPU, pipelineGPU );
 			currentSets.pipeline = pipelineGPU;
 
@@ -1542,9 +1552,9 @@ class WebGPUBackend extends Backend {
 		};
 
 		// Define draw function
-		const draw = ( passEncoderGPU, currentSets ) => {
+		const draw = ( passEncoderGPU, currentSets, frontFaceCW ) => {
 
-			setPipelineAndBindings( passEncoderGPU, currentSets );
+			setPipelineAndBindings( passEncoderGPU, currentSets, frontFaceCW );
 
 			if ( object.isBatchedMesh === true ) {
 
@@ -1697,7 +1707,8 @@ class WebGPUBackend extends Backend {
 
 					}
 
-					draw( pass, sets );
+					const frontFaceCW = computeFrontFaceCW( subCamera );
+					draw( pass, sets, frontFaceCW );
 
 
 				}
@@ -1735,7 +1746,8 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				draw( renderContextData.currentPass, renderContextData.currentSets );
+				const frontFaceCW = computeFrontFaceCW( renderObject.camera );
+				draw( renderContextData.currentPass, renderContextData.currentSets, frontFaceCW );
 
 			}
 
