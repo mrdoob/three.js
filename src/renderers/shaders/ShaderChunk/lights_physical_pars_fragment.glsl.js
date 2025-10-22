@@ -588,8 +588,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_Physical
 #define RE_IndirectSpecular		RE_IndirectSpecular_Physical
 
-// Multi-bounce ambient occlusion approximation
-// Adds energy back that would bounce in occluded areas based on surface albedo
+// Multi-bounce ambient occlusion approximation for diffuse lighting
 // ref: https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf
 vec3 computeMultiBounceAO( const in float ambientOcclusion, const in vec3 albedo ) {
 
@@ -606,7 +605,10 @@ vec3 computeMultiBounceAO( const in float ambientOcclusion, const in vec3 albedo
 // ref: https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {
 
-	return saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );
+	float specularOcclusion = saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );
+
+	// Smoothly disable specular occlusion for very smooth surfaces to prevent over-darkening
+	return mix( 1.0, specularOcclusion, smoothstep( 0.01, 0.1, roughness ) );
 
 }
 `;
