@@ -4,7 +4,7 @@ export default /* glsl */`
 	// reads channel R, compatible with a combined OcclusionRoughnessMetallic (RGB) texture
 	float ambientOcclusion = ( texture2D( aoMap, vAoMapUv ).r - 1.0 ) * aoMapIntensity + 1.0;
 
-	reflectedLight.indirectDiffuse *= ambientOcclusion;
+	reflectedLight.indirectDiffuse *= computeMultiBounceAO( ambientOcclusion, material.diffuseColor );
 
 	#if defined( USE_CLEARCOAT ) 
 		clearcoatSpecularIndirect *= ambientOcclusion;
