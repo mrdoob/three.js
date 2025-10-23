@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>GTAONode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -17,7 +16,7 @@
 				<div class="class-description"><p>Post processing node for applying Ground Truth Ambient Occlusion (GTAO) to a scene.</p>
 <p>Reference: <a href="https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%2520VERSION_COLOR.pdf">https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf</a>.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const postProcessing = new THREE.PostProcessing( renderer );
+				<div translate="no"><pre><code class="language-js">const postProcessing = new THREE.PostProcessing( renderer );
 const scenePass = pass( scene, camera );
 scenePass.setMRT( mrt( {
 	output: output,
@@ -33,7 +32,7 @@ postProcessing.outputNod = aoPass.getTextureNode().mul( scenePassColor );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">GTAONode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { ao } from 'three/addons/tsl/display/GTAONode.js';</code></pre>
+				<pre><code class="language-js">import { ao } from 'three/addons/tsl/display/GTAONode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="GTAONode" translate="no">new <a href="#GTAONode">GTAONode</a><span class="signature">( depthNode : <span class="param-type">Node.&lt;float></span>, normalNode : <span class="param-type">Node.&lt;vec3></span>, camera : <span class="param-type">Camera</span> )</span> </h3>

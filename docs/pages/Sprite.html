@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>Sprite - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -19,7 +18,7 @@ partially transparent texture applied.</p>
 <p>Sprites do not cast shadows, setting <a href="Object3D.html#castShadow">Object3D#castShadow</a> to <code>true</code> will
 have no effect.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const map = new THREE.TextureLoader().load( 'sprite.png' );
+				<div translate="no"><pre><code class="language-js">const map = new THREE.TextureLoader().load( 'sprite.png' );
 const material = new THREE.SpriteMaterial( { map: map } );
 const sprite = new THREE.Sprite( material );
 scene.add( sprite );

@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>FlipNode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -19,7 +18,7 @@ It represents a flip operation during the shader generation process
 meaning it flips normalized values with the following formula:</p>
 <p><code>FlipNode</code> is internally used to implement any <code>flipXYZW()</code>, <code>flipRGBA()</code> and
 <code>flipSTPQ()</code> method invocations on node objects. For example:</p>
-<pre class="prettyprint source lang-js"><code>uvNode = uvNode.flipY();
+<pre><code class="language-js">uvNode = uvNode.flipY();
 </code></pre></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre class="prettyprint source"><code>x = 1 - x;

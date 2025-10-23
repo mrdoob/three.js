@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>BloomNode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 <p>By default, the node affects the entire image. For a selective bloom,
 use the <code>emissive</code> material property to control which objects should
 contribute to bloom or not. This can be achieved via MRT.</p>
-<pre class="prettyprint source lang-js"><code>const postProcessing = new THREE.PostProcessing( renderer );
+<pre><code class="language-js">const postProcessing = new THREE.PostProcessing( renderer );
 const scenePass = pass( scene, camera );
 scenePass.setMRT( mrt( {
 	output,
@@ -30,7 +29,7 @@ const bloomPass = bloom( emissivePass );
 postProcessing.outputNode = scenePassColor.add( bloomPass );
 </code></pre></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const postProcessing = new THREE.PostProcessing( renderer );
+				<div translate="no"><pre><code class="language-js">const postProcessing = new THREE.PostProcessing( renderer );
 const scenePass = pass( scene, camera );
 const scenePassColor = scenePass.getTextureNode( 'output' );
 const bloomPass = bloom( scenePassColor );
@@ -40,7 +39,7 @@ postProcessing.outputNode = scenePassColor.add( bloomPass );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">BloomNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { bloom } from 'three/addons/tsl/display/BloomNode.js';</code></pre>
+				<pre><code class="language-js">import { bloom } from 'three/addons/tsl/display/BloomNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="BloomNode" translate="no">new <a href="#BloomNode">BloomNode</a><span class="signature">( inputNode : <span class="param-type">Node.&lt;vec4></span>, strength : <span class="param-type">number</span>, radius : <span class="param-type">number</span>, threshold : <span class="param-type">number</span> )</span> </h3>

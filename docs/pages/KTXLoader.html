@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>KTXLoader - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -21,7 +20,7 @@
 <li><a href="https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts">Babylon.JS khronosTextureContainer.ts</a></li>
 </ul></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const loader = new KTXLoader();
+				<div translate="no"><pre><code class="language-js">const loader = new KTXLoader();
 const map = loader.load( 'textures/compressed/lensflare_ASTC8x8.ktx' )
 map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 </code></pre></div>
@@ -29,7 +28,7 @@ map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">KTXLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { KTXLoader } from 'three/addons/loaders/KTXLoader.js';</code></pre>
+				<pre><code class="language-js">import { KTXLoader } from 'three/addons/loaders/KTXLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="KTXLoader" translate="no">new <a href="#KTXLoader">KTXLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>

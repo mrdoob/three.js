@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>PLYLoader - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -21,7 +20,7 @@ File Format or the Stanford Triangle Format).</p>
 <li>ASCII decoding assumes file is UTF-8.</li>
 </ul></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const loader = new PLYLoader();
+				<div translate="no"><pre><code class="language-js">const loader = new PLYLoader();
 const geometry = await loader.loadAsync( './models/ply/ascii/dolphins.ply' );
 scene.add( new THREE.Mesh( geometry ) );
 </code></pre></div>
@@ -29,7 +28,7 @@ scene.add( new THREE.Mesh( geometry ) );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">PLYLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';</code></pre>
+				<pre><code class="language-js">import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="PLYLoader" translate="no">new <a href="#PLYLoader">PLYLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
@@ -106,7 +105,7 @@ and color attributes can be added using the setCustomPropertyNameMapping method.
 For example, the following maps the element properties “custom_property_a”
 and “custom_property_b” to an attribute “customAttribute” with an item size of 2.
 Attribute item sizes are set from the number of element properties in the property array.</p>
-<pre class="prettyprint source lang-js"><code>loader.setCustomPropertyNameMapping( {
+<pre><code class="language-js">loader.setCustomPropertyNameMapping( {
 	customAttribute: ['custom_property_a', 'custom_property_b'],
 } );
 </code></pre>
@@ -126,7 +125,7 @@ Attribute item sizes are set from the number of element properties in the proper
 							<p>Sets a property name mapping that maps default property names
 to custom ones. For example, the following maps the properties
 “diffuse_(red|green|blue)” in the file to standard color names.</p>
-<pre class="prettyprint source lang-js"><code>loader.setPropertyNameMapping( {
+<pre><code class="language-js">loader.setPropertyNameMapping( {
 	diffuse_red: 'red',
 	diffuse_green: 'green',
 	diffuse_blue: 'blue'

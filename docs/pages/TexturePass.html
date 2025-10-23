@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>TexturePass - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -16,7 +15,7 @@
 			<header>
 				<div class="class-description"><p>This pass can be used to render a texture over the entire screen.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const texture = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
+				<div translate="no"><pre><code class="language-js">const texture = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 texture.colorSpace = THREE.SRGBColorSpace;
 const texturePass = new TexturePass( texture );
 composer.addPass( texturePass );
@@ -25,7 +24,7 @@ composer.addPass( texturePass );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">TexturePass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';</code></pre>
+				<pre><code class="language-js">import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="TexturePass" translate="no">new <a href="#TexturePass">TexturePass</a><span class="signature">( map : <span class="param-type">Texture</span>, opacity : <span class="param-type">number</span> )</span> </h3>

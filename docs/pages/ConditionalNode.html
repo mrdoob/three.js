@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>ConditionalNode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -20,7 +19,7 @@ to the <code>If()</code>/<code>Else()</code> syntax.</p>
 <p>The <code>select()</code> method is called in a chaining fashion on a condition. The parameter nodes of <code>select()</code>
 determine the outcome of the entire statement.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
+				<div translate="no"><pre><code class="language-js">velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
 </code></pre></div>
 			</header>
 			<article>

@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>ShaderMaterial - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -35,7 +34,7 @@ statements.</li>
 </li>
 </ul></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const material = new THREE.ShaderMaterial( {
+				<div translate="no"><pre><code class="language-js">const material = new THREE.ShaderMaterial( {
 	uniforms: {
 		time: { value: 1.0 },
 		resolution: { value: new THREE.Vector2() }
@@ -94,7 +93,7 @@ avoids errors when buffer data is missing.</p>
 						<p>Defines custom constants using <code>#define</code> directives within the GLSL code
 for both the vertex shader and the fragment shader; each key/value pair
 yields another directive.</p>
-<pre class="prettyprint source lang-js"><code>defines: {
+<pre><code class="language-js">defines: {
 	FOO: 15,
 	BAR: true
 }
@@ -175,7 +174,7 @@ width of one pixel.<br/>Default is <code>1</code>.</p>
 					<h3 class="name" id="uniforms" translate="no">.<a href="#uniforms">uniforms</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>An object of the form:</p>
-<pre class="prettyprint source lang-js"><code>{
+<pre><code class="language-js">{
 	&quot;uniform1&quot;: { value: 1.0 },
 	&quot;uniform2&quot;: { value: 2 }
 }

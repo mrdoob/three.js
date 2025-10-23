@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>SpriteNodeMaterial - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -47,11 +46,11 @@
 						<p>This property makes it possible to define the position of the sprite with a
 node. That can be useful when the material is used with instanced rendering
 and node data are defined with an instanced attribute node:</p>
-<pre class="prettyprint source lang-js"><code>const positionAttribute = new InstancedBufferAttribute( new Float32Array( positions ), 3 );
+<pre><code class="language-js">const positionAttribute = new InstancedBufferAttribute( new Float32Array( positions ), 3 );
 material.positionNode = instancedBufferAttribute( positionAttribute );
 </code></pre>
 <p>Another possibility is to compute the instanced data with a compute shader:</p>
-<pre class="prettyprint source lang-js"><code>const positionBuffer = instancedArray( particleCount, 'vec3' );
+<pre><code class="language-js">const positionBuffer = instancedArray( particleCount, 'vec3' );
 particleMaterial.positionNode = positionBuffer.toAttribute();
 </code></pre><br/>Default is <code>null</code>.
 					</div>

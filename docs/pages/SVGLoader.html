@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>SVGLoader - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 <p>Scalable Vector Graphics is an XML-based vector image format for two-dimensional graphics
 with support for interactivity and animation.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const loader = new SVGLoader();
+				<div translate="no"><pre><code class="language-js">const loader = new SVGLoader();
 const data = await loader.loadAsync( 'data/svgSample.svg' );
 const paths = data.paths;
 const group = new THREE.Group();
@@ -43,7 +42,7 @@ scene.add( group );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">SVGLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';</code></pre>
+				<pre><code class="language-js">import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="SVGLoader" translate="no">new <a href="#SVGLoader">SVGLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>

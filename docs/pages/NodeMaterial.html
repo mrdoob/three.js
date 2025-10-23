@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>NodeMaterial - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -61,7 +60,7 @@ values instead, use <a href="TSL.html#materialAO">materialAO</a>.<br/>Default is
 to store the current rendering into a texture e.g. via <code>viewportSharedTexture()</code>, use it
 to create an arbitrary effect and then assign the node composition to this property.
 Everything behind the object using this material will now be affected by a filter.</p>
-<pre class="prettyprint source lang-js"><code>const material = new NodeMaterial()
+<pre><code class="language-js">const material = new NodeMaterial()
 material.transparent = true;
 // everything behind the object will be monochromatic
 material.backdropNode = saturation( viewportSharedTexture().rgb, 0 );
@@ -74,12 +73,12 @@ material.backdropNode = saturation( viewportSharedTexture().rgb, 0 );
 					<div class="description">
 						<p>This node can be used to influence how an object using this node material
 casts shadows. To apply a color to shadows, you can simply do:</p>
-<pre class="prettyprint source lang-js"><code>material.castShadowNode = vec4( 1, 0, 0, 1 );
+<pre><code class="language-js">material.castShadowNode = vec4( 1, 0, 0, 1 );
 </code></pre>
 <p>Which can be nice to fake colored shadows of semi-transparent objects. It
 is also common to use the property with <code>Fn</code> function so checks are performed
 per fragment.</p>
-<pre class="prettyprint source lang-js"><code>materialCustomShadow.castShadowNode = Fn( () => {
+<pre><code class="language-js">materialCustomShadow.castShadowNode = Fn( () => {
 	hash( vertexIndex ).greaterThan( 0.5 ).discard();
 	return materialColor;
 } )();
@@ -99,11 +98,11 @@ is by default <a href="TSL.html#positionLocal">positionLocal</a>, the vertex pos
 						<p>The diffuse color of node materials is by default inferred from the
 <code>color</code> and <code>map</code> properties. This node property allows to overwrite the default
 and define the diffuse color with a node instead.</p>
-<pre class="prettyprint source lang-js"><code>material.colorNode = color( 0xff0000 ); // define red color
+<pre><code class="language-js">material.colorNode = color( 0xff0000 ); // define red color
 </code></pre>
 <p>If you don't want to overwrite the diffuse color but modify the existing
 values instead, use <a href="TSL.html#materialColor">materialColor</a>.</p>
-<pre class="prettyprint source lang-js"><code>material.colorNode = materialColor.mul( color( 0xff0000 ) ); // give diffuse colors a red tint
+<pre><code class="language-js">material.colorNode = materialColor.mul( color( 0xff0000 ) ); // give diffuse colors a red tint
 </code></pre><br/>Default is <code>null</code>.
 					</div>
 				</div>
@@ -120,7 +119,7 @@ values instead, use <a href="TSL.html#materialColor">materialColor</a>.</p>
 map assigned to the <code>envMap</code> property or by <code>Scene.environment</code>
 if the node material is a PBR material. This node property allows to overwrite
 the default behavior and define the environment with a custom node.</p>
-<pre class="prettyprint source lang-js"><code>material.envNode = pmremTexture( renderTarget.texture );
+<pre><code class="language-js">material.envNode = pmremTexture( renderTarget.texture );
 </code></pre><br/>Default is <code>null</code>.
 					</div>
 				</div>
@@ -180,7 +179,7 @@ lighting is wanted which means only <em>some</em> lights in the scene
 affect a material. This can be achieved by creating an instance
 of <a href="LightsNode.html">LightsNode</a> with a list of selective
 lights and assign the node to this property.</p>
-<pre class="prettyprint source lang-js"><code>const customLightsNode = lights( [ light1, light2 ] );
+<pre><code class="language-js">const customLightsNode = lights( [ light1, light2 ] );
 material.lightsNode = customLightsNode;
 </code></pre><br/>Default is <code>null</code>.
 					</div>
@@ -235,7 +234,7 @@ attribute data, morphing or skinning. This node property allows to overwrite
 the default and define local vertex positions with nodes instead.</p>
 <p>If you don't want to overwrite the vertex positions but modify the existing
 values instead, use <a href="TSL.html#positionLocal">positionLocal</a>.</p>
-<pre class="prettyprint source lang-js"><code>material.positionNode = positionLocal.add( displace );
+<pre><code class="language-js">material.positionNode = positionLocal.add( displace );
 </code></pre><br/>Default is <code>null</code>.
 					</div>
 				</div>
@@ -244,7 +243,7 @@ values instead, use <a href="TSL.html#positionLocal">positionLocal</a>.</p>
 					<div class="description">
 						<p>This node can be used to influence how an object using this node material
 receive shadows.</p>
-<pre class="prettyprint source lang-js"><code>const totalShadows = float( 1 ).toVar();
+<pre><code class="language-js">const totalShadows = float( 1 ).toVar();
 material.receivedShadowNode = Fn( ( [ shadow ] ) => {
 	totalShadows.mulAssign( shadow );
 	//return float( 1 ); // bypass received shadows

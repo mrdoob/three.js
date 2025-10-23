@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>PointsNodeMaterial - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -24,10 +23,10 @@ with a pixel size of <code>1</code>, it's not possible to define a size.</li>
 <li>By rendering point primitives with Sprites. In this case, size is honored,
 see <a href="PointsNodeMaterial.html#sizeNode">PointsNodeMaterial#sizeNode</a>.</li>
 </ul>
-<pre class="prettyprint source lang-js"><code>const instancedPoints = new THREE.Sprite( new THREE.PointsNodeMaterial( { positionNode: instancedBufferAttribute( positionAttribute ) } ) );
+<pre><code class="language-js">const instancedPoints = new THREE.Sprite( new THREE.PointsNodeMaterial( { positionNode: instancedBufferAttribute( positionAttribute ) } ) );
 </code></pre></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const pointCloud = new THREE.Points( geometry, new THREE.PointsNodeMaterial() );
+				<div translate="no"><pre><code class="language-js">const pointCloud = new THREE.Points( geometry, new THREE.PointsNodeMaterial() );
 </code></pre></div>
 			</header>
 			<article>

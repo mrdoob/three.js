@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>ReflectorNode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -16,7 +15,7 @@
 			<header>
 				<div class="class-description"><p>This node can be used to implement mirror-like flat reflective surfaces.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const groundReflector = reflector();
+				<div translate="no"><pre><code class="language-js">const groundReflector = reflector();
 material.colorNode = groundReflector;
 const plane = new Mesh( geometry, material );
 plane.add( groundReflector.target );

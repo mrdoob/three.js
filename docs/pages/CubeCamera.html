@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>CubeCamera - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 cube render target. The render target can then be used as an environment map for rendering
 realtime reflections in your scene.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>// Create cube render target
+				<div translate="no"><pre><code class="language-js">// Create cube render target
 const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
 // Create cube camera
 const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );

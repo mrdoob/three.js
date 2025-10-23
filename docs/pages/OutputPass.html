@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>OutputPass - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -20,14 +19,14 @@ of each pass chain. If a pass requires sRGB input (e.g. like FXAA), the pass
 must follow <code>OutputPass</code> in the pass chain.</p>
 <p>The tone mapping and color space settings are extracted from the renderer.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const outputPass = new OutputPass();
+				<div translate="no"><pre><code class="language-js">const outputPass = new OutputPass();
 composer.addPass( outputPass );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">OutputPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';</code></pre>
+				<pre><code class="language-js">import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="OutputPass" translate="no">new <a href="#OutputPass">OutputPass</a><span class="signature">()</span> </h3>

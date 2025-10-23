@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>WebGLRenderer - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -104,7 +103,7 @@ Assigning a custom function disables the default error reporting.</li>
 					<div class="description">
 						<p>A canvas where the renderer draws its output.This is automatically created by the renderer
 in the constructor (if not provided already); you just need to add it to your page like so:</p>
-<pre class="prettyprint source lang-js"><code>document.body.appendChild( renderer.domElement );
+<pre><code class="language-js">document.body.appendChild( renderer.domElement );
 </code></pre>
 					</div>
 				</div>
@@ -128,10 +127,10 @@ and the rendering process. Useful for debugging and monitoring.</p>
 multiple render passes per frame (e.g. when using post processing) it can
 be preferred to reset with a custom pattern. First, set <code>autoReset</code> to
 <code>false</code>.</p>
-<pre class="prettyprint source lang-js"><code>renderer.info.autoReset = false;
+<pre><code class="language-js">renderer.info.autoReset = false;
 </code></pre>
 <p>Call <code>reset()</code> whenever you have finished to render a single frame.</p>
-<pre class="prettyprint source lang-js"><code>renderer.info.reset();
+<pre><code class="language-js">renderer.info.reset();
 </code></pre>
 					</div>
 				</div>
@@ -768,7 +767,7 @@ for best compatibility.</p>
 							<p>This method allows to define the drawing buffer size by specifying
 width, height and pixel ratio all at once. The size of the drawing
 buffer is computed with this formula:</p>
-<pre class="prettyprint source lang-js"><code>size.x = width * pixelRatio;
+<pre><code class="language-js">size.x = width * pixelRatio;
 size.y = height * pixelRatio;
 </code></pre>
 						</div>

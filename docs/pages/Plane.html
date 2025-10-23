@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>Plane - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -64,7 +63,7 @@ by a unit length normal vector and a constant.</p></div>
 						<div class="description">
 							<p>Apply a 4x4 matrix to the plane. The matrix must be an affine, homogeneous transform.</p>
 <p>The optional normal matrix can be pre-computed like so:</p>
-<pre class="prettyprint source lang-js"><code>const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+<pre><code class="language-js">const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 </code></pre>
 						</div>
 						<table class="params">

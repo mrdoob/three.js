@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>FunctionNode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -23,7 +22,7 @@ TSL functions for easier usage.</p>
 </ul>
 <p>A basic example with one include looks like so:</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const desaturateWGSLFn = wgslFn( `
+				<div translate="no"><pre><code class="language-js">const desaturateWGSLFn = wgslFn( `
 	fn desaturate( color:vec3&lt;f32> ) -> vec3&lt;f32> {
 		let lum = vec3&lt;f32>( 0.299, 0.587, 0.114 );
 		return vec3&lt;f32>( dot( lum, color ) );

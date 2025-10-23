@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>MapControls - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -26,7 +25,7 @@ for mouse/touch interaction and disables screen space panning by default.</p>
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">MapControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { MapControls } from 'three/addons/controls/MapControls.js';</code></pre>
+				<pre><code class="language-js">import { MapControls } from 'three/addons/controls/MapControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="MapControls" translate="no">new <a href="#MapControls">MapControls</a><span class="signature">()</span> </h3>
@@ -38,7 +37,7 @@ for mouse/touch interaction and disables screen space panning by default.</p>
 					<h3 class="name" id="mouseButtons" translate="no">.<a href="#mouseButtons">mouseButtons</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>This object contains references to the mouse actions used by the controls.</p>
-<pre class="prettyprint source lang-js"><code>controls.mouseButtons = {
+<pre><code class="language-js">controls.mouseButtons = {
 	LEFT: THREE.MOUSE.PAN,
 	MIDDLE: THREE.MOUSE.DOLLY,
 	RIGHT: THREE.MOUSE.ROTATE
@@ -62,7 +61,7 @@ for mouse/touch interaction and disables screen space panning by default.</p>
 					<h3 class="name" id="touches" translate="no">.<a href="#touches">touches</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>This object contains references to the touch actions used by the controls.</p>
-<pre class="prettyprint source lang-js"><code>controls.mouseButtons = {
+<pre><code class="language-js">controls.mouseButtons = {
 	ONE: THREE.TOUCH.PAN,
 	TWO: THREE.TOUCH.DOLLY_ROTATE
 }

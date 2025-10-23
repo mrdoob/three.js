@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>PositionalAudioHelper - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -17,7 +16,7 @@
 				<div class="class-description"><p>This helper displays the directional cone of a positional audio.</p>
 <p><code>PositionalAudioHelper</code> must be added as a child of the positional audio.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const positionalAudio = new THREE.PositionalAudio( listener );
+				<div translate="no"><pre><code class="language-js">const positionalAudio = new THREE.PositionalAudio( listener );
 positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 scene.add( positionalAudio );
 const helper = new PositionalAudioHelper( positionalAudio );
@@ -27,7 +26,7 @@ positionalAudio.add( helper );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">PositionalAudioHelper</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';</code></pre>
+				<pre><code class="language-js">import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="PositionalAudioHelper" translate="no">new <a href="#PositionalAudioHelper">PositionalAudioHelper</a><span class="signature">( audio : <span class="param-type">PositionalAudio</span>, range : <span class="param-type">number</span>, divisionsInnerAngle : <span class="param-type">number</span>, divisionsOuterAngle : <span class="param-type">number</span> )</span> </h3>

@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>GPUComputationRenderer - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -26,7 +25,7 @@ as inputs to render the textures of the next frame.</p>
 a common approach could be to use 'texture' prefixing the variable name; i.e texturePosition, textureVelocity...</p>
 <p>The size of the computation (sizeX * sizeY) is defined as 'resolution' automatically in the shader. For example:</p>
 <p>Basic use:</p>
-<pre class="prettyprint source lang-js"><code>// Initialization...
+<pre><code class="language-js">// Initialization...
 // Create computation renderer
 const gpuCompute = new GPUComputationRenderer( 1024, 1024, renderer );
 // Create initial state float textures
@@ -56,7 +55,7 @@ renderer.render( myScene, myCamera );
 </code></pre>
 <p>Also, you can use utility functions to create ShaderMaterial and perform computations (rendering between textures)
 Note that the shaders can have multiple input textures.</p>
-<pre class="prettyprint source lang-js"><code>const myFilter1 = gpuCompute.createShaderMaterial( myFilterFragmentShader1, { theTexture: { value: null } } );
+<pre><code class="language-js">const myFilter1 = gpuCompute.createShaderMaterial( myFilterFragmentShader1, { theTexture: { value: null } } );
 const myFilter2 = gpuCompute.createShaderMaterial( myFilterFragmentShader2, { theTexture: { value: null } } );
 const inputTexture = gpuCompute.createTexture();
 // Fill in here inputTexture...
@@ -77,7 +76,7 @@ gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">GPUComputationRenderer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';</code></pre>
+				<pre><code class="language-js">import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="GPUComputationRenderer" translate="no">new <a href="#GPUComputationRenderer">GPUComputationRenderer</a><span class="signature">( sizeX : <span class="param-type">number</span>, sizeY : <span class="param-type">number</span>, renderer : <span class="param-type">WebGLRenderer</span> )</span> </h3>

@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>DotScreenPass - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -16,14 +15,14 @@
 			<header>
 				<div class="class-description"><p>Pass for creating a dot-screen effect.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const pass = new DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
+				<div translate="no"><pre><code class="language-js">const pass = new DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
 composer.addPass( pass );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">DotScreenPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';</code></pre>
+				<pre><code class="language-js">import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="DotScreenPass" translate="no">new <a href="#DotScreenPass">DotScreenPass</a><span class="signature">( center : <span class="param-type">Vector2</span>, angle : <span class="param-type">number</span>, scale : <span class="param-type">number</span> )</span> </h3>
@@ -61,7 +60,7 @@ composer.addPass( pass );
 					<div class="description">
 						<p>The pass uniforms. Use this object if you want to update the
 <code>center</code>, <code>angle</code> or <code>scale</code> values at runtime.</p>
-<pre class="prettyprint source lang-js"><code>pass.uniforms.center.value.copy( center );
+<pre><code class="language-js">pass.uniforms.center.value.copy( center );
 pass.uniforms.angle.value = 0;
 pass.uniforms.scale.value = 0.5;
 </code></pre>

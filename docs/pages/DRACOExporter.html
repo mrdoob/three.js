@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>DRACOExporter - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -23,14 +22,14 @@ textures, animation, or node hierarchies – to use these features, embed Draco 
 inside of a glTF file. A normal glTF file can be converted to a Draco-compressed glTF file
 using <a href="https://github.com/AnalyticalGraphicsInc/gltf-pipeline">glTF-Pipeline</a>.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const exporter = new DRACOExporter();
+				<div translate="no"><pre><code class="language-js">const exporter = new DRACOExporter();
 const data = exporter.parse( mesh, options );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">DRACOExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';</code></pre>
+				<pre><code class="language-js">import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="DRACOExporter" translate="no">new <a href="#DRACOExporter">DRACOExporter</a><span class="signature">()</span> </h3>

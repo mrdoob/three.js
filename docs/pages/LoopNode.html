@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>LoopNode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -16,25 +15,25 @@
 			<header>
 				<div class="class-description"><p>This module offers a variety of ways to implement loops in TSL. In it's basic form it's:</p>
 <p>However, it is also possible to define a start and end ranges, data types and loop conditions:</p>
-<pre class="prettyprint source lang-js"><code>Loop( { start: int( 0 ), end: int( 10 ), type: 'int', condition: '&lt;' }, ( { i } ) => {
+<pre><code class="language-js">Loop( { start: int( 0 ), end: int( 10 ), type: 'int', condition: '&lt;' }, ( { i } ) => {
 } );
 </code></pre>
 <p>Nested loops can be defined in a compacted form:</p>
-<pre class="prettyprint source lang-js"><code>Loop( 10, 5, ( { i, j } ) => {
+<pre><code class="language-js">Loop( 10, 5, ( { i, j } ) => {
 } );
 </code></pre>
 <p>Loops that should run backwards can be defined like so:</p>
-<pre class="prettyprint source lang-js"><code>Loop( { start: 10 }, () => {} );
+<pre><code class="language-js">Loop( { start: 10 }, () => {} );
 </code></pre>
 <p>It is possible to execute with boolean values, similar to the <code>while</code> syntax.</p>
-<pre class="prettyprint source lang-js"><code>const value = float( 0 ).toVar();
+<pre><code class="language-js">const value = float( 0 ).toVar();
 Loop( value.lessThan( 10 ), () => {
 	value.addAssign( 1 );
 } );
 </code></pre>
 <p>The module also provides <code>Break()</code> and <code>Continue()</code> TSL expression for loop control.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>Loop( count, ( { i } ) => {
+				<div translate="no"><pre><code class="language-js">Loop( count, ( { i } ) => {
 } );
 </code></pre></div>
 			</header>

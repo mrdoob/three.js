@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>XRControllerModelFactory - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -21,7 +20,7 @@ the held device.</p>
 <p>This module depends on the <a href="https://github.com/immersive-web/webxr-input-profiles/blob/main/packages/motion-controllers/README.md">motion-controllers</a>
 third-part library.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const controllerModelFactory = new XRControllerModelFactory();
+				<div translate="no"><pre><code class="language-js">const controllerModelFactory = new XRControllerModelFactory();
 const controllerGrip = renderer.xr.getControllerGrip( 0 );
 controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
 scene.add( controllerGrip );
@@ -30,7 +29,7 @@ scene.add( controllerGrip );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">XRControllerModelFactory</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';</code></pre>
+				<pre><code class="language-js">import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="XRControllerModelFactory" translate="no">new <a href="#XRControllerModelFactory">XRControllerModelFactory</a><span class="signature">( gltfLoader : <span class="param-type">GLTFLoader</span>, onLoad : <span class="param-type">function</span> )</span> </h3>

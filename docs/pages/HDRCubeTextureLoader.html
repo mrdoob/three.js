@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>HDRCubeTextureLoader - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -16,7 +15,7 @@
 			<header>
 				<div class="class-description"><p>A loader for loading HDR cube textures.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const loader = new HDRCubeTextureLoader();
+				<div translate="no"><pre><code class="language-js">const loader = new HDRCubeTextureLoader();
 loader.setPath( 'textures/cube/pisaHDR/' );
 const cubeTexture = await loader.loadAsync( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ] );
 scene.background = cubeTexture;
@@ -26,7 +25,7 @@ scene.environment = cubeTexture;
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">HDRCubeTextureLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';</code></pre>
+				<pre><code class="language-js">import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="HDRCubeTextureLoader" translate="no">new <a href="#HDRCubeTextureLoader">HDRCubeTextureLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>

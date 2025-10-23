@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>BloomPass - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,14 +17,14 @@
 <p><a href="UnrealBloomPass.html">UnrealBloomPass</a> produces a more advanced Bloom but is also
 more expensive.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const effectBloom = new BloomPass( 0.75 );
+				<div translate="no"><pre><code class="language-js">const effectBloom = new BloomPass( 0.75 );
 composer.addPass( effectBloom );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">BloomPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';</code></pre>
+				<pre><code class="language-js">import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="BloomPass" translate="no">new <a href="#BloomPass">BloomPass</a><span class="signature">( strength : <span class="param-type">number</span>, kernelSize : <span class="param-type">number</span>, sigma : <span class="param-type">number</span> )</span> </h3>

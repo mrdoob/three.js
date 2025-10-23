@@ -1,7 +1,7 @@
-// Initialize prettify for syntax highlighting
-if ( typeof prettyPrint === 'function' ) {
+// Initialize Highlight.js for syntax highlighting
+if ( typeof hljs !== 'undefined' ) {
 
-	prettyPrint();
+	hljs.highlightAll();
 
 }
 

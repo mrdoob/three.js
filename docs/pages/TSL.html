@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>TSL - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -761,7 +760,7 @@ The value is composed via <code>transmission</code> * <code>transmissionMap.r</c
 					<h3 class="name" id="numWorkgroups" translate="no">.<a href="#numWorkgroups">numWorkgroups</a><span class="type-signature"> : <a href="ComputeBuiltinNode.html">ComputeBuiltinNode</a>.&lt;uvec3></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Represents the number of workgroups dispatched by the compute shader.</p>
-<pre class="prettyprint source lang-js"><code>// Run 512 invocations/threads with a workgroup size of 128.
+<pre><code class="language-js">// Run 512 invocations/threads with a workgroup size of 128.
 const computeFn = Fn(() => {
     // numWorkgroups.x = 4
     storageBuffer.element(0).assign(numWorkgroups.x)
@@ -1084,7 +1083,7 @@ Useful for normal mapping without precomputed tangents.</p>
 					<h3 class="name" id="workgroupId" translate="no">.<a href="#workgroupId">workgroupId</a><span class="type-signature"> : <a href="ComputeBuiltinNode.html">ComputeBuiltinNode</a>.&lt;uvec3></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Represents the 3-dimensional index of the workgroup the current compute invocation belongs to.</p>
-<pre class="prettyprint source lang-js"><code>// Execute 12 compute threads with a workgroup size of 3.
+<pre><code class="language-js">// Execute 12 compute threads with a workgroup size of 3.
 const computeFn = Fn( () => {
 	If( workgroupId.x.mod( 2 ).equal( 0 ), () => {
 		storageBuffer.element( instanceIndex ).assign( instanceIndex );
@@ -1158,7 +1157,7 @@ const computeFn = Fn( () => {
 					<div class="method">
 						<div class="description">
 							<p>Represent a conditional node using if/else statements.</p>
-<pre class="prettyprint source lang-js"><code>If( condition, function )
+<pre><code class="language-js">If( condition, function )
 	.ElseIf( condition, function )
 	.Else( function )
 </code></pre>
@@ -1205,7 +1204,7 @@ const computeFn = Fn( () => {
 					<div class="method">
 						<div class="description">
 							<p>Represent a conditional node using switch/case statements.</p>
-<pre class="prettyprint source lang-js"><code>Switch( value )
+<pre><code class="language-js">Switch( value )
 	.Case( 1, function )
 	.Case( 2, 3, 4, function )
 	.Default( function )
@@ -1962,7 +1961,7 @@ If two parameters are provided, the result is <code>atan2(y/x)</code>.</p>
 						<div class="description">
 							<p>This can be used to achieve a billboarding behavior for flat meshes. That means they are
 oriented always towards the camera.</p>
-<pre class="prettyprint source lang-js"><code>material.vertexNode = billboarding();
+<pre><code class="language-js">material.vertexNode = billboarding();
 </code></pre>
 						</div>
 						<table class="params">
@@ -3541,7 +3540,7 @@ Use this function if attribute data are updated per frame.</p>
 <p>Can be used to compute texture coordinates for projecting an
 equirectangular texture onto a mesh for using it as the scene's
 background.</p>
-<pre class="prettyprint source lang-js"><code>scene.backgroundNode = texture( equirectTexture, equirectUV() );
+<pre><code class="language-js">scene.backgroundNode = texture( equirectTexture, equirectUV() );
 </code></pre>
 						</div>
 						<table class="params">
@@ -3879,7 +3878,7 @@ target is available or if flat surface normals are required.</p>
 						<div class="description">
 							<p>This computes a parallax corrected normal which is used for box-projected cube mapping (BPCEM).</p>
 <p>Reference: <a href="https://devlog-martinsh.blogspot.com/2011/09/box-projected-cube-environment-mapping.html">https://devlog-martinsh.blogspot.com/2011/09/box-projected-cube-environment-mapping.html</a></p>
-<pre class="prettyprint source lang-js"><code>const uvNode = getParallaxCorrectNormal( reflectVector, vec3( 200, 100, 100 ), vec3( 0, - 50, 0 ) );
+<pre><code class="language-js">const uvNode = getParallaxCorrectNormal( reflectVector, vec3( 200, 100, 100 ), vec3( 0, - 50, 0 ) );
 material.envNode = pmremTexture( renderTarget.texture, uvNode );
 </code></pre>
 						</div>
@@ -8503,7 +8502,7 @@ to complete before the barrier can be passed.</p>
 						<div class="description">
 							<p>TSL function for creating a triplanar textures node.</p>
 <p>Can be used for triplanar texture mapping.</p>
-<pre class="prettyprint source lang-js"><code>material.colorNode = triplanarTexture( texture( diffuseMap ) );
+<pre><code class="language-js">material.colorNode = triplanarTexture( texture( diffuseMap ) );
 </code></pre>
 						</div>
 						<table class="params">

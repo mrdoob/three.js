@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>ParametricGeometry - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -17,7 +16,7 @@
 				<div class="class-description"><p>This class can be used to generate a geometry based on a parametric surface.</p>
 <p>Reference: <a href="https://prideout.net/blog/old/blog/index.html@p=44.html">Mesh Generation with Python</a></p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const geometry = new THREE.ParametricGeometry( klein, 25, 25 );
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.ParametricGeometry( klein, 25, 25 );
 const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 const klein = new THREE.Mesh( geometry, material );
 scene.add( klein );
@@ -26,7 +25,7 @@ scene.add( klein );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">ParametricGeometry</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';</code></pre>
+				<pre><code class="language-js">import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="ParametricGeometry" translate="no">new <a href="#ParametricGeometry">ParametricGeometry</a><span class="signature">( func : <span class="param-type">ParametricGeometry~Func</span>, slices : <span class="param-type">number</span>, stacks : <span class="param-type">number</span> )</span> </h3>

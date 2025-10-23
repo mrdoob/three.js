@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>BokehPass - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -16,7 +15,7 @@
 			<header>
 				<div class="class-description"><p>Pass for creating depth of field (DOF) effect.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const bokehPass = new BokehPass( scene, camera, {
+				<div translate="no"><pre><code class="language-js">const bokehPass = new BokehPass( scene, camera, {
 	focus: 500
 	aperture: 5,
 	maxblur: 0.01
@@ -27,7 +26,7 @@ composer.addPass( bokehPass );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">BokehPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';</code></pre>
+				<pre><code class="language-js">import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="BokehPass" translate="no">new <a href="#BokehPass">BokehPass</a><span class="signature">( scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span>, params : <span class="param-type">BokehPass~Options</span> )</span> </h3>
@@ -77,7 +76,7 @@ composer.addPass( bokehPass );
 					<div class="description">
 						<p>The pass uniforms.  Use this object if you want to update the
 <code>focus</code>, <code>aperture</code> or <code>maxblur</code> values at runtime.</p>
-<pre class="prettyprint source lang-js"><code>pass.uniforms.focus.value = focus;
+<pre><code class="language-js">pass.uniforms.focus.value = focus;
 pass.uniforms.aperture.value = aperture;
 pass.uniforms.maxblur.value = maxblur;
 </code></pre>

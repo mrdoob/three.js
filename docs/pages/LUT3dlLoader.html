@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>LUT3dlLoader - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -21,14 +20,14 @@
 <li><a href="https://community.foundry.com/discuss/topic/103636/format-spec-for-3dl?mode=Post&amp;postID=895258">Format Spec for .3dl</a></li>
 </ul></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const loader = new LUT3dlLoader();
+				<div translate="no"><pre><code class="language-js">const loader = new LUT3dlLoader();
 const map = loader.loadAsync( 'luts/Presetpro-Cinematic.3dl' );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">LUT3dlLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { LUT3dlLoader } from 'three/addons/loaders/LUT3dlLoader.js';</code></pre>
+				<pre><code class="language-js">import { LUT3dlLoader } from 'three/addons/loaders/LUT3dlLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="LUT3dlLoader" translate="no">new <a href="#LUT3dlLoader">LUT3dlLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>

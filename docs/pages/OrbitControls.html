@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>OrbitControls - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -23,7 +22,7 @@ it maintains the &quot;up&quot; direction <code>object.up</code> (+Y by default)
 <li>Pan: Right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move.</li>
 </ul></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const controls = new OrbitControls( camera, renderer.domElement );
+				<div translate="no"><pre><code class="language-js">const controls = new OrbitControls( camera, renderer.domElement );
 // controls.update() must be called after any manual changes to the camera's transform
 camera.position.set( 0, 20, 100 );
 controls.update();
@@ -37,7 +36,7 @@ function animate() {
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">OrbitControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { OrbitControls } from 'three/addons/controls/OrbitControls.js';</code></pre>
+				<pre><code class="language-js">import { OrbitControls } from 'three/addons/controls/OrbitControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="OrbitControls" translate="no">new <a href="#OrbitControls">OrbitControls</a><span class="signature">( object : <span class="param-type">Object3D</span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
@@ -138,7 +137,7 @@ pixels per keypress.<br/>Default is <code>7</code>.</p>
 					<h3 class="name" id="keys" translate="no">.<a href="#keys">keys</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>This object contains references to the keycodes for controlling camera panning.</p>
-<pre class="prettyprint source lang-js"><code>controls.keys = {
+<pre><code class="language-js">controls.keys = {
 	LEFT: 'ArrowLeft', //left arrow
 	UP: 'ArrowUp', // up arrow
 	RIGHT: 'ArrowRight', // right arrow
@@ -216,7 +215,7 @@ must be a sub-interval of <code>[ - 2 PI, 2 PI ]</code>, with <code>( max - min 
 					<h3 class="name" id="mouseButtons" translate="no">.<a href="#mouseButtons">mouseButtons</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>This object contains references to the mouse actions used by the controls.</p>
-<pre class="prettyprint source lang-js"><code>controls.mouseButtons = {
+<pre><code class="language-js">controls.mouseButtons = {
 	LEFT: THREE.MOUSE.ROTATE,
 	MIDDLE: THREE.MOUSE.DOLLY,
 	RIGHT: THREE.MOUSE.PAN
@@ -270,7 +269,7 @@ It can be updated manually at any point to change the focus of the controls.</p>
 					<h3 class="name" id="touches" translate="no">.<a href="#touches">touches</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>This object contains references to the touch actions used by the controls.</p>
-<pre class="prettyprint source lang-js"><code>controls.mouseButtons = {
+<pre><code class="language-js">controls.mouseButtons = {
 	ONE: THREE.TOUCH.ROTATE,
 	TWO: THREE.TOUCH.DOLLY_PAN
 }

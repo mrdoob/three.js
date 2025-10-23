@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>Color - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@ color space</i>, which defaults to <code>LinearSRGBColorSpace</code>. Inputs
 conventionally using <code>SRGBColorSpace</code> (such as hexadecimals and CSS
 strings) are converted to the working color space automatically.</p>
 <p>Source color spaces may be specified explicitly, to ensure correct conversions.</p>
-<pre class="prettyprint source lang-js"><code>// assumed already LinearSRGBColorSpace; no conversion
+<pre><code class="language-js">// assumed already LinearSRGBColorSpace; no conversion
 const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5 );
 // converted explicitly from SRGBColorSpace to LinearSRGBColorSpace
 const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
@@ -27,7 +26,7 @@ const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
 see <i>Color management</i>. Iterating through a Color instance will yield
 its components (r, g, b) in the corresponding order. A Color can be initialised
 in any of the following ways:</p>
-<pre class="prettyprint source lang-js"><code>//empty constructor - will default white
+<pre><code class="language-js">//empty constructor - will default white
 const color1 = new THREE.Color();
 //Hexadecimal color (recommended)
 const color2 = new THREE.Color( 0xff0000 );
@@ -43,7 +42,7 @@ const color6 = new THREE.Color(&quot;hsl(0, 100%, 50%)&quot;);
 const color7 = new THREE.Color( 1, 0, 0 );
 </code></pre></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
+				<div translate="no"><pre><code class="language-js">// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
 const color = new THREE.Color().setHex( 0x112233 );
 </code></pre></div>
 			</header>
@@ -582,7 +581,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 							<p>Sets this color from a color name. Faster than <a href="Color.html#setStyle">Color#setStyle</a> if
 you don't need the other CSS-style formats.</p>
 <p>For convenience, the list of names is exposed in <code>Color.NAMES</code> as a hash.</p>
-<pre class="prettyprint source lang-js"><code>Color.NAMES.aliceblue // returns 0xF0F8FF
+<pre><code class="language-js">Color.NAMES.aliceblue // returns 0xF0F8FF
 </code></pre>
 						</div>
 						<table class="params">

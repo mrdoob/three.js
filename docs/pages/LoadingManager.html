@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>LoadingManager - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -20,7 +19,7 @@ manually.</p>
 be useful to have separate loaders - for example if you want to show
 separate loading bars for objects and textures.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const manager = new THREE.LoadingManager();
+				<div translate="no"><pre><code class="language-js">const manager = new THREE.LoadingManager();
 manager.onLoad = () => console.log( 'Loading complete!' );
 const loader1 = new OBJLoader( manager );
 const loader2 = new ColladaLoader( manager );
@@ -101,7 +100,7 @@ is supported in the browser.</p>
 							<p>Registers a loader with the given regular expression. Can be used to
 define what loader should be used in order to load specific files. A
 typical use case is to overwrite the default loader for textures.</p>
-<pre class="prettyprint source lang-js"><code>// add handler for TGA textures
+<pre><code class="language-js">// add handler for TGA textures
 manager.addHandler( /\.tga$/i, new TGALoader() );
 </code></pre>
 						</div>
@@ -225,7 +224,7 @@ resolved URL. If no URL modifier is set, returns the original URL.</p>
 request is sent. The callback may return the original URL, or a new URL to
 override loading behavior. This behavior can be used to load assets from
 .ZIP files, drag-and-drop APIs, and Data URIs.</p>
-<pre class="prettyprint source lang-js"><code>const blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
+<pre><code class="language-js">const blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
 const manager = new THREE.LoadingManager();
 // Initialize loading manager with URL callback.
 const objectURLs = [];

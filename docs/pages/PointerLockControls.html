@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>PointerLockControls - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -17,7 +16,7 @@
 				<div class="class-description"><p>The implementation of this class is based on the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API">Pointer Lock API</a>.
 <code>PointerLockControls</code> is a perfect choice for first person 3D games.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const controls = new PointerLockControls( camera, document.body );
+				<div translate="no"><pre><code class="language-js">const controls = new PointerLockControls( camera, document.body );
 // add event listener to show/hide a UI (e.g. the game's menu)
 controls.addEventListener( 'lock', function () {
 	menu.style.display = 'none';
@@ -30,7 +29,7 @@ controls.addEventListener( 'unlock', function () {
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">PointerLockControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';</code></pre>
+				<pre><code class="language-js">import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="PointerLockControls" translate="no">new <a href="#PointerLockControls">PointerLockControls</a><span class="signature">( camera : <span class="param-type">Camera</span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>

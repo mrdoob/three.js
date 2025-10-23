@@ -148,7 +148,7 @@ body pre code {
 	display: block;
 	font-size: calc(var(--font-size) - 1px);
 	line-height: calc(var(--line-height) - 1px);
-	padding: var(--page-padding);
+	padding: calc(var(--page-padding) - 6px) var(--page-padding);
 	white-space: pre-wrap;
 	overflow: auto;
 	box-sizing: border-box;

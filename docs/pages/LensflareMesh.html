@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>LensflareMesh - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 <p>Note that this class can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.
 When using <a href="WebGLRenderer.html">WebGLRenderer</a>, use <a href="Lensflare.html">Lensflare</a>.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+				<div translate="no"><pre><code class="language-js">const light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
 const lensflare = new LensflareMesh();
 lensflare.addElement( new LensflareElement( textureFlare0, 512, 0 ) );
 lensflare.addElement( new LensflareElement( textureFlare1, 512, 0 ) );
@@ -29,7 +28,7 @@ light.add( lensflare );
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">LensflareMesh</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { LensflareMesh } from 'three/addons/objects/LensflareMesh.js';</code></pre>
+				<pre><code class="language-js">import { LensflareMesh } from 'three/addons/objects/LensflareMesh.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="LensflareMesh" translate="no">new <a href="#LensflareMesh">LensflareMesh</a><span class="signature">()</span> </h3>

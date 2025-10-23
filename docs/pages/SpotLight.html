@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>SpotLight - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 that increases in size the further from the light it gets.</p>
 <p>This light can cast shadows - see the <a href="SpotLightShadow.html">SpotLightShadow</a> for details.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>// white spotlight shining from the side, modulated by a texture
+				<div translate="no"><pre><code class="language-js">// white spotlight shining from the side, modulated by a texture
 const spotLight = new THREE.SpotLight( 0xffffff );
 spotLight.position.set( 100, 1000, 100 );
 spotLight.map = new THREE.TextureLoader().load( url );

@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>ContextNode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 <a href="NodeBuilder.html">NodeBuilder</a> performs its node building process in a specific context and
 this node allows the modify the context. A typical use case is to overwrite <code>getUV()</code> e.g.:</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>node.context( { getUV: () => customCoord } );
+				<div translate="no"><pre><code class="language-js">node.context( { getUV: () => customCoord } );
 </code></pre></div>
 			</header>
 			<article>

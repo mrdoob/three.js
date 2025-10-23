@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>MD2Loader - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 <p>The loader represents the animations of the MD2 asset as an array of animation
 clips and stores them in the <code>animations</code> property of the geometry.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const loader = new MD2Loader();
+				<div translate="no"><pre><code class="language-js">const loader = new MD2Loader();
 const geometry = await loader.loadAsync( './models/md2/ogro/ogro.md2' );
 const animations = geometry.animations;
 </code></pre></div>
@@ -26,7 +25,7 @@ const animations = geometry.animations;
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">MD2Loader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { MD2Loader } from 'three/addons/loaders/MD2Loader.js';</code></pre>
+				<pre><code class="language-js">import { MD2Loader } from 'three/addons/loaders/MD2Loader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="MD2Loader" translate="no">new <a href="#MD2Loader">MD2Loader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>

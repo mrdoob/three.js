@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>PerspectiveCamera - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 <p>This projection mode is designed to mimic the way the human eye sees. It
 is the most common projection mode used for rendering a 3D scene.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+				<div translate="no"><pre><code class="language-js">const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
 scene.add( camera );
 </code></pre></div>
 			</header>
@@ -243,7 +242,7 @@ the monitors are in grid like this</p>
   +---+---+---+
 </code></pre>
 <p>then for each monitor you would call it like this:</p>
-<pre class="prettyprint source lang-js"><code>const w = 1920;
+<pre><code class="language-js">const w = 1920;
 const h = 1080;
 const fullWidth = w * 3;
 const fullHeight = h * 2;

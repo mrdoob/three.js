@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>DRACOLoader - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -28,7 +27,7 @@ multiple decoder instances.</p>
 <p><code>DRACOLoader</code> will automatically use either the JS or the WASM decoding library, based on
 browser capabilities.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const loader = new DRACOLoader();
+				<div translate="no"><pre><code class="language-js">const loader = new DRACOLoader();
 loader.setDecoderPath( '/examples/jsm/libs/draco/' );
 const geometry = await dracoLoader.loadAsync( 'models/draco/bunny.drc' );
 geometry.computeVertexNormals(); // optional
@@ -38,7 +37,7 @@ dracoLoader.dispose();
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">DRACOLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';</code></pre>
+				<pre><code class="language-js">import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="DRACOLoader" translate="no">new <a href="#DRACOLoader">DRACOLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>

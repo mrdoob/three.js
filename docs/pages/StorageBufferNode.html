@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>StorageBufferNode - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -20,7 +19,7 @@ this node with the convenience functions <code>attributeArray()</code> or <code>
 setup up a compute shader that writes into the buffers and then convert
 the storage buffers to attribute nodes for rendering.</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const positionBuffer = instancedArray( particleCount, 'vec3' ); // the storage buffer node
+				<div translate="no"><pre><code class="language-js">const positionBuffer = instancedArray( particleCount, 'vec3' ); // the storage buffer node
 const computeInit = Fn( () => { // the compute shader
 	const position = positionBuffer.element( instanceIndex );
 	// compute position data

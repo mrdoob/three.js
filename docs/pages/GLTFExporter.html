@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 	<title>GLTFExporter - Three.js Docs</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<script src="../scripts/prettify/prettify.js"></script>
-	<script src="../scripts/prettify/lang-css.js"></script>
-	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
@@ -42,14 +41,14 @@ textures, skins, skeletons, morph targets, animations, lights, and/or cameras.</
 <li><a href="https://github.com/takahirox/three-gltf-extensions">KHR_materials_variants</a></li>
 </ul></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source lang-js"><code>const exporter = new GLTFExporter();
+				<div translate="no"><pre><code class="language-js">const exporter = new GLTFExporter();
 const data = await exporter.parseAsync( scene, options );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
 				<p><span translate="no">GLTFExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
-				<pre class="prettyprint source lang-js" translate="no"><code>import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';</code></pre>
+				<pre><code class="language-js">import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="GLTFExporter" translate="no">new <a href="#GLTFExporter">GLTFExporter</a><span class="signature">()</span> </h3>
