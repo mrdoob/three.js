@@ -359,7 +359,7 @@ class KTX2Loader extends Loader {
 		loader.setPath( this.path );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setWithCredentials( this.withCredentials );
-		loader.setRequestHeader(this.requestHeader);
+		loader.setRequestHeader( this.requestHeader );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, ( buffer ) => {
