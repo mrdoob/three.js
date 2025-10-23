@@ -148,6 +148,9 @@
 
 			postProcessing = new THREE.PostProcessing( renderer );
 			const scenePass = pixelationPass( scene, camera, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
+			scenePass.getTextureNode( 'output' ).toInspector( 'Pixelation / Color' );
+			scenePass.getTextureNode( 'depth' ).toInspector( 'Pixelation / Depth' );
+			scenePass.getTextureNode( 'normal' ).toInspector( 'Pixelation / Normal' );
 			postProcessing.outputNode = scenePass;
 
 			window.addEventListener( 'resize', onWindowResize );
@@ -159,7 +162,7 @@
 
 			const gui = renderer.inspector.createParameters( 'Settings' );
 			gui.add( effectController.pixelSize, 'value', 1, 16, 1 ).name( 'Pixel Size' );
-			gui.add( effectController.normalEdgeStrength, 'value', 0, 2, 0.05 ).name( 'Normal Edge Strength' );
+			gui.add( effectController.normalEdgeStrength, 'value', 0, 4, 0.05 ).name( 'Normal Edge Strength' );
 			gui.add( effectController.depthEdgeStrength, 'value', 0, 1, 0.05 ).name( 'Depth Edge Strength' );
 			gui.add( effectController, 'pixelAlignedPanning' );
 

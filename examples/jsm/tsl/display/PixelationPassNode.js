@@ -1,5 +1,5 @@
 import { NearestFilter, Vector4, TempNode, NodeUpdateType, PassNode } from 'three/webgpu';
-import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property } from 'three/tsl';
+import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, property, normalLocal, normalWorld, transformNormalToView, directionToColor } from 'three/tsl';
 
 /**
  * A inner node definition that implements the actual pixelation TSL code.
@@ -123,7 +123,7 @@ class PixelationNode extends TempNode {
 
 		const sampleDepth = ( x, y ) => depthNode.sample( uvNodeDepth.add( vec2( x, y ).mul( this._resolution.zw ) ) ).r;
 
-		const sampleNormal = ( x, y ) => normalNode.sample( uvNodeNormal.add( vec2( x, y ).mul( this._resolution.zw ) ) ).rgb.normalize();
+		const sampleNormal = ( x, y ) => normalNode.sample( uvNodeNormal.add( vec2( x, y ).mul( this._resolution.zw ) ) ).rgb.mul( 2.0 ).sub( 1.0 );
 
 		const depthEdgeIndicator = ( depth ) => {
 
@@ -277,7 +277,7 @@ class PixelationPassNode extends PassNode {
 
 		this._mrt = mrt( {
 			output: output,
-			normal: normalView
+			normal: directionToColor( normalView ),
 		} );
 
 	}
