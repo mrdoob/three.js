@@ -23,6 +23,7 @@
         "exclude": [
             "src/extras/lib",
             "src/renderers/common/extras/PMREMGenerator.js",
+            "src/renderers/webgpu/WebGPURenderer.Nodes.js",
             "examples/jsm/helpers/LightProbeHelperGPU.js",
             "examples/jsm/helpers/TextureHelperGPU.js",
             "examples/jsm/libs",
