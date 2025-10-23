@@ -382,6 +382,11 @@ function generate( title, docs, filename, resolveLinks ) {
 
 	}
 
+	// Convert Prettify classes to Highlight.js format
+	html = html.replace( /<pre class="prettyprint source linenums"><code>/g, '<pre><code>' );
+	html = html.replace( /<pre class="prettyprint source lang-(\w+)"[^>]*><code>/g, '<pre><code class="language-$1">' );
+	html = html.replace( /<pre class="prettyprint"><code>/g, '<pre><code>' );
+
 	// Remove lines that only contain whitespace
 	html = html.replace( /^\s*\n/gm, '' );
 
