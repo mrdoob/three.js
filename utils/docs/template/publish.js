@@ -618,7 +618,6 @@ function buildNav( members ) {
 
 	nav += buildMainNav( [ ...members.classes, ...members.modules ], seen, linkto );
 	nav += buildGlobalsNav( members.globals, seen );
-	nav += '\t\t\t\t';
 
 	return nav;
 
