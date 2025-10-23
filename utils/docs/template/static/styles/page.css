@@ -218,6 +218,16 @@ body table code {
 	width: auto;
 }
 
+body table.params td.name {
+	min-width: 150px;
+	white-space: nowrap;
+}
+
+body table.props td.name,
+body table.props td.type {
+	white-space: nowrap;
+}
+
 body table p {
 	margin: 0;
 }
