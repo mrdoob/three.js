@@ -37,7 +37,7 @@ export function addMethodChaining( name, nodeElement ) {
 
 			//if ( name === 'toVarIntent' ) return this;
 
-			return this.isStackNode ? this.add( nodeElement( ...params ) ) : nodeElement( this, ...params );
+			return this.isStackNode ? this.addToStack( nodeElement( ...params ) ) : nodeElement( this, ...params );
 
 		};
 
@@ -76,7 +76,7 @@ Node.prototype.assign = function ( ...params ) {
 
 		const nodeElement = NodeElements.get( 'assign' );
 
-		return this.add( nodeElement( ...params ) );
+		return this.addToStack( nodeElement( ...params ) );
 
 	}
 
@@ -928,7 +928,7 @@ export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
 export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
 export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
-export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { intent: true, ...settings } );
+export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, intent: true } );
 
 let fnId = 0;
 
@@ -1129,7 +1129,7 @@ export const Switch = ( ...params ) => currentStack.Switch( ...params );
  */
 export function Stack( node ) {
 
-	if ( currentStack ) currentStack.add( node );
+	if ( currentStack ) currentStack.addToStack( node );
 
 	return node;
 
@@ -1221,4 +1221,3 @@ addMethodChaining( 'append', ( node ) => { // @deprecated, r176
 	return Stack( node );
 
 } );
-

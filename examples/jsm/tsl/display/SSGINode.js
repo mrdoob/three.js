@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils } from 'three/webgpu';
-import { clamp, normalize, reference, nodeObject, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth } from 'three/tsl';
+import { clamp, normalize, reference, nodeObject, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, interleavedGradientNoise } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -51,7 +51,7 @@ class SSGINode extends TempNode {
 	/**
 	 * Constructs a new SSGI node.
 	 *
-	 * @param {TextureNode} beautyNode - The texture node that represents the input of the effect.
+	 * @param {TextureNode} beautyNode - A texture node that represents the beauty or scene pass.
 	 * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
 	 * @param {TextureNode} normalNode - A texture node that represents the scene's normals.
 	 * @param {PerspectiveCamera} camera - The camera the scene is rendered with.
@@ -61,9 +61,9 @@ class SSGINode extends TempNode {
 		super( 'vec4' );
 
 		/**
-		 * A node that represents the scene's depth.
+		 * A texture node that represents the beauty or scene pass.
 		 *
-		 * @type {Node<float>}
+		 * @type {TextureNode}
 		 */
 		this.beautyNode = beautyNode;
 
@@ -413,20 +413,6 @@ class SSGINode extends TempNode {
 			]
 		} );
 
-		// Interleaved gradient function from Jimenez 2014 http://goo.gl/eomGso
-
-		const gradientNoise = Fn( ( [ position ] ) => {
-
-			return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
-
-		} ).setLayout( {
-			name: 'gradientNoise',
-			type: 'float',
-			inputs: [
-				{ name: 'position', type: 'vec2' }
-			]
-		} );
-
 		const GTAOFastAcos = Fn( ( [ value ] ) => {
 
 			const outVal = abs( value ).mul( float( - 0.156583 ) ).add( HALF_PI );
@@ -576,7 +562,7 @@ class SSGINode extends TempNode {
 			//
 
 			const noiseOffset = spatialOffsets( screenCoordinate );
-			const noiseDirection = gradientNoise( screenCoordinate );
+			const noiseDirection = interleavedGradientNoise( screenCoordinate );
 			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
 			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
 

@@ -1,7 +1,7 @@
 import { Material } from '../Material.js';
 import { NormalBlending } from '../../constants.js';
 
-import { getNodeChildren, getCacheKey } from '../../nodes/core/NodeUtils.js';
+import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAO } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
@@ -182,7 +182,7 @@ class NodeMaterial extends Material {
 		 * and `alphaMap` properties. This node property allows to overwrite the default
 		 * and define the opacity with a node instead.
 		 *
-		 * If you don't want to overwrite the normals but modify the existing
+		 * If you don't want to overwrite the opacity but modify the existing
 		 * value instead, use {@link materialOpacity}.
 		 *
 		 * @type {?Node<float>}
@@ -406,6 +406,34 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Returns an array of child nodes for this material.
+	 *
+	 * @private
+	 * @returns {Array<{property: string, childNode: Node}>}
+	 */
+	_getNodeChildren() {
+
+		const children = [];
+
+		for ( const property of Object.getOwnPropertyNames( this ) ) {
+
+			if ( property.startsWith( '_' ) === true ) continue;
+
+			const object = this[ property ];
+
+			if ( object && object.isNode === true ) {
+
+				children.push( { property, childNode: object } );
+
+			}
+
+		}
+
+		return children;
+
+	}
+
+	/**
 	 * Allows to define a custom cache key that influence the material key computation
 	 * for render objects.
 	 *
@@ -413,7 +441,15 @@ class NodeMaterial extends Material {
 	 */
 	customProgramCacheKey() {
 
-		return this.type + getCacheKey( this );
+		const values = [];
+
+		for ( const { property, childNode } of this._getNodeChildren() ) {
+
+			values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey() );
+
+		}
+
+		return this.type + hashArray( values );
 
 	}
 
@@ -505,7 +541,7 @@ class NodeMaterial extends Material {
 
 			const outgoingLightNode = this.setupLighting( builder );
 
-			if ( clippingNode !== null ) builder.stack.add( clippingNode );
+			if ( clippingNode !== null ) builder.stack.addToStack( clippingNode );
 
 			// force unsigned floats - useful for RenderTargets
 
@@ -599,7 +635,7 @@ class NodeMaterial extends Material {
 
 			} else {
 
-				builder.stack.add( clipping() );
+				builder.stack.addToStack( clipping() );
 
 			}
 
@@ -626,7 +662,7 @@ class NodeMaterial extends Material {
 
 		if ( candidateCount > 0 && candidateCount <= 8 && builder.isAvailable( 'clipDistance' ) ) {
 
-			builder.stack.add( hardwareClipping() );
+			builder.stack.addToStack( hardwareClipping() );
 
 			this.hardwareClipping = true;
 
@@ -1189,11 +1225,9 @@ class NodeMaterial extends Material {
 		}
 
 		const data = Material.prototype.toJSON.call( this, meta );
-		const nodeChildren = getNodeChildren( this );
-
 		data.inputNodes = {};
 
-		for ( const { property, childNode } of nodeChildren ) {
+		for ( const { property, childNode } of this._getNodeChildren() ) {
 
 			data.inputNodes[ property ] = childNode.toJSON( meta ).uuid;
 
@@ -1243,6 +1277,7 @@ class NodeMaterial extends Material {
 
 		this.lightsNode = source.lightsNode;
 		this.envNode = source.envNode;
+		this.aoNode = source.aoNode;
 
 		this.colorNode = source.colorNode;
 		this.normalNode = source.normalNode;

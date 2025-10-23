@@ -53,7 +53,7 @@ function TubePainter() {
 
 		const PI2 = Math.PI * 2;
 
-		const sides = 10;
+		const sides = 15;
 		const array = [];
 		const radius = 0.01 * size;
 
@@ -88,37 +88,118 @@ function TubePainter() {
 		let count = geometry.drawRange.count;
 
 		const points = getPoints( capSize );
+		const sides = points.length;
+		const radius = 0.01 * capSize;
+		const latSegments = 4;
+		const directionSign = isEndCap ? - 1 : 1;
 
-		const normalSign = isEndCap ? - 1 : 1;
+		for ( let lat = 0; lat < latSegments; lat ++ ) {
 
-		normal.set(
-			matrix.elements[ 8 ] * normalSign,
-			matrix.elements[ 9 ] * normalSign,
-			matrix.elements[ 10 ] * normalSign
-		).normalize();
+			const phi1 = ( lat / latSegments ) * Math.PI * 0.5;
+			const phi2 = ( ( lat + 1 ) / latSegments ) * Math.PI * 0.5;
 
-		for ( let i = 0, il = points.length; i < il; i ++ ) {
+			const z1 = Math.sin( phi1 ) * radius * directionSign;
+			const r1 = Math.cos( phi1 ) * radius;
 
-			const vertex1 = points[ i ];
-			const vertex2 = points[ ( i + 1 ) % il ];
+			const z2 = Math.sin( phi2 ) * radius * directionSign;
+			const r2 = Math.cos( phi2 ) * radius;
 
-			vector1.copy( position );
-			vector2.copy( isEndCap ? vertex1 : vertex2 ).applyMatrix4( matrix ).add( position );
-			vector3.copy( isEndCap ? vertex2 : vertex1 ).applyMatrix4( matrix ).add( position );
+			for ( let i = 0; i < sides; i ++ ) {
 
-			vector1.toArray( positions.array, ( count + 0 ) * 3 );
-			vector2.toArray( positions.array, ( count + 1 ) * 3 );
-			vector3.toArray( positions.array, ( count + 2 ) * 3 );
+				const theta1 = ( i / sides ) * Math.PI * 2;
+				const theta2 = ( ( i + 1 ) / sides ) * Math.PI * 2;
 
-			normal.toArray( normals.array, ( count + 0 ) * 3 );
-			normal.toArray( normals.array, ( count + 1 ) * 3 );
-			normal.toArray( normals.array, ( count + 2 ) * 3 );
+				// First ring
+				const x1 = Math.sin( theta1 ) * r1;
+				const y1 = Math.cos( theta1 ) * r1;
 
-			color1.toArray( colors.array, ( count + 0 ) * 3 );
-			color1.toArray( colors.array, ( count + 1 ) * 3 );
-			color1.toArray( colors.array, ( count + 2 ) * 3 );
+				const x2 = Math.sin( theta2 ) * r1;
+				const y2 = Math.cos( theta2 ) * r1;
 
-			count += 3;
+				// Second ring
+				const x3 = Math.sin( theta1 ) * r2;
+				const y3 = Math.cos( theta1 ) * r2;
+
+				const x4 = Math.sin( theta2 ) * r2;
+				const y4 = Math.cos( theta2 ) * r2;
+
+				// Transform to world space
+				vector1.set( x1, y1, z1 ).applyMatrix4( matrix ).add( position );
+				vector2.set( x2, y2, z1 ).applyMatrix4( matrix ).add( position );
+				vector3.set( x3, y3, z2 ).applyMatrix4( matrix ).add( position );
+				vector4.set( x4, y4, z2 ).applyMatrix4( matrix ).add( position );
+
+				// First triangle
+				normal.set( x1, y1, z1 ).normalize().transformDirection( matrix );
+				vector.set( x2, y2, z1 ).normalize().transformDirection( matrix );
+				side.set( x3, y3, z2 ).normalize().transformDirection( matrix );
+
+				if ( isEndCap ) {
+
+					vector1.toArray( positions.array, count * 3 );
+					vector2.toArray( positions.array, ( count + 1 ) * 3 );
+					vector3.toArray( positions.array, ( count + 2 ) * 3 );
+
+					normal.toArray( normals.array, count * 3 );
+					vector.toArray( normals.array, ( count + 1 ) * 3 );
+					side.toArray( normals.array, ( count + 2 ) * 3 );
+
+				} else {
+
+					vector1.toArray( positions.array, count * 3 );
+					vector3.toArray( positions.array, ( count + 1 ) * 3 );
+					vector2.toArray( positions.array, ( count + 2 ) * 3 );
+
+					normal.toArray( normals.array, count * 3 );
+					side.toArray( normals.array, ( count + 1 ) * 3 );
+					vector.toArray( normals.array, ( count + 2 ) * 3 );
+
+				}
+
+				color1.toArray( colors.array, count * 3 );
+				color1.toArray( colors.array, ( count + 1 ) * 3 );
+				color1.toArray( colors.array, ( count + 2 ) * 3 );
+
+				count += 3;
+
+				// Second triangle
+				if ( r2 > 0.001 ) {
+
+					normal.set( x2, y2, z1 ).normalize().transformDirection( matrix );
+					vector.set( x4, y4, z2 ).normalize().transformDirection( matrix );
+					side.set( x3, y3, z2 ).normalize().transformDirection( matrix );
+
+					if ( isEndCap ) {
+
+						vector2.toArray( positions.array, count * 3 );
+						vector4.toArray( positions.array, ( count + 1 ) * 3 );
+						vector3.toArray( positions.array, ( count + 2 ) * 3 );
+
+						normal.toArray( normals.array, count * 3 );
+						vector.toArray( normals.array, ( count + 1 ) * 3 );
+						side.toArray( normals.array, ( count + 2 ) * 3 );
+
+					} else {
+
+						vector3.toArray( positions.array, count * 3 );
+						vector4.toArray( positions.array, ( count + 1 ) * 3 );
+						vector2.toArray( positions.array, ( count + 2 ) * 3 );
+
+						side.toArray( normals.array, count * 3 );
+						vector.toArray( normals.array, ( count + 1 ) * 3 );
+						normal.toArray( normals.array, ( count + 2 ) * 3 );
+
+					}
+
+					color1.toArray( colors.array, count * 3 );
+					color1.toArray( colors.array, ( count + 1 ) * 3 );
+					color1.toArray( colors.array, ( count + 2 ) * 3 );
+
+					count += 3;
+
+				}
+
+			}
 
 		}
 
@@ -131,37 +212,92 @@ function TubePainter() {
 		if ( endCapStartIndex === null ) return;
 
 		const points = getPoints( capSize );
-
-		normal.set(
-			- matrix.elements[ 8 ],
-			- matrix.elements[ 9 ],
-			- matrix.elements[ 10 ]
-		).normalize();
+		const sides = points.length;
+		const radius = 0.01 * capSize;
+		const latSegments = 4;
 
 		let count = endCapStartIndex;
 
-		for ( let i = 0, il = points.length; i < il; i ++ ) {
+		for ( let lat = 0; lat < latSegments; lat ++ ) {
 
-			const vertex1 = points[ i ];
-			const vertex2 = points[ ( i + 1 ) % il ];
+			const phi1 = ( lat / latSegments ) * Math.PI * 0.5;
+			const phi2 = ( ( lat + 1 ) / latSegments ) * Math.PI * 0.5;
 
-			vector1.copy( position );
-			vector2.copy( vertex1 ).applyMatrix4( matrix ).add( position );
-			vector3.copy( vertex2 ).applyMatrix4( matrix ).add( position );
+			const z1 = - Math.sin( phi1 ) * radius;
+			const r1 = Math.cos( phi1 ) * radius;
 
-			vector1.toArray( positions.array, ( count + 0 ) * 3 );
-			vector2.toArray( positions.array, ( count + 1 ) * 3 );
-			vector3.toArray( positions.array, ( count + 2 ) * 3 );
+			const z2 = - Math.sin( phi2 ) * radius;
+			const r2 = Math.cos( phi2 ) * radius;
 
-			normal.toArray( normals.array, ( count + 0 ) * 3 );
-			normal.toArray( normals.array, ( count + 1 ) * 3 );
-			normal.toArray( normals.array, ( count + 2 ) * 3 );
+			for ( let i = 0; i < sides; i ++ ) {
 
-			color1.toArray( colors.array, ( count + 0 ) * 3 );
-			color1.toArray( colors.array, ( count + 1 ) * 3 );
-			color1.toArray( colors.array, ( count + 2 ) * 3 );
+				const theta1 = ( i / sides ) * Math.PI * 2;
+				const theta2 = ( ( i + 1 ) / sides ) * Math.PI * 2;
 
-			count += 3;
+				// First ring
+				const x1 = Math.sin( theta1 ) * r1;
+				const y1 = Math.cos( theta1 ) * r1;
+
+				const x2 = Math.sin( theta2 ) * r1;
+				const y2 = Math.cos( theta2 ) * r1;
+
+				// Second ring
+				const x3 = Math.sin( theta1 ) * r2;
+				const y3 = Math.cos( theta1 ) * r2;
+
+				const x4 = Math.sin( theta2 ) * r2;
+				const y4 = Math.cos( theta2 ) * r2;
+
+				// Transform positions to world space
+				vector1.set( x1, y1, z1 ).applyMatrix4( matrix ).add( position );
+				vector2.set( x2, y2, z1 ).applyMatrix4( matrix ).add( position );
+				vector3.set( x3, y3, z2 ).applyMatrix4( matrix ).add( position );
+				vector4.set( x4, y4, z2 ).applyMatrix4( matrix ).add( position );
+
+				// Transform normals to world space
+				normal.set( x1, y1, z1 ).normalize().transformDirection( matrix );
+				vector.set( x2, y2, z1 ).normalize().transformDirection( matrix );
+				side.set( x3, y3, z2 ).normalize().transformDirection( matrix );
+
+				// First triangle
+				vector1.toArray( positions.array, count * 3 );
+				vector2.toArray( positions.array, ( count + 1 ) * 3 );
+				vector3.toArray( positions.array, ( count + 2 ) * 3 );
+
+				normal.toArray( normals.array, count * 3 );
+				vector.toArray( normals.array, ( count + 1 ) * 3 );
+				side.toArray( normals.array, ( count + 2 ) * 3 );
+
+				color1.toArray( colors.array, count * 3 );
+				color1.toArray( colors.array, ( count + 1 ) * 3 );
+				color1.toArray( colors.array, ( count + 2 ) * 3 );
+
+				count += 3;
+
+				// Second triangle
+				if ( r2 > 0.001 ) {
+
+					normal.set( x2, y2, z1 ).normalize().transformDirection( matrix );
+					vector.set( x4, y4, z2 ).normalize().transformDirection( matrix );
+					side.set( x3, y3, z2 ).normalize().transformDirection( matrix );
+
+					vector2.toArray( positions.array, count * 3 );
+					vector4.toArray( positions.array, ( count + 1 ) * 3 );
+					vector3.toArray( positions.array, ( count + 2 ) * 3 );
+
+					normal.toArray( normals.array, count * 3 );
+					vector.toArray( normals.array, ( count + 1 ) * 3 );
+					side.toArray( normals.array, ( count + 2 ) * 3 );
+
+					color1.toArray( colors.array, count * 3 );
+					color1.toArray( colors.array, ( count + 1 ) * 3 );
+					color1.toArray( colors.array, ( count + 2 ) * 3 );
+
+					count += 3;
+
+				}
+
+			}
 
 		}
 
