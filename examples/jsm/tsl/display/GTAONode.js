@@ -4,6 +4,9 @@ import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalF
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
+// From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
+const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
+
 let _rendererState;
 
 /**
@@ -151,6 +154,20 @@ class GTAONode extends TempNode {
 		this.samples = uniform( 16 );
 
 		/**
+		 * Whether to use temporal filtering or not. Setting this property to
+		 * `true` requires the usage of `TRAANode`. This will help to reduce noise
+		 * although it introduces typical TAA artifacts like ghosting and temporal
+		 * instabilities.
+		 *
+		 * If setting this property to `false`, a manual denoise via `DenoiseNode`
+		 * might be required.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.useTemporalFiltering = false;
+
+		/**
 		 * The node represents the internal noise texture used by the AO.
 		 *
 		 * @private
@@ -189,6 +206,13 @@ class GTAONode extends TempNode {
 		 * @type {ReferenceNode<float>}
 		 */
 		this._cameraFar = reference( 'far', 'float', camera );
+
+		/**
+		 * Temporal direction that influences the rotation angle for each slice.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this._temporalDirection = uniform( 0 );
 
 		/**
 		 * The material that is used to render the effect.
@@ -246,6 +270,20 @@ class GTAONode extends TempNode {
 		const { renderer } = frame;
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
+
+		// update temporal uniforms
+
+		if ( this.useTemporalFiltering === true ) {
+
+			const frameId = frame.frameId;
+
+			this._temporalDirection.value = _temporalRotations[ frameId % 6 ] / 360;
+
+		} else {
+
+			this._temporalDirection.value = 0;
+
+		}
 
 		//
 
@@ -313,6 +351,7 @@ class GTAONode extends TempNode {
 			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
 			noiseUv = noiseUv.mul( this.resolution.div( noiseResolution ) );
+
 			const noiseTexel = sampleNoise( noiseUv );
 			const randomVec = noiseTexel.xyz.mul( 2.0 ).sub( 1.0 );
 			const tangent = vec3( randomVec.xy, 0.0 ).normalize();
@@ -328,7 +367,7 @@ class GTAONode extends TempNode {
 
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
-				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).toVar();
+				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
 				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
 				sampleDir.xyz = normalize( kernelMatrix.mul( sampleDir.xyz ) );
 

@@ -5,218 +5,87 @@ import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
-class PromiseQueue {
-
-	constructor( func, ...args ) {
-
-		this.func = func.bind( this, ...args );
-		this.promises = [];
-
-	}
-
-	add( ...args ) {
-
-		const promise = this.func( ...args );
-		this.promises.push( promise );
-		promise.then( () => this.promises.splice( this.promises.indexOf( promise ), 1 ) );
-
-	}
-
-	async waitForAll() {
-
-		while ( this.promises.length > 0 ) {
-
-			await Promise.all( this.promises );
-
-		}
-
-	}
-
-}
-
-/* CONFIG VARIABLES START */
-
-const idleTime = 12; // 9 seconds - for how long there should be no network requests
-const parseTime = 6; // 6 seconds per megabyte
-
 const exceptionList = [
 
-	// tiles not loaded in time for screenshot
-	'webgl_loader_3dtiles',
-
-	// video tag isn't deterministic enough?
-	'css3d_youtube',
-	'webgl_materials_video',
-	'webgl_video_kinect',
-	'webgl_video_panorama_equirectangular',
-	'webgpu_video_frame',
-
-	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
-
-	// WebXR also isn't deterministic enough?
-	'webxr_ar_lighting',
-	'webxr_vr_sandbox',
-	'webxr_vr_video',
-	'webxr_xr_ballshooter',
-	'webxr_xr_dragging_custom_depth',
-
-	'webgl_worker_offscreencanvas', // in a worker, not robust
-
-	// Windows-Linux text rendering differences
-	// TODO: Fix these by e.g. disabling text rendering altogether -- this can also fix a bunch of 0.1%-0.2% examples
-	'css3d_periodictable',
-	'misc_controls_pointerlock',
-	'misc_uv_tests',
-	'webgl_camera_logarithmicdepthbuffer',
-	'webgl_effects_ascii',
-	'webgl_geometry_extrude_shapes',
-	'webgl_interactive_lines',
-	'webgl_loader_collada_kinematics',
-	'webgl_loader_ldraw',
-	'webgl_loader_texture_ktx2',
-	'webgl_loader_pdb',
-	'webgl_modifier_simplifier',
-	'webgl_multiple_canvases_circle',
-	'webgl_multiple_elements_text',
-
-	// Unknown
-	// TODO: most of these can be fixed just by increasing idleTime and parseTime
-	'physics_rapier_basic',
-	'webgl_animation_skinning_blending',
-	'webgl_animation_skinning_additive_blending',
-	'webgl_buffergeometry_glbufferattribute',
-	'webgl_interactive_cubes_gpu',
-	'webgl_clipping_advanced',
-	'webgl_lensflares',
-	'webgl_lights_spotlights',
-	'webgl_loader_imagebitmap',
-	'webgl_loader_texture_ktx',
-	'webgl_loader_texture_lottie',
-	'webgl_loader_texture_pvrtc',
-	'webgl_materials_alphahash',
-	'webgpu_materials_alphahash',
-	'webgl_materials_blending',
-	'webgl_mirror',
-	'webgl_morphtargets_face',
-	'webgl_postprocessing_transition',
-	'webgl_postprocessing_glitch',
-	'webgl_postprocessing_dof2',
-	'webgl_renderer_pathtracer',
-	'webgl_shadowmap',
-	'webgl_shadowmap_progressive',
-	'webgpu_shadowmap_progressive',
-	'webgl_test_memory2',
-	'webgl_points_dynamic',
-	'webgpu_multisampled_renderbuffers',
-	'webgl_test_wide_gamut',
-	'webgl_volume_instancing',
-	'webgl_buffergeometry',
-	'webgl_buffergeometry_attributes_integer',
-	'webgl_buffergeometry_attributes_none',
-	'webgl_buffergeometry_custom_attributes_particles',
-	'webgl_batch_lod_bvh',
-
-	// Intentional z-fighting in this demo makes it non-deterministic
-	'webgl_reversed_depth_buffer',
-
-	// TODO: implement determinism for setTimeout and setInterval
-	// could it fix some examples from above?
+	// Needs investigation
 	'physics_rapier_instancing',
-	'physics_jolt_instancing',
+	'webgl_shadowmap',
+	'webgl_postprocessing_dof2',
+	'webgl_worker_offscreencanvas',
+	'webgpu_backdrop_water',
+	'webgpu_lightprobe_cubecamera',
+	'webgpu_portal',
+	'webgpu_postprocessing_ao',
+	'webgpu_postprocessing_dof',
+	'webgpu_postprocessing_ssgi',
+	'webgpu_postprocessing_sss',
+	'webgpu_postprocessing_traa',
+	'webgpu_reflection',
+	'webgpu_texturegrad',
 
-	// Awaiting for WebGL backend support
+	// Need more time
+	'css3d_mixed',
+	'webgl_loader_3dtiles',
+	'webgl_loader_texture_lottie',
+	'webgl_morphtargets_face',
+	'webgl_renderer_pathtracer',
+	'webgl_shadowmap_progressive',
+	'webgpu_materials_matcap',
+	'webgpu_morphtargets_face',
+	'webgpu_shadowmap_progressive',
+
+	// Video hangs the CI?
+	'css3d_youtube',
+	'webgpu_materials_video',
+
+	// Timeout
+	'webgl_test_memory2',
+
+	// Webcam
+	'webgl_materials_video_webcam',
+	'webgl_morphtargets_webcam',
+
+	// WebGL device lost
+	'webgpu_materialx_noise',
+	'webgpu_portal',
+	'webgpu_shadowmap',
+
+	// WebGPU needed
 	'webgpu_compute_audio',
 	'webgpu_compute_birds',
+	'webgpu_compute_cloth',
+	'webgpu_compute_particles_fluid',
+	'webgpu_compute_reduce',
+	'webgpu_compute_sort_bitonic',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_3d',
 	'webgpu_compute_texture_pingpong',
 	'webgpu_compute_water',
+	'webgpu_hdr',
+	'webgpu_lights_tiled',
 	'webgpu_materials',
 	'webgpu_multiple_canvas',
-	'webgpu_video_panorama',
-	'webgpu_postprocessing_bloom_emissive',
-	'webgpu_lights_tiled',
-	'webgpu_postprocessing_traa',
-	'webgpu_tsl_wood',
-
-	// Awaiting for WebGPU Backend support in Puppeteer
-	'webgpu_storage_buffer',
-	'webgpu_compute_sort_bitonic',
-	'webgpu_compute_reduce',
-	'webgpu_struct_drawindirect',
-	'webgpu_hdr',
-
-	// WebGPURenderer: Unknown problem
-	'webgpu_backdrop_water',
-	"webgpu_centroid_sampling",
-	'webgpu_camera_logarithmicdepthbuffer',
-	'webgpu_lightprobe_cubecamera',
-	'webgpu_loader_materialx',
-	'webgpu_materials_basic',
-	'webgpu_materials_video',
-	'webgpu_materialx_noise',
-	'webgpu_morphtargets_face',
-	'webgpu_occlusion',
 	'webgpu_particles',
-	'webgpu_shadertoy',
-	'webgpu_shadowmap',
-	'webgpu_shadowmap_array',
+	'webgpu_struct_drawindirect',
 	'webgpu_tsl_editor',
-	'webgpu_tsl_transpiler',
 	'webgpu_tsl_interoperability',
-	'webgpu_portal',
-	'webgpu_custom_fog',
-	'webgpu_instancing_morph',
-	'webgpu_texturegrad',
-	'webgpu_performance_renderbundle',
-	'webgpu_lights_rectarealight',
-	'webgpu_tsl_vfx_flames',
-	'webgpu_tsl_halftone',
 	'webgpu_tsl_vfx_linkedparticles',
-	'webgpu_textures_anisotropy',
-	'webgpu_textures_2d-array_compressed',
-	'webgpu_rendertarget_2d-array_3d',
-	'webgpu_materials_envmaps_bpcem',
-	'webgpu_postprocessing_ao',
-	'webgpu_postprocessing_difference',
-	'webgpu_postprocessing_dof',
-	'webgpu_postprocessing_sobel',
-	'webgpu_postprocessing_3dlut',
-	'webgpu_postprocessing_fxaa',
-	'webgpu_postprocessing_afterimage',
-	'webgpu_postprocessing_ca',
-	'webgpu_postprocessing_ssgi',
-	'webgpu_postprocessing_sss',
-	'webgpu_xr_native_layers',
-	'webgpu_volume_caustics',
-	'webgpu_volume_lighting',
-	'webgpu_volume_lighting_rectarea',
-	'webgpu_reflection',
-	'webgpu_ocean',
-
-	// WebGPU idleTime and parseTime too low
-	'webgpu_compute_cloth',
-	'webgpu_compute_particles',
-	'webgpu_compute_particles_fluid',
-	'webgpu_compute_particles_rain',
-	'webgpu_compute_particles_snow',
-	'webgpu_compute_points'
+	'webgpu_tsl_wood'
 
 ];
 
-/* CONFIG VARIABLES END */
+/* Configuration */
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
+const idleTime = 2; // 2 seconds - for how long there should be no network requests
+const parseTime = 1; // 1 second per megabyte
+
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
-
 const numAttempts = 2; // perform 2 attempts before failing
-
-const numPages = 8; // use 8 browser pages
-
 const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
 const width = 400;
@@ -307,9 +176,12 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
-	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
-	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
+	const flags = [
+		'--hide-scrollbars',
+		'--use-angle=swiftshader',
+		'--enable-unsafe-swiftshader',
+		'--no-sandbox'
+	];
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
@@ -318,12 +190,9 @@ async function main() {
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
-		protocolTimeout: 0
+		protocolTimeout: 0,
+		userDataDir: './.puppeteer_profile'
 	} );
-
-	// this line is intended to stop the script if the browser (in headful mode) is closed by user (while debugging)
-	// browser.on( 'targetdestroyed', target => ( target.type() === 'other' ) ? close() : null );
-	// for some reason it randomly stops the script after about ~30 screenshots processed
 
 	/* Prepare injections */
 
@@ -338,22 +207,22 @@ async function main() {
 		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
 	};
 
-	/* Prepare pages */
+	/* Prepare page */
 
 	const errorMessagesCache = [];
 
-	const pages = await browser.pages();
-	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
-
-	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
+	const page = await browser.newPage();
+	await preparePage( page, injection, builds, errorMessagesCache );
 
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	const queue = new PromiseQueue( makeAttempt, pages, failedScreenshots, cleanPage, isMakeScreenshot );
-	for ( const file of files ) queue.add( file );
-	await queue.waitForAll();
+	for ( const file of files ) {
+
+		await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file );
+
+	}
 
 	/* Finish */
 
@@ -363,7 +232,7 @@ async function main() {
 	if ( isMakeScreenshot && failedScreenshots.length ) {
 
 		console.red( 'List of failed screenshots: ' + list );
-		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
+		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, add remaining screenshots to the exception list.` );
 		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated successfully.` );
 
 	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
@@ -373,7 +242,7 @@ async function main() {
 	} else if ( failedScreenshots.length ) {
 
 		console.red( 'List of failed screenshots: ' + list );
-		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
+		console.red( `If you are sure that everything is correct, try to run "npm run make-screenshot ${ list }". If this does not help, add remaining screenshots to the exception list.` );
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ files.length } screenshots have not rendered correctly.` );
 
 	} else {
@@ -388,20 +257,12 @@ async function main() {
 
 async function preparePage( page, injection, builds, errorMessages ) {
 
-	/* let page.file, page.pageSize, page.error */
-
 	await page.evaluateOnNewDocument( injection );
 	await page.setRequestInterception( true );
 
 	page.on( 'console', async msg => {
 
 		const type = msg.type();
-
-		if ( type !== 'warning' && type !== 'error' ) {
-
-			return;
-
-		}
 
 		const file = page.file;
 
@@ -432,12 +293,6 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 		}
 
-		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
-
-			return;
-
-		}
-
 		if ( errorMessages.includes( text ) ) {
 
 			return;
@@ -450,9 +305,13 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 			console.yellow( text );
 
-		} else {
+		} else if ( type === 'error' ) {
 
 			page.error = text;
+
+		} else {
+
+			console.log( `[Browser] ${text}` );
 
 		}
 
@@ -498,31 +357,11 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
-
-	const page = await new Promise( ( resolve, reject ) => {
-
-		const interval = setInterval( () => {
-
-			for ( const page of pages ) {
-
-				if ( page.file === undefined ) {
-
-					page.file = file; // acquire lock
-					clearInterval( interval );
-					resolve( page );
-					break;
-
-				}
-
-			}
-
-		}, 100 );
-
-	} );
+async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
 	try {
 
+		page.file = file;
 		page.pageSize = 0;
 		page.error = undefined;
 
@@ -580,7 +419,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 						}
 
-					}, 10 );
+					}, 100 );
 
 				} );
 
@@ -678,13 +517,15 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 		} else {
 
 			console.yellow( `${ e }, another attempt...` );
-			this.add( file, attemptID + 1 );
+			await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
 
 		}
 
-	}
+	} finally {
 
-	page.file = undefined; // release lock
+		page.file = undefined; // release lock
+
+	}
 
 }
 
