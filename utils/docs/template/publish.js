@@ -449,7 +449,7 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 
 				}
 
-				itemNav += `<li>${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
+				itemNav += `<li>${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>\n`;
 
 				itemsSeen[ item.longname ] = true;
 
@@ -477,25 +477,24 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 
 		for ( const [ mainCategory, map ] of hierarchy ) {
 
-			nav += `<h2>${mainCategory}</h2>\n`;
+			nav += `\t\t\t\t\t<h2>${mainCategory}</h2>\n`;
 
 			const sortedMap = new Map( [ ...map.entries() ].sort() ); // sort sub categories
 
 			for ( const [ subCategory, links ] of sortedMap ) {
 
-				nav += `<h3>${subCategory}</h3>\n`;
-
-				let navItems = '';
+				nav += `\t\t\t\t\t<h3>${subCategory}</h3>\n`;
+				nav += '\t\t\t\t\t<ul>\n';
 
 				links.sort();
 
 				for ( const link of links ) {
 
-					navItems += link + '\n';
+					nav += '\t\t\t\t\t\t' + link;
 
 				}
 
-				nav += `<ul>\n${navItems}</ul>\n`;
+				nav += '\t\t\t\t\t</ul>\n';
 
 			}
 
@@ -526,7 +525,7 @@ function buildGlobalsNav( globals, seen ) {
 
 				if ( hasTslTag ) {
 
-					tslNav += `<li>${linkto( longname, name )}</li>\n`;
+					tslNav += `\t\t\t\t\t\t<li>${linkto( longname, name )}</li>\n`;
 
 					seen[ longname ] = true;
 
@@ -536,7 +535,10 @@ function buildGlobalsNav( globals, seen ) {
 
 		} );
 
-		nav += `<h2>TSL</h2>\n<ul>\n${tslNav}</ul>\n`;
+		nav += '\t\t\t\t\t<h2>TSL</h2>\n';
+		nav += '\t\t\t\t\t<ul>\n';
+		nav += tslNav;
+		nav += '\t\t\t\t\t</ul>\n';
 
 		// Globals
 
@@ -546,7 +548,7 @@ function buildGlobalsNav( globals, seen ) {
 
 			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) ) {
 
-				globalNav += `<li>${linkto( longname, name )}</li>\n`;
+				globalNav += `\t\t\t\t\t\t<li>${linkto( longname, name )}</li>\n`;
 
 			}
 
@@ -557,11 +559,14 @@ function buildGlobalsNav( globals, seen ) {
 		if ( ! globalNav ) {
 
 			// turn the heading into a link so you can actually get to the global page
-			nav += `<h3>${linkto( 'global', 'Global' )}</h3>\n`;
+			nav += `\t\t\t\t\t<h3>${linkto( 'global', 'Global' )}</h3>\n`;
 
 		} else {
 
-			nav += `<h2>Global</h2>\n<ul>\n${globalNav}</ul>\n`;
+			nav += '\t\t\t\t\t<h2>Global</h2>\n';
+			nav += '\t\t\t\t\t<ul>\n';
+			nav += globalNav;
+			nav += '\t\t\t\t\t</ul>\n';
 
 		}
 
@@ -603,11 +608,12 @@ function pushNavItem( hierarchy, mainCategory, subCategory, itemNav ) {
  */
 function buildNav( members ) {
 
-	let nav = '';
+	let nav = '\n';
 	const seen = {};
 
 	nav += buildMainNav( [ ...members.classes, ...members.modules ], seen, linkto );
 	nav += buildGlobalsNav( members.globals, seen );
+	nav += '\t\t\t\t';
 
 	return nav;
 
