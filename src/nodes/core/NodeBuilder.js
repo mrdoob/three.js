@@ -24,7 +24,7 @@ import ChainMap from '../../renderers/common/ChainMap.js';
 
 import BindGroup from '../../renderers/common/BindGroup.js';
 
-import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
+import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, NormalBlending } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -458,6 +458,19 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.fnCall = null;
+
+	}
+
+	/**
+	 * Whether the material is opaque or not.
+	 *
+	 * @return {boolean} Whether the material is opaque or not.
+	 */
+	isOpaque() {
+
+		const material = this.material;
+
+		return material.transparent === false && material.blending === NormalBlending && material.alphaToCoverage === false;
 
 	}
 
