@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WaterMesh - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/prettify/prettify.js"></script>
+	<script src="../scripts/prettify/lang-css.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">WaterMesh</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A basic flat, reflective water effect.</p>
+<p>Note that this class can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.
+When using <a href="WebGLRenderer.html">WebGLRenderer</a>, use <a href="Water.html">Water</a>.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://github.com/Slayvin">Flat mirror for three.js</a></li>
+<li><a href="https://home.adelphi.edu/~stemkoski/">An implementation of water shader based on the flat mirror</a></li>
+<li><a href="http://29a.ch/slides/2012/webglwater/">Water shader explanations in WebGL</a></li>
+</ul></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">WaterMesh</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre class="prettyprint source lang-js" translate="no"><code>import { WaterMesh } from 'three/addons/objects/WaterMesh.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="WaterMesh" translate="no">new <a href="#WaterMesh">WaterMesh</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, options : <span class="param-type">WaterMesh~Options</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new water mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>geometry</code></td>
+									<td class="description last"><p>The water mesh's geometry.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>options</code></td>
+									<td class="description last"><p>The configuration options.</p></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="alpha" translate="no">.<a href="#alpha">alpha</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The alpha value.<br/>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="distortionScale" translate="no">.<a href="#distortionScale">distortionScale</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The distortion scale.<br/>Default is <code>20</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isWaterMesh" translate="no">.<a href="#isWaterMesh">isWaterMesh</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="resolutionScale" translate="no">.<a href="#resolutionScale">resolutionScale</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The effect's resolution scale.<br/>Default is <code>0.5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The size value.<br/>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sunColor" translate="no">.<a href="#sunColor">sunColor</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;color></span> </h3>
+					<div class="description">
+						<p>The sun color.<br/>Default is <code>0xffffff</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sunDirection" translate="no">.<a href="#sunDirection">sunDirection</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The sun direction.<br/>Default is <code>(0.70707,0.70707,0.0)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="waterColor" translate="no">.<a href="#waterColor">waterColor</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;color></span> </h3>
+					<div class="description">
+						<p>The water color.<br/>Default is <code>0x7f7f7f</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="waterNormals" translate="no">.<a href="#waterNormals">waterNormals</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>The water's normal map.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>Constructor options of <code>WaterMesh</code>.</p>
+					</div>
+						<h5 class="subsection-title">Properties:</h5>
+<table class="props">
+	<thead>
+	<tr>
+		<th>Name</th>
+		<th>Type</th>
+		<th>Attributes</th>
+		<th>Default</th>
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	<tbody>
+		<tr>
+				<td class="name"><code>resolutionScale</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					0.5
+				</td>
+			<td class="description last"><p>The resolution scale.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>waterNormals</code></td>
+			<td class="type">
+<span class="param-type"><a href="Texture.html">Texture</a></span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+					&lt;nullable><br>
+				</td>
+				<td class="default">
+					null
+				</td>
+			<td class="description last"><p>The water's normal map.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>alpha</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					1
+				</td>
+			<td class="description last"><p>The alpha value.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>size</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					1
+				</td>
+			<td class="description last"><p>The size value.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>sunColor</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+|
+<span class="param-type"><a href="Color.html">Color</a></span>
+|
+<span class="param-type">string</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					0xffffff
+				</td>
+			<td class="description last"><p>The sun color.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>sunDirection</code></td>
+			<td class="type">
+<span class="param-type"><a href="Vector3.html">Vector3</a></span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					(0.70707,0.70707,0.0)
+				</td>
+			<td class="description last"><p>The sun direction.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>waterColor</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+|
+<span class="param-type"><a href="Color.html">Color</a></span>
+|
+<span class="param-type">string</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					0x7F7F7F
+				</td>
+			<td class="description last"><p>The water color.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>distortionScale</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					20
+				</td>
+			<td class="description last"><p>The distortion scale.</p></td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/WaterMesh.js" target="_blank" rel="noopener" translate="no">examples/jsm/objects/WaterMesh.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

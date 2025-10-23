@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ExtrudeGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/prettify/prettify.js"></script>
+	<script src="../scripts/prettify/lang-css.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="BufferGeometry.html">BufferGeometry</a> → </p>
+	<h1 translate="no">ExtrudeGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Creates extruded geometry from a path shape.</p></div>
+				<iframe id="viewer" src="../scenes/geometry-browser.html#ExtrudeGeometry"></iframe>
+				<h2>Code Example</h2>
+				<div translate="no"><pre class="prettyprint source lang-js"><code>const length = 12, width = 8;
+const shape = new THREE.Shape();
+shape.moveTo( 0,0 );
+shape.lineTo( 0, width );
+shape.lineTo( length, width );
+shape.lineTo( length, 0 );
+shape.lineTo( 0, 0 );
+const geometry = new THREE.ExtrudeGeometry( shape );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const mesh = new THREE.Mesh( geometry, material ) ;
+scene.add( mesh );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ExtrudeGeometry" translate="no">new <a href="#ExtrudeGeometry">ExtrudeGeometry</a><span class="signature">( shapes : <span class="param-type">Shape | Array.&lt;Shape></span>, options : <span class="param-type">ExtrudeGeometry~Options</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new extrude geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>shapes</code></td>
+									<td class="description last"><p>A shape or an array of shapes.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>options</code></td>
+									<td class="description last"><p>The extrude settings.</p></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Holds the constructor parameters that have been
+used to generate the geometry. Any modification
+after instantiation does not change the geometry.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".fromJSON" translate="no">.<a href="#.fromJSON">fromJSON</a><span class="signature">( data : <span class="param-type">Object</span>, shapes : <span class="param-type">Array.&lt;Shape></span> )</span><span class="type-signature"> : <a href="ExtrudeGeometry.html">ExtrudeGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Factory method for creating an instance of this class from the given
+JSON object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>data</code></td>
+									<td class="description last"><p>A JSON object representing the serialized geometry.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>shapes</code></td>
+									<td class="description last"><p>An array of shapes.</p></td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A new instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>Represents the <code>options</code> type of the geometry's constructor.</p>
+					</div>
+						<h5 class="subsection-title">Properties:</h5>
+<table class="props">
+	<thead>
+	<tr>
+		<th>Name</th>
+		<th>Type</th>
+		<th>Attributes</th>
+		<th>Default</th>
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	<tbody>
+		<tr>
+				<td class="name"><code>curveSegments</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					12
+				</td>
+			<td class="description last"><p>Number of points on the curves.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>steps</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					1
+				</td>
+			<td class="description last"><p>Number of points used for subdividing segments along the depth of the extruded spline.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>depth</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					1
+				</td>
+			<td class="description last"><p>Depth to extrude the shape.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>bevelEnabled</code></td>
+			<td class="type">
+<span class="param-type">boolean</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					true
+				</td>
+			<td class="description last"><p>Whether to beveling to the shape or not.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>bevelThickness</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					0.2
+				</td>
+			<td class="description last"><p>How deep into the original shape the bevel goes.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>bevelSize</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					bevelThickness-0.1
+				</td>
+			<td class="description last"><p>Distance from the shape outline that the bevel extends.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>bevelOffset</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					0
+				</td>
+			<td class="description last"><p>Distance from the shape outline that the bevel starts.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>bevelSegments</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					3
+				</td>
+			<td class="description last"><p>Number of bevel layers.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>extrudePath</code></td>
+			<td class="type">
+<span class="param-type"><a href="Curve.html">Curve</a></span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+					&lt;nullable><br>
+				</td>
+				<td class="default">
+					null
+				</td>
+			<td class="description last"><p>A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>UVGenerator</code></td>
+			<td class="type">
+<span class="param-type">Object</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>An object that provides UV generator functions for custom UV generation.</p></td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/geometries/ExtrudeGeometry.js" target="_blank" rel="noopener" translate="no">src/geometries/ExtrudeGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

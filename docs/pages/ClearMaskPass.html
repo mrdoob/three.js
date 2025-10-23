@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ClearMaskPass - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/prettify/prettify.js"></script>
+	<script src="../scripts/prettify/lang-css.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/prettify-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Pass.html">Pass</a> → </p>
+	<h1 translate="no">ClearMaskPass</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This pass can be used to clear a mask previously defined with <a href="MaskPass.html">MaskPass</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre class="prettyprint source lang-js"><code>const clearPass = new ClearMaskPass();
+composer.addPass( clearPass );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ClearMaskPass" translate="no">new <a href="#ClearMaskPass">ClearMaskPass</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new clear mask pass.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="needsSwap" translate="no">.<a href="#needsSwap">needsSwap</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Overwritten to disable the swap.<br/>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#needsSwap">Pass#needsSwap</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, writeBuffer : <span class="param-type">WebGLRenderTarget</span>, readBuffer : <span class="param-type">WebGLRenderTarget</span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs the clear of the currently defined mask.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>renderer</code></td>
+									<td class="description last"><p>The renderer.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>writeBuffer</code></td>
+									<td class="description last"><p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>readBuffer</code></td>
+									<td class="description last"><p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>deltaTime</code></td>
+									<td class="description last"><p>The delta time in seconds.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>maskActive</code></td>
+									<td class="description last"><p>Whether masking is active or not.</p></td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#render">Pass#render</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/MaskPass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/MaskPass.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>
