@@ -695,7 +695,7 @@ class XRManager extends EventDispatcher {
 
 		};
 
-		const createMesh = ( texture, eyeIndex = 1, geometry = null, material = null ) => {
+		const createMesh = ( texture, eyeIndex = 0, geometry = null, material = null ) => {
 
 			//let geometry;
 
