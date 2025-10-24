@@ -72,9 +72,9 @@ class LoadingManager {
 		/**
 		 * Used for aborting ongoing requests in loaders using this manager.
 		 *
-		 * @type {AbortController}
+		 * @type {AbortController | null}
 		 */
-		this.abortController = new AbortController();
+		this._abortController = null;
 
 		/**
 		 * This should be called by any loader using the manager when the loader
@@ -285,12 +285,34 @@ class LoadingManager {
 		 */
 		this.abort = function () {
 
-			this.abortController.abort();
-			this.abortController = new AbortController();
+
+			if ( this.abortController ) {
+
+				this.abortController.abort();
+				this._abortController = null;
+
+			}
 
 			return this;
 
 		};
+
+	}
+
+	/**
+	 * Used for aborting ongoing requests in loaders using this manager.
+	 *
+	 * @type {AbortController}
+	 */
+	get abortController() {
+
+		if ( ! this._abortController ) {
+
+			this._abortController = new AbortController();
+
+		}
+
+		return this._abortController;
 
 	}
 
