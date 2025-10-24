@@ -1343,10 +1343,10 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * - A single number representing count, or
 	 * - An array [x, y, z] representing dispatch size, or
-	 * - A GPUBuffer for indirect dispatch size.
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize = null ) {
 
