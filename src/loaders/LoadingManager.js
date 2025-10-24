@@ -286,12 +286,8 @@ class LoadingManager {
 		this.abort = function () {
 
 
-			if ( this.abortController ) {
-
-				this.abortController.abort();
-				this._abortController = null;
-
-			}
+			this.abortController.abort();
+			this._abortController = null;
 
 			return this;
 
