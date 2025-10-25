@@ -10,6 +10,6 @@ export default /* glsl */`
 	#else
 		uniform sampler2D envMap;
 	#endif
-	
+
 #endif
 `;

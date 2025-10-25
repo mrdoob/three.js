@@ -4,7 +4,7 @@ import { roughness, clearcoatRoughness } from '../core/PropertyNode.js';
 import { cameraViewMatrix } from '../accessors/Camera.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection } from '../accessors/Position.js';
-import { float } from '../tsl/TSLBase.js';
+import { float, pow4 } from '../tsl/TSLBase.js';
 import { bentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
 import { materialEnvIntensity } from '../accessors/MaterialProperties.js';
@@ -117,7 +117,7 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 				reflectVec = positionViewDirection.negate().reflect( normalViewNode );
 
 				// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-				reflectVec = roughnessNode.mul( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
+				reflectVec = pow4( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
 
 				reflectVec = reflectVec.transformDirection( cameraViewMatrix );
 

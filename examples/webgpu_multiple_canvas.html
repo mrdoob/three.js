@@ -121,7 +121,7 @@
 					descriptionElement.innerText = 'Scene ' + ( i + 1 );
 					element.appendChild( descriptionElement );
 
-					const canvasTarget = new THREE.CanvasTarget( sceneCanvas, { antialias: true } );
+					const canvasTarget = new THREE.CanvasTarget( sceneCanvas );
 					canvasTarget.setPixelRatio( window.devicePixelRatio );
 					canvasTarget.setSize( 200, 200 );
 

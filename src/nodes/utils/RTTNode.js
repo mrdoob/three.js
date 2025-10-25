@@ -202,8 +202,8 @@ class RTTNode extends TextureNode {
 			const pixelRatio = renderer.getPixelRatio();
 			const size = renderer.getSize( _size );
 
-			const effectiveWidth = size.width * pixelRatio;
-			const effectiveHeight = size.height * pixelRatio;
+			const effectiveWidth = Math.floor( size.width * pixelRatio );
+			const effectiveHeight = Math.floor( size.height * pixelRatio );
 
 			if ( effectiveWidth !== this.renderTarget.width || effectiveHeight !== this.renderTarget.height ) {
 

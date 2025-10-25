@@ -786,8 +786,8 @@ class PassNode extends TempNode {
 		this._width = width;
 		this._height = height;
 
-		const effectiveWidth = this._width * this._pixelRatio * this._resolutionScale;
-		const effectiveHeight = this._height * this._pixelRatio * this._resolutionScale;
+		const effectiveWidth = Math.floor( this._width * this._pixelRatio * this._resolutionScale );
+		const effectiveHeight = Math.floor( this._height * this._pixelRatio * this._resolutionScale );
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 

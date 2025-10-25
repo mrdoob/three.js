@@ -1,5 +1,5 @@
 import { NodeUpdateType } from './constants.js';
-import { getNodeChildren, getCacheKey, hash } from './NodeUtils.js';
+import { hash, hashArray, hashString } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
@@ -277,7 +277,7 @@ class Node extends EventDispatcher {
 	 */
 	* getChildren() {
 
-		for ( const { childNode } of getNodeChildren( this ) ) {
+		for ( const { childNode } of this._getChildren() ) {
 
 			yield childNode;
 
@@ -320,18 +320,99 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Returns the child nodes of this node.
+	 *
+	 * @private
+	 * @param {Set<Node>} [ignores=new Set()] - A set of nodes to ignore during the search to avoid circular references.
+	 * @returns {Array<Object>} An array of objects describing the child nodes.
+	 */
+	_getChildren( ignores = new Set() ) {
+
+		const children = [];
+
+		// avoid circular references
+		ignores.add( this );
+
+		for ( const property of Object.getOwnPropertyNames( this ) ) {
+
+			const object = this[ property ];
+
+			// Ignore private properties and ignored nodes.
+			if ( property.startsWith( '_' ) === true || ignores.has( object ) ) continue;
+
+			if ( Array.isArray( object ) === true ) {
+
+				for ( let i = 0; i < object.length; i ++ ) {
+
+					const child = object[ i ];
+
+					if ( child && child.isNode === true ) {
+
+						children.push( { property, index: i, childNode: child } );
+
+					}
+
+				}
+
+			} else if ( object && object.isNode === true ) {
+
+				children.push( { property, childNode: object } );
+
+			} else if ( object && Object.getPrototypeOf( object ) === Object.prototype ) {
+
+				for ( const subProperty in object ) {
+
+					// Ignore private sub-properties.
+					if ( subProperty.startsWith( '_' ) === true ) continue;
+
+					const child = object[ subProperty ];
+
+					if ( child && child.isNode === true ) {
+
+						children.push( { property, index: subProperty, childNode: child } );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		//
+
+		return children;
+
+	}
+
+	/**
 	 * Returns the cache key for this node.
 	 *
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of the cache key is forced.
+	 * @param {Set<Node>} [ignores=null] - A set of nodes to ignore during the computation of the cache key.
 	 * @return {number} The cache key of the node.
 	 */
-	getCacheKey( force = false ) {
+	getCacheKey( force = false, ignores = null ) {
 
 		force = force || this.version !== this._cacheKeyVersion;
 
 		if ( force === true || this._cacheKey === null ) {
 
-			this._cacheKey = hash( getCacheKey( this, force ), this.customCacheKey() );
+			if ( ignores === null ) ignores = new Set();
+
+			//
+
+			const values = [ this.id ];
+
+			for ( const { property, childNode } of this._getChildren( ignores ) ) {
+
+				values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey( force, ignores ) );
+
+			}
+
+			//
+
+			this._cacheKey = hash( hashArray( values ), this.customCacheKey() );
 			this._cacheKeyVersion = this.version;
 
 		}
@@ -749,7 +830,12 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			const isGenerateOnce = this.generate.length === 1;
+			// If generate has just one argument, it means the output type is not required.
+			// This means that the node does not handle output conversions internally,
+			// so the value is stored in a cache and the builder handles the conversion
+			// for all requested output types.
+
+			const isGenerateOnce = this.generate.length < 2;
 
 			if ( isGenerateOnce ) {
 
@@ -816,7 +902,7 @@ class Node extends EventDispatcher {
 	 */
 	getSerializeChildren() {
 
-		return getNodeChildren( this );
+		return this._getChildren();
 
 	}
 
