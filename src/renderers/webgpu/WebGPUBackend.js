@@ -1322,17 +1322,39 @@ class WebGPUBackend extends Backend {
 
 		const groupGPU = this.get( computeGroup );
 
+		if ( groupGPU.computePassDescriptor === undefined ) {
+
+			let computePassLabel = 'computeGroup[';
+
+			if ( Array.isArray( computeGroup ) ) {
+
+				for ( let i = 0; i < computeGroup.length; i ++ ) {
+
+					const group = computeGroup[ i ];
+					computePassLabel += `${group.name}_${group.id}${i !== computeGroup.length - 1 ? ',' : ''}`;
+
+				}
+
+			} else {
+
+				computePassLabel += `${computeGroup.name}_${computeGroup.id}`;
+
+			}
+
+			computePassLabel += ']';
+
+			const descriptor = { label: computePassLabel };
+
+			groupGPU.computePassDescriptor = descriptor;
+
+		}
 		//
 
-		const descriptor = {
-			label: 'computeGroup_' + computeGroup.id
-		};
+		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), groupGPU.computePassDescriptor );
 
-		this.initTimestampQuery( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ), descriptor );
+		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( groupGPU.computePassDescriptor );
 
-		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( { label: 'computeGroup_' + computeGroup.id } );
-
-		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( descriptor );
+		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( groupGPU.computePassDescriptor );
 
 	}
 
