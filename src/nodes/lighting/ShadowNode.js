@@ -273,8 +273,22 @@ class ShadowNode extends ShadowBaseNode {
 		 */
 		this._node = null;
 
-		this._builtShadowType = undefined;
+		/**
+		 * The current shadow map type of this shadow node.
+		 *
+		 * @type {?number}
+		 * @private
+		 * @default null
+		 */
+		this._currentShadowType = null;
 
+		/**
+		 * A Weak Map holding the current frame ID per camera. Used
+		 * to control the update of shadow maps.
+		 *
+		 * @type {WeakMap<Camera,number>}
+		 * @private
+		 */
 		this._cameraFrameId = new WeakMap();
 
 		/**
@@ -551,11 +565,11 @@ class ShadowNode extends ShadowBaseNode {
 
 		return Fn( () => {
 
-			const currentType = builder.renderer.shadowMap.type;
+			const currentShadowType = builder.renderer.shadowMap.type;
 
-			if ( this._builtShadowType !== undefined && this._builtShadowType !== currentType ) {
+			if ( this._currentShadowType !== null && this._currentShadowType !== currentShadowType ) {
 
-				this.disposeShadowResources();
+				this._reset();
 				this._node = null;
 
 			}
@@ -567,7 +581,7 @@ class ShadowNode extends ShadowBaseNode {
 			if ( node === null ) {
 
 				this._node = node = this.setupShadow( builder );
-				this._builtShadowType = currentType;
+				this._currentShadowType = currentShadowType;
 
 			}
 
@@ -700,16 +714,20 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	dispose() {
 
-		this.disposeShadowResources();
+		this._reset();
 
 		super.dispose();
 
 	}
 
 	/**
-	 * Frees the internal shadow map resources.
+	 * Resets the resouce state of this shadow node.
+	 *
+	 * @private
 	 */
-	disposeShadowResources() {
+	_reset() {
+
+		this._currentShadowType = null;
 
 		if ( this.shadowMap ) {
 
