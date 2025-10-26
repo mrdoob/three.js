@@ -567,7 +567,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			const currentShadowType = builder.renderer.shadowMap.type;
 
-			if ( this._currentShadowType !== null && this._currentShadowType !== currentShadowType ) {
+			if ( this._currentShadowType !== currentShadowType ) {
 
 				this._reset();
 				this._node = null;
