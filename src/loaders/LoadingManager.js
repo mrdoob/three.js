@@ -72,6 +72,7 @@ class LoadingManager {
 		/**
 		 * Used for aborting ongoing requests in loaders using this manager.
 		 *
+		 * @private
 		 * @type {AbortController | null}
 		 */
 		this._abortController = null;
