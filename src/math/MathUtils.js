@@ -9,7 +9,7 @@ const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
 /**
- * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}
+ * Generate a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)
  * (universally unique identifier).
  *
  * @return {string} The UUID.
@@ -122,7 +122,7 @@ function lerp( x, y, t ) {
 /**
  * Smoothly interpolate a number from `x` to `y` in  a spring-like manner using a delta
  * time to maintain frame rate independent movement. For details, see
- * [Frame rate independent damping using lerp]{@link http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/}.
+ * [Frame rate independent damping using lerp](http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/).
  *
  * @param {number} x - The current point.
  * @param {number} y - The target point.
@@ -157,7 +157,7 @@ function pingpong( x, length = 1 ) {
  * moved between `min` and `max`, but smoothed or slowed down the closer `x` is to
  * the `min` and `max`.
  *
- * See [Smoothstep]{@link http://en.wikipedia.org/wiki/Smoothstep} for more details.
+ * See [Smoothstep](http://en.wikipedia.org/wiki/Smoothstep) for more details.
  *
  * @param {number} x - The value to evaluate based on its position between min and max.
  * @param {number} min - The min value. Any x value below min will be `0`.
@@ -176,7 +176,7 @@ function smoothstep( x, min, max ) {
 }
 
 /**
- * A [variation on smoothstep]{@link https://en.wikipedia.org/wiki/Smoothstep#Variations}
+ * A [variation on smoothstep](https://en.wikipedia.org/wiki/Smoothstep#Variations)
  * that has zero 1st and 2nd order derivatives at x=0 and x=1.
  *
  * @param {number} x - The value to evaluate based on its position between min and max.
@@ -316,7 +316,7 @@ function floorPowerOfTwo( value ) {
 }
 
 /**
- * Sets the given quaternion from the [Intrinsic Proper Euler Angles]{@link https://en.wikipedia.org/wiki/Euler_angles}
+ * Sets the given quaternion from the [Intrinsic Proper Euler Angles](https://en.wikipedia.org/wiki/Euler_angles)
  * defined by the given angles and order.
  *
  * Rotations are applied to the axes in the order specified by order:
@@ -481,7 +481,7 @@ const MathUtils = {
 	DEG2RAD: DEG2RAD,
 	RAD2DEG: RAD2DEG,
 	/**
-	 * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}
+	 * Generate a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)
 	 * (universally unique identifier).
 	 *
 	 * @static
@@ -552,7 +552,7 @@ const MathUtils = {
 	/**
 	 * Smoothly interpolate a number from `x` to `y` in  a spring-like manner using a delta
 	 * time to maintain frame rate independent movement. For details, see
-	 * [Frame rate independent damping using lerp]{@link http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/}.
+	 * [Frame rate independent damping using lerp](http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/).
 	 *
 	 * @static
 	 * @method
@@ -579,7 +579,7 @@ const MathUtils = {
 	 * moved between `min` and `max`, but smoothed or slowed down the closer `x` is to
 	 * the `min` and `max`.
 	 *
-	 * See [Smoothstep]{@link http://en.wikipedia.org/wiki/Smoothstep} for more details.
+	 * See [Smoothstep](http://en.wikipedia.org/wiki/Smoothstep) for more details.
 	 *
 	 * @static
 	 * @method
@@ -590,7 +590,7 @@ const MathUtils = {
 	 */
 	smoothstep: smoothstep,
 	/**
-	 * A [variation on smoothstep]{@link https://en.wikipedia.org/wiki/Smoothstep#Variations}
+	 * A [variation on smoothstep](https://en.wikipedia.org/wiki/Smoothstep#Variations)
 	 * that has zero 1st and 2nd order derivatives at x=0 and x=1.
 	 *
 	 * @static
@@ -685,7 +685,7 @@ const MathUtils = {
 	 */
 	floorPowerOfTwo: floorPowerOfTwo,
 	/**
-	 * Sets the given quaternion from the [Intrinsic Proper Euler Angles]{@link https://en.wikipedia.org/wiki/Euler_angles}
+	 * Sets the given quaternion from the [Intrinsic Proper Euler Angles](https://en.wikipedia.org/wiki/Euler_angles)
 	 * defined by the given angles and order.
 	 *
 	 * Rotations are applied to the axes in the order specified by order:

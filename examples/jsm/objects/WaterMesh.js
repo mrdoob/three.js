@@ -15,9 +15,9 @@ import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, text
  *
  * References:
  *
- * - [Flat mirror for three.js]{@link https://github.com/Slayvin}
- * - [An implementation of water shader based on the flat mirror]{@link https://home.adelphi.edu/~stemkoski/}
- * - [Water shader explanations in WebGL]{@link http://29a.ch/slides/2012/webglwater/ }
+ * - [Flat mirror for three.js](https://github.com/Slayvin)
+ * - [An implementation of water shader based on the flat mirror](https://home.adelphi.edu/~stemkoski/)
+ * - [Water shader explanations in WebGL](http://29a.ch/slides/2012/webglwater/ )
  *
  * @augments Mesh
  * @three_import import { WaterMesh } from 'three/addons/objects/WaterMesh.js';

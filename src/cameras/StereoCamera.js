@@ -9,8 +9,8 @@ const _projectionMatrix = /*@__PURE__*/ new Matrix4();
 /**
  * A special type of camera that uses two perspective cameras with
  * stereoscopic projection. Can be used for rendering stereo effects
- * like [3D Anaglyph]{@link https://en.wikipedia.org/wiki/Anaglyph_3D} or
- * [Parallax Barrier]{@link https://en.wikipedia.org/wiki/parallax_barrier}.
+ * like [3D Anaglyph](https://en.wikipedia.org/wiki/Anaglyph_3D) or
+ * [Parallax Barrier](https://en.wikipedia.org/wiki/parallax_barrier).
  */
 class StereoCamera {
 

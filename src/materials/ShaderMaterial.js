@@ -17,7 +17,7 @@ import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.
  * - You can use the directive `#pragma unroll_loop_start` and `#pragma unroll_loop_end`
  * in order to unroll a `for` loop in GLSL by the shader preprocessor. The directive has
  * to be placed right above the loop. The loop formatting has to correspond to a defined standard.
- *   - The loop has to be [normalized]{@link https://en.wikipedia.org/wiki/Normalized_loop}.
+ *   - The loop has to be [normalized](https://en.wikipedia.org/wiki/Normalized_loop).
  *   - The loop variable has to be *i*.
  *   - The value `UNROLLED_LOOP_INDEX` will be replaced with the explicitly
  * value of *i* for the given iteration and can be used in preprocessor
@@ -223,7 +223,7 @@ class ShaderMaterial extends Material {
 		};
 
 		/**
-		 * If set, this calls [gl.bindAttribLocation]{@link https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation}
+		 * If set, this calls [gl.bindAttribLocation](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation)
 		 * to bind a generic vertex index to an attribute variable.
 		 *
 		 * @type {string|undefined}
