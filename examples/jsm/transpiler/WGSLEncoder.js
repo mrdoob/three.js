@@ -80,6 +80,10 @@ const wgslLib = {
 	'textureLod': 'textureSampleLevel',
 	'texelFetch': 'textureLoad',
 	'textureGrad': 'textureSampleGrad',
+	'floatBitsToInt': 'bitcast<i32>',
+	'floatBitsToUint': 'bitcast<u32>',
+	'intBitsToFloat': 'bitcast<f32>',
+	'uintBitsToFloat': 'bitcast<f32>',
 };
 
 class WGSLEncoder {
@@ -169,6 +173,26 @@ class WGSLEncoder {
 				}
 
 				code = `${ modFnName }( ${ snippets.join( ', ' ) } )`;
+
+			} else if ( fnName.startsWith( 'bitcast' ) ) {
+
+				const params = node.params.map( p => this.emitExpression( p ) ).join( ',' );
+				const types = node.params.map( p => p.getType() );
+
+				if ( /.*vec[234]/.test( types[ 0 ] ) ) {
+
+					const conversionType = fnName.substring( 8, fnName.length - 1 );
+					const vectorType = types[ 0 ].substring( - 1 );
+
+					code = `bitcast<${ vectorType }<${ conversionType }>>`;
+
+				} else {
+
+					code = fnName;
+
+				}
+
+				code += `( ${ params } )`;
 
 			} else if ( fnName.startsWith( 'texture' ) ) {
 

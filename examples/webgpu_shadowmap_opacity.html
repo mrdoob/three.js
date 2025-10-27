@@ -4,12 +4,19 @@
 		<title>three.js webgpu - shadowmap + opacity</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - shadowmap + opacity
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Opacity Shadow Map</span>
+			</div>
+
+			<small>Shadow Map with custom color and opacity by material.</small>
 		</div>
 
 		<script type="importmap">
@@ -25,8 +32,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { Fn, mix } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -50,6 +59,7 @@
 				renderer.toneMapping = THREE.AgXToneMapping;
 				renderer.toneMappingExposure = 1.5;
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();

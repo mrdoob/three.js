@@ -3,12 +3,20 @@
 		<title>three.js webgpu - animation retargeting</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - animation retargeting
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Animation Retargeting</span>
+			</div>
+
+			<small>
+				Basic Animation Retargeting demo.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -24,14 +32,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { color, screenUV, hue, reflector, time, Fn, vec2, length, atan, float, sin, cos, vec3, sub, mul, pow, blendDodge, normalWorldGeometry } from 'three/tsl';
-
-			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
@@ -54,9 +60,6 @@
 			//
 
 			const clock = new THREE.Clock();
-
-			const stats = new Stats();
-			document.body.appendChild( stats.dom );
 
 			export const lightSpeed = /*#__PURE__*/ Fn( ( [ suv_immutable ] ) => {
 
@@ -145,10 +148,11 @@
 
 			// renderer
 			const renderer = new THREE.WebGPURenderer( { antialias: true } );
-			renderer.toneMapping = THREE.NeutralToneMapping;
-			renderer.setAnimationLoop( animate );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
+			renderer.toneMapping = THREE.NeutralToneMapping;
+			renderer.inspector = new Inspector();
 			document.body.appendChild( renderer.domElement );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
@@ -157,8 +161,8 @@
 			controls.target.set( 0, 1, 0 );
 			controls.maxPolarAngle = Math.PI / 2;
 
-			const gui = new GUI();
-			gui.add( helpers, 'visible' ).name( 'helpers' );
+			const gui = renderer.inspector.createParameters( 'Scene settings' );
+			gui.add( helpers, 'visible' ).name( 'show helpers' );
 
 			//
 
@@ -289,8 +293,6 @@
 				mixer.update( delta );
 
 				controls.update();
-
-				stats.update();
 
 				renderer.render( scene, camera );
 

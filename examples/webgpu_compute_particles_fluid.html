@@ -4,13 +4,18 @@
 		<title>three.js webgpu - compute fluid particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - fluid particles<br />
-			MLS-MPM particle simulation running in compute shaders
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Fluid Particles</span>
+			</div>
+
+			<small>MLS-MPM particle simulation running in compute shaders.</small>
 		</div>
 
 		<script type="importmap">
@@ -26,13 +31,14 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { Fn, If, Return, instancedArray, instanceIndex, uniform, attribute, uint, float, clamp, struct, atomicStore, int, ivec3, array, vec3, atomicAdd, Loop, atomicLoad, max, pow, mat3, vec4, cross, step } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -60,8 +66,6 @@
 
 			}
 
-			const gui = new GUI();
-
 			const params = {
 				particleCount: 8192 * 4,
 			};
@@ -75,6 +79,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.35;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -89,9 +94,9 @@
 				controls.maxPolarAngle = Math.PI * 0.35;
 				controls.touches = { TWO: THREE.TOUCH.DOLLY_ROTATE };
 
-				const rgbeLoader = new RGBELoader().setPath( 'textures/equirectangular/' );
+				const hdrLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
 
-				const hdrTexture = await rgbeLoader.loadAsync( 'royal_esplanade_1k.hdr' );
+				const hdrTexture = await hdrLoader.loadAsync( 'royal_esplanade_1k.hdr' );
 				hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
 				scene.background = hdrTexture;
 				scene.backgroundBlurriness = 0.5;
@@ -99,14 +104,13 @@
 
 				setupParticles();
 
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
 				gui.add( params, 'particleCount', 4096, maxParticles, 4096 ).onChange( value => {
 
 					p2g1Kernel.count = value;
 					p2g2Kernel.count = value;
 					g2pKernel.count = value;
-					p2g1Kernel.updateDispatchCount();
-					p2g2Kernel.updateDispatchCount();
-					g2pKernel.updateDispatchCount();
 					particleMesh.count = value;
 					particleCountUniform.value = value;
 
@@ -206,7 +210,7 @@
 					atomicStore( cellBuffer.element( instanceIndex ).get( 'z' ), 0 );
 					atomicStore( cellBuffer.element( instanceIndex ).get( 'mass' ), 0 );
 			
-				} )().compute( cellCount );
+				} )().compute( cellCount ).setName( 'clearGridKernel' );
 
 				p2g1Kernel = Fn( () => {
 
@@ -254,7 +258,7 @@
 			
 					} );
 			
-				} )().compute( params.particleCount );
+				} )().compute( params.particleCount ).setName( 'p2g1Kernel' );
 
 				p2g2Kernel = Fn( () => {
 
@@ -325,7 +329,7 @@
 			
 					} );
 			
-				} )().compute( params.particleCount );
+				} )().compute( params.particleCount ).setName( 'p2g2Kernel' );
 
 				updateGridKernel = Fn( () => {
 
@@ -367,7 +371,7 @@
 
 					cellBufferFloat.element( instanceIndex ).assign( vec4( vx, vy, vz, mass ) );
 			
-				} )().compute( cellCount );
+				} )().compute( cellCount ).setName( 'updateGridKernel' );
 
 
 				const clampToRoundedBox = ( pos, box, radius ) => {
@@ -473,7 +477,7 @@
 					particleBuffer.element( instanceIndex ).get( 'position' ).assign( particlePosition );
 					particleBuffer.element( instanceIndex ).get( 'velocity' ).assign( particleVelocity );
 			
-				} )().compute( params.particleCount );
+				} )().compute( params.particleCount ).setName( 'g2pKernel' );
 
 			}
 
@@ -557,9 +561,14 @@
 
 				prevMouseCoord.copy( mouseCoord );
 
-				await renderer.computeAsync( [ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ] );
+				//renderer.compute( [ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ] );
+				renderer.compute( clearGridKernel );
+				renderer.compute( p2g1Kernel );
+				renderer.compute( p2g2Kernel );
+				renderer.compute( updateGridKernel );
+				renderer.compute( g2pKernel );
 
-				await renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

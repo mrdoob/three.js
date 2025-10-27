@@ -69,9 +69,9 @@ class AnamorphicNode extends TempNode {
 		/**
 		 * The resolution scale.
 		 *
-		 * @type {Vector2}
+		 * @type {number}
 		 */
-		this.resolution = new Vector2( 1, 1 );
+		this.resolutionScale = 1;
 
 		/**
 		 * The internal render target of the effect.
@@ -130,8 +130,8 @@ class AnamorphicNode extends TempNode {
 
 		this._invSize.value.set( 1 / width, 1 / height );
 
-		width = Math.max( Math.round( width * this.resolution.x ), 1 );
-		height = Math.max( Math.round( height * this.resolution.y ), 1 );
+		width = Math.max( Math.round( width * this.resolutionScale ), 1 );
+		height = Math.max( Math.round( height * this.resolutionScale ), 1 );
 
 		this._renderTarget.setSize( width, height );
 
@@ -158,6 +158,7 @@ class AnamorphicNode extends TempNode {
 		const currentTexture = textureNode.value;
 
 		_quadMesh.material = this._material;
+		_quadMesh.name = 'Anamorphic';
 
 		this.setSize( map.image.width, map.image.height );
 
@@ -237,6 +238,29 @@ class AnamorphicNode extends TempNode {
 	dispose() {
 
 		this._renderTarget.dispose();
+
+	}
+
+	/**
+	 * The resolution scale.
+	 *
+	 * @deprecated
+	 * @type {Vector2}
+	 * @default {(1,1)}
+	 */
+	get resolution() {
+
+		console.warn( 'THREE.AnamorphicNode: The "resolution" property has been renamed to "resolutionScale" and is now of type `number`.' ); // @deprecated r180
+
+		return new Vector2( this.resolutionScale, this.resolutionScale );
+
+	}
+
+	set resolution( value ) {
+
+		console.warn( 'THREE.AnamorphicNode: The "resolution" property has been renamed to "resolutionScale" and is now of type `number`.' ); // @deprecated r180
+
+		this.resolutionScale = value.x;
 
 	}
 

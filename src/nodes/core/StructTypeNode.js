@@ -138,6 +138,7 @@ class StructTypeNode extends Node {
 
 	setup( builder ) {
 
+		builder.getStructTypeFromNode( this, this.membersLayout, this.name );
 		builder.addInclude( this );
 
 	}

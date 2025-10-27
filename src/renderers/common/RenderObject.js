@@ -682,7 +682,7 @@ class RenderObject {
 	 */
 	getMaterialCacheKey() {
 
-		const { object, material } = this;
+		const { object, material, renderer } = this;
 
 		let cacheKey = material.customProgramCacheKey();
 
@@ -711,6 +711,18 @@ class RenderObject {
 					if ( value.isTexture ) {
 
 						valueKey += value.mapping;
+
+						// WebGPU must honor the sampler data because they are part of the bindings
+
+						if ( renderer.backend.isWebGPUBackend === true ) {
+
+							valueKey += value.magFilter;
+							valueKey += value.minFilter;
+							valueKey += value.wrapS;
+							valueKey += value.wrapT;
+							valueKey += value.wrapR;
+
+						}
 
 					}
 
@@ -758,7 +770,7 @@ class RenderObject {
 
 		}
 
-		if ( object.count > 1 ) {
+		if ( object.isInstancedMesh || object.count > 1 || Array.isArray( object.morphTargetInfluences ) ) {
 
 			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
 

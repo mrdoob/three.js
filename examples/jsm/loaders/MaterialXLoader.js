@@ -1,20 +1,26 @@
-import { FileLoader, Loader, TextureLoader, RepeatWrapping, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial } from 'three/webgpu';
+import {
+	FileLoader, Loader, ImageBitmapLoader, Texture, RepeatWrapping, MeshBasicNodeMaterial,
+	MeshPhysicalNodeMaterial, DoubleSide,
+} from 'three/webgpu';
 
 import {
 	float, bool, int, vec2, vec3, vec4, color, texture,
 	positionLocal, positionWorld, uv, vertexColor,
 	normalLocal, normalWorld, tangentLocal, tangentWorld,
-	add, sub, mul, div, mod, abs, sign, floor, ceil, round, pow, sin, cos, tan,
-	asin, acos, atan2, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
+	mul, abs, sign, floor, ceil, round, sin, cos, tan,
+	asin, acos, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
 	remap, smoothstep, luminance, mx_rgbtohsv, mx_hsvtorgb,
-	mix, split,
+	mix, saturation, transpose, determinant, inverse, log, reflect, refract, element,
 	mx_ramplr, mx_ramptb, mx_splitlr, mx_splittb,
 	mx_fractal_noise_float, mx_noise_float, mx_cell_noise_float, mx_worley_noise_float,
 	mx_transform_uv,
 	mx_safepower, mx_contrast,
 	mx_srgb_texture_to_lin_rec709,
-	saturation,
-	timerLocal, frameId
+	mx_add, mx_atan2, mx_divide, mx_modulo, mx_multiply, mx_power, mx_subtract,
+	mx_timer, mx_frame, mat3, mx_ramp4,
+	mx_invert, mx_ifgreater, mx_ifgreatereq, mx_ifequal, distance,
+	mx_separate, mx_place2d, mx_rotate2d, mx_rotate3d, mx_heighttonormal,
+	mx_unifiednoise2d, mx_unifiednoise3d
 } from 'three/tsl';
 
 const colorSpaceLib = {
@@ -35,19 +41,9 @@ class MXElement {
 
 // Ref: https://github.com/mrdoob/three.js/issues/24674
 
-const mx_add = ( in1, in2 = float( 0 ) ) => add( in1, in2 );
-const mx_subtract = ( in1, in2 = float( 0 ) ) => sub( in1, in2 );
-const mx_multiply = ( in1, in2 = float( 1 ) ) => mul( in1, in2 );
-const mx_divide = ( in1, in2 = float( 1 ) ) => div( in1, in2 );
-const mx_modulo = ( in1, in2 = float( 1 ) ) => mod( in1, in2 );
-const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
-const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan2( in1, in2 );
-const mx_timer = () => timerLocal();
-const mx_frame = () => frameId;
-const mx_invert = ( in1, amount = float( 1 ) ) => sub( amount, in1 );
+// Enhanced separate node to support multi-output referencing (outx, outy, outz, outw)
 
-const separate = ( in1, channel ) => split( in1, channel.at( - 1 ) );
-const extract = ( in1, index ) => in1.element( index );
+// Type/arity-aware MaterialX node wrappers
 
 const MXElements = [
 
@@ -70,7 +66,7 @@ const MXElements = [
 	new MXElement( 'acos', acos, [ 'in' ] ),
 	new MXElement( 'atan2', mx_atan2, [ 'in1', 'in2' ] ),
 	new MXElement( 'sqrt', sqrt, [ 'in' ] ),
-	//new MtlXElement( 'ln', ... ),
+	new MXElement( 'ln', log, [ 'in' ] ),
 	new MXElement( 'exp', exp, [ 'in' ] ),
 	new MXElement( 'clamp', clamp, [ 'in', 'low', 'high' ] ),
 	new MXElement( 'min', min, [ 'in1', 'in2' ] ),
@@ -79,19 +75,26 @@ const MXElements = [
 	new MXElement( 'magnitude', length, [ 'in1', 'in2' ] ),
 	new MXElement( 'dotproduct', dot, [ 'in1', 'in2' ] ),
 	new MXElement( 'crossproduct', cross, [ 'in' ] ),
+	new MXElement( 'distance', distance, [ 'in1', 'in2' ] ),
 	new MXElement( 'invert', mx_invert, [ 'in', 'amount' ] ),
 	//new MtlXElement( 'transformpoint', ... ),
 	//new MtlXElement( 'transformvector', ... ),
 	//new MtlXElement( 'transformnormal', ... ),
-	//new MtlXElement( 'transformmatrix', ... ),
+	new MXElement( 'transformmatrix', mul, [ 'in1', 'in2' ] ),
 	new MXElement( 'normalmap', normalMap, [ 'in', 'scale' ] ),
-	//new MtlXElement( 'transpose', ... ),
-	//new MtlXElement( 'determinant', ... ),
-	//new MtlXElement( 'invertmatrix', ... ),
+	new MXElement( 'transpose', transpose, [ 'in' ] ),
+	new MXElement( 'determinant', determinant, [ 'in' ] ),
+	new MXElement( 'invertmatrix', inverse, [ 'in' ] ),
+	new MXElement( 'creatematrix', mat3, [ 'in1', 'in2', 'in3' ] ),
 	//new MtlXElement( 'rotate2d', rotateUV, [ 'in', radians( 'amount' )** ] ),
 	//new MtlXElement( 'rotate3d', ... ),
 	//new MtlXElement( 'arrayappend', ... ),
 	//new MtlXElement( 'dot', ... ),
+
+	new MXElement( 'length', length, [ 'in' ] ),
+	new MXElement( 'crossproduct', cross, [ 'in1', 'in2' ] ),
+	new MXElement( 'floor', floor, [ 'in' ] ),
+	new MXElement( 'ceil', ceil, [ 'in' ] ),
 
 	// << Adjustment >>
 	new MXElement( 'remap', remap, [ 'in', 'inlow', 'inhigh', 'outlow', 'outhigh' ] ),
@@ -113,6 +116,7 @@ const MXElements = [
 	// << Procedural >>
 	new MXElement( 'ramplr', mx_ramplr, [ 'valuel', 'valuer', 'texcoord' ] ),
 	new MXElement( 'ramptb', mx_ramptb, [ 'valuet', 'valueb', 'texcoord' ] ),
+	new MXElement( 'ramp4', mx_ramp4, [ 'valuetl', 'valuetr', 'valuebl', 'valuebr', 'texcoord' ] ),
 	new MXElement( 'splitlr', mx_splitlr, [ 'valuel', 'valuer', 'texcoord' ] ),
 	new MXElement( 'splittb', mx_splittb, [ 'valuet', 'valueb', 'texcoord' ] ),
 	new MXElement( 'noise2d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ] ),
@@ -122,23 +126,34 @@ const MXElements = [
 	new MXElement( 'cellnoise3d', mx_cell_noise_float, [ 'texcoord' ] ),
 	new MXElement( 'worleynoise2d', mx_worley_noise_float, [ 'texcoord', 'jitter' ] ),
 	new MXElement( 'worleynoise3d', mx_worley_noise_float, [ 'texcoord', 'jitter' ] ),
-
+	new MXElement( 'unifiednoise2d', mx_unifiednoise2d, [ 'type', 'texcoord', 'freq', 'offset', 'jitter', 'outmin', 'outmax', 'clampoutput', 'octaves', 'lacunarity', 'diminish' ] ),
+	new MXElement( 'unifiednoise3d', mx_unifiednoise3d, [ 'type', 'texcoord', 'freq', 'offset', 'jitter', 'outmin', 'outmax', 'clampoutput', 'octaves', 'lacunarity', 'diminish' ] ),
 	// << Supplemental >>
 	//new MtlXElement( 'tiledimage', ... ),
 	//new MtlXElement( 'triplanarprojection', triplanarTextures, [ 'filex', 'filey', 'filez' ] ),
 	//new MtlXElement( 'ramp4', ... ),
-	//new MtlXElement( 'place2d', mx_place2d, [ 'texcoord', 'pivot', 'scale', 'rotate', 'offset' ] ),
+	new MXElement( 'place2d', mx_place2d, [ 'texcoord', 'pivot', 'scale', 'rotate', 'offset', 'operationorder' ] ),
 	new MXElement( 'safepower', mx_safepower, [ 'in1', 'in2' ] ),
 	new MXElement( 'contrast', mx_contrast, [ 'in', 'amount', 'pivot' ] ),
 	//new MtlXElement( 'hsvadjust', ... ),
 	new MXElement( 'saturate', saturation, [ 'in', 'amount' ] ),
-	new MXElement( 'extract', extract, [ 'in', 'index' ] ),
-	new MXElement( 'separate2', separate, [ 'in' ] ),
-	new MXElement( 'separate3', separate, [ 'in' ] ),
-	new MXElement( 'separate4', separate, [ 'in' ] ),
+	new MXElement( 'extract', element, [ 'in', 'index' ] ),
+	new MXElement( 'separate2', mx_separate, [ 'in' ] ),
+	new MXElement( 'separate3', mx_separate, [ 'in' ] ),
+	new MXElement( 'separate4', mx_separate, [ 'in' ] ),
+	new MXElement( 'reflect', reflect, [ 'in', 'normal' ] ),
+	new MXElement( 'refract', refract, [ 'in', 'normal', 'ior' ] ),
 
 	new MXElement( 'time', mx_timer ),
-	new MXElement( 'frame', mx_frame )
+	new MXElement( 'frame', mx_frame ),
+	new MXElement( 'ifgreater', mx_ifgreater, [ 'value1', 'value2', 'in1', 'in2' ] ),
+	new MXElement( 'ifgreatereq', mx_ifgreatereq, [ 'value1', 'value2', 'in1', 'in2' ] ),
+	new MXElement( 'ifequal', mx_ifequal, [ 'value1', 'value2', 'in1', 'in2' ] ),
+
+	// Placeholder implementations for unsupported nodes
+	new MXElement( 'rotate2d', mx_rotate2d, [ 'in', 'amount' ] ),
+	new MXElement( 'rotate3d', mx_rotate3d, [ 'in', 'amount', 'axis' ] ),
+	new MXElement( 'heighttonormal', mx_heighttonormal, [ 'in', 'scale', 'texcoord' ] ),
 
 ];
 
@@ -220,6 +235,22 @@ class MaterialXLoader extends Loader {
 	/**
 	 * Parses the given MaterialX data and returns the resulting materials.
 	 *
+	 * Supported standard_surface inputs:
+	 * - base, base_color: Base color/albedo
+	 * - opacity: Alpha/transparency
+	 * - specular_roughness: Surface roughness
+	 * - metalness: Metallic property
+	 * - specular: Specular reflection intensity
+	 * - specular_color: Specular reflection color
+	 * - ior: Index of refraction
+	 * - specular_anisotropy, specular_rotation: Anisotropic reflection
+	 * - transmission, transmission_color: Transmission properties
+	 * - thin_film_thickness, thin_film_ior: Thin film interference
+	 * - sheen, sheen_color, sheen_roughness: Sheen properties
+	 * - normal: Normal map
+	 * - coat, coat_roughness, coat_color: Clearcoat properties
+	 * - emission, emissionColor: Emission properties
+	 *
 	 * @param {string} text - The raw MaterialX data as a string.
 	 * @return {Object<string,NodeMaterial>} A dictionary holding the parse node materials.
 	 */
@@ -234,6 +265,12 @@ class MaterialXLoader extends Loader {
 class MaterialXNode {
 
 	constructor( materialX, nodeXML, nodePath = '' ) {
+
+		if ( ! materialX || typeof materialX !== 'object' ) {
+
+			console.warn( 'MaterialXNode: materialX argument is not an object!', { materialX, nodeXML, nodePath } );
+
+		}
 
 		this.materialX = materialX;
 		this.nodeXML = nodeXML;
@@ -373,9 +410,15 @@ class MaterialXNode {
 	getTexture() {
 
 		const filePrefix = this.getRecursiveAttribute( 'fileprefix' ) || '';
+		const uri = filePrefix + this.value;
+
+		if ( this.materialX.textureCache.has( uri ) ) {
+
+			return this.materialX.textureCache.get( uri );
+
+		}
 
 		let loader = this.materialX.textureLoader;
-		const uri = filePrefix + this.value;
 
 		if ( uri ) {
 
@@ -384,9 +427,17 @@ class MaterialXNode {
 
 		}
 
-		const texture = loader.load( uri );
+		const texture = new Texture();
 		texture.wrapS = texture.wrapT = RepeatWrapping;
-		texture.flipY = false;
+
+		this.materialX.textureCache.set( uri, texture );
+
+		loader.load( uri, function ( imageBitmap ) {
+
+			texture.image = imageBitmap;
+			texture.needsUpdate = true;
+
+		} );
 
 		return texture;
 
@@ -415,6 +466,37 @@ class MaterialXNode {
 		if ( node !== null && out === null ) {
 
 			return node;
+
+		}
+
+		// Handle <input name="texcoord" type="vector2" ... />
+		if (
+			this.element === 'input' &&
+			this.name === 'texcoord' &&
+			this.type === 'vector2'
+		) {
+
+			// Try to get index from defaultgeomprop (e.g., "UV0" => 0)
+			let index = 0;
+			const defaultGeomProp = this.getAttribute( 'defaultgeomprop' );
+			if ( defaultGeomProp && /^UV(\d+)$/.test( defaultGeomProp ) ) {
+
+				index = parseInt( defaultGeomProp.match( /^UV(\d+)$/ )[ 1 ], 10 );
+
+			}
+
+			node = uv( index );
+
+		}
+
+		// Multi-output support for separate/separate3
+		if (
+			( this.element === 'separate3' || this.element === 'separate2' || this.element === 'separate4' ) &&
+			out && typeof out === 'string' && out.startsWith( 'out' )
+		) {
+
+			const inNode = this.getNodeByName( 'in' );
+			return mx_separate( inNode, out );
 
 		}
 
@@ -519,6 +601,18 @@ class MaterialXNode {
 
 				const nodeElement = MtlXLibrary[ element ];
 
+				if ( ! nodeElement ) {
+
+					throw new Error( `THREE.MaterialXLoader: Unexpected node ${ new XMLSerializer().serializeToString( this.nodeXML ) }.` );
+
+				}
+
+				if ( ! nodeElement.nodeFunc ) {
+
+					throw new Error( `THREE.MaterialXLoader: Unexpected node 2 ${ new XMLSerializer().serializeToString( this.nodeXML ) }.` );
+
+				}
+
 				if ( out !== null ) {
 
 					node = nodeElement.nodeFunc( ...this.getNodesByNames( ...nodeElement.params ), out );
@@ -550,6 +644,11 @@ class MaterialXNode {
 		if ( nodeToTypeClass !== null ) {
 
 			node = nodeToTypeClass( node );
+
+		} else {
+
+			console.warn( `THREE.MaterialXLoader: Unexpected node ${ new XMLSerializer().serializeToString( this.nodeXML ) }.` );
+			node = float( 0 );
 
 		}
 
@@ -673,6 +772,12 @@ class MaterialXNode {
 
 		//
 
+		let opacityNode = null;
+
+		if ( inputs.opacity ) opacityNode = inputs.opacity;
+
+		//
+
 		let roughnessNode = null;
 
 		if ( inputs.specular_roughness ) roughnessNode = inputs.specular_roughness;
@@ -682,6 +787,64 @@ class MaterialXNode {
 		let metalnessNode = null;
 
 		if ( inputs.metalness ) metalnessNode = inputs.metalness;
+
+		//
+
+		let specularIntensityNode = null;
+
+		if ( inputs.specular ) specularIntensityNode = inputs.specular;
+
+		//
+
+		let specularColorNode = null;
+
+		if ( inputs.specular_color ) specularColorNode = inputs.specular_color;
+
+		//
+
+		let iorNode = null;
+
+		if ( inputs.ior ) iorNode = inputs.ior;
+
+		//
+
+		let anisotropyNode = null;
+		let anisotropyRotationNode = null;
+
+		if ( inputs.specular_anisotropy ) anisotropyNode = inputs.specular_anisotropy;
+		if ( inputs.specular_rotation ) anisotropyRotationNode = inputs.specular_rotation;
+
+		//
+
+		let transmissionNode = null;
+		let transmissionColorNode = null;
+
+		if ( inputs.transmission ) transmissionNode = inputs.transmission;
+		if ( inputs.transmission_color ) transmissionColorNode = inputs.transmission_color;
+
+		//
+
+		let thinFilmThicknessNode = null;
+		let thinFilmIorNode = null;
+
+		if ( inputs.thin_film_thickness ) thinFilmThicknessNode = inputs.thin_film_thickness;
+
+		if ( inputs.thin_film_ior ) {
+
+			// Clamp IOR to valid range for Three.js (1.0 to 2.333)
+			thinFilmIorNode = clamp( inputs.thin_film_ior, float( 1.0 ), float( 2.333 ) );
+
+		}
+
+		//
+
+		let sheenNode = null;
+		let sheenColorNode = null;
+		let sheenRoughnessNode = null;
+
+		if ( inputs.sheen ) sheenNode = inputs.sheen;
+		if ( inputs.sheen_color ) sheenColorNode = inputs.sheen_color;
+		if ( inputs.sheen_roughness ) sheenRoughnessNode = inputs.sheen_roughness;
 
 		//
 
@@ -717,12 +880,45 @@ class MaterialXNode {
 		//
 
 		material.colorNode = colorNode || color( 0.8, 0.8, 0.8 );
+		material.opacityNode = opacityNode || float( 1.0 );
 		material.roughnessNode = roughnessNode || float( 0.2 );
 		material.metalnessNode = metalnessNode || float( 0 );
+		material.specularIntensityNode = specularIntensityNode || float( 0.5 );
+		material.specularColorNode = specularColorNode || color( 1.0, 1.0, 1.0 );
+		material.iorNode = iorNode || float( 1.5 );
+		material.anisotropyNode = anisotropyNode || float( 0 );
+		material.anisotropyRotationNode = anisotropyRotationNode || float( 0 );
+		material.transmissionNode = transmissionNode || float( 0 );
+		material.transmissionColorNode = transmissionColorNode || color( 1.0, 1.0, 1.0 );
+		material.thinFilmThicknessNode = thinFilmThicknessNode || float( 0 );
+		material.thinFilmIorNode = thinFilmIorNode || float( 1.5 );
+		material.sheenNode = sheenNode || float( 0 );
+		material.sheenColorNode = sheenColorNode || color( 1.0, 1.0, 1.0 );
+		material.sheenRoughnessNode = sheenRoughnessNode || float( 0.5 );
 		material.clearcoatNode = clearcoatNode || float( 0 );
 		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
 		if ( normalNode ) material.normalNode = normalNode;
 		if ( emissiveNode ) material.emissiveNode = emissiveNode;
+
+		// Auto-enable iridescence when thin film parameters are present
+		if ( thinFilmThicknessNode && thinFilmThicknessNode.value !== undefined && thinFilmThicknessNode.value > 0 ) {
+
+			material.iridescence = 1.0;
+
+		}
+
+		if ( opacityNode !== null ) {
+
+			material.transparent = true;
+
+		}
+
+		if ( transmissionNode !== null ) {
+
+			material.side = DoubleSide;
+			material.transparent = true;
+
+		}
 
 	}
 
@@ -848,7 +1044,10 @@ class MaterialX {
 		this.nodesXLib = new Map();
 		//this.nodesXRefLib = new WeakMap();
 
-		this.textureLoader = new TextureLoader( manager );
+		this.textureLoader = new ImageBitmapLoader( manager );
+		this.textureLoader.setOptions( { imageOrientation: 'flipY' } );
+
+		this.textureCache = new Map();
 
 	}
 

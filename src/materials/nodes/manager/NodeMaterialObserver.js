@@ -465,13 +465,14 @@ class NodeMaterialObserver {
 
 				if ( renderObjectData.morphTargetInfluences[ i ] !== object.morphTargetInfluences[ i ] ) {
 
+					renderObjectData.morphTargetInfluences[ i ] = object.morphTargetInfluences[ i ];
 					morphChanged = true;
 
 				}
 
 			}
 
-			if ( morphChanged ) return true;
+			if ( morphChanged ) return false;
 
 		}
 
@@ -548,7 +549,7 @@ class NodeMaterialObserver {
 	 *
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {number} renderId - The render ID.
-	 * @return {Array} The lights for the given lights node and render ID.
+	 * @return {Array<Object>} The lights for the given lights node and render ID.
 	 */
 	getLights( lightsNode, renderId ) {
 

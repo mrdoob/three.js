@@ -4,14 +4,23 @@
 		<title>three.js webgpu - glTF + anisotropy</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - glTF + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_anisotropy" target="_blank" rel="noopener">KHR_materials_anisotropy</a><br />
-			Anisotropy Barn Lamp from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnisotropyBarnLamp" target="_blank" rel="noopener">glTF-Sample-Models</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>glTF + Anisotropy</span>
+			</div>
+
+			<small>
+				<a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_anisotropy" target="_blank" rel="noopener">KHR_materials_anisotropy</a>
+				Anisotropy Barn Lamp from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnisotropyBarnLamp" target="_blank" rel="noopener">glTF-Sample-Models</a><br />
+				<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,11 +36,11 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let renderer, scene, camera, controls;
 
@@ -42,7 +51,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.35;
 				document.body.appendChild( renderer.domElement );
@@ -56,14 +65,13 @@
 				controls.target.set( 0, - 0.08, 0.11 );
 				controls.minDistance = 0.1;
 				controls.maxDistance = 2;
-				controls.addEventListener( 'change', render );
 				controls.update();
 
-				const rgbeLoader = new RGBELoader().setPath( 'textures/equirectangular/' );
+				const hdrLoader = new HDRLoader().setPath( 'textures/equirectangular/' );
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/' );
 
 				const [ texture, gltf ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'royal_esplanade_1k.hdr' ),
+					hdrLoader.loadAsync( 'royal_esplanade_1k.hdr' ),
 					gltfLoader.loadAsync( 'AnisotropyBarnLamp.glb' ),
 				] );
 
@@ -93,9 +101,9 @@
 
 			}
 
-			function render() {
+			function animate() {
 
-				renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

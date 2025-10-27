@@ -4,14 +4,22 @@
 		<title>three.js webgpu - morph targets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 		<div id="container"></div>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - morph targets<br/>
-			by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Morph Targets</span>
+			</div>
+
+			<small>
+				Morph targets / blend shapes example with a simple geometry.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,9 +35,9 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -63,9 +71,8 @@
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				initGUI();
-
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.inspector = new Inspector();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( function () {
@@ -79,6 +86,8 @@
 				controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				initGUI();
 
 			}
 
@@ -139,14 +148,15 @@
 					Spherify: 0,
 					Twist: 0,
 				};
-				const gui = new GUI( { title: 'Morph Targets' } );
 
-				gui.add( params, 'Spherify', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+				const gui = renderer.inspector.createParameters( 'Morph Targets' );
+
+				gui.add( params, 'Spherify', 0, 1, 0.01 ).onChange( function ( value ) {
 
 					mesh.morphTargetInfluences[ 0 ] = value;
 
 				} );
-				gui.add( params, 'Twist', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+				gui.add( params, 'Twist', 0, 1, 0.01 ).onChange( function ( value ) {
 
 					mesh.morphTargetInfluences[ 1 ] = value;
 

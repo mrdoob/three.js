@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js docs</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
+		<link rel="stylesheet" type="text/css" href="../files/main.css">
+		<!-- console sandbox -->
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			window.THREE = THREE;
+		</script>
+	</head>
+	<body>
+		<div id="panel" translate="no">
+
+			<div id="header">
+				<h1><a href="https://threejs.org">three.js</a></h1>
+
+				<div id="sections">
+					<span class="selected">docs</span>
+					<a href="../manual/">manual</a>
+				</div>
+
+				<div id="expandButton"></div>
+			</div>
+
+			<div id="panelScrim"></div>
+
+			<div id="contentWrapper">
+				<div id="inputWrapper">
+					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="clearSearchButton"></div>
+				</div>
+				<div id="searchResults" style="display: none;"></div>
+				<div id="content">
+					<!--NAV_PLACEHOLDER-->
+				</div>
+			</div>
+
+		</div>
+
+		<iframe name="viewer"></iframe>
+
+		<script>
+
+		// Handle legacy URLs from old documentation structure
+		( function handleLegacyURLs() {
+
+			const hash = window.location.hash;
+
+			if ( hash.startsWith( '#api/' ) || hash.startsWith( '#examples/' ) ) {
+
+				const mappings = {
+
+					'3DMLoader': 'Rhino3dmLoader',
+
+					'BufferGeometryUtils': 'module-BufferGeometryUtils',
+					'CameraUtils': 'module-CameraUtils',
+					'SceneUtils': 'module-SceneUtils',
+					'SkeletonUtils': 'module-SkeletonUtils',
+					'UniformsUtils': 'module-UniformsUtils',
+
+					'DefaultLoadingManager': 'LoadingManager',
+					'Interpolations': 'module-Interpolations',
+
+					'Animation': 'global',
+					'BufferAttributeUsage': 'global',
+					'Core': 'global',
+					'CustomBlendingEquations': 'global',
+					'Materials': 'global',
+					'Textures': 'global'
+				};
+
+				const parts = hash.split( '/' );
+				let className = parts[ parts.length - 1 ];
+
+				if ( className ) {
+
+					if ( className in mappings ) className = mappings[ className ];
+
+					window.location.hash = className;
+
+				}
+
+			}
+
+		} )();
+
+		const panel = document.getElementById( 'panel' );
+		const content = document.getElementById( 'content' );
+		const expandButton = document.getElementById( 'expandButton' );
+		const clearSearchButton = document.getElementById( 'clearSearchButton' );
+		const panelScrim = document.getElementById( 'panelScrim' );
+		const filterInput = document.getElementById( 'filterInput' );
+		let iframe = document.getElementsByName( 'viewer' )[ 0 ];
+
+		const pageLinks = {};
+		let navigation;
+		let isUserClick = false;
+		let searchData;
+
+		fetch( 'search.json' )
+			.then( response => response.json() )
+			.then( data => {
+
+				searchData = data;
+
+				if ( filterInput.value !== '' ) {
+
+					updateFilter();
+
+				}
+
+			} )
+			.catch( err => console.error( 'Failed to load search data:', err ) );
+
+		init();
+
+		function init() {
+
+			expandButton.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			};
+
+			panelScrim.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			};
+
+			filterInput.onfocus = function () {
+
+				panel.classList.add( 'searchFocused' );
+
+			};
+
+			filterInput.onblur = function () {
+
+				if ( filterInput.value === '' ) {
+
+					panel.classList.remove( 'searchFocused' );
+
+				}
+
+			};
+
+			filterInput.oninput = function () {
+
+				updateFilter();
+
+			};
+
+			clearSearchButton.onclick = function () {
+
+				filterInput.value = '';
+				updateFilter();
+				filterInput.focus();
+
+			};
+
+			window.onpopstate = createNewIframe;
+
+			setupNavigation();
+			createNewIframe();
+
+			filterInput.value = extractQuery();
+
+			if ( filterInput.value !== '' ) {
+
+				panel.classList.add( 'searchFocused' );
+
+			}
+
+		}
+
+		// Navigation Panel
+
+		function setupNavigation() {
+
+			navigation = content;
+
+			const selectedPage = window.location.hash.substring( 1 );
+
+			const links = navigation.querySelectorAll( 'a' );
+
+			links.forEach( link => {
+
+				const href = link.getAttribute( 'href' );
+
+				if ( href && href.includes( '.html' ) ) {
+
+					const match = href.match( /^([^#]+\.html)(#.*)?$/ );
+					if ( ! match ) return;
+
+					const htmlFile = match[ 1 ];
+					const anchor = match[ 2 ] || '';
+					const pageName = htmlFile.replace( /\.html$/, '' );
+					const fullPageName = pageName + anchor.replace( '#', '.' );
+					const pageURL = 'pages/' + htmlFile;
+
+					link.setAttribute( 'href', pageURL + anchor );
+					link.setAttribute( 'target', 'viewer' );
+					link.addEventListener( 'click', function ( event ) {
+
+						if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+
+						event.preventDefault();
+						isUserClick = true;
+						window.location.hash = fullPageName;
+						panel.classList.remove( 'open' );
+
+						navigation.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+							item.classList.remove( 'selected' );
+
+						} );
+
+						link.classList.add( 'selected' );
+
+					} );
+
+					pageLinks[ fullPageName ] = {
+						linkElement: link,
+						pageURL: pageURL,
+						anchor: anchor,
+						href: href
+					};
+
+					if ( ! pageLinks[ pageName ] ) {
+
+						pageLinks[ pageName ] = {
+							linkElement: link,
+							pageURL: pageURL,
+							anchor: '',
+							href: htmlFile
+						};
+
+					}
+
+					if ( fullPageName === selectedPage || pageName === selectedPage ) {
+
+						link.classList.add( 'selected' );
+						scrollIntoViewVertical( link );
+
+					}
+
+				}
+
+			} );
+
+		}
+
+		function scrollIntoViewVertical( element ) {
+
+			const container = document.getElementById( 'content' );
+			const elementTop = element.offsetTop;
+			const elementHeight = element.offsetHeight;
+			const viewportHeight = window.innerHeight;
+
+			// Scroll to center the element vertically using viewport height
+			const scrollTop = elementTop - ( viewportHeight / 2 ) + ( elementHeight / 2 );
+			container.scrollTop = scrollTop;
+
+		}
+
+		function extractQuery() {
+
+			const search = window.location.search;
+
+			if ( search.indexOf( '?q=' ) !== - 1 ) {
+
+				return decodeURI( search.slice( 3 ) );
+
+			}
+
+			return '';
+
+		}
+
+		function escapeRegExp( string ) {
+
+			string = string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+			return '(?=.*' + string.split( ' ' ).join( ')(?=.*' ) + ')';
+
+		}
+
+		function updateFilter() {
+
+			let v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' );
+
+			const searchResults = document.getElementById( 'searchResults' );
+			const content = document.getElementById( 'content' );
+
+			if ( v !== '' ) {
+
+				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
+				// Show search results, hide navigation
+				searchResults.style.display = 'block';
+				content.style.display = 'none';
+
+				if ( searchData === undefined ) {
+
+					searchResults.innerHTML = '<div style="padding: 16px; color: #999;">Loading search data...</div>';
+					return;
+
+				}
+
+				const regExp = new RegExp( escapeRegExp( v ), 'gi' );
+				const highlightRegExp = new RegExp( v.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ), 'gi' );
+
+				// Search through all categories
+				const results = [];
+				for ( const category in searchData ) {
+
+					const items = searchData[ category ];
+					for ( const item of items ) {
+
+						if ( item.title.match( regExp ) ) {
+
+							results.push( { ...item, category } );
+
+						}
+
+					}
+
+				}
+
+				// Display results
+				if ( results.length > 0 ) {
+
+					// Group results by class
+					const grouped = {};
+					results.forEach( item => {
+
+						const parts = item.title.split( /[#~]/ );
+						const className = parts[ 0 ];
+						const memberName = parts[ 1 ];
+
+						if ( ! grouped[ className ] ) {
+
+							grouped[ className ] = {
+								class: null,
+								members: [],
+								category: item.category
+							};
+
+						}
+
+						// Convert title to hash: "BoxHelper#update" -> "BoxHelper.update"
+						const fullHash = item.title.replace( /[#~]/g, '.' );
+
+						if ( memberName ) {
+
+							if ( memberName.match( regExp ) ) {
+
+								grouped[ className ].members.push( {
+									name: memberName,
+									hash: fullHash,
+									kind: item.kind
+								} );
+
+							}
+
+						} else {
+
+							grouped[ className ].class = {
+								name: className,
+								hash: fullHash
+							};
+
+						}
+
+					} );
+
+					// Helper function to highlight matching text
+					function highlightMatch( text, regExp ) {
+
+						return text.replace( regExp, match => `<strong>${match}</strong>` );
+
+					}
+
+					// Group by category
+					const byCategory = {};
+					for ( const className in grouped ) {
+
+						const group = grouped[ className ];
+						const category = group.category || 'Other';
+
+						if ( ! byCategory[ category ] ) {
+
+							byCategory[ category ] = {};
+
+						}
+
+						byCategory[ category ][ className ] = group;
+
+					}
+
+					// Render grouped results with category headers
+					const currentHash = window.location.hash.substring( 1 );
+					let html = '';
+
+					const categories = Object.keys( searchData );
+					for ( const category of categories ) {
+
+						if ( ! byCategory[ category ] ) continue;
+
+						html += `<h2>${category}</h2>`;
+
+						for ( const className in byCategory[ category ] ) {
+
+							const group = byCategory[ category ][ className ];
+
+							if ( group.class ) {
+
+								html += '<div class="search-result-group">';
+								const selectedClass = group.class.hash === currentHash ? ' selected' : '';
+								const highlightedName = highlightMatch( group.class.name, highlightRegExp );
+								html += `<a href="#${group.class.hash}" class="search-result-class${selectedClass}">${highlightedName}</a>`;
+
+							}
+
+							if ( group.members.length > 0 ) {
+
+								if ( ! group.class ) {
+
+									html += '<div class="search-result-group">';
+									html += `<a href="#${className}" class="search-result-class">${className}</a>`;
+
+								}
+
+								group.members.forEach( member => {
+
+									const selectedClass = member.hash === currentHash ? ' selected' : '';
+									const highlightedName = highlightMatch( member.name, highlightRegExp );
+									const suffix = member.kind === 'function' ? '()' : '';
+									html += `<a href="#${member.hash}" class="search-result-member${selectedClass}">.${highlightedName}${suffix}</a>`;
+
+								} );
+
+							}
+
+							if ( group.class || group.members.length > 0 ) {
+
+								html += '</div>';
+
+							}
+
+						}
+
+					}
+
+					searchResults.innerHTML = html;
+
+					// Add click handlers to update selection
+					searchResults.querySelectorAll( 'a' ).forEach( link => {
+
+						link.addEventListener( 'click', function () {
+
+							// Remove selected class from all links
+							searchResults.querySelectorAll( 'a' ).forEach( item => {
+
+								item.classList.remove( 'selected' );
+
+							} );
+							// Add selected class to clicked link
+							link.classList.add( 'selected' );
+
+						} );
+
+					} );
+
+				} else {
+
+					searchResults.innerHTML = '<div style="padding: 16px; color: #999;">No results found.</div>';
+
+				}
+
+			} else {
+
+				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+
+				// Hide search results, show navigation
+				searchResults.style.display = 'none';
+				content.style.display = 'block';
+
+				// Highlight and scroll to current page in navigation
+				const currentHash = window.location.hash.substring( 1 );
+				if ( currentHash ) {
+
+					// Extract the base page name (before the first dot for members)
+					const basePage = currentHash.split( '.' )[ 0 ];
+
+					// Find and highlight the link in navigation
+					const pageInfo = pageLinks[ basePage ];
+					if ( pageInfo ) {
+
+						// Remove selected class from all links
+						navigation.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+							item.classList.remove( 'selected' );
+
+						} );
+
+						// Add selected class to current page
+						pageInfo.linkElement.classList.add( 'selected' );
+
+						// Scroll the link into view
+						scrollIntoViewVertical( pageInfo.linkElement );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		// Routing
+
+		function createNewIframe() {
+
+			const hash = window.location.hash.substring( 1 );
+
+			// Parse hash: "global.Break" -> pageName: "global", anchor: "#Break"
+			// or "BoxHelper" -> pageName: "BoxHelper", anchor: ""
+			let pageName, anchor;
+			const dotIndex = hash.indexOf( '.' );
+
+			if ( dotIndex !== - 1 ) {
+
+				pageName = hash.substring( 0, dotIndex );
+				anchor = '#' + hash.substring( dotIndex + 1 );
+
+			} else {
+
+				pageName = hash;
+				anchor = '';
+
+			}
+
+			let subtitle = '';
+
+			const oldIframe = iframe;
+			iframe = oldIframe.cloneNode();
+
+			iframe.style.display = 'none';
+
+			// Try to find the page link - first with full hash (e.g., "global.Break"), then without anchor
+			const fullPageName = hash;
+			let pageLink = pageLinks[ fullPageName ] || pageLinks[ pageName ];
+
+			// If not found and hash doesn't contain a dot, try TSL.{hash} or global.{hash}
+			if ( ! pageLink && dotIndex === - 1 && hash ) {
+
+				pageLink = pageLinks[ 'TSL.' + hash ] || pageLinks[ 'global.' + hash ];
+
+				// Update the hash to the full path
+				if ( pageLink ) {
+
+					const prefix = pageLinks[ 'TSL.' + hash ] ? 'TSL' : 'global';
+					window.history.replaceState( {}, '', window.location.pathname + window.location.search + '#' + prefix + '.' + hash );
+
+				}
+
+			}
+
+			if ( hash && pageLink ) {
+
+				iframe.onload = function () {
+
+					iframe.style.display = 'unset';
+
+					// Intercept clicks on internal documentation links in the iframe
+					setupIframeLinks();
+
+				};
+
+				// Use the stored anchor if available, otherwise use the parsed one
+				const iframeAnchor = pageLink.anchor || anchor;
+				iframe.src = pageLink.pageURL + iframeAnchor;
+				subtitle = hash + ' – ';
+
+				// Update navigation selection and scroll into view
+				navigation.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+					item.classList.remove( 'selected' );
+
+				} );
+
+				if ( pageLink.linkElement ) {
+
+					pageLink.linkElement.classList.add( 'selected' );
+
+					// Only scroll if this is not a user click (user clicks handle their own smooth scrolling)
+					if ( ! isUserClick ) {
+
+						scrollIntoViewVertical( pageLink.linkElement );
+
+					}
+
+					isUserClick = false;
+
+				}
+
+			} else {
+
+				iframe.src = '';
+				subtitle = '';
+
+			}
+
+			document.body.replaceChild( iframe, oldIframe );
+			document.title = subtitle + 'three.js docs';
+
+		}
+
+		function setupIframeLinks() {
+
+			try {
+
+				// Get the iframe's document
+				const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+				// Find all links in the iframe
+				const links = iframeDoc.querySelectorAll( 'a' );
+
+				links.forEach( function ( link ) {
+
+					link.addEventListener( 'click', function ( event ) {
+
+						const href = link.getAttribute( 'href' );
+
+						// Only handle relative links to .html files (with or without anchors)
+						if ( href && ! href.startsWith( 'http' ) && href.includes( '.html' ) ) {
+
+							event.preventDefault();
+
+							// Parse href: "global.html#Break" -> "global.Break" or "Light.html" -> "Light"
+							const match = href.match( /^([^#]+\.html)(#.*)?$/ );
+							if ( match ) {
+
+								const htmlFile = match[ 1 ];
+								const anchor = match[ 2 ] || '';
+								const pageName = htmlFile.replace( /\.html$/, '' );
+								// Convert to dot notation: "global.html#Break" -> "global.Break"
+								const fullHash = pageName + anchor.replace( '#', '.' );
+
+								// Update the parent page's hash
+								window.location.hash = fullHash;
+
+							}
+
+						}
+
+					} );
+
+				} );
+
+			} catch ( e ) {
+
+				// Ignore cross-origin errors
+				console.error( 'Could not set up iframe links:', e );
+
+			}
+
+		}
+
+		//
+
+		console.log( [
+			'    __     __',
+			' __/ __\\  / __\\__   ____   _____   _____',
+			'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
+			'\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
+			'/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
+			'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
+			'                                         / __/  /  \\__  \\',
+			'                                         \\/____/\\/_____/'
+		].join( '\n' ) );
+
+		</script>
+
+	</body>
+
+</html>

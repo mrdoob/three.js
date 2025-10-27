@@ -196,6 +196,7 @@ class USDZExporter {
 					planeAnchoring: { alignment: 'horizontal' },
 				},
 				includeAnchoringProperties: true,
+				onlyVisible: true,
 				quickLookCompatible: false,
 				maxTextureSize: 1024,
 			},
@@ -240,7 +241,7 @@ class USDZExporter {
 		const materials = {};
 		const textures = {};
 
-		buildHierarchy( scene, sceneNode, materials, usedNames, files );
+		buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
 
 		const materialsNode = buildMaterials(
 			materials,
@@ -426,13 +427,13 @@ function buildHeader() {
 
 // Xform
 
-function buildHierarchy( object, parentNode, materials, usedNames, files ) {
+function buildHierarchy( object, parentNode, materials, usedNames, files, options ) {
 
 	for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
 		const child = object.children[ i ];
 
-		if ( ! child.visible ) continue;
+		if ( child.visible === false && options.onlyVisible === true ) continue;
 
 		let childNode;
 
@@ -489,7 +490,7 @@ function buildHierarchy( object, parentNode, materials, usedNames, files ) {
 		if ( childNode ) {
 
 			parentNode.addChild( childNode );
-			buildHierarchy( child, childNode, materials, usedNames, files );
+			buildHierarchy( child, childNode, materials, usedNames, files, options );
 
 		}
 
@@ -793,13 +794,13 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			'uniform token info:id = "UsdPrimvarReader_float2"'
 		);
 		primvarReaderNode.addProperty( 'float2 inputs:fallback = (0.0, 0.0)' );
-		primvarReaderNode.addProperty( `token inputs:varname = "${uv}"` );
+		primvarReaderNode.addProperty( `string inputs:varname = "${uv}"` );
 		primvarReaderNode.addProperty( 'float2 outputs:result' );
 
 		const transform2dNode = new USDNode( `Transform2d_${mapType}`, 'Shader' );
 		transform2dNode.addProperty( 'uniform token info:id = "UsdTransform2d"' );
 		transform2dNode.addProperty(
-			`token inputs:in.connect = </Materials/Material_${material.id}/PrimvarReader_${mapType}.outputs:result>`
+			`float2 inputs:in.connect = </Materials/Material_${material.id}/PrimvarReader_${mapType}.outputs:result>`
 		);
 		transform2dNode.addProperty(
 			`float inputs:rotation = ${( rotation * ( 180 / Math.PI ) ).toFixed(
@@ -827,6 +828,13 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		if ( color !== undefined ) {
 
 			textureNode.addProperty( `float4 inputs:scale = ${buildColor4( color )}` );
+
+		}
+
+		if ( mapType === 'normal' ) {
+
+			textureNode.addProperty( 'float4 inputs:scale = (2, 2, 2, 1)' );
+			textureNode.addProperty( 'float4 inputs:bias = (-1, -1, -1, 0)' );
 
 		}
 
@@ -1203,6 +1211,7 @@ function buildCamera( camera, usedNames ) {
  * @typedef {Object} USDZExporter~Options
  * @property {number} [maxTextureSize=1024] - The maximum texture size that is going to be exported.
  * @property {boolean} [includeAnchoringProperties=true] - Whether to include anchoring properties or not.
+ * @property {boolean} [onlyVisible=true] - Export only visible 3D objects.
  * @property {Object} [ar] - If `includeAnchoringProperties` is set to `true`, the anchoring type and alignment
  * can be configured via `ar.anchoring.type` and `ar.planeAnchoring.alignment`.
  * @property {boolean} [quickLookCompatible=false] - Whether to make the exported USDZ compatible to QuickLook

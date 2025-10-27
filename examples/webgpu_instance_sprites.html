@@ -4,14 +4,22 @@
 		<title>three.js webgpu - instance sprites</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - instance sprites
-		</div>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Instanced Sprites</span>
+			</div>
+
+			<small>
+				Rendering instanced sprites with TSL.
+			</small>
+		</div>
+		
 		<script type="importmap">
 			{
 				"imports": {
@@ -25,15 +33,14 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { uniform, time, instanceIndex, instancedBufferAttribute } from 'three/tsl';
 
 
-			let camera, scene, renderer, stats, material;
+			let camera, scene, renderer, material;
 			let mouseX = 0, mouseY = 0;
 
 			let windowHalfX = window.innerWidth / 2;
@@ -89,16 +96,12 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
-				//
-
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( material, 'sizeAttenuation' ).onChange( function () {
 
@@ -106,8 +109,6 @@
 					material.scaleNode.value = material.sizeAttenuation ? 15 : 0.03;
 			
 				} );
-
-				gui.open();
 
 				//
 
@@ -146,7 +147,6 @@
 			function animate() {
 
 				render();
-				stats.update();
 
 			}
 

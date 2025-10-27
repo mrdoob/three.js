@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
@@ -481,6 +481,7 @@
 				guiCamera.top = bbox.max.y;
 				guiCamera.bottom = bbox.min.y;
 				guiCamera.updateProjectionMatrix();
+
 			}
 
 			function renderGui() {

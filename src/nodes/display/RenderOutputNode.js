@@ -56,9 +56,10 @@ class RenderOutputNode extends TempNode {
 		/**
 		 * The tone mapping type.
 		 *
+		 * @private
 		 * @type {?number}
 		 */
-		this.toneMapping = toneMapping;
+		this._toneMapping = toneMapping;
 
 		/**
 		 * The output color space.
@@ -78,13 +79,38 @@ class RenderOutputNode extends TempNode {
 
 	}
 
+	/**
+	 * Sets the tone mapping type.
+	 *
+	 * @param {number} value - The tone mapping type.
+	 * @return {ToneMappingNode} A reference to this node.
+	 */
+	setToneMapping( value ) {
+
+		this._toneMapping = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the tone mapping type.
+	 *
+	 * @returns {number} The tone mapping type.
+	 */
+	getToneMapping() {
+
+		return this._toneMapping;
+
+	}
+
 	setup( { context } ) {
 
 		let outputNode = this.colorNode || context.color;
 
 		// tone mapping
 
-		const toneMapping = ( this.toneMapping !== null ? this.toneMapping : context.toneMapping ) || NoToneMapping;
+		const toneMapping = ( this._toneMapping !== null ? this._toneMapping : context.toneMapping ) || NoToneMapping;
 		const outputColorSpace = ( this.outputColorSpace !== null ? this.outputColorSpace : context.outputColorSpace ) || NoColorSpace;
 
 		if ( toneMapping !== NoToneMapping ) {

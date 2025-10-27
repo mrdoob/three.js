@@ -1,7 +1,7 @@
 import terser from '@rollup/plugin-terser';
 import MagicString from 'magic-string';
 
-export function glsl() {
+function glsl() {
 
 	return {
 

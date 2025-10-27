@@ -1,7 +1,9 @@
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 import { vec4, renderOutput } from '../../nodes/TSL.js';
-import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
+import { NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
+import { warnOnce } from '../../utils.js';
 
 /**
  * This module is responsible to manage the post processing setups in apps.
@@ -81,6 +83,7 @@ class PostProcessing {
 		 * @type {QuadMesh}
 		 */
 		this._quadMesh = new QuadMesh( material );
+		this._quadMesh.name = 'Post-Processing';
 
 		/**
 		 * The context of the post processing stack.
@@ -110,7 +113,7 @@ class PostProcessing {
 		const outputColorSpace = renderer.outputColorSpace;
 
 		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = LinearSRGBColorSpace;
+		renderer.outputColorSpace = ColorManagement.workingColorSpace;
 
 		//
 
@@ -205,37 +208,16 @@ class PostProcessing {
 	 * its animation loop (not the one from the renderer).
 	 *
 	 * @async
+	 * @deprecated
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
 	async renderAsync() {
 
-		this._update();
+		warnOnce( 'PostProcessing: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
 
-		if ( this._context.onBeforePostProcessing !== null ) this._context.onBeforePostProcessing();
+		await this.renderer.init();
 
-		const renderer = this.renderer;
-
-		const toneMapping = renderer.toneMapping;
-		const outputColorSpace = renderer.outputColorSpace;
-
-		renderer.toneMapping = NoToneMapping;
-		renderer.outputColorSpace = LinearSRGBColorSpace;
-
-		//
-
-		const currentXR = renderer.xr.enabled;
-		renderer.xr.enabled = false;
-
-		await this._quadMesh.renderAsync( renderer );
-
-		renderer.xr.enabled = currentXR;
-
-		//
-
-		renderer.toneMapping = toneMapping;
-		renderer.outputColorSpace = outputColorSpace;
-
-		if ( this._context.onAfterPostProcessing !== null ) this._context.onAfterPostProcessing();
+		this.render();
 
 	}
 

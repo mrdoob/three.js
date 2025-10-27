@@ -4,7 +4,7 @@ let _color4 = null;
 import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { createCanvasElement, warnOnce } from '../../utils.js';
-import { REVISION } from '../../constants.js';
+import { REVISION, TimestampQuery } from '../../constants.js';
 
 /**
  * Most of the rendering related logic is implemented in the
@@ -38,7 +38,7 @@ class Backend {
 		 * This weak map holds backend-specific data of objects
 		 * like textures, attributes or render targets.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<Object, Object>}
 		 */
 		this.data = new WeakMap();
 
@@ -64,8 +64,8 @@ class Backend {
    		 * @type {{render: ?TimestampQueryPool, compute: ?TimestampQueryPool}}
 		 */
 		this.timestampQueryPool = {
-			'render': null,
-			'compute': null
+			[ TimestampQuery.RENDER ]: null,
+			[ TimestampQuery.COMPUTE ]: null
 		};
 
 		/**
@@ -273,20 +273,13 @@ class Backend {
 	// textures
 
 	/**
-	 * Creates a GPU sampler for the given texture.
+	 * Updates a GPU sampler for the given texture.
 	 *
 	 * @abstract
-	 * @param {Texture} texture - The texture to create the sampler for.
+	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @return {string} The current sampler key.
 	 */
-	createSampler( /*texture*/ ) { }
-
-	/**
-	 * Destroys the GPU sampler for the given texture.
-	 *
-	 * @abstract
-	 * @param {Texture} texture - The texture to destroy the sampler for.
-	 */
-	destroySampler( /*texture*/ ) {}
+	updateSampler( /*texture*/ ) { }
 
 	/**
 	 * Creates a default texture for the given texture that can be used
@@ -328,8 +321,9 @@ class Backend {
 	 *
 	 * @abstract
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( /*texture*/ ) { }
+	destroyTexture( /*texture, isDefaultTexture*/ ) { }
 
 	/**
 	 * Returns texture data as a typed array.
@@ -440,6 +434,103 @@ class Backend {
 	// utils
 
 	/**
+	 * Updates a unique identifier for the given render context that can be used
+	 * to allocate resources like occlusion queries or timestamp queries.
+	 *
+	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
+	 */
+	updateTimeStampUID( abstractRenderContext ) {
+
+		const contextData = this.get( abstractRenderContext );
+		const frame = this.renderer.info.frame;
+
+		let prefix;
+
+		if ( abstractRenderContext.isComputeNode === true ) {
+
+			prefix = 'c:' + this.renderer.info.compute.frameCalls;
+
+		} else {
+
+			prefix = 'r:' + this.renderer.info.render.frameCalls;
+
+		}
+
+		contextData.timestampUID = prefix + ':' + abstractRenderContext.id + ':f' + frame;
+
+	}
+
+	/**
+	 * Returns a unique identifier for the given render context that can be used
+	 * to allocate resources like occlusion queries or timestamp queries.
+	 *
+	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
+	 * @return {string} The unique identifier.
+	 */
+	getTimestampUID( abstractRenderContext ) {
+
+		return this.get( abstractRenderContext ).timestampUID;
+
+	}
+
+	/**
+	 * Returns all timestamp frames for the given type.
+	 *
+	 * @param {string} type - The type of the time stamp.
+	 * @return {Array<number>} The timestamp frames.
+	 */
+	getTimestampFrames( type ) {
+
+		const queryPool = this.timestampQueryPool[ type ];
+
+		return queryPool ? queryPool.getTimestampFrames() : [];
+
+	}
+
+	/**
+	 * Returns the query pool for the given uid.
+	 *
+	 * @param {string} uid - The unique identifier.
+	 * @return {TimestampQueryPool} The query pool.
+	 */
+	_getQueryPool( uid ) {
+
+		const type = uid.startsWith( 'c:' ) ? TimestampQuery.COMPUTE : TimestampQuery.RENDER;
+		const queryPool = this.timestampQueryPool[ type ];
+
+		return queryPool;
+
+	}
+
+	/**
+	 * Returns the timestamp for the given uid.
+	 *
+	 * @param {string} uid - The unique identifier.
+	 * @return {number} The timestamp.
+	 */
+	getTimestamp( uid ) {
+
+		const queryPool = this._getQueryPool( uid );
+
+		return queryPool.getTimestamp( uid );
+
+	}
+
+	/**
+	 * Returns `true` if a timestamp for the given uid is available.
+	 *
+	 * @param {string} uid - The unique identifier.
+	 * @return {boolean} Whether the timestamp is available or not.
+	 */
+	hasTimestamp( uid ) {
+
+		const queryPool = this._getQueryPool( uid );
+
+		return queryPool.hasTimestamp( uid );
+
+	}
+
+	/**
 	 * Returns `true` if the given 3D object is fully occluded by other
 	 * 3D objects in the scene. Backends must implement this method by using
 	 * a Occlusion Query API.
@@ -469,9 +560,9 @@ class Backend {
 		}
 
 		const queryPool = this.timestampQueryPool[ type ];
+
 		if ( ! queryPool ) {
 
-			warnOnce( `WebGPURenderer: No timestamp query pool for type '${type}' found.` );
 			return;
 
 		}
@@ -483,16 +574,6 @@ class Backend {
 		return duration;
 
 	}
-
-	/**
-	 * Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
-	 * the CPU waits for the GPU to complete its operation (e.g. a compute task).
-	 *
-	 * @async
-	 * @abstract
-	 * @return {Promise} A Promise that resolves when synchronization has been finished.
-	 */
-	async waitForGPU() {}
 
 	/**
 	 * This method performs a readback operation by moving buffer data from

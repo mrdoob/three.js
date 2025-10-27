@@ -8,22 +8,68 @@
 	<body>
 
 		<style>
+			* {
+				box-sizing: border-box;
+			}
 			#source {
 				position: absolute;
-				top: 0;
+				top: 50px;
 				left: 0;
-				width: 50%;
-				height: 100%;
+				width: calc(50% - 1px);
+				height: calc(100% - 50px);
 			}
 			#result {
 				position: absolute;
-				top: 0;
+				top: 50px;
 				right: 0;
 				width: 50%;
-				height: 100%;
+				height: calc(100% - 50px);
+			}
+			#source-dropdown {
+				position: absolute;
+				top: 0;
+				width: calc(50% - 1px);
+				z-index: 100;
+				padding: 10px;
+				background: #222;
+				text-align: center;
+			}
+			#result-dropdown {
+				position: absolute;
+				top: 0;
+				left: calc(50%);
+				width: 50%;
+				padding: 10px;
+				z-index: 100;
+				background: #222;
+				text-align: center;
+			}
+			select {
+				background: #333;
+				color: white;
+				border: 1px solid #555;
+				padding: 5px 10px;
+			}
+			label {
+				color: white;
+				font-family: Arial, sans-serif;
+				font-size: 14px;
 			}
 		</style>
 
+		<div id="source-dropdown">
+			<label for="decoder-select">Encoder</label>
+			<select id="decoder-select">
+				<option value="GLSL">GLSL</option>
+			</select>
+		</div>
+		<div id="result-dropdown">
+			<label for="encoder-select">Decoder</label>
+			<select id="encoder-select">
+				<option value="TSL">TSL</option>
+				<option value="WGSL">WGSL</option>
+			</select>
+		</div>
 		<div id="source"></div>
 		<div id="result"></div>
 		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
@@ -45,8 +91,6 @@
 			import GLSLDecoder from 'three/addons/transpiler/GLSLDecoder.js';
 			import WGSLEncoder from 'three/addons/transpiler/WGSLEncoder.js';
 			import TSLEncoder from 'three/addons/transpiler/TSLEncoder.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			init();
 
@@ -124,6 +168,7 @@ float pNoise(vec2 p, int res){
 						language: 'c',
 						theme: 'vs-dark',
 						automaticLayout: true,
+						wordWrap: 'on',
 						minimap: { enabled: false }
 					} );
 
@@ -132,6 +177,7 @@ float pNoise(vec2 p, int res){
 						language: 'javascript',
 						theme: 'vs-dark',
 						automaticLayout: true,
+						wordWrap: 'on',
 						readOnly: true,
 						minimap: { enabled: false }
 					} );
@@ -192,20 +238,28 @@ float pNoise(vec2 p, int res){
 
 					} );
 
-					// gui
+					// dropdowns
 
-					const gui = new GUI();
+					const decoderSelect = document.getElementById( 'decoder-select' );
+					const encoderSelect = document.getElementById( 'encoder-select' );
 
-					gui.add( options, 'decoder', [ 'GLSL' ] );
-					gui.add( options, 'encoder', [ 'TSL', 'WGSL' ] ).onChange( ( encoder => {
+					decoderSelect.addEventListener( 'change', () => {
 
-						const language = encoderLanguages[ encoder ];
+						options.decoder = decoderSelect.value;
+						build();
 
+					} );
+
+					encoderSelect.addEventListener( 'change', () => {
+
+						options.encoder = encoderSelect.value;
+
+						const language = encoderLanguages[ encoderSelect.value ];
 						window.monaco.editor.setModelLanguage( result.getModel(), language );
 
 						build();
 
-					} ) );
+					} );
 
 				} );
 

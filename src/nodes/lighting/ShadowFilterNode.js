@@ -22,7 +22,7 @@ const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
  */
 export const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
 
-	let basic = texture( depthTexture, shadowCoord.xy ).label( 't_basic' );
+	let basic = texture( depthTexture, shadowCoord.xy ).setName( 't_basic' );
 
 	if ( depthTexture.isArrayTexture ) {
 
@@ -245,6 +245,8 @@ const linearShadowDistance = ( light ) => {
  * If not, it creates a new `NodeMaterial` configured for shadow rendering and stores it
  * in the `shadowMaterialLib` for future use.
  *
+ * @tsl
+ * @function
  * @param {Light} light - The light source for which the shadow material is needed.
  *                         If the light is a point light, a depth node is calculated
  *                         using the linear shadow distance.

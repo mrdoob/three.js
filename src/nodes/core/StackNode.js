@@ -1,6 +1,7 @@
 import Node from './Node.js';
 import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } from '../tsl/TSLBase.js';
+import { error } from '../../utils.js';
 
 /**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
@@ -80,13 +81,13 @@ class StackNode extends Node {
 
 	getNodeType( builder ) {
 
-		return this.outputNode ? this.outputNode.getNodeType( builder ) : 'void';
+		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';
 
 	}
 
 	getMemberType( builder, name ) {
 
-		return this.outputNode ? this.outputNode.getMemberType( builder, name ) : 'void';
+		return this.hasOutput ? this.outputNode.getMemberType( builder, name ) : 'void';
 
 	}
 
@@ -96,7 +97,14 @@ class StackNode extends Node {
 	 * @param {Node} node - The node to add.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	add( node ) {
+	addToStack( node ) {
+
+		if ( node.isNode !== true ) {
+
+			error( 'TSL: Invalid node added to stack.' );
+			return this;
+
+		}
 
 		this.nodes.push( node );
 
@@ -116,7 +124,7 @@ class StackNode extends Node {
 		const methodNode = new ShaderNode( method );
 		this._currentCond = select( boolNode, methodNode );
 
-		return this.add( this._currentCond );
+		return this.addToStack( this._currentCond );
 
 	}
 
@@ -191,7 +199,7 @@ class StackNode extends Node {
 
 		} else {
 
-			throw new Error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
+			error( 'TSL: Invalid parameter length. Case() requires at least two parameters.' );
 
 		}
 
@@ -218,7 +226,7 @@ class StackNode extends Node {
 
 			this._currentCond = condNode;
 
-			return this.add( this._currentCond );
+			return this.addToStack( this._currentCond );
 
 		} else {
 
@@ -255,9 +263,7 @@ class StackNode extends Node {
 
 			if ( childNode.isVarNode && childNode.intent === true ) {
 
-				const properties = builder.getNodeProperties( childNode );
-
-				if ( properties.assign !== true ) {
+				if ( childNode.isAssign( builder ) !== true ) {
 
 					continue;
 
@@ -272,6 +278,12 @@ class StackNode extends Node {
 		// return a outputNode if exists or null
 
 		return nodeProperties.outputNode || null;
+
+	}
+
+	get hasOutput() {
+
+		return this.outputNode && this.outputNode.isNode;
 
 	}
 
@@ -290,9 +302,7 @@ class StackNode extends Node {
 
 			if ( node.isVarNode && node.intent === true ) {
 
-				const properties = builder.getNodeProperties( node );
-
-				if ( properties.assign !== true ) {
+				if ( node.isAssign( builder ) !== true ) {
 
 					continue;
 
@@ -325,7 +335,19 @@ class StackNode extends Node {
 
 		}
 
-		const result = this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
+		//
+
+		let result;
+
+		if ( this.hasOutput ) {
+
+			result = this.outputNode.build( builder, ...params );
+
+		} else {
+
+			result = super.build( builder, ...params );
+
+		}
 
 		setCurrentStack( previousStack );
 

@@ -4,12 +4,20 @@
 		<title>three.js webgpu - multiple render targets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank">threejs</a> webgpu - multiple rendertargets
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Multiple Render Targets</span>
+			</div>
+
+			<small>
+				Using multiple render targets to output color and normals to separate buffers.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -25,7 +33,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { mix, vec2, step, texture, uv, screenUV, normalWorld, output, mrt } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';

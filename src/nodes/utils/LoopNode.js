@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
-import { nodeObject, nodeArray, Fn } from '../tsl/TSLBase.js';
+import { nodeArray, Fn } from '../tsl/TSLBase.js';
+import { error } from '../../utils.js';
 
 /**
  * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
@@ -138,6 +139,13 @@ class LoopNode extends Node {
 
 		this.getProperties( builder );
 
+		if ( builder.fnCall ) {
+
+			const shaderNodeData = builder.getDataFromNode( builder.fnCall.shaderNode );
+			shaderNodeData.hasLoop = true;
+
+		}
+
 	}
 
 	generate( builder ) {
@@ -267,7 +275,7 @@ class LoopNode extends Node {
 
 							} else {
 
-								console.error( 'THREE.TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
 
 								updateSnippet = 'break /* invalid update */';
 
@@ -332,7 +340,7 @@ export default LoopNode;
  * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
-export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).toStack();
+export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
  * TSL function for creating a `Continue()` expression.

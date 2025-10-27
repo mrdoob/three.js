@@ -1,3 +1,5 @@
+import { warn } from '../../utils.js';
+
 /**
  * Abstract base class of a timestamp query pool.
  *
@@ -60,6 +62,13 @@ class TimestampQueryPool {
 		this.lastValue = 0;
 
 		/**
+		 * Stores all timestamp frames.
+		 *
+		 * @type {Array<number>}
+		 */
+		this.frames = [];
+
+		/**
 		 * TODO
 		 *
 		 * @type {boolean}
@@ -67,16 +76,69 @@ class TimestampQueryPool {
 		 */
 		this.pendingResolve = false;
 
+		/**
+		 * Stores the latest timestamp for each render context.
+		 *
+		 * @type {Map<string, number>}
+		 */
+		this.timestamps = new Map();
+
 	}
 
 	/**
-	 * Allocate queries for a specific renderContext.
+	 * Returns all timestamp frames.
+	 *
+	 * @return {Array<number>} The timestamp frames.
+	 */
+	getTimestampFrames() {
+
+		return this.frames;
+
+	}
+
+	/**
+	 * Returns the timestamp for a given render context.
+	 *
+	 * @param {string} uid - A unique identifier for the render context.
+	 * @return {?number} The timestamp, or undefined if not available.
+	 */
+	getTimestamp( uid ) {
+
+		let timestamp = this.timestamps.get( uid );
+
+		if ( timestamp === undefined ) {
+
+			warn( `TimestampQueryPool: No timestamp available for uid ${ uid }.` );
+
+			timestamp = 0;
+
+		}
+
+		return timestamp;
+
+	}
+
+	/**
+	 * Returns whether a timestamp is available for a given render context.
+	 *
+	 * @param {string} uid - A unique identifier for the render context.
+	 * @return {boolean} True if a timestamp is available, false otherwise.
+	 */
+	hasTimestamp( uid ) {
+
+		return this.timestamps.has( uid );
+
+	}
+
+	/**
+	 * Allocate queries for a specific uid.
 	 *
 	 * @abstract
-	 * @param {Object} renderContext - The render context to allocate queries for.
+	 * @param {string} uid - A unique identifier for the render context.
+	 * @param {number} frameId - The current frame identifier.
 	 * @returns {?number}
 	 */
-	allocateQueriesForContext( /* renderContext */ ) {}
+	allocateQueriesForContext( /* uid, frameId */ ) {}
 
 	/**
 	 * Resolve all timestamps and return data (or process them).

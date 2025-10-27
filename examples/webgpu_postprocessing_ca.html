@@ -4,13 +4,19 @@
 		<title>three.js webgpu - chromatic aberration</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - chromatic aberration
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>CA</span>
+			</div>
+
+			<small>Chromatic Aberration effect.</small>
 		</div>
 
 		<script type="importmap">
@@ -26,20 +32,20 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { pass, renderOutput, uniform } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const params = {
 				enabled: true,
 				animated: true,
 				strength: 1.5,
-				center: new THREE.Vector2(0.5, 0.5),
+				center: new THREE.Vector2( 0.5, 0.5 ),
 				scale: 1.2,
 				autoRotate: true,
 				cameraDistance: 40
@@ -56,7 +62,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.set( 0, 15, params.cameraDistance );
@@ -65,7 +74,7 @@
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.1;
 				controls.autoRotate = true;
-				controls.autoRotateSpeed = -0.1;
+				controls.autoRotateSpeed = - 0.1;
 				controls.target.set( 0, 0.5, 0 );
 				controls.update();
 
@@ -86,7 +95,7 @@
 
 				// Add a grid for reference
 				const gridHelper = new THREE.GridHelper( 40, 20, 0x444444, 0x222222 );
-				gridHelper.position.y = -10;
+				gridHelper.position.y = - 10;
 				scene.add( gridHelper );
 
 				// post processing
@@ -112,8 +121,7 @@
 
 				// GUI
 
-				const gui = new GUI();
-				gui.title( 'Chromatic Aberration' );
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 
@@ -153,7 +161,7 @@
 					0xff00ff, // Magenta
 					0x00ffff, // Cyan
 					0xffffff, // White
-					0xff8800  // Orange
+					0xff8800 // Orange
 				];
 
 				// Create materials
@@ -165,7 +173,7 @@
 						metalness: 0.8
 					} ) );
 
-				});
+				} );
 
 				// Create geometries
 				const geometries = [
@@ -195,7 +203,7 @@
 				centralGroup.add( centralTorus );
 
 				// Inner rotating shapes
-				for ( let i = 0; i < 6; i++ ) {
+				for ( let i = 0; i < 6; i ++ ) {
 
 					const angle = ( i / 6 ) * Math.PI * 2;
 					const radius = 3;
@@ -224,7 +232,7 @@
 				const numShapes = 12;
 				const outerRadius = 15;
 
-				for ( let i = 0; i < numShapes; i++ ) {
+				for ( let i = 0; i < numShapes; i ++ ) {
 
 					const angle = ( i / numShapes ) * Math.PI * 2;
 					const shapesGroup = new THREE.Group();
@@ -326,6 +334,7 @@
 				}
 
 				postProcessing.render();
+			
 			}
 
 		</script>

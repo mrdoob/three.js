@@ -61,7 +61,7 @@ class GlitchPass extends Pass {
 		// internals
 
 		this._heightMap = this._generateHeightmap( dt_size );
-		this.uniforms[ 'tDisp' ].value = this.heightMap;
+		this.uniforms[ 'tDisp' ].value = this._heightMap;
 
 		this._fsQuad = new FullScreenQuad( this.material );
 
@@ -140,7 +140,7 @@ class GlitchPass extends Pass {
 
 		this.material.dispose();
 
-		this.heightMap.dispose();
+		this._heightMap.dispose();
 
 		this._fsQuad.dispose();
 

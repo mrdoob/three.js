@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>HorizontalTiltShiftShader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">HorizontalTiltShiftShader</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">HorizontalTiltShiftShader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { HorizontalTiltShiftShader } from 'three/addons/shaders/HorizontalTiltShiftShader.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="~HorizontalTiltShiftShader" translate="no">.<a href="#~HorizontalTiltShiftShader">HorizontalTiltShiftShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position.</p>
+<ul>
+<li>9 samples per pass</li>
+<li>standard deviation 2.7</li>
+<li>&quot;h&quot; and &quot;v&quot; parameters should be set to &quot;1 / width&quot; and &quot;1 / height&quot;</li>
+<li>&quot;r&quot; parameter control where &quot;focused&quot; horizontal line lies</li>
+</ul>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/HorizontalTiltShiftShader.js" target="_blank" rel="noopener" translate="no">examples/jsm/shaders/HorizontalTiltShiftShader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

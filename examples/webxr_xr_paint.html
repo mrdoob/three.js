@@ -32,6 +32,7 @@
 			let controller1, controller2;
 
 			const cursor = new THREE.Vector3();
+			const color = new THREE.Color();
 
 			let controls;
 
@@ -106,7 +107,9 @@
 
 					this.userData.isSqueezing = true;
 					this.userData.positionAtSqueezeStart = this.position.y;
-					this.userData.scaleAtSqueezeStart = this.scale.x;
+					
+					const pivot = this.getObjectByName( 'pivot' );
+					this.userData.scaleAtSqueezeStart = pivot.scale.x;
 
 				}
 
@@ -183,6 +186,10 @@
 				cursor.setFromMatrixPosition( pivot.matrixWorld );
 
 				if ( userData.isSelecting === true ) {
+
+					const hue = ( performance.now() * 0.001 ) % 1;
+					color.setHSL( hue, 1.0, 0.5 );
+					painter.setColor( color );
 
 					painter.lineTo( cursor );
 					painter.update();

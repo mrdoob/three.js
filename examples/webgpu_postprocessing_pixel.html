@@ -4,16 +4,20 @@
 		<title>three.js webgpu - postprocessing pixel</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 <body>
-	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node based pixelation pass with optional single pixel outlines by
-		<a href="https://github.com/KodyJKing" target="_blank" rel="noopener">Kody King</a><br /><br />
-	</div>
 
-	<div id="container"></div>
+	<div id="info">
+		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+		<div class="title-wrapper">
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Pixelation</span>
+		</div>
+
+		<small>Node based pixelation pass with optional single pixel outlines by <a href="https://github.com/KodyJKing" target="_blank" rel="noopener">Kody King</a>.</small>
+	</div>
 
 	<script type="importmap">
 		{
@@ -29,16 +33,16 @@
 
 	<script type="module">
 
-		import * as THREE from 'three';
+		import * as THREE from 'three/webgpu';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		import { uniform } from 'three/tsl';
 		import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js';
 
 		let camera, scene, renderer, postProcessing, crystalMesh, clock;
-		let gui, effectController;
+		let effectController;
 
 		init();
 
@@ -128,10 +132,11 @@
 			scene.add( spotLight );
 
 			renderer = new THREE.WebGPURenderer();
-			renderer.shadowMap.enabled = true;
-			renderer.shadowMap.type = THREE.BasicShadowMap;
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
+			renderer.inspector = new Inspector();
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.BasicShadowMap;
 			document.body.appendChild( renderer.domElement );
 
 			effectController = {
@@ -152,7 +157,7 @@
 
 			// gui
 
-			gui = new GUI();
+			const gui = renderer.inspector.createParameters( 'Settings' );
 			gui.add( effectController.pixelSize, 'value', 1, 16, 1 ).name( 'Pixel Size' );
 			gui.add( effectController.normalEdgeStrength, 'value', 0, 2, 0.05 ).name( 'Normal Edge Strength' );
 			gui.add( effectController.depthEdgeStrength, 'value', 0, 1, 0.05 ).name( 'Depth Edge Strength' );

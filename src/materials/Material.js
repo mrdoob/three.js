@@ -2,6 +2,7 @@ import { Color } from '../math/Color.js';
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import { generateUUID } from '../math/MathUtils.js';
+import { warn } from '../utils.js';
 
 let _materialId = 0;
 
@@ -561,7 +562,7 @@ class Material extends EventDispatcher {
 
 			if ( newValue === undefined ) {
 
-				console.warn( `THREE.Material: parameter '${ key }' has value of undefined.` );
+				warn( `Material: parameter '${ key }' has value of undefined.` );
 				continue;
 
 			}
@@ -570,7 +571,7 @@ class Material extends EventDispatcher {
 
 			if ( currentValue === undefined ) {
 
-				console.warn( `THREE.Material: '${ key }' is not a property of THREE.${ this.type }.` );
+				warn( `Material: '${ key }' is not a property of THREE.${ this.type }.` );
 				continue;
 
 			}
@@ -661,6 +662,18 @@ class Material extends EventDispatcher {
 
 			data.clearcoatNormalMap = this.clearcoatNormalMap.toJSON( meta ).uuid;
 			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
+
+		}
+
+		if ( this.sheenColorMap && this.sheenColorMap.isTexture ) {
+
+			data.sheenColorMap = this.sheenColorMap.toJSON( meta ).uuid;
+
+		}
+
+		if ( this.sheenRoughnessMap && this.sheenRoughnessMap.isTexture ) {
+
+			data.sheenRoughnessMap = this.sheenRoughnessMap.toJSON( meta ).uuid;
 
 		}
 

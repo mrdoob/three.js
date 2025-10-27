@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - VFX Tornado</title>
+		<title>three.js webgpu - vfx tornado</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - VFX Tornado
-			<br>
-			Based on <a href="https://threejs-journey.com/lessons/galaxy-generator" target="_blank" rel="noopener">Three.js Journey</a> lesson
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>VFX Tornado</span>
+			</div>
+
+			<small>
+				Based on <a href="https://threejs-journey.com/lessons/galaxy-generator" target="_blank" rel="noopener">Three.js Journey</a> lesson.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,12 +33,13 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { luminance, cos, min, time, atan, uniform, pass, PI, PI2, color, positionLocal, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { luminance, cos, min, time, atan, uniform, pass, PI, TWO_PI, color, positionLocal, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, postProcessing, controls;
 
@@ -59,7 +66,7 @@
 					const centeredUv = uv.sub( 0.5 ).toVar();
 					const distanceToCenter = centeredUv.length();
 					const angle = atan( centeredUv.y, centeredUv.x );
-					const radialUv = vec2( angle.add( PI ).div( PI2 ), distanceToCenter ).toVar();
+					const radialUv = vec2( angle.add( PI ).div( TWO_PI ), distanceToCenter ).toVar();
 					radialUv.mulAssign( multiplier );
 					radialUv.x.addAssign( rotation );
 					radialUv.y.addAssign( offset );
@@ -276,6 +283,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// post processing
@@ -301,7 +309,7 @@
 
 				// debug
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.addColor( { color: emissiveColor.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).onChange( value => emissiveColor.value.set( value ) ).name( 'emissiveColor' );
 				gui.add( timeScale, 'value', - 1, 1, 0.01 ).name( 'timeScale' );

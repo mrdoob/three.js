@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - GLTF with progressive loading</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+			
+	 <!--
+			Documentation: 
+			https://www.npmjs.com/package/@needle-tools/gltf-progressive
+
+			Example:
+			Initial download reduced by 98.8% with progressive loading.
+			Mesh and texture LODs are loaded on demand depending on the mesh size on screen.
+
+			→ 237.9 MB original asset sizes 
+			→ 2.9 MB initial download (base data)
+			→ 46.3 MB progressive download on demand (all LODs, in reality only individual levels are actually loaded)
+	-->
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTF progressive loading: 82x faster - <a href="https://www.npmjs.com/package/@needle-tools/gltf-progressive" target="_blank" rel="noopener">@needle-tools/gltf-progressive</a><br />
+			Mobile Home & Peachy Balloon by
+			<a href="https://sketchfab.com/3d-models/mobile-home-5240b1dbc29c4ea28be7f91b3638951a" target="_blank" rel="noopener">ConradJustin</a><br/>
+			The Forgotten Knight by 
+			<a href="https://sketchfab.com/3d-models/the-forgotten-knight-d14eb14d83bd4e7ba7cbe443d76a10fd" target="_blank" rel="noopener">Dark Igorek</a><br />
+			<a href="https://hdrihaven.com/hdri/?h=quarry_01" target="_blank" rel="noopener">Quarry 01</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/examples/": "./",
+					"@needle-tools/gltf-progressive": "https://cdn.jsdelivr.net/npm/@needle-tools/gltf-progressive@3.2.0/gltf-progressive.min.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+      		import { useNeedleProgressive } from '@needle-tools/gltf-progressive';
+
+			let camera, scene, renderer, mixer;
+			let airshipModel;
+
+			init();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 40 );
+				camera.position.set( - 9, 2, - 13 );
+
+				const fog = new THREE.Fog( '#131055', 15, 50 );
+				scene.fog = fog;
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = .1;
+				controls.maxDistance = 20;
+				controls.target.set( - 1, 2.1, 0 );
+				controls.update();
+
+				new HDRLoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						scene.background = new THREE.Color( '#192022' );
+						scene.backgroundBlurriness = .5;
+						scene.environment = texture;
+						scene.environmentRotation = new THREE.Euler( 0, Math.PI / - 2, 0, 'XYZ' );
+
+					} );
+			
+
+				mixer = new THREE.AnimationMixer( scene );
+
+				const loader = new GLTFLoader();
+
+				useNeedleProgressive( loader, renderer );
+
+				loader.load( 'https://cloud.needle.tools/-/assets/Z23hmXBZ2sPRdk-world/file', function ( gltf ) {
+
+					const model = gltf.scene;
+
+					model.scale.multiplyScalar( 0.1 );
+
+					scene.add( model );
+			
+					const animations = gltf.animations;
+					if ( animations && animations.length ) {
+
+						for ( const animation of animations ) {
+
+							mixer.clipAction( animation ).play();
+
+						}
+			
+					}
+			
+				} );
+
+				loader.load( 'https://cloud.needle.tools/-/assets/Z23hmXBZnlceI-ZnlceI-world/file', function ( gltf ) {
+
+					const model = gltf.scene;
+			
+					model.scale.multiplyScalar( 0.0005 );
+
+					model.position.set( 1.6, 6, 7 );
+
+					model.rotation.set( 0, Math.PI * 1.4, 0 );
+			
+					scene.add( model );
+
+					airshipModel = model;
+			
+					const animations = gltf.animations;
+			
+					if ( animations && animations.length ) {
+
+						for ( const animation of animations ) {
+
+							mixer.clipAction( animation ).play();
+
+						}
+			
+					}
+
+				} );
+
+				loader.load( 'https://cloud.needle.tools/-/assets/Z23hmXBZ21QnG-Z21QnG-product/file', function ( gltf ) {
+
+					const model = gltf.scene;
+			
+					model.scale.multiplyScalar( 0.5 );
+
+					model.position.set( 2, 5.15, 2.3 );
+
+					model.rotation.set( 0, Math.PI * 1, 0 );
+			
+					scene.add( model );
+			
+					const animations = gltf.animations;
+					if ( animations && animations.length ) {
+
+						for ( const animation of animations ) {
+
+							mixer.clipAction( animation ).play();
+
+						}
+			
+					}
+
+				} );
+
+
+				container.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			const clock = new THREE.Clock();
+			let time = 0;
+
+			function animate() {
+
+				const dt = clock.getDelta();
+				time += dt;
+
+				mixer.update( dt );
+
+				if ( airshipModel ) {
+
+					airshipModel.position.y += Math.sin( time ) * 0.002;
+
+				}
+
+				renderer.render( scene, camera );
+
+				window.requestAnimationFrame( animate );
+
+			}
+
+			animate();
+
+		</script>
+
+	</body>
+</html>

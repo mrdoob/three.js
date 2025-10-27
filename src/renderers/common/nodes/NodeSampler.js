@@ -38,10 +38,22 @@ class NodeSampler extends Sampler {
 
 	/**
 	 * Updates the texture value of this sampler.
+	 *
+	 * @return {boolean} Whether the sampler needs an update or not.
 	 */
 	update() {
 
-		this.texture = this.textureNode.value;
+		const { textureNode } = this;
+
+		if ( this.texture !== textureNode.value ) {
+
+			this.texture = textureNode.value;
+
+			return true;
+
+		}
+
+		return super.update();
 
 	}
 

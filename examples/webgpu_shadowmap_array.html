@@ -4,11 +4,20 @@
 		<title>three.js webgpu - shadow map array tile demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
-		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - tile shadow using shadow map array demonstration
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Shadow Map Array</span>
+			</div>
+
+			<small>
+				Tile shadow using shadow map array demonstration
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -17,15 +26,14 @@
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
-					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { mx_fractal_noise_vec3, positionWorld, Fn, color } from 'three/tsl';
 
 			import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js';
@@ -33,10 +41,10 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from 'stats-gl';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, clock;
-			let dirLight, stats;
+			let dirLight;
 			let torusKnot, dirGroup;
 			let tsmHelper;
 
@@ -50,6 +58,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 
+				renderer.inspector = new Inspector();
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -59,6 +69,7 @@
 				document.body.appendChild( renderer.domElement );
 			
 				await renderer.init();
+
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 45, 60, 100 );
 
@@ -125,8 +136,6 @@
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-
-			
 				// Spread various objects across the scene
 				createScenery();
 
@@ -137,16 +146,6 @@
 				controls.maxDistance = 400;
 				controls.maxPolarAngle = Math.PI / 2 - 0.1; // Prevent camera from going below ground
 				controls.update();
-
-
-				stats = new Stats( {
-					precision: 3,
-					horizontal: false,
-					trackGPU: true
-				} );
-				stats.init( renderer );
-				document.body.appendChild( stats.dom );
-
 
 				clock = new THREE.Clock();
 
@@ -407,9 +406,6 @@
 				renderer.render( scene, camera );
 
 				tsmHelper.update();
-
-				await renderer.resolveTimestampsAsync();
-				stats.update();
 
 			}
 

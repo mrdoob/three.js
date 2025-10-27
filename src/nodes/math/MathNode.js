@@ -2,6 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { sub, mul, div, mod, equal } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxyIntent, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
+import { warn } from '../../utils.js';
 
 /**
  * This node represents a variety of mathematical methods available in shaders.
@@ -290,7 +291,7 @@ class MathNode extends TempNode {
 
 				if ( builder.shaderStage !== 'fragment' && ( method === MathNode.DFDX || method === MathNode.DFDY ) ) {
 
-					console.warn( `THREE.TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
+					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.` );
 
 					method = '/*' + method + '*/';
 
@@ -361,10 +362,11 @@ MathNode.RECIPROCAL = 'reciprocal';
 MathNode.TRUNC = 'trunc';
 MathNode.FWIDTH = 'fwidth';
 MathNode.TRANSPOSE = 'transpose';
+MathNode.DETERMINANT = 'determinant';
+MathNode.INVERSE = 'inverse';
 
 // 2 inputs
 
-MathNode.BITCAST = 'bitcast';
 MathNode.EQUALS = 'equals';
 MathNode.MIN = 'min';
 MathNode.MAX = 'max';
@@ -414,12 +416,29 @@ export const INFINITY = /*@__PURE__*/ float( 1e6 );
 export const PI = /*@__PURE__*/ float( Math.PI );
 
 /**
+ * Represents PI * 2. Please use the non-deprecated version `TWO_PI`.
+ *
+ * @tsl
+ * @deprecated
+ * @type {Node<float>}
+ */
+export const PI2 = /*@__PURE__*/ float( Math.PI * 2 ); // @deprecated r181
+
+/**
  * Represents PI * 2.
  *
  * @tsl
  * @type {Node<float>}
  */
-export const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
+export const TWO_PI = /*@__PURE__*/ float( Math.PI * 2 );
+
+/**
+ * Represents PI / 2.
+ *
+ * @tsl
+ * @type {Node<float>}
+ */
+export const HALF_PI = /*@__PURE__*/ float( Math.PI * 0.5 );
 
 /**
  * Returns `true` if all components of `x` are `true`.
@@ -743,18 +762,27 @@ export const fwidth = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FWIDTH )
  */
 export const transpose = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANSPOSE ).setParameterLength( 1 );
 
-// 2 inputs
-
 /**
- * Reinterpret the bit representation of a value in one type as a value in another type.
+ * Returns the determinant of a matrix.
  *
  * @tsl
  * @function
- * @param {Node | number} x - The parameter.
- * @param {string} y - The new type.
- * @returns {Node}
+ * @param {Node<mat2|mat3|mat4>} x - The parameter.
+ * @returns {Node<float>}
  */
-export const bitcast = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.BITCAST ).setParameterLength( 2 );
+export const determinant = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DETERMINANT ).setParameterLength( 1 );
+
+/**
+ * Returns the inverse of a matrix.
+ *
+ * @tsl
+ * @function
+ * @param {Node<mat2|mat3|mat4>} x - The parameter.
+ * @returns {Node<mat2|mat3|mat4>}
+ */
+export const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE ).setParameterLength( 1 );
+
+// 2 inputs
 
 /**
  * Returns `true` if `x` equals `y`.
@@ -768,7 +796,7 @@ export const bitcast = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.BITCAST
  */
 export const equals = ( x, y ) => { // @deprecated, r172
 
-	console.warn( 'THREE.TSL: "equals" is deprecated. Use "equal" inside a vector instead, like: "bvec*( equal( ... ) )"' );
+	warn( 'TSL: "equals" is deprecated. Use "equal" inside a vector instead, like: "bvec*( equal( ... ) )"' );
 	return equal( x, y );
 
 };
@@ -853,9 +881,9 @@ export const dot = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DOT ).setPa
  *
  * @tsl
  * @function
- * @param {Node<vec2|vec3|vec4>} x - The first vector.
- * @param {Node<vec2|vec3|vec4>} y - The second vector.
- * @returns {Node<vec2|vec3|vec4>}
+ * @param {Node<vec2|vec3>} x - The first vector.
+ * @param {Node<vec2|vec3>} y - The second vector.
+ * @returns {Node<float|vec3>}
  */
 export const cross = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.CROSS ).setParameterLength( 2 );
 
@@ -878,7 +906,7 @@ export const pow = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW ).setPa
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-export const pow2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 2 ).setParameterLength( 1 );
+export const pow2 = ( x ) => mul( x, x );
 
 /**
  * Returns the cube of the parameter.
@@ -888,7 +916,7 @@ export const pow2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 2 ).s
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-export const pow3 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 3 ).setParameterLength( 1 );
+export const pow3 = ( x ) => mul( x, x, x );
 
 /**
  * Returns the fourth power of the parameter.
@@ -898,7 +926,7 @@ export const pow3 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 3 ).s
  * @param {Node | number} x - The first parameter.
  * @returns {Node}
  */
-export const pow4 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW, 4 ).setParameterLength( 1 );
+export const pow4 = ( x ) => mul( x, x, x, x );
 
 /**
  * Transforms the direction of a vector by a matrix and then normalizes the result.
@@ -1066,7 +1094,7 @@ export const stepElement = ( x, edge ) => step( edge, x );
  */
 export const atan2 = ( y, x ) => { // @deprecated, r172
 
-	console.warn( 'THREE.TSL: "atan2" is overloaded. Use "atan" instead.' );
+	warn( 'TSL: "atan2" is overloaded. Use "atan" instead.' );
 	return atan( y, x );
 
 };
@@ -1134,4 +1162,6 @@ addMethodChaining( 'difference', difference );
 addMethodChaining( 'saturate', saturate );
 addMethodChaining( 'cbrt', cbrt );
 addMethodChaining( 'transpose', transpose );
+addMethodChaining( 'determinant', determinant );
+addMethodChaining( 'inverse', inverse );
 addMethodChaining( 'rand', rand );

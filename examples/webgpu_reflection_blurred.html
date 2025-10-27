@@ -4,12 +4,20 @@
 		<title>three.js webgpu - blurred reflection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - blurred reflection
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Blurred Reflection</span>
+			</div>
+
+			<small>
+				Reflection with a blurred effect using a hash blur algorithm.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -25,8 +33,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { Fn, vec4, fract, abs, uniform, pow, color, max, length, rangeFogFactor, sub, reflector, normalWorld, hue, time, mix, positionWorld } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { Fn, vec4, fract, sample, abs, uniform, pow, color, max, length, rangeFogFactor, sub, reflector, normalWorld, hue, time, mix, positionWorld } from 'three/tsl';
 
 			import { hashBlur } from 'three/addons/tsl/display/hashBlur.js';
 
@@ -34,14 +42,11 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			let model, mixer, clock;
 			let controls;
-			let stats;
 			let gui;
 
 			init();
@@ -124,7 +129,7 @@
 				const roughness = uniform( .9 );
 				const radius = uniform( 0.2 );
 
-				const reflection = reflector( { resolution: .5, depth: true, bounces: false } ); // 0.5 is half of the rendering view
+				const reflection = reflector( { resolutionScale: .5, depth: true, bounces: false } ); // 0.5 is half of the rendering view
 				const reflectionDepth = reflection.getDepthNode();
 				reflection.target.rotateX( - Math.PI / 2 );
 				scene.add( reflection.target );
@@ -138,11 +143,21 @@
 					const radiusRange = mix( 0.01, 0.1, radius ); // range [ 0.01, 0.1 ]
 					const roughnessRange = mix( 0.3, 0.03, roughness ); // range [ 0.03, 0.3 ]
 
+					// mask the sample
+
+					const maskReflection = sample( ( uv ) => {
+
+						const sample = reflection.sample( uv );
+						const mask = reflectionDepth.sample( uv );
+
+						return vec4( sample.rgb, sample.a.mul( mask.r ) );
+
+					}, reflection.uvNode );
+
 					// blur the reflection
 
-					const reflectionBlurred = hashBlur( reflection, radiusRange, {
+					const reflectionBlurred = hashBlur( maskReflection, radiusRange, {
 						repeats: 40,
-						mask: reflectionDepth,
 						premultipliedAlpha: true
 					} );
 
@@ -179,15 +194,13 @@
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 1.3;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				gui = new GUI();
+				gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( roughness, 'value', 0, 1 ).name( 'roughness' );
 				gui.add( radius, 'value', 0, 1 ).name( 'radius' );
-				gui.add( reflection.reflector, 'resolution', .25, 1 ).name( 'resolution' );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				gui.add( reflection.reflector, 'resolutionScale', .25, 1 ).name( 'resolution scale' );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
@@ -214,8 +227,6 @@
 			}
 
 			function animate() {
-
-				stats.update();
 
 				controls.update();
 

@@ -34,7 +34,7 @@ function createColorManagement() {
 		 *	- luminanceCoefficients: RGB luminance coefficients
 		 *
 		 * Optional:
-		 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace }
+		 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace, toneMappingMode: 'extended' | 'standard' }
 		 *  - workingColorSpaceConfig: { unpackColorSpace: ColorSpace }
 		 *
 		 * Reference:
@@ -103,6 +103,12 @@ function createColorManagement() {
 
 		},
 
+		getToneMappingMode: function ( colorSpace ) {
+
+			return this.spaces[ colorSpace ].outputColorSpaceConfig.toneMappingMode || 'standard';
+
+		},
+
 		getLuminanceCoefficients: function ( target, colorSpace = this.workingColorSpace ) {
 
 			return target.fromArray( this.spaces[ colorSpace ].luminanceCoefficients );
@@ -141,7 +147,7 @@ function createColorManagement() {
 
 		fromWorkingColorSpace: function ( color, targetColorSpace ) {
 
-			warnOnce( 'THREE.ColorManagement: .fromWorkingColorSpace() has been renamed to .workingToColorSpace().' ); // @deprecated, r177
+			warnOnce( 'ColorManagement: .fromWorkingColorSpace() has been renamed to .workingToColorSpace().' ); // @deprecated, r177
 
 			return ColorManagement.workingToColorSpace( color, targetColorSpace );
 
@@ -149,7 +155,7 @@ function createColorManagement() {
 
 		toWorkingColorSpace: function ( color, sourceColorSpace ) {
 
-			warnOnce( 'THREE.ColorManagement: .toWorkingColorSpace() has been renamed to .colorSpaceToWorking().' ); // @deprecated, r177
+			warnOnce( 'ColorManagement: .toWorkingColorSpace() has been renamed to .colorSpaceToWorking().' ); // @deprecated, r177
 
 			return ColorManagement.colorSpaceToWorking( color, sourceColorSpace );
 

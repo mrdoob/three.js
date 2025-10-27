@@ -1,6 +1,7 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, Fn, int, nodeProxyIntent } from '../tsl/TSLCore.js';
+import { warn } from '../../utils.js';
 
 const _vectorOperators = {
 	'==': 'equal',
@@ -103,9 +104,10 @@ class OperatorNode extends TempNode {
 	 * and the input node types.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {?string} [output=null] - The output type.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder ) {
+	getNodeType( builder, output = null ) {
 
 		const op = this.op;
 
@@ -117,7 +119,7 @@ class OperatorNode extends TempNode {
 
 		if ( typeA === 'void' || typeB === 'void' ) {
 
-			return 'void';
+			return output || 'void';
 
 		} else if ( op === '%' ) {
 
@@ -193,7 +195,7 @@ class OperatorNode extends TempNode {
 
 		const { aNode, bNode } = this;
 
-		const type = this.getNodeType( builder );
+		const type = this.getNodeType( builder, output );
 
 		let typeA = null;
 		let typeB = null;
@@ -595,7 +597,7 @@ export const bitAnd = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&' ).setPara
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitNot = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '~' ).setParameterLength( 2 ).setName( 'bitNot' );
+export const bitNot = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '~' ).setParameterLength( 1 ).setName( 'bitNot' );
 
 /**
  * Performs bitwise OR on two nodes.
@@ -741,7 +743,7 @@ addMethodChaining( 'decrement', decrement );
  */
 export const modInt = ( a, b ) => { // @deprecated, r175
 
-	console.warn( 'THREE.TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
 	return mod( int( a ), int( b ) );
 
 };

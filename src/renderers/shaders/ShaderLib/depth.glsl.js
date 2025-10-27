@@ -80,8 +80,17 @@ void main() {
 
 	#include <logdepthbuf_fragment>
 
-	// Higher precision equivalent of gl_FragCoord.z. This assumes depthRange has been left to its default values.
-	float fragCoordZ = 0.5 * vHighPrecisionZW[0] / vHighPrecisionZW[1] + 0.5;
+	// Higher precision equivalent of gl_FragCoord.z
+
+	#ifdef USE_REVERSED_DEPTH_BUFFER
+
+		float fragCoordZ = vHighPrecisionZW[ 0 ] / vHighPrecisionZW[ 1 ];
+
+	#else
+
+		float fragCoordZ = 0.5 * vHighPrecisionZW[ 0 ] / vHighPrecisionZW[ 1 ] + 0.5;
+
+	#endif
 
 	#if DEPTH_PACKING == 3200
 

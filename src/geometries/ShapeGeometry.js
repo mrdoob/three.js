@@ -19,6 +19,7 @@ import { Vector2 } from '../math/Vector2.js';
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#ShapeGeometry
  */
 class ShapeGeometry extends BufferGeometry {
 

@@ -494,7 +494,23 @@ class OutlinePass extends Pass {
 
 		function VisibilityChangeCallBack( object ) {
 
-			if ( object.isMesh || object.isSprite ) {
+			if ( object.isPoints || object.isLine || object.isLine2 ) {
+
+				// the visibility of points and lines is always set to false in order to
+				// not affect the outline computation
+
+				if ( bVisible === true ) {
+
+					object.visible = visibilityCache.get( object ); // restore
+
+				} else {
+
+					visibilityCache.set( object, object.visible );
+					object.visible = bVisible;
+
+				}
+
+			} else if ( object.isMesh || object.isSprite ) {
 
 				// only meshes and sprites are supported by OutlinePass
 
@@ -509,22 +525,6 @@ class OutlinePass extends Pass {
 					}
 
 					visibilityCache.set( object, visibility );
-
-				}
-
-			} else if ( object.isPoints || object.isLine ) {
-
-				// the visibility of points and lines is always set to false in order to
-				// not affect the outline computation
-
-				if ( bVisible === true ) {
-
-					object.visible = visibilityCache.get( object ); // restore
-
-				} else {
-
-					visibilityCache.set( object, object.visible );
-					object.visible = bVisible;
 
 				}
 

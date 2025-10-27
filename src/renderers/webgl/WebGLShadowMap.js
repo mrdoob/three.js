@@ -11,6 +11,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Frustum } from '../../math/Frustum.js';
 
 import * as vsm from '../shaders/ShaderLib/vsm.glsl.js';
+import { warn } from '../../utils.js';
 
 function WebGLShadowMap( renderer, objects, capabilities ) {
 
@@ -84,7 +85,17 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		// Set GL state for depth map.
 		_state.setBlending( NoBlending );
-		_state.buffers.color.setClear( 1, 1, 1, 1 );
+
+		if ( _state.buffers.depth.getReversed() === true ) {
+
+			_state.buffers.color.setClear( 0, 0, 0, 0 );
+
+		} else {
+
+			_state.buffers.color.setClear( 1, 1, 1, 1 );
+
+		}
+
 		_state.buffers.depth.setTest( true );
 		_state.setScissorTest( false );
 
@@ -102,7 +113,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			if ( shadow === undefined ) {
 
-				console.warn( 'THREE.WebGLShadowMap:', light, 'has no shadow.' );
+				warn( 'WebGLShadowMap:', light, 'has no shadow.' );
 				continue;
 
 			}

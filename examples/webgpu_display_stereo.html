@@ -4,12 +4,20 @@
 		<title>three.js webgpu - stereo effects</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - stereo effects. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Stereo Effects</span>
+			</div>
+
+			<small>
+				Collection of Stereo, Anaglyph and Parallax Barrier effects.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -25,13 +33,13 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { stereoPass } from 'three/addons/tsl/display/StereoPassNode.js';
 			import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
 			import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, postProcessing;
 
@@ -97,6 +105,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -106,7 +115,7 @@
 
 				postProcessing.outputNode = stereo;
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Stereo Settings' );
 				gui.add( params, 'effect', effects ).onChange( update );
 				gui.add( params, 'eyeSep', 0.001, 0.15, 0.001 ).onChange( function ( value ) {
 

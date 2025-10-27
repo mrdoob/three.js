@@ -109,7 +109,9 @@ class InstanceNode extends Node {
 	 */
 	setup( builder ) {
 
-		const { count, instanceMatrix, instanceColor } = this;
+		const { instanceMatrix, instanceColor } = this;
+
+		const { count } = instanceMatrix;
 
 		let { instanceMatrixNode, instanceColorNode } = this;
 
@@ -193,15 +195,33 @@ class InstanceNode extends Node {
 	 */
 	update( /*frame*/ ) {
 
-		if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.buffer !== null && this.instanceMatrix.version !== this.buffer.version ) {
+		if ( this.buffer !== null ) {
 
-			this.buffer.version = this.instanceMatrix.version;
+			// keep update ranges in sync
+
+			this.buffer.clearUpdateRanges();
+			this.buffer.updateRanges.push( ... this.instanceMatrix.updateRanges );
+
+			// update version if necessary
+
+			if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.instanceMatrix.version !== this.buffer.version ) {
+
+				this.buffer.version = this.instanceMatrix.version;
+
+			}
 
 		}
 
-		if ( this.instanceColor && this.instanceColor.usage !== DynamicDrawUsage && this.bufferColor !== null && this.instanceColor.version !== this.bufferColor.version ) {
+		if ( this.instanceColor && this.bufferColor !== null ) {
 
-			this.bufferColor.version = this.instanceColor.version;
+			this.bufferColor.clearUpdateRanges();
+			this.bufferColor.updateRanges.push( ... this.instanceColor.updateRanges );
+
+			if ( this.instanceColor.usage !== DynamicDrawUsage && this.instanceColor.version !== this.bufferColor.version ) {
+
+				this.bufferColor.version = this.instanceColor.version;
+
+			}
 
 		}
 

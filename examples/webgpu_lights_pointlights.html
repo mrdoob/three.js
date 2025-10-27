@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - lights - point lights</title>
+		<title>three.js webgpu - point lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - point lights<br />
-			Walt Disney head by <a href="http://web.archive.org/web/20120903131400/http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a><br />
-			Displacement effect by <a href="https://oosmoxiecode.com/archive/js_webgl/stanford_bunny/" target="_blank" rel="noopener">oosmoxiecode</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Point Lights</span>
+			</div>
+
+			<small>
+				Walt Disney head by <a href="http://web.archive.org/web/20120903131400/http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a><br />
+				Displacement effect by <a href="https://oosmoxiecode.com/archive/js_webgl/stanford_bunny/" target="_blank" rel="noopener">oosmoxiecode</a>
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,7 +34,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';

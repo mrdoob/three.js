@@ -4,12 +4,21 @@
 		<title>three.js webgpu - materials arrays and geometry groups</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU Materials Arrays and Geometry Groups<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Material Array</span>
+			</div>
+
+			<small>
+				Materials Arrays and Geometry Groups.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -25,10 +34,11 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let renderer, scene, camera, controls;
 			let planeMesh, boxMesh, boxMeshWireframe, planeMeshWireframe;
@@ -59,6 +69,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// scene
@@ -145,7 +156,7 @@
 
 			// gui
 
-			const gui = new GUI();
+			const gui = renderer.inspector.createParameters( 'Parameters' );
 
 			gui.add( api, 'webgpu' ).onChange( () => {
 

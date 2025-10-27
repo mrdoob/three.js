@@ -5,6 +5,17 @@ import {
 	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight
 } from 'three/tsl';
 
+/**
+ * TSL function that checks if a circle intersects with an axis-aligned bounding box (AABB).
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec2>} circleCenter - The center of the circle.
+ * @param {Node<float>} radius - The radius of the circle.
+ * @param {Node<vec2>} minBounds - The minimum bounds of the AABB.
+ * @param {Node<vec2>} maxBounds - The maximum bounds of the AABB.
+ * @return {Node<bool>} True if the circle intersects the AABB.
+ */
 export const circleIntersectsAABB = /*@__PURE__*/ Fn( ( [ circleCenter, radius, minBounds, maxBounds ] ) => {
 
 	// Find the closest point on the AABB to the circle's center using method chaining
@@ -322,7 +333,7 @@ class TiledLightsNode extends LightsNode {
 		const lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
 
 		const lightIndexesArray = new Int32Array( count * 4 * 2 );
-		const lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).label( 'lightIndexes' );
+		const lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).setName( 'lightIndexes' );
 
 		// compute
 
@@ -392,7 +403,7 @@ class TiledLightsNode extends LightsNode {
 
 			} );
 
-		} )().compute( count );
+		} )().compute( count ).setName( 'Update Tiled Lights' );
 
 		// screen coordinate lighting indexes
 
@@ -419,4 +430,13 @@ class TiledLightsNode extends LightsNode {
 
 export default TiledLightsNode;
 
+/**
+ * TSL function that creates a tiled lights node.
+ *
+ * @tsl
+ * @function
+ * @param {number} [maxLights=1024] - The maximum number of lights.
+ * @param {number} [tileSize=32] - The tile size.
+ * @return {TiledLightsNode} The tiled lights node.
+ */
 export const tiledLights = /*@__PURE__*/ nodeProxy( TiledLightsNode );

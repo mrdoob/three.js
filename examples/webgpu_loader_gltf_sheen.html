@@ -4,7 +4,7 @@
 		<title>three.js webgpu - sheen</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 			body {
 				background: #bbbbbb;
@@ -13,9 +13,17 @@
 	</head>
 
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - glTF + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_sheen" target="_blank" rel="noopener">KHR_materials_sheen</a><br />
-			Sheen Chair from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/SheenChair" target="_blank" rel="noopener">glTF-Sample-Models</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>glTF + Anisotropy</span>
+			</div>
+
+			<small>
+				<a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_sheen" target="_blank" rel="noopener">KHR_materials_sheen</a> Sheen Chair from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/SheenChair" target="_blank" rel="noopener">glTF-Sample-Models</a>
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -31,13 +39,13 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls;
 
@@ -64,10 +72,9 @@
 
 						const object = gltf.scene.getObjectByName( 'SheenChair_fabric' );
 
-						const gui = new GUI();
+						const gui = renderer.inspector.createParameters( 'SheenChair_fabric' );
 
 						gui.add( object.material, 'sheen', 0, 1 );
-						gui.open();
 
 					} );
 
@@ -77,11 +84,12 @@
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				scene.background = new THREE.Color( 0xAAAAAA );
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 

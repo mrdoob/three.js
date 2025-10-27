@@ -74,6 +74,27 @@ class Storage3DTexture extends Texture {
 
 	}
 
+	/**
+	 * Sets the size of the storage 3d texture.
+	 *
+	 * @param {number} width - The new width of the storage texture.
+	 * @param {number} height - The new height of the storage texture.
+	 * @param {number} depth - The new depth of the storage texture.
+	 */
+	setSize( width, height, depth ) {
+
+		if ( this.image.width !== width || this.image.height !== height || this.image.depth !== depth ) {
+
+			this.image.width = width;
+			this.image.height = height;
+			this.image.depth = depth;
+
+			this.dispose();
+
+		}
+
+	}
+
 }
 
 export default Storage3DTexture;

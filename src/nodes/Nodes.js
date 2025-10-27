@@ -6,7 +6,7 @@ export { default as ArrayNode } from './core/ArrayNode.js';
 export { default as AssignNode } from './core/AssignNode.js';
 export { default as AttributeNode } from './core/AttributeNode.js';
 export { default as BypassNode } from './core/BypassNode.js';
-export { default as CacheNode } from './core/CacheNode.js';
+export { default as IsolateNode } from './core/IsolateNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode } from './core/ContextNode.js';
 export { default as IndexNode } from './core/IndexNode.js';
@@ -55,6 +55,10 @@ export { default as ReflectorNode } from './utils/ReflectorNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
 export { default as MemberNode } from './utils/MemberNode.js';
 export { default as DebugNode } from './utils/DebugNode.js';
+export { default as EventNode } from './utils/EventNode.js';
+
+// math
+export { default as BitcastNode } from './math/BitcastNode.js';
 
 // accessors
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';

@@ -1,5 +1,6 @@
 import { Fn, If, vec4 } from '../tsl/TSLBase.js';
 import { mix, min, step } from '../math/MathNode.js';
+import { warn } from '../../utils.js';
 
 /**
  * Represents a "Color Burn" blend mode.
@@ -183,7 +184,7 @@ export const unpremultiplyAlpha = /*@__PURE__*/ Fn( ( [ color ] ) => {
  */
 export const burn = ( ...params ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "burn" has been renamed. Use "blendBurn" instead.' );
+	warn( 'TSL: "burn" has been renamed. Use "blendBurn" instead.' );
 	return blendBurn( params );
 
 };
@@ -198,7 +199,7 @@ export const burn = ( ...params ) => { // @deprecated, r171
  */
 export const dodge = ( ...params ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "dodge" has been renamed. Use "blendDodge" instead.' );
+	warn( 'TSL: "dodge" has been renamed. Use "blendDodge" instead.' );
 	return blendDodge( params );
 
 };
@@ -213,7 +214,7 @@ export const dodge = ( ...params ) => { // @deprecated, r171
  */
 export const screen = ( ...params ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "screen" has been renamed. Use "blendScreen" instead.' );
+	warn( 'TSL: "screen" has been renamed. Use "blendScreen" instead.' );
 	return blendScreen( params );
 
 };
@@ -228,7 +229,7 @@ export const screen = ( ...params ) => { // @deprecated, r171
  */
 export const overlay = ( ...params ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "overlay" has been renamed. Use "blendOverlay" instead.' );
+	warn( 'TSL: "overlay" has been renamed. Use "blendOverlay" instead.' );
 	return blendOverlay( params );
 
 };

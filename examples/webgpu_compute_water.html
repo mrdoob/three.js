@@ -4,13 +4,21 @@
 		<title>three.js webgpu - compute water</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="waterSize"></span> webgpu compute water<br/>
-			Click and move mouse to disturb water.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute Water</span>
+			</div>
+
+			<small>
+				Click and move mouse to disturb water.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -26,17 +34,18 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView, globalId } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
  			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			// Dimensions of simulation grid.
 			const WIDTH = 128;
@@ -48,7 +57,7 @@
 
 			const waterMaxHeight = 0.1;
 
-			let container, stats;
+			let container;
 			let camera, scene, renderer, controls;
 
 			let mouseDown = false;
@@ -60,11 +69,11 @@
 			let frame = 0;
 
 			const effectController = {
-				mousePos: uniform( new THREE.Vector2() ).label( 'mousePos' ),
-				mouseSpeed: uniform( new THREE.Vector2() ).label( 'mouseSpeed' ),
-				mouseDeep: uniform( .5 ).label( 'mouseDeep' ),
-				mouseSize: uniform( 0.12 ).label( 'mouseSize' ),
-				viscosity: uniform( 0.96 ).label( 'viscosity' ),
+				mousePos: uniform( new THREE.Vector2() ).setName( 'mousePos' ),
+				mouseSpeed: uniform( new THREE.Vector2() ).setName( 'mouseSpeed' ),
+				mouseDeep: uniform( .5 ).setName( 'mouseDeep' ),
+				mouseSize: uniform( 0.12 ).setName( 'mouseSize' ),
+				viscosity: uniform( 0.96 ).setName( 'viscosity' ),
 				ducksEnabled: true,
 				wireframe: false,
 				speed: 5,
@@ -80,6 +89,16 @@
 			const NUM_DUCKS = 100;
 
 			const simplex = new SimplexNoise();
+
+			// TODO: Fix example with WebGL backend
+			
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
 
 			init();
 
@@ -140,8 +159,8 @@
 
 				}
 
-				const heightStorage = instancedArray( heightArray ).label( 'Height' );
-				const prevHeightStorage = instancedArray( prevHeightArray ).label( 'PrevHeight' );
+				const heightStorage = instancedArray( heightArray ).setName( 'Height' );
+				const prevHeightStorage = instancedArray( prevHeightArray ).setName( 'PrevHeight' );
 
 				// Get Indices of Neighbor Values of an Index in the Simulation Grid
 				const getNeighborIndicesTSL = ( index ) => {
@@ -217,9 +236,10 @@
 
 					const newHeight = neighborHeight.mul( viscosity );
 
-					// Get 2-D compute coordinate from one-dimensional instanceIndex.
-					const x = float( instanceIndex.mod( WIDTH ) ).mul( 1 / WIDTH );
-					const y = float( instanceIndex.div( WIDTH ) ).mul( 1 / WIDTH );
+					// Get x and y position of the coordinate in the water plane
+
+					const x = float( globalId.x ).mul( 1 / WIDTH );
+					const y = float( globalId.y ).mul( 1 / WIDTH );
 
 					// Mouse influence
 					const centerVec = vec2( 0.5 );
@@ -233,7 +253,7 @@
 					prevHeightStorage.element( instanceIndex ).assign( height );
 					heightStorage.element( instanceIndex ).assign( newHeight );
 
-				} )().compute( WIDTH * WIDTH );
+				} )().compute( WIDTH * WIDTH, [ 16, 16 ] ).setName( 'Update Height' );
 
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
@@ -309,7 +329,7 @@
 
 				// Duck instance data storage
 
-				const duckInstanceDataStorage = instancedArray( duckInstanceDataArray, DuckStruct ).label( 'DuckInstanceData' );
+				const duckInstanceDataStorage = instancedArray( duckInstanceDataArray, DuckStruct ).setName( 'DuckInstanceData' );
 
 				computeDucks = Fn( () => {
 
@@ -319,7 +339,7 @@
 					const linearDamping = float( 0.92 );
 					const bounceDamping = float( - 0.4 );
 
-					// Get 2-D compute coordinate from one-dimensional instanceIndex. The calculation will
+					// Get 2-D compute coordinate from one-dimensional instanceIndex.
 					const instancePosition = duckInstanceDataStorage.element( instanceIndex ).get( 'position' ).toVar();
 					const velocity = duckInstanceDataStorage.element( instanceIndex ).get( 'velocity' ).toVar();
 
@@ -387,15 +407,15 @@
 					duckInstanceDataStorage.element( instanceIndex ).get( 'position' ).assign( instancePosition );
 					duckInstanceDataStorage.element( instanceIndex ).get( 'velocity' ).assign( velocity );
 
-				} )().compute( NUM_DUCKS );
+				} )().compute( NUM_DUCKS ).setName( 'Update Ducks' );
 
 				// Models / Textures
 
-				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
+				const hdrLoader = new HDRLoader().setPath( './textures/equirectangular/' );
  				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
  				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
 
- 				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
+ 				const [ env, model ] = await Promise.all( [ hdrLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
  				env.mapping = THREE.EquirectangularReflectionMapping;
  				scene.environment = env;
  				scene.background = env;
@@ -421,17 +441,17 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
+
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.inspector.domElement );
 
 				controls = new OrbitControls( camera, container );
 
 				container.style.touchAction = 'none';
 
-				// Stats
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				//
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );
@@ -442,7 +462,7 @@
 
 				// GUI
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( effectController.mouseSize, 'value', 0.1, .3 ).name( 'Mouse Size' );
 				gui.add( effectController.mouseDeep, 'value', 0.1, 1 ).name( 'Mouse Deep' );
 				gui.add( effectController.viscosity, 'value', 0.9, 0.96, 0.001 ).name( 'viscosity' );
@@ -502,13 +522,6 @@
 				if ( event.isPrimary === false ) return;
 
 				setMouseCoords( event.clientX, event.clientY );
-
-			}
-
-			function animate() {
-
-				render();
-				stats.update();
 
 			}
 
@@ -573,11 +586,11 @@
 
 				if ( frame >= 7 - effectController.speed ) {
 
-					renderer.computeAsync( computeHeight );
+					renderer.compute( computeHeight, [ 8, 8, 1 ] );
 
 					if ( effectController.ducksEnabled ) {
 
-						renderer.computeAsync( computeDucks );
+						renderer.compute( computeDucks );
 
 					}
 

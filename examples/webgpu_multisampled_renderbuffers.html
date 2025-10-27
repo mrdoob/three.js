@@ -3,12 +3,20 @@
 		<title>three.js webgpu - multisampled renderbuffers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - multisampled renderbuffers
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Multisampled Renderbuffers</span>
+			</div>
+
+			<small>
+				Using multisampled renderbuffers for anti-aliasing.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -24,10 +32,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { texture } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
@@ -63,14 +71,13 @@
 
 			} );
 
-
-			initGUI();
 			init();
+			initGUI();
 
 			function initGUI() {
 
-				const gui = new GUI();
-				gui.add( params, 'samples', 0, 4 ).step( 1 );
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'samples', 0, 4, 1 );
 				gui.add( params, 'animated' );
 
 			}
@@ -108,6 +115,7 @@
 				//
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.inspector = new Inspector();
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

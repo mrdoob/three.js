@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
+import { warn, error } from '../../utils.js';
 
 /**
  * TODO
@@ -53,7 +54,7 @@ class ComputeNode extends Node {
 		/**
 		 * TODO
 		 *
-		 * @type {number}
+		 * @type {number|Array<number>}
 		 */
 		this.count = null;
 
@@ -90,6 +91,12 @@ class ComputeNode extends Node {
 
 	}
 
+	/**
+	 * TODO
+	 *
+	 * @param {number|Array<number>} count - Array with [ x, y, z ] values for dispatch or a single number for the count
+	 * @return {ComputeNode}
+	 */
 	setCount( count ) {
 
 		this.count = count;
@@ -98,6 +105,11 @@ class ComputeNode extends Node {
 
 	}
 
+	/**
+	 * TODO
+	 *
+	 * @return {number|Array<number>}
+	 */
 	getCount() {
 
 		return this.count;
@@ -119,11 +131,26 @@ class ComputeNode extends Node {
 	 * @param {string} name - The name of the uniform.
 	 * @return {ComputeNode} A reference to this node.
 	 */
-	label( name ) {
+	setName( name ) {
 
 		this.name = name;
 
 		return this;
+
+	}
+
+	/**
+	 * Sets the {@link ComputeNode#name} property.
+	 *
+	 * @deprecated
+	 * @param {string} name - The name of the uniform.
+	 * @return {ComputeNode} A reference to this node.
+	 */
+	label( name ) {
+
+		warn( 'TSL: "label()" has been deprecated. Use "setName()" instead.' ); // @deprecated r179
+
+		return this.setName( name );
 
 	}
 
@@ -215,7 +242,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 	if ( workgroupSize.length === 0 || workgroupSize.length > 3 ) {
 
-		console.error( 'THREE.TSL: compute() workgroupSize must have 1, 2, or 3 elements' );
+		error( 'TSL: compute() workgroupSize must have 1, 2, or 3 elements' );
 
 	}
 
@@ -225,7 +252,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
 
 		if ( typeof val !== 'number' || val <= 0 || ! Number.isInteger( val ) ) {
 
-			console.error( `THREE.TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer` );
+			error( `TSL: compute() workgroupSize element at index [ ${ i } ] must be a positive integer` );
 
 		}
 
@@ -247,7 +274,7 @@ export const computeKernel = ( node, workgroupSize = [ 64 ] ) => {
  * @tsl
  * @function
  * @param {Node} node - TODO
- * @param {number} count - TODO.
+ * @param {number|Array<number>} count - TODO.
  * @param {Array<number>} [workgroupSize=[64]] - TODO.
  * @returns {AtomicFunctionNode}
  */

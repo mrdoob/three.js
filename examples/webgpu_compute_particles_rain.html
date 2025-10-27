@@ -1,14 +1,20 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Particles Rain</title>
+		<title>three.js webgpu - compute particles rain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GPU Compute Rain
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Compute Rain</span>
+			</div>
+
+			<small>Compatible with native lights and shadows using post-processing pass.</small>
 		</div>
 
 		<script type="importmap">
@@ -24,14 +30,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { Fn, texture, uv, uint, instancedArray, positionWorld, billboarding, time, hash, deltaTime, vec2, instanceIndex, positionGeometry, If } from 'three/tsl';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -39,7 +43,7 @@
 			const instanceCount = maxParticleCount / 2;
 
 			let camera, scene, renderer;
-			let controls, stats;
+			let controls;
 			let computeParticles;
 			let monkey;
 			let clock;
@@ -49,7 +53,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				const { innerWidth, innerHeight } = window;
 
@@ -181,7 +185,7 @@
 
 				} );
 
-				computeParticles = computeUpdate().compute( maxParticleCount );
+				computeParticles = computeUpdate().compute( maxParticleCount ).setName( 'Particles' );
 
 				// rain
 
@@ -284,13 +288,14 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+
+				await renderer.init();
 
 				//
 
-				renderer.computeAsync( computeInit );
+				renderer.compute( computeInit );
 
 				//
 
@@ -305,7 +310,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				// use lerp to smooth the movement
 				collisionBoxPosUI = new THREE.Vector3().copy( collisionBox.position );
@@ -330,8 +335,6 @@
 
 			function animate() {
 
-				stats.update();
-
 				const delta = clock.getDelta();
 
 				if ( monkey ) {
@@ -347,6 +350,7 @@
 				// position
 
 				scene.overrideMaterial = collisionPosMaterial;
+				scene.name = 'Collision Scene';
 				renderer.setRenderTarget( collisionPosRT );
 				renderer.render( scene, collisionCamera );
 
@@ -357,6 +361,7 @@
 				// result
 
 				scene.overrideMaterial = null;
+				scene.name = 'Scene';
 				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 

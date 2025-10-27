@@ -22,7 +22,7 @@ class FirstPersonControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Object3D} object - The object that is managed by the controls.
-	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 * @param {?HTMLElement} domElement - The HTML element used for event listeners.
 	 */
 	constructor( object, domElement = null ) {
 
@@ -194,8 +194,8 @@ class FirstPersonControls extends Controls {
 		window.removeEventListener( 'keydown', this._onKeyDown );
 		window.removeEventListener( 'keyup', this._onKeyUp );
 
-		this.domElement.removeEventListener( 'pointerdown', this._onPointerMove );
-		this.domElement.removeEventListener( 'pointermove', this._onPointerDown );
+		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
+		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
 

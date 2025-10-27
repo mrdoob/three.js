@@ -179,16 +179,12 @@ class XRHandModelFactory {
 
 			}
 
-			controller.visible = true;
-
 		} );
 
 		controller.addEventListener( 'disconnected', () => {
 
-			controller.visible = false;
-			// handModel.motionController = null;
-			// handModel.remove( scene );
-			// scene = null;
+			handModel.clear();
+			handModel.motionController = null;
 
 		} );
 

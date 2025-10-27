@@ -1,4 +1,4 @@
-export const REVISION = '179dev';
+export const REVISION = '181dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -720,6 +720,14 @@ export const UnsignedInt248Type = 1020;
  * @constant
  */
 export const UnsignedInt5999Type = 35902;
+
+/**
+ * An unsigned int 10_11_11 (packed) data type for textures.
+ *
+ * @type {number}
+ * @constant
+ */
+export const UnsignedInt101111Type = 35899;
 
 /**
  * Discards the red, green and blue components and reads just the alpha component.
@@ -1662,6 +1670,6 @@ export const InterpolationSamplingMode = {
  * @property {string} NORMAL - Normal sampling mode.
  * @property {string} CENTROID - Centroid sampling mode.
  * @property {string} SAMPLE - Sample-specific sampling mode.
- * @property {string} FLAT_FIRST - Flat interpolation using the first vertex.
- * @property {string} FLAT_EITHER - Flat interpolation using either vertex.
+ * @property {string} FIRST - Flat interpolation using the first vertex.
+ * @property {string} EITHER - Flat interpolation using either vertex.
  */

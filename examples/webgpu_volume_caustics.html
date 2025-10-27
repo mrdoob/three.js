@@ -4,12 +4,18 @@
 		<title>three.js webgpu - volumetric caustics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - volumetric caustics
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Volumetric Caustics</span>
+			</div>
+
+			<small>Real-time volumetric caustics effects.</small>
 		</div>
 
 		<script type="importmap">
@@ -25,7 +31,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { uniform, refract, div, frameId, lightViewPosition, float, positionView, positionViewDirection, screenUV, pass, texture3D, time, screenCoordinate, normalView, texture, Fn, vec2, vec3 } from 'three/tsl';
 
@@ -34,16 +40,13 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
 			let camera, scene, renderer, controls;
 			let postProcessing;
-			let stats;
 			let gltf;
 
 			init();
@@ -143,12 +146,6 @@
 
 				} )();
 
-				// GUI
-
-				const gui = new GUI();
-				gui.add( causticOcclusion, 'value', 0, 20 ).name( 'caustic occlusion' );
-				gui.addColor( duck.material, 'color' ).name( 'material color' );
-
 				// Ground
 
 				const textureLoader = new THREE.TextureLoader();
@@ -168,10 +165,17 @@
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Volumetric Caustics' );
+				gui.add( causticOcclusion, 'value', 0, 20 ).name( 'caustic occlusion' );
+				gui.addColor( duck.material, 'color' ).name( 'material color' );
 
 				// Post-Processing
 
@@ -266,8 +270,11 @@
 
 				// Scene Pass
 
-				const scenePass = pass( scene, camera );
+				const scenePass = pass( scene, camera ).toInspector();
+				scenePass.name = 'Scene';
+
 				const sceneDepth = scenePass.getTextureNode( 'depth' );
+				sceneDepth.name = 'Scene Depth';
 
 				// Material - Apply occlusion depth of volumetric lighting based on the scene depth
 
@@ -275,22 +282,19 @@
 
 				// Volumetric Lighting Pass
 
-				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
+				const volumetricPass = pass( scene, camera, { depthBuffer: false, samples: 0 } ).toInspector( 'Volumetric Lighting / Raw' );
+				volumetricPass.name = 'Volumetric Lighting';
 				volumetricPass.setLayers( volumetricLayer );
-				volumetricPass.setResolution( .5 );
+				volumetricPass.setResolutionScale( .5 );
 
 				// Compose and Denoise
 
-				const bloomPass = bloom( volumetricPass, 1, 1, 0 );
+				const bloomPass = bloom( volumetricPass, 1, 1, 0 ).toInspector( 'Volumetric Lighting / Mip-Chain Gaussian Blur' );
+				bloomPass.name = 'Bloom';
 
 				const scenePassColor = scenePass.add( bloomPass.mul( volumetricLightingIntensity ) );
 
 				postProcessing.outputNode = scenePassColor;
-
-				// Stats
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				// Controls
 
@@ -313,8 +317,6 @@
 			}
 
 			function animate() {
-
-				stats.update();
 
 				for ( const mesh of gltf.children ) {
 

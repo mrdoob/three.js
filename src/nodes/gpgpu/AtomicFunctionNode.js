@@ -113,7 +113,7 @@ class AtomicFunctionNode extends Node {
 		}
 
 		const methodSnippet = `${ builder.getMethod( method, type ) }( ${ params.join( ', ' ) } )`;
-		const isVoid = parents.length === 1 && parents[ 0 ].isStackNode === true;
+		const isVoid = parents ? ( parents.length === 1 && parents[ 0 ].isStackNode === true ) : false;
 
 		if ( isVoid ) {
 

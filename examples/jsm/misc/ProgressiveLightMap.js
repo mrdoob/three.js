@@ -123,6 +123,12 @@ class ProgressiveLightMap {
 
 			}
 
+			if ( object.geometry.hasAttribute( 'normal' ) === false ) {
+
+				console.warn( 'THREE.ProgressiveLightMap: All lightmap objects need normals.' ); continue;
+
+			}
+
 			if ( this.blurringPlane === null ) {
 
 				this._initializeBlurPlane( this.res, this.progressiveLightMap1 );
@@ -280,9 +286,9 @@ class ProgressiveLightMap {
 	 *
 	 * @private
 	 * @param {number} res - The square resolution of this object's lightMap.
-	 * @param {WebGLRenderTarget} [lightMap] - The lightmap to initialize the plane with.
+	 * @param {WebGLRenderTarget} lightMap - The lightmap to initialize the plane with.
 	 */
-	_initializeBlurPlane( res, lightMap = null ) {
+	_initializeBlurPlane( res, lightMap ) {
 
 		const blurMaterial = new MeshBasicMaterial();
 		blurMaterial.uniforms = { previousShadowMap: { value: null },

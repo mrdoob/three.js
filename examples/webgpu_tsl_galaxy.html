@@ -4,14 +4,20 @@
 		<title>three.js webgpu - galaxy</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - galaxy
-			<br>
-			Based on <a href="https://threejs-journey.com/lessons/animated-galaxy" target="_blank" rel="noopener">Three.js Journey</a> lessons
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Galaxy</span>
+			</div>
+
+			<small>
+				Based on <a href="https://threejs-journey.com/lessons/animated-galaxy" target="_blank" rel="noopener">Three.js Journey</a> lessons.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,10 +33,11 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { color, cos, float, mix, range, sin, time, uniform, uv, vec3, vec4, PI2 } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { color, cos, float, mix, range, sin, time, uniform, uv, vec3, vec4, TWO_PI } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer, controls;
@@ -59,7 +66,7 @@
 				const radius = radiusRatio.pow( 1.5 ).mul( 5 ).toVar();
 
 				const branches = 3;
-				const branchAngle = range( 0, branches ).floor().mul( PI2.div( branches ) );
+				const branchAngle = range( 0, branches ).floor().mul( TWO_PI.div( branches ) );
 				const angle = branchAngle.add( time.mul( radiusRatio.oneMinus() ) );
 
 				const position = vec3(
@@ -68,7 +75,7 @@
 					sin( angle )
 				).mul( radius );
 
-				const randomOffset = range( vec3( - 1 ), vec3( 1 ) ).pow( 3 ).mul( radiusRatio ).add( 0.2 );
+				const randomOffset = range( vec3( - 1 ), vec3( 1 ) ).pow3().mul( radiusRatio ).add( 0.2 );
 
 				material.positionNode = position.add( randomOffset );
 
@@ -81,9 +88,27 @@
 				const mesh = new THREE.InstancedMesh( new THREE.PlaneGeometry( 1, 1 ), material, 20000 );
 				scene.add( mesh );
 
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.minDistance = 0.1;
+				controls.maxDistance = 50;
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
 				// debug
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.add( size, 'value', 0, 1, 0.001 ).name( 'size' );
 
@@ -102,21 +127,6 @@
 						colorOutside.value.set( value );
 
 					} );
-
-				// renderer
-
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				document.body.appendChild( renderer.domElement );
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableDamping = true;
-				controls.minDistance = 0.1;
-				controls.maxDistance = 50;
-
-				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

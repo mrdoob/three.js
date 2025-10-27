@@ -1,27 +1,20 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Particles</title>
+		<title>three.js webgpu - compute particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute - 500k Particles
-			<div id="timestamps" style="
-				position: absolute;
-				top: 60px;
-				left: 0;
-				padding: 10px;
-				background: rgba( 0, 0, 0, 0.5 );
-				color: #fff;
-				font-family: monospace;
-				font-size: 12px;
-				line-height: 1.5;
-				pointer-events: none;
-				text-align: left;
-			"></div>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Compute Particles</span>
+			</div>
+
+			<small>500k Particles.</small>
 		</div>
 
 		<script type="importmap">
@@ -37,16 +30,15 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { Fn, If, uniform, float, uv, vec2, vec3, hash, shapeCircle,
+			import * as THREE from 'three/webgpu';
+			import { Fn, If, uniform, float, uv, vec3, hash, shapeCircle,
 				instancedArray, instanceIndex } from 'three/tsl';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			const particleCount = 200_000;
+			const particleCount = 200000;
 
 			const gravity = uniform( - .00098 );
 			const bounce = uniform( .8 );
@@ -56,16 +48,14 @@
 			const clickPosition = uniform( new THREE.Vector3() );
 
 			let camera, scene, renderer;
-			let controls, stats;
+			let controls;
 			let computeParticles;
 
 			let isOrbitControlsActive;
 
-			const timestamps = document.getElementById( 'timestamps' );
-
 			init();
 
-			function init() {
+			async function init() {
 
 				const { innerWidth, innerHeight } = window;
 
@@ -81,7 +71,7 @@
 				const colors = instancedArray( particleCount, 'vec3' );
 
 				// compute
-				
+
 				const separation = 0.2;
 				const amount = Math.sqrt( particleCount );
 				const offset = float( amount / 2 );
@@ -90,17 +80,17 @@
 
 					const position = positions.element( instanceIndex );
 					const color = colors.element( instanceIndex );
-					
+
 					const x = instanceIndex.mod( amount );
 					const z = instanceIndex.div( amount );
-					
+
 					position.x = offset.sub( x ).mul( separation );
 					position.z = offset.sub( z ).mul( separation );
 
 					color.x = hash( instanceIndex );
 					color.y = hash( instanceIndex.add( 2 ) );
 
-				} )().compute( particleCount );
+				} )().compute( particleCount ).setName( 'Init Particles' );
 
 				//
 
@@ -130,7 +120,7 @@
 
 				} );
 
-				computeParticles = computeUpdate().compute( particleCount );
+				computeParticles = computeUpdate().compute( particleCount ).setName( 'Update Particles' );
 
 				// create particles
 
@@ -163,18 +153,18 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, trackTimestamp: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				await renderer.init();
 
 				//
 
-				renderer.computeAsync( computeInit );
+				renderer.compute( computeInit );
 
 				// Hit
 
@@ -192,12 +182,12 @@
 
 					velocity.assign( velocity.add( direction.mul( relativePower ) ) );
 
-				} )().compute( particleCount );
+				} )().compute( particleCount ).setName( 'Hit Particles' );
 
 				//
 
 				function onMove( event ) {
-					
+
 					if ( isOrbitControlsActive ) return;
 
 					pointer.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
@@ -217,7 +207,7 @@
 
 						// compute
 
-						renderer.computeAsync( computeHit );
+						renderer.compute( computeHit );
 
 					}
 
@@ -231,11 +221,19 @@
 				controls.enableDamping = true;
 				controls.minDistance = 5;
 				controls.maxDistance = 200;
-				controls.target.set( 0, -8, 0 );
+				controls.target.set( 0, - 8, 0 );
 				controls.update();
-				
-				controls.addEventListener( 'start', () => { isOrbitControlsActive = true; } );
-				controls.addEventListener( 'end', () => { isOrbitControlsActive = false; } );
+
+				controls.addEventListener( 'start', () => {
+
+					isOrbitControlsActive = true;
+
+				} );
+				controls.addEventListener( 'end', () => {
+
+					isOrbitControlsActive = false;
+
+				} );
 
 				controls.touches = {
 					ONE: null,
@@ -248,7 +246,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( gravity, 'value', - .0098, 0, 0.0001 ).name( 'gravity' );
 				gui.add( bounce, 'value', .1, 1, 0.01 ).name( 'bounce' );
@@ -268,37 +266,12 @@
 
 			}
 
-			async function animate() {
-
-				stats.update();
+			function animate() {
 
 				controls.update();
 
-				await renderer.computeAsync( computeParticles );
-				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
-
-				await renderer.renderAsync( scene, camera );
-				renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
-
-				// throttle the logging
-
-				if ( renderer.hasFeature( 'timestamp-query' ) ) {
-
-					if ( renderer.info.render.calls % 5 === 0 ) {
-
-						timestamps.innerHTML = `
-
-							Compute ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
-							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms`;
-
-					}
-
-				} else {
-
-					timestamps.innerHTML = 'Timestamp queries not supported';
-
-				}
-
+				renderer.compute( computeParticles );
+				renderer.render( scene, camera );
 
 			}
 

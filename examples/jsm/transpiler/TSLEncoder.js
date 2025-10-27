@@ -340,7 +340,7 @@ class TSLEncoder {
 
 			if ( node.hasAssignment ) {
 
-				if ( node.after === false ) {
+				if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
 
 					type += 'Before';
 
@@ -665,15 +665,7 @@ ${ this.tab }} )`;
 
 			}
 
-			if ( node.linker.assignments.length > 0 ) {
-
-				varStr += ' = ' + valueStr + '.toVar()';
-
-			} else {
-
-				varStr += ' = ' + valueStr;
-
-			}
+			varStr += ' = ' + valueStr;
 
 		} else {
 
@@ -686,6 +678,12 @@ ${ this.tab }} )`;
 		if ( next ) {
 
 			varStr += ', ' + this.emitVariables( next, false );
+
+		}
+
+		if ( node.needsToVar ) {
+
+			varStr = varStr + '.toVar()';
 
 		}
 
@@ -758,6 +756,7 @@ ${ this.tab }} )`;
 			const mutableParam = new VariableDeclaration( param.type, param.name, new Accessor( param.name + '_immutable' ), null, true );
 			mutableParam.parent = param.parent; // link to the original node
 			mutableParam.linker.assignments.push( mutableParam );
+			mutableParam.needsToVar = true; // force var declaration
 
 			node.body.unshift( mutableParam );
 

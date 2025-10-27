@@ -113,7 +113,7 @@ class USDLoader extends Loader {
 					} else {
 
 						const text = fflate.strFromU8( zip[ filename ] );
-						data[ filename ] = usda.parse( text, data );
+						data[ filename ] = usda.parseText( text );
 
 					}
 
