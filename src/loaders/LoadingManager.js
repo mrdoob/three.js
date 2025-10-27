@@ -295,6 +295,9 @@ class LoadingManager {
 
 	}
 
+	// TODO: Revert this back to a single member variable once this issue has been fixed
+	// https://github.com/cloudflare/workerd/issues/3657
+
 	/**
 	 * Used for aborting ongoing requests in loaders using this manager.
 	 *
