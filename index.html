@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>가상 인터랙티브 웹 (Three.js)</title>
+<link rel="stylesheet" href="style.css">
+
+<!-- Three.js CDN (버전 0.152.x) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+<!-- 3D 캔버스가 삽입될 영역 -->
+<div id="scene-container"></div>
+
+<!-- 클릭·상호작용 정보를 표시할 패널 -->
+<div id="info-panel">
+  <h2>오브젝트 정보</h2>
+  <p id="msg">오브젝트를 클릭하면 여기서 정보를 확인할 수 있어요.</p>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
