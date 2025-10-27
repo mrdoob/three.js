@@ -1343,9 +1343,12 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * - A single number representing count, or
+	 * - An array [x, y, z] representing dispatch size, or
+	 * - A GPUBuffer for indirect dispatch size.
 	 */
-	compute( computeGroup, computeNode, bindings, pipeline, dispatchSizeOrCount = null ) {
+	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize = null ) {
 
 		const computeNodeData = this.get( computeNode );
 		const { passEncoderGPU } = this.get( computeGroup );
@@ -1367,19 +1370,29 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		let dispatchSize;
+		if ( dispatchSize === null ) {
 
-		if ( dispatchSizeOrCount === null ) {
-
-			dispatchSizeOrCount = computeNode.count;
+			dispatchSize = computeNode.count;
 
 		}
 
-		if ( typeof dispatchSizeOrCount === 'number' ) {
+		// When the dispatchSize is set with a StorageBuffer from the GPU.
+
+		if ( dispatchSize && typeof dispatchSize === 'object' && dispatchSize.isIndirectStorageBufferAttribute ) {
+
+			const dispatchBuffer = this.get( dispatchSize ).buffer;
+
+			passEncoderGPU.dispatchWorkgroupsIndirect( dispatchBuffer, 0 );
+
+			return;
+
+		}
+
+		if ( typeof dispatchSize === 'number' ) {
 
 			// If a single number is given, we calculate the dispatch size based on the workgroup size
 
-			const count = dispatchSizeOrCount;
+			const count = dispatchSize;
 
 			if ( computeNodeData.dispatchSize === undefined || computeNodeData.count !== count ) {
 
@@ -1415,10 +1428,6 @@ class WebGPUBackend extends Backend {
 			}
 
 			dispatchSize = computeNodeData.dispatchSize;
-
-		} else {
-
-			dispatchSize = dispatchSizeOrCount;
 
 		}
 
