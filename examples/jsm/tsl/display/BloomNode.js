@@ -463,6 +463,30 @@ class BloomNode extends TempNode {
 
 		}
 
+		let coeffSum = 0;
+
+		if ( coefficients.length > 0 ) {
+
+			coeffSum += coefficients[ 0 ];
+
+			for ( let i = 1; i < coefficients.length; i ++ ) {
+
+				coeffSum += 2.0 * coefficients[ i ];
+
+			}
+
+		}
+
+		if ( coeffSum !== 0 ) {
+
+			for ( let i = 0; i < coefficients.length; i ++ ) {
+
+				coefficients[ i ] /= coeffSum;
+
+			}
+
+		}
+
 		//
 
 		const colorTexture = texture( null );
