@@ -370,13 +370,13 @@ class ViewHelper extends Object3D {
 
 		function useOffscreenCanvas() {
 
-			let useOffscreenCanvas = false;
+			let result = false;
 
 			try {
 
 				// this check has been adapted from WebGLTextures
 
-				useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined' && ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
+				result = typeof OffscreenCanvas !== 'undefined' && ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
 
 			} catch ( err ) {
 
@@ -384,7 +384,7 @@ class ViewHelper extends Object3D {
 
 			}
 
-			return useOffscreenCanvas;
+			return result;
 
 		}
 
