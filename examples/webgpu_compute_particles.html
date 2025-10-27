@@ -31,15 +31,14 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, Switch, uniform, float, uv, vec2, vec3, hash, shapeCircle, storage,
+			import { Fn, If, uniform, float, uv, vec3, hash, shapeCircle,
 				instancedArray, instanceIndex } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			const particleCount = 200_000;
-			const movableParticleCount = particleCount / 2;
+			const particleCount = 200000;
 
 			const gravity = uniform( - .00098 );
 			const bounce = uniform( .8 );
@@ -187,24 +186,6 @@
 
 				//
 
-				const movableParticleIndirectBuffer = new THREE.IndirectStorageBufferAttribute(new Uint32Array(3));
-				const movableParticleBufferNode = storage( movableParticleIndirectBuffer, 'uint' );
-
-				const computeMovableCount = Fn( () => {
-
-					If( instanceIndex.lessThan( 3 ), () => {
-						const count = movableParticleBufferNode.element(instanceIndex);
-
-						Switch(instanceIndex)
-							.Case(0, () => count.assign(Math.ceil(movableParticleCount / 64)))
-							.Case(1, () => count.assign(1))
-							.Case(2, () => count.assign(1));
-					})
-
-				} )().compute( 3 );
-
-				renderer.computeAsync( computeMovableCount );
-
 				function onMove( event ) {
 
 					if ( isOrbitControlsActive ) return;
@@ -226,7 +207,7 @@
 
 						// compute
 
-						renderer.compute( computeHit, movableParticleIndirectBuffer );
+						renderer.compute( computeHit );
 
 					}
 
