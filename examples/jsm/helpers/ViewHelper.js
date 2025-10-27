@@ -368,13 +368,51 @@ class ViewHelper extends Object3D {
 
 		}
 
+		function useOffscreenCavnas() {
+
+			let useOffscreenCanvas = false;
+
+			try {
+
+				// this check has been adapted from WebGLTextures
+
+				useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined' && ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
+
+			} catch ( err ) {
+
+				// Ignore any errors
+
+			}
+
+			return useOffscreenCanvas;
+
+		}
+
+		function createCanvas( width, height ) {
+
+			let canvas;
+
+			if ( useOffscreenCavnas() ) {
+
+				canvas = new OffscreenCanvas( width, height );
+
+			} else {
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+			}
+
+			return canvas;
+
+		}
+
 		function getSpriteMaterial( color, text ) {
 
 			const { font = '24px Arial', color: labelColor = '#000000', radius = 14 } = options;
 
-			const canvas = document.createElement( 'canvas' );
-			canvas.width = 64;
-			canvas.height = 64;
+			const canvas = createCanvas( 64, 64 );
 
 			const context = canvas.getContext( '2d' );
 			context.beginPath();
