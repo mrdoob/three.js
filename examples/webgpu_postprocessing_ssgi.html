@@ -76,8 +76,8 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
-					// Pack metalness into diffuseColor alpha channel to save MRT bandwidth
-					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
+					// Pack metalness into diffuseColor alpha, and attenuate RGB by (1-metalness) for PBR
+					diffuseColor: vec4( diffuseColor.rgb.mul( oneMinus( materialMetalness ) ), materialMetalness ),
 					// Pack roughness into normal alpha channel to save MRT bandwidth
 					normal: vec4( directionToColor( normalView ).rgb, materialRoughness ),
 					velocity: velocity
@@ -93,10 +93,6 @@
 
 				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
-
-				// Extract metalness from diffuseColor.a and roughness from normal.a
-				const scenePassMetalness = scenePassDiffuse.a;
-				const scenePassRoughness = scenePassNormal.a;
 
 				// bandwidth optimization
 
@@ -124,11 +120,7 @@
 				const gi = giPass.rgb.toInspector( 'SSGI' );
 				const ao = giPass.a.toInspector( 'AO' );
 
-				// Reduce GI contribution for metallic surfaces (metals don't have diffuse reflection)
-				const giContribution = gi.mul( oneMinus( scenePassMetalness ) );
-				giContribution.name = 'GI Contribution';
-
-				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( giContribution ) ) ), scenePassColor.a );
+				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( gi ) ) ), scenePassColor.a );
 				compositePass.name = 'Composite';
 
 				// traa
