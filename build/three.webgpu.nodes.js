@@ -8180,9 +8180,19 @@ class VarNode extends Node {
 
 	build( ...params ) {
 
-		if ( this.intent === true ) {
+		const builder = params[ 0 ];
 
-			const builder = params[ 0 ];
+		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
+
+			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+
+				builder.getBaseStack().addToStack( this );
+
+			}
+
+		}
+
+		if ( this.intent === true ) {
 
 			if ( this.isAssign( builder ) !== true ) {
 
@@ -8263,6 +8273,14 @@ class VarNode extends Node {
 
 	}
 
+	_hasStack( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		return nodeData.stack !== undefined;
+
+	}
+
 }
 
 /**
@@ -8311,12 +8329,6 @@ const Const = ( node, name = null ) => createVar( node, name, true ).toStack();
  * @returns {VarNode}
  */
 const VarIntent = ( node ) => {
-
-	if ( getCurrentStack() === null ) {
-
-		return node;
-
-	}
 
 	return createVar( node ).setIntent( true ).toStack();
 
@@ -17551,7 +17563,7 @@ class LoopNode extends Node {
 	 */
 	constructor( params = [] ) {
 
-		super();
+		super( 'void' );
 
 		this.params = params;
 
@@ -17597,36 +17609,26 @@ class LoopNode extends Node {
 
 		}
 
-		const stack = builder.addStack(); // TODO: cache() it
+		const stack = builder.addStack();
 
-		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder );
+		const fnCall = this.params[ this.params.length - 1 ]( inputs );
+
+		properties.returnsNode = fnCall.context( { nodeLoop: fnCall } );
 		properties.stackNode = stack;
 
 		const baseParam = this.params[ 0 ];
 
 		if ( baseParam.isNode !== true && typeof baseParam.update === 'function' ) {
 
-			properties.updateNode = Fn( this.params[ 0 ].update )( inputs );
+			const fnUpdateCall = Fn( this.params[ 0 ].update )( inputs );
+
+			properties.updateNode = fnUpdateCall.context( { nodeLoop: fnUpdateCall } );
 
 		}
 
 		builder.removeStack();
 
 		return properties;
-
-	}
-
-	/**
-	 * This method is overwritten since the node type is inferred based on the loop configuration.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The node type.
-	 */
-	getNodeType( builder ) {
-
-		const { returnsNode } = this.getProperties( builder );
-
-		return returnsNode ? returnsNode.getNodeType( builder ) : 'void';
 
 	}
 
@@ -17809,7 +17811,7 @@ class LoopNode extends Node {
 
 		const stackSnippet = stackNode.build( builder, 'void' );
 
-		const returnsSnippet = properties.returnsNode ? properties.returnsNode.build( builder ) : '';
+		properties.returnsNode.build( builder, 'void' );
 
 		builder.removeFlowTab().addFlowCode( '\n' + builder.tab + stackSnippet );
 
@@ -17820,8 +17822,6 @@ class LoopNode extends Node {
 		}
 
 		builder.addFlowTab();
-
-		return returnsSnippet;
 
 	}
 
@@ -27510,7 +27510,7 @@ class VolumetricLightingModel extends LightingModel {
 
 	start( builder ) {
 
-		const { material, context } = builder;
+		const { material } = builder;
 
 		const startPos = property( 'vec3' );
 		const endPos = property( 'vec3' );
@@ -27559,13 +27559,13 @@ class VolumetricLightingModel extends LightingModel {
 
 				linearDepthRay.assign( linearDepth( viewZToPerspectiveDepth( positionViewRay.z, cameraNear, cameraFar ) ) );
 
-				context.sceneDepthNode = linearDepth( material.depthNode ).toVar();
+				builder.context.sceneDepthNode = linearDepth( material.depthNode ).toVar();
 
 			}
 
-			context.positionWorld = positionRay;
-			context.shadowPositionWorld = positionRay;
-			context.positionView = positionViewRay;
+			builder.context.positionWorld = positionRay;
+			builder.context.shadowPositionWorld = positionRay;
+			builder.context.positionView = positionViewRay;
 
 			scatteringDensity.assign( 0 );
 
@@ -32683,12 +32683,11 @@ class StackNode extends Node {
 
 	build( builder, ...params ) {
 
-		const previousBuildStack = builder.currentStack;
 		const previousStack = getCurrentStack();
 
 		setCurrentStack( this );
 
-		builder.currentStack = this;
+		builder.setActiveStack( this );
 
 		const buildStage = builder.buildStage;
 
@@ -32705,6 +32704,9 @@ class StackNode extends Node {
 			}
 
 			if ( buildStage === 'setup' ) {
+
+				const nodeData = builder.getDataFromNode( node );
+				nodeData.stack = this;
 
 				node.build( builder );
 
@@ -32745,7 +32747,7 @@ class StackNode extends Node {
 
 		setCurrentStack( previousStack );
 
-		builder.currentStack = previousBuildStack;
+		builder.removeActiveStack( this );
 
 		return result;
 
@@ -39445,8 +39447,11 @@ class RangeNode extends Node {
 	 */
 	getVectorLength( builder ) {
 
-		const minLength = builder.getTypeLength( getValueType( this.minNode.value ) );
-		const maxLength = builder.getTypeLength( getValueType( this.maxNode.value ) );
+		const minNode = this.getConstNode( this.minNode );
+		const maxNode = this.getConstNode( this.maxNode );
+
+		const minLength = builder.getTypeLength( getValueType( minNode.value ) );
+		const maxLength = builder.getTypeLength( getValueType( maxNode.value ) );
 
 		return minLength > maxLength ? minLength : maxLength;
 
@@ -39464,6 +39469,36 @@ class RangeNode extends Node {
 
 	}
 
+	/**
+	 * Returns a constant node from the given node by traversing it.
+	 *
+	 * @param {Node} node - The node to traverse.
+	 * @returns {Node} The constant node, if found.
+	 */
+	getConstNode( node ) {
+
+		let output = null;
+
+		node.traverse( n => {
+
+			if ( n.isConstNode === true ) {
+
+				output = n;
+
+			}
+
+		} );
+
+		if ( output === null ) {
+
+			throw new Error( 'THREE.TSL: No "ConstNode" found in node graph.' );
+
+		}
+
+		return output;
+
+	}
+
 	setup( builder ) {
 
 		const object = builder.object;
@@ -39472,8 +39507,11 @@ class RangeNode extends Node {
 
 		if ( object.count > 1 ) {
 
-			const minValue = this.minNode.value;
-			const maxValue = this.maxNode.value;
+			const minNode = this.getConstNode( this.minNode );
+			const maxNode = this.getConstNode( this.maxNode );
+
+			const minValue = minNode.value;
+			const maxValue = maxNode.value;
 
 			const minLength = builder.getTypeLength( getValueType( minValue ) );
 			const maxLength = builder.getTypeLength( getValueType( maxValue ) );
@@ -47895,13 +47933,13 @@ class NodeBuilder {
 		 */
 		this.subBuildLayers = [];
 
+
 		/**
-		 * The current stack of nodes.
+		 * The active stack nodes.
 		 *
-		 * @type {?StackNode}
-		 * @default null
+		 * @type {Array<StackNode>}
 		 */
-		this.currentStack = null;
+		this.activeStacks = [];
 
 		/**
 		 * The current sub-build TSL function(Fn).
@@ -49060,6 +49098,58 @@ class NodeBuilder {
 		if ( componentType === 'int' || componentType === 'uint' ) return type;
 
 		return this.changeComponentType( type, 'int' );
+
+	}
+
+	/**
+	 * Adds an active stack to the internal stack.
+	 *
+	 * @param {StackNode} stack - The stack node to add.
+	 */
+	setActiveStack( stack ) {
+
+		this.activeStacks.push( stack );
+
+	}
+
+	/**
+	 * Removes the active stack from the internal stack.
+	 *
+	 * @param {StackNode} stack - The stack node to remove.
+	 */
+	removeActiveStack( stack ) {
+
+		if ( this.activeStacks[ this.activeStacks.length - 1 ] === stack ) {
+
+			this.activeStacks.pop();
+
+		} else {
+
+			throw new Error( 'NodeBuilder: Invalid active stack removal.' );
+
+		}
+
+	}
+
+	/**
+	 * Returns the active stack.
+	 *
+	 * @return {StackNode} The active stack.
+	 */
+	getActiveStack() {
+
+		return this.activeStacks[ this.activeStacks.length - 1 ];
+
+	}
+
+	/**
+	 * Returns the base stack.
+	 *
+	 * @return {StackNode} The base stack.
+	 */
+	getBaseStack() {
+
+		return this.activeStacks[ 0 ];
 
 	}
 
@@ -57617,10 +57707,10 @@ class Renderer {
 	 * if the renderer has been initialized.
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * - A single number representing count, or
 	 * - An array [x, y, z] representing dispatch size, or
-	 * - A GPUBuffer for indirect dispatch size.
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
 	compute( computeNodes, dispatchSize = null ) {
@@ -57631,7 +57721,7 @@ class Renderer {
 
 			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
 
-			return this.computeAsync( computeNodes );
+			return this.computeAsync( computeNodes, dispatchSize );
 
 		}
 
@@ -57729,10 +57819,10 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * - A single number representing count, or
 	 * - An array [x, y, z] representing dispatch size, or
-	 * - A GPUBuffer for indirect dispatch size.
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
 	async computeAsync( computeNodes, dispatchSize = null ) {
@@ -66656,6 +66746,12 @@ class WebGLBackend extends Backend {
 			warnOnce( 'WebGLBackend.compute(): The count parameter must be a single number, not an array.' );
 
 			count = count[ 0 ];
+
+		} else if ( count && typeof count === 'object' && count.isIndirectStorageBufferAttribute ) {
+
+			warnOnce( 'WebGLBackend.compute(): The count parameter must be a single number, not IndirectStorageBufferAttribute' );
+
+			count = computeNode.count;
 
 		}
 
@@ -76857,10 +76953,10 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * - A single number representing count, or
 	 * - An array [x, y, z] representing dispatch size, or
-	 * - A GPUBuffer for indirect dispatch size.
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 */
 	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize = null ) {
 

@@ -21,8 +21,10 @@ chain, it only goes down to the LOD_MIN level (above), and then creates extra
 even more filtered 'mips' at the same LOD_MIN resolution, associated with
 higher roughness levels. In this way we maintain resolution to smoothly
 interpolate diffuse lighting while limiting sampling computation.</p>
-<p>Paper: Fast, Accurate Image-Based Lighting:
-<a href="https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view">https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view</a></p></div>
+<p>The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
+importance sampling based on &quot;Sampling the GGX Distribution of Visible Normals&quot;
+(Heitz, 2018) to generate environment maps that accurately match the GGX BRDF
+used in material rendering for physically-based image-based lighting.</p></div>
 			</header>
 			<article>
 				<div class="container-overview">

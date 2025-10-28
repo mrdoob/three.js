@@ -62,6 +62,23 @@ call, the node picks the best-fit overloaded version.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getCandidateFn" translate="no">.<a href="#getCandidateFn">getCandidateFn</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="FunctionNode.html">FunctionNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the candidate function for the current parameters.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>builder</code></td>
+									<td class="description last"><p>The current node builder.</p></td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The candidate function.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -81,6 +98,26 @@ the function's return type.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets up the node for the current parameters.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>builder</code></td>
+									<td class="description last"><p>The current node builder.</p></td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The setup node.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>
