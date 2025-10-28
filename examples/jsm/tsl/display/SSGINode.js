@@ -55,10 +55,8 @@ class SSGINode extends TempNode {
 	 * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
 	 * @param {TextureNode} normalNode - A texture node that represents the scene's normals.
 	 * @param {PerspectiveCamera} camera - The camera the scene is rendered with.
-	 * @param {TextureNode?} metalnessNode - Optional texture node that represents the scene's metalness values.
-	 * @param {TextureNode?} roughnessNode - Optional texture node that represents the scene's roughness values.
 	 */
-	constructor( beautyNode, depthNode, normalNode, camera, metalnessNode = null, roughnessNode = null ) {
+	constructor( beautyNode, depthNode, normalNode, camera ) {
 
 		super( 'vec4' );
 
@@ -84,23 +82,6 @@ class SSGINode extends TempNode {
 		 * @type {TextureNode}
 		 */
 		this.normalNode = normalNode;
-
-		/**
-		 * A node that represents the scene's metalness values. This is used to reduce
-		 * the indirect diffuse lighting contribution for metallic surfaces, since metals
-		 * don't scatter light diffusely.
-		 *
-		 * @type {TextureNode|null}
-		 */
-		this.metalnessNode = metalnessNode;
-
-		/**
-		 * A node that represents the scene's roughness values. This can be used to
-		 * modulate the GI effect based on surface roughness.
-		 *
-		 * @type {TextureNode|null}
-		 */
-		this.roughnessNode = roughnessNode;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -668,8 +649,6 @@ export default SSGINode;
  * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
  * @param {TextureNode} normalNode - A texture node that represents the scene's normals.
  * @param {Camera} camera - The camera the scene is rendered with.
- * @param {TextureNode?} metalnessNode - Optional texture node that represents the scene's metalness values.
- * @param {TextureNode?} roughnessNode - Optional texture node that represents the scene's roughness values.
  * @returns {SSGINode}
  */
-export const ssgi = ( beautyNode, depthNode, normalNode, camera, metalnessNode = null, roughnessNode = null ) => nodeObject( new SSGINode( convertToTexture( beautyNode ), depthNode, normalNode, camera, metalnessNode, roughnessNode ) );
+export const ssgi = ( beautyNode, depthNode, normalNode, camera ) => nodeObject( new SSGINode( convertToTexture( beautyNode ), depthNode, normalNode, camera ) );
