@@ -61811,8 +61811,6 @@ class PMREMGenerator {
 
 	_fromTexture( texture, renderTarget ) {
 
-		console.time( 'PMREMGenerator' );
-
 		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
 
 			this._setSize( texture.image.length === 0 ? 16 : ( texture.image[ 0 ].width || texture.image[ 0 ].image.width ) );
@@ -61834,8 +61832,6 @@ class PMREMGenerator {
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
-
-		console.timeEnd( 'PMREMGenerator' );
 
 		return cubeUVRenderTarget;
 
@@ -62057,9 +62053,9 @@ class PMREMGenerator {
 	 * Uses Monte Carlo integration with importance sampling to accurately represent the
 	 * GGX BRDF for physically-based rendering. Reads from the previous LOD level and
 	 * applies incremental roughness filtering to avoid over-blurring.
-	 * 
+	 *
 	 * @private
-	 * @param {WebGLRenderTarget} cubeUVRenderTarget  
+	 * @param {WebGLRenderTarget} cubeUVRenderTarget
 	 * @param {number} lodIn - Source LOD level to read from
 	 * @param {number} lodOut - Target LOD level to write to
 	 */
@@ -62067,7 +62063,7 @@ class PMREMGenerator {
 
 		const renderer = this._renderer;
 		const pingPongRenderTarget = this._pingPongRenderTarget;
-		
+
 		if ( this._ggxMaterial === null ) {
 
 			const width = 3 * Math.max( this._cubeSize, 16 );
@@ -62084,7 +62080,7 @@ class PMREMGenerator {
 		const targetRoughness = lodOut / ( this._lodPlanes.length - 1 );
 		const sourceRoughness = lodIn / ( this._lodPlanes.length - 1 );
 		const incrementalRoughness = Math.sqrt( targetRoughness * targetRoughness - sourceRoughness * sourceRoughness );
-		
+
 		// Apply blur strength mapping for better quality across the roughness range
 		const blurStrength = 0.05 + targetRoughness * 0.95;
 		const adjustedRoughness = incrementalRoughness * blurStrength;
@@ -62121,7 +62117,7 @@ class PMREMGenerator {
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
-	 * 
+	 *
 	 * Used for initial scene blur in fromScene() method when sigma > 0.
 	 *
 	 * @private
@@ -62391,64 +62387,87 @@ function _getGGXShader( lodMax, width, height ) {
 				return vec2(float(i) / float(N), radicalInverse_VdC(i));
 			}
 
-			// GGX importance sampling
-			vec3 importanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
-				float a = roughness * roughness;
-				
-				float phi = 2.0 * PI * Xi.x;
-				float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a * a - 1.0) * Xi.y));
-				float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
-				
-				// Spherical to cartesian
-				vec3 H;
-				H.x = cos(phi) * sinTheta;
-				H.y = sin(phi) * sinTheta;
-				H.z = cosTheta;
-				
-				// Tangent space to world space
-				vec3 up = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
-				vec3 tangent = normalize(cross(up, N));
-				vec3 bitangent = cross(N, tangent);
-				
-				vec3 sampleVec = tangent * H.x + bitangent * H.y + N * H.z;
-				return normalize(sampleVec);
+			// GGX VNDF importance sampling (Eric Heitz 2018)
+			// "Sampling the GGX Distribution of Visible Normals"
+			vec3 importanceSampleGGX_VNDF(vec2 Xi, vec3 V, float roughness) {
+				float alpha = roughness * roughness;
+
+				// Section 3.2: Transform view direction to hemisphere configuration
+				vec3 Vh = normalize(vec3(alpha * V.x, alpha * V.y, V.z));
+
+				// Section 4.1: Orthonormal basis
+				float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
+				vec3 T1 = lensq > 0.0 ? vec3(-Vh.y, Vh.x, 0.0) / sqrt(lensq) : vec3(1.0, 0.0, 0.0);
+				vec3 T2 = cross(Vh, T1);
+
+				// Section 4.2: Parameterization of projected area
+				float r = sqrt(Xi.x);
+				float phi = 2.0 * PI * Xi.y;
+				float t1 = r * cos(phi);
+				float t2 = r * sin(phi);
+				float s = 0.5 * (1.0 + Vh.z);
+				t2 = (1.0 - s) * sqrt(1.0 - t1 * t1) + s * t2;
+
+				// Section 4.3: Reprojection onto hemisphere
+				vec3 Nh = t1 * T1 + t2 * T2 + sqrt(max(0.0, 1.0 - t1 * t1 - t2 * t2)) * Vh;
+
+				// Section 3.4: Transform back to ellipsoid configuration
+				return normalize(vec3(alpha * Nh.x, alpha * Nh.y, max(0.0, Nh.z)));
 			}
 
 			void main() {
 				vec3 N = normalize(vOutputDirection);
 				vec3 V = N; // Assume view direction equals normal for pre-filtering
-				
+
 				vec3 prefilteredColor = vec3(0.0);
 				float totalWeight = 0.0;
-				
+
 				// For very low roughness, just sample the environment directly
 				if (roughness < 0.001) {
 					gl_FragColor = vec4(bilinearCubeUV(envMap, N, mipInt), 1.0);
 					return;
 				}
-				
+
+				// Tangent space basis for VNDF sampling
+				vec3 up = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+				vec3 tangent = normalize(cross(up, N));
+				vec3 bitangent = cross(N, tangent);
+
 				for(uint i = 0u; i < uint(GGX_SAMPLES); i++) {
 					vec2 Xi = hammersley(i, uint(GGX_SAMPLES));
-					vec3 H = importanceSampleGGX(Xi, N, roughness);
+
+					// Transform V to tangent space for VNDF sampling
+					vec3 V_tangent = vec3(
+						dot(V, tangent),
+						dot(V, bitangent),
+						dot(V, N)
+					);
+
+					// Sample VNDF in tangent space
+					vec3 H_tangent = importanceSampleGGX_VNDF(Xi, V_tangent, roughness);
+
+					// Transform H back to world space
+					vec3 H = normalize(tangent * H_tangent.x + bitangent * H_tangent.y + N * H_tangent.z);
 					vec3 L = normalize(2.0 * dot(V, H) * H - V);
-					
+
 					float NdotL = max(dot(N, L), 0.0);
-					
+
 					if(NdotL > 0.0) {
 						// Sample environment with the reflected direction
+						// Using fixed mipInt to maintain brightness
 						vec3 sampleColor = bilinearCubeUV(envMap, L, mipInt);
-						
+
 						// For split-sum approximation in IBL, we weight by NdotL
 						// The PDF cancellation happens naturally with importance sampling
 						prefilteredColor += sampleColor * NdotL;
 						totalWeight += NdotL;
 					}
 				}
-				
+
 				if (totalWeight > 0.0) {
 					prefilteredColor = prefilteredColor / totalWeight;
 				}
-				
+
 				gl_FragColor = vec4(prefilteredColor, 1.0);
 			}
 		`,
