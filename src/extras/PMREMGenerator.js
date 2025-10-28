@@ -489,9 +489,9 @@ class PMREMGenerator {
 	 * Uses Monte Carlo integration with importance sampling to accurately represent the
 	 * GGX BRDF for physically-based rendering. Reads from the previous LOD level and
 	 * applies incremental roughness filtering to avoid over-blurring.
-	 * 
+	 *
 	 * @private
-	 * @param {WebGLRenderTarget} cubeUVRenderTarget  
+	 * @param {WebGLRenderTarget} cubeUVRenderTarget
 	 * @param {number} lodIn - Source LOD level to read from
 	 * @param {number} lodOut - Target LOD level to write to
 	 */
@@ -499,7 +499,7 @@ class PMREMGenerator {
 
 		const renderer = this._renderer;
 		const pingPongRenderTarget = this._pingPongRenderTarget;
-		
+
 		if ( this._ggxMaterial === null ) {
 
 			const width = 3 * Math.max( this._cubeSize, 16 );
@@ -516,7 +516,7 @@ class PMREMGenerator {
 		const targetRoughness = lodOut / ( this._lodPlanes.length - 1 );
 		const sourceRoughness = lodIn / ( this._lodPlanes.length - 1 );
 		const incrementalRoughness = Math.sqrt( targetRoughness * targetRoughness - sourceRoughness * sourceRoughness );
-		
+
 		// Apply blur strength mapping for better quality across the roughness range
 		const blurStrength = 0.05 + targetRoughness * 0.95;
 		const adjustedRoughness = incrementalRoughness * blurStrength;
@@ -553,7 +553,7 @@ class PMREMGenerator {
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
-	 * 
+	 *
 	 * Used for initial scene blur in fromScene() method when sigma > 0.
 	 *
 	 * @private
