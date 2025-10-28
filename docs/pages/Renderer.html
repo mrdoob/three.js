@@ -530,7 +530,7 @@ and environment must be configured before calling this method.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the compile has been finished.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="compute" translate="no">.<a href="#compute">compute</a><span class="signature">( computeNodes : <span class="param-type">Node | Array.&lt;Node></span>, dispatchSize : <span class="param-type">number | Array.&lt;number> | IndirectStorageBufferAttribute</span> )</span><span class="type-signature"> : Promise | undefined</span> </h3>
+					<h3 class="name name-method" id="compute" translate="no">.<a href="#compute">compute</a><span class="signature">( computeNodes : <span class="param-type">Node | Array.&lt;Node></span>, dispatchSizeOrCount : <span class="param-type">Array.&lt;number> | number</span> )</span><span class="type-signature"> : Promise | undefined</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Execute a single or an array of compute nodes. This method can only be called
@@ -543,12 +543,8 @@ if the renderer has been initialized.</p>
 									<td class="description last"><p>The compute node(s).</p></td>
 								</tr>
 								<tr>
-									<td class="name"><code>dispatchSize</code></td>
-									<td class="description last"><ul>
-<li>A single number representing count, or</li>
-<li>An array [x, y, z] representing dispatch size, or</li>
-<li>A IndirectStorageBufferAttribute for indirect dispatch size.</li>
-</ul><br/>Default is <code>null</code>.</td>
+									<td class="name"><code>dispatchSizeOrCount</code></td>
+									<td class="description last"><p>Array with [ x, y, z ] values for dispatch or a single number for the count.<br/>Default is <code>null</code>.</p></td>
 								</tr>
 							</tbody>
 						</table>
@@ -556,7 +552,7 @@ if the renderer has been initialized.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNodes : <span class="param-type">Node | Array.&lt;Node></span>, dispatchSize : <span class="param-type">number | Array.&lt;number> | IndirectStorageBufferAttribute</span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNodes : <span class="param-type">Node | Array.&lt;Node></span>, dispatchSizeOrCount : <span class="param-type">Array.&lt;number> | number</span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Execute a single or an array of compute nodes.</p>
@@ -568,12 +564,8 @@ if the renderer has been initialized.</p>
 									<td class="description last"><p>The compute node(s).</p></td>
 								</tr>
 								<tr>
-									<td class="name"><code>dispatchSize</code></td>
-									<td class="description last"><ul>
-<li>A single number representing count, or</li>
-<li>An array [x, y, z] representing dispatch size, or</li>
-<li>A IndirectStorageBufferAttribute for indirect dispatch size.</li>
-</ul><br/>Default is <code>null</code>.</td>
+									<td class="name"><code>dispatchSizeOrCount</code></td>
+									<td class="description last"><p>Array with [ x, y, z ] values for dispatch or a single number for the count.<br/>Default is <code>null</code>.</p></td>
 								</tr>
 							</tbody>
 						</table>

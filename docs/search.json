@@ -3593,10 +3593,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "FunctionOverloadingNode#getCandidateFn",
-			"kind": "function"
-		},
-		{
 			"title": "FunctionOverloadingNode#getNodeType",
 			"kind": "function"
 		},
@@ -3607,10 +3603,6 @@
 		{
 			"title": "FunctionOverloadingNode#parametersNodes",
 			"kind": "member"
-		},
-		{
-			"title": "FunctionOverloadingNode#setup",
-			"kind": "function"
 		},
 		{
 			"title": "GLBufferAttribute",
@@ -5483,6 +5475,10 @@
 		{
 			"title": "LoopNode",
 			"kind": "class"
+		},
+		{
+			"title": "LoopNode#getNodeType",
+			"kind": "function"
 		},
 		{
 			"title": "LoopNode#getProperties",
@@ -7689,10 +7685,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "NodeBuilder#activeStacks",
-			"kind": "member"
-		},
-		{
 			"title": "NodeBuilder#addChain",
 			"kind": "function"
 		},
@@ -7837,6 +7829,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "NodeBuilder#currentStack",
+			"kind": "member"
+		},
+		{
 			"title": "NodeBuilder#declarations",
 			"kind": "member"
 		},
@@ -7925,10 +7921,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "NodeBuilder#getActiveStack",
-			"kind": "function"
-		},
-		{
 			"title": "NodeBuilder#getAttribute",
 			"kind": "function"
 		},
@@ -7938,10 +7930,6 @@
 		},
 		{
 			"title": "NodeBuilder#getAttributesArray",
-			"kind": "function"
-		},
-		{
-			"title": "NodeBuilder#getBaseStack",
 			"kind": "function"
 		},
 		{
@@ -8201,10 +8189,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "NodeBuilder#isOpaque",
-			"kind": "function"
-		},
-		{
 			"title": "NodeBuilder#isReference",
 			"kind": "function"
 		},
@@ -8245,10 +8229,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "NodeBuilder#removeActiveStack",
-			"kind": "function"
-		},
-		{
 			"title": "NodeBuilder#removeChain",
 			"kind": "function"
 		},
@@ -8275,10 +8255,6 @@
 		{
 			"title": "NodeBuilder#sequentialNodes",
 			"kind": "member"
-		},
-		{
-			"title": "NodeBuilder#setActiveStack",
-			"kind": "function"
 		},
 		{
 			"title": "NodeBuilder#setBuildStage",
@@ -10707,10 +10683,6 @@
 		{
 			"title": "RangeNode",
 			"kind": "class"
-		},
-		{
-			"title": "RangeNode#getConstNode",
-			"kind": "function"
 		},
 		{
 			"title": "RangeNode#getNodeType",
