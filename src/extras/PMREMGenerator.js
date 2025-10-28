@@ -58,8 +58,8 @@ const _origin = /*@__PURE__*/ new Vector3();
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * The prefiltering uses GGX VNDF (Visible Normal Distribution Function) 
- * importance sampling to generate environment maps that accurately represent 
+ * The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
+ * importance sampling to generate environment maps that accurately represent
  * the material's BRDF for image-based lighting.
 */
 class PMREMGenerator {
