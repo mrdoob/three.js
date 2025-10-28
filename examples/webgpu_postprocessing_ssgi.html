@@ -32,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, directionToColor, colorToDirection, sample } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, directionToColor, colorToDirection, sample, materialMetalness, materialRoughness, oneMinus, vec2 } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -76,8 +76,10 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
-					diffuseColor: diffuseColor,
-					normal: directionToColor( normalView ),
+					// Pack metalness into diffuseColor alpha channel to save MRT bandwidth
+					diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
+					// Pack roughness into normal alpha channel to save MRT bandwidth
+					normal: vec4( directionToColor( normalView ).rgb, materialRoughness ),
 					velocity: velocity
 				} ) );
 
@@ -92,6 +94,10 @@
 				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 
+				// Extract metalness from diffuseColor.a and roughness from normal.a
+				const scenePassMetalness = scenePassDiffuse.a;
+				const scenePassRoughness = scenePassNormal.a;
+
 				// bandwidth optimization
 
 				const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
@@ -102,13 +108,14 @@
 
 				const sceneNormal = sample( ( uv ) => {
 
-					return colorToDirection( scenePassNormal.sample( uv ) );
+					// Only use RGB channels for normal direction (alpha contains roughness)
+					return colorToDirection( scenePassNormal.sample( uv ).rgb );
 
 				} );
 
 				// gi
 
-				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
+				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera, scenePassMetalness, scenePassRoughness );
 				giPass.sliceCount.value = 2;
 				giPass.stepCount.value = 8;
 
@@ -117,7 +124,11 @@
 				const gi = giPass.rgb.toInspector( 'SSGI' );
 				const ao = giPass.a.toInspector( 'AO' );
 
-				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( gi ) ) ), scenePassColor.a );
+				// Reduce GI contribution for metallic surfaces (metals don't have diffuse reflection)
+				const giContribution = gi.mul( oneMinus( scenePassMetalness ) );
+				giContribution.name = 'GI Contribution';
+
+				const compositePass = vec4( add( scenePassColor.rgb.mul( ao ), ( scenePassDiffuse.rgb.mul( giContribution ) ) ), scenePassColor.a );
 				compositePass.name = 'Composite';
 
 				// traa
@@ -190,6 +201,31 @@
 				shortBox.castShadow = true;
 				shortBox.receiveShadow = true;
 				scene.add( shortBox );
+
+				// Add metallic sphere to demonstrate metalness support
+				const metallicMaterial = new THREE.MeshPhysicalMaterial( {
+					color: '#ffffff',
+					metalness: 1.0,
+					roughness: 0.1
+				} );
+				const sphereGeometry = new THREE.SphereGeometry( 1.5, 32, 32 );
+				const metallicSphere = new THREE.Mesh( sphereGeometry, metallicMaterial );
+				metallicSphere.position.set( - 5, 1.5, 6 );
+				metallicSphere.castShadow = true;
+				metallicSphere.receiveShadow = true;
+				scene.add( metallicSphere );
+
+				// Add rough non-metallic sphere
+				const roughMaterial = new THREE.MeshPhysicalMaterial( {
+					color: '#ffffff',
+					metalness: 0.0,
+					roughness: 0.9
+				} );
+				const roughSphere = new THREE.Mesh( sphereGeometry, roughMaterial );
+				roughSphere.position.set( 5, 1.5, 6 );
+				roughSphere.castShadow = true;
+				roughSphere.receiveShadow = true;
+				scene.add( roughSphere );
 
 				// Light source geometry
 				const lightSourceGeometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 64 );
