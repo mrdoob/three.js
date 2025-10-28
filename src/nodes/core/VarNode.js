@@ -183,7 +183,7 @@ class VarNode extends Node {
 
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
-			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.getDataFromNode( this ).stack === undefined ) {
+			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
 
 				builder.getBaseStack().addToStack( this );
 
