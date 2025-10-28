@@ -54,7 +54,7 @@ class LoopNode extends Node {
 	 */
 	constructor( params = [] ) {
 
-		super();
+		super( 'void' );
 
 		this.params = params;
 
@@ -102,7 +102,7 @@ class LoopNode extends Node {
 
 		const stack = builder.addStack();
 
-		const fnCall = this.params[ this.params.length - 1 ]( inputs, builder );
+		const fnCall = this.params[ this.params.length - 1 ]( inputs );
 
 		properties.returnsNode = fnCall.context( { nodeLoop: fnCall } );
 		properties.stackNode = stack;
@@ -120,20 +120,6 @@ class LoopNode extends Node {
 		builder.removeStack();
 
 		return properties;
-
-	}
-
-	/**
-	 * This method is overwritten since the node type is inferred based on the loop configuration.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The node type.
-	 */
-	getNodeType( builder ) {
-
-		const { returnsNode } = this.getProperties( builder );
-
-		return returnsNode ? returnsNode.getNodeType( builder ) : 'void';
 
 	}
 
@@ -316,7 +302,7 @@ class LoopNode extends Node {
 
 		const stackSnippet = stackNode.build( builder, 'void' );
 
-		const returnsSnippet = properties.returnsNode ? properties.returnsNode.build( builder ) : '';
+		properties.returnsNode.build( builder, 'void' );
 
 		builder.removeFlowTab().addFlowCode( '\n' + builder.tab + stackSnippet );
 
@@ -327,8 +313,6 @@ class LoopNode extends Node {
 		}
 
 		builder.addFlowTab();
-
-		return returnsSnippet;
 
 	}
 
