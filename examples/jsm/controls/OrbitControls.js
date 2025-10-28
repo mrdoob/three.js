@@ -1404,13 +1404,15 @@ class OrbitControls extends Controls {
 
 	}
 
-	_getSecondPointerPosition(event) {
-        if (this._pointers.length < 2) return null;
-	
-        const pointerId = (event.pointerId === this._pointers[0]) ? this._pointers[1] : this._pointers[0];
-	
-        return this._pointerPositions[pointerId] || null;
-    }
+	_getSecondPointerPosition( event ) {
+
+		if ( this._pointers.length < 2 ) return null;
+
+		const pointerId = ( event.pointerId === this._pointers[ 0 ] ) ? this._pointers[ 1 ] : this._pointers[ 0 ];
+
+		return this._pointerPositions[ pointerId ] || null;
+
+	}
 
 	//
 
