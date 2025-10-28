@@ -35,7 +35,7 @@ const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 // Used for scene blur in fromScene() method.
 const MAX_SAMPLES = 20;
 
-// GGX importance sampling configuration
+// GGX VNDF importance sampling configuration
 const GGX_SAMPLES = 2048;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
@@ -58,8 +58,9 @@ const _origin = /*@__PURE__*/ new Vector3();
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * The prefiltering uses GGX importance sampling to generate environment maps
- * that accurately represent the material's BRDF for image-based lighting.
+ * The prefiltering uses GGX VNDF (Visible Normal Distribution Function) 
+ * importance sampling to generate environment maps that accurately represent 
+ * the material's BRDF for image-based lighting.
 */
 class PMREMGenerator {
 
@@ -473,7 +474,7 @@ class PMREMGenerator {
 		renderer.autoClear = false;
 		const n = this._lodPlanes.length;
 
-		// Use GGX importance sampling
+		// Use GGX VNDF importance sampling
 		for ( let i = 1; i < n; i ++ ) {
 
 			this._applyGGXFilter( cubeUVRenderTarget, i - 1, i );
@@ -485,8 +486,8 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Applies GGX importance sampling filter to generate a prefiltered environment map.
-	 * Uses Monte Carlo integration with importance sampling to accurately represent the
+	 * Applies GGX VNDF importance sampling filter to generate a prefiltered environment map.
+	 * Uses Monte Carlo integration with VNDF importance sampling to accurately represent the
 	 * GGX BRDF for physically-based rendering. Reads from the previous LOD level and
 	 * applies incremental roughness filtering to avoid over-blurring.
 	 *
@@ -889,12 +890,12 @@ function _getGGXShader( lodMax, width, height ) {
 					float NdotL = max(dot(N, L), 0.0);
 
 					if(NdotL > 0.0) {
-						// Sample environment with the reflected direction
-						// Using fixed mipInt to maintain brightness
+						// Sample environment at fixed mip level
+						// VNDF importance sampling handles the distribution filtering
 						vec3 sampleColor = bilinearCubeUV(envMap, L, mipInt);
 
-						// For split-sum approximation in IBL, we weight by NdotL
-						// The PDF cancellation happens naturally with importance sampling
+						// Weight by NdotL for the split-sum approximation
+						// VNDF PDF naturally accounts for the visible microfacet distribution
 						prefilteredColor += sampleColor * NdotL;
 						totalWeight += NdotL;
 					}
