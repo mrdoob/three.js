@@ -185,25 +185,25 @@
 				ceiling.receiveShadow = true;
 				scene.add( ceiling );
 
-				// Boxes with TSL metalness/roughness stripes
+				// Boxes
 
-				// Create striped material using TSL
-				const stripedMaterial = new THREE.MeshPhysicalNodeMaterial( { color: '#ffffff' } );
-				// Create vertical stripes based on Y position: alternating metalness (0 and 1)
-				const stripePattern = step( 0.5, mod( positionLocal.y, float( 2.0 ) ) );
-				stripedMaterial.metalnessNode = stripePattern;
-				stripedMaterial.roughnessNode = stripePattern.oneMinus().mul( 0.8 ).add( 0.1 ); // roughness: 0.1 when metallic, 0.9 when not
+				const tallBoxMaterial = new THREE.MeshPhysicalNodeMaterial( { roughness: 0, color: '#ffffff' } );
+				tallBoxMaterial.metalnessNode = step( 0.5, mod( positionLocal.y, float( 1.0 ) ) );
 
 				const tallBoxGeometry = new THREE.BoxGeometry( 5, 7, 5 );
-				const tallBox = new THREE.Mesh( tallBoxGeometry, stripedMaterial );
+				const tallBox = new THREE.Mesh( tallBoxGeometry, tallBoxMaterial );
 				tallBox.rotation.y = Math.PI * 0.25;
 				tallBox.position.set( - 3, 3.5, - 2 );
 				tallBox.castShadow = true;
 				tallBox.receiveShadow = true;
 				scene.add( tallBox );
 
+
+				const shortBoxMaterial = new THREE.MeshPhysicalNodeMaterial( { metalness: 0, color: '#ffffff' } );
+				shortBoxMaterial.colorNode = step( 0.5, mod( positionLocal.y, float( 1.0 ) ) );
+
 				const shortBoxGeometry = new THREE.BoxGeometry( 4, 4, 4 );
-				const shortBox = new THREE.Mesh( shortBoxGeometry, stripedMaterial );
+				const shortBox = new THREE.Mesh( shortBoxGeometry, shortBoxMaterial );
 				shortBox.rotation.y = Math.PI * - 0.1;
 				shortBox.position.set( 4, 2, 4 );
 				shortBox.castShadow = true;
