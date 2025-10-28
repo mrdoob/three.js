@@ -59,9 +59,10 @@ const _origin = /*@__PURE__*/ new Vector3();
  * interpolate diffuse lighting while limiting sampling computation.
  *
  * The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
- * importance sampling to generate environment maps that accurately represent
- * the material's BRDF for image-based lighting.
-*/
+ * importance sampling based on "Sampling the GGX Distribution of Visible Normals"
+ * (Heitz, 2018) to generate environment maps that accurately match the GGX BRDF
+ * used in material rendering for physically-based image-based lighting.
+ */
 class PMREMGenerator {
 
 	/**
@@ -826,6 +827,7 @@ function _getGGXShader( lodMax, width, height ) {
 
 			// GGX VNDF importance sampling (Eric Heitz 2018)
 			// "Sampling the GGX Distribution of Visible Normals"
+			// https://jcgt.org/published/0007/04/01/
 			vec3 importanceSampleGGX_VNDF(vec2 Xi, vec3 V, float roughness) {
 				float alpha = roughness * roughness;
 
@@ -873,15 +875,8 @@ function _getGGXShader( lodMax, width, height ) {
 				for(uint i = 0u; i < uint(GGX_SAMPLES); i++) {
 					vec2 Xi = hammersley(i, uint(GGX_SAMPLES));
 
-					// Transform V to tangent space for VNDF sampling
-					vec3 V_tangent = vec3(
-						dot(V, tangent),
-						dot(V, bitangent),
-						dot(V, N)
-					);
-
-					// Sample VNDF in tangent space
-					vec3 H_tangent = importanceSampleGGX_VNDF(Xi, V_tangent, roughness);
+					// For PMREM, V = N, so in tangent space V is always (0, 0, 1)
+					vec3 H_tangent = importanceSampleGGX_VNDF(Xi, vec3(0.0, 0.0, 1.0), roughness);
 
 					// Transform H back to world space
 					vec3 H = normalize(tangent * H_tangent.x + bitangent * H_tangent.y + N * H_tangent.z);
