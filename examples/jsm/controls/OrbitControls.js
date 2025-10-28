@@ -1200,7 +1200,7 @@ class OrbitControls extends Controls {
 		} else {
 
 			const position = this._getSecondPointerPosition( event );
-
+            if (!position) return;
 			const x = 0.5 * ( event.pageX + position.x );
 			const y = 0.5 * ( event.pageY + position.y );
 
@@ -1219,7 +1219,7 @@ class OrbitControls extends Controls {
 		} else {
 
 			const position = this._getSecondPointerPosition( event );
-
+            if (!position) return;
 			const x = 0.5 * ( event.pageX + position.x );
 			const y = 0.5 * ( event.pageY + position.y );
 
@@ -1232,7 +1232,7 @@ class OrbitControls extends Controls {
 	_handleTouchStartDolly( event ) {
 
 		const position = this._getSecondPointerPosition( event );
-
+        if (!position) return;
 		const dx = event.pageX - position.x;
 		const dy = event.pageY - position.y;
 
@@ -1267,7 +1267,7 @@ class OrbitControls extends Controls {
 		} else {
 
 			const position = this._getSecondPointerPosition( event );
-
+            if (!position) return;
 			const x = 0.5 * ( event.pageX + position.x );
 			const y = 0.5 * ( event.pageY + position.y );
 
@@ -1296,7 +1296,7 @@ class OrbitControls extends Controls {
 		} else {
 
 			const position = this._getSecondPointerPosition( event );
-
+            if (!position) return;
 			const x = 0.5 * ( event.pageX + position.x );
 			const y = 0.5 * ( event.pageY + position.y );
 
@@ -1315,7 +1315,7 @@ class OrbitControls extends Controls {
 	_handleTouchMoveDolly( event ) {
 
 		const position = this._getSecondPointerPosition( event );
-
+        if (!position) return;
 		const dx = event.pageX - position.x;
 		const dy = event.pageY - position.y;
 
@@ -1404,13 +1404,12 @@ class OrbitControls extends Controls {
 
 	}
 
-	_getSecondPointerPosition( event ) {
+	_getSecondPointerPosition(event) {
+        if (this._pointers.length < 2) return null;
 
-		const pointerId = ( event.pointerId === this._pointers[ 0 ] ) ? this._pointers[ 1 ] : this._pointers[ 0 ];
-
-		return this._pointerPositions[ pointerId ];
-
-	}
+        const pointerId = (event.pointerId === this._pointers[0]) ? this._pointers[1] : this._pointers[0];
+        return this._pointerPositions[pointerId] || null;
+    }
 
 	//
 
