@@ -67,8 +67,11 @@ class RangeNode extends Node {
 	 */
 	getVectorLength( builder ) {
 
-		const minLength = builder.getTypeLength( getValueType( this.minNode.value ) );
-		const maxLength = builder.getTypeLength( getValueType( this.maxNode.value ) );
+		const minNode = this.getConstNode( this.minNode );
+		const maxNode = this.getConstNode( this.maxNode );
+
+		const minLength = builder.getTypeLength( getValueType( minNode.value ) );
+		const maxLength = builder.getTypeLength( getValueType( maxNode.value ) );
 
 		return minLength > maxLength ? minLength : maxLength;
 
@@ -86,6 +89,36 @@ class RangeNode extends Node {
 
 	}
 
+	/**
+	 * Returns a constant node from the given node by traversing it.
+	 *
+	 * @param {Node} node - The node to traverse.
+	 * @returns {Node} The constant node, if found.
+	 */
+	getConstNode( node ) {
+
+		let output = null;
+
+		node.traverse( n => {
+
+			if ( n.isConstNode === true ) {
+
+				output = n;
+
+			}
+
+		} );
+
+		if ( output === null ) {
+
+			throw new Error( 'THREE.TSL: No "ConstNode" found in node graph.' );
+
+		}
+
+		return output;
+
+	}
+
 	setup( builder ) {
 
 		const object = builder.object;
@@ -94,8 +127,11 @@ class RangeNode extends Node {
 
 		if ( object.count > 1 ) {
 
-			const minValue = this.minNode.value;
-			const maxValue = this.maxNode.value;
+			const minNode = this.getConstNode( this.minNode );
+			const maxNode = this.getConstNode( this.maxNode );
+
+			const minValue = minNode.value;
+			const maxValue = maxNode.value;
 
 			const minLength = builder.getTypeLength( getValueType( minValue ) );
 			const maxLength = builder.getTypeLength( getValueType( maxValue ) );
