@@ -2420,10 +2420,10 @@ class Renderer {
 	 * if the renderer has been initialized.
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * - A single number representing count, or
 	 * - An array [x, y, z] representing dispatch size, or
-	 * - A GPUBuffer for indirect dispatch size.
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
 	compute( computeNodes, dispatchSize = null ) {
@@ -2434,7 +2434,7 @@ class Renderer {
 
 			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
 
-			return this.computeAsync( computeNodes );
+			return this.computeAsync( computeNodes, dispatchSize );
 
 		}
 
@@ -2532,10 +2532,10 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * - A single number representing count, or
 	 * - An array [x, y, z] representing dispatch size, or
-	 * - A GPUBuffer for indirect dispatch size.
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
 	async computeAsync( computeNodes, dispatchSize = null ) {

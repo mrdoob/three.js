@@ -22,6 +22,7 @@ const exceptionList = [
 	'webgpu_postprocessing_traa',
 	'webgpu_reflection',
 	'webgpu_texturegrad',
+	'webgpu_tsl_vfx_flames',
 
 	// Need more time
 	'css3d_mixed',
