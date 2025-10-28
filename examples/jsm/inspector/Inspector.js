@@ -346,7 +346,7 @@ class Inspector extends RendererInspector {
 
 		}
 
-		return sum / count;
+		return count > 0 ? sum / count : 0;
 
 	}
 
