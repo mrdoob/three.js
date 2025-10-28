@@ -18,7 +18,7 @@ const _triangle = new Triangle();
  * Can be used to compute the convex hull in 3D space for a given set of points. It
  * is primarily intended for {@link ConvexGeometry}.
  *
- * This Quickhull 3D implementation is a port of [quickhull3d]{@link https://github.com/maurizzzio/quickhull3d/}
+ * This Quickhull 3D implementation is a port of [quickhull3d](https://github.com/maurizzzio/quickhull3d/)
  * by Mauricio Poppe.
  *
  * @three_import import { ConvexHull } from 'three/addons/math/ConvexHull.js';

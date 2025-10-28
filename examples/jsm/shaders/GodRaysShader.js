@@ -22,7 +22,7 @@ import {
  * 6*6*6 = 216 samples.
  *
  * References:
- * - [Sousa2008, Crysis Next Gen Effects, GDC2008]{@link http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt}.
+ * - [Sousa2008, Crysis Next Gen Effects, GDC2008](http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt).
  *
  * @constant
  * @type {ShaderMaterial~Shader}

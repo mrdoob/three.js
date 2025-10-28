@@ -20,7 +20,7 @@ import {
 /**
  * A special type of helper that visualizes the camera's transformation
  * in a small viewport area as an axes helper. Such a helper is often wanted
- * in 3D modeling tools or scene editors like the [three.js editor]{@link https://threejs.org/editor}.
+ * in 3D modeling tools or scene editors like the [three.js editor](https://threejs.org/editor).
  *
  * The helper allows to click on the X, Y and Z axes which animates the camera
  * so it looks along the selected axis.

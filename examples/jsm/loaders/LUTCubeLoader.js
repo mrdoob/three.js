@@ -12,7 +12,7 @@ import {
  * A loader for the Cube LUT format.
  *
  * References:
- * - [Cube LUT Specification]{@link https://web.archive.org/web/20220220033515/https://wwwimages2.adobe.com/content/dam/acom/en/products/speedgrade/cc/pdfs/cube-lut-specification-1.0.pdf}
+ * - [Cube LUT Specification](https://web.archive.org/web/20220220033515/https://wwwimages2.adobe.com/content/dam/acom/en/products/speedgrade/cc/pdfs/cube-lut-specification-1.0.pdf)
  *
  * ```js
  * const loader = new LUTCubeLoader();

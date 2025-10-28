@@ -16,14 +16,14 @@ const _taskCache = new WeakMap();
 /**
  * A loader for the Draco format.
  *
- * [Draco]{@link https://google.github.io/draco/} is an open source library for compressing
+ * [Draco](https://google.github.io/draco/) is an open source library for compressing
  * and decompressing 3D meshes and point clouds. Compressed geometry can be significantly smaller,
  * at the cost of additional decoding time on the client device.
  *
  * Standalone Draco files have a `.drc` extension, and contain vertex positions, normals, colors,
  * and other attributes. Draco files do not contain materials, textures, animation, or node hierarchies –
  * to use these features, embed Draco geometry inside of a glTF file. A normal glTF file can be converted
- * to a Draco-compressed glTF file using [glTF-Pipeline]{@link https://github.com/CesiumGS/gltf-pipeline}.
+ * to a Draco-compressed glTF file using [glTF-Pipeline](https://github.com/CesiumGS/gltf-pipeline).
  * When using Draco with glTF, an instance of `DRACOLoader` will be used internally by {@link GLTFLoader}.
  *
  * It is recommended to create one DRACOLoader instance and reuse it to avoid loading and creating

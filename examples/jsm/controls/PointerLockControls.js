@@ -35,7 +35,7 @@ const _MOUSE_SENSITIVITY = 0.002;
 const _PI_2 = Math.PI / 2;
 
 /**
- * The implementation of this class is based on the [Pointer Lock API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API}.
+ * The implementation of this class is based on the [Pointer Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API).
  * `PointerLockControls` is a perfect choice for first person 3D games.
  *
  * ```js

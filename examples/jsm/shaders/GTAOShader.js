@@ -15,8 +15,8 @@ import {
  * GTAO shader. Use by {@link GTAOPass}.
  *
  * References:
- * - [Practical Realtime Strategies for Accurate Indirect Occlusion]{@link https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf}.
- * - [Horizon-Based Indirect Lighting (HBIL)]{@link https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf}
+ * - [Practical Realtime Strategies for Accurate Indirect Occlusion](https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf).
+ * - [Horizon-Based Indirect Lighting (HBIL)](https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf)
  *
  * @constant
  * @type {ShaderMaterial~Shader}

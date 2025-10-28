@@ -12,8 +12,8 @@ import {
  * A loader for the 3DL LUT format.
  *
  * References:
- * - [3D LUTs]{@link http://download.autodesk.com/us/systemdocs/help/2011/lustre/index.html?url=./files/WSc4e151a45a3b785a24c3d9a411df9298473-7ffd.htm,topicNumber=d0e9492}
- * - [Format Spec for .3dl]{@link https://community.foundry.com/discuss/topic/103636/format-spec-for-3dl?mode=Post&postID=895258}
+ * - [3D LUTs](http://download.autodesk.com/us/systemdocs/help/2011/lustre/index.html?url=./files/WSc4e151a45a3b785a24c3d9a411df9298473-7ffd.htm,topicNumber=d0e9492)
+ * - [Format Spec for .3dl](https://community.foundry.com/discuss/topic/103636/format-spec-for-3dl?mode=Post&postID=895258)
  *
  * ```js
  * const loader = new LUT3dlLoader();
