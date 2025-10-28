@@ -273,6 +273,22 @@ class ShadowNode extends ShadowBaseNode {
 		 */
 		this._node = null;
 
+		/**
+		 * The current shadow map type of this shadow node.
+		 *
+		 * @type {?number}
+		 * @private
+		 * @default null
+		 */
+		this._currentShadowType = null;
+
+		/**
+		 * A Weak Map holding the current frame ID per camera. Used
+		 * to control the update of shadow maps.
+		 *
+		 * @type {WeakMap<Camera,number>}
+		 * @private
+		 */
 		this._cameraFrameId = new WeakMap();
 
 		/**
@@ -549,6 +565,15 @@ class ShadowNode extends ShadowBaseNode {
 
 		return Fn( () => {
 
+			const currentShadowType = builder.renderer.shadowMap.type;
+
+			if ( this._currentShadowType !== currentShadowType ) {
+
+				this._reset();
+				this._node = null;
+
+			}
+
 			let node = this._node;
 
 			this.setupShadowPosition( builder );
@@ -556,6 +581,7 @@ class ShadowNode extends ShadowBaseNode {
 			if ( node === null ) {
 
 				this._node = node = this.setupShadow( builder );
+				this._currentShadowType = currentShadowType;
 
 			}
 
@@ -688,8 +714,27 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	dispose() {
 
-		this.shadowMap.dispose();
-		this.shadowMap = null;
+		this._reset();
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Resets the resouce state of this shadow node.
+	 *
+	 * @private
+	 */
+	_reset() {
+
+		this._currentShadowType = null;
+
+		if ( this.shadowMap ) {
+
+			this.shadowMap.dispose();
+			this.shadowMap = null;
+
+		}
 
 		if ( this.vsmShadowMapVertical !== null ) {
 
@@ -710,8 +755,6 @@ class ShadowNode extends ShadowBaseNode {
 			this.vsmMaterialHorizontal = null;
 
 		}
-
-		super.dispose();
 
 	}
 

@@ -113,9 +113,9 @@ let _zstd;
  * This loader relies on Web Assembly which is not supported in older browsers.
  *
  * References:
- * - [KTX specification]{@link http://github.khronos.org/KTX-Specification/}
- * - [DFD]{@link https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor}
- * - [BasisU HDR]{@link https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0}
+ * - [KTX specification](http://github.khronos.org/KTX-Specification/)
+ * - [DFD](https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor)
+ * - [BasisU HDR](https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0)
  *
  * ```js
  * const loader = new KTX2Loader();
@@ -359,6 +359,7 @@ class KTX2Loader extends Loader {
 		loader.setPath( this.path );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setWithCredentials( this.withCredentials );
+		loader.setRequestHeader( this.requestHeader );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, ( buffer ) => {

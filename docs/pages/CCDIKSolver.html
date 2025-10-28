@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CCDIKSolver - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">CCDIKSolver</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class solves the Inverse Kinematics Problem with a <a href="https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm">CCD Algorithm</a>.</p>
+<p><code>CCDIKSolver</code> is designed to work with instances of <a href="SkinnedMesh.html">SkinnedMesh</a>.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">CCDIKSolver</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { CCDIKSolver } from 'three/addons/animation/CCDIKSolver.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CCDIKSolver" translate="no">new <a href="#CCDIKSolver">CCDIKSolver</a><span class="signature">( mesh : <span class="param-type">SkinnedMesh</span>, iks : <span class="param-type">Array.&lt;CCDIKSolver~IK></span> )</span> </h3>
+					<div class="method">
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>mesh</code></td>
+									<td class="description last"><p>The skinned mesh.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>iks</code></td>
+									<td class="description last"><p>The IK objects.<br/>Default is <code>[]</code>.</p></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="iks" translate="no">.<a href="#iks">iks</a><span class="type-signature"> : <a href="SkinnedMesh.html">SkinnedMesh</a></span> </h3>
+					<div class="description">
+						<p>The IK objects.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mesh" translate="no">.<a href="#mesh">mesh</a><span class="type-signature"> : <a href="SkinnedMesh.html">SkinnedMesh</a></span> </h3>
+					<div class="description">
+						<p>The skinned mesh.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createHelper" translate="no">.<a href="#createHelper">createHelper</a><span class="signature">( sphereSize : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="CCDIKHelper.html">CCDIKHelper</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a helper for visualizing the CCDIK.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>sphereSize</code></td>
+									<td class="description last"><p>The sphere size.</p></td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created helper.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( globalBlendFactor : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="CCDIKSolver.html">CCDIKSolver</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates all IK bones by solving the CCD algorithm.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>globalBlendFactor</code></td>
+									<td class="description last"><p>Blend factor applied if an IK chain doesn't have its own .blendFactor.<br/>Default is <code>1.0</code>.</p></td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateOne" translate="no">.<a href="#updateOne">updateOne</a><span class="signature">( ik : <span class="param-type">CCDIKSolver~IK</span>, overrideBlend : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="CCDIKSolver.html">CCDIKSolver</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates one IK bone solving the CCD algorithm.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name"><code>ik</code></td>
+									<td class="description last"><p>The IK to update.</p></td>
+								</tr>
+								<tr>
+									<td class="name"><code>overrideBlend</code></td>
+									<td class="description last"><p>If the IK object does not define <code>blendFactor</code>, this value is used.<br/>Default is <code>1.0</code>.</p></td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~BoneLink" translate="no">.<a href="#~BoneLink">BoneLink</a> </h3>
+					<div class="description">
+						<p>This type represents bone links.</p>
+					</div>
+						<h5 class="subsection-title">Properties:</h5>
+<table class="props">
+	<thead>
+	<tr>
+		<th>Name</th>
+		<th>Type</th>
+		<th>Attributes</th>
+		<th>Default</th>
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	<tbody>
+		<tr>
+				<td class="name"><code>index</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>The index of a linked bone which refers to a bone in the <code>Skeleton.bones</code> array.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>limitation</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>Rotation axis.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>rotationMin</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>Rotation minimum limit.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>rotationMax</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>Rotation maximum limit.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>enabled</code></td>
+			<td class="type">
+<span class="param-type">boolean</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					true
+				</td>
+			<td class="description last"><p>Whether the link is enabled or not.</p></td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~IK" translate="no">.<a href="#~IK">IK</a> </h3>
+					<div class="description">
+						<p>This type represents IK configuration objects.</p>
+					</div>
+						<h5 class="subsection-title">Properties:</h5>
+<table class="props">
+	<thead>
+	<tr>
+		<th>Name</th>
+		<th>Type</th>
+		<th>Attributes</th>
+		<th>Default</th>
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	<tbody>
+		<tr>
+				<td class="name"><code>target</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>The target bone index which refers to a bone in the <code>Skeleton.bones</code> array.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>effector</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>The effector bone index which refers to a bone in the <code>Skeleton.bones</code> array.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>links</code></td>
+			<td class="type">
+<span class="param-type">Array.&lt;<a href="CCDIKSolver.html#~BoneLink">CCDIKSolver~BoneLink</a>></span>
+			</td>
+				<td class="attributes">
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>An array of bone links.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>iteration</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+					1
+				</td>
+			<td class="description last"><p>Iteration number of calculation. Smaller is faster but less precise.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>minAngle</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>Minimum rotation angle in a step in radians.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>maxAngle</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>Minimum rotation angle in a step in radians.</p></td>
+		</tr>
+		<tr>
+				<td class="name"><code>blendFactor</code></td>
+			<td class="type">
+<span class="param-type">number</span>
+			</td>
+				<td class="attributes">
+					&lt;optional><br>
+				</td>
+				<td class="default">
+				</td>
+			<td class="description last"><p>The blend factor.</p></td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/CCDIKSolver.js" target="_blank" rel="noopener" translate="no">examples/jsm/animation/CCDIKSolver.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

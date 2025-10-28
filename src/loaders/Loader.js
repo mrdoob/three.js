@@ -54,7 +54,7 @@ class Loader {
 		this.resourcePath = '';
 
 		/**
-		 * The [request header]{@link https://developer.mozilla.org/en-US/docs/Glossary/Request_header}
+		 * The [request header](https://developer.mozilla.org/en-US/docs/Glossary/Request_header)
 		 * used in HTTP request.
 		 *
 		 * @type {Object<string, any>}
@@ -119,7 +119,7 @@ class Loader {
 
 	/**
 	 * Whether the XMLHttpRequest uses credentials such as cookies, authorization
-	 * headers or TLS client certificates, see [XMLHttpRequest.withCredentials]{@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials}.
+	 * headers or TLS client certificates, see [XMLHttpRequest.withCredentials](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials).
 	 *
 	 * Note: This setting has no effect if you are loading files locally or from the same domain.
 	 *
@@ -162,7 +162,7 @@ class Loader {
 	/**
 	 * Sets the given request header.
 	 *
-	 * @param {Object} requestHeader - A [request header]{@link https://developer.mozilla.org/en-US/docs/Glossary/Request_header}
+	 * @param {Object} requestHeader - A [request header](https://developer.mozilla.org/en-US/docs/Glossary/Request_header)
 	 * for configuring the HTTP request.
 	 * @return {Loader} A reference to this instance.
 	 */

@@ -1,5 +1,4 @@
 import { Material } from '../Material.js';
-import { NormalBlending } from '../../constants.js';
 
 import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
@@ -182,7 +181,7 @@ class NodeMaterial extends Material {
 		 * and `alphaMap` properties. This node property allows to overwrite the default
 		 * and define the opacity with a node instead.
 		 *
-		 * If you don't want to overwrite the normals but modify the existing
+		 * If you don't want to overwrite the opacity but modify the existing
 		 * value instead, use {@link materialOpacity}.
 		 *
 		 * @type {?Node<float>}
@@ -820,7 +819,9 @@ class NodeMaterial extends Material {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {BufferGeometry} geometry - The geometry.
 	 */
-	setupDiffuseColor( { object, geometry } ) {
+	setupDiffuseColor( builder ) {
+
+		const { object, geometry } = builder;
 
 		// MASK
 
@@ -902,9 +903,7 @@ class NodeMaterial extends Material {
 
 		// OPAQUE
 
-		const isOpaque = this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false;
-
-		if ( isOpaque ) {
+		if ( builder.isOpaque() ) {
 
 			diffuseColor.a.assign( 1.0 );
 
@@ -1277,6 +1276,7 @@ class NodeMaterial extends Material {
 
 		this.lightsNode = source.lightsNode;
 		this.envNode = source.envNode;
+		this.aoNode = source.aoNode;
 
 		this.colorNode = source.colorNode;
 		this.normalNode = source.normalNode;

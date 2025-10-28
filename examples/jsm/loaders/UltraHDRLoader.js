@@ -39,7 +39,7 @@ const SRGB_TO_LINEAR = Array( 1024 )
 /**
  * A loader for the Ultra HDR Image Format.
  *
- * Existing HDR or EXR textures can be converted to Ultra HDR with this [tool]{@link https://gainmap-creator.monogrid.com/}.
+ * Existing HDR or EXR textures can be converted to Ultra HDR with this [tool](https://gainmap-creator.monogrid.com/).
  *
  * Current feature set:
  * - JPEG headers (required)

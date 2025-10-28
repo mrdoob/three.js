@@ -2420,10 +2420,13 @@ class Renderer {
 	 * if the renderer has been initialized.
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * - A single number representing count, or
+	 * - An array [x, y, z] representing dispatch size, or
+	 * - A GPUBuffer for indirect dispatch size.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
-	compute( computeNodes, dispatchSizeOrCount = null ) {
+	compute( computeNodes, dispatchSize = null ) {
 
 		if ( this._isDeviceLost === true ) return;
 
@@ -2508,7 +2511,7 @@ class Renderer {
 			const computeBindings = bindings.getForCompute( computeNode );
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
-			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSizeOrCount );
+			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
 
 		}
 
@@ -2529,16 +2532,17 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {number|Array<number>|GPUBuffer} [dispatchSize=null]
+	 * - A single number representing count, or
+	 * - An array [x, y, z] representing dispatch size, or
+	 * - A GPUBuffer for indirect dispatch size.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
-	async computeAsync( computeNodes, dispatchSizeOrCount = null ) {
+	async computeAsync( computeNodes, dispatchSize = null ) {
 
-		warnOnce( 'Renderer: "computeAsync()" has been deprecated. Use "compute()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+		if ( this._initialized === false ) await this.init();
 
-		await this.init();
-
-		this.compute( computeNodes, dispatchSizeOrCount );
+		this.compute( computeNodes, dispatchSize );
 
 	}
 
@@ -3102,7 +3106,9 @@ class Renderer {
 
 			overrideMaterial.alphaTest = material.alphaTest;
 			overrideMaterial.alphaMap = material.alphaMap;
-			overrideMaterial.transparent = material.transparent || material.transmission > 0;
+			overrideMaterial.transparent = material.transparent || material.transmission > 0 ||
+				( material.transmissionNode && material.transmissionNode.isNode ) ||
+				( material.backdropNode && material.backdropNode.isNode );
 
 			if ( overrideMaterial.isShadowPassMaterial ) {
 

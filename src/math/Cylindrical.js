@@ -1,6 +1,6 @@
 /**
  * This class can be used to represent points in 3D space as
- * [Cylindrical coordinates]{@link https://en.wikipedia.org/wiki/Cylindrical_coordinate_system}.
+ * [Cylindrical coordinates](https://en.wikipedia.org/wiki/Cylindrical_coordinate_system).
  */
 class Cylindrical {
 

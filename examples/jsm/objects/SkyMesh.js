@@ -9,7 +9,7 @@ import {
 import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
 
 /**
- * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight]{@link https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight}
+ * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
  * aka The Preetham Model, the de facto standard for analytical skydomes.
  *
  * Note that this class can only be used with {@link WebGLRenderer}.

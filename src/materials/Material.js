@@ -523,7 +523,7 @@ class Material extends EventDispatcher {
 	 *
 	 * This method can only be used when rendering with {@link WebGLRenderer}. The
 	 * recommended approach when customizing materials is to use `WebGPURenderer` with the new
-	 * Node Material system and [TSL]{@link https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language}.
+	 * Node Material system and [TSL](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language).
 	 *
 	 * @param {{vertexShader:string,fragmentShader:string,uniforms:Object}} shaderobject - The object holds the uniforms and the vertex and fragment shader source.
 	 * @param {WebGLRenderer} renderer - A reference to the renderer.
