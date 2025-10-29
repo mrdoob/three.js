@@ -322,7 +322,7 @@ const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V_immutable, roughnes
 	const Vh = normalize( vec3( alpha.mul( V.x ), alpha.mul( V.y ), V.z ) ).toVar();
 
 	// Section 4.1: Orthonormal basis
-	const lensq = Vh.x.mul( Vh.x ).add( Vh.y.mul( Vh.y ) ).toVar();
+	const lensq = Vh.x.mul( Vh.x ).add( Vh.y.mul( Vh.y ) );
 	const T1 = select( lensq.greaterThan( 0.0 ), vec3( Vh.y.negate(), Vh.x, 0.0 ).div( sqrt( lensq ) ), vec3( 1.0, 0.0, 0.0 ) ).toVar();
 	const T2 = cross( Vh, T1 ).toVar();
 
@@ -331,11 +331,11 @@ const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V_immutable, roughnes
 	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y );
 	const t1 = r.mul( cos( phi ) ).toVar();
 	const t2 = r.mul( sin( phi ) ).toVar();
-	const s = mul( 0.5, Vh.z.add( 1.0 ) ).toVar();
+	const s = mul( 0.5, Vh.z.add( 1.0 ) );
 	t2.assign( s.oneMinus().mul( sqrt( t1.mul( t1 ).oneMinus() ) ).add( s.mul( t2 ) ) );
 
 	// Section 4.3: Reprojection onto hemisphere
-	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( Vh.mul( sqrt( max( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) ).toVar();
+	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( Vh.mul( sqrt( max( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
 
 	// Section 3.4: Transform back to ellipsoid configuration
 	return normalize( vec3( alpha.mul( Nh.x ), alpha.mul( Nh.y ), max( 0.0, Nh.z ) ) );
@@ -358,7 +358,7 @@ export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, mipInt, envMap, N
 	} ).Else( () => {
 
 		// Tangent space basis for VNDF sampling
-		const up = select( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) ).toVar();
+		const up = select( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
 		const tangent = normalize( cross( up, N ) ).toVar();
 		const bitangent = cross( N, tangent ).toVar();
 
