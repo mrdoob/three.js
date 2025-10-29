@@ -311,9 +311,6 @@ class StackNode extends Node {
 
 			if ( buildStage === 'setup' ) {
 
-				const nodeData = builder.getDataFromNode( node );
-				nodeData.stack = this;
-
 				node.build( builder );
 
 			} else if ( buildStage === 'analyze' ) {
