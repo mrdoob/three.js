@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
+import { hashString } from './NodeUtils.js';
 
 /**
  * This class represents a shader property. It can be used
@@ -65,6 +66,12 @@ class PropertyNode extends Node {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	customCacheKey() {
+
+		return hashString( this.type + ':' + ( this.name || '' ) + ':' + ( this.varying ? '1' : '0' ) );
 
 	}
 
