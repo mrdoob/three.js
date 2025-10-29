@@ -38,13 +38,6 @@ class AfterImageNode extends TempNode {
 		this.textureNode = textureNode;
 
 		/**
-		 * The texture represents the pervious frame.
-		 *
-		 * @type {TextureNode}
-		 */
-		this.textureNodeOld = texture( null );
-
-		/**
 		 * How quickly the after-image fades. A higher value means the after-image
 		 * persists longer, while a lower value means it fades faster. Should be in
 		 * the range `[0, 1]`.
@@ -78,6 +71,14 @@ class AfterImageNode extends TempNode {
 		 * @type {PassTextureNode}
 		 */
 		this._textureNode = passTexture( this, this._compRT.texture );
+
+		/**
+		 * The texture represents the pervious frame.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
+		this._textureNodeOld = texture( this._oldRT.texture );
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -139,26 +140,26 @@ class AfterImageNode extends TempNode {
 
 		this.setSize( _size.x, _size.y );
 
-		const currentTexture = textureNode.value;
+		// make sure texture nodes point to correct render targets
 
-		this.textureNodeOld.value = this._oldRT.texture;
+		this._textureNode.value = this._compRT.texture;
+		this._textureNodeOld.value = this._oldRT.texture;
 
-		// comp
+		// composite
+
 		_quadMesh.material = this._materialComposed;
 		_quadMesh.name = 'AfterImage';
 
 		renderer.setRenderTarget( this._compRT );
 		_quadMesh.render( renderer );
 
-		// Swap the textures
+		// swap
 
 		const temp = this._oldRT;
 		this._oldRT = this._compRT;
 		this._compRT = temp;
 
 		//
-
-		textureNode.value = currentTexture;
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 
@@ -173,7 +174,7 @@ class AfterImageNode extends TempNode {
 	setup( builder ) {
 
 		const textureNode = this.textureNode;
-		const textureNodeOld = this.textureNodeOld;
+		const textureNodeOld = this._textureNodeOld;
 
 		//
 
