@@ -123,10 +123,10 @@
 
 				// ao
 
-				aoPass = ao( scenePassDepth, scenePassNormal, camera ).toInspector( 'AO' );
+				aoPass = ao( scenePassDepth, scenePassNormal, camera );
 				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
 				aoPass.useTemporalFiltering = true;
-				blendPassAO = vec4( scenePassColor.rgb.mul( aoPass.r ), scenePassColor.a ); // the AO is stored only in the red channel
+				blendPassAO = vec4( scenePassColor.rgb.mul( aoPass.r.toInspector( 'AO' ) ), scenePassColor.a ); // the AO is stored only in the red channel
 
 				// traa
 
