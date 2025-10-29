@@ -4,9 +4,12 @@ import { clamp, normalize, reference, nodeObject, Fn, NodeUpdateType, uniform, v
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
-// From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
-const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
-const _spatialOffsets = [ 0, 0.5, 0.25, 0.75 ];
+// Extended temporal sampling patterns for better temporal distribution and reduced ghosting
+// Original values from Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
+// Doubled from 6 to 12 rotations and 4 to 8 offsets for better noise distribution across frames
+// More rotation angles and spatial offsets improve temporal accumulation and reduce structured artifacts
+const _temporalRotations = [ 60, 300, 180, 240, 120, 0, 90, 270, 30, 150, 210, 330 ];
+const _spatialOffsets = [ 0, 0.5, 0.25, 0.75, 0.125, 0.625, 0.375, 0.875 ];
 
 let _rendererState;
 
@@ -338,8 +341,8 @@ class SSGINode extends TempNode {
 
 			const frameId = frame.frameId;
 
-			this._temporalDirection.value = _temporalRotations[ frameId % 6 ] / 360;
-			this._temporalOffset.value = _spatialOffsets[ frameId % 4 ];
+			this._temporalDirection.value = _temporalRotations[ frameId % _temporalRotations.length ] / 360;
+			this._temporalOffset.value = _spatialOffsets[ frameId % _spatialOffsets.length ];
 
 		} else {
 
