@@ -33,6 +33,8 @@ import { Vector4 } from '../../math/Vector4.js';
 import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
 import { warn, error } from '../../utils.js';
 
+let _id = 0;
+
 const rendererCache = new WeakMap();
 
 const typeFromArray = new Map( [
@@ -458,6 +460,8 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.fnCall = null;
+
+		Object.defineProperty( this, 'id', { value: _id ++ } );
 
 	}
 
