@@ -1499,7 +1499,7 @@ class Node extends EventDispatcher {
 
 			//
 
-			const values = [ this.id ];
+			const values = [];
 
 			for ( const { property, childNode } of this._getChildren( ignores ) ) {
 
@@ -1525,7 +1525,7 @@ class Node extends EventDispatcher {
 	 */
 	customCacheKey() {
 
-		return 0;
+		return this.id;
 
 	}
 
@@ -4508,6 +4508,12 @@ class PropertyNode extends Node {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	customCacheKey() {
+
+		return hashString( this.type + ':' + ( this.name || '' ) + ':' + ( this.varying ? '1' : '0' ) );
 
 	}
 
@@ -27990,7 +27996,7 @@ class ChainMap {
 
 }
 
-let _id$9 = 0;
+let _id$a = 0;
 
 function getKeys( obj ) {
 
@@ -28062,7 +28068,7 @@ class RenderObject {
 	 */
 	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext ) {
 
-		this.id = _id$9 ++;
+		this.id = _id$a ++;
 
 		/**
 		 * Renderer component for managing nodes related logic.
@@ -28858,6 +28864,8 @@ class RenderObject {
 			cacheKey = hash$1( cacheKey, 1 );
 
 		}
+
+		cacheKey = hash$1( cacheKey, this.camera.id );
 
 		return cacheKey;
 
@@ -29943,7 +29951,7 @@ class ComputePipeline extends Pipeline {
 
 }
 
-let _id$8 = 0;
+let _id$9 = 0;
 
 /**
  * Class for representing programmable stages which are vertex,
@@ -29970,7 +29978,7 @@ class ProgrammableStage {
 		 *
 		 * @type {number}
 		 */
-		this.id = _id$8 ++;
+		this.id = _id$9 ++;
 
 		/**
 		 * The shader code.
@@ -31328,7 +31336,7 @@ class RenderLists {
 
 }
 
-let _id$7 = 0;
+let _id$8 = 0;
 
 /**
  * Any render or compute command is executed in a specific context that defines
@@ -31350,7 +31358,7 @@ class RenderContext {
 		 *
 		 * @type {number}
 		 */
-		this.id = _id$7 ++;
+		this.id = _id$8 ++;
 
 		/**
 		 * Whether the current active framebuffer has a color attachment.
@@ -32704,9 +32712,6 @@ class StackNode extends Node {
 			}
 
 			if ( buildStage === 'setup' ) {
-
-				const nodeData = builder.getDataFromNode( node );
-				nodeData.stack = this;
 
 				node.build( builder );
 
@@ -46167,7 +46172,7 @@ class Background extends DataMap {
 
 }
 
-let _id$6 = 0;
+let _id$7 = 0;
 
 /**
  * A bind group represents a collection of bindings and thus a collection
@@ -46221,7 +46226,7 @@ class BindGroup {
 		 *
 		 * @type {number}
 		 */
-		this.id = _id$6 ++;
+		this.id = _id$7 ++;
 
 	}
 
@@ -46682,7 +46687,7 @@ class NodeCode {
 
 }
 
-let _id$5 = 0;
+let _id$6 = 0;
 
 /**
  * This utility class is used in {@link NodeBuilder} as an internal
@@ -46703,7 +46708,7 @@ class NodeCache {
 		 * @type {number}
 		 * @readonly
 		 */
-		this.id = _id$5 ++;
+		this.id = _id$6 ++;
 
 		/**
 		 * A weak map for managing node data.
@@ -47531,6 +47536,8 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 
 }
 
+let _id$5 = 0;
+
 const rendererCache = new WeakMap();
 
 const typeFromArray = new Map( [
@@ -47956,6 +47963,8 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.fnCall = null;
+
+		Object.defineProperty( this, 'id', { value: _id$5 ++ } );
 
 	}
 
@@ -49179,6 +49188,14 @@ class NodeBuilder {
 	removeStack() {
 
 		const lastStack = this.stack;
+
+		for ( const node of lastStack.nodes ) {
+
+			const nodeData = this.getDataFromNode( node );
+			nodeData.stack = lastStack;
+
+		}
+
 		this.stack = lastStack.parent;
 
 		setCurrentStack( this.stacks.pop() );

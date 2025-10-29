@@ -43616,9 +43616,10 @@ class LoadingManager {
 		/**
 		 * Used for aborting ongoing requests in loaders using this manager.
 		 *
-		 * @type {AbortController}
+		 * @private
+		 * @type {AbortController | null}
 		 */
-		this.abortController = new AbortController();
+		this._abortController = null;
 
 		/**
 		 * This should be called by any loader using the manager when the loader
@@ -43829,12 +43830,33 @@ class LoadingManager {
 		 */
 		this.abort = function () {
 
+
 			this.abortController.abort();
-			this.abortController = new AbortController();
+			this._abortController = null;
 
 			return this;
 
 		};
+
+	}
+
+	// TODO: Revert this back to a single member variable once this issue has been fixed
+	// https://github.com/cloudflare/workerd/issues/3657
+
+	/**
+	 * Used for aborting ongoing requests in loaders using this manager.
+	 *
+	 * @type {AbortController}
+	 */
+	get abortController() {
+
+		if ( ! this._abortController ) {
+
+			this._abortController = new AbortController();
+
+		}
+
+		return this._abortController;
 
 	}
 
