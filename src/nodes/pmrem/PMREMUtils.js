@@ -26,8 +26,8 @@ const cubeUV_minTileSize = /*@__PURE__*/ float( 16.0 );
 
 const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 
-	const absDirection = vec3( abs( direction ) );
-	const face = float( - 1.0 );
+	const absDirection = vec3( abs( direction ) ).toVar();
+	const face = float( - 1.0 ).toVar();
 
 	If( absDirection.x.greaterThan( absDirection.z ), () => {
 
@@ -68,7 +68,7 @@ const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 // RH coordinate system; PMREM face-indexing convention
 const getUV = /*@__PURE__*/ Fn( ( [ direction, face ] ) => {
 
-	const uv = vec2();
+	const uv = vec2().toVar();
 
 	If( face.equal( 0.0 ), () => {
 
@@ -109,7 +109,7 @@ const getUV = /*@__PURE__*/ Fn( ( [ direction, face ] ) => {
 
 const roughnessToMip = /*@__PURE__*/ Fn( ( [ roughness ] ) => {
 
-	const mip = float( 0.0 );
+	const mip = float( 0.0 ).toVar();
 
 	If( roughness.greaterThanEqual( cubeUV_r1 ), () => {
 
@@ -148,7 +148,7 @@ export const getDirection = /*@__PURE__*/ Fn( ( [ uv_immutable, face ] ) => {
 
 	const uv = uv_immutable.toVar();
 	uv.assign( mul( 2.0, uv ).sub( 1.0 ) );
-	const direction = vec3( uv, 1.0 );
+	const direction = vec3( uv, 1.0 ).toVar();
 
 	If( face.equal( 0.0 ), () => {
 
@@ -200,11 +200,11 @@ export const textureCubeUV = /*@__PURE__*/ Fn( ( [ envMap, sampleDir_immutable, 
 	const mip = clamp( roughnessToMip( roughness ), cubeUV_m0, CUBEUV_MAX_MIP );
 	const mipF = fract( mip );
 	const mipInt = floor( mip );
-	const color0 = vec3( bilinearCubeUV( envMap, sampleDir, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) );
+	const color0 = vec3( bilinearCubeUV( envMap, sampleDir, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) ).toVar();
 
 	If( mipF.notEqual( 0.0 ), () => {
 
-		const color1 = vec3( bilinearCubeUV( envMap, sampleDir, mipInt.add( 1.0 ), CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) );
+		const color1 = vec3( bilinearCubeUV( envMap, sampleDir, mipInt.add( 1.0 ), CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) ).toVar();
 
 		color0.assign( mix( color0, color1, mipF ) );
 
@@ -218,11 +218,11 @@ const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt
 
 	const mipInt = float( mipInt_immutable ).toVar();
 	const direction = vec3( direction_immutable );
-	const face = float( getFace( direction ) );
+	const face = float( getFace( direction ) ).toVar();
 	const filterInt = float( max( cubeUV_minMipLevel.sub( mipInt ), 0.0 ) ).toVar();
 	mipInt.assign( max( mipInt, cubeUV_minMipLevel ) );
-	const faceSize = float( exp2( mipInt ) );
-	const uv = vec2( getUV( direction, face ).mul( faceSize.sub( 2.0 ) ).add( 1.0 ) );
+	const faceSize = float( exp2( mipInt ) ).toVar();
+	const uv = vec2( getUV( direction, face ).mul( faceSize.sub( 2.0 ) ).add( 1.0 ) ).toVar();
 
 	If( face.greaterThan( 2.0 ), () => {
 
@@ -256,7 +256,7 @@ const getSample = /*@__PURE__*/ Fn( ( { envMap, mipInt, outputDirection, theta, 
 
 export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
-	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) );
+	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 
 	If( axis.equal( vec3( 0.0 ) ), () => {
 
@@ -266,7 +266,7 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 
 	axis.assign( normalize( axis ) );
 
-	const gl_FragColor = vec3();
+	const gl_FragColor = vec3().toVar();
 	gl_FragColor.addAssign( weights.element( 0 ).mul( getSample( { theta: 0.0, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
 
 	Loop( { start: int( 1 ), end: n }, ( { i } ) => {
@@ -277,7 +277,7 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 
 		} );
 
-		const theta = float( dTheta.mul( float( i ) ) );
+		const theta = float( dTheta.mul( float( i ) ) ).toVar();
 		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta: theta.mul( - 1.0 ), axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
 		gl_FragColor.addAssign( weights.element( i ).mul( getSample( { theta, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
 
@@ -292,7 +292,7 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 // Van der Corput radical inverse for generating quasi-random sequences
 const radicalInverse_VdC = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 
-	const bits = uint( bits_immutable );
+	const bits = uint( bits_immutable ).toVar();
 	bits.assign( bits.shiftLeft( uint( 16 ) ).bitOr( bits.shiftRight( uint( 16 ) ) ) );
 	bits.assign( bits.bitAnd( uint( 0x55555555 ) ).shiftLeft( uint( 1 ) ).bitOr( bits.bitAnd( uint( 0xAAAAAAAA ) ).shiftRight( uint( 1 ) ) ) );
 	bits.assign( bits.bitAnd( uint( 0x33333333 ) ).shiftLeft( uint( 2 ) ).bitOr( bits.bitAnd( uint( 0xCCCCCCCC ) ).shiftRight( uint( 2 ) ) ) );
@@ -316,21 +316,21 @@ const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V_immutable, roughnes
 
 	const V = vec3( V_immutable ).toVar();
 	const roughness = float( roughness_immutable );
-	const alpha = roughness.mul( roughness );
+	const alpha = roughness.mul( roughness ).toVar();
 
 	// Section 3.2: Transform view direction to hemisphere configuration
-	const Vh = normalize( vec3( alpha.mul( V.x ), alpha.mul( V.y ), V.z ) );
+	const Vh = normalize( vec3( alpha.mul( V.x ), alpha.mul( V.y ), V.z ) ).toVar();
 
 	// Section 4.1: Orthonormal basis
 	const lensq = Vh.x.mul( Vh.x ).add( Vh.y.mul( Vh.y ) );
-	const T1 = select( lensq.greaterThan( 0.0 ), vec3( Vh.y.negate(), Vh.x, 0.0 ).div( sqrt( lensq ) ), vec3( 1.0, 0.0, 0.0 ) );
-	const T2 = cross( Vh, T1 );
+	const T1 = select( lensq.greaterThan( 0.0 ), vec3( Vh.y.negate(), Vh.x, 0.0 ).div( sqrt( lensq ) ), vec3( 1.0, 0.0, 0.0 ) ).toVar();
+	const T2 = cross( Vh, T1 ).toVar();
 
 	// Section 4.2: Parameterization of projected area
 	const r = sqrt( Xi.x );
 	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y );
-	const t1 = r.mul( cos( phi ) );
-	const t2 = r.mul( sin( phi ) );
+	const t1 = r.mul( cos( phi ) ).toVar();
+	const t2 = r.mul( sin( phi ) ).toVar();
 	const s = mul( 0.5, Vh.z.add( 1.0 ) );
 	t2.assign( s.oneMinus().mul( sqrt( t1.mul( t1 ).oneMinus() ) ).add( s.mul( t2 ) ) );
 
@@ -347,8 +347,8 @@ export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, mipInt, envMap, N
 
 	const N = vec3( N_immutable ).toVar();
 
-	const prefilteredColor = vec3( 0.0 );
-	const totalWeight = float( 0.0 );
+	const prefilteredColor = vec3( 0.0 ).toVar();
+	const totalWeight = float( 0.0 ).toVar();
 
 	// For very low roughness, just sample the environment directly
 	If( roughness.lessThan( 0.001 ), () => {
@@ -359,8 +359,8 @@ export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, mipInt, envMap, N
 
 		// Tangent space basis for VNDF sampling
 		const up = select( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
-		const tangent = normalize( cross( up, N ) );
-		const bitangent = cross( N, tangent );
+		const tangent = normalize( cross( up, N ) ).toVar();
+		const bitangent = cross( N, tangent ).toVar();
 
 		Loop( { start: uint( 0 ), end: GGX_SAMPLES }, ( { i } ) => {
 
