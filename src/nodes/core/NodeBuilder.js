@@ -1683,6 +1683,14 @@ class NodeBuilder {
 	removeStack() {
 
 		const lastStack = this.stack;
+
+		for ( const node of lastStack.nodes ) {
+
+			const nodeData = this.getDataFromNode( node );
+			nodeData.stack = lastStack;
+
+		}
+
 		this.stack = lastStack.parent;
 
 		setCurrentStack( this.stacks.pop() );
