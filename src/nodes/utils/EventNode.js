@@ -64,6 +64,7 @@ class EventNode extends Node {
 
 EventNode.OBJECT = 'object';
 EventNode.MATERIAL = 'material';
+EventNode.BEFORE_OBJECT = 'beforeObject';
 EventNode.BEFORE_MATERIAL = 'beforeMaterial';
 
 export default EventNode;
