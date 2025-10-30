@@ -7,6 +7,18 @@ import * as fs from 'fs/promises';
 
 const exceptionList = [
 
+	// Take too long
+	'webgpu_parallax_uv', 				// 11 min
+	'webgpu_cubemap_adjustments', 		// 9 min
+	'webgl_loader_lwo', 				// 8 min
+	'webgpu_cubemap_mix', 				// 2 min
+	'webgl_loader_texture_ultrahdr', 	// 1 min
+	'webgl_marchingcubes', 				// 1 min
+ 	'webgl_materials_cubemap_dynamic', 	// 1 min
+	'webgl_materials_displacementmap', 	// 1 min
+	'webgl_materials_envmaps_hdr', 		// 1 min
+	'webgpu_water', 					// 1 min
+
 	// Needs investigation
 	'physics_rapier_instancing',
 	'webgl_shadowmap',
@@ -25,7 +37,7 @@ const exceptionList = [
 	'webgpu_texturegrad',
 	'webgpu_tsl_vfx_flames',
 
-	// Need more time
+	// Need more time to render
 	'css3d_mixed',
 	'webgl_loader_3dtiles',
 	'webgl_loader_texture_lottie',
