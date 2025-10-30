@@ -55,6 +55,7 @@ import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createCanvasElement, probeAsync, warnOnce, error, warn, log } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 import { getDFGLUT } from './shaders/DFGLUTData.js';
+import { getSheenLUT } from './shaders/SheenLUTData.js';
 
 /**
  * This renderer uses WebGL 2 to display scenes.
@@ -2517,6 +2518,13 @@ class WebGLRenderer {
 			if ( m_uniforms.dfgLUT !== undefined ) {
 
 				m_uniforms.dfgLUT.value = getDFGLUT();
+
+			}
+
+			// Set Sheen LUT for sheen materials
+			if ( material.sheen > 0 ) {
+
+				m_uniforms.sheenLUT.value = getSheenLUT();
 
 			}
 

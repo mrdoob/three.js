@@ -1,6 +1,7 @@
 export default /* glsl */`
 
 uniform sampler2D dfgLUT;
+uniform sampler2D sheenLUT;
 
 struct PhysicalMaterial {
 
@@ -530,20 +531,19 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 		sheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );
 
-		// Energy conservation: reduce base layers by sheen energy
 		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
 		float maxSheenColor = max( max( material.sheenColor.r, material.sheenColor.g ), material.sheenColor.b );
-		
-		// Approximate directional albedo
-		float x = 1.0 - dotNV;
-		float r = material.sheenRoughness;
-		float r2 = r * r;
-		float baseAlbedo = 0.04 + 0.96 * r2;
-		float fresnelFactor = pow( x, 5.0 * ( 1.0 - r ) );
-		float E_sheen = baseAlbedo * mix( 1.0, fresnelFactor, 1.0 - r2 * r );
-		
-		// Scale base layers
-		float sheenScaling = 1.0 - maxSheenColor * E_sheen;
+
+		// Lookup directional albedo for both view and light angles
+		float E_sheen_V = texture2D( sheenLUT, vec2( dotNV, material.sheenRoughness ) ).r;
+		float E_sheen_L = texture2D( sheenLUT, vec2( dotNL, material.sheenRoughness ) ).r;
+
+		// Take minimum for proper energy conservation
+		float sheenScaling = min(
+			1.0 - maxSheenColor * E_sheen_V,
+			1.0 - maxSheenColor * E_sheen_L
+		);
+
 		irradiance *= sheenScaling;
 
 	#endif
@@ -575,13 +575,8 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
 		float maxSheenColor = max( max( material.sheenColor.r, material.sheenColor.g ), material.sheenColor.b );
 		
-		// Approximate directional albedo (same as direct lighting)
-		float x = 1.0 - dotNV;
-		float r = material.sheenRoughness;
-		float r2 = r * r;
-		float baseAlbedo = 0.04 + 0.96 * r2;
-		float fresnelFactor = pow( x, 5.0 * ( 1.0 - r ) );
-		float E_sheen = baseAlbedo * mix( 1.0, fresnelFactor, 1.0 - r2 * r );
+		// Lookup directional albedo from LUT
+		float E_sheen = texture2D( sheenLUT, vec2( dotNV, material.sheenRoughness ) ).r;
 		
 		float sheenScaling = 1.0 - maxSheenColor * E_sheen;
 
