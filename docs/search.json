@@ -16539,10 +16539,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "AfterImageNode#textureNodeOld",
-			"kind": "member"
-		},
-		{
 			"title": "AfterImageNode#updateBefore",
 			"kind": "function"
 		},
@@ -25147,6 +25143,14 @@
 		{
 			"title": "OctahedronGeometry.fromJSON",
 			"kind": "function"
+		},
+		{
+			"title": "OnBeforeMaterialUpdate",
+			"kind": "member"
+		},
+		{
+			"title": "OnBeforeObjectUpdate",
+			"kind": "member"
 		},
 		{
 			"title": "OnMaterialUpdate",
