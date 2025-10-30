@@ -369,8 +369,6 @@ class LightsNode extends Node {
 
 				}
 
-				context.material.transparent = true;
-
 			}
 
 			totalDiffuseNode.assign( totalDiffuse );

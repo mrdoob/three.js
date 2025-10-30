@@ -7,7 +7,7 @@ import {
 /**
  * A loader for loading fonts.
  *
- * You can convert fonts online using [facetype.js]{@link https://gero3.github.io/facetype.js/}.
+ * You can convert fonts online using [facetype.js](https://gero3.github.io/facetype.js/).
  *
  * ```js
  * const loader = new FontLoader();

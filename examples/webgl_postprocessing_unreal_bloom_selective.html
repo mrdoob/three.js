@@ -30,12 +30,13 @@
 
 			uniform sampler2D baseTexture;
 			uniform sampler2D bloomTexture;
+			uniform float bloomStrength;
 
 			varying vec2 vUv;
 
 			void main() {
 
-				gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+				gl_FragColor = ( texture2D( baseTexture, vUv ) + texture2D( bloomTexture, vUv ) * bloomStrength );
 
 			}
 
@@ -116,7 +117,8 @@
 				new THREE.ShaderMaterial( {
 					uniforms: {
 						baseTexture: { value: null },
-						bloomTexture: { value: bloomComposer.renderTarget2.texture }
+						bloomTexture: { value: bloomComposer.renderTarget2.texture },
+						bloomStrength: { value: params.strength }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
@@ -153,6 +155,8 @@
 			bloomFolder.add( params, 'strength', 0.0, 3 ).onChange( function ( value ) {
 
 				bloomPass.strength = Number( value );
+				mixPass.material.uniforms.bloomStrength.value = bloomPass.strength;
+
 				render();
 
 			} );

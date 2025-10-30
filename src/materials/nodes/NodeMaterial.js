@@ -1,5 +1,4 @@
 import { Material } from '../Material.js';
-import { NormalBlending } from '../../constants.js';
 
 import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
@@ -820,7 +819,9 @@ class NodeMaterial extends Material {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {BufferGeometry} geometry - The geometry.
 	 */
-	setupDiffuseColor( { object, geometry } ) {
+	setupDiffuseColor( builder ) {
+
+		const { object, geometry } = builder;
 
 		// MASK
 
@@ -902,9 +903,7 @@ class NodeMaterial extends Material {
 
 		// OPAQUE
 
-		const isOpaque = this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false;
-
-		if ( isOpaque ) {
+		if ( builder.isOpaque() ) {
 
 			diffuseColor.a.assign( 1.0 );
 

@@ -402,7 +402,7 @@ class Node extends EventDispatcher {
 
 			//
 
-			const values = [ this.id ];
+			const values = [];
 
 			for ( const { property, childNode } of this._getChildren( ignores ) ) {
 
@@ -428,7 +428,7 @@ class Node extends EventDispatcher {
 	 */
 	customCacheKey() {
 
-		return 0;
+		return this.id;
 
 	}
 

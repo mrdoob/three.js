@@ -8,7 +8,7 @@ const _minTarget = /*@__PURE__*/ new Vector2();
 const _maxTarget = /*@__PURE__*/ new Vector2();
 
 /**
- * Camera that uses [perspective projection]{@link https://en.wikipedia.org/wiki/Perspective_(graphical)}.
+ * Camera that uses [perspective projection](https://en.wikipedia.org/wiki/Perspective_(graphical)).
  *
  * This projection mode is designed to mimic the way the human eye sees. It
  * is the most common projection mode used for rendering a 3D scene.

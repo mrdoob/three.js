@@ -852,6 +852,12 @@ class WebGLBackend extends Backend {
 
 			count = count[ 0 ];
 
+		} else if ( count && typeof count === 'object' && count.isIndirectStorageBufferAttribute ) {
+
+			warnOnce( 'WebGLBackend.compute(): The count parameter must be a single number, not IndirectStorageBufferAttribute' );
+
+			count = computeNode.count;
+
 		}
 
 		if ( attributes[ 0 ].isStorageInstancedBufferAttribute ) {

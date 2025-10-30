@@ -8,7 +8,7 @@ import {
  *
  * See the {@link FontLoader} page for additional details.
  *
- * `TextGeometry` uses [typeface.json]{@link http://gero3.github.io/facetype.js/} generated fonts.
+ * `TextGeometry` uses [typeface.json](http://gero3.github.io/facetype.js/) generated fonts.
  * Some existing fonts can be found located in `/examples/fonts`.
  *
  * ```js

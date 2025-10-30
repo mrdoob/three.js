@@ -464,6 +464,12 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.getOutputNode( builder ).getElementType( builder );
+
+	}
+
 	getMemberType( builder, name ) {
 
 		return this.getOutputNode( builder ).getMemberType( builder, name );

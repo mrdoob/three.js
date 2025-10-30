@@ -2667,15 +2667,17 @@ function WebGLCubeMaps( renderer ) {
 
 const LOD_MIN = 4;
 
-// The standard deviations (radians) associated with the extra mips. These are
-// chosen to approximate a Trowbridge-Reitz distribution function times the
-// geometric shadowing function. These sigma values squared must match the
-// variance #defines in cube_uv_reflection_fragment.glsl.js.
+// The standard deviations (radians) associated with the extra mips.
+// Used for scene blur in fromScene() method.
 const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 
 // The maximum length of the blur for loop. Smaller sigmas will use fewer
 // samples and exit early, but not recompile the shader.
+// Used for scene blur in fromScene() method.
 const MAX_SAMPLES = 20;
+
+// GGX VNDF importance sampling configuration
+const GGX_SAMPLES = 2048;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const _clearColor = /*@__PURE__*/ new Color();
@@ -2683,24 +2685,6 @@ let _oldTarget = null;
 let _oldActiveCubeFace = 0;
 let _oldActiveMipmapLevel = 0;
 let _oldXrEnabled = false;
-
-// Golden Ratio
-const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
-const INV_PHI = 1 / PHI;
-
-// Vertices of a dodecahedron (except the opposites, which represent the
-// same axis), used as axis directions evenly spread on a sphere.
-const _axisDirections = [
-	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
-	/*@__PURE__*/ new Vector3( -1, 1, -1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, -1 ),
-	/*@__PURE__*/ new Vector3( -1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, 1 ) ];
 
 const _origin = /*@__PURE__*/ new Vector3();
 
@@ -2715,9 +2699,11 @@ const _origin = /*@__PURE__*/ new Vector3();
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * Paper: Fast, Accurate Image-Based Lighting:
- * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
-*/
+ * The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
+ * importance sampling based on "Sampling the GGX Distribution of Visible Normals"
+ * (Heitz, 2018) to generate environment maps that accurately match the GGX BRDF
+ * used in material rendering for physically-based image-based lighting.
+ */
 class PMREMGenerator {
 
 	/**
@@ -2737,6 +2723,7 @@ class PMREMGenerator {
 		this._sigmas = [];
 
 		this._blurMaterial = null;
+		this._ggxMaterial = null;
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 
@@ -2879,6 +2866,7 @@ class PMREMGenerator {
 	_dispose() {
 
 		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
+		if ( this._ggxMaterial !== null ) this._ggxMaterial.dispose();
 
 		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
 
@@ -3128,17 +3116,77 @@ class PMREMGenerator {
 		renderer.autoClear = false;
 		const n = this._lodPlanes.length;
 
+		// Use GGX VNDF importance sampling
 		for ( let i = 1; i < n; i ++ ) {
 
-			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
-
-			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
-
-			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+			this._applyGGXFilter( cubeUVRenderTarget, i - 1, i );
 
 		}
 
 		renderer.autoClear = autoClear;
+
+	}
+
+	/**
+	 * Applies GGX VNDF importance sampling filter to generate a prefiltered environment map.
+	 * Uses Monte Carlo integration with VNDF importance sampling to accurately represent the
+	 * GGX BRDF for physically-based rendering. Reads from the previous LOD level and
+	 * applies incremental roughness filtering to avoid over-blurring.
+	 *
+	 * @private
+	 * @param {WebGLRenderTarget} cubeUVRenderTarget
+	 * @param {number} lodIn - Source LOD level to read from
+	 * @param {number} lodOut - Target LOD level to write to
+	 */
+	_applyGGXFilter( cubeUVRenderTarget, lodIn, lodOut ) {
+
+		const renderer = this._renderer;
+		const pingPongRenderTarget = this._pingPongRenderTarget;
+
+		if ( this._ggxMaterial === null ) {
+
+			const width = 3 * Math.max( this._cubeSize, 16 );
+			const height = 4 * this._cubeSize;
+			this._ggxMaterial = _getGGXShader( this._lodMax, width, height );
+
+		}
+
+		const ggxMaterial = this._ggxMaterial;
+		const ggxMesh = new Mesh( this._lodPlanes[ lodOut ], ggxMaterial );
+		const ggxUniforms = ggxMaterial.uniforms;
+
+		// Calculate incremental roughness between LOD levels
+		const targetRoughness = lodOut / ( this._lodPlanes.length - 1 );
+		const sourceRoughness = lodIn / ( this._lodPlanes.length - 1 );
+		const incrementalRoughness = Math.sqrt( targetRoughness * targetRoughness - sourceRoughness * sourceRoughness );
+
+		// Apply blur strength mapping for better quality across the roughness range
+		const blurStrength = 0.05 + targetRoughness * 0.95;
+		const adjustedRoughness = incrementalRoughness * blurStrength;
+
+		// Calculate viewport position based on output LOD level
+		const { _lodMax } = this;
+		const outputSize = this._sizeLods[ lodOut ];
+		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
+		const y = 4 * ( this._cubeSize - outputSize );
+
+		// Read from previous LOD with incremental roughness
+		ggxUniforms[ 'envMap' ].value = cubeUVRenderTarget.texture;
+		ggxUniforms[ 'roughness' ].value = adjustedRoughness;
+		ggxUniforms[ 'mipInt' ].value = _lodMax - lodIn; // Sample from input LOD
+
+		_setViewport( pingPongRenderTarget, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( pingPongRenderTarget );
+		renderer.render( ggxMesh, _flatCamera );
+
+		// Copy from pingPong back to cubeUV (simple direct copy)
+		ggxUniforms[ 'envMap' ].value = pingPongRenderTarget.texture;
+		ggxUniforms[ 'roughness' ].value = 0.0; // Direct copy
+		ggxUniforms[ 'mipInt' ].value = _lodMax - lodOut; // Read from the level we just wrote
+
+		_setViewport( cubeUVRenderTarget, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( cubeUVRenderTarget );
+		renderer.render( ggxMesh, _flatCamera );
 
 	}
 
@@ -3148,6 +3196,8 @@ class PMREMGenerator {
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
+	 *
+	 * Used for initial scene blur in fromScene() method when sigma > 0.
 	 *
 	 * @private
 	 * @param {WebGLRenderTarget} cubeUVRenderTarget
@@ -3361,6 +3411,147 @@ function _setViewport( target, x, y, width, height ) {
 
 	target.viewport.set( x, y, width, height );
 	target.scissor.set( x, y, width, height );
+
+}
+
+function _getGGXShader( lodMax, width, height ) {
+
+	const shaderMaterial = new ShaderMaterial( {
+
+		name: 'PMREMGGXConvolution',
+
+		defines: {
+			'GGX_SAMPLES': GGX_SAMPLES,
+			'CUBEUV_TEXEL_WIDTH': 1.0 / width,
+			'CUBEUV_TEXEL_HEIGHT': 1.0 / height,
+			'CUBEUV_MAX_MIP': `${lodMax}.0`,
+		},
+
+		uniforms: {
+			'envMap': { value: null },
+			'roughness': { value: 0.0 },
+			'mipInt': { value: 0 }
+		},
+
+		vertexShader: _getCommonVertexShader(),
+
+		fragmentShader: /* glsl */`
+
+			precision mediump float;
+			precision mediump int;
+
+			varying vec3 vOutputDirection;
+
+			uniform sampler2D envMap;
+			uniform float roughness;
+			uniform float mipInt;
+
+			#define ENVMAP_TYPE_CUBE_UV
+			#include <cube_uv_reflection_fragment>
+
+			#define PI 3.14159265359
+
+			// Van der Corput radical inverse
+			float radicalInverse_VdC(uint bits) {
+				bits = (bits << 16u) | (bits >> 16u);
+				bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+				bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+				bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+				bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+				return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+			}
+
+			// Hammersley sequence
+			vec2 hammersley(uint i, uint N) {
+				return vec2(float(i) / float(N), radicalInverse_VdC(i));
+			}
+
+			// GGX VNDF importance sampling (Eric Heitz 2018)
+			// "Sampling the GGX Distribution of Visible Normals"
+			// https://jcgt.org/published/0007/04/01/
+			vec3 importanceSampleGGX_VNDF(vec2 Xi, vec3 V, float roughness) {
+				float alpha = roughness * roughness;
+
+				// Section 3.2: Transform view direction to hemisphere configuration
+				vec3 Vh = normalize(vec3(alpha * V.x, alpha * V.y, V.z));
+
+				// Section 4.1: Orthonormal basis
+				float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
+				vec3 T1 = lensq > 0.0 ? vec3(-Vh.y, Vh.x, 0.0) / sqrt(lensq) : vec3(1.0, 0.0, 0.0);
+				vec3 T2 = cross(Vh, T1);
+
+				// Section 4.2: Parameterization of projected area
+				float r = sqrt(Xi.x);
+				float phi = 2.0 * PI * Xi.y;
+				float t1 = r * cos(phi);
+				float t2 = r * sin(phi);
+				float s = 0.5 * (1.0 + Vh.z);
+				t2 = (1.0 - s) * sqrt(1.0 - t1 * t1) + s * t2;
+
+				// Section 4.3: Reprojection onto hemisphere
+				vec3 Nh = t1 * T1 + t2 * T2 + sqrt(max(0.0, 1.0 - t1 * t1 - t2 * t2)) * Vh;
+
+				// Section 3.4: Transform back to ellipsoid configuration
+				return normalize(vec3(alpha * Nh.x, alpha * Nh.y, max(0.0, Nh.z)));
+			}
+
+			void main() {
+				vec3 N = normalize(vOutputDirection);
+				vec3 V = N; // Assume view direction equals normal for pre-filtering
+
+				vec3 prefilteredColor = vec3(0.0);
+				float totalWeight = 0.0;
+
+				// For very low roughness, just sample the environment directly
+				if (roughness < 0.001) {
+					gl_FragColor = vec4(bilinearCubeUV(envMap, N, mipInt), 1.0);
+					return;
+				}
+
+				// Tangent space basis for VNDF sampling
+				vec3 up = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+				vec3 tangent = normalize(cross(up, N));
+				vec3 bitangent = cross(N, tangent);
+
+				for(uint i = 0u; i < uint(GGX_SAMPLES); i++) {
+					vec2 Xi = hammersley(i, uint(GGX_SAMPLES));
+
+					// For PMREM, V = N, so in tangent space V is always (0, 0, 1)
+					vec3 H_tangent = importanceSampleGGX_VNDF(Xi, vec3(0.0, 0.0, 1.0), roughness);
+
+					// Transform H back to world space
+					vec3 H = normalize(tangent * H_tangent.x + bitangent * H_tangent.y + N * H_tangent.z);
+					vec3 L = normalize(2.0 * dot(V, H) * H - V);
+
+					float NdotL = max(dot(N, L), 0.0);
+
+					if(NdotL > 0.0) {
+						// Sample environment at fixed mip level
+						// VNDF importance sampling handles the distribution filtering
+						vec3 sampleColor = bilinearCubeUV(envMap, L, mipInt);
+
+						// Weight by NdotL for the split-sum approximation
+						// VNDF PDF naturally accounts for the visible microfacet distribution
+						prefilteredColor += sampleColor * NdotL;
+						totalWeight += NdotL;
+					}
+				}
+
+				if (totalWeight > 0.0) {
+					prefilteredColor = prefilteredColor / totalWeight;
+				}
+
+				gl_FragColor = vec4(prefilteredColor, 1.0);
+			}
+		`,
+
+		blending: NoBlending,
+		depthTest: false,
+		depthWrite: false
+
+	} );
+
+	return shaderMaterial;
 
 }
 

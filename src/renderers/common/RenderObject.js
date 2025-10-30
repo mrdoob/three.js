@@ -869,6 +869,8 @@ class RenderObject {
 
 		}
 
+		cacheKey = hash( cacheKey, this.camera.id );
+
 		return cacheKey;
 
 	}

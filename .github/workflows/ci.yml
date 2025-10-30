@@ -40,12 +40,12 @@ jobs:
   e2e:
     name: E2E testing
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
-        CI: [ 0, 1, 2, 3 ]
+        CI: [ 0, 1, 2, 3, 4 ]
     env:
       CI: ${{ matrix.CI }}
     steps:

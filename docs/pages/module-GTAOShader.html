@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GTAOShader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">GTAOShader</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">GTAOShader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { GTAOShader } from 'three/addons/shaders/GTAOShader.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="~GTAOBlendShader" translate="no">.<a href="#~GTAOBlendShader">GTAOBlendShader</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>GTAO blend shader. Use by <a href="GTAOPass.html">GTAOPass</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~GTAODepthShader" translate="no">.<a href="#~GTAODepthShader">GTAODepthShader</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>GTAO depth shader. Use by <a href="GTAOPass.html">GTAOPass</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~GTAOShader" translate="no">.<a href="#~GTAOShader">GTAOShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>GTAO shader. Use by <a href="GTAOPass.html">GTAOPass</a>.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf">Practical Realtime Strategies for Accurate Indirect Occlusion</a>.</li>
+<li><a href="https://github.com/Patapom/GodComplex/blob/master/Tests/TestHBIL/2018%20Mayaux%20-%20Horizon-Based%20Indirect%20Lighting%20(HBIL).pdf">Horizon-Based Indirect Lighting (HBIL)</a></li>
+</ul>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/GTAOShader.js" target="_blank" rel="noopener" translate="no">examples/jsm/shaders/GTAOShader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

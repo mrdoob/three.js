@@ -3,7 +3,7 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, Texture, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, NormalBlending, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, DataTexture, RGFormat, HalfFloatType, ClampToEdgeWrapping, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, BasicShadowMap, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, TimestampQuery, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBuffer, InterleavedBufferAttribute, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, Texture, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, ObjectSpaceNormalMap, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, DataTexture, RGFormat, HalfFloatType, ClampToEdgeWrapping, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, CubeUVReflectionMapping, BufferGeometry, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, BasicShadowMap, SphereGeometry, NormalBlending, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, TimestampQuery, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
@@ -1499,7 +1499,7 @@ class Node extends EventDispatcher {
 
 			//
 
-			const values = [ this.id ];
+			const values = [];
 
 			for ( const { property, childNode } of this._getChildren( ignores ) ) {
 
@@ -1525,7 +1525,7 @@ class Node extends EventDispatcher {
 	 */
 	customCacheKey() {
 
-		return 0;
+		return this.id;
 
 	}
 
@@ -3692,6 +3692,12 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.getOutputNode( builder ).getElementType( builder );
+
+	}
+
 	getMemberType( builder, name ) {
 
 		return this.getOutputNode( builder ).getMemberType( builder, name );
@@ -4508,6 +4514,12 @@ class PropertyNode extends Node {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	customCacheKey() {
+
+		return hashString( this.type + ':' + ( this.name || '' ) + ':' + ( this.varying ? '1' : '0' ) );
 
 	}
 
@@ -8180,9 +8192,19 @@ class VarNode extends Node {
 
 	build( ...params ) {
 
-		if ( this.intent === true ) {
+		const builder = params[ 0 ];
 
-			const builder = params[ 0 ];
+		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
+
+			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+
+				builder.getBaseStack().addToStack( this );
+
+			}
+
+		}
+
+		if ( this.intent === true ) {
 
 			if ( this.isAssign( builder ) !== true ) {
 
@@ -8263,6 +8285,14 @@ class VarNode extends Node {
 
 	}
 
+	_hasStack( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		return nodeData.stack !== undefined;
+
+	}
+
 }
 
 /**
@@ -8311,12 +8341,6 @@ const Const = ( node, name = null ) => createVar( node, name, true ).toStack();
  * @returns {VarNode}
  */
 const VarIntent = ( node ) => {
-
-	if ( getCurrentStack() === null ) {
-
-		return node;
-
-	}
 
 	return createVar( node ).setIntent( true ).toStack();
 
@@ -17551,7 +17575,7 @@ class LoopNode extends Node {
 	 */
 	constructor( params = [] ) {
 
-		super();
+		super( 'void' );
 
 		this.params = params;
 
@@ -17597,36 +17621,26 @@ class LoopNode extends Node {
 
 		}
 
-		const stack = builder.addStack(); // TODO: cache() it
+		const stack = builder.addStack();
 
-		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder );
+		const fnCall = this.params[ this.params.length - 1 ]( inputs );
+
+		properties.returnsNode = fnCall.context( { nodeLoop: fnCall } );
 		properties.stackNode = stack;
 
 		const baseParam = this.params[ 0 ];
 
 		if ( baseParam.isNode !== true && typeof baseParam.update === 'function' ) {
 
-			properties.updateNode = Fn( this.params[ 0 ].update )( inputs );
+			const fnUpdateCall = Fn( this.params[ 0 ].update )( inputs );
+
+			properties.updateNode = fnUpdateCall.context( { nodeLoop: fnUpdateCall } );
 
 		}
 
 		builder.removeStack();
 
 		return properties;
-
-	}
-
-	/**
-	 * This method is overwritten since the node type is inferred based on the loop configuration.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The node type.
-	 */
-	getNodeType( builder ) {
-
-		const { returnsNode } = this.getProperties( builder );
-
-		return returnsNode ? returnsNode.getNodeType( builder ) : 'void';
 
 	}
 
@@ -17809,7 +17823,7 @@ class LoopNode extends Node {
 
 		const stackSnippet = stackNode.build( builder, 'void' );
 
-		const returnsSnippet = properties.returnsNode ? properties.returnsNode.build( builder ) : '';
+		properties.returnsNode.build( builder, 'void' );
 
 		builder.removeFlowTab().addFlowCode( '\n' + builder.tab + stackSnippet );
 
@@ -17820,8 +17834,6 @@ class LoopNode extends Node {
 		}
 
 		builder.addFlowTab();
-
-		return returnsSnippet;
 
 	}
 
@@ -20377,7 +20389,9 @@ class NodeMaterial extends Material {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {BufferGeometry} geometry - The geometry.
 	 */
-	setupDiffuseColor( { object, geometry } ) {
+	setupDiffuseColor( builder ) {
+
+		const { object, geometry } = builder;
 
 		// MASK
 
@@ -20459,9 +20473,7 @@ class NodeMaterial extends Material {
 
 		// OPAQUE
 
-		const isOpaque = this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false;
-
-		if ( isOpaque ) {
+		if ( builder.isOpaque() ) {
 
 			diffuseColor.a.assign( 1.0 );
 
@@ -24394,17 +24406,134 @@ const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, we
 
 } );
 
+// GGX VNDF importance sampling functions
+
+// Van der Corput radical inverse for generating quasi-random sequences
+const radicalInverse_VdC = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
+
+	const bits = uint( bits_immutable ).toVar();
+	bits.assign( bits.shiftLeft( uint( 16 ) ).bitOr( bits.shiftRight( uint( 16 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x55555555 ) ).shiftLeft( uint( 1 ) ).bitOr( bits.bitAnd( uint( 0xAAAAAAAA ) ).shiftRight( uint( 1 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x33333333 ) ).shiftLeft( uint( 2 ) ).bitOr( bits.bitAnd( uint( 0xCCCCCCCC ) ).shiftRight( uint( 2 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x0F0F0F0F ) ).shiftLeft( uint( 4 ) ).bitOr( bits.bitAnd( uint( 0xF0F0F0F0 ) ).shiftRight( uint( 4 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x00FF00FF ) ).shiftLeft( uint( 8 ) ).bitOr( bits.bitAnd( uint( 0xFF00FF00 ) ).shiftRight( uint( 8 ) ) ) );
+	return float( bits ).mul( 2.3283064365386963e-10 ); // / 0x100000000
+
+} );
+
+// Hammersley sequence for quasi-Monte Carlo sampling
+const hammersley = /*@__PURE__*/ Fn( ( [ i, N ] ) => {
+
+	return vec2( float( i ).div( float( N ) ), radicalInverse_VdC( i ) );
+
+} );
+
+// GGX VNDF importance sampling (Eric Heitz 2018)
+// "Sampling the GGX Distribution of Visible Normals"
+// https://jcgt.org/published/0007/04/01/
+const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V_immutable, roughness_immutable ] ) => {
+
+	const V = vec3( V_immutable ).toVar();
+	const roughness = float( roughness_immutable );
+	const alpha = roughness.mul( roughness ).toVar();
+
+	// Section 3.2: Transform view direction to hemisphere configuration
+	const Vh = normalize( vec3( alpha.mul( V.x ), alpha.mul( V.y ), V.z ) ).toVar();
+
+	// Section 4.1: Orthonormal basis
+	const lensq = Vh.x.mul( Vh.x ).add( Vh.y.mul( Vh.y ) );
+	const T1 = select( lensq.greaterThan( 0.0 ), vec3( Vh.y.negate(), Vh.x, 0.0 ).div( sqrt( lensq ) ), vec3( 1.0, 0.0, 0.0 ) ).toVar();
+	const T2 = cross( Vh, T1 ).toVar();
+
+	// Section 4.2: Parameterization of projected area
+	const r = sqrt( Xi.x );
+	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y );
+	const t1 = r.mul( cos( phi ) ).toVar();
+	const t2 = r.mul( sin( phi ) ).toVar();
+	const s = mul( 0.5, Vh.z.add( 1.0 ) );
+	t2.assign( s.oneMinus().mul( sqrt( t1.mul( t1 ).oneMinus() ) ).add( s.mul( t2 ) ) );
+
+	// Section 4.3: Reprojection onto hemisphere
+	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( Vh.mul( sqrt( max$1( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
+
+	// Section 3.4: Transform back to ellipsoid configuration
+	return normalize( vec3( alpha.mul( Nh.x ), alpha.mul( Nh.y ), max$1( 0.0, Nh.z ) ) );
+
+} );
+
+// GGX convolution using VNDF importance sampling
+const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, mipInt, envMap, N_immutable, GGX_SAMPLES, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+
+	const N = vec3( N_immutable ).toVar();
+
+	const prefilteredColor = vec3( 0.0 ).toVar();
+	const totalWeight = float( 0.0 ).toVar();
+
+	// For very low roughness, just sample the environment directly
+	If( roughness.lessThan( 0.001 ), () => {
+
+		prefilteredColor.assign( bilinearCubeUV( envMap, N, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) );
+
+	} ).Else( () => {
+
+		// Tangent space basis for VNDF sampling
+		const up = select( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+		const tangent = normalize( cross( up, N ) ).toVar();
+		const bitangent = cross( N, tangent ).toVar();
+
+		Loop( { start: uint( 0 ), end: GGX_SAMPLES }, ( { i } ) => {
+
+			const Xi = hammersley( i, GGX_SAMPLES );
+
+			// For PMREM, V = N, so in tangent space V is always (0, 0, 1)
+			const H_tangent = importanceSampleGGX_VNDF( Xi, vec3( 0.0, 0.0, 1.0 ), roughness );
+
+			// Transform H back to world space
+			const H = normalize( tangent.mul( H_tangent.x ).add( bitangent.mul( H_tangent.y ) ).add( N.mul( H_tangent.z ) ) );
+			const L = normalize( H.mul( dot( N, H ).mul( 2.0 ) ).sub( N ) );
+
+			const NdotL = max$1( dot( N, L ), 0.0 );
+
+			If( NdotL.greaterThan( 0.0 ), () => {
+
+				// Sample environment at fixed mip level
+				// VNDF importance sampling handles the distribution filtering
+				const sampleColor = bilinearCubeUV( envMap, L, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
+
+				// Weight by NdotL for the split-sum approximation
+				// VNDF PDF naturally accounts for the visible microfacet distribution
+				prefilteredColor.addAssign( sampleColor.mul( NdotL ) );
+				totalWeight.addAssign( NdotL );
+
+			} );
+
+		} );
+
+		If( totalWeight.greaterThan( 0.0 ), () => {
+
+			prefilteredColor.assign( prefilteredColor.div( totalWeight ) );
+
+		} );
+
+	} );
+
+	return vec4( prefilteredColor, 1.0 );
+
+} );
+
 const LOD_MIN = 4;
 
-// The standard deviations (radians) associated with the extra mips. These are
-// chosen to approximate a Trowbridge-Reitz distribution function times the
-// geometric shadowing function. These sigma values squared must match the
-// variance #defines in cube_uv_reflection_fragment.glsl.js.
+// The standard deviations (radians) associated with the extra mips.
+// Used for scene blur in fromScene() method.
 const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 
 // The maximum length of the blur for loop. Smaller sigmas will use fewer
 // samples and exit early, but not recompile the shader.
+// Used for scene blur in fromScene() method.
 const MAX_SAMPLES = 20;
+
+// GGX VNDF importance sampling configuration
+const GGX_SAMPLES = 1024;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
@@ -24412,25 +24541,6 @@ const _clearColor$2 = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 let _oldActiveCubeFace = 0;
 let _oldActiveMipmapLevel = 0;
-
-// Golden Ratio
-const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
-const INV_PHI = 1 / PHI;
-
-// Vertices of a dodecahedron (except the opposites, which represent the
-// same axis), used as axis directions evenly spread on a sphere.
-const _axisDirections = [
-	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
-	/*@__PURE__*/ new Vector3( -1, 1, -1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, -1 ),
-	/*@__PURE__*/ new Vector3( -1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, 1 )
-];
 
 const _origin = /*@__PURE__*/ new Vector3();
 
@@ -24458,9 +24568,11 @@ const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direct
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * Paper: Fast, Accurate Image-Based Lighting:
- * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
-*/
+ * The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
+ * importance sampling based on "Sampling the GGX Distribution of Visible Normals"
+ * (Heitz, 2018) to generate environment maps that accurately match the GGX BRDF
+ * used in material rendering for physically-based image-based lighting.
+ */
 class PMREMGenerator {
 
 	/**
@@ -24481,6 +24593,7 @@ class PMREMGenerator {
 		this._lodMeshes = [];
 
 		this._blurMaterial = null;
+		this._ggxMaterial = null;
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 		this._backgroundBox = null;
@@ -24770,6 +24883,7 @@ class PMREMGenerator {
 	_dispose() {
 
 		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
+		if ( this._ggxMaterial !== null ) this._ggxMaterial.dispose();
 
 		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
 
@@ -24994,17 +25108,80 @@ class PMREMGenerator {
 		renderer.autoClear = false;
 		const n = this._lodPlanes.length;
 
+		// Use GGX VNDF importance sampling
 		for ( let i = 1; i < n; i ++ ) {
 
-			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
-
-			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
-
-			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+			this._applyGGXFilter( cubeUVRenderTarget, i - 1, i );
 
 		}
 
 		renderer.autoClear = autoClear;
+
+	}
+
+	/**
+	 * Applies GGX VNDF importance sampling filter to generate a prefiltered environment map.
+	 * Uses Monte Carlo integration with VNDF importance sampling to accurately represent the
+	 * GGX BRDF for physically-based rendering. Reads from the previous LOD level and
+	 * applies incremental roughness filtering to avoid over-blurring.
+	 *
+	 * @private
+	 * @param {RenderTarget} cubeUVRenderTarget
+	 * @param {number} lodIn - Source LOD level to read from
+	 * @param {number} lodOut - Target LOD level to write to
+	 */
+	_applyGGXFilter( cubeUVRenderTarget, lodIn, lodOut ) {
+
+		const renderer = this._renderer;
+		const pingPongRenderTarget = this._pingPongRenderTarget;
+
+		// Lazy create GGX material only when first used
+		if ( this._ggxMaterial === null ) {
+
+			this._ggxMaterial = _getGGXShader( this._lodMax, this._pingPongRenderTarget.width, this._pingPongRenderTarget.height );
+
+		}
+
+		const ggxMaterial = this._ggxMaterial;
+		const ggxMesh = this._lodMeshes[ lodOut ];
+		ggxMesh.material = ggxMaterial;
+
+		const ggxUniforms = _uniformsMap.get( ggxMaterial );
+
+		// Calculate incremental roughness between LOD levels
+		const targetRoughness = lodOut / ( this._lodPlanes.length - 1 );
+		const sourceRoughness = lodIn / ( this._lodPlanes.length - 1 );
+		const incrementalRoughness = Math.sqrt( targetRoughness * targetRoughness - sourceRoughness * sourceRoughness );
+
+		// Apply blur strength mapping for better quality across the roughness range
+		const blurStrength = 0.05 + targetRoughness * 0.95;
+		const adjustedRoughness = incrementalRoughness * blurStrength;
+
+		// Calculate viewport position based on output LOD level
+		const { _lodMax } = this;
+		const outputSize = this._sizeLods[ lodOut ];
+		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
+		const y = 4 * ( this._cubeSize - outputSize );
+
+		// Read from previous LOD with incremental roughness
+		cubeUVRenderTarget.texture.frame = ( cubeUVRenderTarget.texture.frame || 0 ) + 1;
+		ggxUniforms.envMap.value = cubeUVRenderTarget.texture;
+		ggxUniforms.roughness.value = adjustedRoughness;
+		ggxUniforms.mipInt.value = _lodMax - lodIn; // Sample from input LOD
+
+		_setViewport( pingPongRenderTarget, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( pingPongRenderTarget );
+		renderer.render( ggxMesh, _flatCamera );
+
+		// Copy from pingPong back to cubeUV (simple direct copy)
+		pingPongRenderTarget.texture.frame = ( pingPongRenderTarget.texture.frame || 0 ) + 1;
+		ggxUniforms.envMap.value = pingPongRenderTarget.texture;
+		ggxUniforms.roughness.value = 0.0; // Direct copy
+		ggxUniforms.mipInt.value = _lodMax - lodOut; // Read from the level we just wrote
+
+		_setViewport( cubeUVRenderTarget, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( cubeUVRenderTarget );
+		renderer.render( ggxMesh, _flatCamera );
 
 	}
 
@@ -25014,6 +25191,8 @@ class PMREMGenerator {
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
+	 *
+	 * Used for initial scene blur in fromScene() method when sigma > 0.
 	 *
 	 * @private
 	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
@@ -25266,7 +25445,7 @@ function _getBlurShader( lodMax, width, height ) {
 	const n = float( MAX_SAMPLES );
 	const latitudinal = uniform( 0 ); // false, bool
 	const samples = uniform( 1 ); // int
-	const envMap = texture( null );
+	const envMap = texture();
 	const mipInt = uniform( 0 ); // int
 	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
 	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
@@ -25289,6 +25468,37 @@ function _getBlurShader( lodMax, width, height ) {
 
 	const material = _getMaterial( 'blur' );
 	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
+
+	_uniformsMap.set( material, materialUniforms );
+
+	return material;
+
+}
+
+function _getGGXShader( lodMax, width, height ) {
+
+	const envMap = texture();
+	const roughness = uniform( 0 );
+	const mipInt = uniform( 0 );
+	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
+	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
+	const CUBEUV_MAX_MIP = float( lodMax );
+
+	const materialUniforms = {
+		envMap,
+		roughness,
+		mipInt,
+		CUBEUV_TEXEL_WIDTH,
+		CUBEUV_TEXEL_HEIGHT,
+		CUBEUV_MAX_MIP
+	};
+
+	const material = _getMaterial( 'ggx' );
+	material.fragmentNode = ggxConvolution( {
+		...materialUniforms,
+		N_immutable: _outputDirection,
+		GGX_SAMPLES: uint( GGX_SAMPLES )
+	} );
 
 	_uniformsMap.set( material, materialUniforms );
 
@@ -26554,7 +26764,7 @@ class SSSLightingModel extends PhysicalLightingModel {
 	/**
 	 * Extends the default implementation with a SSS term.
 	 *
-	 * Reference: [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look]{@link https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/}
+	 * Reference: [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look](https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/)
 	 *
 	 * @param {Object} input - The input data.
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -27510,7 +27720,7 @@ class VolumetricLightingModel extends LightingModel {
 
 	start( builder ) {
 
-		const { material, context } = builder;
+		const { material } = builder;
 
 		const startPos = property( 'vec3' );
 		const endPos = property( 'vec3' );
@@ -27559,13 +27769,13 @@ class VolumetricLightingModel extends LightingModel {
 
 				linearDepthRay.assign( linearDepth( viewZToPerspectiveDepth( positionViewRay.z, cameraNear, cameraFar ) ) );
 
-				context.sceneDepthNode = linearDepth( material.depthNode ).toVar();
+				builder.context.sceneDepthNode = linearDepth( material.depthNode ).toVar();
 
 			}
 
-			context.positionWorld = positionRay;
-			context.shadowPositionWorld = positionRay;
-			context.positionView = positionViewRay;
+			builder.context.positionWorld = positionRay;
+			builder.context.shadowPositionWorld = positionRay;
+			builder.context.positionView = positionViewRay;
 
 			scatteringDensity.assign( 0 );
 
@@ -27990,7 +28200,7 @@ class ChainMap {
 
 }
 
-let _id$9 = 0;
+let _id$a = 0;
 
 function getKeys( obj ) {
 
@@ -28062,7 +28272,7 @@ class RenderObject {
 	 */
 	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext ) {
 
-		this.id = _id$9 ++;
+		this.id = _id$a ++;
 
 		/**
 		 * Renderer component for managing nodes related logic.
@@ -28858,6 +29068,8 @@ class RenderObject {
 			cacheKey = hash$1( cacheKey, 1 );
 
 		}
+
+		cacheKey = hash$1( cacheKey, this.camera.id );
 
 		return cacheKey;
 
@@ -29943,7 +30155,7 @@ class ComputePipeline extends Pipeline {
 
 }
 
-let _id$8 = 0;
+let _id$9 = 0;
 
 /**
  * Class for representing programmable stages which are vertex,
@@ -29970,7 +30182,7 @@ class ProgrammableStage {
 		 *
 		 * @type {number}
 		 */
-		this.id = _id$8 ++;
+		this.id = _id$9 ++;
 
 		/**
 		 * The shader code.
@@ -30926,7 +31138,7 @@ function reversePainterSortStable( a, b ) {
  */
 function needsDoublePass( material ) {
 
-	const hasTransmission = material.transmission > 0 || material.transmissionNode;
+	const hasTransmission = material.transmission > 0 || ( material.transmissionNode && material.transmissionNode.isNode );
 
 	return hasTransmission && material.side === DoubleSide && material.forceSinglePass === false;
 
@@ -31137,7 +31349,9 @@ class RenderList {
 
 		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
 
-		if ( material.transparent === true || material.transmission > 0 ) {
+		if ( material.transparent === true || material.transmission > 0 ||
+			( material.transmissionNode && material.transmissionNode.isNode ) ||
+			( material.backdropNode && material.backdropNode.isNode ) ) {
 
 			if ( needsDoublePass( material ) ) this.transparentDoublePass.push( renderItem );
 
@@ -31167,7 +31381,9 @@ class RenderList {
 
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
-		if ( material.transparent === true || material.transmission > 0 ) {
+		if ( material.transparent === true || material.transmission > 0 ||
+			( material.transmissionNode && material.transmissionNode.isNode ) ||
+			( material.backdropNode && material.backdropNode.isNode ) ) {
 
 			if ( needsDoublePass( material ) ) this.transparentDoublePass.unshift( renderItem );
 
@@ -31324,7 +31540,7 @@ class RenderLists {
 
 }
 
-let _id$7 = 0;
+let _id$8 = 0;
 
 /**
  * Any render or compute command is executed in a specific context that defines
@@ -31346,7 +31562,7 @@ class RenderContext {
 		 *
 		 * @type {number}
 		 */
-		this.id = _id$7 ++;
+		this.id = _id$8 ++;
 
 		/**
 		 * Whether the current active framebuffer has a color attachment.
@@ -31853,28 +32069,13 @@ class Textures extends DataMap {
 
 			// dispose
 
-			const onDispose = () => {
+			renderTargetData.onDispose = () => {
 
-				renderTarget.removeEventListener( 'dispose', onDispose );
-
-				for ( let i = 0; i < textures.length; i ++ ) {
-
-					this._destroyTexture( textures[ i ] );
-
-				}
-
-				if ( depthTexture ) {
-
-					this._destroyTexture( depthTexture );
-
-				}
-
-				this.delete( renderTarget );
-				this.backend.delete( renderTarget );
+				this._destroyRenderTarget( renderTarget );
 
 			};
 
-			renderTarget.addEventListener( 'dispose', onDispose );
+			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
 
 		}
 
@@ -32037,15 +32238,13 @@ class Textures extends DataMap {
 
 			// dispose
 
-			const onDispose = () => {
-
-				texture.removeEventListener( 'dispose', onDispose );
+			textureData.onDispose = () => {
 
 				this._destroyTexture( texture );
 
 			};
 
-			texture.addEventListener( 'dispose', onDispose );
+			texture.addEventListener( 'dispose', textureData.onDispose );
 
 		}
 
@@ -32174,6 +32373,46 @@ class Textures extends DataMap {
 	}
 
 	/**
+	 * Frees internal resources when the given render target isn't
+	 * required anymore.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target to destroy.
+	 */
+	_destroyRenderTarget( renderTarget ) {
+
+		if ( this.has( renderTarget ) === true ) {
+
+			const renderTargetData = this.get( renderTarget );
+
+			const textures = renderTargetData.textures;
+			const depthTexture = renderTargetData.depthTexture;
+
+			//
+
+			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
+
+			//
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				this._destroyTexture( textures[ i ] );
+
+			}
+
+			if ( depthTexture ) {
+
+				this._destroyTexture( depthTexture );
+
+			}
+
+			this.delete( renderTarget );
+			this.backend.delete( renderTarget );
+
+		}
+
+	}
+
+	/**
 	 * Frees internal resource when the given texture isn't
 	 * required anymore.
 	 *
@@ -32183,12 +32422,18 @@ class Textures extends DataMap {
 
 		if ( this.has( texture ) === true ) {
 
+			const textureData = this.get( texture );
+
+			//
+
+			texture.removeEventListener( 'dispose', textureData.onDispose );
+
 			// if a texture is not ready for use, it falls back to a default texture so it's possible
 			// to use it for rendering. If a texture in this state is disposed, it's important to
 			// not destroy/delete the underlying GPU texture object since it is cached and shared with
 			// other textures.
 
-			const isDefaultTexture = this.get( texture ).isDefaultTexture;
+			const isDefaultTexture = textureData.isDefaultTexture;
 			this.backend.destroyTexture( texture, isDefaultTexture );
 
 			this.delete( texture );
@@ -32440,6 +32685,12 @@ class StackNode extends Node {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.hasOutput ? this.outputNode.getElementType( builder ) : 'void';
+
+	}
+
 	getNodeType( builder ) {
 
 		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';
@@ -32650,12 +32901,11 @@ class StackNode extends Node {
 
 	build( builder, ...params ) {
 
-		const previousBuildStack = builder.currentStack;
 		const previousStack = getCurrentStack();
 
 		setCurrentStack( this );
 
-		builder.currentStack = this;
+		builder.setActiveStack( this );
 
 		const buildStage = builder.buildStage;
 
@@ -32712,7 +32962,7 @@ class StackNode extends Node {
 
 		setCurrentStack( previousStack );
 
-		builder.currentStack = previousBuildStack;
+		builder.removeActiveStack( this );
 
 		return result;
 
@@ -33579,7 +33829,7 @@ class FunctionOverloadingNode extends Node {
 		 * @private
 		 * @type {ShaderCallNodeInternal}
 		 */
-		this._candidateFnCall = null;
+		this._candidateFn = null;
 
 		/**
 		 * This node is marked as global.
@@ -33598,22 +33848,30 @@ class FunctionOverloadingNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	getNodeType() {
+	getNodeType( builder ) {
 
-		return this.functionNodes[ 0 ].shaderNode.layout.type;
+		const candidateFn = this.getCandidateFn( builder );
+
+		return candidateFn.shaderNode.layout.type;
 
 	}
 
-	setup( builder ) {
+	/**
+	 * Returns the candidate function for the current parameters.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {FunctionNode} The candidate function.
+	 */
+	getCandidateFn( builder ) {
 
 		const params = this.parametersNodes;
 
-		let candidateFnCall = this._candidateFnCall;
+		let candidateFn = this._candidateFn;
 
-		if ( candidateFnCall === null ) {
+		if ( candidateFn === null ) {
 
-			let candidateFn = null;
-			let candidateScore = -1;
+			let bestCandidateFn = null;
+			let bestScore = -1;
 
 			for ( const functionNode of this.functionNodes ) {
 
@@ -33630,7 +33888,7 @@ class FunctionOverloadingNode extends Node {
 
 				if ( params.length === inputs.length ) {
 
-					let score = 0;
+					let currentScore = 0;
 
 					for ( let i = 0; i < params.length; i ++ ) {
 
@@ -33639,20 +33897,16 @@ class FunctionOverloadingNode extends Node {
 
 						if ( param.getNodeType( builder ) === input.type ) {
 
-							score ++;
-
-						} else {
-
-							score = 0;
+							currentScore ++;
 
 						}
 
 					}
 
-					if ( score > candidateScore ) {
+					if ( currentScore > bestScore ) {
 
-						candidateFn = functionNode;
-						candidateScore = score;
+						bestCandidateFn = functionNode;
+						bestScore = currentScore;
 
 					}
 
@@ -33660,11 +33914,25 @@ class FunctionOverloadingNode extends Node {
 
 			}
 
-			this._candidateFnCall = candidateFnCall = candidateFn( ...params );
+			this._candidateFn = candidateFn = bestCandidateFn;
 
 		}
 
-		return candidateFnCall;
+		return candidateFn;
+
+	}
+
+	/**
+	 * Sets up the node for the current parameters.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node} The setup node.
+	 */
+	setup( builder ) {
+
+		const candidateFn = this.getCandidateFn( builder );
+
+		return candidateFn( ...this.parametersNodes );
 
 	}
 
@@ -35241,6 +35509,14 @@ class EventNode extends Node {
 
 			this.updateType = NodeUpdateType.RENDER;
 
+		} else if ( eventType === EventNode.BEFORE_OBJECT ) {
+
+			this.updateBeforeType = NodeUpdateType.OBJECT;
+
+		} else if ( eventType === EventNode.BEFORE_MATERIAL ) {
+
+			this.updateBeforeType = NodeUpdateType.RENDER;
+
 		}
 
 	}
@@ -35251,10 +35527,18 @@ class EventNode extends Node {
 
 	}
 
+	updateBefore( frame ) {
+
+		this.callback( frame );
+
+	}
+
 }
 
 EventNode.OBJECT = 'object';
 EventNode.MATERIAL = 'material';
+EventNode.BEFORE_OBJECT = 'beforeObject';
+EventNode.BEFORE_MATERIAL = 'beforeMaterial';
 
 /**
  * Helper to create an EventNode and add it to the stack.
@@ -35284,6 +35568,26 @@ const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, callback )
  * @returns {EventNode}
  */
 const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL, callback );
+
+/**
+ * Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeObjectUpdate = ( callback ) => createEvent( EventNode.BEFORE_OBJECT, callback );
+
+/**
+ * Creates an event that triggers a function before the material is updated.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEFORE_MATERIAL, callback );
 
 /**
  * This special type of instanced buffer attribute is intended for compute shaders.
@@ -39394,8 +39698,11 @@ class RangeNode extends Node {
 	 */
 	getVectorLength( builder ) {
 
-		const minLength = builder.getTypeLength( getValueType( this.minNode.value ) );
-		const maxLength = builder.getTypeLength( getValueType( this.maxNode.value ) );
+		const minNode = this.getConstNode( this.minNode );
+		const maxNode = this.getConstNode( this.maxNode );
+
+		const minLength = builder.getTypeLength( getValueType( minNode.value ) );
+		const maxLength = builder.getTypeLength( getValueType( maxNode.value ) );
 
 		return minLength > maxLength ? minLength : maxLength;
 
@@ -39413,6 +39720,36 @@ class RangeNode extends Node {
 
 	}
 
+	/**
+	 * Returns a constant node from the given node by traversing it.
+	 *
+	 * @param {Node} node - The node to traverse.
+	 * @returns {Node} The constant node, if found.
+	 */
+	getConstNode( node ) {
+
+		let output = null;
+
+		node.traverse( n => {
+
+			if ( n.isConstNode === true ) {
+
+				output = n;
+
+			}
+
+		} );
+
+		if ( output === null ) {
+
+			throw new Error( 'THREE.TSL: No "ConstNode" found in node graph.' );
+
+		}
+
+		return output;
+
+	}
+
 	setup( builder ) {
 
 		const object = builder.object;
@@ -39421,8 +39758,11 @@ class RangeNode extends Node {
 
 		if ( object.count > 1 ) {
 
-			const minValue = this.minNode.value;
-			const maxValue = this.maxNode.value;
+			const minNode = this.getConstNode( this.minNode );
+			const maxNode = this.getConstNode( this.maxNode );
+
+			const minValue = minNode.value;
+			const maxValue = maxNode.value;
 
 			const minLength = builder.getTypeLength( getValueType( minValue ) );
 			const maxLength = builder.getTypeLength( getValueType( maxValue ) );
@@ -41247,8 +41587,6 @@ class LightsNode extends Node {
 
 				}
 
-				context.material.transparent = true;
-
 			}
 
 			totalDiffuseNode.assign( totalDiffuse );
@@ -42135,6 +42473,22 @@ class ShadowNode extends ShadowBaseNode {
 		 */
 		this._node = null;
 
+		/**
+		 * The current shadow map type of this shadow node.
+		 *
+		 * @type {?number}
+		 * @private
+		 * @default null
+		 */
+		this._currentShadowType = null;
+
+		/**
+		 * A Weak Map holding the current frame ID per camera. Used
+		 * to control the update of shadow maps.
+		 *
+		 * @type {WeakMap<Camera,number>}
+		 * @private
+		 */
 		this._cameraFrameId = new WeakMap();
 
 		/**
@@ -42411,6 +42765,15 @@ class ShadowNode extends ShadowBaseNode {
 
 		return Fn( () => {
 
+			const currentShadowType = builder.renderer.shadowMap.type;
+
+			if ( this._currentShadowType !== currentShadowType ) {
+
+				this._reset();
+				this._node = null;
+
+			}
+
 			let node = this._node;
 
 			this.setupShadowPosition( builder );
@@ -42418,6 +42781,7 @@ class ShadowNode extends ShadowBaseNode {
 			if ( node === null ) {
 
 				this._node = node = this.setupShadow( builder );
+				this._currentShadowType = currentShadowType;
 
 			}
 
@@ -42550,8 +42914,27 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	dispose() {
 
-		this.shadowMap.dispose();
-		this.shadowMap = null;
+		this._reset();
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Resets the resouce state of this shadow node.
+	 *
+	 * @private
+	 */
+	_reset() {
+
+		this._currentShadowType = null;
+
+		if ( this.shadowMap ) {
+
+			this.shadowMap.dispose();
+			this.shadowMap = null;
+
+		}
 
 		if ( this.vsmShadowMapVertical !== null ) {
 
@@ -42572,8 +42955,6 @@ class ShadowNode extends ShadowBaseNode {
 			this.vsmMaterialHorizontal = null;
 
 		}
-
-		super.dispose();
 
 	}
 
@@ -45234,6 +45615,8 @@ var TSL = /*#__PURE__*/Object.freeze({
 	NodeShaderStage: NodeShaderStage,
 	NodeType: NodeType,
 	NodeUpdateType: NodeUpdateType,
+	OnBeforeMaterialUpdate: OnBeforeMaterialUpdate,
+	OnBeforeObjectUpdate: OnBeforeObjectUpdate,
 	OnMaterialUpdate: OnMaterialUpdate,
 	OnObjectUpdate: OnObjectUpdate,
 	PCFShadowFilter: PCFShadowFilter,
@@ -45421,6 +45804,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	getShadowRenderObjectFunction: getShadowRenderObjectFunction,
 	getTextureIndex: getTextureIndex,
 	getViewPosition: getViewPosition,
+	ggxConvolution: ggxConvolution,
 	globalId: globalId,
 	glsl: glsl,
 	glslFn: glslFn,
@@ -46037,7 +46421,7 @@ class Background extends DataMap {
 
 }
 
-let _id$6 = 0;
+let _id$7 = 0;
 
 /**
  * A bind group represents a collection of bindings and thus a collection
@@ -46091,7 +46475,7 @@ class BindGroup {
 		 *
 		 * @type {number}
 		 */
-		this.id = _id$6 ++;
+		this.id = _id$7 ++;
 
 	}
 
@@ -46552,7 +46936,7 @@ class NodeCode {
 
 }
 
-let _id$5 = 0;
+let _id$6 = 0;
 
 /**
  * This utility class is used in {@link NodeBuilder} as an internal
@@ -46573,7 +46957,7 @@ class NodeCache {
 		 * @type {number}
 		 * @readonly
 		 */
-		this.id = _id$5 ++;
+		this.id = _id$6 ++;
 
 		/**
 		 * A weak map for managing node data.
@@ -47401,6 +47785,8 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 
 }
 
+let _id$5 = 0;
+
 const rendererCache = new WeakMap();
 
 const typeFromArray = new Map( [
@@ -47803,13 +48189,13 @@ class NodeBuilder {
 		 */
 		this.subBuildLayers = [];
 
+
 		/**
-		 * The current stack of nodes.
+		 * The active stack nodes.
 		 *
-		 * @type {?StackNode}
-		 * @default null
+		 * @type {Array<StackNode>}
 		 */
-		this.currentStack = null;
+		this.activeStacks = [];
 
 		/**
 		 * The current sub-build TSL function(Fn).
@@ -47826,6 +48212,21 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.fnCall = null;
+
+		Object.defineProperty( this, 'id', { value: _id$5 ++ } );
+
+	}
+
+	/**
+	 * Whether the material is opaque or not.
+	 *
+	 * @return {boolean} Whether the material is opaque or not.
+	 */
+	isOpaque() {
+
+		const material = this.material;
+
+		return material.transparent === false && material.blending === NormalBlending && material.alphaToCoverage === false;
 
 	}
 
@@ -48959,6 +49360,58 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Adds an active stack to the internal stack.
+	 *
+	 * @param {StackNode} stack - The stack node to add.
+	 */
+	setActiveStack( stack ) {
+
+		this.activeStacks.push( stack );
+
+	}
+
+	/**
+	 * Removes the active stack from the internal stack.
+	 *
+	 * @param {StackNode} stack - The stack node to remove.
+	 */
+	removeActiveStack( stack ) {
+
+		if ( this.activeStacks[ this.activeStacks.length - 1 ] === stack ) {
+
+			this.activeStacks.pop();
+
+		} else {
+
+			throw new Error( 'NodeBuilder: Invalid active stack removal.' );
+
+		}
+
+	}
+
+	/**
+	 * Returns the active stack.
+	 *
+	 * @return {StackNode} The active stack.
+	 */
+	getActiveStack() {
+
+		return this.activeStacks[ this.activeStacks.length - 1 ];
+
+	}
+
+	/**
+	 * Returns the base stack.
+	 *
+	 * @return {StackNode} The base stack.
+	 */
+	getBaseStack() {
+
+		return this.activeStacks[ 0 ];
+
+	}
+
+	/**
 	 * Adds a stack node to the internal stack.
 	 *
 	 * @return {StackNode} The added stack node.
@@ -48984,6 +49437,14 @@ class NodeBuilder {
 	removeStack() {
 
 		const lastStack = this.stack;
+
+		for ( const node of lastStack.nodes ) {
+
+			const nodeData = this.getDataFromNode( node );
+			nodeData.stack = lastStack;
+
+		}
+
 		this.stack = lastStack.parent;
 
 		setCurrentStack( this.stacks.pop() );
@@ -51804,22 +52265,41 @@ class Nodes extends DataMap {
 
 			if ( nodeBuilderState === undefined ) {
 
-				const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
-				nodeBuilder.scene = renderObject.scene;
-				nodeBuilder.material = renderObject.material;
-				nodeBuilder.camera = renderObject.camera;
-				nodeBuilder.context.material = renderObject.material;
-				nodeBuilder.lightsNode = renderObject.lightsNode;
-				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
-				nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
-				nodeBuilder.clippingContext = renderObject.clippingContext;
-				if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
+				const createNodeBuilder = ( material ) => {
 
-					nodeBuilder.enableMultiview();
+					const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+					nodeBuilder.scene = renderObject.scene;
+					nodeBuilder.material = material;
+					nodeBuilder.camera = renderObject.camera;
+					nodeBuilder.context.material = material;
+					nodeBuilder.lightsNode = renderObject.lightsNode;
+					nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
+					nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
+					nodeBuilder.clippingContext = renderObject.clippingContext;
+					if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
+
+						nodeBuilder.enableMultiview();
+
+					}
+
+					return nodeBuilder;
+
+				};
+
+				let nodeBuilder = createNodeBuilder( renderObject.material );
+
+				try {
+
+					nodeBuilder.build();
+
+				} catch ( e ) {
+
+					nodeBuilder = createNodeBuilder( new NodeMaterial() );
+					nodeBuilder.build();
+
+					error( 'TSL: ' + e );
 
 				}
-
-				nodeBuilder.build();
 
 				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
 
@@ -52023,6 +52503,7 @@ class Nodes extends DataMap {
 
 			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
 			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
+			_cacheKeyValues.push( this.renderer.shadowMap.type );
 
 			cacheKeyData.callId = callId;
 			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
@@ -57492,10 +57973,13 @@ class Renderer {
 	 * if the renderer has been initialized.
 	 *
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
+	 * - A single number representing count, or
+	 * - An array [x, y, z] representing dispatch size, or
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
-	compute( computeNodes, dispatchSizeOrCount = null ) {
+	compute( computeNodes, dispatchSize = null ) {
 
 		if ( this._isDeviceLost === true ) return;
 
@@ -57503,7 +57987,7 @@ class Renderer {
 
 			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
 
-			return this.computeAsync( computeNodes );
+			return this.computeAsync( computeNodes, dispatchSize );
 
 		}
 
@@ -57580,7 +58064,7 @@ class Renderer {
 			const computeBindings = bindings.getForCompute( computeNode );
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
-			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSizeOrCount );
+			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
 
 		}
 
@@ -57601,16 +58085,17 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
+	 * - A single number representing count, or
+	 * - An array [x, y, z] representing dispatch size, or
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 * @return {Promise} A Promise that resolve when the compute has finished.
 	 */
-	async computeAsync( computeNodes, dispatchSizeOrCount = null ) {
+	async computeAsync( computeNodes, dispatchSize = null ) {
 
-		warnOnce( 'Renderer: "computeAsync()" has been deprecated. Use "compute()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+		if ( this._initialized === false ) await this.init();
 
-		await this.init();
-
-		this.compute( computeNodes, dispatchSizeOrCount );
+		this.compute( computeNodes, dispatchSize );
 
 	}
 
@@ -58174,7 +58659,9 @@ class Renderer {
 
 			overrideMaterial.alphaTest = material.alphaTest;
 			overrideMaterial.alphaMap = material.alphaMap;
-			overrideMaterial.transparent = material.transparent || material.transmission > 0;
+			overrideMaterial.transparent = material.transparent || material.transmission > 0 ||
+				( material.transmissionNode && material.transmissionNode.isNode ) ||
+				( material.backdropNode && material.backdropNode.isNode );
 
 			if ( overrideMaterial.isShadowPassMaterial ) {
 
@@ -66526,6 +67013,12 @@ class WebGLBackend extends Backend {
 
 			count = count[ 0 ];
 
+		} else if ( count && typeof count === 'object' && count.isIndirectStorageBufferAttribute ) {
+
+			warnOnce( 'WebGLBackend.compute(): The count parameter must be a single number, not IndirectStorageBufferAttribute' );
+
+			count = computeNode.count;
+
 		}
 
 		if ( attributes[ 0 ].isStorageInstancedBufferAttribute ) {
@@ -74515,21 +75008,47 @@ class WebGPUPipelineUtils {
 
 		}
 
+		// create pipeline
+
+		device.pushErrorScope( 'validation' );
 
 		if ( promises === null ) {
 
 			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
 
+			device.popErrorScope().then( ( err ) => {
+
+				if ( err !== null ) {
+
+					pipelineData.error = true;
+
+					error( err.message );
+
+				}
+
+			} );
+
 		} else {
 
-			const p = new Promise( ( resolve /*, reject*/ ) => {
+			const p = new Promise( async ( resolve /*, reject*/ ) => {
 
-				device.createRenderPipelineAsync( pipelineDescriptor ).then( pipeline => {
+				try {
 
-					pipelineData.pipeline = pipeline;
-					resolve();
+					pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
 
-				} );
+				} catch ( err ) { }
+
+				const errorScope = await device.popErrorScope();
+
+				if ( errorScope !== null ) {
+
+					pipelineData.error = true;
+
+					error( errorScope.message );
+
+				}
+
+				resolve();
 
 			} );
 
@@ -76700,9 +77219,12 @@ class WebGPUBackend extends Backend {
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
-	 * @param {?(Array<number>|number)} [dispatchSizeOrCount=null] - Array with [ x, y, z ] values for dispatch or a single number for the count.
+	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
+	 * - A single number representing count, or
+	 * - An array [x, y, z] representing dispatch size, or
+	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
 	 */
-	compute( computeGroup, computeNode, bindings, pipeline, dispatchSizeOrCount = null ) {
+	compute( computeGroup, computeNode, bindings, pipeline, dispatchSize = null ) {
 
 		const computeNodeData = this.get( computeNode );
 		const { passEncoderGPU } = this.get( computeGroup );
@@ -76724,19 +77246,29 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		let dispatchSize;
+		if ( dispatchSize === null ) {
 
-		if ( dispatchSizeOrCount === null ) {
-
-			dispatchSizeOrCount = computeNode.count;
+			dispatchSize = computeNode.count;
 
 		}
 
-		if ( typeof dispatchSizeOrCount === 'number' ) {
+		// When the dispatchSize is set with a StorageBuffer from the GPU.
+
+		if ( dispatchSize && typeof dispatchSize === 'object' && dispatchSize.isIndirectStorageBufferAttribute ) {
+
+			const dispatchBuffer = this.get( dispatchSize ).buffer;
+
+			passEncoderGPU.dispatchWorkgroupsIndirect( dispatchBuffer, 0 );
+
+			return;
+
+		}
+
+		if ( typeof dispatchSize === 'number' ) {
 
 			// If a single number is given, we calculate the dispatch size based on the workgroup size
 
-			const count = dispatchSizeOrCount;
+			const count = dispatchSize;
 
 			if ( computeNodeData.dispatchSize === undefined || computeNodeData.count !== count ) {
 
@@ -76772,10 +77304,6 @@ class WebGPUBackend extends Backend {
 			}
 
 			dispatchSize = computeNodeData.dispatchSize;
-
-		} else {
-
-			dispatchSize = dispatchSizeOrCount;
 
 		}
 
@@ -76818,7 +77346,10 @@ class WebGPUBackend extends Backend {
 		const { object, material, context, pipeline } = renderObject;
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
-		const pipelineGPU = this.get( pipeline ).pipeline;
+		const pipelineData = this.get( pipeline );
+		const pipelineGPU = pipelineData.pipeline;
+
+		if ( pipelineData.error === true ) return;
 
 		const index = renderObject.getIndex();
 		const hasIndex = ( index !== null );

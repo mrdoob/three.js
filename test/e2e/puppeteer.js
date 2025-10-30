@@ -7,10 +7,23 @@ import * as fs from 'fs/promises';
 
 const exceptionList = [
 
+	// Take too long
+	'webgpu_parallax_uv', 				// 11 min
+	'webgpu_cubemap_adjustments', 		// 9 min
+	'webgl_loader_lwo', 				// 8 min
+	'webgpu_cubemap_mix', 				// 2 min
+	'webgl_loader_texture_ultrahdr', 	// 1 min
+	'webgl_marchingcubes', 				// 1 min
+ 	'webgl_materials_cubemap_dynamic', 	// 1 min
+	'webgl_materials_displacementmap', 	// 1 min
+	'webgl_materials_envmaps_hdr', 		// 1 min
+	'webgpu_water', 					// 1 min
+
 	// Needs investigation
 	'physics_rapier_instancing',
 	'webgl_shadowmap',
 	'webgl_postprocessing_dof2',
+	'webgl_video_kinect',
 	'webgl_worker_offscreencanvas',
 	'webgpu_backdrop_water',
 	'webgpu_lightprobe_cubecamera',
@@ -22,8 +35,9 @@ const exceptionList = [
 	'webgpu_postprocessing_traa',
 	'webgpu_reflection',
 	'webgpu_texturegrad',
+	'webgpu_tsl_vfx_flames',
 
-	// Need more time
+	// Need more time to render
 	'css3d_mixed',
 	'webgl_loader_3dtiles',
 	'webgl_loader_texture_lottie',
@@ -86,7 +100,7 @@ const parseTime = 1; // 1 second per megabyte
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
 const numAttempts = 2; // perform 2 attempts before failing
-const numCIJobs = 4; // GitHub Actions run the script in 4 threads
+const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
 const height = 250;

@@ -139,7 +139,7 @@ const _matrix2 = new Matrix4();
 
 /**
  * This renderer can be used to apply hierarchical 3D transformations to DOM elements
- * via the CSS3 [transform]{@link https://www.w3schools.com/cssref/css3_pr_transform.asp} property.
+ * via the CSS3 [transform](https://www.w3schools.com/cssref/css3_pr_transform.asp) property.
  * `CSS3DRenderer` is particularly interesting if you want to apply 3D effects to a website without
  * canvas based rendering. It can also be used in order to combine DOM elements with WebGLcontent.
  *

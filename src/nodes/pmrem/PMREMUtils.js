@@ -1,5 +1,5 @@
-import { Fn, int, float, vec2, vec3, vec4, If } from '../tsl/TSLBase.js';
-import { cos, sin, abs, max, exp2, log2, clamp, fract, mix, floor, normalize, cross } from '../math/MathNode.js';
+import { Fn, int, uint, float, vec2, vec3, vec4, If } from '../tsl/TSLBase.js';
+import { cos, sin, abs, max, exp2, log2, clamp, fract, mix, floor, normalize, cross, dot, sqrt } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
 import { select } from '../math/ConditionalNode.js';
 import { Loop, Break } from '../utils/LoopNode.js';
@@ -284,5 +284,120 @@ export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirect
 	} );
 
 	return vec4( gl_FragColor, 1 );
+
+} );
+
+// GGX VNDF importance sampling functions
+
+// Van der Corput radical inverse for generating quasi-random sequences
+const radicalInverse_VdC = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
+
+	const bits = uint( bits_immutable ).toVar();
+	bits.assign( bits.shiftLeft( uint( 16 ) ).bitOr( bits.shiftRight( uint( 16 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x55555555 ) ).shiftLeft( uint( 1 ) ).bitOr( bits.bitAnd( uint( 0xAAAAAAAA ) ).shiftRight( uint( 1 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x33333333 ) ).shiftLeft( uint( 2 ) ).bitOr( bits.bitAnd( uint( 0xCCCCCCCC ) ).shiftRight( uint( 2 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x0F0F0F0F ) ).shiftLeft( uint( 4 ) ).bitOr( bits.bitAnd( uint( 0xF0F0F0F0 ) ).shiftRight( uint( 4 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x00FF00FF ) ).shiftLeft( uint( 8 ) ).bitOr( bits.bitAnd( uint( 0xFF00FF00 ) ).shiftRight( uint( 8 ) ) ) );
+	return float( bits ).mul( 2.3283064365386963e-10 ); // / 0x100000000
+
+} );
+
+// Hammersley sequence for quasi-Monte Carlo sampling
+const hammersley = /*@__PURE__*/ Fn( ( [ i, N ] ) => {
+
+	return vec2( float( i ).div( float( N ) ), radicalInverse_VdC( i ) );
+
+} );
+
+// GGX VNDF importance sampling (Eric Heitz 2018)
+// "Sampling the GGX Distribution of Visible Normals"
+// https://jcgt.org/published/0007/04/01/
+const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V_immutable, roughness_immutable ] ) => {
+
+	const V = vec3( V_immutable ).toVar();
+	const roughness = float( roughness_immutable );
+	const alpha = roughness.mul( roughness ).toVar();
+
+	// Section 3.2: Transform view direction to hemisphere configuration
+	const Vh = normalize( vec3( alpha.mul( V.x ), alpha.mul( V.y ), V.z ) ).toVar();
+
+	// Section 4.1: Orthonormal basis
+	const lensq = Vh.x.mul( Vh.x ).add( Vh.y.mul( Vh.y ) );
+	const T1 = select( lensq.greaterThan( 0.0 ), vec3( Vh.y.negate(), Vh.x, 0.0 ).div( sqrt( lensq ) ), vec3( 1.0, 0.0, 0.0 ) ).toVar();
+	const T2 = cross( Vh, T1 ).toVar();
+
+	// Section 4.2: Parameterization of projected area
+	const r = sqrt( Xi.x );
+	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y );
+	const t1 = r.mul( cos( phi ) ).toVar();
+	const t2 = r.mul( sin( phi ) ).toVar();
+	const s = mul( 0.5, Vh.z.add( 1.0 ) );
+	t2.assign( s.oneMinus().mul( sqrt( t1.mul( t1 ).oneMinus() ) ).add( s.mul( t2 ) ) );
+
+	// Section 4.3: Reprojection onto hemisphere
+	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( Vh.mul( sqrt( max( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
+
+	// Section 3.4: Transform back to ellipsoid configuration
+	return normalize( vec3( alpha.mul( Nh.x ), alpha.mul( Nh.y ), max( 0.0, Nh.z ) ) );
+
+} );
+
+// GGX convolution using VNDF importance sampling
+export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, mipInt, envMap, N_immutable, GGX_SAMPLES, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+
+	const N = vec3( N_immutable ).toVar();
+
+	const prefilteredColor = vec3( 0.0 ).toVar();
+	const totalWeight = float( 0.0 ).toVar();
+
+	// For very low roughness, just sample the environment directly
+	If( roughness.lessThan( 0.001 ), () => {
+
+		prefilteredColor.assign( bilinearCubeUV( envMap, N, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) );
+
+	} ).Else( () => {
+
+		// Tangent space basis for VNDF sampling
+		const up = select( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+		const tangent = normalize( cross( up, N ) ).toVar();
+		const bitangent = cross( N, tangent ).toVar();
+
+		Loop( { start: uint( 0 ), end: GGX_SAMPLES }, ( { i } ) => {
+
+			const Xi = hammersley( i, GGX_SAMPLES );
+
+			// For PMREM, V = N, so in tangent space V is always (0, 0, 1)
+			const H_tangent = importanceSampleGGX_VNDF( Xi, vec3( 0.0, 0.0, 1.0 ), roughness );
+
+			// Transform H back to world space
+			const H = normalize( tangent.mul( H_tangent.x ).add( bitangent.mul( H_tangent.y ) ).add( N.mul( H_tangent.z ) ) );
+			const L = normalize( H.mul( dot( N, H ).mul( 2.0 ) ).sub( N ) );
+
+			const NdotL = max( dot( N, L ), 0.0 );
+
+			If( NdotL.greaterThan( 0.0 ), () => {
+
+				// Sample environment at fixed mip level
+				// VNDF importance sampling handles the distribution filtering
+				const sampleColor = bilinearCubeUV( envMap, L, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
+
+				// Weight by NdotL for the split-sum approximation
+				// VNDF PDF naturally accounts for the visible microfacet distribution
+				prefilteredColor.addAssign( sampleColor.mul( NdotL ) );
+				totalWeight.addAssign( NdotL );
+
+			} );
+
+		} );
+
+		If( totalWeight.greaterThan( 0.0 ), () => {
+
+			prefilteredColor.assign( prefilteredColor.div( totalWeight ) );
+
+		} );
+
+	} );
+
+	return vec4( prefilteredColor, 1.0 );
 
 } );
