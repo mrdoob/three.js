@@ -79,6 +79,12 @@ class StackNode extends Node {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.hasOutput ? this.outputNode.getElementType( builder ) : 'void';
+
+	}
+
 	getNodeType( builder ) {
 
 		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';

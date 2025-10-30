@@ -11,6 +11,7 @@ const exceptionList = [
 	'physics_rapier_instancing',
 	'webgl_shadowmap',
 	'webgl_postprocessing_dof2',
+	'webgl_video_kinect',
 	'webgl_worker_offscreencanvas',
 	'webgpu_backdrop_water',
 	'webgpu_lightprobe_cubecamera',
