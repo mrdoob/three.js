@@ -80,7 +80,7 @@ float V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const i
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-// alpha is "roughness squared" in Disney’s reparameterization
+// alpha is "roughness squared" in Disney's reparameterization
 float D_GGX( const in float alpha, const in float dotNH ) {
 
 	float a2 = pow2( alpha );
@@ -353,7 +353,7 @@ vec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 no
 
 #endif
 
-// This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from
+// This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from 
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
 // in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
 float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {
@@ -524,6 +524,18 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 		clearcoatSpecularDirect += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );
 
+		// Energy conservation: attenuate base layer by clearcoat reflectance
+		// Calculate clearcoat Fresnel for energy conservation
+		vec3 clearcoatHalfDir = normalize( directLight.direction + geometryViewDir );
+		float dotVHcc = saturate( dot( geometryViewDir, clearcoatHalfDir ) );
+		float clearcoatFresnel = F_Schlick( material.clearcoatF0.x, material.clearcoatF90, dotVHcc );
+		
+		// Base layer attenuation: (1 - clearcoat * Fresnel)
+		float baseLayerAttenuation = 1.0 - material.clearcoat * clearcoatFresnel;
+		
+		// Apply attenuation to base layer contributions
+		irradiance *= baseLayerAttenuation;
+
 	#endif
 
 	#ifdef USE_SHEEN
@@ -539,7 +551,20 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+	#ifdef USE_CLEARCOAT
+		
+		// Energy conservation: attenuate indirect diffuse by clearcoat reflectance
+		float dotNVcc = saturate( dot( geometryClearcoatNormal, geometryViewDir ) );
+		float clearcoatFresnelIndirect = F_Schlick( material.clearcoatF0.x, material.clearcoatF90, dotNVcc );
+		float baseLayerAttenuationIndirect = 1.0 - material.clearcoat * clearcoatFresnelIndirect;
+		
+		reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor ) * baseLayerAttenuationIndirect;
+
+	#else
+
+		reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+
+	#endif
 
 }
 
@@ -576,10 +601,26 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	vec3 totalScattering = singleScattering + multiScattering;
 	vec3 diffuse = material.diffuseColor * ( 1.0 - max( max( totalScattering.r, totalScattering.g ), totalScattering.b ) );
 
-	reflectedLight.indirectSpecular += radiance * singleScattering;
-	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
+	#ifdef USE_CLEARCOAT
+		
+		// Energy conservation: attenuate indirect specular by clearcoat reflectance
+		float dotNVcc = saturate( dot( geometryClearcoatNormal, geometryViewDir ) );
+		float clearcoatFresnelIndirect = F_Schlick( material.clearcoatF0.x, material.clearcoatF90, dotNVcc );
+		float baseLayerAttenuationIndirect = 1.0 - material.clearcoat * clearcoatFresnelIndirect;
+		
+		reflectedLight.indirectSpecular += radiance * singleScattering * baseLayerAttenuationIndirect;
+		reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance * baseLayerAttenuationIndirect;
 
-	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance * baseLayerAttenuationIndirect;
+
+	#else
+
+		reflectedLight.indirectSpecular += radiance * singleScattering;
+		reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
+
+		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+
+	#endif
 
 }
 
