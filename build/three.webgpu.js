@@ -3692,6 +3692,12 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.getOutputNode( builder ).getElementType( builder );
+
+	}
+
 	getMemberType( builder, name ) {
 
 		return this.getOutputNode( builder ).getMemberType( builder, name );
@@ -24400,17 +24406,134 @@ const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, we
 
 } );
 
+// GGX VNDF importance sampling functions
+
+// Van der Corput radical inverse for generating quasi-random sequences
+const radicalInverse_VdC = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
+
+	const bits = uint( bits_immutable ).toVar();
+	bits.assign( bits.shiftLeft( uint( 16 ) ).bitOr( bits.shiftRight( uint( 16 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x55555555 ) ).shiftLeft( uint( 1 ) ).bitOr( bits.bitAnd( uint( 0xAAAAAAAA ) ).shiftRight( uint( 1 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x33333333 ) ).shiftLeft( uint( 2 ) ).bitOr( bits.bitAnd( uint( 0xCCCCCCCC ) ).shiftRight( uint( 2 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x0F0F0F0F ) ).shiftLeft( uint( 4 ) ).bitOr( bits.bitAnd( uint( 0xF0F0F0F0 ) ).shiftRight( uint( 4 ) ) ) );
+	bits.assign( bits.bitAnd( uint( 0x00FF00FF ) ).shiftLeft( uint( 8 ) ).bitOr( bits.bitAnd( uint( 0xFF00FF00 ) ).shiftRight( uint( 8 ) ) ) );
+	return float( bits ).mul( 2.3283064365386963e-10 ); // / 0x100000000
+
+} );
+
+// Hammersley sequence for quasi-Monte Carlo sampling
+const hammersley = /*@__PURE__*/ Fn( ( [ i, N ] ) => {
+
+	return vec2( float( i ).div( float( N ) ), radicalInverse_VdC( i ) );
+
+} );
+
+// GGX VNDF importance sampling (Eric Heitz 2018)
+// "Sampling the GGX Distribution of Visible Normals"
+// https://jcgt.org/published/0007/04/01/
+const importanceSampleGGX_VNDF = /*@__PURE__*/ Fn( ( [ Xi, V_immutable, roughness_immutable ] ) => {
+
+	const V = vec3( V_immutable ).toVar();
+	const roughness = float( roughness_immutable );
+	const alpha = roughness.mul( roughness ).toVar();
+
+	// Section 3.2: Transform view direction to hemisphere configuration
+	const Vh = normalize( vec3( alpha.mul( V.x ), alpha.mul( V.y ), V.z ) ).toVar();
+
+	// Section 4.1: Orthonormal basis
+	const lensq = Vh.x.mul( Vh.x ).add( Vh.y.mul( Vh.y ) );
+	const T1 = select( lensq.greaterThan( 0.0 ), vec3( Vh.y.negate(), Vh.x, 0.0 ).div( sqrt( lensq ) ), vec3( 1.0, 0.0, 0.0 ) ).toVar();
+	const T2 = cross( Vh, T1 ).toVar();
+
+	// Section 4.2: Parameterization of projected area
+	const r = sqrt( Xi.x );
+	const phi = mul( 2.0, 3.14159265359 ).mul( Xi.y );
+	const t1 = r.mul( cos( phi ) ).toVar();
+	const t2 = r.mul( sin( phi ) ).toVar();
+	const s = mul( 0.5, Vh.z.add( 1.0 ) );
+	t2.assign( s.oneMinus().mul( sqrt( t1.mul( t1 ).oneMinus() ) ).add( s.mul( t2 ) ) );
+
+	// Section 4.3: Reprojection onto hemisphere
+	const Nh = T1.mul( t1 ).add( T2.mul( t2 ) ).add( Vh.mul( sqrt( max$1( 0.0, t1.mul( t1 ).add( t2.mul( t2 ) ).oneMinus() ) ) ) );
+
+	// Section 3.4: Transform back to ellipsoid configuration
+	return normalize( vec3( alpha.mul( Nh.x ), alpha.mul( Nh.y ), max$1( 0.0, Nh.z ) ) );
+
+} );
+
+// GGX convolution using VNDF importance sampling
+const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, mipInt, envMap, N_immutable, GGX_SAMPLES, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+
+	const N = vec3( N_immutable ).toVar();
+
+	const prefilteredColor = vec3( 0.0 ).toVar();
+	const totalWeight = float( 0.0 ).toVar();
+
+	// For very low roughness, just sample the environment directly
+	If( roughness.lessThan( 0.001 ), () => {
+
+		prefilteredColor.assign( bilinearCubeUV( envMap, N, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ) );
+
+	} ).Else( () => {
+
+		// Tangent space basis for VNDF sampling
+		const up = select( abs( N.z ).lessThan( 0.999 ), vec3( 0.0, 0.0, 1.0 ), vec3( 1.0, 0.0, 0.0 ) );
+		const tangent = normalize( cross( up, N ) ).toVar();
+		const bitangent = cross( N, tangent ).toVar();
+
+		Loop( { start: uint( 0 ), end: GGX_SAMPLES }, ( { i } ) => {
+
+			const Xi = hammersley( i, GGX_SAMPLES );
+
+			// For PMREM, V = N, so in tangent space V is always (0, 0, 1)
+			const H_tangent = importanceSampleGGX_VNDF( Xi, vec3( 0.0, 0.0, 1.0 ), roughness );
+
+			// Transform H back to world space
+			const H = normalize( tangent.mul( H_tangent.x ).add( bitangent.mul( H_tangent.y ) ).add( N.mul( H_tangent.z ) ) );
+			const L = normalize( H.mul( dot( N, H ).mul( 2.0 ) ).sub( N ) );
+
+			const NdotL = max$1( dot( N, L ), 0.0 );
+
+			If( NdotL.greaterThan( 0.0 ), () => {
+
+				// Sample environment at fixed mip level
+				// VNDF importance sampling handles the distribution filtering
+				const sampleColor = bilinearCubeUV( envMap, L, mipInt, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP );
+
+				// Weight by NdotL for the split-sum approximation
+				// VNDF PDF naturally accounts for the visible microfacet distribution
+				prefilteredColor.addAssign( sampleColor.mul( NdotL ) );
+				totalWeight.addAssign( NdotL );
+
+			} );
+
+		} );
+
+		If( totalWeight.greaterThan( 0.0 ), () => {
+
+			prefilteredColor.assign( prefilteredColor.div( totalWeight ) );
+
+		} );
+
+	} );
+
+	return vec4( prefilteredColor, 1.0 );
+
+} );
+
 const LOD_MIN = 4;
 
-// The standard deviations (radians) associated with the extra mips. These are
-// chosen to approximate a Trowbridge-Reitz distribution function times the
-// geometric shadowing function. These sigma values squared must match the
-// variance #defines in cube_uv_reflection_fragment.glsl.js.
+// The standard deviations (radians) associated with the extra mips.
+// Used for scene blur in fromScene() method.
 const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 
 // The maximum length of the blur for loop. Smaller sigmas will use fewer
 // samples and exit early, but not recompile the shader.
+// Used for scene blur in fromScene() method.
 const MAX_SAMPLES = 20;
+
+// GGX VNDF importance sampling configuration
+const GGX_SAMPLES = 1024;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
@@ -24418,25 +24541,6 @@ const _clearColor$2 = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 let _oldActiveCubeFace = 0;
 let _oldActiveMipmapLevel = 0;
-
-// Golden Ratio
-const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
-const INV_PHI = 1 / PHI;
-
-// Vertices of a dodecahedron (except the opposites, which represent the
-// same axis), used as axis directions evenly spread on a sphere.
-const _axisDirections = [
-	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
-	/*@__PURE__*/ new Vector3( -1, 1, -1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, -1 ),
-	/*@__PURE__*/ new Vector3( -1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, 1 )
-];
 
 const _origin = /*@__PURE__*/ new Vector3();
 
@@ -24464,9 +24568,11 @@ const _outputDirection = /*@__PURE__*/ vec3( _direction.x, _direction.y, _direct
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
- * Paper: Fast, Accurate Image-Based Lighting:
- * {@link https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view}
-*/
+ * The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
+ * importance sampling based on "Sampling the GGX Distribution of Visible Normals"
+ * (Heitz, 2018) to generate environment maps that accurately match the GGX BRDF
+ * used in material rendering for physically-based image-based lighting.
+ */
 class PMREMGenerator {
 
 	/**
@@ -24487,6 +24593,7 @@ class PMREMGenerator {
 		this._lodMeshes = [];
 
 		this._blurMaterial = null;
+		this._ggxMaterial = null;
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 		this._backgroundBox = null;
@@ -24776,6 +24883,7 @@ class PMREMGenerator {
 	_dispose() {
 
 		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
+		if ( this._ggxMaterial !== null ) this._ggxMaterial.dispose();
 
 		if ( this._pingPongRenderTarget !== null ) this._pingPongRenderTarget.dispose();
 
@@ -25000,17 +25108,80 @@ class PMREMGenerator {
 		renderer.autoClear = false;
 		const n = this._lodPlanes.length;
 
+		// Use GGX VNDF importance sampling
 		for ( let i = 1; i < n; i ++ ) {
 
-			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
-
-			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
-
-			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+			this._applyGGXFilter( cubeUVRenderTarget, i - 1, i );
 
 		}
 
 		renderer.autoClear = autoClear;
+
+	}
+
+	/**
+	 * Applies GGX VNDF importance sampling filter to generate a prefiltered environment map.
+	 * Uses Monte Carlo integration with VNDF importance sampling to accurately represent the
+	 * GGX BRDF for physically-based rendering. Reads from the previous LOD level and
+	 * applies incremental roughness filtering to avoid over-blurring.
+	 *
+	 * @private
+	 * @param {RenderTarget} cubeUVRenderTarget
+	 * @param {number} lodIn - Source LOD level to read from
+	 * @param {number} lodOut - Target LOD level to write to
+	 */
+	_applyGGXFilter( cubeUVRenderTarget, lodIn, lodOut ) {
+
+		const renderer = this._renderer;
+		const pingPongRenderTarget = this._pingPongRenderTarget;
+
+		// Lazy create GGX material only when first used
+		if ( this._ggxMaterial === null ) {
+
+			this._ggxMaterial = _getGGXShader( this._lodMax, this._pingPongRenderTarget.width, this._pingPongRenderTarget.height );
+
+		}
+
+		const ggxMaterial = this._ggxMaterial;
+		const ggxMesh = this._lodMeshes[ lodOut ];
+		ggxMesh.material = ggxMaterial;
+
+		const ggxUniforms = _uniformsMap.get( ggxMaterial );
+
+		// Calculate incremental roughness between LOD levels
+		const targetRoughness = lodOut / ( this._lodPlanes.length - 1 );
+		const sourceRoughness = lodIn / ( this._lodPlanes.length - 1 );
+		const incrementalRoughness = Math.sqrt( targetRoughness * targetRoughness - sourceRoughness * sourceRoughness );
+
+		// Apply blur strength mapping for better quality across the roughness range
+		const blurStrength = 0.05 + targetRoughness * 0.95;
+		const adjustedRoughness = incrementalRoughness * blurStrength;
+
+		// Calculate viewport position based on output LOD level
+		const { _lodMax } = this;
+		const outputSize = this._sizeLods[ lodOut ];
+		const x = 3 * outputSize * ( lodOut > _lodMax - LOD_MIN ? lodOut - _lodMax + LOD_MIN : 0 );
+		const y = 4 * ( this._cubeSize - outputSize );
+
+		// Read from previous LOD with incremental roughness
+		cubeUVRenderTarget.texture.frame = ( cubeUVRenderTarget.texture.frame || 0 ) + 1;
+		ggxUniforms.envMap.value = cubeUVRenderTarget.texture;
+		ggxUniforms.roughness.value = adjustedRoughness;
+		ggxUniforms.mipInt.value = _lodMax - lodIn; // Sample from input LOD
+
+		_setViewport( pingPongRenderTarget, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( pingPongRenderTarget );
+		renderer.render( ggxMesh, _flatCamera );
+
+		// Copy from pingPong back to cubeUV (simple direct copy)
+		pingPongRenderTarget.texture.frame = ( pingPongRenderTarget.texture.frame || 0 ) + 1;
+		ggxUniforms.envMap.value = pingPongRenderTarget.texture;
+		ggxUniforms.roughness.value = 0.0; // Direct copy
+		ggxUniforms.mipInt.value = _lodMax - lodOut; // Read from the level we just wrote
+
+		_setViewport( cubeUVRenderTarget, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( cubeUVRenderTarget );
+		renderer.render( ggxMesh, _flatCamera );
 
 	}
 
@@ -25020,6 +25191,8 @@ class PMREMGenerator {
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
+	 *
+	 * Used for initial scene blur in fromScene() method when sigma > 0.
 	 *
 	 * @private
 	 * @param {RenderTarget} cubeUVRenderTarget - The cubemap render target.
@@ -25272,7 +25445,7 @@ function _getBlurShader( lodMax, width, height ) {
 	const n = float( MAX_SAMPLES );
 	const latitudinal = uniform( 0 ); // false, bool
 	const samples = uniform( 1 ); // int
-	const envMap = texture( null );
+	const envMap = texture();
 	const mipInt = uniform( 0 ); // int
 	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
 	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
@@ -25295,6 +25468,37 @@ function _getBlurShader( lodMax, width, height ) {
 
 	const material = _getMaterial( 'blur' );
 	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
+
+	_uniformsMap.set( material, materialUniforms );
+
+	return material;
+
+}
+
+function _getGGXShader( lodMax, width, height ) {
+
+	const envMap = texture();
+	const roughness = uniform( 0 );
+	const mipInt = uniform( 0 );
+	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
+	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
+	const CUBEUV_MAX_MIP = float( lodMax );
+
+	const materialUniforms = {
+		envMap,
+		roughness,
+		mipInt,
+		CUBEUV_TEXEL_WIDTH,
+		CUBEUV_TEXEL_HEIGHT,
+		CUBEUV_MAX_MIP
+	};
+
+	const material = _getMaterial( 'ggx' );
+	material.fragmentNode = ggxConvolution( {
+		...materialUniforms,
+		N_immutable: _outputDirection,
+		GGX_SAMPLES: uint( GGX_SAMPLES )
+	} );
 
 	_uniformsMap.set( material, materialUniforms );
 
@@ -32481,6 +32685,12 @@ class StackNode extends Node {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.hasOutput ? this.outputNode.getElementType( builder ) : 'void';
+
+	}
+
 	getNodeType( builder ) {
 
 		return this.hasOutput ? this.outputNode.getNodeType( builder ) : 'void';
@@ -35299,6 +35509,14 @@ class EventNode extends Node {
 
 			this.updateType = NodeUpdateType.RENDER;
 
+		} else if ( eventType === EventNode.BEFORE_OBJECT ) {
+
+			this.updateBeforeType = NodeUpdateType.OBJECT;
+
+		} else if ( eventType === EventNode.BEFORE_MATERIAL ) {
+
+			this.updateBeforeType = NodeUpdateType.RENDER;
+
 		}
 
 	}
@@ -35309,10 +35527,18 @@ class EventNode extends Node {
 
 	}
 
+	updateBefore( frame ) {
+
+		this.callback( frame );
+
+	}
+
 }
 
 EventNode.OBJECT = 'object';
 EventNode.MATERIAL = 'material';
+EventNode.BEFORE_OBJECT = 'beforeObject';
+EventNode.BEFORE_MATERIAL = 'beforeMaterial';
 
 /**
  * Helper to create an EventNode and add it to the stack.
@@ -35342,6 +35568,26 @@ const OnObjectUpdate = ( callback ) => createEvent( EventNode.OBJECT, callback )
  * @returns {EventNode}
  */
 const OnMaterialUpdate = ( callback ) => createEvent( EventNode.MATERIAL, callback );
+
+/**
+ * Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeObjectUpdate = ( callback ) => createEvent( EventNode.BEFORE_OBJECT, callback );
+
+/**
+ * Creates an event that triggers a function before the material is updated.
+ *
+ * The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+ *
+ * @param {Function} callback - The callback function.
+ * @returns {EventNode}
+ */
+const OnBeforeMaterialUpdate = ( callback ) => createEvent( EventNode.BEFORE_MATERIAL, callback );
 
 /**
  * This special type of instanced buffer attribute is intended for compute shaders.
@@ -45369,6 +45615,8 @@ var TSL = /*#__PURE__*/Object.freeze({
 	NodeShaderStage: NodeShaderStage,
 	NodeType: NodeType,
 	NodeUpdateType: NodeUpdateType,
+	OnBeforeMaterialUpdate: OnBeforeMaterialUpdate,
+	OnBeforeObjectUpdate: OnBeforeObjectUpdate,
 	OnMaterialUpdate: OnMaterialUpdate,
 	OnObjectUpdate: OnObjectUpdate,
 	PCFShadowFilter: PCFShadowFilter,
@@ -45556,6 +45804,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	getShadowRenderObjectFunction: getShadowRenderObjectFunction,
 	getTextureIndex: getTextureIndex,
 	getViewPosition: getViewPosition,
+	ggxConvolution: ggxConvolution,
 	globalId: globalId,
 	glsl: glsl,
 	glslFn: glslFn,
