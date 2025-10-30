@@ -530,6 +530,22 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 		sheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );
 
+		// Energy conservation: reduce base layers by sheen energy
+		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
+		float maxSheenColor = max( max( material.sheenColor.r, material.sheenColor.g ), material.sheenColor.b );
+		
+		// Approximate directional albedo
+		float x = 1.0 - dotNV;
+		float r = material.sheenRoughness;
+		float r2 = r * r;
+		float baseAlbedo = 0.04 + 0.96 * r2;
+		float fresnelFactor = pow( x, 5.0 * ( 1.0 - r ) );
+		float E_sheen = baseAlbedo * mix( 1.0, fresnelFactor, 1.0 - r2 * r );
+		
+		// Scale base layers
+		float sheenScaling = 1.0 - maxSheenColor * E_sheen;
+		irradiance *= sheenScaling;
+
 	#endif
 
 	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
@@ -555,6 +571,20 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 		sheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
 
+		// Energy conservation for indirect lighting
+		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
+		float maxSheenColor = max( max( material.sheenColor.r, material.sheenColor.g ), material.sheenColor.b );
+		
+		// Approximate directional albedo (same as direct lighting)
+		float x = 1.0 - dotNV;
+		float r = material.sheenRoughness;
+		float r2 = r * r;
+		float baseAlbedo = 0.04 + 0.96 * r2;
+		float fresnelFactor = pow( x, 5.0 * ( 1.0 - r ) );
+		float E_sheen = baseAlbedo * mix( 1.0, fresnelFactor, 1.0 - r2 * r );
+		
+		float sheenScaling = 1.0 - maxSheenColor * E_sheen;
+
 	#endif
 
 	// Both indirect specular and indirect diffuse light accumulate here
@@ -576,10 +606,16 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	vec3 totalScattering = singleScattering + multiScattering;
 	vec3 diffuse = material.diffuseColor * ( 1.0 - max( max( totalScattering.r, totalScattering.g ), totalScattering.b ) );
 
-	reflectedLight.indirectSpecular += radiance * singleScattering;
-	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
-
-	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+	#ifdef USE_SHEEN
+		// Apply energy conservation scaling to base layers
+		reflectedLight.indirectSpecular += radiance * singleScattering * sheenScaling;
+		reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance * sheenScaling;
+		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance * sheenScaling;
+	#else
+		reflectedLight.indirectSpecular += radiance * singleScattering;
+		reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
+		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+	#endif
 
 }
 
