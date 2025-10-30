@@ -134,7 +134,6 @@ function integrateBRDF(roughness, NoV, samples) {
         
         const NoL = Math.max(L[2], 0.0);
         const NoH = Math.max(H[2], 0.0);
-        const VoH = Math.max(dot(V, H), 0.0);
         
         if (NoL > 0.0) {
             const brdf = charlieSheen(roughness, NoH, NoL, NoV);
