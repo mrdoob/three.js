@@ -483,13 +483,23 @@ class TRAANode extends TempNode {
 			const worldPositionDifference = length( currentWorldPosition.sub( previousWorldPosition ) ).toVar();
 			worldPositionDifference.assign( min( max( worldPositionDifference.sub( 1.0 ), 0.0 ), 1.0 ) );
 
-			const currentWeight = float( 0.05 ).toVar();
+			// Adaptive blend weights based on velocity magnitude suggested by CLAUDE in #32133
+			// Higher velocity or position difference = more weight on current frame to reduce ghosting
+
+			const velocityMagnitude = length( offset ).toConst();
+			const motionFactor = max( worldPositionDifference.mul( 0.5 ), velocityMagnitude.mul( 10.0 ) ).toVar();
+			motionFactor.assign( min( motionFactor, 1.0 ) );
+
+			const currentWeight = float( 0.05 ).add( motionFactor.mul( 0.25 ) ).toVar();
 			const historyWeight = currentWeight.oneMinus().toVar();
 
-			// zero out history weight if world positions are different (indicating motion) except on edges
+			// zero out history weight if world positions are different (indicating motion) except on edges.
+			// note that the constants 0.00001 and 0.5 were suggested by CLAUDE in #32133
 
-			const rejectPixel = worldPositionDifference.greaterThan( 0.01 ).and( farthestDepth.sub( closestDepth ).lessThan( 0.0001 ) );
-			If( rejectPixel, () => {
+			const isEdge = farthestDepth.sub( closestDepth ).greaterThan( 0.00001 );
+			const strongDisocclusion = worldPositionDifference.greaterThan( 0.5 ).and( isEdge.not() );
+
+			If( strongDisocclusion, () => {
 
 				currentWeight.assign( 1.0 );
 				historyWeight.assign( 0.0 );
