@@ -323,9 +323,7 @@ class PMREMGenerator {
 
 	_compileMaterial( material ) {
 
-		const mesh = this._lodMeshes[ 0 ];
-		mesh.material = material;
-
+		const mesh = new Mesh( new BufferGeometry(), material );
 		this._renderer.compile( mesh, _flatCamera );
 
 	}
