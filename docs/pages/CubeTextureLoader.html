@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CubeTextureLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">CubeTextureLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Class for loading cube textures. Images are internally loaded via <a href="ImageLoader.html">ImageLoader</a>.</p>
+<p>The loader returns an instance of <a href="CubeTexture.html">CubeTexture</a> and expects the cube map to
+be defined as six separate images representing the sides of a cube. Other cube map definitions
+like vertical and horizontal cross, column and row layouts are not supported.</p>
+<p>Note that, by convention, cube maps are specified in a coordinate system
+in which positive-x is to the right when looking up the positive-z axis --
+in other words, using a left-handed coordinate system. Since three.js uses
+a right-handed coordinate system, environment maps used in three.js will
+have pos-x and neg-x swapped.</p>
+<p>The loaded cube texture is in sRGB color space. Meaning <a href="Texture.html#colorSpace">Texture#colorSpace</a>
+is set to <code>SRGBColorSpace</code> by default.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new THREE.CubeTextureLoader().setPath( 'textures/cubeMaps/' );
+const cubeTexture = await loader.loadAsync( [
+	'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'
+] );
+scene.background = cubeTexture;
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CubeTextureLoader" translate="no">new <a href="#CubeTextureLoader">CubeTextureLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new cube texture loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( urls : <span class="param-type">Array.&lt;string></span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : <a href="CubeTexture.html">CubeTexture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URL and pass the fully loaded cube texture
+to the <code>onLoad()</code> callback. The method also returns a new cube texture object which can
+directly be used for material creation. If you do it this way, the cube texture
+may pop up in your scene once the respective loading process is finished.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>urls</strong>
+									</td>
+									<td class="description last">
+										<p>Array of 6 URLs to images, one for each side of the
+cube texture. The urls should be specified in the following order: pos-x,
+neg-x, pos-y, neg-y, pos-z, neg-z. An array of data URIs are allowed as well.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Unsupported in this loader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The cube texture.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/CubeTextureLoader.js" target="_blank" rel="noopener" translate="no">src/loaders/CubeTextureLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

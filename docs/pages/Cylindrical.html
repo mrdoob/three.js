@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Cylindrical - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Cylindrical</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to represent points in 3D space as
+<a href="https://en.wikipedia.org/wiki/Cylindrical_coordinate_system">Cylindrical coordinates</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Cylindrical" translate="no">new <a href="#Cylindrical">Cylindrical</a><span class="signature">( radius : <span class="param-type">number</span>, theta : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new cylindrical.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The distance from the origin to a point in the x-z plane.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>theta</strong>
+									</td>
+									<td class="description last">
+										<p>A counterclockwise angle in the x-z plane measured in radians from the positive z-axis.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The height above the x-z plane.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="radius" translate="no">.<a href="#radius">radius</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The distance from the origin to a point in the x-z plane.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="theta" translate="no">.<a href="#theta">theta</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>A counterclockwise angle in the x-z plane measured in radians from the positive z-axis.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="y" translate="no">.<a href="#y">y</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The height above the x-z plane.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Cylindrical.html">Cylindrical</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new cylindrical with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( other : <span class="param-type"><a href="Cylindrical.html">Cylindrical</a></span> )</span><span class="type-signature"> : <a href="Cylindrical.html">Cylindrical</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given cylindrical to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>other</strong>
+									</td>
+									<td class="description last">
+										<p>The cylindrical to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this cylindrical.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( radius : <span class="param-type">number</span>, theta : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Cylindrical.html">Cylindrical</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the cylindrical components by copying the given values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>theta</strong>
+									</td>
+									<td class="description last">
+										<p>The theta angle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The height value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this cylindrical.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromCartesianCoords" translate="no">.<a href="#setFromCartesianCoords">setFromCartesianCoords</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Cylindrical.html">Cylindrical</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the cylindrical components from the given Cartesian coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The x value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The x value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this cylindrical.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromVector3" translate="no">.<a href="#setFromVector3">setFromVector3</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Cylindrical.html">Cylindrical</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the cylindrical components from the given vector which is assumed to hold
+Cartesian coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this cylindrical.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Cylindrical.js" target="_blank" rel="noopener" translate="no">src/math/Cylindrical.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

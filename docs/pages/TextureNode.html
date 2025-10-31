@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TextureNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="InputNode.html">InputNode</a> → <a href="UniformNode.html">UniformNode</a> → </p>
+	<h1 translate="no">TextureNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This type of uniform node represents a 2D texture.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TextureNode" translate="no">new <a href="#TextureNode">TextureNode</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>, biasNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new texture node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+										<p>Default is <code>EmptyTexture</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelNode</strong>
+									</td>
+									<td class="description last">
+										<p>The level node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>biasNode</strong>
+									</td>
+									<td class="description last">
+										<p>The bias node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="biasNode" translate="no">.<a href="#biasNode">biasNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Represents the bias to be applied during level-of-detail computation.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="compareNode" translate="no">.<a href="#compareNode">compareNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Represents a reference value a texture sample is compared to.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthNode" translate="no">.<a href="#depthNode">depthNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;int></span> </h3>
+					<div class="description">
+						<p>When using texture arrays, the depth node defines the layer to select.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="gradNode" translate="no">.<a href="#gradNode">gradNode</a><span class="type-signature"> : Array.&lt;<a href="Node.html">Node</a>.&lt;vec2>></span> </h3>
+					<div class="description">
+						<p>When defined, a texture is sampled using explicit gradients.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isTextureNode" translate="no">.<a href="#isTextureNode">isTextureNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="levelNode" translate="no">.<a href="#levelNode">levelNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;int></span> </h3>
+					<div class="description">
+						<p>Represents the mip level that should be selected.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="offsetNode" translate="no">.<a href="#offsetNode">offsetNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;(ivec2|ivec3)></span> </h3>
+					<div class="description">
+						<p>Represents the optional texel offset applied to the unnormalized texture
+coordinate before sampling the texture.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="referenceNode" translate="no">.<a href="#referenceNode">referenceNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The reference node.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sampler" translate="no">.<a href="#sampler">sampler</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether texture values should be sampled or fetched.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateMatrix" translate="no">.<a href="#updateMatrix">updateMatrix</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the uv transformation matrix should be
+automatically updated or not. Use <code>setUpdateMatrix()</code>
+if you want to change the value of the property.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>By default the <code>update()</code> method is not executed. Depending on
+whether a uv transformation matrix and/or flipY is applied, <code>update()</code>
+is executed per object.</p>
+						<p>Default is <code>'none'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#updateType">UniformNode#updateType</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uvNode" translate="no">.<a href="#uvNode">uvNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;(vec2|vec3)></span> </h3>
+					<div class="description">
+						<p>Represents the texture coordinates.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="value" translate="no">.<a href="#value">value</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The texture value.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#value">UniformNode#value</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="bias" translate="no">.<a href="#bias">bias</a><span class="signature">( biasNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Samples the texture with the given bias.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>biasNode</strong>
+									</td>
+									<td class="description last">
+										<p>The bias node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="blur" translate="no">.<a href="#blur">blur</a><span class="signature">( amountNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Samples a blurred version of the texture by defining an internal bias.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>amountNode</strong>
+									</td>
+									<td class="description last">
+										<p>How blurred the texture should be.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clones the texture node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The cloned texture node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="compare" translate="no">.<a href="#compare">compare</a><span class="signature">( compareNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Samples the texture by executing a compare operation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>compareNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that defines the compare value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="depth" translate="no">.<a href="#depth">depth</a><span class="signature">( depthNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Samples the texture by defining a depth node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>The depth node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the code snippet of the texture node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The current output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#generate">UniformNode#generate</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateOffset" translate="no">.<a href="#generateOffset">generateOffset</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, offsetNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the offset code snippet.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetNode</strong>
+									</td>
+									<td class="description last">
+										<p>The offset node to generate code for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateSnippet" translate="no">.<a href="#generateSnippet">generateSnippet</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, biasSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, compareSnippet : <span class="param-type">string</span>, gradSnippet : <span class="param-type">Array.&lt;string></span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the snippet for the texture sampling.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The texture property.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The uv snippet.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The level snippet.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>biasSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The bias snippet.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The depth snippet.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>compareSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The compare snippet.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>gradSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The grad snippet.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The offset snippet.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateUV" translate="no">.<a href="#generateUV">generateUV</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the uv code snippet.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node to generate code for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBase" translate="no">.<a href="#getBase">getBase</a><span class="signature">()</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the base texture of this node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The base texture node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDefaultUV" translate="no">.<a href="#getDefaultUV">getDefaultUV</a><span class="signature">()</span><span class="type-signature"> : <a href="AttributeNode.html">AttributeNode</a>.&lt;vec2></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a default uvs based on the current texture's channel.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The default uvs.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation to return a fixed value <code>'texture'</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#getInputType">UniformNode#getInputType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten since the node type is inferred from the texture type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#getNodeType">UniformNode#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSampler" translate="no">.<a href="#getSampler">getSampler</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the sampler value.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The sampler value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTransformedUV" translate="no">.<a href="#getTransformedUV">getTransformedUV</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Transforms the given uv node with the texture transformation matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node to transform.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The transformed uv node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getUniformHash" translate="no">.<a href="#getUniformHash">getUniformHash</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten since the uniform hash is defined by the texture's UUID.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#getUniformHash">UniformNode#getUniformHash</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The uniform hash.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="grad" translate="no">.<a href="#grad">grad</a><span class="signature">( gradNodeX : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, gradNodeY : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Samples the texture using an explicit gradient.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>gradNodeX</strong>
+									</td>
+									<td class="description last">
+										<p>The gradX node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>gradNodeY</strong>
+									</td>
+									<td class="description last">
+										<p>The gradY node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="level" translate="no">.<a href="#level">level</a><span class="signature">( levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Samples a specific mip of the texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>levelNode</strong>
+									</td>
+									<td class="description last">
+										<p>The mip level to sample.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;uvec2></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a texture node that fetches/loads texels without interpolation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture load.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="offset" translate="no">.<a href="#offset">offset</a><span class="signature">( offsetNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;ivec2></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Samples the texture by defining an offset node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>offsetNode</strong>
+									</td>
+									<td class="description last">
+										<p>The offset node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="sample" translate="no">.<a href="#sample">sample</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Samples the texture with the given uv node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSampler" translate="no">.<a href="#setSampler">setSampler</a><span class="signature">( value : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the sampler value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The sampler value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this texture node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setUpdateMatrix" translate="no">.<a href="#setUpdateMatrix">setUpdateMatrix</a><span class="signature">( value : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines whether the uv transformation matrix should automatically be updated or not.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The update toggle.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups texture node by preparing the internal nodes for code generation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#setup">UniformNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupUV" translate="no">.<a href="#setupUV">setupUV</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the uv node. Depending on the backend as well as texture's image and type, it might be necessary
+to modify the uv node for correct sampling.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node to setup.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated uv node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="size" translate="no">.<a href="#size">size</a><span class="signature">( levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span><span class="type-signature"> : <a href="TextureSizeNode.html">TextureSizeNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the texture size of the requested level.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>levelNode</strong>
+									</td>
+									<td class="description last">
+										<p>The level to compute the size for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The texture size.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The update is used to implement the update of the uv transformation matrix.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#update">UniformNode#update</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten to always return the texture reference of the node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>state</strong>
+									</td>
+									<td class="description last">
+										<p>This method can be invocated in different contexts so <code>state</code> can refer to any object type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#updateReference">UniformNode#updateReference</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The texture reference.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="uv" translate="no">.<a href="#uv">uv</a><span class="signature">( uvNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r172. Use <a href="TextureNode.html#sample">TextureNode#sample</a> instead.</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node representing the texture sample.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/TextureNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/TextureNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

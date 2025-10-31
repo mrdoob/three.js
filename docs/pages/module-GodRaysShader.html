@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GodRaysShader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">GodRaysShader</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">GodRaysShader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import * as GodRaysShader from 'three/addons/shaders/GodRaysShader.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="~GodRaysCombineShader" translate="no">.<a href="#~GodRaysCombineShader">GodRaysCombineShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Additively applies god rays from texture tGodRays to a background (tColors).
+fGodRayIntensity attenuates the god rays.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~GodRaysDepthMaskShader" translate="no">.<a href="#~GodRaysDepthMaskShader">GodRaysDepthMaskShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>God-rays (crepuscular rays)</p>
+<p>Similar implementation to the one used by Crytek for CryEngine 2 [Sousa2008].
+Blurs a mask generated from the depth map along radial lines emanating from the light
+source. The blur repeatedly applies a blur filter of increasing support but constant
+sample count to produce a blur filter with large support.</p>
+<p>My implementation performs 3 passes, similar to the implementation from Sousa. I found
+just 6 samples per pass produced acceptable results. The blur is applied three times,
+with decreasing filter support. The result is equivalent to a single pass with
+6<em>6</em>6 = 216 samples.</p>
+<p>References:</p>
+<ul>
+<li><a href="http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt">Sousa2008, Crysis Next Gen Effects, GDC2008</a>.</li>
+</ul>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~GodRaysFakeSunShader" translate="no">.<a href="#~GodRaysFakeSunShader">GodRaysFakeSunShader</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>A dodgy sun/sky shader. Makes a bright spot at the sun location. Would be
+cheaper/faster/simpler to implement this as a simple sun sprite.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~GodRaysGenerateShader" translate="no">.<a href="#~GodRaysGenerateShader">GodRaysGenerateShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>The god-ray generation shader.</p>
+<p>First pass:</p>
+<p>The depth map is blurred along radial lines towards the &quot;sun&quot;. The
+output is written to a temporary render target (I used a 1/4 sized
+target).</p>
+<p>Pass two &amp; three:</p>
+<p>The results of the previous pass are re-blurred, each time with a
+decreased distance between samples.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/GodRaysShader.js" target="_blank" rel="noopener" translate="no">examples/jsm/shaders/GodRaysShader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PointsNodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="NodeMaterial.html">NodeMaterial</a> → <a href="SpriteNodeMaterial.html">SpriteNodeMaterial</a> → </p>
+	<h1 translate="no">PointsNodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Node material version of <a href="PointsMaterial.html">PointsMaterial</a>.</p>
+<p>This material can be used in two ways:</p>
+<ul>
+<li>By rendering point primitives with <a href="Points.html">Points</a>. Since WebGPU only supports point primitives
+with a pixel size of <code>1</code>, it's not possible to define a size.</li>
+</ul>
+<ul>
+<li>By rendering point primitives with Sprites. In this case, size is honored,
+see <a href="PointsNodeMaterial.html#sizeNode">PointsNodeMaterial#sizeNode</a>.</li>
+</ul>
+<pre><code class="language-js">const instancedPoints = new THREE.Sprite( new THREE.PointsNodeMaterial( { positionNode: instancedBufferAttribute( positionAttribute ) } ) );
+</code></pre></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const pointCloud = new THREE.Points( geometry, new THREE.PointsNodeMaterial() );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PointsNodeMaterial" translate="no">new <a href="#PointsNodeMaterial">PointsNodeMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new points node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="alphaToCoverage" translate="no">.<a href="#alphaToCoverage">alphaToCoverage</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether alpha to coverage should be used or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="SpriteNodeMaterial.html#alphaToCoverage">SpriteNodeMaterial#alphaToCoverage</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isPointsNodeMaterial" translate="no">.<a href="#isPointsNodeMaterial">isPointsNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sizeNode" translate="no">.<a href="#sizeNode">sizeNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>This node property provides an additional way to set the point size.</p>
+<p>Note that WebGPU only supports point primitives with 1 pixel size. Consequently,
+this node has no effect when the material is used with <a href="Points.html">Points</a> and a WebGPU
+backend. If an application wants to render points with a size larger than 1 pixel,
+the material should be used with <a href="Sprite.html">Sprite</a> and instancing.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/PointsNodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/PointsNodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

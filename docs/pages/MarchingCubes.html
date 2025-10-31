@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MarchingCubes - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">MarchingCubes</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A marching cubes implementation.</p>
+<p>Port of: <a href="http://webglsamples.org/blob/blob.html">http://webglsamples.org/blob/blob.html</a></p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">MarchingCubes</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MarchingCubes" translate="no">new <a href="#MarchingCubes">MarchingCubes</a><span class="signature">( resolution : <span class="param-type">number</span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, enableUvs : <span class="param-type">boolean</span>, enableColors : <span class="param-type">boolean</span>, maxPolyCount : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new marching cubes instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>resolution</strong>
+									</td>
+									<td class="description last">
+										<p>The effect's resolution.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The cube's material.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>enableUvs</strong>
+									</td>
+									<td class="description last">
+										<p>Whether texture coordinates should be animated or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>enableColors</strong>
+									</td>
+									<td class="description last">
+										<p>Whether colors should be animated or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxPolyCount</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum size of the geometry buffers.</p>
+										<p>Default is <code>10000</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="enableColors" translate="no">.<a href="#enableColors">enableColors</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether colors should be animated or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableUvs" translate="no">.<a href="#enableUvs">enableUvs</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether texture coordinates should be animated or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMarchingCubes" translate="no">.<a href="#isMarchingCubes">isMarchingCubes</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addBall" translate="no">.<a href="#addBall">addBall</a><span class="signature">( ballx : <span class="param-type">number</span>, bally : <span class="param-type">number</span>, ballz : <span class="param-type">number</span>, strength : <span class="param-type">number</span>, subtract : <span class="param-type">number</span>, colors : <span class="param-type"><a href="Color.html">Color</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a reciprocal ball (nice and blobby) that, to be fast, fades to zero after
+a fixed distance, determined by strength and subtract.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>ballx</strong>
+									</td>
+									<td class="description last">
+										<p>The x-coordinate of the ball.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bally</strong>
+									</td>
+									<td class="description last">
+										<p>The y-coordinate of the ball.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>ballz</strong>
+									</td>
+									<td class="description last">
+										<p>The z-coordinate of the ball.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>strength</strong>
+									</td>
+									<td class="description last">
+										<p>The strength factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>subtract</strong>
+									</td>
+									<td class="description last">
+										<p>The subtract factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colors</strong>
+									</td>
+									<td class="description last">
+										<p>The color.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="addPlaneX" translate="no">.<a href="#addPlaneX">addPlaneX</a><span class="signature">( strength : <span class="param-type">number</span>, subtract : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a plane along the x-axis.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>strength</strong>
+									</td>
+									<td class="description last">
+										<p>The strength factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>subtract</strong>
+									</td>
+									<td class="description last">
+										<p>The subtract factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="addPlaneY" translate="no">.<a href="#addPlaneY">addPlaneY</a><span class="signature">( strength : <span class="param-type">number</span>, subtract : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a plane along the y-axis.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>strength</strong>
+									</td>
+									<td class="description last">
+										<p>The strength factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>subtract</strong>
+									</td>
+									<td class="description last">
+										<p>The subtract factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="addPlaneZ" translate="no">.<a href="#addPlaneZ">addPlaneZ</a><span class="signature">( strength : <span class="param-type">number</span>, subtract : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a plane along the z-axis.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>strength</strong>
+									</td>
+									<td class="description last">
+										<p>The strength factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>subtract</strong>
+									</td>
+									<td class="description last">
+										<p>The subtract factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="blur" translate="no">.<a href="#blur">blur</a><span class="signature">( intensity : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies a blur with the given intensity.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>intensity</strong>
+									</td>
+									<td class="description last">
+										<p>The intensity of the blur.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="getCell" translate="no">.<a href="#getCell">getCell</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the cell value for the given coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets the effect.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="setCell" translate="no">.<a href="#setCell">setCell</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, value : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the cell value for the given coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the effect.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/MarchingCubes.js" target="_blank" rel="noopener" translate="no">examples/jsm/objects/MarchingCubes.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

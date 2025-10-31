@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>StorageArrayElementNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="ArrayElementNode.html">ArrayElementNode</a> → </p>
+	<h1 translate="no">StorageArrayElementNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class enables element access on instances of <a href="StorageBufferNode.html">StorageBufferNode</a>.
+In most cases, it is indirectly used when accessing elements with the
+<a href="StorageBufferNode.html#element">StorageBufferNode#element</a> method.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const position = positionStorage.element( instanceIndex );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="StorageArrayElementNode" translate="no">new <a href="#StorageArrayElementNode">StorageArrayElementNode</a><span class="signature">( storageBufferNode : <span class="param-type"><a href="StorageBufferNode.html">StorageBufferNode</a></span>, indexNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs storage buffer element node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>storageBufferNode</strong>
+									</td>
+									<td class="description last">
+										<p>The storage buffer node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>indexNode</strong>
+									</td>
+									<td class="description last">
+										<p>The index node that defines the element access.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isStorageArrayElementNode" translate="no">.<a href="#isStorageArrayElementNode">isStorageArrayElementNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="storageBufferNode" translate="no">.<a href="#storageBufferNode">storageBufferNode</a><span class="type-signature"> : <a href="StorageBufferNode.html">StorageBufferNode</a></span> </h3>
+					<div class="description">
+						<p>The storage buffer node.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/utils/StorageArrayElementNode.js" target="_blank" rel="noopener" translate="no">src/nodes/utils/StorageArrayElementNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

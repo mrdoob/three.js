@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>XRManager - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → </p>
+	<h1 translate="no">XRManager</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>The XR manager is built on top of the WebXR Device API to
+manage XR sessions with <code>WebGPURenderer</code>.</p>
+<p>XR is currently only supported with a WebGL 2 backend.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="XRManager" translate="no">new <a href="#XRManager">XRManager</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, multiview : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new XR manager.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>multiview</strong>
+									</td>
+									<td class="description last">
+										<p>Enables multiview if the device supports it.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="_sessionUsesLayers" translate="no">.<a href="#_sessionUsesLayers">_sessionUsesLayers</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the XR session uses layers.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="cameraAutoUpdate" translate="no">.<a href="#cameraAutoUpdate">cameraAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the XR camera should automatically be updated or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enabled" translate="no">.<a href="#enabled">enabled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>This flag globally enables XR rendering.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isPresenting" translate="no">.<a href="#isPresenting">isPresenting</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether the XR device is currently presenting or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createCylinderLayer" translate="no">.<a href="#createCylinderLayer">createCylinderLayer</a><span class="signature">( radius : <span class="param-type">number</span>, centralAngle : <span class="param-type">number</span>, aspectratio : <span class="param-type">number</span>, translation : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, quaternion : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, pixelwidth : <span class="param-type">number</span>, pixelheight : <span class="param-type">number</span>, rendercall : <span class="param-type">function</span>, attributes : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method can be used in XR applications to create a cylindrical layer that presents a separate
+rendered scene.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the cylinder in world units.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>centralAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The central angle of the cylinder in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aspectratio</strong>
+									</td>
+									<td class="description last">
+										<p>The aspect ratio.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>translation</strong>
+									</td>
+									<td class="description last">
+										<p>The position/translation of the layer plane in world units.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>quaternion</strong>
+									</td>
+									<td class="description last">
+										<p>The orientation of the layer plane expressed as a quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>pixelwidth</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the layer's render target in pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>pixelheight</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the layer's render target in pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>rendercall</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that renders the layer. Similar to code in
+the default animation loop, this method can be used to update/transform 3D object in the layer's scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>attributes</strong>
+									</td>
+									<td class="description last">
+										<p>Allows to configure the layer's render target.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A mesh representing the cylindrical XR layer. This mesh should be added to the XR scene.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="createQuadLayer" translate="no">.<a href="#createQuadLayer">createQuadLayer</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, translation : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, quaternion : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, pixelwidth : <span class="param-type">number</span>, pixelheight : <span class="param-type">number</span>, rendercall : <span class="param-type">function</span>, attributes : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method can be used in XR applications to create a quadratic layer that presents a separate
+rendered scene.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the layer plane in world units.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the layer plane in world units.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>translation</strong>
+									</td>
+									<td class="description last">
+										<p>The position/translation of the layer plane in world units.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>quaternion</strong>
+									</td>
+									<td class="description last">
+										<p>The orientation of the layer plane expressed as a quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>pixelwidth</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the layer's render target in pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>pixelheight</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the layer's render target in pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>rendercall</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that renders the layer. Similar to code in
+the default animation loop, this method can be used to update/transform 3D object in the layer's scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>attributes</strong>
+									</td>
+									<td class="description last">
+										<p>Allows to configure the layer's render target.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A mesh representing the quadratic XR layer. This mesh should be added to the XR scene.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBinding" translate="no">.<a href="#getBinding">getBinding</a><span class="signature">()</span><span class="type-signature"> : XRWebGLBinding</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current XR binding.</p>
+<p>Creates a new binding if needed and the browser is
+capable of doing so.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR binding. Returns <code>null</code> if one cannot be created.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getCamera" translate="no">.<a href="#getCamera">getCamera</a><span class="signature">()</span><span class="type-signature"> : <a href="ArrayCamera.html">ArrayCamera</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the XR camera.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR camera.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getController" translate="no">.<a href="#getController">getController</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an instance of <code>THREE.Group</code> that represents the transformation
+of a XR controller in target ray space. The requested controller is defined
+by the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the XR controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group that represents the controller's transformation.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getControllerGrip" translate="no">.<a href="#getControllerGrip">getControllerGrip</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an instance of <code>THREE.Group</code> that represents the transformation
+of a XR controller in grip space. The requested controller is defined
+by the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the XR controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group that represents the controller's transformation.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getEnvironmentBlendMode" translate="no">.<a href="#getEnvironmentBlendMode">getEnvironmentBlendMode</a><span class="signature">()</span><span class="type-signature"> : 'opaque' | 'additive' | 'alpha-blend' | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the environment blend mode from the current XR session.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The environment blend mode. Returns <code>undefined</code> when used outside of a XR session.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFoveation" translate="no">.<a href="#getFoveation">getFoveation</a><span class="signature">()</span><span class="type-signature"> : number | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the foveation value.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The foveation value. Returns <code>undefined</code> if no base or projection layer is defined.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFrame" translate="no">.<a href="#getFrame">getFrame</a><span class="signature">()</span><span class="type-signature"> : XRFrame</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current XR frame.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR frame. Returns <code>null</code> when used outside a XR session.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFramebufferScaleFactor" translate="no">.<a href="#getFramebufferScaleFactor">getFramebufferScaleFactor</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the framebuffer scale factor.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The framebuffer scale factor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHand" translate="no">.<a href="#getHand">getHand</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an instance of <code>THREE.Group</code> that represents the transformation
+of a XR controller in hand space. The requested controller is defined
+by the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the XR controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group that represents the controller's transformation.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getReferenceSpace" translate="no">.<a href="#getReferenceSpace">getReferenceSpace</a><span class="signature">()</span><span class="type-signature"> : XRReferenceSpace</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the XR reference space.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR reference space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getReferenceSpaceType" translate="no">.<a href="#getReferenceSpaceType">getReferenceSpaceType</a><span class="signature">()</span><span class="type-signature"> : XRReferenceSpaceType</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the reference space type.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The reference space type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSession" translate="no">.<a href="#getSession">getSession</a><span class="signature">()</span><span class="type-signature"> : XRSession</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current XR session.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR session. Returns <code>null</code> when used outside a XR session.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="renderLayers" translate="no">.<a href="#renderLayers">renderLayers</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the XR layers that have been previously added to the scene.</p>
+<p>This method is usually called in your animation loop before rendering
+the actual scene via <code>renderer.render( scene, camera );</code>.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="setFoveation" translate="no">.<a href="#setFoveation">setFoveation</a><span class="signature">( foveation : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the foveation value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>foveation</strong>
+									</td>
+									<td class="description last">
+										<p>A number in the range <code>[0,1]</code> where <code>0</code> means no foveation (full resolution)
+and <code>1</code> means maximum foveation (the edges render at lower resolution).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setFramebufferScaleFactor" translate="no">.<a href="#setFramebufferScaleFactor">setFramebufferScaleFactor</a><span class="signature">( factor : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the framebuffer scale factor.</p>
+<p>This method can not be used during a XR session.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>factor</strong>
+									</td>
+									<td class="description last">
+										<p>The framebuffer scale factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setReferenceSpace" translate="no">.<a href="#setReferenceSpace">setReferenceSpace</a><span class="signature">( space : <span class="param-type">XRReferenceSpace</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets a custom XR reference space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>space</strong>
+									</td>
+									<td class="description last">
+										<p>The XR reference space.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setReferenceSpaceType" translate="no">.<a href="#setReferenceSpaceType">setReferenceSpaceType</a><span class="signature">( type : <span class="param-type">XRReferenceSpaceType</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the reference space type.</p>
+<p>This method can not be used during a XR session.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The reference space type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSession" translate="no">.<a href="#setSession">setSession</a><span class="signature">( session : <span class="param-type">XRSession</span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>After a XR session has been requested usually with one of the <code>*Button</code> modules, it
+is injected into the renderer with this method. This method triggers the start of
+the actual XR rendering.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>session</strong>
+									</td>
+									<td class="description last">
+										<p>The XR session to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the session has been set.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateCamera" translate="no">.<a href="#updateCamera">updateCamera</a><span class="signature">( camera : <span class="param-type"><a href="PerspectiveCamera.html">PerspectiveCamera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is called by the renderer per frame and updates the XR camera
+and it sub cameras based on the given camera. The given camera is the &quot;user&quot;
+camera created on application level and used for non-XR rendering.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="useMultiview" translate="no">.<a href="#useMultiview">useMultiview</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the engine renders to a multiview target.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the engine renders to a multiview render target or not.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/XRManager.js" target="_blank" rel="noopener" translate="no">src/renderers/common/XRManager.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

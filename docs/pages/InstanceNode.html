@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>InstanceNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">InstanceNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node implements the vertex shader logic which is required
+when rendering 3D objects via instancing. The code makes sure
+vertex positions, normals and colors can be modified via instanced
+data.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="InstanceNode" translate="no">new <a href="#InstanceNode">InstanceNode</a><span class="signature">( count : <span class="param-type">number</span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span>, instanceColor : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new instance node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The number of instances.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>instanceMatrix</strong>
+									</td>
+									<td class="description last">
+										<p>Instanced buffer attribute representing the instance transformations.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>instanceColor</strong>
+									</td>
+									<td class="description last">
+										<p>Instanced buffer attribute representing the instance colors.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="buffer" translate="no">.<a href="#buffer">buffer</a><span class="type-signature"> : <a href="InstancedInterleavedBuffer.html">InstancedInterleavedBuffer</a></span> </h3>
+					<div class="description">
+						<p>A reference to a buffer that is used by <code>instanceMatrixNode</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bufferColor" translate="no">.<a href="#bufferColor">bufferColor</a><span class="type-signature"> : <a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span> </h3>
+					<div class="description">
+						<p>A reference to a buffer that is used by <code>instanceColorNode</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of instances.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="instanceColor" translate="no">.<a href="#instanceColor">instanceColor</a><span class="type-signature"> : <a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span> </h3>
+					<div class="description">
+						<p>Instanced buffer attribute representing the color of instances.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="instanceColorNode" translate="no">.<a href="#instanceColorNode">instanceColorNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The node that represents the instance color data.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="instanceMatrix" translate="no">.<a href="#instanceMatrix">instanceMatrix</a><span class="type-signature"> : <a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span> </h3>
+					<div class="description">
+						<p>Instanced buffer attribute representing the transformation of instances.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="instanceMatrixNode" translate="no">.<a href="#instanceMatrixNode">instanceMatrixNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The node that represents the instance matrix data.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The update type is set to <code>frame</code> since an update
+of instanced buffer data must be checked per frame.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateType">Node#updateType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the internal buffers and nodes and assigns the transformed vertex data
+to predefined node variables for accumulation. That follows the same patterns
+like with morph and skinning nodes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the internal buffers required an update.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#update">Node#update</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/InstanceNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/InstanceNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

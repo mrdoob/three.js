@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Quaternion - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Quaternion</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Class for representing a Quaternion. Quaternions are used in three.js to represent rotations.</p>
+<p>Iterating through a vector instance will yield its components <code>(x, y, z, w)</code> in
+the corresponding order.</p>
+<p>Note that three.js expects Quaternions to be normalized.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const quaternion = new THREE.Quaternion();
+quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
+const vector = new THREE.Vector3( 1, 0, 0 );
+vector.applyQuaternion( quaternion );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Quaternion" translate="no">new <a href="#Quaternion">Quaternion</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, w : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new quaternion.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x value of this quaternion.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y value of this quaternion.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z value of this quaternion.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The w value of this quaternion.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isQuaternion" translate="no">.<a href="#isQuaternion">isQuaternion</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="w" translate="no">.<a href="#w">w</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The w value of this quaternion.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="x" translate="no">.<a href="#x">x</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The x value of this quaternion.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="y" translate="no">.<a href="#y">y</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The y value of this quaternion.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="z" translate="no">.<a href="#z">z</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The z value of this quaternion.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="angleTo" translate="no">.<a href="#angleTo">angleTo</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the angle between this quaternion and the given one in radians.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The quaternion to compute the angle with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The angle in radians.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new quaternion with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="conjugate" translate="no">.<a href="#conjugate">conjugate</a><span class="signature">()</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the rotational conjugate of this quaternion. The conjugate of a
+quaternion represents the same rotation in the opposite direction about
+the rotational axis.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( quaternion : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given quaternion to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>quaternion</strong>
+									</td>
+									<td class="description last">
+										<p>The quaternion to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dot" translate="no">.<a href="#dot">dot</a><span class="signature">( v : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calculates the dot product of this quaternion and the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The quaternion to compute the dot product with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result of the dot product.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( quaternion : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this quaternion is equal with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>quaternion</strong>
+									</td>
+									<td class="description last">
+										<p>The quaternion to test for equality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this quaternion is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromArray" translate="no">.<a href="#fromArray">fromArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this quaternion's components from the given array.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding the quaternion component values.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset into the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromBufferAttribute" translate="no">.<a href="#fromBufferAttribute">fromBufferAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the components of this quaternion from the given buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute holding quaternion data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="identity" translate="no">.<a href="#identity">identity</a><span class="signature">()</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this quaternion to the identity quaternion; that is, to the
+quaternion that represents &quot;no rotation&quot;.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="invert" translate="no">.<a href="#invert">invert</a><span class="signature">()</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Inverts this quaternion via <a href="Quaternion.html#conjugate">Quaternion#conjugate</a>. The
+quaternion is assumed to have unit length.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="length" translate="no">.<a href="#length">length</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the Euclidean length (straight-line length) of this quaternion,
+considered as a 4 dimensional vector.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The Euclidean length.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lengthSq" translate="no">.<a href="#lengthSq">lengthSq</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the squared Euclidean length (straight-line length) of this quaternion,
+considered as a 4 dimensional vector. This can be useful if you are comparing the
+lengths of two quaternions, as this is a slightly more efficient calculation than
+<a href="Quaternion.html#length">Quaternion#length</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The squared Euclidean length.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiply" translate="no">.<a href="#multiply">multiply</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies this quaternion by the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The quaternion.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiplyQuaternions" translate="no">.<a href="#multiplyQuaternions">multiplyQuaternions</a><span class="signature">( a : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, b : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies the given quaternions and stores the result in this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second quaternion.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="normalize" translate="no">.<a href="#normalize">normalize</a><span class="signature">()</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Normalizes this quaternion - that is, calculated the quaternion that performs
+the same rotation as this one, but has a length equal to <code>1</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="premultiply" translate="no">.<a href="#premultiply">premultiply</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Pre-multiplies this quaternion by the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The quaternion.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="random" translate="no">.<a href="#random">random</a><span class="signature">()</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this quaternion to a uniformly random, normalized quaternion.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotateTowards" translate="no">.<a href="#rotateTowards">rotateTowards</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, step : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates this quaternion by a given angular step to the given quaternion.
+The method ensures that the final quaternion will not overshoot <code>q</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The target quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>step</strong>
+									</td>
+									<td class="description last">
+										<p>The angular step in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, w : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the quaternion components.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x value of this quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y value of this quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z value of this quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The w value of this quaternion.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromAxisAngle" translate="no">.<a href="#setFromAxisAngle">setFromAxisAngle</a><span class="signature">( axis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this quaternion from the given axis and angle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The normalized axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromEuler" translate="no">.<a href="#setFromEuler">setFromEuler</a><span class="signature">( euler : <span class="param-type"><a href="Euler.html">Euler</a></span>, update : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this quaternion from the rotation specified by the given
+Euler angles.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>euler</strong>
+									</td>
+									<td class="description last">
+										<p>The Euler angles.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>update</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the internal <code>onChange</code> callback should be executed or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromRotationMatrix" translate="no">.<a href="#setFromRotationMatrix">setFromRotationMatrix</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this quaternion from the given rotation matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>A 4x4 matrix of which the upper 3x3 of matrix is a pure rotation matrix (i.e. unscaled).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromUnitVectors" translate="no">.<a href="#setFromUnitVectors">setFromUnitVectors</a><span class="signature">( vFrom : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, vTo : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this quaternion to the rotation required to rotate the direction vector
+<code>vFrom</code> to the direction vector <code>vTo</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>vFrom</strong>
+									</td>
+									<td class="description last">
+										<p>The first (normalized) direction vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>vTo</strong>
+									</td>
+									<td class="description last">
+										<p>The second (normalized) direction vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="slerp" translate="no">.<a href="#slerp">slerp</a><span class="signature">( qb : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, t : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a spherical linear interpolation between quaternions.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>qb</strong>
+									</td>
+									<td class="description last">
+										<p>The target quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0, 1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="slerpQuaternions" translate="no">.<a href="#slerpQuaternions">slerpQuaternions</a><span class="signature">( qa : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, qb : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, t : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a spherical linear interpolation between the given quaternions
+and stores the result in this quaternion.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>qa</strong>
+									</td>
+									<td class="description last">
+										<p>The source quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>qb</strong>
+									</td>
+									<td class="description last">
+										<p>The target quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0, 1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this quaternion.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toArray" translate="no">.<a href="#toArray">toArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Writes the components of this quaternion to the given array. If no array is provided,
+the method returns a new instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The target array holding the quaternion components.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first element in the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The quaternion components.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">()</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This methods defines the serialization result of this class. Returns the
+numerical elements of this quaternion in an array of format <code>[x, y, z, w]</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The serialized quaternion.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".multiplyQuaternionsFlat" translate="no">.<a href="#.multiplyQuaternionsFlat">multiplyQuaternionsFlat</a><span class="signature">( dst : <span class="param-type">Array.&lt;number></span>, dstOffset : <span class="param-type">number</span>, src0 : <span class="param-type">Array.&lt;number></span>, srcOffset0 : <span class="param-type">number</span>, src1 : <span class="param-type">Array.&lt;number></span>, srcOffset1 : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies two quaternions. This implementation assumes the quaternion data are managed
+in flat arrays.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>dst</strong>
+									</td>
+									<td class="description last">
+										<p>The destination array.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dstOffset</strong>
+									</td>
+									<td class="description last">
+										<p>An offset into the destination array.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>src0</strong>
+									</td>
+									<td class="description last">
+										<p>The source array of the first quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>srcOffset0</strong>
+									</td>
+									<td class="description last">
+										<p>An offset into the first source array.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>src1</strong>
+									</td>
+									<td class="description last">
+										<p>The source array of the second quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>srcOffset1</strong>
+									</td>
+									<td class="description last">
+										<p>An offset into the second source array.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="Quaternion.html#multiplyQuaternions">Quaternion#multiplyQuaternions</a>.</li>
+								</ul>
+							</dd>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The destination array.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".slerpFlat" translate="no">.<a href="#.slerpFlat">slerpFlat</a><span class="signature">( dst : <span class="param-type">Array.&lt;number></span>, dstOffset : <span class="param-type">number</span>, src0 : <span class="param-type">Array.&lt;number></span>, srcOffset0 : <span class="param-type">number</span>, src1 : <span class="param-type">Array.&lt;number></span>, srcOffset1 : <span class="param-type">number</span>, t : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Interpolates between two quaternions via SLERP. This implementation assumes the
+quaternion data are managed in flat arrays.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>dst</strong>
+									</td>
+									<td class="description last">
+										<p>The destination array.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dstOffset</strong>
+									</td>
+									<td class="description last">
+										<p>An offset into the destination array.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>src0</strong>
+									</td>
+									<td class="description last">
+										<p>The source array of the first quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>srcOffset0</strong>
+									</td>
+									<td class="description last">
+										<p>An offset into the first source array.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>src1</strong>
+									</td>
+									<td class="description last">
+										<p>The source array of the second quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>srcOffset1</strong>
+									</td>
+									<td class="description last">
+										<p>An offset into the second source array.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="Quaternion.html#slerp">Quaternion#slerp</a></li>
+								</ul>
+							</dd>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Quaternion.js" target="_blank" rel="noopener" translate="no">src/math/Quaternion.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

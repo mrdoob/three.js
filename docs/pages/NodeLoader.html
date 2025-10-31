@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">NodeLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for loading node objects in the three.js JSON Object/Scene format.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NodeLoader" translate="no">new <a href="#NodeLoader">NodeLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new node loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to a loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="nodes" translate="no">.<a href="#nodes">nodes</a><span class="type-signature"> : Object.&lt;string, Node.constructor></span> </h3>
+					<div class="description">
+						<p>Represents a dictionary of node types.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="textures" translate="no">.<a href="#textures">textures</a><span class="type-signature"> : Object.&lt;string, <a href="Texture.html">Texture</a>></span> </h3>
+					<div class="description">
+						<p>Represents a dictionary of textures.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createNodeFromType" translate="no">.<a href="#createNodeFromType">createNodeFromType</a><span class="signature">( type : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a node object from the given type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created node instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">function</span>, onError : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Loads the node definitions from the given URL.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Will be called when load completes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Will be called while load progresses.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Will be called when errors are thrown during the loading process.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( json : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the node from the given JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uuid</strong>
+									</td>
+									<td class="description last">
+										<p>The node UUID.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>nodes</strong>
+									</td>
+									<td class="description last">
+										<p>The node dependencies.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>meta</strong>
+									</td>
+									<td class="description last">
+										<p>The meta data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The parsed node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parseNodes" translate="no">.<a href="#parseNodes">parseNodes</a><span class="signature">( json : <span class="param-type">Array.&lt;Object></span> )</span><span class="type-signature"> : Object.&lt;string, <a href="Node.html">Node</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parse the node dependencies for the loaded node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A dictionary with node dependencies.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setNodes" translate="no">.<a href="#setNodes">setNodes</a><span class="signature">( value : <span class="param-type">Object.&lt;string, Node.constructor></span> )</span><span class="type-signature"> : <a href="NodeLoader.html">NodeLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the dictionary of node types.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node library defined as <code>&lt;classname,class&gt;</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setTextures" translate="no">.<a href="#setTextures">setTextures</a><span class="signature">( value : <span class="param-type">Object.&lt;string, <a href="Texture.html">Texture</a>></span> )</span><span class="type-signature"> : <a href="NodeLoader.html">NodeLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the dictionary of textures.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The texture library defines as <code>&lt;uuid,texture&gt;</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/nodes/NodeLoader.js" target="_blank" rel="noopener" translate="no">src/loaders/nodes/NodeLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

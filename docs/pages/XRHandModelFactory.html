@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>XRHandModelFactory - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">XRHandModelFactory</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Similar to <a href="XRControllerModelFactory.html">XRControllerModelFactory</a>, this class allows to create hand models
+for WebXR controllers that can be added as a visual representation to your scene.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const handModelFactory = new XRHandModelFactory();
+const hand = renderer.xr.getHand( 0 );
+hand.add( handModelFactory.createHandModel( hand ) );
+scene.add( hand );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">XRHandModelFactory</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="XRHandModelFactory" translate="no">new <a href="#XRHandModelFactory">XRHandModelFactory</a><span class="signature">( gltfLoader : <span class="param-type"><a href="GLTFLoader.html">GLTFLoader</a></span>, onLoad : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new XR hand model factory.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>gltfLoader</strong>
+									</td>
+									<td class="description last">
+										<p>A glTF loader that is used to load hand models.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>A callback that is executed when a hand model has been loaded.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="gltfLoader" translate="no">.<a href="#gltfLoader">gltfLoader</a><span class="type-signature"> : <a href="GLTFLoader.html">GLTFLoader</a></span> </h3>
+					<div class="description">
+						<p>A glTF loader that is used to load hand models.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="onLoad" translate="no">.<a href="#onLoad">onLoad</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>A callback that is executed when a hand model has been loaded.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="path" translate="no">.<a href="#path">path</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The path to the model repository.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createHandModel" translate="no">.<a href="#createHandModel">createHandModel</a><span class="signature">( controller : <span class="param-type"><a href="Group.html">Group</a></span>, profile : <span class="param-type">'spheres' | 'boxes' | 'mesh'</span> )</span><span class="type-signature"> : <a href="XRHandModel.html">XRHandModel</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a controller model for the given WebXR hand controller.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The hand controller.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>profile</strong>
+									</td>
+									<td class="description last">
+										<p>The model profile that defines the model type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR hand model.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setPath" translate="no">.<a href="#setPath">setPath</a><span class="signature">( path : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="XRHandModelFactory.html">XRHandModelFactory</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the path to the hand model repository.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The path to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XRHandModelFactory.js" target="_blank" rel="noopener" translate="no">examples/jsm/webxr/XRHandModelFactory.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

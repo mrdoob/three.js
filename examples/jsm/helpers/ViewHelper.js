@@ -20,7 +20,7 @@ import {
 /**
  * A special type of helper that visualizes the camera's transformation
  * in a small viewport area as an axes helper. Such a helper is often wanted
- * in 3D modeling tools or scene editors like the [three.js editor]{@link https://threejs.org/editor}.
+ * in 3D modeling tools or scene editors like the [three.js editor](https://threejs.org/editor).
  *
  * The helper allows to click on the X, Y and Z axes which animates the camera
  * so it looks along the selected axis.
@@ -34,7 +34,7 @@ class ViewHelper extends Object3D {
 	 * Constructs a new view helper.
 	 *
 	 * @param {Camera} camera - The camera whose transformation should be visualized.
-	 * @param {HTMLDOMElement} [domElement] - The DOM element that is used to render the view.
+	 * @param {HTMLElement} [domElement] - The DOM element that is used to render the view.
 	 */
 	constructor( camera, domElement ) {
 
@@ -368,13 +368,51 @@ class ViewHelper extends Object3D {
 
 		}
 
+		function useOffscreenCanvas() {
+
+			let result = false;
+
+			try {
+
+				// this check has been adapted from WebGLTextures
+
+				result = typeof OffscreenCanvas !== 'undefined' && ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
+
+			} catch ( err ) {
+
+				// Ignore any errors
+
+			}
+
+			return result;
+
+		}
+
+		function createCanvas( width, height ) {
+
+			let canvas;
+
+			if ( useOffscreenCanvas() ) {
+
+				canvas = new OffscreenCanvas( width, height );
+
+			} else {
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+			}
+
+			return canvas;
+
+		}
+
 		function getSpriteMaterial( color, text ) {
 
 			const { font = '24px Arial', color: labelColor = '#000000', radius = 14 } = options;
 
-			const canvas = document.createElement( 'canvas' );
-			canvas.width = 64;
-			canvas.height = 64;
+			const canvas = createCanvas( 64, 64 );
 
 			const context = canvas.getContext( '2d' );
 			context.beginPath();

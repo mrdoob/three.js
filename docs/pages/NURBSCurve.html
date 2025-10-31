@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NURBSCurve - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Curve.html">Curve</a> → </p>
+	<h1 translate="no">NURBSCurve</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class represents a NURBS curve.</p>
+<p>Implementation is based on <code>(x, y [, z=0 [, w=1]])</code> control points with <code>w=weight</code>.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">NURBSCurve</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { NURBSCurve } from 'three/addons/curves/NURBSCurve.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NURBSCurve" translate="no">new <a href="#NURBSCurve">NURBSCurve</a><span class="signature">( degree : <span class="param-type">number</span>, knots : <span class="param-type">Array.&lt;number></span>, controlPoints : <span class="param-type">Array.&lt;(<a href="Vector2.html">Vector2</a>|<a href="Vector3.html">Vector3</a>|<a href="Vector4.html">Vector4</a>)></span>, startKnot : <span class="param-type">number</span>, endKnot : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new NURBS curve.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>degree</strong>
+									</td>
+									<td class="description last">
+										<p>The NURBS degree.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>knots</strong>
+									</td>
+									<td class="description last">
+										<p>The knots as a flat array of numbers.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>controlPoints</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding control points.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>startKnot</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the start knot into the <code>knots</code> array.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>endKnot</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the end knot into the <code>knots</code> array.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="controlPoints" translate="no">.<a href="#controlPoints">controlPoints</a><span class="type-signature"> : Array.&lt;<a href="Vector4.html">Vector4</a>></span> </h3>
+					<div class="description">
+						<p>An array of control points.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="degree" translate="no">.<a href="#degree">degree</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The NURBS degree.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="endKnot" translate="no">.<a href="#endKnot">endKnot</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Index of the end knot into the <code>knots</code> array.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="knots" translate="no">.<a href="#knots">knots</a><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="description">
+						<p>The knots as a flat array of numbers.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="startKnot" translate="no">.<a href="#startKnot">startKnot</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Index of the start knot into the <code>knots</code> array.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method returns a vector in 3D space for the given interpolation factor.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Curve.html#getPoint">Curve#getPoint</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position on the curve.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTangent" translate="no">.<a href="#getTangent">getTangent</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a unit vector tangent for the given interpolation factor.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Curve.html#getTangent">Curve#getTangent</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The tangent vector.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/curves/NURBSCurve.js" target="_blank" rel="noopener" translate="no">examples/jsm/curves/NURBSCurve.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WorkgroupInfoNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">WorkgroupInfoNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A node allowing the user to create a 'workgroup' scoped buffer within the
+context of a compute shader. Typically, workgroup scoped buffers are
+created to hold data that is transferred from a global storage scope into
+a local workgroup scope. For invocations within a workgroup, data
+access speeds on 'workgroup' scoped buffers can be significantly faster
+than similar access operations on globally accessible storage buffers.</p>
+<p>This node can only be used with a WebGPU backend.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="WorkgroupInfoNode" translate="no">new <a href="#WorkgroupInfoNode">WorkgroupInfoNode</a><span class="signature">( scope : <span class="param-type">string</span>, bufferType : <span class="param-type">string</span>, bufferCount : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new buffer scoped to type scope.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>TODO.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferType</strong>
+									</td>
+									<td class="description last">
+										<p>The data type of a 'workgroup' scoped buffer element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferCount</strong>
+									</td>
+									<td class="description last">
+										<p>The number of elements in the buffer.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="bufferCount" translate="no">.<a href="#bufferCount">bufferCount</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The buffer count.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bufferType" translate="no">.<a href="#bufferType">bufferType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The buffer type.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="elementType" translate="no">.<a href="#elementType">elementType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The data type of the array buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isWorkgroupInfoNode" translate="no">.<a href="#isWorkgroupInfoNode">isWorkgroupInfoNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the workgroup scoped buffer.</p>
+						<p>Default is <code>''</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#name">Node#name</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scope" translate="no">.<a href="#scope">scope</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>TODO.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="element" translate="no">.<a href="#element">element</a><span class="signature">( indexNode : <span class="param-type"><a href="IndexNode.html">IndexNode</a></span> )</span><span class="type-signature"> : <a href="WorkgroupInfoElementNode.html">WorkgroupInfoElementNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method can be used to access elements via an index node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>indexNode</strong>
+									</td>
+									<td class="description last">
+										<p>indexNode.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to an element.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getElementType" translate="no">.<a href="#getElementType">getElementType</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The data type of the array buffer.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getElementType">Node#getElementType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The element type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation since the input type
+is inferred from the scope.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="label" translate="no">.<a href="#label">label</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="WorkgroupInfoNode.html">WorkgroupInfoNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the name/label of this node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setName" translate="no">.<a href="#setName">setName</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="WorkgroupInfoNode.html">WorkgroupInfoNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the name of this node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setScope" translate="no">.<a href="#setScope">setScope</a><span class="signature">( scope : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="WorkgroupInfoNode.html">WorkgroupInfoNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the scope of this node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The scope to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/gpgpu/WorkgroupInfoNode.js" target="_blank" rel="noopener" translate="no">src/nodes/gpgpu/WorkgroupInfoNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

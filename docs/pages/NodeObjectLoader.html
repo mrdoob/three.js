@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeObjectLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → <a href="ObjectLoader.html">ObjectLoader</a> → </p>
+	<h1 translate="no">NodeObjectLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special type of object loader for loading 3D objects using
+node materials.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NodeObjectLoader" translate="no">new <a href="#NodeObjectLoader">NodeObjectLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new node object loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to a loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="nodeMaterials" translate="no">.<a href="#nodeMaterials">nodeMaterials</a><span class="type-signature"> : Object.&lt;string, NodeMaterial.constructor></span> </h3>
+					<div class="description">
+						<p>Represents a dictionary of node material types.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="nodes" translate="no">.<a href="#nodes">nodes</a><span class="type-signature"> : Object.&lt;string, Node.constructor></span> </h3>
+					<div class="description">
+						<p>Represents a dictionary of node types.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( json : <span class="param-type">Object</span>, onLoad : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the node objects from the given JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>The onLoad callback function.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ObjectLoader.html#parse">ObjectLoader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> . The parsed 3D object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parseMaterials" translate="no">.<a href="#parseMaterials">parseMaterials</a><span class="signature">( json : <span class="param-type">Object</span>, textures : <span class="param-type">Object.&lt;string, <a href="Texture.html">Texture</a>></span> )</span><span class="type-signature"> : Object.&lt;string, <a href="NodeMaterial.html">NodeMaterial</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the node objects from the given JSON and textures.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textures</strong>
+									</td>
+									<td class="description last">
+										<p>The texture library.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> . The parsed materials.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parseNodes" translate="no">.<a href="#parseNodes">parseNodes</a><span class="signature">( json : <span class="param-type">Array.&lt;Object></span>, textures : <span class="param-type">Object.&lt;string, <a href="Texture.html">Texture</a>></span> )</span><span class="type-signature"> : Object.&lt;string, <a href="Node.html">Node</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the node objects from the given JSON and textures.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textures</strong>
+									</td>
+									<td class="description last">
+										<p>The texture library.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> . The parsed nodes.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setNodeMaterials" translate="no">.<a href="#setNodeMaterials">setNodeMaterials</a><span class="signature">( value : <span class="param-type">Object.&lt;string, NodeMaterial.constructor></span> )</span><span class="type-signature"> : <a href="NodeObjectLoader.html">NodeObjectLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the dictionary of node material types.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node material library defined as <code>&lt;classname,class&gt;</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setNodes" translate="no">.<a href="#setNodes">setNodes</a><span class="signature">( value : <span class="param-type">Object.&lt;string, Node.constructor></span> )</span><span class="type-signature"> : <a href="NodeObjectLoader.html">NodeObjectLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the dictionary of node types.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node library defined as <code>&lt;classname,class&gt;</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/nodes/NodeObjectLoader.js" target="_blank" rel="noopener" translate="no">src/loaders/nodes/NodeObjectLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

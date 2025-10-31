@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ShadowNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="ShadowBaseNode.html">ShadowBaseNode</a> → </p>
+	<h1 translate="no">ShadowNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents the default shadow implementation for lighting nodes.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ShadowNode" translate="no">new <a href="#ShadowNode">ShadowNode</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span>, shadow : <span class="param-type"><a href="LightShadow.html">LightShadow</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new shadow node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow casting light.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadow</strong>
+									</td>
+									<td class="description last">
+										<p>An optional light shadow.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="depthLayer" translate="no">.<a href="#depthLayer">depthLayer</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This index can be used when overriding setupRenderTarget with a RenderTarget Array to specify the depth layer.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isShadowNode" translate="no">.<a href="#isShadowNode">isShadowNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadow" translate="no">.<a href="#shadow">shadow</a><span class="type-signature"> : <a href="LightShadow.html">LightShadow</a></span> </h3>
+					<div class="description">
+						<p>The light shadow which defines the properties light's
+shadow.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadowMap" translate="no">.<a href="#shadowMap">shadowMap</a><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
+					<div class="description">
+						<p>A reference to the shadow map which is a render target.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="vsmMaterialHorizontal" translate="no">.<a href="#vsmMaterialHorizontal">vsmMaterialHorizontal</a><span class="type-signature"> : <a href="NodeMaterial.html">NodeMaterial</a></span> </h3>
+					<div class="description">
+						<p>Only relevant for VSM shadows. Node material which
+is used to render the second VSM pass.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="vsmMaterialVertical" translate="no">.<a href="#vsmMaterialVertical">vsmMaterialVertical</a><span class="type-signature"> : <a href="NodeMaterial.html">NodeMaterial</a></span> </h3>
+					<div class="description">
+						<p>Only relevant for VSM shadows. Node material which
+is used to render the first VSM pass.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="vsmShadowMapHorizontal" translate="no">.<a href="#vsmShadowMapHorizontal">vsmShadowMapHorizontal</a><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
+					<div class="description">
+						<p>Only relevant for VSM shadows. Render target for the
+second VSM render pass.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="vsmShadowMapVertical" translate="no">.<a href="#vsmShadowMapVertical">vsmShadowMapVertical</a><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
+					<div class="description">
+						<p>Only relevant for VSM shadows. Render target for the
+first VSM render pass.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the internal resources of this shadow node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowBaseNode.html#dispose">ShadowBaseNode#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getShadowFilterFn" translate="no">.<a href="#getShadowFilterFn">getShadowFilterFn</a><span class="signature">( type : <span class="param-type">number</span> )</span><span class="type-signature"> : function</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the shadow filtering function for the given shadow type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The filtering function.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="renderShadow" translate="no">.<a href="#renderShadow">renderShadow</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the shadow. The logic of this function could be included
+into <a href="ShadowNode.html#updateShadow">ShadowNode#updateShadow</a> however more specialized shadow
+nodes might require a custom shadow map rendering. By having a
+dedicated method, it's easier to overwrite the default behavior.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The implementation performs the setup of the output node. An output is only
+produces if shadow mapping is globally enabled in the renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowBaseNode.html#setup">ShadowBaseNode#setup</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupShadow" translate="no">.<a href="#setupShadow">setupShadow</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the shadow output node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shadow output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupShadowCoord" translate="no">.<a href="#setupShadowCoord">setupShadowCoord</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, shadowPosition : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the shadow coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadowPosition</strong>
+									</td>
+									<td class="description last">
+										<p>A node representing the shadow position.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shadow coordinates.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupShadowFilter" translate="no">.<a href="#setupShadowFilter">setupShadowFilter</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the shadow filtering.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>inputs</strong>
+									</td>
+									<td class="description last">
+										<p>A configuration object that defines the shadow filtering.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>filterFn</strong>
+									</td>
+									<td class="description last">
+										<p>This function defines the filtering type of the shadow map e.g. PCF.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthTexture</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the shadow map's texture data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadowCoord</strong>
+									</td>
+									<td class="description last">
+										<p>Shadow coordinates which are used to sample from the shadow map.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadow</strong>
+									</td>
+									<td class="description last">
+										<p>The light shadow.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result node of the shadow filtering.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The implementation performs the update of the shadow map if necessary.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowBaseNode.html#updateBefore">ShadowBaseNode#updateBefore</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateShadow" translate="no">.<a href="#updateShadow">updateShadow</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the shadow.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="vsmPass" translate="no">.<a href="#vsmPass">vsmPass</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>For VSM additional render passes are required.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/lighting/ShadowNode.js" target="_blank" rel="noopener" translate="no">src/nodes/lighting/ShadowNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

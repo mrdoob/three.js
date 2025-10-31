@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LineSegmentsGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="InstancedBufferGeometry.html">InstancedBufferGeometry</a> → </p>
+	<h1 translate="no">LineSegmentsGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A series of vertex pairs, forming line segments.</p>
+<p>This is used in <a href="LineSegments2.html">LineSegments2</a> to describe the shape.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LineSegmentsGeometry</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LineSegmentsGeometry" translate="no">new <a href="#LineSegmentsGeometry">LineSegmentsGeometry</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new line segments geometry.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isLineSegmentsGeometry" translate="no">.<a href="#isLineSegmentsGeometry">isLineSegmentsGeometry</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="LineSegmentsGeometry.html">LineSegmentsGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 4x4 transformation matrix to the geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromEdgesGeometry" translate="no">.<a href="#fromEdgesGeometry">fromEdgesGeometry</a><span class="signature">( geometry : <span class="param-type"><a href="EdgesGeometry.html">EdgesGeometry</a></span> )</span><span class="type-signature"> : <a href="LineSegmentsGeometry.html">LineSegmentsGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups this line segments geometry from the given edges geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry that should be used as a data source for this geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromLineSegments" translate="no">.<a href="#fromLineSegments">fromLineSegments</a><span class="signature">( lineSegments : <span class="param-type"><a href="LineSegments.html">LineSegments</a></span> )</span><span class="type-signature"> : <a href="LineSegmentsGeometry.html">LineSegmentsGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups this line segments geometry from the given line segments.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>lineSegments</strong>
+									</td>
+									<td class="description last">
+										<p>The line segments that should be used as a data source for this geometry.
+Assumes the source geometry is not using indices.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromMesh" translate="no">.<a href="#fromMesh">fromMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span><span class="type-signature"> : <a href="LineSegmentsGeometry.html">LineSegmentsGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups this line segments geometry from the given mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh geometry that should be used as a data source for this geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromWireframeGeometry" translate="no">.<a href="#fromWireframeGeometry">fromWireframeGeometry</a><span class="signature">( geometry : <span class="param-type"><a href="WireframeGeometry.html">WireframeGeometry</a></span> )</span><span class="type-signature"> : <a href="LineSegmentsGeometry.html">LineSegmentsGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups this line segments geometry from the given wireframe geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry that should be used as a data source for this geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setColors" translate="no">.<a href="#setColors">setColors</a><span class="signature">( array : <span class="param-type">Float32Array | Array.&lt;number></span> )</span><span class="type-signature"> : <a href="LineSegmentsGeometry.html">LineSegmentsGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given line colors for this geometry. The length must be a multiple of six since
+each line segment is defined by a start end color in the pattern <code>(rgb rgb)</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The position data to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setPositions" translate="no">.<a href="#setPositions">setPositions</a><span class="signature">( array : <span class="param-type">Float32Array | Array.&lt;number></span> )</span><span class="type-signature"> : <a href="LineSegmentsGeometry.html">LineSegmentsGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given line positions for this geometry. The length must be a multiple of six since
+each line segment is defined by a start end vertex in the pattern <code>(xyz xyz)</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The position data to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lines/LineSegmentsGeometry.js" target="_blank" rel="noopener" translate="no">examples/jsm/lines/LineSegmentsGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

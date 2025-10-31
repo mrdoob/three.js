@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Reflector - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">Reflector</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Can be used to create a flat, reflective surface like a mirror.</p>
+<p>Note that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.
+When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="ReflectorNode.html">ReflectorNode</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.PlaneGeometry( 100, 100 );
+const reflector = new Reflector( geometry, {
+	clipBias: 0.003,
+	textureWidth: window.innerWidth * window.devicePixelRatio,
+	textureHeight: window.innerHeight * window.devicePixelRatio,
+	color: 0xc1cbcb
+} );
+scene.add( reflector );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">Reflector</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { Reflector } from 'three/addons/objects/Reflector.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Reflector" translate="no">new <a href="#Reflector">Reflector</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, options : <span class="param-type"><a href="Reflector.html#~Options">Reflector~Options</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new reflector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The reflector's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration options.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="PerspectiveCamera.html">PerspectiveCamera</a></span> </h3>
+					<div class="description">
+						<p>The reflector's virtual camera. This is used to render
+the scene from the mirror's point of view.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="forceUpdate" translate="no">.<a href="#forceUpdate">forceUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to force an update, no matter if the reflector
+is in view or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isReflector" translate="no">.<a href="#isReflector">isReflector</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="getRenderTarget" translate="no">.<a href="#getRenderTarget">getRenderTarget</a><span class="signature">()</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the reflector's internal render target.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The internal render target</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>Constructor options of <code>Reflector</code>.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>color</strong>
+						<br>
+<span class="param-type">number</span>
+|
+<span class="param-type"><a href="Color.html">Color</a></span>
+|
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The reflector's color.</p>
+						<p>Default is <code>0x7F7F7F</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>textureWidth</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture width. A higher value results in more clear reflections but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>textureHeight</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture height. A higher value results in more clear reflections but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>clipBias</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The clip bias.</p>
+						<p>Default is <code>0</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>shader</strong>
+						<br>
+<span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>Can be used to pass in a custom shader that defines how the reflective view is projected onto the reflector's geometry.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>multisample</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>How many samples to use for MSAA. <code>0</code> disables MSAA.</p>
+						<p>Default is <code>4</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/Reflector.js" target="_blank" rel="noopener" translate="no">examples/jsm/objects/Reflector.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

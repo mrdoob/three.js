@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BufferNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="InputNode.html">InputNode</a> → <a href="UniformNode.html">UniformNode</a> → </p>
+	<h1 translate="no">BufferNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special type of uniform node which represents array-like data
+as uniform buffers. The access usually happens via <code>element()</code>
+which returns an instance of <a href="ArrayElementNode.html">ArrayElementNode</a>. For example:</p>
+<p>In general, it is recommended to use the more managed <a href="UniformArrayNode.html">UniformArrayNode</a>
+since it handles more input types and automatically cares about buffer paddings.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const bufferNode = buffer( array, 'mat4', count );
+const matrixNode = bufferNode.element( index ); // access a matrix from the buffer
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BufferNode" translate="no">new <a href="#BufferNode">BufferNode</a><span class="signature">( value : <span class="param-type">Array.&lt;number></span>, bufferType : <span class="param-type">string</span>, bufferCount : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new buffer node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Array-like buffer data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferType</strong>
+									</td>
+									<td class="description last">
+										<p>The data type of the buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferCount</strong>
+									</td>
+									<td class="description last">
+										<p>The count of buffer elements.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="bufferCount" translate="no">.<a href="#bufferCount">bufferCount</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The uniform node that holds the value of the reference node.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bufferType" translate="no">.<a href="#bufferType">bufferType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The data type of the buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isBufferNode" translate="no">.<a href="#isBufferNode">isBufferNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getElementType" translate="no">.<a href="#getElementType">getElementType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The data type of the buffer elements.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#getElementType">UniformNode#getElementType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The element type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation to return a fixed value <code>'buffer'</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#getInputType">UniformNode#getInputType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/BufferNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/BufferNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

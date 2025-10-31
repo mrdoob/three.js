@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ToonOutlinePassNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → <a href="PassNode.html">PassNode</a> → </p>
+	<h1 translate="no">ToonOutlinePassNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a render pass for producing a toon outline effect on compatible objects.
+Only 3D objects with materials of type <code>MeshToonMaterial</code> and <code>MeshToonNodeMaterial</code>
+will receive the outline.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const postProcessing = new PostProcessing( renderer );
+const scenePass = toonOutlinePass( scene, camera );
+postProcessing.outputNode = scenePass;
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ToonOutlinePassNode" translate="no">new <a href="#ToonOutlinePassNode">ToonOutlinePassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, colorNode : <span class="param-type"><a href="Node.html">Node</a></span>, thicknessNode : <span class="param-type"><a href="Node.html">Node</a></span>, alphaNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new outline pass node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the camera.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorNode</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the outline's color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>thicknessNode</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the outline's thickness.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>alphaNode</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the outline's alpha.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="alphaNode" translate="no">.<a href="#alphaNode">alphaNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>Defines the outline's alpha.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="colorNode" translate="no">.<a href="#colorNode">colorNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>Defines the outline's color.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of this pass.</p>
+						<p>Default is <code>'Outline Pass'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="PassNode.html#name">PassNode#name</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thicknessNode" translate="no">.<a href="#thicknessNode">thicknessNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>Defines the outline's thickness.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/display/ToonOutlinePassNode.js" target="_blank" rel="noopener" translate="no">src/nodes/display/ToonOutlinePassNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

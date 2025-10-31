@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeCache - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">NodeCache</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This utility class is used in <a href="NodeBuilder.html">NodeBuilder</a> as an internal
+cache data structure for node data.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NodeCache" translate="no">new <a href="#NodeCache">NodeCache</a><span class="signature">( parent : <span class="param-type"><a href="NodeCache.html">NodeCache</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new node cache.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parent</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to a parent cache.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="id" translate="no">.<a href="#id">id</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The id of the cache.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="nodesData" translate="no">.<a href="#nodesData">nodesData</a><span class="type-signature"> : WeakMap.&lt;<a href="Node.html">Node</a>, Object></span> </h3>
+					<div class="description">
+						<p>A weak map for managing node data.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="parent" translate="no">.<a href="#parent">parent</a><span class="type-signature"> : <a href="NodeCache.html">NodeCache</a></span> </h3>
+					<div class="description">
+						<p>Reference to a parent node cache.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getData" translate="no">.<a href="#getData">getData</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the data for the given node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The data for the node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setData" translate="no">.<a href="#setData">setData</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, data : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the data for a given node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The data that should be cached.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/NodeCache.js" target="_blank" rel="noopener" translate="no">src/nodes/core/NodeCache.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

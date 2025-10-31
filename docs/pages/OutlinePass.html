@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>OutlinePass - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Pass.html">Pass</a> → </p>
+	<h1 translate="no">OutlinePass</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A pass for rendering outlines around selected objects.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
+const outlinePass = new OutlinePass( resolution, scene, camera );
+composer.addPass( outlinePass );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">OutlinePass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="OutlinePass" translate="no">new <a href="#OutlinePass">OutlinePass</a><span class="signature">( resolution : <span class="param-type"><a href="Vector2.html">Vector2</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, selectedObjects : <span class="param-type">Array.&lt;<a href="Object3D.html">Object3D</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new outline pass.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>resolution</strong>
+									</td>
+									<td class="description last">
+										<p>The effect's resolution.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>selectedObjects</strong>
+									</td>
+									<td class="description last">
+										<p>The selected 3D objects that should receive an outline.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="downSampleRatio" translate="no">.<a href="#downSampleRatio">downSampleRatio</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The downsample ratio. The effect can be rendered in a much
+lower resolution than the beauty pass.</p>
+						<p>Default is <code>2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="edgeGlow" translate="no">.<a href="#edgeGlow">edgeGlow</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Can be used for an animated glow/pulse effect.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="edgeStrength" translate="no">.<a href="#edgeStrength">edgeStrength</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The edge strength.</p>
+						<p>Default is <code>3</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="edgeThickness" translate="no">.<a href="#edgeThickness">edgeThickness</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The edge thickness.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="hiddenEdgeColor" translate="no">.<a href="#hiddenEdgeColor">hiddenEdgeColor</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>The hidden edge color.</p>
+						<p>Default is <code>(0.1,0.04,0.02)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="patternTexture" translate="no">.<a href="#patternTexture">patternTexture</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>Can be used to highlight selected 3D objects. Requires to set
+<a href="OutlinePass.html#usePatternTexture">OutlinePass#usePatternTexture</a> to <code>true</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="pulsePeriod" translate="no">.<a href="#pulsePeriod">pulsePeriod</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The pulse period.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderCamera" translate="no">.<a href="#renderCamera">renderCamera</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The camera.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderScene" translate="no">.<a href="#renderScene">renderScene</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The scene to render.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="resolution" translate="no">.<a href="#resolution">resolution</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="description">
+						<p>The effect's resolution.</p>
+						<p>Default is <code>(256,256)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="selectedObjects" translate="no">.<a href="#selectedObjects">selectedObjects</a><span class="type-signature"> : Array.&lt;<a href="Object3D.html">Object3D</a>></span> </h3>
+					<div class="description">
+						<p>The selected 3D objects that should receive an outline.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="usePatternTexture" translate="no">.<a href="#usePatternTexture">usePatternTexture</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to use a pattern texture for to highlight selected
+3D objects or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="visibleEdgeColor" translate="no">.<a href="#visibleEdgeColor">visibleEdgeColor</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>The visible edge color.</p>
+						<p>Default is <code>(1,1,1)</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever the pass is no longer used in your app.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#dispose">Pass#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, writeBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, readBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs the Outline pass.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>writeBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>readBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maskActive</strong>
+									</td>
+									<td class="description last">
+										<p>Whether masking is active or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#render">Pass#render</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the pass.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#setSize">Pass#setSize</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/OutlinePass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/OutlinePass.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

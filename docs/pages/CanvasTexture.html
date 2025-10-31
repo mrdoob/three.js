@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CanvasTexture - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Texture.html">Texture</a> → </p>
+	<h1 translate="no">CanvasTexture</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Creates a texture from a canvas element.</p>
+<p>This is almost the same as the base texture class, except that it sets <a href="Texture.html#needsUpdate">Texture#needsUpdate</a>
+to <code>true</code> immediately since a canvas can directly be used for rendering.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CanvasTexture" translate="no">new <a href="#CanvasTexture">CanvasTexture</a><span class="signature">( canvas : <span class="param-type">HTMLCanvasElement</span>, mapping : <span class="param-type">number</span>, wrapS : <span class="param-type">number</span>, wrapT : <span class="param-type">number</span>, magFilter : <span class="param-type">number</span>, minFilter : <span class="param-type">number</span>, format : <span class="param-type">number</span>, type : <span class="param-type">number</span>, anisotropy : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>canvas</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML canvas element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mapping</strong>
+									</td>
+									<td class="description last">
+										<p>The texture mapping.</p>
+										<p>Default is <code>Texture.DEFAULT_MAPPING</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapS</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapT</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapT value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>magFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The mag filter value.</p>
+										<p>Default is <code>LinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The min filter value.</p>
+										<p>Default is <code>LinearMipmapLinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>format</strong>
+									</td>
+									<td class="description last">
+										<p>The texture format.</p>
+										<p>Default is <code>RGBAFormat</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The texture type.</p>
+										<p>Default is <code>UnsignedByteType</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>anisotropy</strong>
+									</td>
+									<td class="description last">
+										<p>The anisotropy value.</p>
+										<p>Default is <code>Texture.DEFAULT_ANISOTROPY</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isCanvasTexture" translate="no">.<a href="#isCanvasTexture">isCanvasTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/textures/CanvasTexture.js" target="_blank" rel="noopener" translate="no">src/textures/CanvasTexture.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

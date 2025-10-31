@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LightProbeGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">LightProbeGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Utility class for creating instances of <a href="LightProbe.html">LightProbe</a>.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LightProbeGenerator</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LightProbeGenerator } from 'three/addons/lights/LightProbeGenerator.js';</code></pre>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".fromCubeRenderTarget" translate="no">.<a href="#.fromCubeRenderTarget">fromCubeRenderTarget</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, cubeRenderTarget : <span class="param-type"><a href="CubeRenderTarget.html">CubeRenderTarget</a> | <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> )</span><span class="type-signature"> : Promise.&lt;<a href="LightProbe.html">LightProbe</a>></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a light probe from the given (radiance) environment map.
+The method expects that the environment map is represented as a cube render target.</p>
+<p>The cube render target must be in RGBA so <code>cubeRenderTarget.texture.format</code> must be
+set to <a href="global.html#RGBAFormat">RGBAFormat</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>cubeRenderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The environment map.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with the created light probe.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".fromCubeTexture" translate="no">.<a href="#.fromCubeTexture">fromCubeTexture</a><span class="signature">( cubeTexture : <span class="param-type"><a href="CubeTexture.html">CubeTexture</a></span> )</span><span class="type-signature"> : <a href="LightProbe.html">LightProbe</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a light probe from the given (radiance) environment map.
+The method expects that the environment map is represented as a cube texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>cubeTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The environment map.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created light probe.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/LightProbeGenerator.js" target="_blank" rel="noopener" translate="no">examples/jsm/lights/LightProbeGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

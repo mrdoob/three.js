@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>VelocityNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">VelocityNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A node for representing motion or velocity vectors. Foundation
+for advanced post processing effects like motion blur or TRAA.</p>
+<p>The node keeps track of the model, view and projection matrices
+of the previous frame and uses them to compute offsets in NDC space.
+These offsets represent the final velocity.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="VelocityNode" translate="no">new <a href="#VelocityNode">VelocityNode</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new vertex color node.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="previousCameraViewMatrix" translate="no">.<a href="#previousCameraViewMatrix">previousCameraViewMatrix</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;mat4></span> </h3>
+					<div class="description">
+						<p>Uniform node representing the previous view matrix.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="previousModelWorldMatrix" translate="no">.<a href="#previousModelWorldMatrix">previousModelWorldMatrix</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;mat4></span> </h3>
+					<div class="description">
+						<p>Uniform node representing the previous model matrix in world space.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="previousProjectionMatrix" translate="no">.<a href="#previousProjectionMatrix">previousProjectionMatrix</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;mat4></span> </h3>
+					<div class="description">
+						<p>Uniform node representing the previous projection matrix.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="projectionMatrix" translate="no">.<a href="#projectionMatrix">projectionMatrix</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="description">
+						<p>The current projection matrix.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateAfterType" translate="no">.<a href="#updateAfterType">updateAfterType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Overwritten since velocity nodes save data after the update.</p>
+						<p>Default is <code>'object'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateAfterType">TempNode#updateAfterType</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Overwritten since velocity nodes are updated per object.</p>
+						<p>Default is <code>'object'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateType">TempNode#updateType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setProjectionMatrix" translate="no">.<a href="#setProjectionMatrix">setProjectionMatrix</a><span class="signature">( projectionMatrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given projection matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>projectionMatrix</strong>
+									</td>
+									<td class="description last">
+										<p>The projection matrix to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Implements the velocity computation based on the previous and current vertex data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The motion vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates velocity specific uniforms.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#update">TempNode#update</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateAfter" translate="no">.<a href="#updateAfter">updateAfter</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten to updated velocity specific uniforms.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateAfter">TempNode#updateAfter</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/VelocityNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/VelocityNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

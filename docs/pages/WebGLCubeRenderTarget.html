@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WebGLCubeRenderTarget - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="RenderTarget.html">RenderTarget</a> → <a href="WebGLRenderTarget.html">WebGLRenderTarget</a> → </p>
+	<h1 translate="no">WebGLCubeRenderTarget</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A cube render target used in context of <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="WebGLCubeRenderTarget" translate="no">new <a href="#WebGLCubeRenderTarget">WebGLCubeRenderTarget</a><span class="signature">( size : <span class="param-type">number</span>, options : <span class="param-type"><a href="RenderTarget.html#~Options">RenderTarget~Options</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new cube render target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The size of the render target.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isWebGLCubeRenderTarget" translate="no">.<a href="#isWebGLCubeRenderTarget">isWebGLCubeRenderTarget</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="texture" translate="no">.<a href="#texture">texture</a><span class="type-signature"> : <a href="DataArrayTexture.html">DataArrayTexture</a></span> </h3>
+					<div class="description">
+						<p>Overwritten with a different texture type.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="WebGLRenderTarget.html#texture">WebGLRenderTarget#texture</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clear" translate="no">.<a href="#clear">clear</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, color : <span class="param-type">boolean</span>, depth : <span class="param-type">boolean</span>, stencil : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clears this cube render target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the color buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the depth buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>stencil</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the stencil buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="fromEquirectangularTexture" translate="no">.<a href="#fromEquirectangularTexture">fromEquirectangularTexture</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts the given equirectangular texture to a cube map.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The equirectangular texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this cube render target.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLCubeRenderTarget.js" target="_blank" rel="noopener" translate="no">src/renderers/WebGLCubeRenderTarget.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PointerLockControls - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Controls.html">Controls</a> → </p>
+	<h1 translate="no">PointerLockControls</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>The implementation of this class is based on the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API">Pointer Lock API</a>.
+<code>PointerLockControls</code> is a perfect choice for first person 3D games.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const controls = new PointerLockControls( camera, document.body );
+// add event listener to show/hide a UI (e.g. the game's menu)
+controls.addEventListener( 'lock', function () {
+	menu.style.display = 'none';
+} );
+controls.addEventListener( 'unlock', function () {
+	menu.style.display = 'block';
+} );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">PointerLockControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PointerLockControls" translate="no">new <a href="#PointerLockControls">PointerLockControls</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new controls instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is managed by the controls.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isLocked" translate="no">.<a href="#isLocked">isLocked</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether the controls are locked or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxPolarAngle" translate="no">.<a href="#maxPolarAngle">maxPolarAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Camera pitch, upper limit. Range is '[0, Math.PI]' in radians.</p>
+						<p>Default is <code>Math.PI</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minPolarAngle" translate="no">.<a href="#minPolarAngle">minPolarAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Camera pitch, lower limit. Range is '[0, Math.PI]' in radians.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="pointerSpeed" translate="no">.<a href="#pointerSpeed">pointerSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Multiplier for how much the pointer movement influences the camera rotation.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getDirection" translate="no">.<a href="#getDirection">getDirection</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the look direction of the camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The normalized direction vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lock" translate="no">.<a href="#lock">lock</a><span class="signature">( unadjustedMovement : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Activates the pointer lock.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>unadjustedMovement</strong>
+									</td>
+									<td class="description last">
+										<p>Disables OS-level adjustment for mouse acceleration, and accesses raw mouse input instead.
+Setting it to true will disable mouse acceleration.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="moveForward" translate="no">.<a href="#moveForward">moveForward</a><span class="signature">( distance : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Moves the camera forward parallel to the xz-plane. Assumes camera.up is y-up.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The signed distance.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="moveRight" translate="no">.<a href="#moveRight">moveRight</a><span class="signature">( distance : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Moves the camera sidewards parallel to the xz-plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The signed distance.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="unlock" translate="no">.<a href="#unlock">unlock</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Exits the pointer lock.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:change" translate="no">.<a href="#event:change">change</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the user moves the mouse.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:lock" translate="no">.<a href="#event:lock">lock</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the pointer lock status is &quot;locked&quot; (in other words: the mouse is captured).</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:unlock" translate="no">.<a href="#event:unlock">unlock</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the pointer lock status is &quot;unlocked&quot; (in other words: the mouse is not captured anymore).</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/PointerLockControls.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

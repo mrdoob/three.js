@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MathNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">MathNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node represents a variety of mathematical methods available in shaders.
+They are divided into three categories:</p>
+<ul>
+<li>Methods with one input like <code>sin</code>, <code>cos</code> or <code>normalize</code>.</li>
+<li>Methods with two inputs like <code>dot</code>, <code>cross</code> or <code>pow</code>.</li>
+<li>Methods with three inputs like <code>mix</code>, <code>clamp</code> or <code>smoothstep</code>.</li>
+</ul></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MathNode" translate="no">new <a href="#MathNode">MathNode</a><span class="signature">( method : <span class="param-type">string</span>, aNode : <span class="param-type"><a href="Node.html">Node</a></span>, bNode : <span class="param-type"><a href="Node.html">Node</a></span>, cNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new math node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>method</strong>
+									</td>
+									<td class="description last">
+										<p>The method name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aNode</strong>
+									</td>
+									<td class="description last">
+										<p>The first input.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bNode</strong>
+									</td>
+									<td class="description last">
+										<p>The second input.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>cNode</strong>
+									</td>
+									<td class="description last">
+										<p>The third input.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="aNode" translate="no">.<a href="#aNode">aNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The first input.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bNode" translate="no">.<a href="#bNode">bNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The second input.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="cNode" translate="no">.<a href="#cNode">cNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The third input.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMathNode" translate="no">.<a href="#isMathNode">isMathNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="method" translate="no">.<a href="#method">method</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The method name.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The input type is inferred from the node types of the input nodes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The selected method as well as the input type determine the node type of this node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#getNodeType">TempNode#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/math/MathNode.js" target="_blank" rel="noopener" translate="no">src/nodes/math/MathNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

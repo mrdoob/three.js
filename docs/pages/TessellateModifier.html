@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TessellateModifier - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">TessellateModifier</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to modify a geometry by breaking its edges if they
+are longer than maximum length.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const modifier = new TessellateModifier( 8, 6 );
+geometry = modifier.modify( geometry );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TessellateModifier</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { TessellateModifier } from 'three/addons/modifiers/TessellateModifier.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TessellateModifier" translate="no">new <a href="#TessellateModifier">TessellateModifier</a><span class="signature">( maxEdgeLength : <span class="param-type">number</span>, maxIterations : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new Tessellate modifier.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>maxEdgeLength</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum edge length.</p>
+										<p>Default is <code>0.1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxIterations</strong>
+									</td>
+									<td class="description last">
+										<p>The number of iterations.</p>
+										<p>Default is <code>6</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="maxEdgeLength" translate="no">.<a href="#maxEdgeLength">maxEdgeLength</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum edge length.</p>
+						<p>Default is <code>0.1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxIterations" translate="no">.<a href="#maxIterations">maxIterations</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum edge length.</p>
+						<p>Default is <code>0.1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="modify" translate="no">.<a href="#modify">modify</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new, modified version of the given geometry by applying a tesselation.
+Please note that the resulting geometry is always non-indexed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to modify.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A new, modified geometry.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/modifiers/TessellateModifier.js" target="_blank" rel="noopener" translate="no">examples/jsm/modifiers/TessellateModifier.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

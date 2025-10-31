@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SSSNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">SSSNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Post processing node for applying Screen-Space Shadows (SSS) to a scene.</p>
+<p>Screen-Space Shadows (also known as Contact Shadows) should ideally be used to complement
+traditional shadow maps. They are best suited for rendering detailed shadows of smaller
+objects at a closer scale like intricate shadowing on highly detailed models. In other words:
+Use Shadow Maps for the foundation and Screen-Space Shadows for the details.</p>
+<p>The shadows produced by this implementation might have too hard edges for certain use cases.
+Use a box, gaussian or hash blur to soften the edges before doing the composite with the
+beauty pass. Code example:</p>
+<p>Limitations:</p>
+<ul>
+<li>Ideally the maximum shadow length should not exceed <code>1</code> meter. Otherwise the effect gets
+computationally very expensive since more samples during the ray marching process are evaluated.
+You can mitigate this issue by reducing the <code>quality</code> paramter.</li>
+<li>The effect can only be used with a single directional light, the main light of your scene.
+This main light usually represents the sun or daylight.</li>
+<li>Like other Screen-Space techniques SSS can only honor objects in the shadowing computation that
+are currently visible within the camera's view.</li>
+</ul>
+<p>References:</p>
+<ul>
+<li><a href="https://panoskarabelas.com/posts/screen_space_shadows/">https://panoskarabelas.com/posts/screen_space_shadows/</a>.</li>
+<li><a href="https://www.bendstudio.com/blog/inside-bend-screen-space-shadows/">https://www.bendstudio.com/blog/inside-bend-screen-space-shadows/</a>.</li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const sssPass = sss( scenePassDepth, camera, mainLight );
+const sssBlur = boxBlur( sssPass.r, { size: 2, separation: 1 } ); // optional blur
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SSSNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { sss } from 'three/addons/tsl/display/SSSNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SSSNode" translate="no">new <a href="#SSSNode">SSSNode</a><span class="signature">( depthNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, mainLight : <span class="param-type"><a href="DirectionalLight.html">DirectionalLight</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new SSS node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the scene's depth.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mainLight</strong>
+									</td>
+									<td class="description last">
+										<p>The main directional light of the scene.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="_frameId" translate="no">.<a href="#_frameId">_frameId</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;uint></span> </h3>
+					<div class="description">
+						<p>The frame ID use when temporal filtering is enabled.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_temporalOffset" translate="no">.<a href="#_temporalOffset">_temporalOffset</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Temporal offset added to the initial ray step.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthNode" translate="no">.<a href="#depthNode">depthNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>A node that represents the beauty pass's depth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxDistance" translate="no">.<a href="#maxDistance">maxDistance</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Maximum shadow length in world units. Longer shadows result in more computational
+overhead.</p>
+						<p>Default is <code>0.1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="quality" translate="no">.<a href="#quality">quality</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>This parameter controls how detailed the raymarching process works.
+The value ranges is <code>[0,1]</code> where <code>1</code> means best quality (the maximum number
+of raymarching iterations/samples) and <code>0</code> means no samples at all.</p>
+<p>A quality of <code>0.5</code> is usually sufficient for most use cases. Try to keep
+this parameter as low as possible. Larger values result in noticeable more
+overhead.</p>
+						<p>Default is <code>0.5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="resolutionScale" translate="no">.<a href="#resolutionScale">resolutionScale</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The resolution scale. Valid values are in the range
+<code>[0,1]</code>. <code>1</code> means best quality but also results in
+more computational overhead. Setting to <code>0.5</code> means
+the effect is computed in half-resolution.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadowIntensity" translate="no">.<a href="#shadowIntensity">shadowIntensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Shadow intensity. Must be in the range <code>[0, 1]</code>.</p>
+						<p>Default is <code>0.5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thickness" translate="no">.<a href="#thickness">thickness</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Depth testing thickness.</p>
+						<p>Default is <code>0.01</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders
+its effect once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useTemporalFiltering" translate="no">.<a href="#useTemporalFiltering">useTemporalFiltering</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to use temporal filtering or not. Setting this property to
+<code>true</code> requires the usage of <code>TRAANode</code>. This will help to reduce noice
+although it introduces typical TAA artifacts like ghosting and temporal
+instabilities.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources. This method should be called
+when the effect is no longer required.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#dispose">TempNode#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTextureNode" translate="no">.<a href="#getTextureNode">getTextureNode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the result of the effect as a texture node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the result of the effect.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to setup the effect's TSL code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to render the effect once per frame.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBefore">TempNode#updateBefore</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/SSSNode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/SSSNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

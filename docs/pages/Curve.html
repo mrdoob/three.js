@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Curve - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Curve</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An abstract base class for creating an analytic curve object that contains methods
+for interpolation.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Curve" translate="no">new <a href="#Curve">Curve</a><span class="signature">()</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new curve.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="arcLengthDivisions" translate="no">.<a href="#arcLengthDivisions">arcLengthDivisions</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>This value determines the amount of divisions when calculating the
+cumulative segment lengths of a curve via <a href="Curve.html#getLengths">Curve#getLengths</a>. To ensure
+precision when using methods like <a href="Curve.html#getSpacedPoints">Curve#getSpacedPoints</a>, it is
+recommended to increase the value of this property if the curve is very large.</p>
+						<p>Default is <code>200</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Must be set to <code>true</code> if the curve parameters have changed.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The type property is used for detecting the object type
+in context of serialization/deserialization.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Curve.html">Curve</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new curve with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="computeFrenetFrames" translate="no">.<a href="#computeFrenetFrames">computeFrenetFrames</a><span class="signature">( segments : <span class="param-type">number</span>, closed : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the Frenet Frames. Requires a curve definition in 3D space. Used
+in geometries like <a href="TubeGeometry.html">TubeGeometry</a> or <a href="ExtrudeGeometry.html">ExtrudeGeometry</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>segments</strong>
+									</td>
+									<td class="description last">
+										<p>The number of segments.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>closed</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the curve is closed or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The Frenet Frames.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="Curve.html">Curve</a></span> )</span><span class="type-signature"> : <a href="Curve.html">Curve</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given curve to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The curve to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this curve.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromJSON" translate="no">.<a href="#fromJSON">fromJSON</a><span class="signature">( json : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Curve.html">Curve</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Deserializes the curve from the given JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON holding the serialized curve.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this curve.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getLength" translate="no">.<a href="#getLength">getLength</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the total arc length of the curve.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The length of the curve.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getLengths" translate="no">.<a href="#getLengths">getLengths</a><span class="signature">( divisions : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an array of cumulative segment lengths of the curve.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions.</p>
+										<p>Default is <code>this.arcLengthDivisions</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array holding the cumulative segment lengths.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method returns a vector in 2D or 3D space (depending on the curve definition)
+for the given interpolation factor.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position on the curve. It can be a 2D or 3D vector depending on the curve definition.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPointAt" translate="no">.<a href="#getPointAt">getPointAt</a><span class="signature">( u : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method returns a vector in 2D or 3D space (depending on the curve definition)
+for the given interpolation factor. Unlike <a href="Curve.html#getPoint">Curve#getPoint</a>, this method honors the length
+of the curve which equidistant samples.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position on the curve. It can be a 2D or 3D vector depending on the curve definition.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPoints" translate="no">.<a href="#getPoints">getPoints</a><span class="signature">( divisions : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;(<a href="Vector2.html">Vector2</a>|<a href="Vector3.html">Vector3</a>)></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method samples the curve via <a href="Curve.html#getPoint">Curve#getPoint</a> and returns an array of points representing
+the curve shape.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions.</p>
+										<p>Default is <code>5</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array holding the sampled curve values. The number of points is <code>divisions + 1</code>.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSpacedPoints" translate="no">.<a href="#getSpacedPoints">getSpacedPoints</a><span class="signature">( divisions : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;(<a href="Vector2.html">Vector2</a>|<a href="Vector3.html">Vector3</a>)></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method samples the curve via <a href="Curve.html#getPointAt">Curve#getPointAt</a> and returns an array of points representing
+the curve shape. Unlike <a href="Curve.html#getPoints">Curve#getPoints</a>, this method returns equi-spaced points across the entire
+curve.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions.</p>
+										<p>Default is <code>5</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array holding the sampled curve values. The number of points is <code>divisions + 1</code>.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTangent" translate="no">.<a href="#getTangent">getTangent</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a unit vector tangent for the given interpolation factor.
+If the derived curve does not implement its tangent derivation,
+two points a small delta apart will be used to find its gradient
+which seems to give a reasonable approximation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The tangent vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTangentAt" translate="no">.<a href="#getTangentAt">getTangentAt</a><span class="signature">( u : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Same as <a href="Curve.html#getTangent">Curve#getTangent</a> but with equidistant samples.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="Curve.html#getPointAt">Curve#getPointAt</a></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The tangent vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getUtoTmapping" translate="no">.<a href="#getUtoTmapping">getUtoTmapping</a><span class="signature">( u : <span class="param-type">number</span>, distance : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Given an interpolation factor in the range <code>[0,1]</code>, this method returns an updated
+interpolation factor in the same range that can be ued to sample equidistant points
+from a curve.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>An optional distance on the curve.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated interpolation factor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the curve into JSON.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="ObjectLoader.html#parse">ObjectLoader#parse</a></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized curve.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateArcLengths" translate="no">.<a href="#updateArcLengths">updateArcLengths</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Update the cumulative segment distance cache. The method must be called
+every time curve parameters are changed. If an updated curve is part of a
+composed curve like <a href="CurvePath.html">CurvePath</a>, this method must be called on the
+composed curve, too.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/core/Curve.js" target="_blank" rel="noopener" translate="no">src/extras/core/Curve.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

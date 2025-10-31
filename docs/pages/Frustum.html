@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Frustum - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Frustum</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Frustums are used to determine what is inside the camera's field of view.
+They help speed up the rendering process - objects which lie outside a camera's
+frustum can safely be excluded from rendering.</p>
+<p>This class is mainly intended for use internally by a renderer.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Frustum" translate="no">new <a href="#Frustum">Frustum</a><span class="signature">( p0 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p1 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p2 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p3 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p4 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p5 : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new frustum.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>p0</strong>
+									</td>
+									<td class="description last">
+										<p>The first plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p1</strong>
+									</td>
+									<td class="description last">
+										<p>The second plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p2</strong>
+									</td>
+									<td class="description last">
+										<p>The third plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p3</strong>
+									</td>
+									<td class="description last">
+										<p>The fourth plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p4</strong>
+									</td>
+									<td class="description last">
+										<p>The fifth plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p5</strong>
+									</td>
+									<td class="description last">
+										<p>The sixth plane that encloses the frustum.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="planes" translate="no">.<a href="#planes">planes</a><span class="type-signature"> : Array.&lt;<a href="Plane.html">Plane</a>></span> </h3>
+					<div class="description">
+						<p>This array holds the planes that enclose the frustum.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Frustum.html">Frustum</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new frustum with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given point lies within the frustum.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the point lies within this frustum or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( frustum : <span class="param-type"><a href="Frustum.html">Frustum</a></span> )</span><span class="type-signature"> : <a href="Frustum.html">Frustum</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given frustum to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frustum</strong>
+									</td>
+									<td class="description last">
+										<p>The frustum to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this frustum.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given bounding box is intersecting this frustum.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding box to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the bounding box is intersecting this frustum or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsObject" translate="no">.<a href="#intersectsObject">intersectsObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the 3D object's bounding sphere is intersecting this frustum.</p>
+<p>Note that the 3D object must have a geometry so that the bounding sphere can be calculated.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the 3D object's bounding sphere is intersecting this frustum or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given bounding sphere is intersecting this frustum.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding sphere to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the bounding sphere is intersecting this frustum or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsSprite" translate="no">.<a href="#intersectsSprite">intersectsSprite</a><span class="signature">( sprite : <span class="param-type"><a href="Sprite.html">Sprite</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given sprite is intersecting this frustum.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sprite</strong>
+									</td>
+									<td class="description last">
+										<p>The sprite to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the sprite is intersecting this frustum or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( p0 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p1 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p2 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p3 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p4 : <span class="param-type"><a href="Plane.html">Plane</a></span>, p5 : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span><span class="type-signature"> : <a href="Frustum.html">Frustum</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the frustum planes by copying the given planes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>p0</strong>
+									</td>
+									<td class="description last">
+										<p>The first plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p1</strong>
+									</td>
+									<td class="description last">
+										<p>The second plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p2</strong>
+									</td>
+									<td class="description last">
+										<p>The third plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p3</strong>
+									</td>
+									<td class="description last">
+										<p>The fourth plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p4</strong>
+									</td>
+									<td class="description last">
+										<p>The fifth plane that encloses the frustum.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p5</strong>
+									</td>
+									<td class="description last">
+										<p>The sixth plane that encloses the frustum.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this frustum.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromProjectionMatrix" translate="no">.<a href="#setFromProjectionMatrix">setFromProjectionMatrix</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span>, coordinateSystem : <span class="param-type"><a href="global.html#WebGLCoordinateSystem">WebGLCoordinateSystem</a> | <a href="global.html#WebGPUCoordinateSystem">WebGPUCoordinateSystem</a></span>, reversedDepth : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Frustum.html">Frustum</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the frustum planes from the given projection matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The projection matrix.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>coordinateSystem</strong>
+									</td>
+									<td class="description last">
+										<p>The coordinate system.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>reversedDepth</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to use a reversed depth.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this frustum.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Frustum.js" target="_blank" rel="noopener" translate="no">src/math/Frustum.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

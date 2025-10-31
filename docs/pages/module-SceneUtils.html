@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SceneUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">SceneUtils</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SceneUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import * as SceneUtils from 'three/addons/utils/SceneUtils.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="~createMeshesFromInstancedMesh" translate="no">.<a href="#~createMeshesFromInstancedMesh">createMeshesFromInstancedMesh</a><span class="signature">( instancedMesh : <span class="param-type"><a href="InstancedMesh.html">InstancedMesh</a></span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This function creates a mesh for each instance of the given instanced mesh and
+adds it to a group. Each mesh will honor the current 3D transformation of its
+corresponding instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instancedMesh</strong>
+									</td>
+									<td class="description last">
+										<p>The instanced mesh.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group of meshes.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~createMeshesFromMultiMaterialMesh" translate="no">.<a href="#~createMeshesFromMultiMaterialMesh">createMeshesFromMultiMaterialMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This function creates a mesh for each geometry-group of the given multi-material mesh and
+adds it to a group.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The multi-material mesh.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group of meshes.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~createMultiMaterialObject" translate="no">.<a href="#~createMultiMaterialObject">createMultiMaterialObject</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, materials : <span class="param-type">Array.&lt;<a href="Material.html">Material</a>></span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This function represents an alternative way to create 3D objects with multiple materials.
+Normally, <a href="BufferGeometry.html#groups">BufferGeometry#groups</a> are used which might introduce issues e.g. when
+exporting the object to a 3D format. This function accepts a geometry and an array of
+materials and creates for each material a mesh that is added to a group.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>materials</strong>
+									</td>
+									<td class="description last">
+										<p>An array of materials.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group representing a multi-material object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~reduceVertices" translate="no">.<a href="#~reduceVertices">reduceVertices</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, func : <span class="param-type">function</span>, initialValue : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="global.html#any">any</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Executes a reducer function for each vertex of the given 3D object.
+<code>reduceVertices()</code> returns a single value: the function's accumulated result.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object that should be processed. It must have a
+geometry with a <code>position</code> attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>func</strong>
+									</td>
+									<td class="description last">
+										<p>The reducer function. First argument
+is the current value, second argument the current vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>initialValue</strong>
+									</td>
+									<td class="description last">
+										<p>The initial value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~sortInstancedMesh" translate="no">.<a href="#~sortInstancedMesh">sortInstancedMesh</a><span class="signature">( mesh : <span class="param-type"><a href="InstancedMesh.html">InstancedMesh</a></span>, compareFn : <span class="param-type">function</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Sorts the instances of the given instanced mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The instanced mesh to sort.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>compareFn</strong>
+									</td>
+									<td class="description last">
+										<p>A custom compare function for the sort.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="~traverseAncestorsGenerator" translate="no">.<a href="#~traverseAncestorsGenerator">traverseAncestorsGenerator</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Generator based alternative to <a href="Object3D.html#traverseAncestors">Object3D#traverseAncestors</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>Object to traverse.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<h5>Yields:</h5>
+							Objects that passed the filter condition.
+					</div>
+					<h3 class="name name-method" id="~traverseGenerator" translate="no">.<a href="#~traverseGenerator">traverseGenerator</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Generator based alternative to <a href="Object3D.html#traverse">Object3D#traverse</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>Object to traverse.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<h5>Yields:</h5>
+							Objects that passed the filter condition.
+					</div>
+					<h3 class="name name-method" id="~traverseVisibleGenerator" translate="no">.<a href="#~traverseVisibleGenerator">traverseVisibleGenerator</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Generator based alternative to <a href="Object3D.html#traverseVisible">Object3D#traverseVisible</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>Object to traverse.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<h5>Yields:</h5>
+							Objects that passed the filter condition.
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/SceneUtils.js" target="_blank" rel="noopener" translate="no">examples/jsm/utils/SceneUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

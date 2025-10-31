@@ -4,14 +4,19 @@
 		<title>three.js webgpu - volumetric lighting rect area</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - volumetric lighting rect area
-			<br>Improve the quality/performance adjusting the parameters in the Controls
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Volumetric Lighting Rect Area</span>
+			</div>
+
+			<small>Compatible with rect area lights and shadows using post-processing pass.</small>
 		</div>
 
 		<script type="importmap">
@@ -34,19 +39,16 @@
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 			import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let renderer, scene, camera;
 			let volumetricMesh, meshKnot;
 			let rectLight1, rectLight2, rectLight3;
 			let clock;
 			let postProcessing;
-			let stats;
 
 			init();
 
@@ -103,9 +105,6 @@
 
 				const LAYER_VOLUMETRIC_LIGHTING = 10;
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				clock = new THREE.Clock();
 
 				renderer = new THREE.WebGPURenderer();
@@ -115,6 +114,7 @@
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 2;
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -238,7 +238,7 @@
 
 				const volumetricPass = pass( scene, camera, { depthBuffer: false } );
 				volumetricPass.setLayers( volumetricLayer );
-				volumetricPass.setResolution( .25 );
+				volumetricPass.setResolutionScale( .25 );
 
 				// Compose and Denoise
 
@@ -253,16 +253,16 @@
 				// GUI
 
 				const params = {
-					resolution: volumetricPass.getResolution(),
+					resolution: volumetricPass.getResolutionScale(),
 					denoise: true
 				};
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Volumetric Lighting' );
 
-				const rayMarching = gui.addFolder( 'Ray Marching' ).close();
+				const rayMarching = gui.addFolder( 'Ray Marching' );
 				rayMarching.add( params, 'resolution', .1, .5 ).onChange( ( resolution ) => {
 
-					volumetricPass.setResolution( resolution );
+					volumetricPass.setResolutionScale( resolution );
 
 				} );
 				rayMarching.add( volumetricMaterial, 'steps', 2, 12 ).name( 'step count' );
@@ -278,7 +278,7 @@
 
 				} );
 
-				const lighting = gui.addFolder( 'Lighting / Scene' ).close();
+				const lighting = gui.addFolder( 'Lighting / Scene' );
 				lighting.add( volumetricLightingIntensity, 'value', 0, 2 ).name( 'fog intensity' );
 				lighting.add( smokeAmount, 'value', 0, 3 ).name( 'smoke amount' );
 
@@ -298,8 +298,6 @@
 			function animate() {
 
 				const delta = clock.getDelta();
-
-				stats.update();
 
 				rectLight1.rotation.y += - delta;
 				rectLight2.rotation.y += delta * .5;

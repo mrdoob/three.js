@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ScriptableNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">ScriptableNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This type of node allows to implement nodes with custom scripts. The script
+section is represented as an instance of <code>CodeNode</code> written with JavaScript.
+The script itself must adhere to a specific structure.</p>
+<ul>
+<li>main(): Executed once by default and every time <code>node.needsUpdate</code> is set.</li>
+<li>layout: The layout object defines the script's interface (inputs and outputs).</li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">ScriptableNodeResources.set( 'TSL', TSL );
+const scriptableNode = scriptable( js( `
+	layout = {
+		outputType: 'node',
+		elements: [
+			{ name: 'source', inputType: 'node' },
+		]
+	};
+	const { mul, oscSine } = TSL;
+	function main() {
+		const source = parameters.get( 'source' ) || float();
+		return mul( source, oscSine() ) );
+	}
+` ) );
+scriptableNode.setParameter( 'source', color( 1, 0, 0 ) );
+const material = new THREE.MeshBasicNodeMaterial();
+material.colorNode = scriptableNode;
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ScriptableNode" translate="no">new <a href="#ScriptableNode">ScriptableNode</a><span class="signature">( codeNode : <span class="param-type"><a href="CodeNode.html">CodeNode</a></span>, parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new scriptable node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>codeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The code node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The parameters definition.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="codeNode" translate="no">.<a href="#codeNode">codeNode</a><span class="type-signature"> : <a href="CodeNode.html">CodeNode</a></span> </h3>
+					<div class="description">
+						<p>The code node.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isScriptableNode" translate="no">.<a href="#isScriptableNode">isScriptableNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The parameters definition.</p>
+						<p>Default is <code>{}</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="source" translate="no">.<a href="#source">source</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The source code of the scriptable node.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="call" translate="no">.<a href="#call">call</a><span class="signature">( name : <span class="param-type">string</span>, &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calls a function from the script.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The function name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>params</strong>
+									</td>
+									<td class="description last">
+										<p>A list of parameters.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result of the function call.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="callAsync" translate="no">.<a href="#callAsync">callAsync</a><span class="signature">( name : <span class="param-type">string</span>, &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : Promise.&lt;<a href="global.html#any">any</a>></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Asynchronously calls a function from the script.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The function name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>params</strong>
+									</td>
+									<td class="description last">
+										<p>A list of parameters.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result of the function call.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clearParameters" translate="no">.<a href="#clearParameters">clearParameters</a><span class="signature">()</span><span class="type-signature"> : <a href="ScriptableNode.html">ScriptableNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Deletes all parameters from the script.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="deleteParameter" translate="no">.<a href="#deleteParameter">deleteParameter</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ScriptableNode.html">ScriptableNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Deletes a parameter from the script.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter to remove.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees all internal resources.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#dispose">Node#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDefaultOutput" translate="no">.<a href="#getDefaultOutput">getDefaultOutput</a><span class="signature">()</span><span class="type-signature"> : <a href="ScriptableValueNode.html">ScriptableValueNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns default output of the script.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The default output.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDefaultOutputNode" translate="no">.<a href="#getDefaultOutputNode">getDefaultOutputNode</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns default node output of the script.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The default node output.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInputLayout" translate="no">.<a href="#getInputLayout">getInputLayout</a><span class="signature">( id : <span class="param-type">string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an input from the layout with the given id/name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>id</strong>
+									</td>
+									<td class="description last">
+										<p>The id/name of the input.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The element entry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getLayout" translate="no">.<a href="#getLayout">getLayout</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the layout of the script.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The script's layout.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getLocal" translate="no">.<a href="#getLocal">getLocal</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Gets the value of a local script variable.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The variable name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMethod" translate="no">.<a href="#getMethod">getMethod</a><span class="signature">()</span><span class="type-signature"> : function</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a function created from the node's script.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The function representing the node's code.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten since the node types is inferred from the script's output.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getNodeType">Node#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getObject" translate="no">.<a href="#getObject">getObject</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an object representation of the script.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getOutput" translate="no">.<a href="#getOutput">getOutput</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ScriptableValueNode.html">ScriptableValueNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a script output for the given name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getOutputLayout" translate="no">.<a href="#getOutputLayout">getOutputLayout</a><span class="signature">( id : <span class="param-type">string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an output from the layout with the given id/name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>id</strong>
+									</td>
+									<td class="description last">
+										<p>The id/name of the output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The element entry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getParameter" translate="no">.<a href="#getParameter">getParameter</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ScriptableValueNode.html">ScriptableValueNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a parameter for the given name</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getValue" translate="no">.<a href="#getValue">getValue</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the value of this node which is the value of
+the default output.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="onRefresh" translate="no">.<a href="#onRefresh">onRefresh</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Event listener for the <code>refresh</code> event.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="refresh" translate="no">.<a href="#refresh">refresh</a><span class="signature">( output : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Refreshes the script node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>An optional output.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setLocal" translate="no">.<a href="#setLocal">setLocal</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Resources.html">Resources</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the reference of a local script variable.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The variable name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The reference to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The resource map</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setOutput" translate="no">.<a href="#setOutput">setOutput</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ScriptableNode.html">ScriptableNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines a script output for the given name and value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the output.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setParameter" translate="no">.<a href="#setParameter">setParameter</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="ScriptableNode.html">ScriptableNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets a value for the given parameter name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/code/ScriptableNode.js" target="_blank" rel="noopener" translate="no">src/nodes/code/ScriptableNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

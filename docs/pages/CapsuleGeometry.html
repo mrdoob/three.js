@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CapsuleGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="BufferGeometry.html">BufferGeometry</a> → </p>
+	<h1 translate="no">CapsuleGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A geometry class for representing a capsule.</p></div>
+				<iframe id="viewer" src="../scenes/geometry-browser.html#CapsuleGeometry"></iframe>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8, 1 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const capsule = new THREE.Mesh( geometry, material );
+scene.add( capsule );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CapsuleGeometry" translate="no">new <a href="#CapsuleGeometry">CapsuleGeometry</a><span class="signature">( radius : <span class="param-type">number</span>, height : <span class="param-type">number</span>, capSegments : <span class="param-type">number</span>, radialSegments : <span class="param-type">number</span>, heightSegments : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new capsule geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>Radius of the capsule.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>Height of the middle section.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>capSegments</strong>
+									</td>
+									<td class="description last">
+										<p>Number of curve segments used to build each cap.</p>
+										<p>Default is <code>4</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>radialSegments</strong>
+									</td>
+									<td class="description last">
+										<p>Number of segmented faces around the circumference of the capsule. Must be an integer &gt;= 3.</p>
+										<p>Default is <code>8</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>heightSegments</strong>
+									</td>
+									<td class="description last">
+										<p>Number of rows of faces along the height of the middle section. Must be an integer &gt;= 1.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Holds the constructor parameters that have been
+used to generate the geometry. Any modification
+after instantiation does not change the geometry.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".fromJSON" translate="no">.<a href="#.fromJSON">fromJSON</a><span class="signature">( data : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="CapsuleGeometry.html">CapsuleGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Factory method for creating an instance of this class from the given
+JSON object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>A JSON object representing the serialized geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A new instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/geometries/CapsuleGeometry.js" target="_blank" rel="noopener" translate="no">src/geometries/CapsuleGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

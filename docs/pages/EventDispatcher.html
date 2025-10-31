@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EventDispatcher - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">EventDispatcher</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This modules allows to dispatch event objects on custom JavaScript objects.</p>
+<p>Main repository: <a href="https://github.com/mrdoob/eventdispatcher.js/">eventdispatcher.js</a></p>
+<p>Code Example:</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">class Car extends EventDispatcher {
+	start() {
+		this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+	}
+};
+// Using events with the custom object
+const car = new Car();
+car.addEventListener( 'start', function ( event ) {
+	alert( event.message );
+} );
+car.start();
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="EventDispatcher" translate="no">new <a href="#EventDispatcher">EventDispatcher</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addEventListener" translate="no">.<a href="#addEventListener">addEventListener</a><span class="signature">( type : <span class="param-type">string</span>, listener : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given event listener to the given event type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type of event to listen to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>listener</strong>
+									</td>
+									<td class="description last">
+										<p>The function that gets called when the event is fired.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="dispatchEvent" translate="no">.<a href="#dispatchEvent">dispatchEvent</a><span class="signature">( event : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Dispatches an event object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>event</strong>
+									</td>
+									<td class="description last">
+										<p>The event that gets fired.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="hasEventListener" translate="no">.<a href="#hasEventListener">hasEventListener</a><span class="signature">( type : <span class="param-type">string</span>, listener : <span class="param-type">function</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given event listener has been added to the given event type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type of event.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>listener</strong>
+									</td>
+									<td class="description last">
+										<p>The listener to check.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given event listener has been added to the given event type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="removeEventListener" translate="no">.<a href="#removeEventListener">removeEventListener</a><span class="signature">( type : <span class="param-type">string</span>, listener : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the given event listener from the given event type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type of event.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>listener</strong>
+									</td>
+									<td class="description last">
+										<p>The listener to remove.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/EventDispatcher.js" target="_blank" rel="noopener" translate="no">src/core/EventDispatcher.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

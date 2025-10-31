@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - cameras - logarithmic depth buffer</title>
+		<title>three.js webgpu - logarithmic depth buffer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
+
 			body{
 				touch-action: none;
 			}
+
 			.renderer_label {
 				position: absolute;
 				bottom: 1em;
@@ -47,7 +49,9 @@
 				border: 1px inset #ccc;
 				cursor: col-resize;
 			}
+
 		</style>
+
 	</head>
 	<body>
 
@@ -58,8 +62,13 @@
 		</div>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - logarithmic depth buffer<br/>
-			mousewheel to dolly out
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Logarithmic Depth Buffer</span>
+			</div>
+
+			<small>Mousewheel to dolly out.</small>
 		</div>
 
 		<script type="importmap">
@@ -77,10 +86,10 @@
 
 			import * as THREE from 'three/webgpu';
 
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
 
 			// 1 micrometer to 100 billion light years in one scene, with 1 unit = 1 meter?  preposterous!  and yet...
 			const NEAR = 1e-6, FAR = 1e27;
@@ -91,7 +100,7 @@
 			let zoompos = - 100, minzoomspeed = .015;
 			let zoomspeed = minzoomspeed;
 
-			let container, border, stats;
+			let container, border;
 			const objects = {};
 
 			// Generate a number of text labels, from 1µm in size up to 100,000,000 light years
@@ -130,9 +139,6 @@
 				objects.normal = await initView( scene, 'normal', false );
 				objects.logzbuf = await initView( scene, 'logzbuf', true );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				// Resize border allows the user to easily compare effects of logarithmic depth buffer over the whole scene
 				border = document.getElementById( 'renderer_border' );
 				border.addEventListener( 'pointerdown', onBorderPointerDown );
@@ -155,6 +161,7 @@
 				renderer.setSize( SCREEN_WIDTH / 2, SCREEN_HEIGHT );
 				renderer.domElement.style.position = 'relative';
 				renderer.domElement.id = 'renderer_' + name;
+				renderer.inspector = new Inspector();
 				framecontainer.appendChild( renderer.domElement );
 
 				await renderer.init();
@@ -288,8 +295,6 @@
 
 				objects.normal.renderer.render( objects.normal.scene, objects.normal.camera );
 				objects.logzbuf.renderer.render( objects.logzbuf.scene, objects.logzbuf.camera );
-
-				stats.update();
 
 			}
 

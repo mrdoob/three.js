@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SSGINode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">SSGINode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Post processing node for applying Screen Space Global Illumination (SSGI) to a scene.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://github.com/cdrinmatane/SSRT3">https://github.com/cdrinmatane/SSRT3</a>.</li>
+<li><a href="https://cdrinmatane.github.io/posts/ssaovb-code/">https://cdrinmatane.github.io/posts/ssaovb-code/</a>.</li>
+<li><a href="https://cdrinmatane.github.io/cgspotlight-slides/ssilvb_slides.pdf">https://cdrinmatane.github.io/cgspotlight-slides/ssilvb_slides.pdf</a>.</li>
+</ul>
+<p>The quality and performance of the effect mainly depend on <code>sliceCount</code> and <code>stepCount</code>.
+The total number of samples taken per pixel is <code>sliceCount</code> * <code>stepCount</code> * <code>2</code>. Here are some
+recommended presets depending on whether temporal filtering is used or not.</p>
+<p>With temporal filtering (recommended):</p>
+<ul>
+<li>Low: <code>sliceCount</code> of <code>1</code>, <code>stepCount</code> of <code>12</code>.</li>
+<li>Medium: <code>sliceCount</code> of <code>2</code>, <code>stepCount</code> of <code>8</code>.</li>
+<li>High: <code>sliceCount</code> of <code>3</code>, <code>stepCount</code> of <code>16</code>.</li>
+</ul>
+<p>Use for a higher slice count if you notice temporal instabilities like flickering. Reduce the sample
+count then to mitigate the performance lost.</p>
+<p>Without temporal filtering:</p>
+<ul>
+<li>Low: <code>sliceCount</code> of <code>2</code>, <code>stepCount</code> of <code>6</code>.</li>
+<li>Medium: <code>sliceCount</code> of <code>3</code>, <code>stepCount</code> of <code>8</code>.</li>
+<li>High: <code>sliceCount</code> of <code>4</code>, <code>stepCount</code> of <code>12</code>.</li>
+</ul></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SSGINode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ssgi } from 'three/addons/tsl/display/SSGINode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SSGINode" translate="no">new <a href="#SSGINode">SSGINode</a><span class="signature">( beautyNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, depthNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, normalNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, camera : <span class="param-type"><a href="PerspectiveCamera.html">PerspectiveCamera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new SSGI node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>beautyNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the beauty or scene pass.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the scene's depth.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normalNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the scene's normals.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="_halfProjScale" translate="no">.<a href="#_halfProjScale">_halfProjScale</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>Used to compute the effective step radius when viewSpaceSampling is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_resolution" translate="no">.<a href="#_resolution">_resolution</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>The resolution of the effect.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_temporalDirection" translate="no">.<a href="#_temporalDirection">_temporalDirection</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Temporal direction that influences the rotation angle for each slice.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_temporalOffset" translate="no">.<a href="#_temporalOffset">_temporalOffset</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Temporal offset added to the initial ray step.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="aoIntensity" translate="no">.<a href="#aoIntensity">aoIntensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Power function applied to AO to make it appear darker/lighter. Should be in the range <code>[0, 4]</code>.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="backfaceLighting" translate="no">.<a href="#backfaceLighting">backfaceLighting</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>How much light backface surfaces emit.
+Should be in the range <code>[0, 1]</code>.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="beautyNode" translate="no">.<a href="#beautyNode">beautyNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>A texture node that represents the beauty or scene pass.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthNode" translate="no">.<a href="#depthNode">depthNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>A node that represents the scene's depth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="expFactor" translate="no">.<a href="#expFactor">expFactor</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Controls samples distribution. It's an exponent applied at each step get increasing step size over the distance.
+Should be in the range <code>[1, 3]</code>.</p>
+						<p>Default is <code>2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="giIntensity" translate="no">.<a href="#giIntensity">giIntensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Intensity of the indirect diffuse light. Should be in the range <code>[0, 100]</code>.</p>
+						<p>Default is <code>10</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalNode" translate="no">.<a href="#normalNode">normalNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>A node that represents the scene's normals. If no normals are passed to the
+constructor (because MRT is not available), normals can be automatically
+reconstructed from depth values in the shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="radius" translate="no">.<a href="#radius">radius</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Effective sampling radius in world space. AO and GI can only have influence within that radius.
+Should be in the range <code>[1, 25]</code>.</p>
+						<p>Default is <code>12</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sliceCount" translate="no">.<a href="#sliceCount">sliceCount</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;uint></span> </h3>
+					<div class="description">
+						<p>Number of per-pixel hemisphere slices. This has a big performance cost and should be kept as low as possible.
+Should be in the range <code>[1, 4]</code>.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stepCount" translate="no">.<a href="#stepCount">stepCount</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;uint></span> </h3>
+					<div class="description">
+						<p>Number of samples taken along one side of a given hemisphere slice. This has a big performance cost and should
+be kept as low as possible.  Should be in the range <code>[1, 32]</code>.</p>
+						<p>Default is <code>12</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thickness" translate="no">.<a href="#thickness">thickness</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Constant thickness value of objects on the screen in world units. Allows light to pass behind surfaces past that thickness value.
+Should be in the range <code>[0.01, 10]</code>.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders
+its effect once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useLinearThickness" translate="no">.<a href="#useLinearThickness">useLinearThickness</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;bool></span> </h3>
+					<div class="description">
+						<p>Whether to increase thickness linearly over distance or not (avoid losing detail over the distance).</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useScreenSpaceSampling" translate="no">.<a href="#useScreenSpaceSampling">useScreenSpaceSampling</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;bool></span> </h3>
+					<div class="description">
+						<p>Makes the sample distance in screen space instead of world-space (helps having more detail up close).</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useTemporalFiltering" translate="no">.<a href="#useTemporalFiltering">useTemporalFiltering</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to use temporal filtering or not. Setting this property to
+<code>true</code> requires the usage of <code>TRAANode</code>. This will help to reduce noise
+although it introduces typical TAA artifacts like ghosting and temporal
+instabilities.</p>
+<p>If setting this property to <code>false</code>, a manual denoise via <code>DenoiseNode</code>
+is required.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources. This method should be called
+when the effect is no longer required.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#dispose">TempNode#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTextureNode" translate="no">.<a href="#getTextureNode">getTextureNode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the result of the effect as a texture node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the result of the effect.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to setup the effect's TSL code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to render the effect once per frame.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBefore">TempNode#updateBefore</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/SSGINode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/SSGINode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

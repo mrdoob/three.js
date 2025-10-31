@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ClippingNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">ClippingNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node is used in <a href="NodeMaterial.html">NodeMaterial</a> to setup the clipping
+which can happen hardware-accelerated (if supported) and optionally
+use alpha-to-coverage for anti-aliasing clipped edges.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ClippingNode" translate="no">new <a href="#ClippingNode">ClippingNode</a><span class="signature">( scope : <span class="param-type">'default' | 'hardware' | 'alphaToCoverage'</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new clipping node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The node's scope. Similar to other nodes,
+the selected scope influences the behavior of the node and what type of code is generated.</p>
+										<p>Default is <code>'default'</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="scope" translate="no">.<a href="#scope">scope</a><span class="type-signature"> : 'default' | 'hardware' | 'alphaToCoverage'</span> </h3>
+					<div class="description">
+						<p>The node's scope. Similar to other nodes, the selected scope influences
+the behavior of the node and what type of code is generated.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the node depending on the selected scope.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupAlphaToCoverage" translate="no">.<a href="#setupAlphaToCoverage">setupAlphaToCoverage</a><span class="signature">( intersectionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, unionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups alpha to coverage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>intersectionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The intersection planes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>unionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The union planes.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupDefault" translate="no">.<a href="#setupDefault">setupDefault</a><span class="signature">( intersectionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, unionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the default clipping.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>intersectionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The intersection planes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>unionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The union planes.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupHardwareClipping" translate="no">.<a href="#setupHardwareClipping">setupHardwareClipping</a><span class="signature">( unionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups hardware clipping.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>unionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The union planes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/ClippingNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/ClippingNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

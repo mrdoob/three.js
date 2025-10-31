@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MRTNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="OutputStructNode.html">OutputStructNode</a> → </p>
+	<h1 translate="no">MRTNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node can be used setup a MRT context for rendering. A typical MRT setup for
+post-processing is shown below:</p>
+<p>The MRT output is defined as a dictionary.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const mrtNode = mrt( {
+  output: output,
+  normal: normalView
+} ) );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MRTNode" translate="no">new <a href="#MRTNode">MRTNode</a><span class="signature">( outputNodes : <span class="param-type">Object.&lt;string, <a href="Node.html">Node</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new output struct node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>outputNodes</strong>
+									</td>
+									<td class="description last">
+										<p>The MRT outputs.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isMRTNode" translate="no">.<a href="#isMRTNode">isMRTNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="outputNodes" translate="no">.<a href="#outputNodes">outputNodes</a><span class="type-signature"> : Object.&lt;string, <a href="Node.html">Node</a>></span> </h3>
+					<div class="description">
+						<p>A dictionary representing the MRT outputs. The key
+is the name of the output, the value the node which produces
+the output result.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="get" translate="no">.<a href="#get">get</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the output node for the given name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="has" translate="no">.<a href="#has">has</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="NodeBuilder.html">NodeBuilder</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the MRT node has an output with the given name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the MRT node has an output for the given name or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="merge" translate="no">.<a href="#merge">merge</a><span class="signature">( mrtNode : <span class="param-type"><a href="MRTNode.html">MRTNode</a></span> )</span><span class="type-signature"> : <a href="MRTNode.html">MRTNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Merges the outputs of the given MRT node with the outputs of this node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mrtNode</strong>
+									</td>
+									<td class="description last">
+										<p>The MRT to merge.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A new MRT node with merged outputs..</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/MRTNode.js" target="_blank" rel="noopener" translate="no">src/nodes/core/MRTNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>InstancedBufferAttribute - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="BufferAttribute.html">BufferAttribute</a> → </p>
+	<h1 translate="no">InstancedBufferAttribute</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An instanced version of a buffer attribute.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="InstancedBufferAttribute" translate="no">new <a href="#InstancedBufferAttribute">InstancedBufferAttribute</a><span class="signature">( array : <span class="param-type">TypedArray</span>, itemSize : <span class="param-type">number</span>, normalized : <span class="param-type">boolean</span>, meshPerAttribute : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new instanced buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The array holding the attribute data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>itemSize</strong>
+									</td>
+									<td class="description last">
+										<p>The item size.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normalized</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the data are normalized or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>meshPerAttribute</strong>
+									</td>
+									<td class="description last">
+										<p>How often a value of this buffer attribute should be repeated.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isInstancedBufferAttribute" translate="no">.<a href="#isInstancedBufferAttribute">isInstancedBufferAttribute</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="meshPerAttribute" translate="no">.<a href="#meshPerAttribute">meshPerAttribute</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Defines how often a value of this buffer attribute should be repeated. A
+value of one means that each value of the instanced attribute is used for
+a single instance. A value of two means that each value is used for two
+consecutive instances (and so on).</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/InstancedBufferAttribute.js" target="_blank" rel="noopener" translate="no">src/core/InstancedBufferAttribute.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

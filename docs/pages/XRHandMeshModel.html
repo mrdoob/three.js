@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>XRHandMeshModel - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">XRHandMeshModel</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents one of the hand model types <a href="XRHandModelFactory.html">XRHandModelFactory</a> might produce
+depending on the selected profile. <code>XRHandMeshModel</code> represents a hand with a
+custom asset.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">XRHandMeshModel</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { XRHandMeshModel } from 'three/addons/webxr/XRHandMeshModel.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="XRHandMeshModel" translate="no">new <a href="#XRHandMeshModel">XRHandMeshModel</a><span class="signature">( handModel : <span class="param-type"><a href="XRHandModel.html">XRHandModel</a></span>, controller : <span class="param-type"><a href="Group.html">Group</a></span>, path : <span class="param-type">string</span>, handedness : <span class="param-type">XRHandedness</span>, loader : <span class="param-type"><a href="Loader.html">Loader</a></span>, onLoad : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new XR hand mesh model.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>handModel</strong>
+									</td>
+									<td class="description last">
+										<p>The hand model.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The WebXR controller.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The model path.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>handedness</strong>
+									</td>
+									<td class="description last">
+										<p>The handedness of the XR input source.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>loader</strong>
+									</td>
+									<td class="description last">
+										<p>The loader. If not provided, an instance of <code>GLTFLoader</code> will be used to load models.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>A callback that is executed when a controller model has been loaded.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="bones" translate="no">.<a href="#bones">bones</a><span class="type-signature"> : Array.&lt;<a href="Bone.html">Bone</a>></span> </h3>
+					<div class="description">
+						<p>An array of bones representing the bones
+of the hand skeleton.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="controller" translate="no">.<a href="#controller">controller</a><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="description">
+						<p>The WebXR controller.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="handModel" translate="no">.<a href="#handModel">handModel</a><span class="type-signature"> : <a href="XRHandModel.html">XRHandModel</a></span> </h3>
+					<div class="description">
+						<p>The hand model.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="updateMesh" translate="no">.<a href="#updateMesh">updateMesh</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the mesh based on the tracked XR joints data.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XRHandMeshModel.js" target="_blank" rel="noopener" translate="no">examples/jsm/webxr/XRHandMeshModel.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

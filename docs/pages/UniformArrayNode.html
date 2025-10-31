@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>UniformArrayNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="InputNode.html">InputNode</a> → <a href="UniformNode.html">UniformNode</a> → <a href="BufferNode.html">BufferNode</a> → </p>
+	<h1 translate="no">UniformArrayNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Similar to <a href="BufferNode.html">BufferNode</a> this module represents array-like data as
+uniform buffers. Unlike <a href="BufferNode.html">BufferNode</a>, it can handle more common
+data types in the array (e.g <code>three.js</code> primitives) and automatically
+manage buffer padding. It should be the first choice when working with
+uniforms buffers.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const tintColors = uniformArray( [
+	new Color( 1, 0, 0 ),
+	new Color( 0, 1, 0 ),
+	new Color( 0, 0, 1 )
+], 'color' );
+const redColor = tintColors.element( 0 );</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="UniformArrayNode" translate="no">new <a href="#UniformArrayNode">UniformArrayNode</a><span class="signature">( value : <span class="param-type">Array.&lt;<a href="global.html#any">any</a>></span>, elementType : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new uniform array node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Array holding the buffer data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>elementType</strong>
+									</td>
+									<td class="description last">
+										<p>The data type of a buffer element.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="array" translate="no">.<a href="#array">array</a><span class="type-signature"> : Array.&lt;<a href="global.html#any">any</a>></span> </h3>
+					<div class="description">
+						<p>Array holding the buffer data. Unlike <a href="BufferNode.html">BufferNode</a>, the array can
+hold number primitives as well as three.js objects like vectors, matrices
+or colors.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="elementType" translate="no">.<a href="#elementType">elementType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The data type of an array element.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isArrayBufferNode" translate="no">.<a href="#isArrayBufferNode">isArrayBufferNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="paddedType" translate="no">.<a href="#paddedType">paddedType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The padded type. Uniform buffers must conform to a certain buffer layout
+so a separate type is computed to ensure correct buffer size.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Overwritten since uniform array nodes are updated per render.</p>
+						<p>Default is <code>'render'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="BufferNode.html#updateType">BufferNode#updateType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="element" translate="no">.<a href="#element">element</a><span class="signature">( indexNode : <span class="param-type"><a href="IndexNode.html">IndexNode</a></span> )</span><span class="type-signature"> : <a href="UniformArrayElementNode.html">UniformArrayElementNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default <code>element()</code> method to provide element access
+based on <a href="UniformArrayNode.html">UniformArrayNode</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>indexNode</strong>
+									</td>
+									<td class="description last">
+										<p>The index node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="getElementType" translate="no">.<a href="#getElementType">getElementType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The data type of the array elements.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="BufferNode.html#getElementType">BufferNode#getElementType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The element type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type is inferred from the
+<a href="UniformArrayNode.html#paddedType">UniformArrayNode#paddedType</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="BufferNode.html#getNodeType">BufferNode#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPaddedType" translate="no">.<a href="#getPaddedType">getPaddedType</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the padded type based on the element type.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The padded type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : null</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Implement the value buffer creation based on the array data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="BufferNode.html#setup">BufferNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The update makes sure to correctly transfer the data from the (complex) objects
+in the array to the internal, correctly padded value buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="BufferNode.html#update">BufferNode#update</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/UniformArrayNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/UniformArrayNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

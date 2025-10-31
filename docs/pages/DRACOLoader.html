@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>DRACOLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">DRACOLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for the Draco format.</p>
+<p><a href="https://google.github.io/draco/">Draco</a> is an open source library for compressing
+and decompressing 3D meshes and point clouds. Compressed geometry can be significantly smaller,
+at the cost of additional decoding time on the client device.</p>
+<p>Standalone Draco files have a <code>.drc</code> extension, and contain vertex positions, normals, colors,
+and other attributes. Draco files do not contain materials, textures, animation, or node hierarchies –
+to use these features, embed Draco geometry inside of a glTF file. A normal glTF file can be converted
+to a Draco-compressed glTF file using <a href="https://github.com/CesiumGS/gltf-pipeline">glTF-Pipeline</a>.
+When using Draco with glTF, an instance of <code>DRACOLoader</code> will be used internally by <a href="GLTFLoader.html">GLTFLoader</a>.</p>
+<p>It is recommended to create one DRACOLoader instance and reuse it to avoid loading and creating
+multiple decoder instances.</p>
+<p><code>DRACOLoader</code> will automatically use either the JS or the WASM decoding library, based on
+browser capabilities.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new DRACOLoader();
+loader.setDecoderPath( '/examples/jsm/libs/draco/' );
+const geometry = await dracoLoader.loadAsync( 'models/draco/bunny.drc' );
+geometry.computeVertexNormals(); // optional
+dracoLoader.dispose();
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">DRACOLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="DRACOLoader" translate="no">new <a href="#DRACOLoader">DRACOLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new Draco loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URL and passes the loaded Draco asset
+to the <code>onLoad()</code> callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given Draco data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw Draco data as an array buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading/parsing process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDecoderConfig" translate="no">.<a href="#setDecoderConfig">setDecoderConfig</a><span class="signature">( config : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="DRACOLoader.html">DRACOLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Provides configuration for the decoder libraries. Configuration cannot be changed after decoding begins.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>config</strong>
+									</td>
+									<td class="description last">
+										<p>The decoder config.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDecoderPath" translate="no">.<a href="#setDecoderPath">setDecoderPath</a><span class="signature">( path : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="DRACOLoader.html">DRACOLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Provides configuration for the decoder libraries. Configuration cannot be changed after decoding begins.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The decoder path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setWorkerLimit" translate="no">.<a href="#setWorkerLimit">setWorkerLimit</a><span class="signature">( workerLimit : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="DRACOLoader.html">DRACOLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the maximum number of Web Workers to be used during decoding.
+A lower limit may be preferable if workers are also for other tasks in the application.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>workerLimit</strong>
+									</td>
+									<td class="description last">
+										<p>The worker limit.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DRACOLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/DRACOLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

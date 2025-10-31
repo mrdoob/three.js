@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshBasicNodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="NodeMaterial.html">NodeMaterial</a> → </p>
+	<h1 translate="no">MeshBasicNodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Node material version of <a href="MeshBasicMaterial.html">MeshBasicMaterial</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshBasicNodeMaterial" translate="no">new <a href="#MeshBasicNodeMaterial">MeshBasicNodeMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new mesh basic node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isMeshBasicNodeMaterial" translate="no">.<a href="#isMeshBasicNodeMaterial">isMeshBasicNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lights" translate="no">.<a href="#lights">lights</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Although the basic material is by definition unlit, we set
+this property to <code>true</code> since we use a lighting model to compute
+the outgoing light of the fragment shader.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#lights">NodeMaterial#lights</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupEnvironment" translate="no">.<a href="#setupEnvironment">setupEnvironment</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="BasicEnvironmentNode.html">BasicEnvironmentNode</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten since this type of material uses <a href="BasicEnvironmentNode.html">BasicEnvironmentNode</a>
+to implement the default environment mapping.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupEnvironment">NodeMaterial#setupEnvironment</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The environment node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLightMap" translate="no">.<a href="#setupLightMap">setupLightMap</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="BasicLightMapNode.html">BasicLightMapNode</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method must be overwritten since light maps are evaluated
+with a special scaling factor for basic materials.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupLightMap">NodeMaterial#setupLightMap</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The light map node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLightingModel" translate="no">.<a href="#setupLightingModel">setupLightingModel</a><span class="signature">()</span><span class="type-signature"> : <a href="BasicLightingModel.html">BasicLightingModel</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the lighting model.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupLightingModel">NodeMaterial#setupLightingModel</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lighting model.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupNormal" translate="no">.<a href="#setupNormal">setupNormal</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Basic materials are not affected by normal and bump maps so we
+return by default <a href="TSL.html#normalViewGeometry">normalViewGeometry</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupNormal">NodeMaterial#setupNormal</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The normal node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupOutgoingLight" translate="no">.<a href="#setupOutgoingLight">setupOutgoingLight</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The material overwrites this method because <code>lights</code> is set to <code>true</code> but
+we still want to return the diffuse color as the outgoing light.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupOutgoingLight">NodeMaterial#setupOutgoingLight</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The outgoing light node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/MeshBasicNodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/MeshBasicNodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

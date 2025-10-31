@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GTAONode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">GTAONode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Post processing node for applying Ground Truth Ambient Occlusion (GTAO) to a scene.</p>
+<p>Reference: <a href="https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%2520VERSION_COLOR.pdf">https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const postProcessing = new THREE.PostProcessing( renderer );
+const scenePass = pass( scene, camera );
+scenePass.setMRT( mrt( {
+	output: output,
+	normal: normalView
+} ) );
+const scenePassColor = scenePass.getTextureNode( 'output' );
+const scenePassNormal = scenePass.getTextureNode( 'normal' );
+const scenePassDepth = scenePass.getTextureNode( 'depth' );
+const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+postProcessing.outputNod = aoPass.getTextureNode().mul( scenePassColor );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">GTAONode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ao } from 'three/addons/tsl/display/GTAONode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="GTAONode" translate="no">new <a href="#GTAONode">GTAONode</a><span class="signature">( depthNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new GTAO node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the scene's depth.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normalNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the scene's normals.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="_temporalDirection" translate="no">.<a href="#_temporalDirection">_temporalDirection</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Temporal direction that influences the rotation angle for each slice.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthNode" translate="no">.<a href="#depthNode">depthNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>A node that represents the scene's depth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="distanceExponent" translate="no">.<a href="#distanceExponent">distanceExponent</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Another option to tweak the occlusion. The recommended range is
+<code>[1,2]</code> for attenuating the AO.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="distanceFallOff" translate="no">.<a href="#distanceFallOff">distanceFallOff</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The distance fall off value of the ambient occlusion.
+A lower value leads to a larger AO effect. The value
+should lie in the range <code>[0,1]</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalNode" translate="no">.<a href="#normalNode">normalNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>A node that represents the scene's normals. If no normals are passed to the
+constructor (because MRT is not available), normals can be automatically
+reconstructed from depth values in the shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="radius" translate="no">.<a href="#radius">radius</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The radius of the ambient occlusion.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="resolution" translate="no">.<a href="#resolution">resolution</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>The resolution of the effect. Can be scaled via
+<code>resolutionScale</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="resolutionScale" translate="no">.<a href="#resolutionScale">resolutionScale</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The resolution scale. By default the effect is rendered in full resolution
+for best quality but a value of <code>0.5</code> should be sufficient for most scenes.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="samples" translate="no">.<a href="#samples">samples</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>How many samples are used to compute the AO.
+A higher value results in better quality but also
+in a more expensive runtime behavior.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scale" translate="no">.<a href="#scale">scale</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The scale of the ambient occlusion.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thickness" translate="no">.<a href="#thickness">thickness</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The thickness of the ambient occlusion.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders
+its effect once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useTemporalFiltering" translate="no">.<a href="#useTemporalFiltering">useTemporalFiltering</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to use temporal filtering or not. Setting this property to
+<code>true</code> requires the usage of <code>TRAANode</code>. This will help to reduce noise
+although it introduces typical TAA artifacts like ghosting and temporal
+instabilities.</p>
+<p>If setting this property to <code>false</code>, a manual denoise via <code>DenoiseNode</code>
+might be required.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources. This method should be called
+when the effect is no longer required.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#dispose">TempNode#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTextureNode" translate="no">.<a href="#getTextureNode">getTextureNode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the result of the effect as a texture node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the result of the effect.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to setup the effect's TSL code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to render the effect once per frame.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBefore">TempNode#updateBefore</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/GTAONode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/GTAONode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

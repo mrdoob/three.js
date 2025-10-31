@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>RangeNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">RangeNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p><code>RangeNode</code> generates random instanced attribute data in a defined range.
+An exemplary use case for this utility node is to generate random per-instance
+colors:</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const material = new MeshBasicNodeMaterial();
+material.colorNode = range( new Color( 0x000000 ), new Color( 0xFFFFFF ) );
+const mesh = new InstancedMesh( geometry, material, count );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="RangeNode" translate="no">new <a href="#RangeNode">RangeNode</a><span class="signature">( minNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;<a href="global.html#any">any</a>></span>, maxNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;<a href="global.html#any">any</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new range node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>minNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node defining the lower bound of the range.</p>
+										<p>Default is <code>float()</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node defining the upper bound of the range.</p>
+										<p>Default is <code>float()</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="maxNode" translate="no">.<a href="#maxNode">maxNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;<a href="global.html#any">any</a>></span> </h3>
+					<div class="description">
+						<p>A node defining the upper bound of the range.</p>
+						<p>Default is <code>float()</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minNode" translate="no">.<a href="#minNode">minNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;<a href="global.html#any">any</a>></span> </h3>
+					<div class="description">
+						<p>A node defining the lower bound of the range.</p>
+						<p>Default is <code>float()</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getConstNode" translate="no">.<a href="#getConstNode">getConstNode</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a constant node from the given node by traversing it.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node to traverse.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The constant node, if found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type is inferred from range definition.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getNodeType">Node#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getVectorLength" translate="no">.<a href="#getVectorLength">getVectorLength</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the vector length which is computed based on the range definition.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The vector length.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/geometry/RangeNode.js" target="_blank" rel="noopener" translate="no">src/nodes/geometry/RangeNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

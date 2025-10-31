@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AudioListener - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → </p>
+	<h1 translate="no">AudioListener</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>The class represents a virtual listener of the all positional and non-positional audio effects
+in the scene. A three.js application usually creates a single listener. It is a mandatory
+constructor parameter for audios entities like <a href="Audio.html">Audio</a> and <a href="PositionalAudio.html">PositionalAudio</a>.</p>
+<p>In most cases, the listener object is a child of the camera. So the 3D transformation of the
+camera represents the 3D transformation of the listener.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="AudioListener" translate="no">new <a href="#AudioListener">AudioListener</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new audio listener.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="context" translate="no">.<a href="#context">context</a><span class="type-signature"> : <a href="AudioContext.html">AudioContext</a></span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The native audio context.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="filter" translate="no">.<a href="#filter">filter</a><span class="type-signature"> : AudioNode</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>An optional filter.</p>
+<p>Defined via <a href="AudioListener.html#setFilter">AudioListener#setFilter</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="gain" translate="no">.<a href="#gain">gain</a><span class="type-signature"> : GainNode</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The gain node used for volume control.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="timeDelta" translate="no">.<a href="#timeDelta">timeDelta</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Time delta values required for <code>linearRampToValueAtTime()</code> usage.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getFilter" translate="no">.<a href="#getFilter">getFilter</a><span class="signature">()</span><span class="type-signature"> : AudioNode</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current set filter.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The filter.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInput" translate="no">.<a href="#getInput">getInput</a><span class="signature">()</span><span class="type-signature"> : GainNode</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the listener's input node.</p>
+<p>This method is used by other audio nodes to connect to this listener.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The input node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMasterVolume" translate="no">.<a href="#getMasterVolume">getMasterVolume</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the applications master volume.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The master volume.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="removeFilter" translate="no">.<a href="#removeFilter">removeFilter</a><span class="signature">()</span><span class="type-signature"> : <a href="AudioListener.html">AudioListener</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the current filter from this listener.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this listener.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFilter" translate="no">.<a href="#setFilter">setFilter</a><span class="signature">( value : <span class="param-type">AudioNode</span> )</span><span class="type-signature"> : <a href="AudioListener.html">AudioListener</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given filter to this listener.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The filter to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this listener.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setMasterVolume" translate="no">.<a href="#setMasterVolume">setMasterVolume</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AudioListener.html">AudioListener</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the applications master volume. This volume setting affects
+all audio nodes in the scene.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The master volume to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this listener.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/audio/AudioListener.js" target="_blank" rel="noopener" translate="no">src/audio/AudioListener.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

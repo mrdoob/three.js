@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PointLight - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Light.html">Light</a> → </p>
+	<h1 translate="no">PointLight</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A light that gets emitted from a single point in all directions. A common
+use case for this is to replicate the light emitted from a bare
+lightbulb.</p>
+<p>This light can cast shadows - see the <a href="PointLightShadow.html">PointLightShadow</a> for details.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const light = new THREE.PointLight( 0xff0000, 1, 100 );
+light.position.set( 50, 50, 50 );
+scene.add( light );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PointLight" translate="no">new <a href="#PointLight">PointLight</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, intensity : <span class="param-type">number</span>, distance : <span class="param-type">number</span>, decay : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new point light.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The light's color.</p>
+										<p>Default is <code>0xffffff</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>intensity</strong>
+									</td>
+									<td class="description last">
+										<p>The light's strength/intensity measured in candela (cd).</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum range of the light. <code>0</code> means no limit.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>decay</strong>
+									</td>
+									<td class="description last">
+										<p>The amount the light dims along the distance of the light.</p>
+										<p>Default is <code>2</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="decay" translate="no">.<a href="#decay">decay</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The amount the light dims along the distance of the light. In context of
+physically-correct rendering the default value should not be changed.</p>
+						<p>Default is <code>2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="distance" translate="no">.<a href="#distance">distance</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>When distance is zero, light will attenuate according to inverse-square
+law to infinite distance. When distance is non-zero, light will attenuate
+according to inverse-square law until near the distance cutoff, where it
+will then attenuate quickly and smoothly to 0. Inherently, cutoffs are not
+physically correct.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isPointLight" translate="no">.<a href="#isPointLight">isPointLight</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="power" translate="no">.<a href="#power">power</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The light's power. Power is the luminous power of the light measured in lumens (lm).
+Changing the power will also change the light's intensity.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadow" translate="no">.<a href="#shadow">shadow</a><span class="type-signature"> : <a href="PointLightShadow.html">PointLightShadow</a></span> </h3>
+					<div class="description">
+						<p>This property holds the light's shadow configuration.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/lights/PointLight.js" target="_blank" rel="noopener" translate="no">src/lights/PointLight.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

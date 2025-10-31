@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>StructTypeNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">StructTypeNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a struct type node in the node-based system.
+This class is used to define and manage the layout and types of struct members.
+It extends the base Node class and provides methods to get the length of the struct,
+retrieve member types, and generate the struct type for a builder.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="StructTypeNode" translate="no">new <a href="#StructTypeNode">StructTypeNode</a><span class="signature">( membersLayout : <span class="param-type">Object</span>, name : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates an instance of StructTypeNode.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>membersLayout</strong>
+									</td>
+									<td class="description last">
+										<p>The layout of the members for the struct.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The optional name of the struct.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isStructLayoutNode" translate="no">.<a href="#isStructLayoutNode">isStructLayoutNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="membersLayout" translate="no">.<a href="#membersLayout">membersLayout</a><span class="type-signature"> : Array.&lt;{name: string, type: string, atomic: boolean}></span> </h3>
+					<div class="description">
+						<p>The layout of the members for the struct</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the struct.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#name">Node#name</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getLength" translate="no">.<a href="#getLength">getLength</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the length of the struct.
+The length is calculated by summing the lengths of the struct's members.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The length of the struct.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/StructTypeNode.js" target="_blank" rel="noopener" translate="no">src/nodes/core/StructTypeNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

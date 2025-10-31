@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CubeCamera - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → </p>
+	<h1 translate="no">CubeCamera</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special type of camera that is positioned in 3D space to render its surroundings into a
+cube render target. The render target can then be used as an environment map for rendering
+realtime reflections in your scene.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">// Create cube render target
+const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+// Create cube camera
+const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+scene.add( cubeCamera );
+// Create car
+const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
+const car = new THREE.Mesh( carGeometry, chromeMaterial );
+scene.add( car );
+// Update the render target cube
+car.visible = false;
+cubeCamera.position.copy( car.position );
+cubeCamera.update( renderer, scene );
+// Render the scene
+car.visible = true;
+renderer.render( scene, camera );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CubeCamera" translate="no">new <a href="#CubeCamera">CubeCamera</a><span class="signature">( near : <span class="param-type">number</span>, far : <span class="param-type">number</span>, renderTarget : <span class="param-type"><a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new cube camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>near</strong>
+									</td>
+									<td class="description last">
+										<p>The camera's near plane.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>far</strong>
+									</td>
+									<td class="description last">
+										<p>The camera's far plane.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The cube render target.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="activeMipmapLevel" translate="no">.<a href="#activeMipmapLevel">activeMipmapLevel</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The current active mipmap level</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="coordinateSystem" translate="no">.<a href="#coordinateSystem">coordinateSystem</a><span class="type-signature"> : <a href="global.html#WebGLCoordinateSystem">WebGLCoordinateSystem</a> | <a href="global.html#WebGPUCoordinateSystem">WebGPUCoordinateSystem</a></span> </h3>
+					<div class="description">
+						<p>The current active coordinate system.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderTarget" translate="no">.<a href="#renderTarget">renderTarget</a><span class="type-signature"> : <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> </h3>
+					<div class="description">
+						<p>A reference to the cube render target.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calling this method will render the given scene with the given renderer
+into the cube render target of the camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateCoordinateSystem" translate="no">.<a href="#updateCoordinateSystem">updateCoordinateSystem</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Must be called when the coordinate system of the cube camera is changed.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/cameras/CubeCamera.js" target="_blank" rel="noopener" translate="no">src/cameras/CubeCamera.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

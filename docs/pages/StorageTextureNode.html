@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>StorageTextureNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="InputNode.html">InputNode</a> → <a href="UniformNode.html">UniformNode</a> → <a href="TextureNode.html">TextureNode</a> → </p>
+	<h1 translate="no">StorageTextureNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This special version of a texture node can be used to
+write data into a storage texture with a compute shader.</p>
+<p>This node can only be used with a WebGPU backend.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const storageTexture = new THREE.StorageTexture( width, height );
+const computeTexture = Fn( ( { storageTexture } ) => {
+	const posX = instanceIndex.mod( width );
+	const posY = instanceIndex.div( width );
+	const indexUV = uvec2( posX, posY );
+	// generate RGB values
+	const r = 1;
+	const g = 1;
+	const b = 1;
+	textureStore( storageTexture, indexUV, vec4( r, g, b, 1 ) ).toWriteOnly();
+} );
+const computeNode = computeTexture( { storageTexture } ).compute( width * height );
+renderer.computeAsync( computeNode );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="StorageTextureNode" translate="no">new <a href="#StorageTextureNode">StorageTextureNode</a><span class="signature">( value : <span class="param-type"><a href="StorageTexture.html">StorageTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new storage texture node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The storage texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>storeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The value node that should be stored in the texture.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="access" translate="no">.<a href="#access">access</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The access type of the texture node.</p>
+						<p>Default is <code>'writeOnly'</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isStorageTextureNode" translate="no">.<a href="#isStorageTextureNode">isStorageTextureNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mipLevel" translate="no">.<a href="#mipLevel">mipLevel</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The mip level to write to for storage textures.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="storeNode" translate="no">.<a href="#storeNode">storeNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The value node that should be stored in the texture.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the code snippet of the storage node. If no <code>storeNode</code>
+is defined, the texture node is generated as normal texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The current output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#generate">TextureNode#generate</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateStore" translate="no">.<a href="#generateStore">generateStore</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the code snippet of the storage texture node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation to return a fixed value <code>'storageTexture'</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#getInputType">TextureNode#getInputType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setAccess" translate="no">.<a href="#setAccess">setAccess</a><span class="signature">( value : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the node access.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node access.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setMipLevel" translate="no">.<a href="#setMipLevel">setMipLevel</a><span class="signature">( level : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the mip level to write to.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>level</strong>
+									</td>
+									<td class="description last">
+										<p>The mip level.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toReadOnly" translate="no">.<a href="#toReadOnly">toReadOnly</a><span class="signature">()</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Convenience method for configuring a read-only node access.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toReadWrite" translate="no">.<a href="#toReadWrite">toReadWrite</a><span class="signature">()</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Convenience method for configuring a read/write node access.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toWriteOnly" translate="no">.<a href="#toWriteOnly">toWriteOnly</a><span class="signature">()</span><span class="type-signature"> : <a href="StorageTextureNode.html">StorageTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Convenience method for configuring a write-only node access.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/StorageTextureNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/StorageTextureNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

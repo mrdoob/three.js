@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BundleGroup - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Group.html">Group</a> → </p>
+	<h1 translate="no">BundleGroup</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A specialized group which enables applications access to the
+Render Bundle API of WebGPU. The group with all its descendant nodes
+are considered as one render bundle and processed as such by
+the renderer.</p>
+<p>This module is only fully supported by <code>WebGPURenderer</code> with a WebGPU backend.
+With a WebGL backend, the group can technically be rendered but without
+any performance improvements.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BundleGroup" translate="no">new <a href="#BundleGroup">BundleGroup</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new bundle group.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isBundleGroup" translate="no">.<a href="#isBundleGroup">isBundleGroup</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set this property to <code>true</code> when the bundle group has changed.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="static" translate="no">.<a href="#static">static</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the bundle is static or not. When set to <code>true</code>, the structure
+is assumed to be static and does not change. E.g. no new objects are
+added to the group</p>
+<p>If a change is required, an update can still be forced by setting the
+<code>needsUpdate</code> flag to <code>true</code>.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This property is only relevant for detecting types
+during serialization/deserialization. It should always
+match the class name.</p>
+						<p>Default is <code>'BundleGroup'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Group.html#type">Group#type</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="version" translate="no">.<a href="#version">version</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The bundle group's version.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/BundleGroup.js" target="_blank" rel="noopener" translate="no">src/renderers/common/BundleGroup.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

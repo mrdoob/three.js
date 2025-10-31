@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AnimationUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">AnimationUtils</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A class with various methods to assist with animations.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".convertArray" translate="no">.<a href="#.convertArray">convertArray</a><span class="signature">( array : <span class="param-type">TypedArray | Array</span>, type : <span class="param-type">TypedArray.constructor</span> )</span><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts an array to a specific type</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The array to convert.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The constructor of a type array.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The converted array</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".flattenJSON" translate="no">.<a href="#.flattenJSON">flattenJSON</a><span class="signature">( jsonKeys : <span class="param-type">Array.&lt;number></span>, times : <span class="param-type">Array.&lt;number></span>, values : <span class="param-type">Array.&lt;number></span>, valuePropertyName : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Used for parsing AOS keyframe formats.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>jsonKeys</strong>
+									</td>
+									<td class="description last">
+										<p>A list of JSON keyframes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>times</strong>
+									</td>
+									<td class="description last">
+										<p>This array will be filled with keyframe times by this method.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>values</strong>
+									</td>
+									<td class="description last">
+										<p>This array will be filled with keyframe values by this method.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>valuePropertyName</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property to use.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id=".getKeyframeOrder" translate="no">.<a href="#.getKeyframeOrder">getKeyframeOrder</a><span class="signature">( times : <span class="param-type">Array.&lt;number></span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an array by which times and values can be sorted.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>times</strong>
+									</td>
+									<td class="description last">
+										<p>The keyframe time values.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The array.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".isTypedArray" translate="no">.<a href="#.isTypedArray">isTypedArray</a><span class="signature">( object : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given object is a typed array.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object to check.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given object is a typed array.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".makeClipAdditive" translate="no">.<a href="#.makeClipAdditive">makeClipAdditive</a><span class="signature">( targetClip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, referenceFrame : <span class="param-type">number</span>, referenceClip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, fps : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts the keyframes of the given animation clip to an additive format.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>targetClip</strong>
+									</td>
+									<td class="description last">
+										<p>The clip to make additive.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>referenceFrame</strong>
+									</td>
+									<td class="description last">
+										<p>The reference frame.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>referenceClip</strong>
+									</td>
+									<td class="description last">
+										<p>The reference clip.</p>
+										<p>Default is <code>targetClip</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>fps</strong>
+									</td>
+									<td class="description last">
+										<p>The FPS.</p>
+										<p>Default is <code>30</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated clip which is now additive.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".sortedArray" translate="no">.<a href="#.sortedArray">sortedArray</a><span class="signature">( values : <span class="param-type">Array.&lt;number></span>, stride : <span class="param-type">number</span>, order : <span class="param-type">Array.&lt;number></span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sorts the given array by the previously computed order via <code>getKeyframeOrder()</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>values</strong>
+									</td>
+									<td class="description last">
+										<p>The values to sort.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>stride</strong>
+									</td>
+									<td class="description last">
+										<p>The stride.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>order</strong>
+									</td>
+									<td class="description last">
+										<p>The sort order.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The sorted values.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".subclip" translate="no">.<a href="#.subclip">subclip</a><span class="signature">( sourceClip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, name : <span class="param-type">string</span>, startFrame : <span class="param-type">number</span>, endFrame : <span class="param-type">number</span>, fps : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new clip, containing only the segment of the original clip between the given frames.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sourceClip</strong>
+									</td>
+									<td class="description last">
+										<p>The values to sort.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the clip.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>startFrame</strong>
+									</td>
+									<td class="description last">
+										<p>The start frame.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>endFrame</strong>
+									</td>
+									<td class="description last">
+										<p>The end frame.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>fps</strong>
+									</td>
+									<td class="description last">
+										<p>The FPS.</p>
+										<p>Default is <code>30</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The new sub clip.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/AnimationUtils.js" target="_blank" rel="noopener" translate="no">src/animation/AnimationUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

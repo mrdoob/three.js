@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Shape - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Curve.html">Curve</a> → <a href="CurvePath.html">CurvePath</a> → <a href="Path.html">Path</a> → </p>
+	<h1 translate="no">Shape</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Defines an arbitrary 2d shape plane using paths with optional holes. It
+can be used with <a href="ExtrudeGeometry.html">ExtrudeGeometry</a>, <a href="ShapeGeometry.html">ShapeGeometry</a>, to get
+points, or to get triangulated faces.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const heartShape = new THREE.Shape();
+heartShape.moveTo( 25, 25 );
+heartShape.bezierCurveTo( 25, 25, 20, 0, 0, 0 );
+heartShape.bezierCurveTo( - 30, 0, - 30, 35, - 30, 35 );
+heartShape.bezierCurveTo( - 30, 55, - 10, 77, 25, 95 );
+heartShape.bezierCurveTo( 60, 77, 80, 55, 80, 35 );
+heartShape.bezierCurveTo( 80, 35, 80, 0, 50, 0 );
+heartShape.bezierCurveTo( 35, 0, 25, 25, 25, 25 );
+const extrudeSettings = {
+	depth: 8,
+	bevelEnabled: true,
+	bevelSegments: 2,
+	steps: 2,
+	bevelSize: 1,
+	bevelThickness: 1
+};
+const geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
+const mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial() );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Shape" translate="no">new <a href="#Shape">Shape</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new shape.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points defining the shape.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="holes" translate="no">.<a href="#holes">holes</a><span class="type-signature"> : Array.&lt;<a href="Path.html">Path</a>></span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Defines the holes in the shape. Hole definitions must use the
+opposite winding order (CW/CCW) than the outer shape.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uuid" translate="no">.<a href="#uuid">uuid</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The UUID of the shape.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="extractPoints" translate="no">.<a href="#extractPoints">extractPoints</a><span class="signature">( divisions : <span class="param-type">number</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an object that holds contour data for the shape and its holes as
+arrays of 2D points.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The fineness of the result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object with contour data.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPointsHoles" translate="no">.<a href="#getPointsHoles">getPointsHoles</a><span class="signature">( divisions : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;Array.&lt;<a href="Vector2.html">Vector2</a>>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an array representing each contour of the holes
+as a list of 2D points.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The fineness of the result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The holes as a series of 2D points.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/core/Shape.js" target="_blank" rel="noopener" translate="no">src/extras/core/Shape.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

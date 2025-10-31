@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshPhysicalNodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="NodeMaterial.html">NodeMaterial</a> → <a href="MeshStandardNodeMaterial.html">MeshStandardNodeMaterial</a> → </p>
+	<h1 translate="no">MeshPhysicalNodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Node material version of <a href="MeshPhysicalMaterial.html">MeshPhysicalMaterial</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshPhysicalNodeMaterial" translate="no">new <a href="#MeshPhysicalNodeMaterial">MeshPhysicalNodeMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new mesh physical node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="anisotropyNode" translate="no">.<a href="#anisotropyNode">anisotropyNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The anisotropy of physical materials is by default inferred from the
+<code>anisotropy</code> property. This node property allows to overwrite the default
+and define the anisotropy with a node instead.</p>
+<p>If you don't want to overwrite the anisotropy but modify the existing
+value instead, use <a href="TSL.html#materialAnisotropy">materialAnisotropy</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="attenuationColorNode" translate="no">.<a href="#attenuationColorNode">attenuationColorNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The attenuation color of physical materials is by default inferred from the
+<code>attenuationColor</code> property. This node property allows to overwrite the default
+and define the attenuation color with a node instead.</p>
+<p>If you don't want to overwrite the attenuation color but modify the existing
+value instead, use <a href="TSL.html#materialAttenuationColor">materialAttenuationColor</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="attenuationDistanceNode" translate="no">.<a href="#attenuationDistanceNode">attenuationDistanceNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The attenuation distance of physical materials is by default inferred from the
+<code>attenuationDistance</code> property. This node property allows to overwrite the default
+and define the attenuation distance with a node instead.</p>
+<p>If you don't want to overwrite the attenuation distance but modify the existing
+value instead, use <a href="TSL.html#materialAttenuationDistance">materialAttenuationDistance</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clearcoatNode" translate="no">.<a href="#clearcoatNode">clearcoatNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The clearcoat of physical materials is by default inferred from the <code>clearcoat</code>
+and <code>clearcoatMap</code> properties. This node property allows to overwrite the default
+and define the clearcoat with a node instead.</p>
+<p>If you don't want to overwrite the clearcoat but modify the existing
+value instead, use <a href="TSL.html#materialClearcoat">materialClearcoat</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clearcoatNormalNode" translate="no">.<a href="#clearcoatNormalNode">clearcoatNormalNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The clearcoat normal of physical materials is by default inferred from the <code>clearcoatNormalMap</code>
+property. This node property allows to overwrite the default
+and define the clearcoat normal with a node instead.</p>
+<p>If you don't want to overwrite the clearcoat normal but modify the existing
+value instead, use <a href="TSL.html#materialClearcoatNormal">materialClearcoatNormal</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clearcoatRoughnessNode" translate="no">.<a href="#clearcoatRoughnessNode">clearcoatRoughnessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The clearcoat roughness of physical materials is by default inferred from the <code>clearcoatRoughness</code>
+and <code>clearcoatRoughnessMap</code> properties. This node property allows to overwrite the default
+and define the clearcoat roughness with a node instead.</p>
+<p>If you don't want to overwrite the clearcoat roughness but modify the existing
+value instead, use <a href="TSL.html#materialClearcoatRoughness">materialClearcoatRoughness</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dispersionNode" translate="no">.<a href="#dispersionNode">dispersionNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The dispersion of physical materials is by default inferred from the
+<code>dispersion</code> property. This node property allows to overwrite the default
+and define the dispersion with a node instead.</p>
+<p>If you don't want to overwrite the dispersion but modify the existing
+value instead, use <a href="TSL.html#materialDispersion">materialDispersion</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iorNode" translate="no">.<a href="#iorNode">iorNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The ior of physical materials is by default inferred from the <code>ior</code>
+property. This node property allows to overwrite the default
+and define the ior with a node instead.</p>
+<p>If you don't want to overwrite the ior but modify the existing
+value instead, use <a href="TSL.html#materialIOR">materialIOR</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iridescenceIORNode" translate="no">.<a href="#iridescenceIORNode">iridescenceIORNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The iridescence IOR of physical materials is by default inferred from the <code>iridescenceIOR</code>
+property. This node property allows to overwrite the default
+and define the iridescence IOR with a node instead.</p>
+<p>If you don't want to overwrite the iridescence IOR but modify the existing
+value instead, use <a href="TSL.html#materialIridescenceIOR">materialIridescenceIOR</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iridescenceNode" translate="no">.<a href="#iridescenceNode">iridescenceNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The iridescence of physical materials is by default inferred from the <code>iridescence</code>
+property. This node property allows to overwrite the default
+and define the iridescence with a node instead.</p>
+<p>If you don't want to overwrite the iridescence but modify the existing
+value instead, use <a href="TSL.html#materialIridescence">materialIridescence</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iridescenceThicknessNode" translate="no">.<a href="#iridescenceThicknessNode">iridescenceThicknessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The iridescence thickness of physical materials is by default inferred from the <code>iridescenceThicknessRange</code>
+and <code>iridescenceThicknessMap</code> properties. This node property allows to overwrite the default
+and define the iridescence thickness with a node instead.</p>
+<p>If you don't want to overwrite the iridescence thickness but modify the existing
+value instead, use <a href="TSL.html#materialIridescenceThickness">materialIridescenceThickness</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMeshPhysicalNodeMaterial" translate="no">.<a href="#isMeshPhysicalNodeMaterial">isMeshPhysicalNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sheenNode" translate="no">.<a href="#sheenNode">sheenNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The sheen of physical materials is by default inferred from the <code>sheen</code>, <code>sheenColor</code>
+and <code>sheenColorMap</code> properties. This node property allows to overwrite the default
+and define the sheen with a node instead.</p>
+<p>If you don't want to overwrite the sheen but modify the existing
+value instead, use <a href="TSL.html#materialSheen">materialSheen</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sheenRoughnessNode" translate="no">.<a href="#sheenRoughnessNode">sheenRoughnessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The sheen roughness of physical materials is by default inferred from the <code>sheenRoughness</code> and
+<code>sheenRoughnessMap</code> properties. This node property allows to overwrite the default
+and define the sheen roughness with a node instead.</p>
+<p>If you don't want to overwrite the sheen roughness but modify the existing
+value instead, use <a href="TSL.html#materialSheenRoughness">materialSheenRoughness</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="specularColorNode" translate="no">.<a href="#specularColorNode">specularColorNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The specular color of physical materials is by default inferred from the <code>specularColor</code>
+and <code>specularColorMap</code> properties. This node property allows to overwrite the default
+and define the specular color with a node instead.</p>
+<p>If you don't want to overwrite the specular color but modify the existing
+value instead, use <a href="TSL.html#materialSpecularColor">materialSpecularColor</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="specularIntensityNode" translate="no">.<a href="#specularIntensityNode">specularIntensityNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The specular intensity of physical materials is by default inferred from the <code>specularIntensity</code>
+and <code>specularIntensityMap</code> properties. This node property allows to overwrite the default
+and define the specular intensity with a node instead.</p>
+<p>If you don't want to overwrite the specular intensity but modify the existing
+value instead, use <a href="TSL.html#materialSpecularIntensity">materialSpecularIntensity</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thicknessNode" translate="no">.<a href="#thicknessNode">thicknessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The thickness of physical materials is by default inferred from the <code>thickness</code> and
+<code>thicknessMap</code> properties. This node property allows to overwrite the default
+and define the thickness with a node instead.</p>
+<p>If you don't want to overwrite the thickness but modify the existing
+value instead, use <a href="TSL.html#materialThickness">materialThickness</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transmissionNode" translate="no">.<a href="#transmissionNode">transmissionNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The transmission of physical materials is by default inferred from the <code>transmission</code> and
+<code>transmissionMap</code> properties. This node property allows to overwrite the default
+and define the transmission with a node instead.</p>
+<p>If you don't want to overwrite the transmission but modify the existing
+value instead, use <a href="TSL.html#materialTransmission">materialTransmission</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useAnisotropy" translate="no">.<a href="#useAnisotropy">useAnisotropy</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use anisotropy or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useClearcoat" translate="no">.<a href="#useClearcoat">useClearcoat</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use clearcoat or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useDispersion" translate="no">.<a href="#useDispersion">useDispersion</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use dispersion or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useIridescence" translate="no">.<a href="#useIridescence">useIridescence</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use iridescence or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useSheen" translate="no">.<a href="#useSheen">useSheen</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use sheen or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useTransmission" translate="no">.<a href="#useTransmission">useTransmission</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use transmission or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupClearcoatNormal" translate="no">.<a href="#setupClearcoatNormal">setupClearcoatNormal</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the clearcoat normal node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clearcoat normal.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLightingModel" translate="no">.<a href="#setupLightingModel">setupLightingModel</a><span class="signature">()</span><span class="type-signature"> : <a href="PhysicalLightingModel.html">PhysicalLightingModel</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the lighting model.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="MeshStandardNodeMaterial.html#setupLightingModel">MeshStandardNodeMaterial#setupLightingModel</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lighting model.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupSpecular" translate="no">.<a href="#setupSpecular">setupSpecular</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the specular related node variables.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="MeshStandardNodeMaterial.html#setupSpecular">MeshStandardNodeMaterial#setupSpecular</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupVariants" translate="no">.<a href="#setupVariants">setupVariants</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the physical specific node variables.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="MeshStandardNodeMaterial.html#setupVariants">MeshStandardNodeMaterial#setupVariants</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/MeshPhysicalNodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/MeshPhysicalNodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

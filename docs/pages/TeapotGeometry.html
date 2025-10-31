@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TeapotGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="BufferGeometry.html">BufferGeometry</a> → </p>
+	<h1 translate="no">TeapotGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Tessellates the famous Utah teapot database by Martin Newell into triangles.</p>
+<p>The teapot should normally be rendered as a double sided object, since for some
+patches both sides can be seen, e.g., the gap around the lid and inside the spout.</p>
+<p>Segments 'n' determines the number of triangles output. Total triangles = 32<em>2</em>n<em>n - 8</em>n
+(degenerates at the top and bottom cusps are deleted).</p>
+<p>Code based on <a href="http://tog.acm.org/resources/SPD/">SPD software</a>
+Created for the Udacity course <a href="http://bit.ly/ericity">Interactive Rendering</a></p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new TeapotGeometry( 50, 18 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const teapot = new THREE.Mesh( geometry, material );
+scene.add( teapot );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TeapotGeometry</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TeapotGeometry" translate="no">new <a href="#TeapotGeometry">TeapotGeometry</a><span class="signature">( size : <span class="param-type">number</span>, segments : <span class="param-type">number</span>, bottom : <span class="param-type">boolean</span>, lid : <span class="param-type">boolean</span>, body : <span class="param-type">boolean</span>, fitLid : <span class="param-type">boolean</span>, blinn : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new teapot geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>Relative scale of the teapot.</p>
+										<p>Default is <code>50</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>segments</strong>
+									</td>
+									<td class="description last">
+										<p>Number of line segments to subdivide each patch edge.</p>
+										<p>Default is <code>10</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bottom</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the bottom of the teapot is generated or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>lid</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the lid is generated or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>body</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the body is generated or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>fitLid</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the lid is slightly stretched to prevent gaps between the body and lid or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>blinn</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the teapot is scaled vertically for better aesthetics or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/TeapotGeometry.js" target="_blank" rel="noopener" translate="no">examples/jsm/geometries/TeapotGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PolarGridHelper - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Line.html">Line</a> → <a href="LineSegments.html">LineSegments</a> → </p>
+	<h1 translate="no">PolarGridHelper</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This helper is an object to define polar grids. Grids are
+two-dimensional arrays of lines.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const radius = 10;
+const sectors = 16;
+const rings = 8;
+const divisions = 64;
+const helper = new THREE.PolarGridHelper( radius, sectors, rings, divisions );
+scene.add( helper );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PolarGridHelper" translate="no">new <a href="#PolarGridHelper">PolarGridHelper</a><span class="signature">( radius : <span class="param-type">number</span>, sectors : <span class="param-type">number</span>, rings : <span class="param-type">number</span>, divisions : <span class="param-type">number</span>, color1 : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, color2 : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new polar grid helper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the polar grid. This can be any positive number.</p>
+										<p>Default is <code>10</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sectors</strong>
+									</td>
+									<td class="description last">
+										<p>The number of sectors the grid will be divided into. This can be any positive integer.</p>
+										<p>Default is <code>16</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>rings</strong>
+									</td>
+									<td class="description last">
+										<p>The number of rings. This can be any positive integer.</p>
+										<p>Default is <code>16</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of line segments used for each circle. This can be any positive integer.</p>
+										<p>Default is <code>64</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color1</strong>
+									</td>
+									<td class="description last">
+										<p>The first color used for grid elements.</p>
+										<p>Default is <code>0x444444</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color2</strong>
+									</td>
+									<td class="description last">
+										<p>The second color used for grid elements.</p>
+										<p>Default is <code>0x888888</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/helpers/PolarGridHelper.js" target="_blank" rel="noopener" translate="no">src/helpers/PolarGridHelper.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

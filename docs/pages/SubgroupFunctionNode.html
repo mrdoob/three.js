@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SubgroupFunctionNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">SubgroupFunctionNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class represents a set of built in WGSL shader functions that sync
+synchronously execute an operation across a subgroup, or 'warp', of compute
+or fragment shader invocations within a workgroup. Typically, these functions
+will synchronously execute an operation using data from all active invocations
+within the subgroup, then broadcast that result to all active invocations. In
+other graphics APIs, subgroup functions are also referred to as wave intrinsics
+(DirectX/HLSL) or warp intrinsics (CUDA).</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SubgroupFunctionNode" translate="no">new <a href="#SubgroupFunctionNode">SubgroupFunctionNode</a><span class="signature">( method : <span class="param-type">string</span>, aNode : <span class="param-type"><a href="Node.html">Node</a></span>, bNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new function node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>method</strong>
+									</td>
+									<td class="description last">
+										<p>The subgroup/wave intrinsic method to construct.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aNode</strong>
+									</td>
+									<td class="description last">
+										<p>The method's first argument.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bNode</strong>
+									</td>
+									<td class="description last">
+										<p>The method's second argument.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="aNode" translate="no">.<a href="#aNode">aNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The method's first argument.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bNode" translate="no">.<a href="#bNode">bNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The method's second argument.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="method" translate="no">.<a href="#method">method</a><span class="type-signature"> : String</span> </h3>
+					<div class="description">
+						<p>The subgroup/wave intrinsic method to construct.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/gpgpu/SubgroupFunctionNode.js" target="_blank" rel="noopener" translate="no">src/nodes/gpgpu/SubgroupFunctionNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

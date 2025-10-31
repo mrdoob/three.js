@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>DDSLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → <a href="CompressedTextureLoader.html">CompressedTextureLoader</a> → </p>
+	<h1 translate="no">DDSLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for the S3TC texture compression format.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new DDSLoader();
+const map = loader.load( 'textures/compressed/disturb_dxt1_nomip.dds' );
+map.colorSpace = THREE.SRGBColorSpace; // only for color textures
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">DDSLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="DDSLoader" translate="no">new <a href="#DDSLoader">DDSLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new DDS loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span>, loadMipmaps : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="CompressedTextureLoader.html#~TexData">CompressedTextureLoader~TexData</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given S3TC texture data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw texture data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>loadMipmaps</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to load mipmaps or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="CompressedTextureLoader.html#parse">CompressedTextureLoader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object representing the parsed texture data.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DDSLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/DDSLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

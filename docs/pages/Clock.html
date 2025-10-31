@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Clock - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Clock</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Class for keeping track of time.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Clock" translate="no">new <a href="#Clock">Clock</a><span class="signature">( autoStart : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new clock.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>autoStart</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to automatically start the clock when
+<code>getDelta()</code> is called for the first time.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="autoStart" translate="no">.<a href="#autoStart">autoStart</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, the clock starts automatically when <code>getDelta()</code> is called
+for the first time.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="elapsedTime" translate="no">.<a href="#elapsedTime">elapsedTime</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Keeps track of the total time that the clock has been running.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="oldTime" translate="no">.<a href="#oldTime">oldTime</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Holds the time at which the clock's <code>start()</code>, <code>getElapsedTime()</code> or
+<code>getDelta()</code> methods were last called.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="running" translate="no">.<a href="#running">running</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the clock is running or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="startTime" translate="no">.<a href="#startTime">startTime</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Holds the time at which the clock's <code>start()</code> method was last called.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getDelta" translate="no">.<a href="#getDelta">getDelta</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the delta time in seconds.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The delta time.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getElapsedTime" translate="no">.<a href="#getElapsedTime">getElapsedTime</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the elapsed time in seconds.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The elapsed time.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="start" translate="no">.<a href="#start">start</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts the clock. When <code>autoStart</code> is set to <code>true</code>, the method is automatically
+called by the class.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="stop" translate="no">.<a href="#stop">stop</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Stops the clock.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js" target="_blank" rel="noopener" translate="no">src/core/Clock.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

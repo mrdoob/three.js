@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>FogExp2 - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">FogExp2</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to define an exponential squared fog,
+which gives a clear view near the camera and a faster than exponentially
+densening fog farther from the camera.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="FogExp2" translate="no">new <a href="#FogExp2">FogExp2</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a></span>, density : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new fog.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The fog's color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>density</strong>
+									</td>
+									<td class="description last">
+										<p>Defines how fast the fog will grow dense.</p>
+										<p>Default is <code>0.00025</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="color" translate="no">.<a href="#color">color</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>The fog's color.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="density" translate="no">.<a href="#density">density</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Defines how fast the fog will grow dense.</p>
+						<p>Default is <code>0.00025</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isFogExp2" translate="no">.<a href="#isFogExp2">isFogExp2</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the fog.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="FogExp2.html">FogExp2</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new fog with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">( meta : <span class="param-type">Object | string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the fog into JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>meta</strong>
+									</td>
+									<td class="description last">
+										<p>An optional value holding meta information about the serialization.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized fog</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/scenes/FogExp2.js" target="_blank" rel="noopener" translate="no">src/scenes/FogExp2.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

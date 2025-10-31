@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeFunction - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">NodeFunction</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Base class for node functions. A derived module must be implemented
+for each supported native shader language. Similar to other <code>Node*</code> modules,
+this class is only relevant during the building process and not used
+in user-level code.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NodeFunction" translate="no">new <a href="#NodeFunction">NodeFunction</a><span class="signature">( type : <span class="param-type">string</span>, inputs : <span class="param-type">Array.&lt;<a href="NodeFunctionInput.html">NodeFunctionInput</a>></span>, name : <span class="param-type">string</span>, precision : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new node function.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node type. This type is the return type of the node function.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>inputs</strong>
+									</td>
+									<td class="description last">
+										<p>The function's inputs.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The function's name.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>precision</strong>
+									</td>
+									<td class="description last">
+										<p>The precision qualifier.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="inputs" translate="no">.<a href="#inputs">inputs</a><span class="type-signature"> : Array.&lt;<a href="NodeFunctionInput.html">NodeFunctionInput</a>></span> </h3>
+					<div class="description">
+						<p>The function's inputs.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the uniform.</p>
+						<p>Default is <code>''</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="precision" translate="no">.<a href="#precision">precision</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The precision qualifier.</p>
+						<p>Default is <code>''</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The node type. This type is the return type of the node function.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getCode" translate="no">.<a href="#getCode">getCode</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method returns the native code of the node function.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The function's name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A shader code.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/NodeFunction.js" target="_blank" rel="noopener" translate="no">src/nodes/core/NodeFunction.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

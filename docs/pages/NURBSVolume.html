@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NURBSVolume - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">NURBSVolume</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class represents a NURBS volume.</p>
+<p>Implementation is based on <code>(x, y [, z=0 [, w=1]])</code> control points with <code>w=weight</code>.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">NURBSVolume</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { NURBSVolume } from 'three/addons/curves/NURBSVolume.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NURBSVolume" translate="no">new <a href="#NURBSVolume">NURBSVolume</a><span class="signature">( degree1 : <span class="param-type">number</span>, degree2 : <span class="param-type">number</span>, degree3 : <span class="param-type">number</span>, knots1 : <span class="param-type">Array.&lt;number></span>, knots2 : <span class="param-type">Array.&lt;number></span>, knots3 : <span class="param-type">Array.&lt;number></span>, controlPoints : <span class="param-type">Array.&lt;Array.&lt;Array.&lt;(<a href="Vector2.html">Vector2</a>|<a href="Vector3.html">Vector3</a>|<a href="Vector4.html">Vector4</a>)>>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new NURBS surface.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>degree1</strong>
+									</td>
+									<td class="description last">
+										<p>The first NURBS degree.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>degree2</strong>
+									</td>
+									<td class="description last">
+										<p>The second NURBS degree.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>degree3</strong>
+									</td>
+									<td class="description last">
+										<p>The third NURBS degree.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>knots1</strong>
+									</td>
+									<td class="description last">
+										<p>The first knots as a flat array of numbers.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>knots2</strong>
+									</td>
+									<td class="description last">
+										<p>The second knots as a flat array of numbers.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>knots3</strong>
+									</td>
+									<td class="description last">
+										<p>The third knots as a flat array of numbers.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>controlPoints</strong>
+									</td>
+									<td class="description last">
+										<p>An array^3 holding control points.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t1 : <span class="param-type">number</span>, t2 : <span class="param-type">number</span>, t3 : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method returns a vector in 3D space for the given interpolation factor. This vector lies within the NURBS volume.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>t1</strong>
+									</td>
+									<td class="description last">
+										<p>The first interpolation factor representing the <code>u</code> position within the volume. Must be in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t2</strong>
+									</td>
+									<td class="description last">
+										<p>The second interpolation factor representing the <code>v</code> position within the volume. Must be in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t3</strong>
+									</td>
+									<td class="description last">
+										<p>The third interpolation factor representing the <code>w</code> position within the volume. Must be in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector the result is written to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/curves/NURBSVolume.js" target="_blank" rel="noopener" translate="no">examples/jsm/curves/NURBSVolume.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

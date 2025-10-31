@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SkinnedMesh - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">SkinnedMesh</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A mesh that has a <a href="Skeleton.html">Skeleton</a> that can then be used to animate the
+vertices of the geometry with skinning/skeleton animation.</p>
+<p>Next to a valid skeleton, the skinned mesh requires skin indices and weights
+as buffer attributes in its geometry. These attribute define which bones affect a single
+vertex to a certain extend.</p>
+<p>Typically skinned meshes are not created manually but loaders like <a href="GLTFLoader.html">GLTFLoader</a>
+or <a href="FBXLoader.html">FBXLoader</a> import respective models.</p></div>
+				<iframe id="viewer" src="../scenes/bones-browser.html"></iframe>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SkinnedMesh" translate="no">new <a href="#SkinnedMesh">SkinnedMesh</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a> | Array.&lt;<a href="Material.html">Material</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new skinned mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh material.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="bindMatrix" translate="no">.<a href="#bindMatrix">bindMatrix</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="description">
+						<p>The base matrix that is used for the bound bone transforms.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bindMatrixInverse" translate="no">.<a href="#bindMatrixInverse">bindMatrixInverse</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="description">
+						<p>The base matrix that is used for resetting the bound bone transforms.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bindMode" translate="no">.<a href="#bindMode">bindMode</a><span class="type-signature"> : <a href="global.html#AttachedBindMode">AttachedBindMode</a> | <a href="global.html#DetachedBindMode">DetachedBindMode</a></span> </h3>
+					<div class="description">
+						<p><code>AttachedBindMode</code> means the skinned mesh shares the same world space as the skeleton.
+This is not true when using <code>DetachedBindMode</code> which is useful when sharing a skeleton
+across multiple skinned meshes.</p>
+						<p>Default is <code>AttachedBindMode</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="boundingBox" translate="no">.<a href="#boundingBox">boundingBox</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<div class="description">
+						<p>The bounding box of the skinned mesh. Can be computed via <a href="SkinnedMesh.html#computeBoundingBox">SkinnedMesh#computeBoundingBox</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="boundingSphere" translate="no">.<a href="#boundingSphere">boundingSphere</a><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<div class="description">
+						<p>The bounding sphere of the skinned mesh. Can be computed via <a href="SkinnedMesh.html#computeBoundingSphere">SkinnedMesh#computeBoundingSphere</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isSkinnedMesh" translate="no">.<a href="#isSkinnedMesh">isSkinnedMesh</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="applyBoneTransform" translate="no">.<a href="#applyBoneTransform">applyBoneTransform</a><span class="signature">( index : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the bone transform associated with the given index to the given
+vertex position. Returns the updated vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The vertex index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.
+the skinned mesh's world matrix will be used instead.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated vertex position.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="bind" translate="no">.<a href="#bind">bind</a><span class="signature">( skeleton : <span class="param-type"><a href="Skeleton.html">Skeleton</a></span>, bindMatrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Binds the given skeleton to the skinned mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>skeleton</strong>
+									</td>
+									<td class="description last">
+										<p>The skeleton to bind.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bindMatrix</strong>
+									</td>
+									<td class="description last">
+										<p>The bind matrix. If no bind matrix is provided,
+the skinned mesh's world matrix will be used instead.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="computeBoundingBox" translate="no">.<a href="#computeBoundingBox">computeBoundingBox</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the bounding box of the skinned mesh, and updates <a href="SkinnedMesh.html#boundingBox">SkinnedMesh#boundingBox</a>.
+The bounding box is not automatically computed by the engine; this method must be called by your app.
+If the skinned mesh is animated, the bounding box should be recomputed per frame in order to reflect
+the current animation state.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="computeBoundingSphere" translate="no">.<a href="#computeBoundingSphere">computeBoundingSphere</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the bounding sphere of the skinned mesh, and updates <a href="SkinnedMesh.html#boundingSphere">SkinnedMesh#boundingSphere</a>.
+The bounding sphere is automatically computed by the engine once when it is needed, e.g., for ray casting
+and view frustum culling. If the skinned mesh is animated, the bounding sphere should be recomputed
+per frame in order to reflect the current animation state.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="normalizeSkinWeights" translate="no">.<a href="#normalizeSkinWeights">normalizeSkinWeights</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Normalizes the skin weights which are defined as a buffer attribute
+in the skinned mesh's geometry.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="pose" translate="no">.<a href="#pose">pose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method sets the skinned mesh in the rest pose).</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/objects/SkinnedMesh.js" target="_blank" rel="noopener" translate="no">src/objects/SkinnedMesh.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

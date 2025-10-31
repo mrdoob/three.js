@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Object3DNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">Object3DNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node can be used to access transformation related metrics of 3D objects.
+Depending on the selected scope, a different metric is represented as a uniform
+in the shader. The following scopes are supported:</p>
+<ul>
+<li><code>POSITION</code>: The object's position in world space.</li>
+<li><code>VIEW_POSITION</code>: The object's position in view/camera space.</li>
+<li><code>DIRECTION</code>: The object's direction in world space.</li>
+<li><code>SCALE</code>: The object's scale in world space.</li>
+<li><code>WORLD_MATRIX</code>: The object's matrix in world space.</li>
+</ul></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Object3DNode" translate="no">new <a href="#Object3DNode">Object3DNode</a><span class="signature">( scope : <span class="param-type">'position' | 'viewPosition' | 'direction' | 'scale' | 'worldMatrix'</span>, object3d : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new object 3D node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The node represents a different type of transformation depending on the scope.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>object3d</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="object3d" translate="no">.<a href="#object3d">object3d</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="description">
+						<p>The 3D object.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scope" translate="no">.<a href="#scope">scope</a><span class="type-signature"> : 'position' | 'viewPosition' | 'direction' | 'scale' | 'worldMatrix'</span> </h3>
+					<div class="description">
+						<p>The node reports a different type of transformation depending on the scope.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uniformNode" translate="no">.<a href="#uniformNode">uniformNode</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<div class="description">
+						<p>Holds the value of the node as a uniform.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Overwritten since this type of node is updated per object.</p>
+						<p>Default is <code>'object'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateType">Node#updateType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the code snippet of the uniform node. The node type of the uniform
+node also depends on the selected scope.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#generate">Node#generate</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">()</span><span class="type-signature"> : 'mat4' | 'vec3' | 'float'</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten since the node type is inferred from the scope.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getNodeType">Node#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the uniform value depending on the scope.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#update">Node#update</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/Object3DNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/Object3DNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

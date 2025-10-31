@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MTLLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">MTLLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for the MTL format.</p>
+<p>The Material Template Library format (MTL) or .MTL File Format is a companion file format
+to OBJ that describes surface shading (material) properties of objects within one or more
+OBJ files.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new MTLLoader();
+const materials = await loader.loadAsync( 'models/obj/male02/male02.mtl' );
+const objLoader = new OBJLoader();
+objLoader.setMaterials( materials );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">MTLLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MTLLoader" translate="no">new <a href="#MTLLoader">MTLLoader</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URL and passes the loaded MTL asset
+to the <code>onLoad()</code> callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( text : <span class="param-type">string</span>, path : <span class="param-type">string</span> )</span><span class="type-signature"> : MaterialCreator</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given MTL data and returns the resulting material creator.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>text</strong>
+									</td>
+									<td class="description last">
+										<p>The raw MTL data as a string.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The URL base path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The material creator.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setMaterialOptions" translate="no">.<a href="#setMaterialOptions">setMaterialOptions</a><span class="signature">( value : <span class="param-type"><a href="MTLLoader.html#~MaterialOptions">MTLLoader~MaterialOptions</a></span> )</span><span class="type-signature"> : <a href="MTLLoader.html">MTLLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the material options.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The material options.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~MaterialOptions" translate="no">.<a href="#~MaterialOptions">MaterialOptions</a> </h3>
+					<div class="description">
+						<p>Material options of <code>MTLLoader</code>.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>side</strong>
+						<br>
+<span class="param-type"><a href="global.html#FrontSide">FrontSide</a></span>
+|
+<span class="param-type"><a href="global.html#BackSide">BackSide</a></span>
+|
+<span class="param-type"><a href="global.html#DoubleSide">DoubleSide</a></span>
+				</td>
+			<td class="description last">
+				<p>Which side to apply the material.</p>
+						<p>Default is <code>FrontSide</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>wrap</strong>
+						<br>
+<span class="param-type"><a href="global.html#RepeatWrapping">RepeatWrapping</a></span>
+|
+<span class="param-type"><a href="global.html#ClampToEdgeWrapping">ClampToEdgeWrapping</a></span>
+|
+<span class="param-type"><a href="global.html#MirroredRepeatWrapping">MirroredRepeatWrapping</a></span>
+				</td>
+			<td class="description last">
+				<p>What type of wrapping to apply for textures.</p>
+						<p>Default is <code>RepeatWrapping</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>normalizeRGB</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether RGB colors should be normalized to <code>0-1</code> from <code>0-255</code>.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>ignoreZeroRGBs</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Ignore values of RGBs (Ka,Kd,Ks) that are all 0's.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/MTLLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/MTLLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

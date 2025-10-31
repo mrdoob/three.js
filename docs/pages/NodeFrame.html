@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeFrame - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">NodeFrame</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Management class for updating nodes. The module tracks metrics like
+the elapsed time, delta time, the render and frame ID to correctly
+call the node update methods <a href="Node.html#updateBefore">Node#updateBefore</a>, <a href="Node.html#update">Node#update</a>
+and <a href="Node.html#updateAfter">Node#updateAfter</a> depending on the node's configuration.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NodeFrame" translate="no">new <a href="#NodeFrame">NodeFrame</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new node fame.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
+					<div class="description">
+						<p>A reference to the current camera.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="deltaTime" translate="no">.<a href="#deltaTime">deltaTime</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The delta time in seconds.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="frameId" translate="no">.<a href="#frameId">frameId</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The frame ID.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="material" translate="no">.<a href="#material">material</a><span class="type-signature"> : <a href="Material.html">Material</a></span> </h3>
+					<div class="description">
+						<p>A reference to the current material.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="object" translate="no">.<a href="#object">object</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="description">
+						<p>A reference to the current 3D object.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderId" translate="no">.<a href="#renderId">renderId</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The render ID.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderer" translate="no">.<a href="#renderer">renderer</a><span class="type-signature"> : <a href="Renderer.html">Renderer</a></span> </h3>
+					<div class="description">
+						<p>A reference to the current renderer.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scene" translate="no">.<a href="#scene">scene</a><span class="type-signature"> : <a href="Scene.html">Scene</a></span> </h3>
+					<div class="description">
+						<p>A reference to the current scene.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="time" translate="no">.<a href="#time">time</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The elapsed time in seconds.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateAfterMap" translate="no">.<a href="#updateAfterMap">updateAfterMap</a><span class="type-signature"> : WeakMap.&lt;<a href="Node.html">Node</a>, Object></span> </h3>
+					<div class="description">
+						<p>Used to control the <a href="Node.html#updateAfter">Node#updateAfter</a> call.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateBeforeMap" translate="no">.<a href="#updateBeforeMap">updateBeforeMap</a><span class="type-signature"> : WeakMap.&lt;<a href="Node.html">Node</a>, Object></span> </h3>
+					<div class="description">
+						<p>Used to control the <a href="Node.html#updateBefore">Node#updateBefore</a> call.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateMap" translate="no">.<a href="#updateMap">updateMap</a><span class="type-signature"> : WeakMap.&lt;<a href="Node.html">Node</a>, Object></span> </h3>
+					<div class="description">
+						<p>Used to control the <a href="Node.html#update">Node#update</a> call.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the internal state of the node frame. This method is
+called by the renderer in its internal animation loop.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="updateAfterNode" translate="no">.<a href="#updateAfterNode">updateAfterNode</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method executes the <a href="Node.html#updateAfter">Node#updateAfter</a> for the given node.
+It makes sure <a href="Node.html#updateAfterType">Node#updateAfterType</a> is honored meaning the update
+is only executed once per frame, render or object depending on the update
+type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node that should be updated.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateBeforeNode" translate="no">.<a href="#updateBeforeNode">updateBeforeNode</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method executes the <a href="Node.html#updateBefore">Node#updateBefore</a> for the given node.
+It makes sure <a href="Node.html#updateBeforeType">Node#updateBeforeType</a> is honored meaning the update
+is only executed once per frame, render or object depending on the update
+type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node that should be updated.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateNode" translate="no">.<a href="#updateNode">updateNode</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method executes the <a href="Node.html#update">Node#update</a> for the given node.
+It makes sure <a href="Node.html#updateType">Node#updateType</a> is honored meaning the update
+is only executed once per frame, render or object depending on the update
+type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node that should be updated.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/NodeFrame.js" target="_blank" rel="noopener" translate="no">src/nodes/core/NodeFrame.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

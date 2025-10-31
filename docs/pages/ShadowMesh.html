@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ShadowMesh - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">ShadowMesh</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A Shadow Mesh that follows a shadow-casting mesh in the scene,
+but is confined to a single plane. This technique can be used as
+a very performant alternative to classic shadow mapping. However,
+it has serious limitations like:</p>
+<ul>
+<li>Shadows can only be casted on flat planes.</li>
+<li>No soft shadows support.</li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const cubeShadow = new ShadowMesh( cube );
+scene.add( cubeShadow );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">ShadowMesh</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ShadowMesh } from 'three/addons/objects/ShadowMesh.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ShadowMesh" translate="no">new <a href="#ShadowMesh">ShadowMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new shadow mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow-casting reference mesh.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="frustumCulled" translate="no">.<a href="#frustumCulled">frustumCulled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Overwritten to disable view-frustum culling by default.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Mesh.html#frustumCulled">Mesh#frustumCulled</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isShadowMesh" translate="no">.<a href="#isShadowMesh">isShadowMesh</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrixAutoUpdate" translate="no">.<a href="#matrixAutoUpdate">matrixAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Overwritten to disable automatic matrix update. The local
+matrix is computed manually in <a href="ShadowMesh.html#update">ShadowMesh#update</a>.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Mesh.html#matrixAutoUpdate">Mesh#matrixAutoUpdate</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="meshMatrix" translate="no">.<a href="#meshMatrix">meshMatrix</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="description">
+						<p>Represent the world matrix of the reference mesh.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span>, lightPosition4D : <span class="param-type"><a href="Vector4.html">Vector4</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the shadow mesh so it follows its shadow-casting reference mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane onto the shadow mesh is projected.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>lightPosition4D</strong>
+									</td>
+									<td class="description last">
+										<p>The light position.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/ShadowMesh.js" target="_blank" rel="noopener" translate="no">examples/jsm/objects/ShadowMesh.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PhysicalLightingModel - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="LightingModel.html">LightingModel</a> → </p>
+	<h1 translate="no">PhysicalLightingModel</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents the lighting model for a PBR material.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PhysicalLightingModel" translate="no">new <a href="#PhysicalLightingModel">PhysicalLightingModel</a><span class="signature">( clearcoat : <span class="param-type">boolean</span>, sheen : <span class="param-type">boolean</span>, iridescence : <span class="param-type">boolean</span>, anisotropy : <span class="param-type">boolean</span>, transmission : <span class="param-type">boolean</span>, dispersion : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new physical lighting model.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>clearcoat</strong>
+									</td>
+									<td class="description last">
+										<p>Whether clearcoat is supported or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sheen</strong>
+									</td>
+									<td class="description last">
+										<p>Whether sheen is supported or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>iridescence</strong>
+									</td>
+									<td class="description last">
+										<p>Whether iridescence is supported or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>anisotropy</strong>
+									</td>
+									<td class="description last">
+										<p>Whether anisotropy is supported or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>transmission</strong>
+									</td>
+									<td class="description last">
+										<p>Whether transmission is supported or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dispersion</strong>
+									</td>
+									<td class="description last">
+										<p>Whether dispersion is supported or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="anisotropy" translate="no">.<a href="#anisotropy">anisotropy</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether anisotropy is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clearcoat" translate="no">.<a href="#clearcoat">clearcoat</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether clearcoat is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clearcoatRadiance" translate="no">.<a href="#clearcoatRadiance">clearcoatRadiance</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The clear coat radiance.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clearcoatSpecularDirect" translate="no">.<a href="#clearcoatSpecularDirect">clearcoatSpecularDirect</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The clear coat specular direct.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clearcoatSpecularIndirect" translate="no">.<a href="#clearcoatSpecularIndirect">clearcoatSpecularIndirect</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The clear coat specular indirect.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dispersion" translate="no">.<a href="#dispersion">dispersion</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether dispersion is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iridescence" translate="no">.<a href="#iridescence">iridescence</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether iridescence is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iridescenceF0" translate="no">.<a href="#iridescenceF0">iridescenceF0</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The iridescence F0.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iridescenceFresnel" translate="no">.<a href="#iridescenceFresnel">iridescenceFresnel</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The iridescence Fresnel.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sheen" translate="no">.<a href="#sheen">sheen</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether sheen is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sheenSpecularDirect" translate="no">.<a href="#sheenSpecularDirect">sheenSpecularDirect</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The sheen specular direct.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sheenSpecularIndirect" translate="no">.<a href="#sheenSpecularIndirect">sheenSpecularIndirect</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The sheen specular indirect.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transmission" translate="no">.<a href="#transmission">transmission</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether transmission is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="ambientOcclusion" translate="no">.<a href="#ambientOcclusion">ambientOcclusion</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Implements the ambient occlusion term.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingModel.html#ambientOcclusion">LightingModel#ambientOcclusion</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="direct" translate="no">.<a href="#direct">direct</a><span class="signature">( lightData : <span class="param-type">Object</span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Implements the direct light.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>lightData</strong>
+									</td>
+									<td class="description last">
+										<p>The light data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingModel.html#direct">LightingModel#direct</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="directRectArea" translate="no">.<a href="#directRectArea">directRectArea</a><span class="signature">( input : <span class="param-type">Object</span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is intended for implementing the direct light term for
+rect area light nodes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>input</strong>
+									</td>
+									<td class="description last">
+										<p>The input data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingModel.html#directRectArea">LightingModel#directRectArea</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="finish" translate="no">.<a href="#finish">finish</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Used for final lighting accumulations depending on the requested features.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingModel.html#finish">LightingModel#finish</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="indirect" translate="no">.<a href="#indirect">indirect</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Implements the indirect lighting.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingModel.html#indirect">LightingModel#indirect</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="indirectDiffuse" translate="no">.<a href="#indirectDiffuse">indirectDiffuse</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Implements the indirect diffuse term.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="indirectSpecular" translate="no">.<a href="#indirectSpecular">indirectSpecular</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Implements the indirect specular term.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="start" translate="no">.<a href="#start">start</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Depending on what features are requested, the method prepares certain node variables
+which are later used for lighting computations.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingModel.html#start">LightingModel#start</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/functions/PhysicalLightingModel.js" target="_blank" rel="noopener" translate="no">src/nodes/functions/PhysicalLightingModel.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Uniform - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Uniform</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a uniform which is a global shader variable. They are passed to shader programs.</p>
+<p>When declaring a uniform of a <a href="ShaderMaterial.html">ShaderMaterial</a>, it is declared by value or by object.</p>
+<p>Since this class can only be used in context of <a href="ShaderMaterial.html">ShaderMaterial</a>, it is only supported
+in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">uniforms: {
+	time: { value: 1.0 },
+	resolution: new Uniform( new Vector2() )
+};
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Uniform" translate="no">new <a href="#Uniform">Uniform</a><span class="signature">( value : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new uniform.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="boundary" translate="no">.<a href="#boundary">boundary</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Used to build the uniform buffer according to the STD140 layout.
+Derived uniforms will set this property to a data type specific
+value.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="itemSize" translate="no">.<a href="#itemSize">itemSize</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The item size. Derived uniforms will set this property to a data
+type specific value.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The uniform's name.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="offset" translate="no">.<a href="#offset">offset</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>This property is set by <a href="UniformsGroup.html">UniformsGroup</a> and marks
+the start position in the uniform buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="value" translate="no">.<a href="#value">value</a><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
+					<div class="description">
+						<p>The uniform value.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="value" translate="no">.<a href="#value">value</a><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
+					<div class="description">
+						<p>The uniform's value.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Uniform.html">Uniform</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new uniform with copied values from this instance.
+If the value has a <code>clone()</code> method, the value is cloned as well.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getValue" translate="no">.<a href="#getValue">getValue</a><span class="signature">()</span><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the uniform's value.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setValue" translate="no">.<a href="#setValue">setValue</a><span class="signature">( value : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the uniform's value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/Uniform.js" target="_blank" rel="noopener" translate="no">src/core/Uniform.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

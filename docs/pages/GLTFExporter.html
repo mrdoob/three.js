@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GLTFExporter - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">GLTFExporter</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An exporter for <code>glTF</code> 2.0.</p>
+<p>glTF (GL Transmission Format) is an <a href="https://github.com/KhronosGroup/glTF/tree/master/specification/2.0">open format specification</a>
+for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
+or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
+data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
+textures, skins, skeletons, morph targets, animations, lights, and/or cameras.</p>
+<p>GLTFExporter supports the <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/">glTF 2.0 extensions</a>:</p>
+<ul>
+<li>KHR_lights_punctual</li>
+<li>KHR_materials_clearcoat</li>
+<li>KHR_materials_dispersion</li>
+<li>KHR_materials_emissive_strength</li>
+<li>KHR_materials_ior</li>
+<li>KHR_materials_iridescence</li>
+<li>KHR_materials_specular</li>
+<li>KHR_materials_sheen</li>
+<li>KHR_materials_transmission</li>
+<li>KHR_materials_unlit</li>
+<li>KHR_materials_volume</li>
+<li>KHR_mesh_quantization</li>
+<li>KHR_texture_transform</li>
+<li>EXT_materials_bump</li>
+<li>EXT_mesh_gpu_instancing</li>
+</ul>
+<p>The following glTF 2.0 extension is supported by an external user plugin:</p>
+<ul>
+<li><a href="https://github.com/takahirox/three-gltf-extensions">KHR_materials_variants</a></li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const exporter = new GLTFExporter();
+const data = await exporter.parseAsync( scene, options );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">GLTFExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="GLTFExporter" translate="no">new <a href="#GLTFExporter">GLTFExporter</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new glTF exporter.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="textureUtils" translate="no">.<a href="#textureUtils">textureUtils</a><span class="type-signature"> : <a href="WebGLTextureUtils.html">WebGLTextureUtils</a> | <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a></span> </h3>
+					<div class="description">
+						<p>A reference to a texture utils module.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( input : <span class="param-type"><a href="Scene.html">Scene</a> | Array.&lt;<a href="Scene.html">Scene</a>></span>, onDone : <span class="param-type"><a href="GLTFExporter.html#~OnDone">GLTFExporter~OnDone</a></span>, onError : <span class="param-type"><a href="GLTFExporter.html#~OnError">GLTFExporter~OnError</a></span>, options : <span class="param-type"><a href="GLTFExporter.html#~Options">GLTFExporter~Options</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given scenes and generates the glTF output.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>input</strong>
+									</td>
+									<td class="description last">
+										<p>A scene or an array of scenes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onDone</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that is executed when the export has finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that is executed when an error happens.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>options</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="parseAsync" translate="no">.<a href="#parseAsync">parseAsync</a><span class="signature">( input : <span class="param-type"><a href="Scene.html">Scene</a> | Array.&lt;<a href="Scene.html">Scene</a>></span>, options : <span class="param-type"><a href="GLTFExporter.html#~Options">GLTFExporter~Options</a></span> )</span><span class="type-signature"> : Promise.&lt;(ArrayBuffer|string)></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Async version of <a href="GLTFExporter.html#parse">GLTFExporter#parse</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>input</strong>
+									</td>
+									<td class="description last">
+										<p>A scene or an array of scenes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>options.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolved with the exported glTF data.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="register" translate="no">.<a href="#register">register</a><span class="signature">( callback : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="GLTFExporter.html">GLTFExporter</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Registers a plugin callback. This API is internally used to implement the various
+glTF extensions but can also used by third-party code to add additional logic
+to the exporter.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>The callback function to register.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this exporter.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setTextureUtils" translate="no">.<a href="#setTextureUtils">setTextureUtils</a><span class="signature">( utils : <span class="param-type"><a href="WebGLTextureUtils.html">WebGLTextureUtils</a> | <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a></span> )</span><span class="type-signature"> : <a href="GLTFExporter.html">GLTFExporter</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.</p>
+<p>Depending on whether you use <a href="WebGLRenderer.html">WebGLRenderer</a> or <a href="WebGPURenderer.html">WebGPURenderer</a>, you must inject the
+corresponding texture utils <a href="WebGLTextureUtils.html">WebGLTextureUtils</a> or <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>utils</strong>
+									</td>
+									<td class="description last">
+										<p>The texture utils.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this exporter.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="unregister" translate="no">.<a href="#unregister">unregister</a><span class="signature">( callback : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="GLTFExporter.html">GLTFExporter</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Unregisters a plugin callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>The callback function to unregister.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this exporter.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+					<h3 class="name name-method" id="~OnDone" translate="no">.<a href="#~OnDone">OnDone</a><span class="signature">( result : <span class="param-type">ArrayBuffer | string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>onDone callback of <code>GLTFExporter</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>result</strong>
+									</td>
+									<td class="description last">
+										<p>The generated .gltf (JSON) or .glb (binary).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="~OnError" translate="no">.<a href="#~OnError">OnError</a><span class="signature">( error : <span class="param-type">Error</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>onError callback of <code>GLTFExporter</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>error</strong>
+									</td>
+									<td class="description last">
+										<p>The error object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>Export options of <code>GLTFExporter</code>.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>trs</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Export position, rotation and scale instead of matrix per node.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>onlyVisible</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Export only visible 3D objects.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>binary</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Export in binary (.glb) format, returning an ArrayBuffer.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>maxTextureSize</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Restricts the image maximum size (both width and height) to the given value.</p>
+						<p>Default is <code>Infinity</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>animations</strong>
+						<br>
+<span class="param-type">Array.&lt;<a href="AnimationClip.html">AnimationClip</a>></span>
+				</td>
+			<td class="description last">
+				<p>List of animations to be included in the export.</p>
+						<p>Default is <code>[]</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>includeCustomExtensions</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Export custom glTF extensions defined on an object's <code>userData.gltfExtensions</code> property.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/GLTFExporter.js" target="_blank" rel="noopener" translate="no">examples/jsm/exporters/GLTFExporter.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

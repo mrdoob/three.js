@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>StereoCamera - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">StereoCamera</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special type of camera that uses two perspective cameras with
+stereoscopic projection. Can be used for rendering stereo effects
+like <a href="https://en.wikipedia.org/wiki/Anaglyph_3D">3D Anaglyph</a> or
+<a href="https://en.wikipedia.org/wiki/parallax_barrier">Parallax Barrier</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="StereoCamera" translate="no">new <a href="#StereoCamera">StereoCamera</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new stereo camera.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="aspect" translate="no">.<a href="#aspect">aspect</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The aspect.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="cameraL" translate="no">.<a href="#cameraL">cameraL</a><span class="type-signature"> : <a href="PerspectiveCamera.html">PerspectiveCamera</a></span> </h3>
+					<div class="description">
+						<p>The camera representing the left eye. This is added to layer <code>1</code> so objects to be
+rendered by the left camera must also be added to this layer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="cameraR" translate="no">.<a href="#cameraR">cameraR</a><span class="type-signature"> : <a href="PerspectiveCamera.html">PerspectiveCamera</a></span> </h3>
+					<div class="description">
+						<p>The camera representing the right eye. This is added to layer <code>2</code> so objects to be
+rendered by the right camera must also be added to this layer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="eyeSep" translate="no">.<a href="#eyeSep">eyeSep</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The eye separation which represents the distance
+between the left and right camera.</p>
+						<p>Default is <code>0.064</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The type property is used for detecting the object type
+in context of serialization/deserialization.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( camera : <span class="param-type"><a href="PerspectiveCamera.html">PerspectiveCamera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the stereo camera based on the given perspective camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The perspective camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/cameras/StereoCamera.js" target="_blank" rel="noopener" translate="no">src/cameras/StereoCamera.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>DecalGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="BufferGeometry.html">BufferGeometry</a> → </p>
+	<h1 translate="no">DecalGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to create a decal mesh that serves different kinds of purposes e.g.
+adding unique details to models, performing dynamic visual environmental changes or covering seams.</p>
+<p>Please not that decal projections can be distorted when used around corners. More information at
+this GitHub issue: <a href="https://github.com/mrdoob/three.js/issues/21187">Decal projections without distortions</a>.</p>
+<p>Reference: <a href="http://blog.wolfire.com/2009/06/how-to-project-decals/">How to project decals</a></p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new DecalGeometry( mesh, position, orientation, size );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const mesh = new THREE.Mesh( geometry, material );
+scene.add( mesh );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">DecalGeometry</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="DecalGeometry" translate="no">new <a href="#DecalGeometry">DecalGeometry</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, position : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, orientation : <span class="param-type"><a href="Euler.html">Euler</a></span>, size : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new decal geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The base mesh the decal should be projected on.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>position</strong>
+									</td>
+									<td class="description last">
+										<p>The position of the decal projector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>orientation</strong>
+									</td>
+									<td class="description last">
+										<p>The orientation of the decal projector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>Tje scale of the decal projector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/DecalGeometry.js" target="_blank" rel="noopener" translate="no">examples/jsm/geometries/DecalGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

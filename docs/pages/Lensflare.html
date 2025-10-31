@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Lensflare - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">Lensflare</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Creates a simulated lens flare that tracks a light.</p>
+<p>Note that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.
+When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="LensflareMesh.html">LensflareMesh</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+const lensflare = new Lensflare();
+lensflare.addElement( new LensflareElement( textureFlare0, 512, 0 ) );
+lensflare.addElement( new LensflareElement( textureFlare1, 512, 0 ) );
+lensflare.addElement( new LensflareElement( textureFlare2, 60, 0.6 ) );
+light.add( lensflare );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">Lensflare</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { Lensflare } from 'three/addons/objects/Lensflare.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Lensflare" translate="no">new <a href="#Lensflare">Lensflare</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new lensflare.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="frustumCulled" translate="no">.<a href="#frustumCulled">frustumCulled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Overwritten to disable view-frustum culling by default.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Mesh.html#frustumCulled">Mesh#frustumCulled</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isLensflare" translate="no">.<a href="#isLensflare">isLensflare</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderOrder" translate="no">.<a href="#renderOrder">renderOrder</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Overwritten to make sure lensflares a rendered last.</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Mesh.html#renderOrder">Mesh#renderOrder</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addElement" translate="no">.<a href="#addElement">addElement</a><span class="signature">( element : <span class="param-type"><a href="LensflareElement.html">LensflareElement</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given lensflare element to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>element</strong>
+									</td>
+									<td class="description last">
+										<p>The element to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/Lensflare.js" target="_blank" rel="noopener" translate="no">examples/jsm/objects/Lensflare.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MaxMipLevelNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="InputNode.html">InputNode</a> → <a href="UniformNode.html">UniformNode</a> → </p>
+	<h1 translate="no">MaxMipLevelNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special type of uniform node that computes the
+maximum mipmap level for a given texture node.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const level = maxMipLevel( textureNode );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MaxMipLevelNode" translate="no">new <a href="#MaxMipLevelNode">MaxMipLevelNode</a><span class="signature">( textureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new max mip level node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>textureNode</strong>
+									</td>
+									<td class="description last">
+										<p>The texture node to compute the max mip level for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="texture" translate="no">.<a href="#texture">texture</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The texture.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="textureNode" translate="no">.<a href="#textureNode">textureNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The texture node to compute the max mip level for.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The <code>updateType</code> is set to <code>NodeUpdateType.FRAME</code> since the node updates
+the texture once per frame in its <a href="MaxMipLevelNode.html#update">MaxMipLevelNode#update</a> method.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="UniformNode.html#updateType">UniformNode#updateType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/utils/MaxMipLevelNode.js" target="_blank" rel="noopener" translate="no">src/nodes/utils/MaxMipLevelNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

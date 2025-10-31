@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TrackballControls - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Controls.html">Controls</a> → </p>
+	<h1 translate="no">TrackballControls</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class is similar to <a href="OrbitControls.html">OrbitControls</a>. However, it does not maintain a constant camera
+<code>up</code> vector. That means if the camera orbits over the “north” and “south” poles, it does not flip
+to stay &quot;right side up&quot;.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TrackballControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { TrackballControls } from 'three/addons/controls/TrackballControls.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TrackballControls" translate="no">new <a href="#TrackballControls">TrackballControls</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new controls instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object that is managed by the controls.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="dynamicDampingFactor" translate="no">.<a href="#dynamicDampingFactor">dynamicDampingFactor</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Defines the intensity of damping. Only considered if <code>staticMoving</code> is set to <code>false</code>.</p>
+						<p>Default is <code>0.2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="keys" translate="no">.<a href="#keys">keys</a><span class="type-signature"> : Array.&lt;string></span> </h3>
+					<div class="description">
+						<p>This array holds keycodes for controlling interactions.</p>
+<ul>
+<li>When the first defined key is pressed, all mouse interactions (left, middle, right) performs orbiting.</li>
+<li>When the second defined key is pressed, all mouse interactions (left, middle, right) performs zooming.</li>
+<li>When the third defined key is pressed, all mouse interactions (left, middle, right) performs panning.</li>
+</ul>
+<p>Default is <em>KeyA, KeyS, KeyD</em> which represents A, S, D.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Controls.html#keys">Controls#keys</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxDistance" translate="no">.<a href="#maxDistance">maxDistance</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can dolly out (perspective camera only).</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxZoom" translate="no">.<a href="#maxZoom">maxZoom</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can zoom out (orthographic camera only).</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minDistance" translate="no">.<a href="#minDistance">minDistance</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can dolly in (perspective camera only).</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minZoom" translate="no">.<a href="#minZoom">minZoom</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can zoom in (orthographic camera only).</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mouseButtons" translate="no">.<a href="#mouseButtons">mouseButtons</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>This object contains references to the mouse actions used by the controls.</p>
+<pre><code class="language-js">controls.mouseButtons = {
+	LEFT: THREE.MOUSE.ROTATE,
+	MIDDLE: THREE.MOUSE.DOLLY,
+	RIGHT: THREE.MOUSE.PAN
+}
+</code></pre>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Controls.html#mouseButtons">Controls#mouseButtons</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="noPan" translate="no">.<a href="#noPan">noPan</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether panning is disabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="noRotate" translate="no">.<a href="#noRotate">noRotate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether rotation is disabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="noZoom" translate="no">.<a href="#noZoom">noZoom</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether zooming is disabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="panSpeed" translate="no">.<a href="#panSpeed">panSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The pan speed.</p>
+						<p>Default is <code>0.3</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotateSpeed" translate="no">.<a href="#rotateSpeed">rotateSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The rotation speed.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="screen" translate="no">.<a href="#screen">screen</a><span class="type-signature"> : Object</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Represents the properties of the screen. Automatically set when <code>handleResize()</code> is called.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="staticMoving" translate="no">.<a href="#staticMoving">staticMoving</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether damping is disabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="target" translate="no">.<a href="#target">target</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The focus point of the controls.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="zoomSpeed" translate="no">.<a href="#zoomSpeed">zoomSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The zoom speed.</p>
+						<p>Default is <code>1.2</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="handleResize" translate="no">.<a href="#handleResize">handleResize</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Must be called if the application window is resized.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets the controls to its initial state.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:change" translate="no">.<a href="#event:change">change</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the camera has been transformed by the controls.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:end" translate="no">.<a href="#event:end">end</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when an interaction has finished.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:start" translate="no">.<a href="#event:start">start</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when an interaction was initiated.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/TrackballControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/TrackballControls.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

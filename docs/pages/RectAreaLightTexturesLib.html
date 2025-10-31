@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>RectAreaLightTexturesLib - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">RectAreaLightTexturesLib</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Texture library for <a href="RectAreaLight.html">RectAreaLight</a>. This class holds the LTC BRDF data
+in data textures for further use in the renderer.</p>
+<p>Reference: Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
+by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt. <a href="https://github.com/selfshadow/ltc_code/">Code</a>.</p>
+<p>NOTE: This is a temporary location for the BRDF approximation texture data
+based off of Eric Heitz's work (see citation). BRDF data for
+<code>RectAreaLight</code> is currently approximated using a precomputed texture
+of roughly 80kb in size. The hope is to find a better way to include
+the large texture data before including the full RectAreaLight implementation
+in the main build files.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">RectAreaLightTexturesLib</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';</code></pre>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id=".LTC_FLOAT_1" translate="no">.<a href="#.LTC_FLOAT_1">LTC_FLOAT_1</a><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
+					<div class="description">
+						<p>The first LTC FP32 data texture.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".LTC_FLOAT_2" translate="no">.<a href="#.LTC_FLOAT_2">LTC_FLOAT_2</a><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
+					<div class="description">
+						<p>The second LTC FP32 data texture.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".LTC_HALF_1" translate="no">.<a href="#.LTC_HALF_1">LTC_HALF_1</a><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
+					<div class="description">
+						<p>The first LTC FP16 data texture.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".LTC_HALF_2" translate="no">.<a href="#.LTC_HALF_2">LTC_HALF_2</a><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
+					<div class="description">
+						<p>The second LTC FP16 data texture.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".init" translate="no">.<a href="#.init">init</a><span class="signature">()</span><span class="type-signature"> : <a href="RectAreaLightTexturesLib.html">RectAreaLightTexturesLib</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Inits the texture library.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/RectAreaLightTexturesLib.js" target="_blank" rel="noopener" translate="no">examples/jsm/lights/RectAreaLightTexturesLib.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

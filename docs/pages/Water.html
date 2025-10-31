@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Water - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">Water</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A basic flat, reflective water effect.</p>
+<p>Note that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.
+When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="WaterMesh.html">WaterMesh</a>.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://github.com/Slayvin">Flat mirror for three.js</a></li>
+<li><a href="https://home.adelphi.edu/~stemkoski/">An implementation of water shader based on the flat mirror</a></li>
+<li><a href="http://29a.ch/slides/2012/webglwater/">Water shader explanations in WebGL</a></li>
+</ul></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">Water</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { Water } from 'three/addons/objects/Water.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Water" translate="no">new <a href="#Water">Water</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, options : <span class="param-type"><a href="Water.html#~Options">Water~Options</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new water instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The water's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration options.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isWater" translate="no">.<a href="#isWater">isWater</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>Constructor options of <code>Water</code>.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>textureWidth</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture width. A higher value results in more clear reflections but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>textureHeight</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture height. A higher value results in more clear reflections but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>clipBias</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The clip bias.</p>
+						<p>Default is <code>0</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>alpha</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The alpha value.</p>
+						<p>Default is <code>1</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>time</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The time value.</p>
+						<p>Default is <code>0</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>waterNormals</strong>
+						<br>
+<span class="param-type"><a href="Texture.html">Texture</a></span>
+				</td>
+			<td class="description last">
+				<p>The water's normal map.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>sunDirection</strong>
+						<br>
+<span class="param-type"><a href="Vector3.html">Vector3</a></span>
+				</td>
+			<td class="description last">
+				<p>The sun direction.</p>
+						<p>Default is <code>(0.70707,0.70707,0.0)</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>sunColor</strong>
+						<br>
+<span class="param-type">number</span>
+|
+<span class="param-type"><a href="Color.html">Color</a></span>
+|
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The sun color.</p>
+						<p>Default is <code>0xffffff</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>waterColor</strong>
+						<br>
+<span class="param-type">number</span>
+|
+<span class="param-type"><a href="Color.html">Color</a></span>
+|
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The water color.</p>
+						<p>Default is <code>0x7F7F7F</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>eye</strong>
+						<br>
+<span class="param-type"><a href="Vector3.html">Vector3</a></span>
+				</td>
+			<td class="description last">
+				<p>The eye vector.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>distortionScale</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The distortion scale.</p>
+						<p>Default is <code>20</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>side</strong>
+						<br>
+<span class="param-type"><a href="global.html#FrontSide">FrontSide</a></span>
+|
+<span class="param-type"><a href="global.html#BackSide">BackSide</a></span>
+|
+<span class="param-type"><a href="global.html#DoubleSide">DoubleSide</a></span>
+				</td>
+			<td class="description last">
+				<p>The water material's <code>side</code> property.</p>
+						<p>Default is <code>FrontSide</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>fog</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the water should be affected by fog or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/Water.js" target="_blank" rel="noopener" translate="no">examples/jsm/objects/Water.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

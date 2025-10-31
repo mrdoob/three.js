@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>InputNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">InputNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Base class for representing data input nodes.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="InputNode" translate="no">new <a href="#InputNode">InputNode</a><span class="signature">( value : <span class="param-type"><a href="global.html#any">any</a></span>, nodeType : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new input node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>nodeType</strong>
+									</td>
+									<td class="description last">
+										<p>The node type. If no explicit type is defined, the node tries to derive the type from its value.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isInputNode" translate="no">.<a href="#isInputNode">isInputNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="precision" translate="no">.<a href="#precision">precision</a><span class="type-signature"> : 'low' | 'medium' | 'high'</span> </h3>
+					<div class="description">
+						<p>The precision of the value in the shader.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="value" translate="no">.<a href="#value">value</a><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
+					<div class="description">
+						<p>The value of this node. This can be any JS primitive, functions, array buffers or even three.js objects (vector, matrices, colors).</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the input type of the node which is by default the node type. Derived modules
+might overwrite this method and use a fixed type or compute one analytically.</p>
+<p>A typical example for different input and node types are textures. The input type of a
+normal RGBA texture is <code>texture</code> whereas its node type is <code>vec4</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setPrecision" translate="no">.<a href="#setPrecision">setPrecision</a><span class="signature">( precision : <span class="param-type">'low' | 'medium' | 'high'</span> )</span><span class="type-signature"> : <a href="InputNode.html">InputNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the precision to the given value. The method can be
+overwritten in derived classes if the final precision must be computed
+analytically.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>precision</strong>
+									</td>
+									<td class="description last">
+										<p>The precision of the input value in the shader.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/InputNode.js" target="_blank" rel="noopener" translate="no">src/nodes/core/InputNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PixelationNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">PixelationNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A inner node definition that implements the actual pixelation TSL code.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PixelationNode" translate="no">new <a href="#PixelationNode">PixelationNode</a><span class="signature">( textureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, depthNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, normalNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, pixelSize : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, depthEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new pixelation node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>textureNode</strong>
+									</td>
+									<td class="description last">
+										<p>The texture node that represents the beauty pass.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>The texture that represents the beauty's depth.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normalNode</strong>
+									</td>
+									<td class="description last">
+										<p>The texture that represents the beauty's normals.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>pixelSize</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel size.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normalEdgeStrength</strong>
+									</td>
+									<td class="description last">
+										<p>The normal edge strength.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthEdgeStrength</strong>
+									</td>
+									<td class="description last">
+										<p>The depth edge strength.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="_resolution" translate="no">.<a href="#_resolution">_resolution</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="description">
+						<p>Uniform node that represents the resolution.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthEdgeStrength" translate="no">.<a href="#depthEdgeStrength">depthEdgeStrength</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The depth edge strength.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthNode" translate="no">.<a href="#depthNode">depthNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>The texture that represents the beauty's depth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalEdgeStrength" translate="no">.<a href="#normalEdgeStrength">normalEdgeStrength</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The pixel size.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalNode" translate="no">.<a href="#normalNode">normalNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>The texture that represents the beauty's normals.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="pixelSize" translate="no">.<a href="#pixelSize">pixelSize</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The pixel size.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="textureNode" translate="no">.<a href="#textureNode">textureNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>The texture node that represents the beauty pass.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node updates
+its internal uniforms once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to setup the effect's TSL code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to update uniforms once per frame.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBefore">TempNode#updateBefore</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/PixelationPassNode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/PixelationPassNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WebGPUTimestampQueryPool - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="TimestampQueryPool.html">TimestampQueryPool</a> → </p>
+	<h1 translate="no">WebGPUTimestampQueryPool</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Manages a pool of WebGPU timestamp queries for performance measurement.
+Extends the base TimestampQueryPool to provide WebGPU-specific implementation.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="WebGPUTimestampQueryPool" translate="no">new <a href="#WebGPUTimestampQueryPool">WebGPUTimestampQueryPool</a><span class="signature">( device : <span class="param-type">GPUDevice</span>, type : <span class="param-type">string</span>, maxQueries : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new WebGPU timestamp query pool.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>device</strong>
+									</td>
+									<td class="description last">
+										<p>The WebGPU device to create queries on.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type identifier for this query pool.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxQueries</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum number of queries this pool can hold.</p>
+										<p>Default is <code>2048</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="allocateQueriesForContext" translate="no">.<a href="#allocateQueriesForContext">allocateQueriesForContext</a><span class="signature">( uid : <span class="param-type">string</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Allocates a pair of queries for a given render context.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TimestampQueryPool.html#allocateQueriesForContext">TimestampQueryPool#allocateQueriesForContext</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The base offset for the allocated queries, or null if allocation failed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Dispose of the query pool.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TimestampQueryPool.html#dispose">TimestampQueryPool#dispose</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the dispose has been executed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="resolveQueriesAsync" translate="no">.<a href="#resolveQueriesAsync">resolveQueriesAsync</a><span class="signature">()</span><span class="type-signature"> : Promise.&lt;number></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Asynchronously resolves all pending queries and returns the total duration.
+If there's already a pending resolve operation, returns that promise instead.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TimestampQueryPool.html#resolveQueriesAsync">TimestampQueryPool#resolveQueriesAsync</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The total duration in milliseconds, or the last valid value if resolution fails.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/webgpu/utils/WebGPUTimestampQueryPool.js" target="_blank" rel="noopener" translate="no">src/renderers/webgpu/utils/WebGPUTimestampQueryPool.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

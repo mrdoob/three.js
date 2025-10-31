@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LOD - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → </p>
+	<h1 translate="no">LOD</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A component for providing a basic Level of Detail (LOD) mechanism.</p>
+<p>Every LOD level is associated with an object, and rendering can be switched
+between them at the distances specified. Typically you would create, say,
+three meshes, one for far away (low detail), one for mid range (medium
+detail) and one for close up (high detail).</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const lod = new THREE.LOD();
+const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+//Create spheres with 3 levels of detail and create new LOD levels for them
+for( let i = 0; i &lt; 3; i++ ) {
+	const geometry = new THREE.IcosahedronGeometry( 10, 3 - i );
+	const mesh = new THREE.Mesh( geometry, material );
+	lod.addLevel( mesh, i * 75 );
+}
+scene.add( lod );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LOD" translate="no">new <a href="#LOD">LOD</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new LOD.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="autoUpdate" translate="no">.<a href="#autoUpdate">autoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the LOD object is updated automatically by the renderer per frame
+or not. If set to <code>false</code>, you have to call <a href="LOD.html#update">LOD#update</a> in the
+render loop by yourself.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isLOD" translate="no">.<a href="#isLOD">isLOD</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="levels" translate="no">.<a href="#levels">levels</a><span class="type-signature"> : Array.&lt;{object:Object3D, distance:number, hysteresis:number}></span> </h3>
+					<div class="description">
+						<p>This array holds the LOD levels.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addLevel" translate="no">.<a href="#addLevel">addLevel</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, distance : <span class="param-type">number</span>, hysteresis : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="LOD.html">LOD</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a mesh that will display at a certain distance and greater. Typically
+the further away the distance, the lower the detail on the mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to display at this level.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The distance at which to display this level of detail.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>hysteresis</strong>
+									</td>
+									<td class="description last">
+										<p>Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getCurrentLevel" translate="no">.<a href="#getCurrentLevel">getCurrentLevel</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the currently active LOD level index.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current active LOD level index.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getObjectForDistance" translate="no">.<a href="#getObjectForDistance">getObjectForDistance</a><span class="signature">( distance : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a reference to the first 3D object that is greater than
+the given distance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The LOD distance.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The found 3D object. <code>null</code> if no 3D object has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type"><a href="Raycaster.html">Raycaster</a></span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes intersection points between a casted ray and this LOD.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>raycaster</strong>
+									</td>
+									<td class="description last">
+										<p>The raycaster.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>intersects</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the intersection points.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Object3D.html#raycast">Object3D#raycast</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="removeLevel" translate="no">.<a href="#removeLevel">removeLevel</a><span class="signature">( distance : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes an existing level, based on the distance from the camera.
+Returns <code>true</code> when the level has been removed. Otherwise <code>false</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>Distance of the level to remove.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the level has been removed or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the LOD by computing which LOD level should be visible according
+to the current distance of the given camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/objects/LOD.js" target="_blank" rel="noopener" translate="no">src/objects/LOD.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>FunctionNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="CodeNode.html">CodeNode</a> → </p>
+	<h1 translate="no">FunctionNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class represents a native shader function. It can be used to implement
+certain aspects of a node material with native shader code. There are two predefined
+TSL functions for easier usage.</p>
+<ul>
+<li><code>wgslFn</code>: Creates a WGSL function node.</li>
+<li><code>glslFn</code>: Creates a GLSL function node.</li>
+</ul>
+<p>A basic example with one include looks like so:</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const desaturateWGSLFn = wgslFn( `
+	fn desaturate( color:vec3&lt;f32> ) -> vec3&lt;f32> {
+		let lum = vec3&lt;f32>( 0.299, 0.587, 0.114 );
+		return vec3&lt;f32>( dot( lum, color ) );
+	}`
+);
+const someWGSLFn = wgslFn( `
+	fn someFn( color:vec3&lt;f32> ) -> vec3&lt;f32> {
+		return desaturate( color );
+	}
+`, [ desaturateWGSLFn ] );
+material.colorNode = someWGSLFn( { color: texture( map ) } );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="FunctionNode" translate="no">new <a href="#FunctionNode">FunctionNode</a><span class="signature">( code : <span class="param-type">string</span>, includes : <span class="param-type">Array.&lt;<a href="Node.html">Node</a>></span>, language : <span class="param-type">'js' | 'wgsl' | 'glsl'</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new function node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>code</strong>
+									</td>
+									<td class="description last">
+										<p>The native code.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>includes</strong>
+									</td>
+									<td class="description last">
+										<p>An array of includes.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>language</strong>
+									</td>
+									<td class="description last">
+										<p>The used language.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getInputs" translate="no">.<a href="#getInputs">getInputs</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Array.&lt;<a href="NodeFunctionInput.html">NodeFunctionInput</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the inputs of this function node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The inputs.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMemberType" translate="no">.<a href="#getMemberType">getMemberType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the type of a member of this function node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the member.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="CodeNode.html#getMemberType">CodeNode#getMemberType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The type of the member.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeFunction" translate="no">.<a href="#getNodeFunction">getNodeFunction</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="NodeFunction.html">NodeFunction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the node function for this function node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node function.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the type of this function node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="CodeNode.html#getNodeType">CodeNode#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The type.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/code/FunctionNode.js" target="_blank" rel="noopener" translate="no">src/nodes/code/FunctionNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LineDashedNodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="NodeMaterial.html">NodeMaterial</a> → </p>
+	<h1 translate="no">LineDashedNodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Node material version of  <a href="LineDashedMaterial.html">LineDashedMaterial</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LineDashedNodeMaterial" translate="no">new <a href="#LineDashedNodeMaterial">LineDashedNodeMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new line dashed node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="dashOffset" translate="no">.<a href="#dashOffset">dashOffset</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The dash offset.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dashScaleNode" translate="no">.<a href="#dashScaleNode">dashScaleNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The scale of dash materials is by default inferred from the <code>scale</code>
+property. This node property allows to overwrite the default
+and define the scale with a node instead.</p>
+<p>If you don't want to overwrite the scale but modify the existing
+value instead, use <a href="TSL.html#materialLineScale">materialLineScale</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dashSizeNode" translate="no">.<a href="#dashSizeNode">dashSizeNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The dash size of dash materials is by default inferred from the <code>dashSize</code>
+property. This node property allows to overwrite the default
+and define the dash size with a node instead.</p>
+<p>If you don't want to overwrite the dash size but modify the existing
+value instead, use <a href="TSL.html#materialLineDashSize">materialLineDashSize</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="gapSizeNode" translate="no">.<a href="#gapSizeNode">gapSizeNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The gap size of dash materials is by default inferred from the <code>gapSize</code>
+property. This node property allows to overwrite the default
+and define the gap size with a node instead.</p>
+<p>If you don't want to overwrite the gap size but modify the existing
+value instead, use <a href="TSL.html#materialLineGapSize">materialLineGapSize</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isLineDashedNodeMaterial" translate="no">.<a href="#isLineDashedNodeMaterial">isLineDashedNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="offsetNode" translate="no">.<a href="#offsetNode">offsetNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The offset of dash materials is by default inferred from the <code>dashOffset</code>
+property. This node property allows to overwrite the default
+and define the offset with a node instead.</p>
+<p>If you don't want to overwrite the offset but modify the existing
+value instead, use <a href="TSL.html#materialLineDashOffset">materialLineDashOffset</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupVariants" translate="no">.<a href="#setupVariants">setupVariants</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the dash specific node variables.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupVariants">NodeMaterial#setupVariants</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/LineDashedNodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/LineDashedNodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

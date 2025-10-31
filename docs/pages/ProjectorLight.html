@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ProjectorLight - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Light.html">Light</a> → <a href="SpotLight.html">SpotLight</a> → </p>
+	<h1 translate="no">ProjectorLight</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A projector light version of <a href="SpotLight.html">SpotLight</a>. Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ProjectorLight" translate="no">new <a href="#ProjectorLight">ProjectorLight</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, intensity : <span class="param-type">number</span>, distance : <span class="param-type">number</span>, angle : <span class="param-type">number</span>, penumbra : <span class="param-type">number</span>, decay : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new projector light.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The light's color.</p>
+										<p>Default is <code>0xffffff</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>intensity</strong>
+									</td>
+									<td class="description last">
+										<p>The light's strength/intensity measured in candela (cd).</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum range of the light. <code>0</code> means no limit.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum angle of light dispersion from its direction whose upper bound is <code>Math.PI/2</code>.</p>
+										<p>Default is <code>Math.PI/3</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>penumbra</strong>
+									</td>
+									<td class="description last">
+										<p>Percent of the spotlight cone that is attenuated due to penumbra. Value range is <code>[0,1]</code>.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>decay</strong>
+									</td>
+									<td class="description last">
+										<p>The amount the light dims along the distance of the light.</p>
+										<p>Default is <code>2</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="aspect" translate="no">.<a href="#aspect">aspect</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Aspect ratio of the light. Set to <code>null</code> to use the texture aspect ratio.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/lights/webgpu/ProjectorLight.js" target="_blank" rel="noopener" translate="no">src/lights/webgpu/ProjectorLight.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

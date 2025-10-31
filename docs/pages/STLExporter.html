@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>STLExporter - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">STLExporter</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An exporter for STL.</p>
+<p>STL files describe only the surface geometry of a three-dimensional object without
+any representation of color, texture or other common model attributes. The STL format
+specifies both ASCII and binary representations, with binary being more compact.
+STL files contain no scale information or indexes, and the units are arbitrary.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const exporter = new STLExporter();
+const data = exporter.parse( mesh, { binary: true } );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">STLExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { STLExporter } from 'three/addons/exporters/STLExporter.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="STLExporter" translate="no">new <a href="#STLExporter">STLExporter</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, options : <span class="param-type"><a href="STLExporter.html#~Options">STLExporter~Options</a></span> )</span><span class="type-signature"> : string | ArrayBuffer</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given 3D object and generates the STL output.</p>
+<p>If the 3D object is composed of multiple children and geometry, they are merged into a single mesh in the file.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A scene, mesh or any other 3D object containing meshes to encode.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The export options.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The exported STL.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>Export options of <code>STLExporter</code>.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>binary</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to export in binary format or ASCII.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/STLExporter.js" target="_blank" rel="noopener" translate="no">examples/jsm/exporters/STLExporter.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

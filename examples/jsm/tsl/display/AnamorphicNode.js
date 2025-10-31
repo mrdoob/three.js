@@ -69,7 +69,7 @@ class AnamorphicNode extends TempNode {
 		/**
 		 * The resolution scale.
 		 *
-		 * @type {float}
+		 * @type {number}
 		 */
 		this.resolutionScale = 1;
 
@@ -158,6 +158,7 @@ class AnamorphicNode extends TempNode {
 		const currentTexture = textureNode.value;
 
 		_quadMesh.material = this._material;
+		_quadMesh.name = 'Anamorphic';
 
 		this.setSize( map.image.width, map.image.height );
 

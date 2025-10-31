@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AudioAnalyser - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">AudioAnalyser</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to analyse audio data.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">// create an AudioListener and add it to the camera
+const listener = new THREE.AudioListener();
+camera.add( listener );
+// create an Audio source
+const sound = new THREE.Audio( listener );
+// load a sound and set it as the Audio object's buffer
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+	sound.setBuffer( buffer );
+	sound.setLoop(true);
+	sound.setVolume(0.5);
+	sound.play();
+});
+// create an AudioAnalyser, passing in the sound and desired fftSize
+const analyser = new THREE.AudioAnalyser( sound, 32 );
+// get the average frequency of the sound
+const data = analyser.getAverageFrequency();
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="AudioAnalyser" translate="no">new <a href="#AudioAnalyser">AudioAnalyser</a><span class="signature">( audio : <span class="param-type"><a href="Audio.html">Audio</a></span>, fftSize : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new audio analyzer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>audio</strong>
+									</td>
+									<td class="description last">
+										<p>The audio to analyze.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>fftSize</strong>
+									</td>
+									<td class="description last">
+										<p>The window size in samples that is used when performing a Fast Fourier Transform (FFT) to get frequency domain data.</p>
+										<p>Default is <code>2048</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="analyser" translate="no">.<a href="#analyser">analyser</a><span class="type-signature"> : AnalyserNode</span> </h3>
+					<div class="description">
+						<p>The global audio listener.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="data" translate="no">.<a href="#data">data</a><span class="type-signature"> : Uint8Array</span> </h3>
+					<div class="description">
+						<p>Holds the analyzed data.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getAverageFrequency" translate="no">.<a href="#getAverageFrequency">getAverageFrequency</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the average of the frequencies returned by <a href="AudioAnalyser.html#getFrequencyData">AudioAnalyser#getFrequencyData</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The average frequency.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFrequencyData" translate="no">.<a href="#getFrequencyData">getFrequencyData</a><span class="signature">()</span><span class="type-signature"> : Uint8Array</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an array with frequency data of the audio.</p>
+<p>Each item in the array represents the decibel value for a specific frequency.
+The frequencies are spread linearly from 0 to 1/2 of the sample rate.
+For example, for 48000 sample rate, the last item of the array will represent
+the decibel value for 24000 Hz.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The frequency data.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/audio/AudioAnalyser.js" target="_blank" rel="noopener" translate="no">src/audio/AudioAnalyser.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

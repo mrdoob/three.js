@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>HDRCubeTextureLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">HDRCubeTextureLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for loading HDR cube textures.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new HDRCubeTextureLoader();
+loader.setPath( 'textures/cube/pisaHDR/' );
+const cubeTexture = await loader.loadAsync( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ] );
+scene.background = cubeTexture;
+scene.environment = cubeTexture;
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">HDRCubeTextureLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="HDRCubeTextureLoader" translate="no">new <a href="#HDRCubeTextureLoader">HDRCubeTextureLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new HDR cube texture loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="hdrLoader" translate="no">.<a href="#hdrLoader">hdrLoader</a><span class="type-signature"> : <a href="HDRLoader.html">HDRLoader</a></span> </h3>
+					<div class="description">
+						<p>The internal HDR loader that loads the
+individual textures for each cube face.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : <a href="global.html#HalfFloatType">HalfFloatType</a> | <a href="global.html#FloatType">FloatType</a></span> </h3>
+					<div class="description">
+						<p>The texture type.</p>
+						<p>Default is <code>HalfFloatType</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( urls : <span class="param-type">Array.&lt;string></span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : <a href="CubeTexture.html">CubeTexture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URLs and passes the loaded HDR cube texture
+to the <code>onLoad()</code> callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>urls</strong>
+									</td>
+									<td class="description last">
+										<p>The paths/URLs of the files to be loaded. This can also be a data URIs.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The HDR cube texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDataType" translate="no">.<a href="#setDataType">setDataType</a><span class="signature">( value : <span class="param-type"><a href="global.html#HalfFloatType">HalfFloatType</a> | <a href="global.html#FloatType">FloatType</a></span> )</span><span class="type-signature"> : <a href="HDRCubeTextureLoader.html">HDRCubeTextureLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the texture type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The texture type to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/HDRCubeTextureLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/HDRCubeTextureLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

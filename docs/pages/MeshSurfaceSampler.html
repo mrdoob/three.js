@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshSurfaceSampler - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">MeshSurfaceSampler</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Utility class for sampling weighted random points on the surface of a mesh.</p>
+<p>Building the sampler is a one-time O(n) operation. Once built, any number of
+random samples may be selected in O(logn) time. Memory usage is O(n).</p>
+<p>References:</p>
+<ul>
+<li><a href="http://www.joesfer.com/?p=84">http://www.joesfer.com/?p=84</a></li>
+<li><a href="https://stackoverflow.com/a/4322940/1314762">https://stackoverflow.com/a/4322940/1314762</a></li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const sampler = new MeshSurfaceSampler( surfaceMesh )
+	.setWeightAttribute( 'color' )
+	.build();
+const mesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
+const position = new THREE.Vector3();
+const matrix = new THREE.Matrix4();
+// Sample randomly from the surface, creating an instance of the sample geometry at each sample point.
+for ( let i = 0; i &lt; 100; i ++ ) {
+	sampler.sample( position );
+	matrix.makeTranslation( position.x, position.y, position.z );
+	mesh.setMatrixAt( i, matrix );
+}
+scene.add( mesh );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">MeshSurfaceSampler</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshSurfaceSampler" translate="no">new <a href="#MeshSurfaceSampler">MeshSurfaceSampler</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a mesh surface sampler.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>Surface mesh from which to sample.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="build" translate="no">.<a href="#build">build</a><span class="signature">()</span><span class="type-signature"> : <a href="MeshSurfaceSampler.html">MeshSurfaceSampler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Processes the input geometry and prepares to return samples. Any configuration of the
+geometry or sampler must occur before this method is called. Time complexity is O(n)
+for a surface with n faces.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sampler.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="sample" translate="no">.<a href="#sample">sample</a><span class="signature">( targetPosition : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, targetNormal : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, targetColor : <span class="param-type"><a href="Color.html">Color</a></span>, targetUV : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="MeshSurfaceSampler.html">MeshSurfaceSampler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Selects a random point on the surface of the input geometry, returning the
+position and optionally the normal vector, color and UV Coordinate at that point.
+Time complexity is O(log n) for a surface with n faces.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>targetPosition</strong>
+									</td>
+									<td class="description last">
+										<p>The target object holding the sampled position.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>targetNormal</strong>
+									</td>
+									<td class="description last">
+										<p>The target object holding the sampled normal.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>targetColor</strong>
+									</td>
+									<td class="description last">
+										<p>The target object holding the sampled color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>targetUV</strong>
+									</td>
+									<td class="description last">
+										<p>The target object holding the sampled uv coordinates.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sampler.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setRandomGenerator" translate="no">.<a href="#setRandomGenerator">setRandomGenerator</a><span class="signature">( randomFunction : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="MeshSurfaceSampler.html">MeshSurfaceSampler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Allows to set a custom random number generator. Default is <code>Math.random()</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>randomFunction</strong>
+									</td>
+									<td class="description last">
+										<p>A random number generator.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sampler.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setWeightAttribute" translate="no">.<a href="#setWeightAttribute">setWeightAttribute</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="MeshSurfaceSampler.html">MeshSurfaceSampler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Specifies a vertex attribute to be used as a weight when sampling from the surface.
+Faces with higher weights are more likely to be sampled, and those with weights of
+zero will not be sampled at all. For vector attributes, only .x is used in sampling.</p>
+<p>If no weight attribute is selected, sampling is randomly distributed by area.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sampler.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/MeshSurfaceSampler.js" target="_blank" rel="noopener" translate="no">examples/jsm/math/MeshSurfaceSampler.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>RendererReferenceNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="ReferenceBaseNode.html">ReferenceBaseNode</a> → </p>
+	<h1 translate="no">RendererReferenceNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node is a special type of reference node which is intended
+for linking renderer properties with node values.</p>
+<p>When changing <code>renderer.toneMappingExposure</code>, the node value of <code>exposureNode</code> will
+automatically be updated.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const exposureNode = rendererReference( 'toneMappingExposure', 'float', renderer );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="RendererReferenceNode" translate="no">new <a href="#RendererReferenceNode">RendererReferenceNode</a><span class="signature">( property : <span class="param-type">string</span>, inputType : <span class="param-type">string</span>, renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new renderer reference node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property the node refers to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>inputType</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform type that should be used to represent the property value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer the property belongs to. When no renderer is set,
+the node refers to the renderer of the current state.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="renderer" translate="no">.<a href="#renderer">renderer</a><span class="type-signature"> : <a href="Renderer.html">Renderer</a></span> </h3>
+					<div class="description">
+						<p>The renderer the property belongs to. When no renderer is set,
+the node refers to the renderer of the current state.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a> | <a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the reference based on the given state. The state is only evaluated
+<a href="RendererReferenceNode.html#renderer">RendererReferenceNode#renderer</a> is not set.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>state</strong>
+									</td>
+									<td class="description last">
+										<p>The current state.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ReferenceBaseNode.html#updateReference">ReferenceBaseNode#updateReference</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated reference.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/RendererReferenceNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/RendererReferenceNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

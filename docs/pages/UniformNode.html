@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>UniformNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="InputNode.html">InputNode</a> → </p>
+	<h1 translate="no">UniformNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Class for representing a uniform.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="UniformNode" translate="no">new <a href="#UniformNode">UniformNode</a><span class="signature">( value : <span class="param-type"><a href="global.html#any">any</a></span>, nodeType : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new uniform node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>nodeType</strong>
+									</td>
+									<td class="description last">
+										<p>The node type. If no explicit type is defined, the node tries to derive the type from its value.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="groupNode" translate="no">.<a href="#groupNode">groupNode</a><span class="type-signature"> : <a href="UniformGroupNode.html">UniformGroupNode</a></span> </h3>
+					<div class="description">
+						<p>The uniform group of this uniform. By default, uniforms are
+managed per object but they might belong to a shared group
+which is updated per frame or render call.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isUniformNode" translate="no">.<a href="#isUniformNode">isUniformNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name or label of the uniform.</p>
+						<p>Default is <code>''</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#name">InputNode#name</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getGroup" translate="no">.<a href="#getGroup">getGroup</a><span class="signature">()</span><span class="type-signature"> : <a href="UniformGroupNode.html">UniformGroupNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the <a href="UniformNode.html#groupNode">UniformNode#groupNode</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The uniform group.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getUniformHash" translate="no">.<a href="#getUniformHash">getUniformHash</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>By default, this method returns the result of <a href="Node.html#getHash">Node#getHash</a> but derived
+classes might overwrite this method with a different implementation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The uniform hash.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="label" translate="no">.<a href="#label">label</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the <a href="UniformNode.html#name">UniformNode#name</a> property.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the uniform.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setGroup" translate="no">.<a href="#setGroup">setGroup</a><span class="signature">( group : <span class="param-type"><a href="UniformGroupNode.html">UniformGroupNode</a></span> )</span><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the <a href="UniformNode.html#groupNode">UniformNode#groupNode</a> property.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform group.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setName" translate="no">.<a href="#setName">setName</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the <a href="UniformNode.html#name">UniformNode#name</a> property.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the uniform.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/UniformNode.js" target="_blank" rel="noopener" translate="no">src/nodes/core/UniformNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

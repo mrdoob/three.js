@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WGSLNodeBuilder - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="NodeBuilder.html">NodeBuilder</a> → </p>
+	<h1 translate="no">WGSLNodeBuilder</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A node builder targeting WGSL.</p>
+<p>This module generates WGSL shader code from node materials and also
+generates the respective bindings and vertex buffer definitions. These
+data are later used by the renderer to create render and compute pipelines
+for render objects.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="WGSLNodeBuilder" translate="no">new <a href="#WGSLNodeBuilder">WGSLNodeBuilder</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new WGSL node builder renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="builtins" translate="no">.<a href="#builtins">builtins</a><span class="type-signature"> : Object.&lt;string, Map.&lt;string, Object>></span> </h3>
+					<div class="description">
+						<p>A dictionary that holds for each shader stage a Map of builtins.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="directives" translate="no">.<a href="#directives">directives</a><span class="type-signature"> : Object.&lt;string, Set.&lt;string>></span> </h3>
+					<div class="description">
+						<p>A dictionary that holds for each shader stage a Set of directives.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scopedArrays" translate="no">.<a href="#scopedArrays">scopedArrays</a><span class="type-signature"> : Map.&lt;string, Object></span> </h3>
+					<div class="description">
+						<p>A map for managing scope arrays. Only relevant for when using
+<a href="WorkgroupInfoNode.html">WorkgroupInfoNode</a> in context of compute shaders.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uniformGroups" translate="no">.<a href="#uniformGroups">uniformGroups</a><span class="type-signature"> : Object.&lt;string, Object.&lt;string, <a href="NodeUniformsGroup.html">NodeUniformsGroup</a>>></span> </h3>
+					<div class="description">
+						<p>A dictionary that holds for each shader stage ('vertex', 'fragment', 'compute')
+another dictionary which manages UBOs per group ('render','frame','object').</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="buildCode" translate="no">.<a href="#buildCode">buildCode</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Controls the code build of the shader stages.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#buildCode">NodeBuilder#buildCode</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="buildFunctionCode" translate="no">.<a href="#buildFunctionCode">buildFunctionCode</a><span class="signature">( shaderNode : <span class="param-type">ShaderNodeInternal</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Builds the given shader node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderNode</strong>
+									</td>
+									<td class="description last">
+										<p>The shader node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#buildFunctionCode">NodeBuilder#buildFunctionCode</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL function code.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="enableClipDistances" translate="no">.<a href="#enableClipDistances">enableClipDistances</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enables the 'clip_distances' directive.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="enableDirective" translate="no">.<a href="#enableDirective">enableDirective</a><span class="signature">( name : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enables the given directive for the given shader stage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The directive name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage to enable the directive for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="enableDualSourceBlending" translate="no">.<a href="#enableDualSourceBlending">enableDualSourceBlending</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enables the 'dual_source_blending' directive.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="enableHardwareClipping" translate="no">.<a href="#enableHardwareClipping">enableHardwareClipping</a><span class="signature">( planeCount : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enables hardware clipping.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>planeCount</strong>
+									</td>
+									<td class="description last">
+										<p>The clipping plane count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="enableShaderF16" translate="no">.<a href="#enableShaderF16">enableShaderF16</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enables the 'f16' directive.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="enableSubGroups" translate="no">.<a href="#enableSubGroups">enableSubGroups</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enables the 'subgroups' directive.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="enableSubgroupsF16" translate="no">.<a href="#enableSubgroupsF16">enableSubgroupsF16</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Enables the 'subgroups-f16' directive.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="generateArrayDeclaration" translate="no">.<a href="#generateArrayDeclaration">generateArrayDeclaration</a><span class="signature">( type : <span class="param-type">string</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the array declaration string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateArrayDeclaration">NodeBuilder#generateArrayDeclaration</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated value as a shader string.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateFilteredTexture" translate="no">.<a href="#generateFilteredTexture">generateFilteredTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet for a manual filtered texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+										<p>Default is <code>'0u'</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTexture" translate="no">.<a href="#generateTexture">generateTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet for sampling/loading the given texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateTexture">NodeBuilder#generateTexture</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureBias" translate="no">.<a href="#generateTextureBias">generateTextureBias</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, biasSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet when sampling textures with a bias to the mip level.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>biasSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the bias to apply to the mip level before sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureCompare" translate="no">.<a href="#generateTextureCompare">generateTextureCompare</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, compareSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet for sampling a depth texture and comparing the sampled depth values
+against a reference value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>compareSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the reference value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureDimension" translate="no">.<a href="#generateTextureDimension">generateTextureDimension</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates a WGSL variable that holds the texture dimension of the given texture.
+It also returns information about the number of layers (elements) of an arrayed
+texture as well as the cube face count of cube textures.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture to generate the function for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the video texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The name of the dimension variable.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureGrad" translate="no">.<a href="#generateTextureGrad">generateTextureGrad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, gradSnippet : <span class="param-type">Array.&lt;string></span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet for sampling/loading the given texture using explicit gradients.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>gradSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding both gradient WGSL snippets.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureLevel" translate="no">.<a href="#generateTextureLevel">generateTextureLevel</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet when sampling textures with explicit mip level.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureLoad" translate="no">.<a href="#generateTextureLoad">generateTextureLoad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvIndexSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet that reads a single texel from a texture without sampling or filtering.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvIndexSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureLod" translate="no">.<a href="#generateTextureLod">generateTextureLod</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet for a texture lookup with explicit level-of-detail.
+Since it's a lookup, no sampling or filtering is applied.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+										<p>Default is <code>'0u'</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateTextureLod">NodeBuilder#generateTextureLod</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateTextureStore" translate="no">.<a href="#generateTextureStore">generateTextureStore</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvIndexSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, valueSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the WGSL snippet that writes a single texel to a texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvIndexSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>valueSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A WGSL snippet that represent the new texel value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateWrapFunction" translate="no">.<a href="#generateWrapFunction">generateWrapFunction</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates a wrap function used in context of textures.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture to generate the function for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The name of the generated function.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getAttributes" translate="no">.<a href="#getAttributes">getAttributes</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the shader attributes of the given shader stage as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getAttributes">NodeBuilder#getAttributes</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the shader attributes.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBitcastMethod" translate="no">.<a href="#getBitcastMethod">getBitcastMethod</a><span class="signature">( type : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the bitcast method name for a given input and outputType.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The output type to bitcast to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The resolved WGSL bitcast invocation.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBuiltin" translate="no">.<a href="#getBuiltin">getBuiltin</a><span class="signature">( name : <span class="param-type">string</span>, property : <span class="param-type">string</span>, type : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method should be used whenever builtins are required in nodes.
+The internal builtins data structure will make sure builtins are
+defined in the WGSL source.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The builtin name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The property name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node data type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The property name.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBuiltins" translate="no">.<a href="#getBuiltins">getBuiltins</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the builtins of the given shader stage as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A WGSL snippet that represents the builtins of the given stage.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClipDistance" translate="no">.<a href="#getClipDistance">getClipDistance</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the clip distances builtin.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clip distances builtin.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDirectives" translate="no">.<a href="#getDirectives">getDirectives</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the directives of the given shader stage as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A WGSL snippet that enables the directives of the given stage.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDrawIndex" translate="no">.<a href="#getDrawIndex">getDrawIndex</a><span class="signature">()</span><span class="type-signature"> : null</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten as a NOP since this method is intended for the WebGL 2 backend.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getDrawIndex">NodeBuilder#getDrawIndex</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Null.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFragCoord" translate="no">.<a href="#getFragCoord">getFragCoord</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the frag coord builtin.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getFragCoord">NodeBuilder#getFragCoord</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The frag coord builtin.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFragDepth" translate="no">.<a href="#getFragDepth">getFragDepth</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the frag depth builtin.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The frag depth builtin.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFrontFacing" translate="no">.<a href="#getFrontFacing">getFrontFacing</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the front facing builtin.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getFrontFacing">NodeBuilder#getFrontFacing</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The front facing builtin.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFunctionOperator" translate="no">.<a href="#getFunctionOperator">getFunctionOperator</a><span class="signature">( op : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the native shader operator name for a given generic name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>op</strong>
+									</td>
+									<td class="description last">
+										<p>The operator name to resolve.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getFunctionOperator">NodeBuilder#getFunctionOperator</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The resolved operator name.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInstanceIndex" translate="no">.<a href="#getInstanceIndex">getInstanceIndex</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Contextually returns either the vertex stage instance index builtin
+or the linearized index of an compute invocation within a grid of workgroups.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getInstanceIndex">NodeBuilder#getInstanceIndex</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The instance index.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInvocationLocalIndex" translate="no">.<a href="#getInvocationLocalIndex">getInvocationLocalIndex</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a builtin representing the index of a compute invocation within the scope of a workgroup load.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The invocation local index.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInvocationSubgroupIndex" translate="no">.<a href="#getInvocationSubgroupIndex">getInvocationSubgroupIndex</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a builtin representing the index of a compute invocation within the scope of a subgroup.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The invocation subgroup index.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMethod" translate="no">.<a href="#getMethod">getMethod</a><span class="signature">( method : <span class="param-type">string</span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the native shader method name for a given generic name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>method</strong>
+									</td>
+									<td class="description last">
+										<p>The method name to resolve.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>An optional output.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getMethod">NodeBuilder#getMethod</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The resolved WGSL method name.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeAccess" translate="no">.<a href="#getNodeAccess">getNodeAccess</a><span class="signature">( node : <span class="param-type"><a href="StorageTextureNode.html">StorageTextureNode</a> | <a href="StorageBufferNode.html">StorageBufferNode</a></span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the node access for the given node and shader stage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The storage node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node access.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getOutputStructName" translate="no">.<a href="#getOutputStructName">getOutputStructName</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the output struct name.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getOutputStructName">NodeBuilder#getOutputStructName</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The name of the output struct.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPropertyName" translate="no">.<a href="#getPropertyName">getPropertyName</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a WGSL snippet that represents the property name of the given node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getPropertyName">NodeBuilder#getPropertyName</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The property name.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getScopedArray" translate="no">.<a href="#getScopedArray">getScopedArray</a><span class="signature">( name : <span class="param-type">string</span>, scope : <span class="param-type">string</span>, bufferType : <span class="param-type">string</span>, bufferCount : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method should be used when a new scoped buffer is used in context of
+compute shaders. It adds the array to the internal data structure which is
+later used to generate the respective WGSL.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The array name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The scope.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferType</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferCount</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The array name.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getScopedArrays" translate="no">.<a href="#getScopedArrays">getScopedArrays</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the scoped arrays of the given shader stage as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the scoped arrays.
+Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getStorageAccess" translate="no">.<a href="#getStorageAccess">getStorageAccess</a><span class="signature">( node : <span class="param-type"><a href="StorageTextureNode.html">StorageTextureNode</a> | <a href="StorageBufferNode.html">StorageBufferNode</a></span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns A WGSL snippet representing the storage access.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The storage node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet representing the storage access.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getStructMembers" translate="no">.<a href="#getStructMembers">getStructMembers</a><span class="signature">( struct : <span class="param-type"><a href="StructTypeNode.html">StructTypeNode</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the members of the given struct type node as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>struct</strong>
+									</td>
+									<td class="description last">
+										<p>The struct type node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the struct members.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getStructs" translate="no">.<a href="#getStructs">getStructs</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the structs of the given shader stage as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the structs.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSubgroupIndex" translate="no">.<a href="#getSubgroupIndex">getSubgroupIndex</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a builtin representing the index of a compute invocation's subgroup within its workgroup.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The subgroup index.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSubgroupSize" translate="no">.<a href="#getSubgroupSize">getSubgroupSize</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a builtin representing the size of a subgroup within the current shader.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The subgroup size.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTernary" translate="no">.<a href="#getTernary">getTernary</a><span class="signature">( condSnippet : <span class="param-type">string</span>, ifSnippet : <span class="param-type">string</span>, elseSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the native snippet for a ternary operation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>condSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The condition determining which expression gets resolved.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>ifSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The expression to resolve to if the condition is true.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>elseSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The expression to resolve to if the condition is false.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getTernary">NodeBuilder#getTernary</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The resolved method name.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getType" translate="no">.<a href="#getType">getType</a><span class="signature">( type : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the WGSL type of the given node data type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node data type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getType">NodeBuilder#getType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getUniformFromNode" translate="no">.<a href="#getUniformFromNode">getUniformFromNode</a><span class="signature">( node : <span class="param-type"><a href="UniformNode.html">UniformNode</a></span>, type : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="NodeUniform.html">NodeUniform</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is one of the more important ones since it's responsible
+for generating a matching binding instance for the given uniform node.</p>
+<p>These bindings are later used in the renderer to create bind groups
+and layouts.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node data type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>An optional uniform name.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getUniformFromNode">NodeBuilder#getUniformFromNode</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node uniform object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getUniforms" translate="no">.<a href="#getUniforms">getUniforms</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the uniforms of the given shader stage as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getUniforms">NodeBuilder#getUniforms</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the uniforms.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getVar" translate="no">.<a href="#getVar">getVar</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a WGSL string representing a variable.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The array length.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getVar">NodeBuilder#getVar</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines a variable.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getVars" translate="no">.<a href="#getVars">getVars</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the variables of the given shader stage as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getVars">NodeBuilder#getVars</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the variables.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getVaryings" translate="no">.<a href="#getVaryings">getVaryings</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the varyings of the given shader stage as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getVaryings">NodeBuilder#getVaryings</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines the varyings.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getVertexIndex" translate="no">.<a href="#getVertexIndex">getVertexIndex</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the vertex index builtin.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getVertexIndex">NodeBuilder#getVertexIndex</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The vertex index.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasBuiltin" translate="no">.<a href="#hasBuiltin">hasBuiltin</a><span class="signature">( name : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given builtin is defined in the given shader stage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The builtin name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given builtin is defined in the given shader stage or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isAvailable" translate="no">.<a href="#isAvailable">isAvailable</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Whether the requested feature is available or not.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The requested feature.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#isAvailable">NodeBuilder#isAvailable</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the requested feature is supported or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isFlipY" translate="no">.<a href="#isFlipY">isFlipY</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Whether to flip texture data along its vertical axis or not.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#isFlipY">NodeBuilder#isFlipY</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Returns always <code>false</code> in context of WGSL.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isSampleCompare" translate="no">.<a href="#isSampleCompare">isSampleCompare</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the sampled values of the given texture should be compared against a reference value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the sampled values of the given texture should be compared against a reference value or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isUnfilterable" translate="no">.<a href="#isUnfilterable">isUnfilterable</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given texture is unfilterable.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given texture is unfilterable or not.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/webgpu/nodes/WGSLNodeBuilder.js" target="_blank" rel="noopener" translate="no">src/renderers/webgpu/nodes/WGSLNodeBuilder.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

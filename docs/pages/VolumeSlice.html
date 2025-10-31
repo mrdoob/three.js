@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>VolumeSlice - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">VolumeSlice</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class has been made to hold a slice of a volume data.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">VolumeSlice</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { VolumeSlice } from 'three/addons/misc/VolumeSlice.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="VolumeSlice" translate="no">new <a href="#VolumeSlice">VolumeSlice</a><span class="signature">( volume : <span class="param-type"><a href="Volume.html">Volume</a></span>, index : <span class="param-type">number</span>, axis : <span class="param-type">'x' | 'y' | 'z'</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new volume slice.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>volume</strong>
+									</td>
+									<td class="description last">
+										<p>The associated volume.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the slice.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>For now only 'x', 'y' or 'z' but later it will change to a normal vector.</p>
+										<p>Default is <code>'z'</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="Volume.html">Volume</a></li>
+								</ul>
+							</dd>
+						</dl>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="axis" translate="no">.<a href="#axis">axis</a><span class="type-signature"> : 'x' | 'y' | 'z'</span> </h3>
+					<div class="description">
+						<p>The normal axis.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="canvas" translate="no">.<a href="#canvas">canvas</a><span class="type-signature"> : HTMLCanvasElement</span> </h3>
+					<div class="description">
+						<p>The final canvas used for the texture.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="canvasBuffer" translate="no">.<a href="#canvasBuffer">canvasBuffer</a><span class="type-signature"> : HTMLCanvasElement</span> </h3>
+					<div class="description">
+						<p>The intermediary canvas used to paint the data.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ctx" translate="no">.<a href="#ctx">ctx</a><span class="type-signature"> : CanvasRenderingContext2D</span> </h3>
+					<div class="description">
+						<p>The rendering context of the canvas.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ctxBuffer" translate="no">.<a href="#ctxBuffer">ctxBuffer</a><span class="type-signature"> : CanvasRenderingContext2D</span> </h3>
+					<div class="description">
+						<p>The rendering context of the canvas buffer,</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="geometryNeedsUpdate" translate="no">.<a href="#geometryNeedsUpdate">geometryNeedsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, <code>updateGeometry()</code> will be triggered at the next repaint.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iLength" translate="no">.<a href="#iLength">iLength</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Width of slice in the original coordinate system, corresponds to the width of the buffer canvas.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="index" translate="no">.<a href="#index">index</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The index of the slice, if changed, will automatically call updateGeometry at the next repaint.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="jLength" translate="no">.<a href="#jLength">jLength</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Height of slice in the original coordinate system, corresponds to the height of the buffer canvas.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mesh" translate="no">.<a href="#mesh">mesh</a><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="description">
+						<p>The mesh ready to get used in the scene.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sliceAccess" translate="no">.<a href="#sliceAccess">sliceAccess</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>Function that allow the slice to access right data.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="Volume.html#extractPerpendicularPlane">Volume#extractPerpendicularPlane</a></li>
+								</ul>
+							</dd>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="volume" translate="no">.<a href="#volume">volume</a><span class="type-signature"> : <a href="Volume.html">Volume</a></span> </h3>
+					<div class="description">
+						<p>The associated volume.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="repaint" translate="no">.<a href="#repaint">repaint</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Refresh the texture and the geometry if geometryNeedsUpdate is set to <code>true</code>.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="updateGeometry" translate="no">.<a href="#updateGeometry">updateGeometry</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Refresh the geometry according to axis and index.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="Volume.html#extractPerpendicularPlane">Volume#extractPerpendicularPlane</a></li>
+								</ul>
+							</dd>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/VolumeSlice.js" target="_blank" rel="noopener" translate="no">examples/jsm/misc/VolumeSlice.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GPUComputationRenderer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">GPUComputationRenderer</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>GPUComputationRenderer, based on SimulationRenderer by @zz85.</p>
+<p>The GPUComputationRenderer uses the concept of variables. These variables are RGBA float textures that hold 4 floats
+for each compute element (texel).</p>
+<p>Each variable has a fragment shader that defines the computation made to obtain the variable in question.
+You can use as many variables you need, and make dependencies so you can use textures of other variables in the shader
+(the sampler uniforms are added automatically) Most of the variables will need themselves as dependency.</p>
+<p>The renderer has actually two render targets per variable, to make ping-pong. Textures from the current frame are used
+as inputs to render the textures of the next frame.</p>
+<p>The render targets of the variables can be used as input textures for your visualization shaders.</p>
+<p>Variable names should be valid identifiers and should not collide with THREE GLSL used identifiers.
+a common approach could be to use 'texture' prefixing the variable name; i.e texturePosition, textureVelocity...</p>
+<p>The size of the computation (sizeX * sizeY) is defined as 'resolution' automatically in the shader. For example:</p>
+<p>Basic use:</p>
+<pre><code class="language-js">// Initialization...
+// Create computation renderer
+const gpuCompute = new GPUComputationRenderer( 1024, 1024, renderer );
+// Create initial state float textures
+const pos0 = gpuCompute.createTexture();
+const vel0 = gpuCompute.createTexture();
+// and fill in here the texture data...
+// Add texture variables
+const velVar = gpuCompute.addVariable( &quot;textureVelocity&quot;, fragmentShaderVel, vel0 );
+const posVar = gpuCompute.addVariable( &quot;texturePosition&quot;, fragmentShaderPos, pos0 );
+// Add variable dependencies
+gpuCompute.setVariableDependencies( velVar, [ velVar, posVar ] );
+gpuCompute.setVariableDependencies( posVar, [ velVar, posVar ] );
+// Add custom uniforms
+velVar.material.uniforms.time = { value: 0.0 };
+// Check for completeness
+const error = gpuCompute.init();
+if ( error !== null ) {
+		console.error( error );
+}
+// In each frame...
+// Compute!
+gpuCompute.compute();
+// Update texture uniforms in your visualization materials with the gpu renderer output
+myMaterial.uniforms.myTexture.value = gpuCompute.getCurrentRenderTarget( posVar ).texture;
+// Do your rendering
+renderer.render( myScene, myCamera );
+</code></pre>
+<p>Also, you can use utility functions to create ShaderMaterial and perform computations (rendering between textures)
+Note that the shaders can have multiple input textures.</p>
+<pre><code class="language-js">const myFilter1 = gpuCompute.createShaderMaterial( myFilterFragmentShader1, { theTexture: { value: null } } );
+const myFilter2 = gpuCompute.createShaderMaterial( myFilterFragmentShader2, { theTexture: { value: null } } );
+const inputTexture = gpuCompute.createTexture();
+// Fill in here inputTexture...
+myFilter1.uniforms.theTexture.value = inputTexture;
+const myRenderTarget = gpuCompute.createRenderTarget();
+myFilter2.uniforms.theTexture.value = myRenderTarget.texture;
+const outputRenderTarget = gpuCompute.createRenderTarget();
+// Now use the output texture where you want:
+myMaterial.uniforms.map.value = outputRenderTarget.texture;
+// And compute each frame, before rendering to screen:
+gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
+gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
+</code></pre></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre class="prettyprint source"><code>#DEFINE resolution vec2( 1024.0, 1024.0 )
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">GPUComputationRenderer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="GPUComputationRenderer" translate="no">new <a href="#GPUComputationRenderer">GPUComputationRenderer</a><span class="signature">( sizeX : <span class="param-type">number</span>, sizeY : <span class="param-type">number</span>, renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new GPU computation renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sizeX</strong>
+									</td>
+									<td class="description last">
+										<p>Computation problem size is always 2d: sizeX * sizeY elements.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sizeY</strong>
+									</td>
+									<td class="description last">
+										<p>Computation problem size is always 2d: sizeX * sizeY elements.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="addResolutionDefine" translate="no">.<a href="#addResolutionDefine">addResolutionDefine</a> </h3>
+					<div class="description">
+						<p>Adds a resolution defined for the given material shader.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addVariable" translate="no">.<a href="#addVariable">addVariable</a><span class="signature">( variableName : <span class="param-type">string</span>, computeFragmentShader : <span class="param-type">string</span>, initialValueTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a compute variable to the renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>variableName</strong>
+									</td>
+									<td class="description last">
+										<p>The variable name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>computeFragmentShader</strong>
+									</td>
+									<td class="description last">
+										<p>The compute (fragment) shader source.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>initialValueTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The initial value texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The compute variable.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="compute" translate="no">.<a href="#compute">compute</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Executes the compute. This method is usually called in the animation loop.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="createRenderTarget" translate="no">.<a href="#createRenderTarget">createRenderTarget</a><span class="signature">( sizeXTexture : <span class="param-type">number</span>, sizeYTexture : <span class="param-type">number</span>, wrapS : <span class="param-type">number</span>, wrapT : <span class="param-type">number</span>, minFilter : <span class="param-type">number</span>, magFilter : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new render target from the given parameters.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sizeXTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the render target.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sizeYTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the render target.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapS</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapT</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The minFilter value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>magFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The magFilter value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The new render target.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="createTexture" translate="no">.<a href="#createTexture">createTexture</a><span class="signature">()</span><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new data texture.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The new data texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees all internal resources. Call this method if you don't need the
+renderer anymore.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="doRenderTarget" translate="no">.<a href="#doRenderTarget">doRenderTarget</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span>, output : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the given material into the given render target
+with a full-screen pass.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="getAlternateRenderTarget" translate="no">.<a href="#getAlternateRenderTarget">getAlternateRenderTarget</a><span class="signature">( variable : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the alternate render target for the given compute variable.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>variable</strong>
+									</td>
+									<td class="description last">
+										<p>The compute variable.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The alternate render target.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getCurrentRenderTarget" translate="no">.<a href="#getCurrentRenderTarget">getCurrentRenderTarget</a><span class="signature">( variable : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current render target for the given compute variable.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>variable</strong>
+									</td>
+									<td class="description last">
+										<p>The compute variable.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current render target.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="init" translate="no">.<a href="#init">init</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the renderer.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Returns <code>null</code> if no errors are detected. Otherwise returns the error message.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="renderTexture" translate="no">.<a href="#renderTexture">renderTexture</a><span class="signature">( input : <span class="param-type"><a href="Texture.html">Texture</a></span>, output : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the given texture into the given render target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>input</strong>
+									</td>
+									<td class="description last">
+										<p>The input.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setDataType" translate="no">.<a href="#setDataType">setDataType</a><span class="signature">( type : <span class="param-type"><a href="global.html#FloatType">FloatType</a> | <a href="global.html#HalfFloatType">HalfFloatType</a></span> )</span><span class="type-signature"> : <a href="GPUComputationRenderer.html">GPUComputationRenderer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the data type of the internal textures.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this renderer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setVariableDependencies" translate="no">.<a href="#setVariableDependencies">setVariableDependencies</a><span class="signature">( variable : <span class="param-type">Object</span>, dependencies : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets variable dependencies.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>variable</strong>
+									</td>
+									<td class="description last">
+										<p>The compute variable.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dependencies</strong>
+									</td>
+									<td class="description last">
+										<p>Other compute variables that represents the dependencies.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/GPUComputationRenderer.js" target="_blank" rel="noopener" translate="no">examples/jsm/misc/GPUComputationRenderer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

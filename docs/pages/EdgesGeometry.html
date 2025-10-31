@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EdgesGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="BufferGeometry.html">BufferGeometry</a> → </p>
+	<h1 translate="no">EdgesGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Can be used as a helper object to view the edges of a geometry.</p>
+<p>Note: It is not yet possible to serialize/deserialize instances of this class.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.BoxGeometry();
+const edges = new THREE.EdgesGeometry( geometry );
+const line = new THREE.LineSegments( edges );
+scene.add( line );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="EdgesGeometry" translate="no">new <a href="#EdgesGeometry">EdgesGeometry</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, thresholdAngle : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new edges geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>thresholdAngle</strong>
+									</td>
+									<td class="description last">
+										<p>An edge is only rendered if the angle (in degrees)
+between the face normals of the adjoining faces exceeds this value.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Holds the constructor parameters that have been
+used to generate the geometry. Any modification
+after instantiation does not change the geometry.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/geometries/EdgesGeometry.js" target="_blank" rel="noopener" translate="no">src/geometries/EdgesGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

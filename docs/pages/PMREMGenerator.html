@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PMREMGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">PMREMGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class generates a Prefiltered, Mipmapped Radiance Environment Map
+(PMREM) from a cubeMap environment texture. This allows different levels of
+blur to be quickly accessed based on material roughness. It is packed into a
+special CubeUV format that allows us to perform custom interpolation so that
+we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
+chain, it only goes down to the LOD_MIN level (above), and then creates extra
+even more filtered 'mips' at the same LOD_MIN resolution, associated with
+higher roughness levels. In this way we maintain resolution to smoothly
+interpolate diffuse lighting while limiting sampling computation.</p>
+<p>The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
+importance sampling based on &quot;Sampling the GGX Distribution of Visible Normals&quot;
+(Heitz, 2018) to generate environment maps that accurately match the GGX BRDF
+used in material rendering for physically-based image-based lighting.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PMREMGenerator" translate="no">new <a href="#PMREMGenerator">PMREMGenerator</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new PMREM generator.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="compileCubemapShader" translate="no">.<a href="#compileCubemapShader">compileCubemapShader</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
+your texture's network fetch for increased concurrency.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="compileEquirectangularShader" translate="no">.<a href="#compileEquirectangularShader">compileEquirectangularShader</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
+your texture's network fetch for increased concurrency.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
+so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
+one of them will cause any others to also become unusable.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="fromCubemap" translate="no">.<a href="#fromCubemap">fromCubemap</a><span class="signature">( cubemap : <span class="param-type"><a href="Texture.html">Texture</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates a PMREM from an cubemap texture, which can be either LDR
+or HDR. The ideal input cube size is 256 x 256,
+as this matches best with the 256 x 256 cubemap output.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>cubemap</strong>
+									</td>
+									<td class="description last">
+										<p>The cubemap texture to be converted.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target to use.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The resulting PMREM.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromEquirectangular" translate="no">.<a href="#fromEquirectangular">fromEquirectangular</a><span class="signature">( equirectangular : <span class="param-type"><a href="Texture.html">Texture</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates a PMREM from an equirectangular texture, which can be either LDR
+or HDR. The ideal input image size is 1k (1024 x 512),
+as this matches best with the 256 x 256 cubemap output.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>equirectangular</strong>
+									</td>
+									<td class="description last">
+										<p>The equirectangular texture to be converted.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target to use.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The resulting PMREM.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromScene" translate="no">.<a href="#fromScene">fromScene</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, sigma : <span class="param-type">number</span>, near : <span class="param-type">number</span>, far : <span class="param-type">number</span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates a PMREM from a supplied Scene, which can be faster than using an
+image if networking bandwidth is low. Optional sigma specifies a blur radius
+in radians to be applied to the scene before PMREM generation. Optional near
+and far planes ensure the scene is rendered in its entirety.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to be captured.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sigma</strong>
+									</td>
+									<td class="description last">
+										<p>The blur radius in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>near</strong>
+									</td>
+									<td class="description last">
+										<p>The near plane distance.</p>
+										<p>Default is <code>0.1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>far</strong>
+									</td>
+									<td class="description last">
+										<p>The far plane distance.</p>
+										<p>Default is <code>100</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration options.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The texture size of the PMREM.</p>
+										<p>Default is <code>256</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The position of the internal cube camera that renders the scene.</p>
+										<p>Default is <code>origin</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The resulting PMREM.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/PMREMGenerator.js" target="_blank" rel="noopener" translate="no">src/extras/PMREMGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

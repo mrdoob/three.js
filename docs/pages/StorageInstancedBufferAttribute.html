@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>StorageInstancedBufferAttribute - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="BufferAttribute.html">BufferAttribute</a> → <a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> → </p>
+	<h1 translate="no">StorageInstancedBufferAttribute</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This special type of instanced buffer attribute is intended for compute shaders.
+In earlier three.js versions it was only possible to update attribute data
+on the CPU via JavaScript and then upload the data to the GPU. With the
+new material system and renderer it is now possible to use compute shaders
+to compute the data for an attribute more efficiently on the GPU.</p>
+<p>The idea is to create an instance of this class and provide it as an input
+to <a href="StorageBufferNode.html">StorageBufferNode</a>.</p>
+<p>Note: This type of buffer attribute can only be used with <code>WebGPURenderer</code>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="StorageInstancedBufferAttribute" translate="no">new <a href="#StorageInstancedBufferAttribute">StorageInstancedBufferAttribute</a><span class="signature">( count : <span class="param-type">number | TypedArray</span>, itemSize : <span class="param-type">number</span>, typeClass : <span class="param-type">TypedArray.constructor</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new storage instanced buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The item count. It is also valid to pass a typed array as an argument.
+The subsequent parameters are then obsolete.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>itemSize</strong>
+									</td>
+									<td class="description last">
+										<p>The item size.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>typeClass</strong>
+									</td>
+									<td class="description last">
+										<p>A typed array constructor.</p>
+										<p>Default is <code>Float32Array</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isStorageInstancedBufferAttribute" translate="no">.<a href="#isStorageInstancedBufferAttribute">isStorageInstancedBufferAttribute</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/StorageInstancedBufferAttribute.js" target="_blank" rel="noopener" translate="no">src/renderers/common/StorageInstancedBufferAttribute.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

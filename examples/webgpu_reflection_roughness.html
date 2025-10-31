@@ -4,12 +4,20 @@
 		<title>three.js webgpu - roughness reflection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - roughness reflection
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Roughness Reflection</span>
+			</div>
+
+			<small>
+				Reflection with roughness.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -31,11 +39,10 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			let controls;
-			let stats;
 
 			init();
 
@@ -87,7 +94,7 @@
 
 				// reflection
 
-				const reflection = reflector( { resolution: .5, bounces: false, generateMipmaps: true } ); // 0.5 is half of the rendering view
+				const reflection = reflector( { resolutionScale: .5, bounces: false, generateMipmaps: true } ); // 0.5 is half of the rendering view
 				reflection.target.rotateX( - Math.PI / 2 );
 				scene.add( reflection.target );
 
@@ -122,10 +129,8 @@
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 1.5;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
@@ -151,9 +156,7 @@
 
 			}
 
-			function animate( time ) {
-
-				stats.update();
+			function animate() {
 
 				controls.update();
 

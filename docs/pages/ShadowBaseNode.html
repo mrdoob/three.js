@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ShadowBaseNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">ShadowBaseNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Base class for all shadow nodes.</p>
+<p>Shadow nodes encapsulate shadow related logic and are always coupled to lighting nodes.
+Lighting nodes might share the same shadow node type or use specific ones depending on
+their requirements.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ShadowBaseNode" translate="no">new <a href="#ShadowBaseNode">ShadowBaseNode</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new shadow base node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow casting light.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isShadowBaseNode" translate="no">.<a href="#isShadowBaseNode">isShadowBaseNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="light" translate="no">.<a href="#light">light</a><span class="type-signature"> : <a href="Light.html">Light</a></span> </h3>
+					<div class="description">
+						<p>The shadow casting light.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Overwritten since shadows are updated by default per render.</p>
+						<p>Default is <code>'render'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBeforeType">Node#updateBeforeType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupShadowPosition" translate="no">.<a href="#setupShadowPosition">setupShadowPosition</a><span class="signature">( object : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the shadow position node which is by default the predefined TSL node object <code>shadowPositionWorld</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>A configuration object that must at least hold a material reference.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/lighting/ShadowBaseNode.js" target="_blank" rel="noopener" translate="no">src/nodes/lighting/ShadowBaseNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

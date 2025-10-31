@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TiledLightsNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="LightsNode.html">LightsNode</a> → </p>
+	<h1 translate="no">TiledLightsNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A custom version of <code>LightsNode</code> implementing tiled lighting. This node is used in
+<a href="TiledLighting.html">TiledLighting</a> to overwrite the renderer's default lighting with
+a custom implementation.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TiledLightsNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { tiledLights } from 'three/addons/tsl/lighting/TiledLightsNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TiledLightsNode" translate="no">new <a href="#TiledLightsNode">TiledLightsNode</a><span class="signature">( maxLights : <span class="param-type">number</span>, tileSize : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new tiled lights node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>maxLights</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum number of lights.</p>
+										<p>Default is <code>1024</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>tileSize</strong>
+									</td>
+									<td class="description last">
+										<p>The tile size.</p>
+										<p>Default is <code>32</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="maxLights" translate="no">.<a href="#maxLights">maxLights</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum number of lights.</p>
+						<p>Default is <code>1024</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="tileSize" translate="no">.<a href="#tileSize">tileSize</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The tile size.</p>
+						<p>Default is <code>32</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/lighting/TiledLightsNode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/lighting/TiledLightsNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

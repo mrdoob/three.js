@@ -80,7 +80,7 @@ class TransformControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Camera} camera - The camera of the rendered scene.
-	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 * @param {?HTMLElement} domElement - The HTML element used for event listeners.
 	 */
 	constructor( camera, domElement = null ) {
 

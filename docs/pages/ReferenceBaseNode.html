@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ReferenceBaseNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">ReferenceBaseNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Base class for nodes which establishes a reference to a property of another object.
+In this way, the value of the node is automatically linked to the value of
+referenced object. Reference nodes internally represent the linked value
+as a uniform.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ReferenceBaseNode" translate="no">new <a href="#ReferenceBaseNode">ReferenceBaseNode</a><span class="signature">( property : <span class="param-type">string</span>, uniformType : <span class="param-type">string</span>, object : <span class="param-type">Object</span>, count : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new reference base node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property the node refers to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uniformType</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform type that should be used to represent the property value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object the property belongs to.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>When the linked property is an array-like, this parameter defines its length.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>When the linked property is an array, this parameter defines its length.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="group" translate="no">.<a href="#group">group</a><span class="type-signature"> : <a href="UniformGroupNode.html">UniformGroupNode</a></span> </h3>
+					<div class="description">
+						<p>The uniform group of the internal uniform.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="node" translate="no">.<a href="#node">node</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<div class="description">
+						<p>The uniform node that holds the value of the reference node.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="object" translate="no">.<a href="#object">object</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The object the property belongs to.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="properties" translate="no">.<a href="#properties">properties</a><span class="type-signature"> : Array.&lt;string></span> </h3>
+					<div class="description">
+						<p>The property name might have dots so nested properties can be referred.
+The hierarchy of the names is stored inside this array.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="property" translate="no">.<a href="#property">property</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the property the node refers to.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="reference" translate="no">.<a href="#reference">reference</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Points to the current referred object. This property exists next to <a href="ReferenceNode.html#object">ReferenceNode#object</a>
+since the final reference might be updated from calling code.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uniformType" translate="no">.<a href="#uniformType">uniformType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The uniform type that should be used to represent the property value.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Overwritten since reference nodes are updated per object.</p>
+						<p>Default is <code>'object'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateType">Node#updateType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="element" translate="no">.<a href="#element">element</a><span class="signature">( indexNode : <span class="param-type"><a href="IndexNode.html">IndexNode</a></span> )</span><span class="type-signature"> : <a href="ReferenceElementNode.html">ReferenceElementNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>When the referred property is array-like, this method can be used
+to access elements via an index node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>indexNode</strong>
+									</td>
+									<td class="description last">
+										<p>indexNode.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to an element.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type is inferred from
+the type of the reference node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getNodeType">Node#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getValueFromReference" translate="no">.<a href="#getValueFromReference">getValueFromReference</a><span class="signature">( object : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the property value from the given referred object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object to retrieve the property value from.</p>
+										<p>Default is <code>this.reference</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setGroup" translate="no">.<a href="#setGroup">setGroup</a><span class="signature">( group : <span class="param-type"><a href="UniformGroupNode.html">UniformGroupNode</a></span> )</span><span class="type-signature"> : <a href="ReferenceBaseNode.html">ReferenceBaseNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the uniform group for this reference node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform group to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setNodeType" translate="no">.<a href="#setNodeType">setNodeType</a><span class="signature">( uniformType : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the node type which automatically defines the internal
+uniform type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uniformType</strong>
+									</td>
+									<td class="description last">
+										<p>The type to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">()</span><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The output of the reference node is the internal uniform node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten to update the internal uniform value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#update">Node#update</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a> | <a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Allows to update the reference based on the given state. The state is only
+evaluated <a href="ReferenceBaseNode.html#object">ReferenceBaseNode#object</a> is not set.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>state</strong>
+									</td>
+									<td class="description last">
+										<p>The current state.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateReference">Node#updateReference</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated reference.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateValue" translate="no">.<a href="#updateValue">updateValue</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Retrieves the value from the referred object property and uses it
+to updated the internal uniform.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/ReferenceBaseNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/ReferenceBaseNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

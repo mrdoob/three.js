@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>KTX2Exporter - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">KTX2Exporter</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An exporter for KTX2.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const exporter = new KTX2Exporter();
+const result = await exporter.parse( dataTexture );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">KTX2Exporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { KTX2Exporter } from 'three/addons/exporters/KTX2Exporter.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="KTX2Exporter" translate="no">new <a href="#KTX2Exporter">KTX2Exporter</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( arg1 : <span class="param-type"><a href="DataTexture.html">DataTexture</a> | <a href="Data3DTexture.html">Data3DTexture</a> | <a href="WebGPURenderer.html">WebGPURenderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, arg2 : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a></span> )</span><span class="type-signature"> : Promise.&lt;Uint8Array></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method has two variants.</p>
+<ul>
+<li>When exporting a data texture, it receives one parameter. The data or 3D data texture.</li>
+<li>When exporting a render target (e.g. a PMREM), it receives two parameters. The renderer and the
+render target.</li>
+</ul>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>arg1</strong>
+									</td>
+									<td class="description last">
+										<p>The data texture to export or a renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>arg2</strong>
+									</td>
+									<td class="description last">
+										<p>The render target that should be exported</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with the exported KTX2.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/KTX2Exporter.js" target="_blank" rel="noopener" translate="no">examples/jsm/exporters/KTX2Exporter.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

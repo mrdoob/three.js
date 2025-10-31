@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PropertyBinding - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">PropertyBinding</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This holds a reference to a real property in the scene graph; used internally.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PropertyBinding" translate="no">new <a href="#PropertyBinding">PropertyBinding</a><span class="signature">( rootNode : <span class="param-type">Object</span>, path : <span class="param-type">string</span>, parsedPath : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new property binding.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>rootNode</strong>
+									</td>
+									<td class="description last">
+										<p>The root node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The path.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>parsedPath</strong>
+									</td>
+									<td class="description last">
+										<p>The parsed path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="node" translate="no">.<a href="#node">node</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The object owns the animated property.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="parsedPath" translate="no">.<a href="#parsedPath">parsedPath</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>An object holding information about the path.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="path" translate="no">.<a href="#path">path</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The object path to the animated property.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rootNode" translate="no">.<a href="#rootNode">rootNode</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a> | <a href="Skeleton.html">Skeleton</a></span> </h3>
+					<div class="description">
+						<p>The root node.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="bind" translate="no">.<a href="#bind">bind</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a getter / setter pair for the property tracked by this binding.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="unbind" translate="no">.<a href="#unbind">unbind</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Unbinds the property.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".create" translate="no">.<a href="#.create">create</a><span class="signature">( root : <span class="param-type">Object</span>, path : <span class="param-type">string</span>, parsedPath : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="PropertyBinding.html">PropertyBinding</a> | Composite</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Factory method for creating a property binding from the given parameters.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>root</strong>
+									</td>
+									<td class="description last">
+										<p>The root node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The path.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>parsedPath</strong>
+									</td>
+									<td class="description last">
+										<p>The parsed path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created property binding or composite.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".findNode" translate="no">.<a href="#.findNode">findNode</a><span class="signature">( root : <span class="param-type">Object</span>, nodeName : <span class="param-type">string | number</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Searches for a node in the hierarchy of the given root object by the given
+node name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>root</strong>
+									</td>
+									<td class="description last">
+										<p>The root object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>nodeName</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The found node. Returns <code>null</code> if no object was found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".parseTrackName" translate="no">.<a href="#.parseTrackName">parseTrackName</a><span class="signature">( trackName : <span class="param-type">string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given track name (an object path to an animated property) and
+returns an object with information about the path. Matches strings in the following forms:</p>
+<ul>
+<li>nodeName.property</li>
+<li>nodeName.property[accessor]</li>
+<li>nodeName.material.property[accessor]</li>
+<li>uuid.property[accessor]</li>
+<li>uuid.objectName[objectIndex].propertyName[propertyIndex]</li>
+<li>parentName/nodeName.property</li>
+<li>parentName/parentName/nodeName.property[index]</li>
+<li>.bone[Armature.DEF_cog].position</li>
+<li>scene:helium_balloon_model:helium_balloon_model.position</li>
+</ul>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>trackName</strong>
+									</td>
+									<td class="description last">
+										<p>The track name to parse.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The parsed track name as an object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".sanitizeNodeName" translate="no">.<a href="#.sanitizeNodeName">sanitizeNodeName</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Replaces spaces with underscores and removes unsupported characters from
+node names, to ensure compatibility with parseTrackName().</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>Node name to be sanitized.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The sanitized node name.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/PropertyBinding.js" target="_blank" rel="noopener" translate="no">src/animation/PropertyBinding.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

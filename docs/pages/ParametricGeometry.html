@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ParametricGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="BufferGeometry.html">BufferGeometry</a> → </p>
+	<h1 translate="no">ParametricGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to generate a geometry based on a parametric surface.</p>
+<p>Reference: <a href="https://prideout.net/blog/old/blog/index.html@p=44.html">Mesh Generation with Python</a></p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.ParametricGeometry( klein, 25, 25 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const klein = new THREE.Mesh( geometry, material );
+scene.add( klein );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">ParametricGeometry</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ParametricGeometry" translate="no">new <a href="#ParametricGeometry">ParametricGeometry</a><span class="signature">( func : <span class="param-type"><a href="ParametricGeometry.html#~Func">ParametricGeometry~Func</a></span>, slices : <span class="param-type">number</span>, stacks : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new parametric geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>func</strong>
+									</td>
+									<td class="description last">
+										<p>The parametric function. Default is a function that generates a curved plane surface.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>slices</strong>
+									</td>
+									<td class="description last">
+										<p>The number of slices to use for the parametric function.</p>
+										<p>Default is <code>8</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>stacks</strong>
+									</td>
+									<td class="description last">
+										<p>The stacks of slices to use for the parametric function.</p>
+										<p>Default is <code>8</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Holds the constructor parameters that have been
+used to generate the geometry. Any modification
+after instantiation does not change the geometry.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+					<h3 class="name name-method" id="~Func" translate="no">.<a href="#~Func">Func</a><span class="signature">( u : <span class="param-type">number</span>, v : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parametric function definition of <code>ParametricGeometry</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/ParametricGeometry.js" target="_blank" rel="noopener" translate="no">examples/jsm/geometries/ParametricGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

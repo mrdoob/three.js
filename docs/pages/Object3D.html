@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Object3D - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → </p>
+	<h1 translate="no">Object3D</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This is the base class for most objects in three.js and provides a set of
+properties and methods for manipulating objects in 3D space.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Object3D" translate="no">new <a href="#Object3D">Object3D</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new 3D object.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="animations" translate="no">.<a href="#animations">animations</a><span class="type-signature"> : Array.&lt;<a href="AnimationClip.html">AnimationClip</a>></span> </h3>
+					<div class="description">
+						<p>An array holding the animation clips of the 3D object.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="castShadow" translate="no">.<a href="#castShadow">castShadow</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set to <code>true</code>, the 3D object gets rendered into shadow maps.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="children" translate="no">.<a href="#children">children</a><span class="type-signature"> : Array.&lt;<a href="Object3D.html">Object3D</a>></span> </h3>
+					<div class="description">
+						<p>An array holding the child 3D objects of this instance.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="customDepthMaterial" translate="no">.<a href="#customDepthMaterial">customDepthMaterial</a><span class="type-signature"> : <a href="Material.html">Material</a> | undefined</span> </h3>
+					<div class="description">
+						<p>Custom depth material to be used when rendering to the depth map. Can only be used
+in context of meshes. When shadow-casting with a <a href="DirectionalLight.html">DirectionalLight</a> or <a href="SpotLight.html">SpotLight</a>,
+if you are modifying vertex positions in the vertex shader you must specify a custom depth
+material for proper shadows.</p>
+<p>Only relevant in context of <a href="WebGLRenderer.html">WebGLRenderer</a>.</p>
+						<p>Default is <code>undefined</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="customDistanceMaterial" translate="no">.<a href="#customDistanceMaterial">customDistanceMaterial</a><span class="type-signature"> : <a href="Material.html">Material</a> | undefined</span> </h3>
+					<div class="description">
+						<p>Same as <a href="Object3D.html#customDepthMaterial">Object3D#customDepthMaterial</a>, but used with <a href="PointLight.html">PointLight</a>.</p>
+<p>Only relevant in context of <a href="WebGLRenderer.html">WebGLRenderer</a>.</p>
+						<p>Default is <code>undefined</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="frustumCulled" translate="no">.<a href="#frustumCulled">frustumCulled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set to <code>true</code>, the 3D object is honored by view frustum culling.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="id" translate="no">.<a href="#id">id</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The ID of the 3D object.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isObject3D" translate="no">.<a href="#isObject3D">isObject3D</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="layers" translate="no">.<a href="#layers">layers</a><span class="type-signature"> : <a href="Layers.html">Layers</a></span> </h3>
+					<div class="description">
+						<p>The layer membership of the 3D object. The 3D object is only visible if it has
+at least one layer in common with the camera in use. This property can also be
+used to filter out unwanted objects in ray-intersection tests when using <a href="Raycaster.html">Raycaster</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrix" translate="no">.<a href="#matrix">matrix</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="description">
+						<p>Represents the object's transformation matrix in local space.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrixAutoUpdate" translate="no">.<a href="#matrixAutoUpdate">matrixAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set to <code>true</code>, the engine automatically computes the local matrix from position,
+rotation and scale every frame.</p>
+<p>The default values for all 3D objects is defined by <code>Object3D.DEFAULT_MATRIX_AUTO_UPDATE</code>.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrixWorld" translate="no">.<a href="#matrixWorld">matrixWorld</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="description">
+						<p>Represents the object's transformation matrix in world space.
+If the 3D object has no parent, then it's identical to the local transformation matrix</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrixWorldAutoUpdate" translate="no">.<a href="#matrixWorldAutoUpdate">matrixWorldAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set to <code>true</code>, the engine automatically computes the world matrix from the current local
+matrix and the object's transformation hierarchy.</p>
+<p>The default values for all 3D objects is defined by <code>Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE</code>.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrixWorldNeedsUpdate" translate="no">.<a href="#matrixWorldNeedsUpdate">matrixWorldNeedsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set to <code>true</code>, it calculates the world matrix in that frame and resets this property
+to <code>false</code>.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="modelViewMatrix" translate="no">.<a href="#modelViewMatrix">modelViewMatrix</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="description">
+						<p>Represents the object's model-view matrix.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the 3D object.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalMatrix" translate="no">.<a href="#normalMatrix">normalMatrix</a><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="description">
+						<p>Represents the object's normal matrix.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="parent" translate="no">.<a href="#parent">parent</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="description">
+						<p>A reference to the parent object.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="position" translate="no">.<a href="#position">position</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>Represents the object's local position.</p>
+						<p>Default is <code>(0,0,0)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="quaternion" translate="no">.<a href="#quaternion">quaternion</a><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="description">
+						<p>Represents the object's local rotation as Quaternions.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="receiveShadow" translate="no">.<a href="#receiveShadow">receiveShadow</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set to <code>true</code>, the 3D object is affected by shadows in the scene.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderOrder" translate="no">.<a href="#renderOrder">renderOrder</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>This value allows the default rendering order of scene graph objects to be
+overridden although opaque and transparent objects remain sorted independently.
+When this property is set for an instance of <a href="Group.html">Group</a>,all descendants
+objects will be sorted and rendered together. Sorting is from lowest to highest
+render order.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotation" translate="no">.<a href="#rotation">rotation</a><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="description">
+						<p>Represents the object's local rotation as Euler angles, in radians.</p>
+						<p>Default is <code>(0,0,0)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scale" translate="no">.<a href="#scale">scale</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>Represents the object's local scale.</p>
+						<p>Default is <code>(1,1,1)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The type property is used for detecting the object type
+in context of serialization/deserialization.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="up" translate="no">.<a href="#up">up</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>Defines the <code>up</code> direction of the 3D object which influences
+the orientation via methods like <a href="Object3D.html#lookAt">Object3D#lookAt</a>.</p>
+<p>The default values for all 3D objects is defined by <code>Object3D.DEFAULT_UP</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="userData" translate="no">.<a href="#userData">userData</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>An object that can be used to store custom data about the 3D object. It
+should not hold references to functions as these will not be cloned.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uuid" translate="no">.<a href="#uuid">uuid</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The UUID of the 3D object.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="visible" translate="no">.<a href="#visible">visible</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set to <code>true</code>, the 3D object gets rendered.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".DEFAULT_MATRIX_AUTO_UPDATE" translate="no">.<a href="#.DEFAULT_MATRIX_AUTO_UPDATE">DEFAULT_MATRIX_AUTO_UPDATE</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>The default setting for <a href="Object3D.html#matrixAutoUpdate">Object3D#matrixAutoUpdate</a> for
+newly created 3D objects.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".DEFAULT_MATRIX_WORLD_AUTO_UPDATE" translate="no">.<a href="#.DEFAULT_MATRIX_WORLD_AUTO_UPDATE">DEFAULT_MATRIX_WORLD_AUTO_UPDATE</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>The default setting for <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> for
+newly created 3D objects.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".DEFAULT_UP" translate="no">.<a href="#.DEFAULT_UP">DEFAULT_UP</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The default up direction for objects, also used as the default
+position for <a href="DirectionalLight.html">DirectionalLight</a> and <a href="HemisphereLight.html">HemisphereLight</a>.</p>
+						<p>Default is <code>(0,1,0)</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given 3D object as a child to this 3D object. An arbitrary number of
+objects may be added. Any current parent on an object passed in here will be
+removed, since an object can have at most one parent.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<h5>Fires:</h5>
+						<ul>
+							<li><a href="Object3D.html#event:added">Object3D#event:added</a></li>
+							<li><a href="Object3D.html#event:childadded">Object3D#event:childadded</a></li>
+						</ul>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given transformation matrix to the object and updates the object's position,
+rotation and scale.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The transformation matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="applyQuaternion" translate="no">.<a href="#applyQuaternion">applyQuaternion</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies a rotation represented by given the quaternion to the 3D object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The quaternion.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="attach" translate="no">.<a href="#attach">attach</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given 3D object as a child of this 3D object, while maintaining the object's world
+transform. This method does not support scene graphs having non-uniformly-scaled nodes(s).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to attach.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<h5>Fires:</h5>
+						<ul>
+							<li><a href="Object3D.html#event:added">Object3D#event:added</a></li>
+							<li><a href="Object3D.html#event:childadded">Object3D#event:childadded</a></li>
+						</ul>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clear" translate="no">.<a href="#clear">clear</a><span class="signature">()</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes all child objects.</p>
+						</div>
+						<h5>Fires:</h5>
+						<ul>
+							<li><a href="Object3D.html#event:removed">Object3D#event:removed</a></li>
+							<li><a href="Object3D.html#event:childremoved">Object3D#event:childremoved</a></li>
+						</ul>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">( recursive : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new 3D object with copied values from this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>recursive</strong>
+									</td>
+									<td class="description last">
+										<p>When set to <code>true</code>, descendants of the 3D object are also cloned.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, recursive : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given 3D object to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to copy.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>recursive</strong>
+									</td>
+									<td class="description last">
+										<p>When set to <code>true</code>, descendants of the 3D object are cloned.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getObjectById" translate="no">.<a href="#getObjectById">getObjectById</a><span class="signature">( id : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a> | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Searches through the 3D object and its children, starting with the 3D object
+itself, and returns the first with a matching ID.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>id</strong>
+									</td>
+									<td class="description last">
+										<p>The id.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The found 3D object. Returns <code>undefined</code> if no 3D object has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getObjectByName" translate="no">.<a href="#getObjectByName">getObjectByName</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a> | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Searches through the 3D object and its children, starting with the 3D object
+itself, and returns the first with a matching name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The found 3D object. Returns <code>undefined</code> if no 3D object has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getObjectByProperty" translate="no">.<a href="#getObjectByProperty">getObjectByProperty</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a> | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Searches through the 3D object and its children, starting with the 3D object
+itself, and returns the first with a matching property value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The found 3D object. Returns <code>undefined</code> if no 3D object has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getObjectsByProperty" translate="no">.<a href="#getObjectsByProperty">getObjectsByProperty</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type"><a href="global.html#any">any</a></span>, result : <span class="param-type">Array.&lt;<a href="Object3D.html">Object3D</a>></span> )</span><span class="type-signature"> : Array.&lt;<a href="Object3D.html">Object3D</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Searches through the 3D object and its children, starting with the 3D object
+itself, and returns all 3D objects with a matching property value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>result</strong>
+									</td>
+									<td class="description last">
+										<p>The method stores the result in this array.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The found 3D objects.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getWorldDirection" translate="no">.<a href="#getWorldDirection">getWorldDirection</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a vector representing the (&quot;look&quot;) direction of the 3D object in world space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector the result is stored to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The 3D object's direction in world space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getWorldPosition" translate="no">.<a href="#getWorldPosition">getWorldPosition</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a vector representing the position of the 3D object in world space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector the result is stored to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The 3D object's position in world space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getWorldQuaternion" translate="no">.<a href="#getWorldQuaternion">getWorldQuaternion</a><span class="signature">( target : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a Quaternion representing the position of the 3D object in world space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target Quaternion the result is stored to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The 3D object's rotation in world space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getWorldScale" translate="no">.<a href="#getWorldScale">getWorldScale</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a vector representing the scale of the 3D object in world space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector the result is stored to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The 3D object's scale in world space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="localToWorld" translate="no">.<a href="#localToWorld">localToWorld</a><span class="signature">( vector : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts the given vector from this 3D object's local space to world space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>vector</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to convert.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The converted vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lookAt" translate="no">.<a href="#lookAt">lookAt</a><span class="signature">( x : <span class="param-type">number | <a href="Vector3.html">Vector3</a></span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the object to face a point in world space.</p>
+<p>This method does not support objects having non-uniformly-scaled parent(s).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate in world space. Alternatively, a vector representing a position in world space</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate in world space.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z coordinate in world space.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="onAfterRender" translate="no">.<a href="#onAfterRender">onAfterRender</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A callback that is executed immediately after a 3D object is rendered.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is used to render the scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's material.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry group data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="onAfterShadow" translate="no">.<a href="#onAfterShadow">onAfterShadow</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, shadowCamera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, depthMaterial : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A callback that is executed immediately after a 3D object is rendered to a shadow map.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is used to render the scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadowCamera</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow camera.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthMaterial</strong>
+									</td>
+									<td class="description last">
+										<p>The depth material.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry group data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="onBeforeRender" translate="no">.<a href="#onBeforeRender">onBeforeRender</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A callback that is executed immediately before a 3D object is rendered.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is used to render the scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's material.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry group data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="onBeforeShadow" translate="no">.<a href="#onBeforeShadow">onBeforeShadow</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, shadowCamera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, depthMaterial : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A callback that is executed immediately before a 3D object is rendered to a shadow map.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is used to render the scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadowCamera</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow camera.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthMaterial</strong>
+									</td>
+									<td class="description last">
+										<p>The depth material.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry group data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type"><a href="Raycaster.html">Raycaster</a></span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Abstract method to get intersections between a casted ray and this
+3D object. Renderable 3D objects such as <a href="Mesh.html">Mesh</a>, <a href="Line.html">Line</a> or <a href="Points.html">Points</a>
+implement this method in order to use raycasting.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>raycaster</strong>
+									</td>
+									<td class="description last">
+										<p>The raycaster.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>intersects</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding the result of the method.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="remove" translate="no">.<a href="#remove">remove</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the given 3D object as child from this 3D object.
+An arbitrary number of objects may be removed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to remove.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<h5>Fires:</h5>
+						<ul>
+							<li><a href="Object3D.html#event:removed">Object3D#event:removed</a></li>
+							<li><a href="Object3D.html#event:childremoved">Object3D#event:childremoved</a></li>
+						</ul>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="removeFromParent" translate="no">.<a href="#removeFromParent">removeFromParent</a><span class="signature">()</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes this 3D object from its current parent.</p>
+						</div>
+						<h5>Fires:</h5>
+						<ul>
+							<li><a href="Object3D.html#event:removed">Object3D#event:removed</a></li>
+							<li><a href="Object3D.html#event:childremoved">Object3D#event:childremoved</a></li>
+						</ul>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotateOnAxis" translate="no">.<a href="#rotateOnAxis">rotateOnAxis</a><span class="signature">( axis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the 3D object along an axis in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) axis vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotateOnWorldAxis" translate="no">.<a href="#rotateOnWorldAxis">rotateOnWorldAxis</a><span class="signature">( axis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the 3D object along an axis in world space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) axis vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotateX" translate="no">.<a href="#rotateX">rotateX</a><span class="signature">( angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the 3D object around its X axis in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotateY" translate="no">.<a href="#rotateY">rotateY</a><span class="signature">( angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the 3D object around its Y axis in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotateZ" translate="no">.<a href="#rotateZ">rotateZ</a><span class="signature">( angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the 3D object around its Z axis in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setRotationFromAxisAngle" translate="no">.<a href="#setRotationFromAxisAngle">setRotationFromAxisAngle</a><span class="signature">( axis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, angle : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given rotation represented as an axis/angle couple to the 3D object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) axis vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setRotationFromEuler" translate="no">.<a href="#setRotationFromEuler">setRotationFromEuler</a><span class="signature">( euler : <span class="param-type"><a href="Euler.html">Euler</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given rotation represented as Euler angles to the 3D object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>euler</strong>
+									</td>
+									<td class="description last">
+										<p>The Euler angles.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setRotationFromMatrix" translate="no">.<a href="#setRotationFromMatrix">setRotationFromMatrix</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given rotation represented as rotation matrix to the 3D object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>Although a 4x4 matrix is expected, the upper 3x3 portion must be
+a pure rotation matrix (i.e, unscaled).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setRotationFromQuaternion" translate="no">.<a href="#setRotationFromQuaternion">setRotationFromQuaternion</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given rotation represented as a Quaternion to the 3D object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The Quaternion</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">( meta : <span class="param-type">Object | string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the 3D object into JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>meta</strong>
+									</td>
+									<td class="description last">
+										<p>An optional value holding meta information about the serialization.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="ObjectLoader.html#parse">ObjectLoader#parse</a></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized 3D object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="translateOnAxis" translate="no">.<a href="#translateOnAxis">translateOnAxis</a><span class="signature">( axis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, distance : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Translate the 3D object by a distance along the given axis in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) axis vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The distance in world units.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="translateX" translate="no">.<a href="#translateX">translateX</a><span class="signature">( distance : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Translate the 3D object by a distance along its X-axis in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The distance in world units.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="translateY" translate="no">.<a href="#translateY">translateY</a><span class="signature">( distance : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Translate the 3D object by a distance along its Y-axis in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The distance in world units.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="translateZ" translate="no">.<a href="#translateZ">translateZ</a><span class="signature">( distance : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Translate the 3D object by a distance along its Z-axis in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The distance in world units.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="traverse" translate="no">.<a href="#traverse">traverse</a><span class="signature">( callback : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Executes the callback on this 3D object and all descendants.</p>
+<p>Note: Modifying the scene graph inside the callback is discouraged.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that allows to process the current 3D object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="traverseAncestors" translate="no">.<a href="#traverseAncestors">traverseAncestors</a><span class="signature">( callback : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Like <a href="Object3D.html#traverse">Object3D#traverse</a>, but the callback will only be executed for all ancestors.</p>
+<p>Note: Modifying the scene graph inside the callback is discouraged.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that allows to process the current 3D object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="traverseVisible" translate="no">.<a href="#traverseVisible">traverseVisible</a><span class="signature">( callback : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Like <a href="Object3D.html#traverse">Object3D#traverse</a>, but the callback will only be executed for visible 3D objects.
+Descendants of invisible 3D objects are not traversed.</p>
+<p>Note: Modifying the scene graph inside the callback is discouraged.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that allows to process the current 3D object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateMatrix" translate="no">.<a href="#updateMatrix">updateMatrix</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the transformation matrix in local space by computing it from the current
+position, rotation and scale values.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="updateMatrixWorld" translate="no">.<a href="#updateMatrixWorld">updateMatrixWorld</a><span class="signature">( force : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the transformation matrix in world space of this 3D objects and its descendants.</p>
+<p>To ensure correct results, this method also recomputes the 3D object's transformation matrix in
+local space. The computation of the local and world matrix can be controlled with the
+<a href="Object3D.html#matrixAutoUpdate">Object3D#matrixAutoUpdate</a> and <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> flags which are both
+<code>true</code> by default.  Set these flags to <code>false</code> if you need more control over the update matrix process.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>force</strong>
+									</td>
+									<td class="description last">
+										<p>When set to <code>true</code>, a recomputation of world matrices is forced even
+when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateWorldMatrix" translate="no">.<a href="#updateWorldMatrix">updateWorldMatrix</a><span class="signature">( updateParents : <span class="param-type">boolean</span>, updateChildren : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>An alternative version of <a href="Object3D.html#updateMatrixWorld">Object3D#updateMatrixWorld</a> with more control over the
+update of ancestor and descendant nodes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>updateParents</strong>
+									</td>
+									<td class="description last">
+										<p>Whether ancestor nodes should be updated or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>updateChildren</strong>
+									</td>
+									<td class="description last">
+										<p>Whether descendant nodes should be updated or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="worldToLocal" translate="no">.<a href="#worldToLocal">worldToLocal</a><span class="signature">( vector : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts the given vector from this 3D object's word space to local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>vector</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to convert.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The converted vector.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:added" translate="no">.<a href="#event:added">added</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the object has been added to its parent object.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:childadded" translate="no">.<a href="#event:childadded">childadded</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when a new child object has been added.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:childremoved" translate="no">.<a href="#event:childremoved">childremoved</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when a child object has been removed.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:removed" translate="no">.<a href="#event:removed">removed</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the object has been removed from its parent object.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/Object3D.js" target="_blank" rel="noopener" translate="no">src/core/Object3D.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

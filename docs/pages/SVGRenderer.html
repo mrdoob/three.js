@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SVGRenderer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">SVGRenderer</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This renderer an be used to render geometric data using SVG. The produced vector
+graphics are particular useful in the following use cases:</p>
+<ul>
+<li>Animated logos or icons.</li>
+<li>Interactive 2D/3D diagrams or graphs.</li>
+<li>Interactive maps.</li>
+<li>Complex or animated user interfaces.</li>
+</ul>
+<p><code>SVGRenderer</code> has various advantages. It produces crystal-clear and sharp output which
+is independent of the actual viewport resolution.SVG elements can be styled via CSS.
+And they have good accessibility since it's possible to add metadata like title or description
+(useful for search engines or screen readers).</p>
+<p>There are, however, some important limitations:</p>
+<ul>
+<li>No advanced shading.</li>
+<li>No texture support.</li>
+<li>No shadow support.</li>
+</ul></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SVGRenderer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SVGRenderer } from 'three/addons/renderers/SVGRenderer.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SVGRenderer" translate="no">new <a href="#SVGRenderer">SVGRenderer</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new SVG renderer.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="autoClear" translate="no">.<a href="#autoClear">autoClear</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to automatically perform a clear before a render call or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="domElement" translate="no">.<a href="#domElement">domElement</a><span class="type-signature"> : SVGSVGElement</span> </h3>
+					<div class="description">
+						<p>The DOM where the renderer appends its child-elements.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="info" translate="no">.<a href="#info">info</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Provides information about the number of
+rendered vertices and faces.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="outputColorSpace" translate="no">.<a href="#outputColorSpace">outputColorSpace</a><span class="type-signature"> : <a href="global.html#SRGBColorSpace">SRGBColorSpace</a> | <a href="global.html#LinearSRGBColorSpace">LinearSRGBColorSpace</a></span> </h3>
+					<div class="description">
+						<p>The output color space.</p>
+						<p>Default is <code>SRGBColorSpace</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="overdraw" translate="no">.<a href="#overdraw">overdraw</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Number of fractional pixels to enlarge polygons in order to
+prevent anti-aliasing gaps. Range is <code>[0,1]</code>.</p>
+						<p>Default is <code>0.5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sortElements" translate="no">.<a href="#sortElements">sortElements</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to sort elements or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sortObjects" translate="no">.<a href="#sortObjects">sortObjects</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to sort 3D objects or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clear" translate="no">.<a href="#clear">clear</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a manual clear with the defined clear color.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="getSize" translate="no">.<a href="#getSize">getSize</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an object containing the width and height of the renderer.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The size of the renderer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the given scene using the given camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A scene or any other type of 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setClearColor" translate="no">.<a href="#setClearColor">setClearColor</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the clear color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The clear color to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setPrecision" translate="no">.<a href="#setPrecision">setPrecision</a><span class="signature">( precision : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the precision of the data used to create a paths.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>precision</strong>
+									</td>
+									<td class="description last">
+										<p>The precision to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setQuality" translate="no">.<a href="#setQuality">setQuality</a><span class="signature">( quality : <span class="param-type">'low' | 'high'</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the render quality. Setting to <code>high</code> means This value indicates that the browser
+tries to improve the SVG quality over rendering speed and geometric precision.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>quality</strong>
+									</td>
+									<td class="description last">
+										<p>The quality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resizes the renderer to the given width and height.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/SVGRenderer.js" target="_blank" rel="noopener" translate="no">examples/jsm/renderers/SVGRenderer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

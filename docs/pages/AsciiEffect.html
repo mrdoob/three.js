@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AsciiEffect - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">AsciiEffect</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A class that creates an ASCII effect.</p>
+<p>The ASCII generation is based on <a href="https://github.com/hassadee/jsascii/blob/master/jsascii.js">jsascii</a>.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">AsciiEffect</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { AsciiEffect } from 'three/addons/effects/AsciiEffect.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="AsciiEffect" translate="no">new <a href="#AsciiEffect">AsciiEffect</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, charSet : <span class="param-type">string</span>, options : <span class="param-type"><a href="AsciiEffect.html#~Options">AsciiEffect~Options</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new ASCII effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>charSet</strong>
+									</td>
+									<td class="description last">
+										<p>The char set.</p>
+										<p>Default is <code>' .:-=+*#%@'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="domElement" translate="no">.<a href="#domElement">domElement</a><span class="type-signature"> : HTMLDivElement</span> </h3>
+					<div class="description">
+						<p>The DOM element of the effect. This element must be used instead of the
+default <a href="WebGLRenderer.html#domElement">WebGLRenderer#domElement</a>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>When using this effect, this method should be called instead of the
+default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( w : <span class="param-type">number</span>, h : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resizes the effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect in logical pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>h</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect in logical pixels.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>This type represents configuration settings of <code>AsciiEffect</code>.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>resolution</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>A higher value leads to more details.</p>
+						<p>Default is <code>0.15</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>scale</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The scale of the effect.</p>
+						<p>Default is <code>1</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>color</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether colors should be enabled or not. Better quality but slows down rendering.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>alpha</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether transparency should be enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>block</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether blocked characters should be enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>invert</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether colors should be inverted or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>strResolution</strong>
+						<br>
+<span class="param-type">'low'</span>
+|
+<span class="param-type">'medium'</span>
+|
+<span class="param-type">'high'</span>
+				</td>
+			<td class="description last">
+				<p>The string resolution.</p>
+						<p>Default is <code>'low'</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/effects/AsciiEffect.js" target="_blank" rel="noopener" translate="no">examples/jsm/effects/AsciiEffect.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

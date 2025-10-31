@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>XREstimatedLight - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Group.html">Group</a> → </p>
+	<h1 translate="no">XREstimatedLight</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to represent the environmental light of
+a XR session. It relies on the WebXR Lighting Estimation API.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">XREstimatedLight</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="XREstimatedLight" translate="no">new <a href="#XREstimatedLight">XREstimatedLight</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, environmentEstimation : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new light.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>environmentEstimation</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to use environment estimation or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Classes</h2>
+				<dl>
+					<dt><a href="XREstimatedLight.html">XREstimatedLight</a></dt>
+					<dd></dd>
+				</dl>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="directionalLight" translate="no">.<a href="#directionalLight">directionalLight</a><span class="type-signature"> : <a href="DirectionalLight.html">DirectionalLight</a></span> </h3>
+					<div class="description">
+						<p>Represents the primary light from the XR environment.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="environment" translate="no">.<a href="#environment">environment</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>Will be set to a cube map in the SessionLightProbe if environment estimation is
+available and requested.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lightProbe" translate="no">.<a href="#lightProbe">lightProbe</a><span class="type-signature"> : <a href="LightProbe.html">LightProbe</a></span> </h3>
+					<div class="description">
+						<p>The light probe that represents the estimated light.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XREstimatedLight.js" target="_blank" rel="noopener" translate="no">examples/jsm/webxr/XREstimatedLight.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

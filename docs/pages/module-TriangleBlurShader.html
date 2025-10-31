@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TriangleBlurShader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">TriangleBlurShader</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TriangleBlurShader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { TriangleBlurShader } from 'three/addons/shaders/TriangleBlurShader.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="~TechnicolorShader" translate="no">.<a href="#~TechnicolorShader">TechnicolorShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Simulates the look of the two-strip technicolor process popular in early 20th century films.
+More historical info here: <a href="http://www.widescreenmuseum.com/oldcolor/technicolor1.htm">http://www.widescreenmuseum.com/oldcolor/technicolor1.htm</a>
+Demo here: <a href="http://charliehoey.com/technicolor_shader/shader_test.html">http://charliehoey.com/technicolor_shader/shader_test.html</a></p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShader1" translate="no">.<a href="#~ToonShader1">ToonShader1</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon1 shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShader2" translate="no">.<a href="#~ToonShader2">ToonShader2</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon2 shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShaderDotted" translate="no">.<a href="#~ToonShaderDotted">ToonShaderDotted</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon Dotted shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShaderHatching" translate="no">.<a href="#~ToonShaderHatching">ToonShaderHatching</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon Hatching shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~TriangleBlurShader" translate="no">.<a href="#~TriangleBlurShader">TriangleBlurShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Triangle blur shader based on <a href="https://github.com/evanw/glfx.js">glfx.js triangle blur shader</a>.</p>
+<p>A basic blur filter, which convolves the image with a
+pyramid filter. The pyramid filter is separable and is applied as two
+perpendicular triangle filters.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/TechnicolorShader.js" target="_blank" rel="noopener" translate="no">examples/jsm/shaders/TechnicolorShader.js</a>
+				</p>
+			</article>
+		</section>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TriangleBlurShader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import * as ToonShader from 'three/addons/shaders/ToonShader.js';</code></pre>
+				<div class="container-overview">
+					<div class="description"><p>Collection of toon shaders.</p></div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="~TechnicolorShader" translate="no">.<a href="#~TechnicolorShader">TechnicolorShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Simulates the look of the two-strip technicolor process popular in early 20th century films.
+More historical info here: <a href="http://www.widescreenmuseum.com/oldcolor/technicolor1.htm">http://www.widescreenmuseum.com/oldcolor/technicolor1.htm</a>
+Demo here: <a href="http://charliehoey.com/technicolor_shader/shader_test.html">http://charliehoey.com/technicolor_shader/shader_test.html</a></p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShader1" translate="no">.<a href="#~ToonShader1">ToonShader1</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon1 shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShader2" translate="no">.<a href="#~ToonShader2">ToonShader2</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon2 shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShaderDotted" translate="no">.<a href="#~ToonShaderDotted">ToonShaderDotted</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon Dotted shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShaderHatching" translate="no">.<a href="#~ToonShaderHatching">ToonShaderHatching</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon Hatching shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~TriangleBlurShader" translate="no">.<a href="#~TriangleBlurShader">TriangleBlurShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Triangle blur shader based on <a href="https://github.com/evanw/glfx.js">glfx.js triangle blur shader</a>.</p>
+<p>A basic blur filter, which convolves the image with a
+pyramid filter. The pyramid filter is separable and is applied as two
+perpendicular triangle filters.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/ToonShader.js" target="_blank" rel="noopener" translate="no">examples/jsm/shaders/ToonShader.js</a>
+				</p>
+			</article>
+		</section>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TriangleBlurShader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { TriangleBlurShader } from 'three/addons/shaders/TriangleBlurShader.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="~TechnicolorShader" translate="no">.<a href="#~TechnicolorShader">TechnicolorShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Simulates the look of the two-strip technicolor process popular in early 20th century films.
+More historical info here: <a href="http://www.widescreenmuseum.com/oldcolor/technicolor1.htm">http://www.widescreenmuseum.com/oldcolor/technicolor1.htm</a>
+Demo here: <a href="http://charliehoey.com/technicolor_shader/shader_test.html">http://charliehoey.com/technicolor_shader/shader_test.html</a></p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShader1" translate="no">.<a href="#~ToonShader1">ToonShader1</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon1 shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShader2" translate="no">.<a href="#~ToonShader2">ToonShader2</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon2 shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShaderDotted" translate="no">.<a href="#~ToonShaderDotted">ToonShaderDotted</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon Dotted shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~ToonShaderHatching" translate="no">.<a href="#~ToonShaderHatching">ToonShaderHatching</a><span class="type-signature"> : Object</span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Toon Hatching shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~TriangleBlurShader" translate="no">.<a href="#~TriangleBlurShader">TriangleBlurShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
+					<div class="description">
+						<p>Triangle blur shader based on <a href="https://github.com/evanw/glfx.js">glfx.js triangle blur shader</a>.</p>
+<p>A basic blur filter, which convolves the image with a
+pyramid filter. The pyramid filter is separable and is applied as two
+perpendicular triangle filters.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/TriangleBlurShader.js" target="_blank" rel="noopener" translate="no">examples/jsm/shaders/TriangleBlurShader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BufferAttributeNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="InputNode.html">InputNode</a> → </p>
+	<h1 translate="no">BufferAttributeNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>In earlier <code>three.js</code> versions it was only possible to define attribute data
+on geometry level. With <code>BufferAttributeNode</code>, it is also possible to do this
+on the node level.</p>
+<p>This new approach is especially interesting when geometry data are generated via
+compute shaders. The below line converts a storage buffer into an attribute node.</p>
+<pre><code class="language-js">material.positionNode = positionBuffer.toAttribute();
+</code></pre></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.PlaneGeometry();
+const positionAttribute = geometry.getAttribute( 'position' );
+const colors = [];
+for ( let i = 0; i &lt; position.count; i ++ ) {
+	colors.push( 1, 0, 0 );
+}
+material.colorNode = bufferAttribute( new THREE.Float32BufferAttribute( colors, 3 ) );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BufferAttributeNode" translate="no">new <a href="#BufferAttributeNode">BufferAttributeNode</a><span class="signature">( value : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, bufferType : <span class="param-type">string</span>, bufferStride : <span class="param-type">number</span>, bufferOffset : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new buffer attribute node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferType</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer type (e.g. <code>'vec3'</code>).</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferStride</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer stride.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bufferOffset</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer offset.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="attribute" translate="no">.<a href="#attribute">attribute</a><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="description">
+						<p>A reference to the buffer attribute.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bufferOffset" translate="no">.<a href="#bufferOffset">bufferOffset</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The buffer offset.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bufferStride" translate="no">.<a href="#bufferStride">bufferStride</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The buffer stride.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bufferType" translate="no">.<a href="#bufferType">bufferType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The buffer type (e.g. <code>'vec3'</code>).</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="global" translate="no">.<a href="#global">global</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p><code>BufferAttributeNode</code> sets this property to <code>true</code> by default.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#global">InputNode#global</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="instanced" translate="no">.<a href="#instanced">instanced</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the attribute is instanced or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isBufferNode" translate="no">.<a href="#isBufferNode">isBufferNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="usage" translate="no">.<a href="#usage">usage</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The usage property. Set this to <code>THREE.DynamicDrawUsage</code> via <code>.setUsage()</code>,
+if you are planning to update the attribute data per frame.</p>
+						<p>Default is <code>StaticDrawUsage</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates the code snippet of the buffer attribute node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#generate">InputNode#generate</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHash" translate="no">.<a href="#getHash">getHash</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the attribute data might be shared
+and thus the hash should be shared as well.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#getHash">InputNode#getHash</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The hash.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation to return a fixed value <code>'bufferAttribute'</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#getInputType">InputNode#getInputType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type is inferred from
+the buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#getNodeType">InputNode#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setInstanced" translate="no">.<a href="#setInstanced">setInstanced</a><span class="signature">( value : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the <code>instanced</code> property to the given value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setUsage" translate="no">.<a href="#setUsage">setUsage</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the <code>usage</code> property to the given value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The usage to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Depending on which value was passed to the node, <code>setup()</code> behaves
+differently. If no instance of <code>BufferAttribute</code> was passed, the method
+creates an internal attribute and configures it respectively.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#setup">InputNode#setup</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/BufferAttributeNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/BufferAttributeNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

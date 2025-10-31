@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshSSSNodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="NodeMaterial.html">NodeMaterial</a> → <a href="MeshStandardNodeMaterial.html">MeshStandardNodeMaterial</a> → <a href="MeshPhysicalNodeMaterial.html">MeshPhysicalNodeMaterial</a> → </p>
+	<h1 translate="no">MeshSSSNodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node material is an experimental extension of <a href="MeshPhysicalNodeMaterial.html">MeshPhysicalNodeMaterial</a>
+that implements a Subsurface scattering (SSS) term.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshSSSNodeMaterial" translate="no">new <a href="#MeshSSSNodeMaterial">MeshSSSNodeMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new mesh SSS node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="thicknessAmbientNode" translate="no">.<a href="#thicknessAmbientNode">thicknessAmbientNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Represents the thickness ambient factor.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thicknessAttenuationNode" translate="no">.<a href="#thicknessAttenuationNode">thicknessAttenuationNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Represents the thickness attenuation.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thicknessColorNode" translate="no">.<a href="#thicknessColorNode">thicknessColorNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>Represents the thickness color.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thicknessDistortionNode" translate="no">.<a href="#thicknessDistortionNode">thicknessDistortionNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Represents the distortion factor.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thicknessPowerNode" translate="no">.<a href="#thicknessPowerNode">thicknessPowerNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Represents the thickness power.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thicknessScaleNode" translate="no">.<a href="#thicknessScaleNode">thicknessScaleNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Represents the thickness scale.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useSSS" translate="no">.<a href="#useSSS">useSSS</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use SSS or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupLightingModel" translate="no">.<a href="#setupLightingModel">setupLightingModel</a><span class="signature">()</span><span class="type-signature"> : <a href="SSSLightingModel.html">SSSLightingModel</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the lighting model.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="MeshPhysicalNodeMaterial.html#setupLightingModel">MeshPhysicalNodeMaterial#setupLightingModel</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lighting model.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/MeshSSSNodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/MeshSSSNodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

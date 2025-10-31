@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AnimationClip - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">AnimationClip</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A reusable set of keyframe tracks which represent an animation.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="AnimationClip" translate="no">new <a href="#AnimationClip">AnimationClip</a><span class="signature">( name : <span class="param-type">string</span>, duration : <span class="param-type">number</span>, tracks : <span class="param-type">Array.&lt;<a href="KeyframeTrack.html">KeyframeTrack</a>></span>, blendMode : <span class="param-type"><a href="global.html#NormalAnimationBlendMode">NormalAnimationBlendMode</a> | <a href="global.html#AdditiveAnimationBlendMode">AdditiveAnimationBlendMode</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new animation clip.</p>
+<p>Note: Instead of instantiating an AnimationClip directly with the constructor, you can
+use the static interface of this class for creating clips. In most cases though, animation clips
+will automatically be created by loaders when importing animated 3D assets.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The clip's name.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The clip's duration in seconds. If a negative value is passed,
+the duration will be calculated from the passed keyframes.</p>
+										<p>Default is <code>-1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>tracks</strong>
+									</td>
+									<td class="description last">
+										<p>An array of keyframe tracks.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>blendMode</strong>
+									</td>
+									<td class="description last">
+										<p>Defines how the animation
+is blended/combined when two or more animations are simultaneously played.</p>
+										<p>Default is <code>NormalAnimationBlendMode</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="blendMode" translate="no">.<a href="#blendMode">blendMode</a><span class="type-signature"> : <a href="global.html#NormalAnimationBlendMode">NormalAnimationBlendMode</a> | <a href="global.html#AdditiveAnimationBlendMode">AdditiveAnimationBlendMode</a></span> </h3>
+					<div class="description">
+						<p>Defines how the animation is blended/combined when two or more animations
+are simultaneously played.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="duration" translate="no">.<a href="#duration">duration</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The clip's duration in seconds.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The clip's name.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="tracks" translate="no">.<a href="#tracks">tracks</a><span class="type-signature"> : Array.&lt;<a href="KeyframeTrack.html">KeyframeTrack</a>></span> </h3>
+					<div class="description">
+						<p>An array of keyframe tracks.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="userData" translate="no">.<a href="#userData">userData</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>An object that can be used to store custom data about the animation clip.
+It should not hold references to functions as these will not be cloned.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uuid" translate="no">.<a href="#uuid">uuid</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The UUID of the animation clip.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new animation clip with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="optimize" translate="no">.<a href="#optimize">optimize</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Optimizes each track by removing equivalent sequential keys (which are
+common in morph target sequences).</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation clip.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="resetDuration" translate="no">.<a href="#resetDuration">resetDuration</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the duration of this clip to the duration of its longest keyframe track.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation clip.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes this animation clip into JSON.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The JSON object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="trim" translate="no">.<a href="#trim">trim</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Trims all tracks to the clip's duration.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation clip.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="validate" translate="no">.<a href="#validate">validate</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs minimal validation on each track in the clip. Returns <code>true</code> if all
+tracks are valid.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the clip's keyframes are valid or not.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".CreateClipsFromMorphTargetSequences" translate="no">.<a href="#.CreateClipsFromMorphTargetSequences">CreateClipsFromMorphTargetSequences</a><span class="signature">( morphTargets : <span class="param-type">Array.&lt;Object></span>, fps : <span class="param-type">number</span>, noLoop : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Array.&lt;<a href="AnimationClip.html">AnimationClip</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an array of new AnimationClips created from the morph target
+sequences of a geometry, trying to sort morph target names into
+animation-group-based patterns like &quot;Walk_001, Walk_002, Run_001, Run_002...&quot;.</p>
+<p>See <a href="MD2Loader.html#parse">MD2Loader#parse</a> as an example for how the method should be used.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>morphTargets</strong>
+									</td>
+									<td class="description last">
+										<p>A sequence of morph targets.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>fps</strong>
+									</td>
+									<td class="description last">
+										<p>The Frames-Per-Second value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>noLoop</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clip should be no loop or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array of new animation clips.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".CreateFromMorphTargetSequence" translate="no">.<a href="#.CreateFromMorphTargetSequence">CreateFromMorphTargetSequence</a><span class="signature">( name : <span class="param-type">string</span>, morphTargetSequence : <span class="param-type">Array.&lt;Object></span>, fps : <span class="param-type">number</span>, noLoop : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new animation clip from the passed morph targets array of a
+geometry, taking a name and the number of frames per second.</p>
+<p>Note: The fps parameter is required, but the animation speed can be
+overridden via <a href="AnimationAction.html#setDuration">AnimationAction#setDuration</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the animation clip.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>morphTargetSequence</strong>
+									</td>
+									<td class="description last">
+										<p>A sequence of morph targets.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>fps</strong>
+									</td>
+									<td class="description last">
+										<p>The Frames-Per-Second value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>noLoop</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clip should be no loop or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The new animation clip.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".findByName" translate="no">.<a href="#.findByName">findByName</a><span class="signature">( objectOrClipArray : <span class="param-type">Array.&lt;<a href="AnimationClip.html">AnimationClip</a>> | <a href="Object3D.html">Object3D</a></span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Searches for an animation clip by name, taking as its first parameter
+either an array of clips, or a mesh or geometry that contains an
+array named &quot;animations&quot; property.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>objectOrClipArray</strong>
+									</td>
+									<td class="description last">
+										<p>The array or object to search through.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to search for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The found animation clip. Returns <code>null</code> if no clip has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".parse" translate="no">.<a href="#.parse">parse</a><span class="signature">( json : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Factory method for creating an animation clip from the given JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The serialized animation clip.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The new animation clip.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".parseAnimation" translate="no">.<a href="#.parseAnimation">parseAnimation</a><span class="signature">( animation : <span class="param-type">Object</span>, bones : <span class="param-type">Array.&lt;Bones></span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the <code>animation.hierarchy</code> format and returns a new animation clip.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>animation</strong>
+									</td>
+									<td class="description last">
+										<p>A serialized animation clip as JSON.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bones</strong>
+									</td>
+									<td class="description last">
+										<p>An array of bones.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r175.</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The new animation clip.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".toJSON" translate="no">.<a href="#.toJSON">toJSON</a><span class="signature">( clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the given animation clip into JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>The animation clip to serialize.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The JSON object.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/AnimationClip.js" target="_blank" rel="noopener" translate="no">src/animation/AnimationClip.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

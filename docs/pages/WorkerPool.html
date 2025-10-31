@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WorkerPool - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">WorkerPool</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A simple pool for managing Web Workers.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">WorkerPool</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { WorkerPool } from 'three/addons/utils/WorkerPool.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="WorkerPool" translate="no">new <a href="#WorkerPool">WorkerPool</a><span class="signature">( pool : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new Worker pool.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pool</strong>
+									</td>
+									<td class="description last">
+										<p>The size of the pool.</p>
+										<p>Default is <code>4</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Classes</h2>
+				<dl>
+					<dt><a href="WorkerPool.html">WorkerPool</a></dt>
+					<dd></dd>
+				</dl>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="pool" translate="no">.<a href="#pool">pool</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The size of the pool.</p>
+						<p>Default is <code>4</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="queue" translate="no">.<a href="#queue">queue</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>A message queue.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="workerCreator" translate="no">.<a href="#workerCreator">workerCreator</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>A factory function for creating workers.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="workerStatus" translate="no">.<a href="#workerStatus">workerStatus</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The current worker status.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="workers" translate="no">.<a href="#workers">workers</a><span class="type-signature"> : Array.&lt;Worker></span> </h3>
+					<div class="description">
+						<p>An array of Workers.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="workersResolve" translate="no">.<a href="#workersResolve">workersResolve</a><span class="type-signature"> : Array.&lt;function()></span> </h3>
+					<div class="description">
+						<p>An array with resolve functions for messages.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Terminates all Workers of this pool. Call this  method whenever this
+Worker pool is no longer used in your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="postMessage" translate="no">.<a href="#postMessage">postMessage</a><span class="signature">( msg : <span class="param-type">Object</span>, transfer : <span class="param-type">Array.&lt;ArrayBuffer></span> )</span><span class="type-signature"> : Promise</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Post a message to an idle Worker. If no Worker is available,
+the message is pushed into a message queue for later processing.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>msg</strong>
+									</td>
+									<td class="description last">
+										<p>The message.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>transfer</strong>
+									</td>
+									<td class="description last">
+										<p>An array with array buffers for data transfer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the message has been processed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setWorkerCreator" translate="no">.<a href="#setWorkerCreator">setWorkerCreator</a><span class="signature">( workerCreator : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets a function that is responsible for creating Workers.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>workerCreator</strong>
+									</td>
+									<td class="description last">
+										<p>The worker creator function.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setWorkerLimit" translate="no">.<a href="#setWorkerLimit">setWorkerLimit</a><span class="signature">( pool : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the Worker limit</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pool</strong>
+									</td>
+									<td class="description last">
+										<p>The size of the pool.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/WorkerPool.js" target="_blank" rel="noopener" translate="no">examples/jsm/utils/WorkerPool.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

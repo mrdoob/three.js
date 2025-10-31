@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Line2 - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → <a href="LineSegments2.html">LineSegments2</a> → </p>
+	<h1 translate="no">Line2</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A polyline drawn between vertices.</p>
+<p>This adds functionality beyond <a href="Line.html">Line</a>, like arbitrary line width and changing width to
+be in world units.It extends <a href="LineSegments2.html">LineSegments2</a>, simplifying constructing segments from a
+chain of points.</p>
+<p>This module can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>. When using <a href="WebGPURenderer.html">WebGPURenderer</a>,
+import the class from <code>lines/webgpu/Line2.js</code>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new LineGeometry();
+geometry.setPositions( positions );
+geometry.setColors( colors );
+const material = new LineMaterial( { linewidth: 5, vertexColors: true } };
+const line = new Line2( geometry, material );
+scene.add( line );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">Line2</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { Line2 } from 'three/addons/lines/Line2.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Line2" translate="no">new <a href="#Line2">Line2</a><span class="signature">( geometry : <span class="param-type"><a href="LineGeometry.html">LineGeometry</a></span>, material : <span class="param-type"><a href="LineMaterial.html">LineMaterial</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new wide line.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The line geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The line material.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isLine2" translate="no">.<a href="#isLine2">isLine2</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lines/Line2.js" target="_blank" rel="noopener" translate="no">examples/jsm/lines/Line2.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

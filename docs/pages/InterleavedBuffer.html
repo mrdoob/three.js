@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>InterleavedBuffer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">InterleavedBuffer</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>&quot;Interleaved&quot; means that multiple attributes, possibly of different types,
+(e.g., position, normal, uv, color) are packed into a single array buffer.</p>
+<p>An introduction into interleaved arrays can be found here: <a href="https://blog.tojicode.com/2011/05/interleaved-array-basics.html">Interleaved array basics</a></p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="InterleavedBuffer" translate="no">new <a href="#InterleavedBuffer">InterleavedBuffer</a><span class="signature">( array : <span class="param-type">TypedArray</span>, stride : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new interleaved buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>A typed array with a shared buffer storing attribute data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>stride</strong>
+									</td>
+									<td class="description last">
+										<p>The number of typed-array elements per vertex.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="array" translate="no">.<a href="#array">array</a><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="description">
+						<p>A typed array with a shared buffer storing attribute data.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The total number of elements in the array</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isInterleavedBuffer" translate="no">.<a href="#isInterleavedBuffer">isInterleavedBuffer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Flag to indicate that this attribute has changed and should be re-sent to
+the GPU. Set this to <code>true</code> when you modify the value of the array.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stride" translate="no">.<a href="#stride">stride</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of typed-array elements per vertex.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateRanges" translate="no">.<a href="#updateRanges">updateRanges</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>This can be used to only update some components of stored vectors (for example, just the
+component related to color). Use the <code>addUpdateRange()</code> function to add ranges to this array.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="usage" translate="no">.<a href="#usage">usage</a><span class="type-signature"> : <a href="global.html#StaticDrawUsage">StaticDrawUsage</a> | <a href="global.html#DynamicDrawUsage">DynamicDrawUsage</a> | <a href="global.html#StreamDrawUsage">StreamDrawUsage</a> | <a href="global.html#StaticReadUsage">StaticReadUsage</a> | <a href="global.html#DynamicReadUsage">DynamicReadUsage</a> | <a href="global.html#StreamReadUsage">StreamReadUsage</a> | <a href="global.html#StaticCopyUsage">StaticCopyUsage</a> | <a href="global.html#DynamicCopyUsage">DynamicCopyUsage</a> | <a href="global.html#StreamCopyUsage">StreamCopyUsage</a></span> </h3>
+					<div class="description">
+						<p>Defines the intended usage pattern of the data store for optimization purposes.</p>
+<p>Note: After the initial use of a buffer, its usage cannot be changed. Instead,
+instantiate a new one and set the desired usage before the next render.</p>
+						<p>Default is <code>StaticDrawUsage</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uuid" translate="no">.<a href="#uuid">uuid</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The UUID of the interleaved buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="version" translate="no">.<a href="#version">version</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>A version number, incremented every time the <code>needsUpdate</code> is set to <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addUpdateRange" translate="no">.<a href="#addUpdateRange">addUpdateRange</a><span class="signature">( start : <span class="param-type">number</span>, count : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a range of data in the data array to be updated on the GPU.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>Position at which to start update.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The number of components to update.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="clearUpdateRanges" translate="no">.<a href="#clearUpdateRanges">clearUpdateRanges</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clears the update ranges.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">( data : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new interleaved buffer with copied values from this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>An object with shared array buffers that allows to retain shared structures.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="InterleavedBuffer.html">InterleavedBuffer</a></span> )</span><span class="type-signature"> : <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given interleaved buffer to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The interleaved buffer to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copyAt" translate="no">.<a href="#copyAt">copyAt</a><span class="signature">( index1 : <span class="param-type">number</span>, interleavedBuffer : <span class="param-type"><a href="InterleavedBuffer.html">InterleavedBuffer</a></span>, index2 : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies a vector from the given interleaved buffer to this one. The start
+and destination position in the attribute buffers are represented by the
+given indices.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index1</strong>
+									</td>
+									<td class="description last">
+										<p>The destination index into this interleaved buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>interleavedBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The interleaved buffer to copy from.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index2</strong>
+									</td>
+									<td class="description last">
+										<p>The source index into the given interleaved buffer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="onUpload" translate="no">.<a href="#onUpload">onUpload</a><span class="signature">( callback : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given callback function that is executed after the Renderer has transferred
+the array data to the GPU. Can be used to perform clean-up operations after
+the upload when data are not needed anymore on the CPU side.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>onUpload()</code> callback.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="onUploadCallback" translate="no">.<a href="#onUploadCallback">onUploadCallback</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A callback function that is executed after the renderer has transferred the attribute array
+data to the GPU.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( value : <span class="param-type">TypedArray | Array</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given array data in the interleaved buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The array data to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset in this interleaved buffer's array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setUsage" translate="no">.<a href="#setUsage">setUsage</a><span class="signature">( value : <span class="param-type"><a href="global.html#StaticDrawUsage">StaticDrawUsage</a> | <a href="global.html#DynamicDrawUsage">DynamicDrawUsage</a> | <a href="global.html#StreamDrawUsage">StreamDrawUsage</a> | <a href="global.html#StaticReadUsage">StaticReadUsage</a> | <a href="global.html#DynamicReadUsage">DynamicReadUsage</a> | <a href="global.html#StreamReadUsage">StreamReadUsage</a> | <a href="global.html#StaticCopyUsage">StaticCopyUsage</a> | <a href="global.html#DynamicCopyUsage">DynamicCopyUsage</a> | <a href="global.html#StreamCopyUsage">StreamCopyUsage</a></span> )</span><span class="type-signature"> : <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the usage of this interleaved buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The usage to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this interleaved buffer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">( data : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the interleaved buffer into JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>An optional value holding meta information about the serialization.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized interleaved buffer.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBuffer.js" target="_blank" rel="noopener" translate="no">src/core/InterleavedBuffer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

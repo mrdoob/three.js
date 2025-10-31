@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>InterleavedBufferAttribute - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">InterleavedBufferAttribute</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An alternative version of a buffer attribute with interleaved data. Interleaved
+attributes share a common interleaved data storage (<a href="InterleavedBuffer.html">InterleavedBuffer</a>) and refer with
+different offsets into the buffer.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="InterleavedBufferAttribute" translate="no">new <a href="#InterleavedBufferAttribute">InterleavedBufferAttribute</a><span class="signature">( interleavedBuffer : <span class="param-type"><a href="InterleavedBuffer.html">InterleavedBuffer</a></span>, itemSize : <span class="param-type">number</span>, offset : <span class="param-type">number</span>, normalized : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new interleaved buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>interleavedBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer holding the interleaved data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>itemSize</strong>
+									</td>
+									<td class="description last">
+										<p>The item size.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute offset into the buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normalized</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the data are normalized or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="array" translate="no">.<a href="#array">array</a><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="description">
+						<p>The array holding the interleaved buffer attribute data.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The item count of this buffer attribute.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="data" translate="no">.<a href="#data">data</a><span class="type-signature"> : <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="description">
+						<p>The buffer holding the interleaved data.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isInterleavedBufferAttribute" translate="no">.<a href="#isInterleavedBufferAttribute">isInterleavedBufferAttribute</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="itemSize" translate="no">.<a href="#itemSize">itemSize</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The item size, see <a href="BufferAttribute.html#itemSize">BufferAttribute#itemSize</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the buffer attribute.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Flag to indicate that this attribute has changed and should be re-sent to
+the GPU. Set this to <code>true</code> when you modify the value of the array.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalized" translate="no">.<a href="#normalized">normalized</a><span class="type-signature"> : <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="description">
+						<p>Whether the data are normalized or not, see <a href="BufferAttribute.html#normalized">BufferAttribute#normalized</a></p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="offset" translate="no">.<a href="#offset">offset</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The attribute offset into the buffer.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 4x4 matrix to the given attribute. Only works with
+item size <code>3</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyNormalMatrix" translate="no">.<a href="#applyNormalMatrix">applyNormalMatrix</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 3x3 normal matrix to the given attribute. Only works with
+item size <code>3</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The normal matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">( data : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new buffer attribute with copied values from this instance.</p>
+<p>If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>An object with interleaved buffers that allows to retain the interleaved property.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getComponent" translate="no">.<a href="#getComponent">getComponent</a><span class="signature">( index : <span class="param-type">number</span>, component : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the given component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>component</strong>
+									</td>
+									<td class="description last">
+										<p>The component index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The returned value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getW" translate="no">.<a href="#getW">getW</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the w component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The w component.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getX" translate="no">.<a href="#getX">getX</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the x component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The x component.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getY" translate="no">.<a href="#getY">getY</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the y component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The y component.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getZ" translate="no">.<a href="#getZ">getZ</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the z component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The z component.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setComponent" translate="no">.<a href="#setComponent">setComponent</a><span class="signature">( index : <span class="param-type">number</span>, component : <span class="param-type">number</span>, value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given value to the given component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>component</strong>
+									</td>
+									<td class="description last">
+										<p>The component index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setW" translate="no">.<a href="#setW">setW</a><span class="signature">( index : <span class="param-type">number</span>, w : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the w component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setX" translate="no">.<a href="#setX">setX</a><span class="signature">( index : <span class="param-type">number</span>, x : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the x component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setXY" translate="no">.<a href="#setXY">setXY</a><span class="signature">( index : <span class="param-type">number</span>, x : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the x and y component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setXYZ" translate="no">.<a href="#setXYZ">setXYZ</a><span class="signature">( index : <span class="param-type">number</span>, x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the x, y and z component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the z component to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setXYZW" translate="no">.<a href="#setXYZW">setXYZW</a><span class="signature">( index : <span class="param-type">number</span>, x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, w : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the x, y, z and w component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the z component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the w component to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setY" translate="no">.<a href="#setY">setY</a><span class="signature">( index : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the y component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setZ" translate="no">.<a href="#setZ">setZ</a><span class="signature">( index : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the z component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">( data : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the buffer attribute into JSON.</p>
+<p>If no parameter is provided, cloning an interleaved buffer attribute will de-interleave buffer data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>An optional value holding meta information about the serialization.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized buffer attribute.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="transformDirection" translate="no">.<a href="#transformDirection">transformDirection</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 4x4 matrix to the given attribute. Only works with
+item size <code>3</code> and with direction vectors.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBufferAttribute.js" target="_blank" rel="noopener" translate="no">src/core/InterleavedBufferAttribute.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

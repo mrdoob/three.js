@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AnalyticLightNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="LightingNode.html">LightingNode</a> → </p>
+	<h1 translate="no">AnalyticLightNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Base class for analytic light nodes.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="AnalyticLightNode" translate="no">new <a href="#AnalyticLightNode">AnalyticLightNode</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new analytic light node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The light source.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="baseColorNode" translate="no">.<a href="#baseColorNode">baseColorNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>This property is used to retain a reference to the original value of <a href="AnalyticLightNode.html#colorNode">AnalyticLightNode#colorNode</a>.
+The final color node is represented by a different node when using shadows.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="color" translate="no">.<a href="#color">color</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>The light's color value.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="colorNode" translate="no">.<a href="#colorNode">colorNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The light's color node. Points to <code>colorNode</code> of the light source, if set. Otherwise
+it creates a uniform node based on <a href="AnalyticLightNode.html#color">AnalyticLightNode#color</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isAnalyticLightNode" translate="no">.<a href="#isAnalyticLightNode">isAnalyticLightNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="light" translate="no">.<a href="#light">light</a><span class="type-signature"> : <a href="Light.html">Light</a></span> </h3>
+					<div class="description">
+						<p>The light source.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadowColorNode" translate="no">.<a href="#shadowColorNode">shadowColorNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>Represents the light's shadow color.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadowNode" translate="no">.<a href="#shadowNode">shadowNode</a><span class="type-signature"> : <a href="ShadowNode.html">ShadowNode</a></span> </h3>
+					<div class="description">
+						<p>Represents the light's shadow.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Overwritten since analytic light nodes are updated
+once per frame.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingNode.html#updateType">LightingNode#updateType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getLightVector" translate="no">.<a href="#getLightVector">getLightVector</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a node representing a direction vector which points from the current
+position in view space to the light's position in view space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The builder object used for setting up the light.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The light vector node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Unlike most other nodes, lighting nodes do not return a output node in <a href="Node.html#setup">Node#setup</a>.
+The main purpose of lighting nodes is to configure the current <a href="LightingModel.html">LightingModel</a> and/or
+invocate the respective interface methods.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingNode.html#setup">LightingNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupDirect" translate="no">.<a href="#setupDirect">setupDirect</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object | undefined</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets up the direct lighting for the analytic light node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The builder object used for setting up the light.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The direct light data (color and direction).</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupDirectRectArea" translate="no">.<a href="#setupDirectRectArea">setupDirectRectArea</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object | undefined</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets up the direct rect area lighting for the analytic light node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The builder object used for setting up the light.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The direct rect area light data.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupShadow" translate="no">.<a href="#setupShadow">setupShadow</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the shadow for this light. This method is only executed if the light
+cast shadows and the current build object receives shadows. It incorporates
+shadows into the lighting computation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setupShadowNode" translate="no">.<a href="#setupShadowNode">setupShadowNode</a><span class="signature">()</span><span class="type-signature"> : <a href="ShadowNode.html">ShadowNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the shadow node for this light. The method exists so concrete light classes
+can setup different types of shadow nodes.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created shadow node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The update method is used to update light uniforms per frame.
+Potentially overwritten in concrete light nodes to update light
+specific uniforms.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightingNode.html#update">LightingNode#update</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/lighting/AnalyticLightNode.js" target="_blank" rel="noopener" translate="no">src/nodes/lighting/AnalyticLightNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

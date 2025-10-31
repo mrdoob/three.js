@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Plane - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Plane</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A two dimensional surface that extends infinitely in 3D space, represented
+in <a href="http://mathworld.wolfram.com/HessianNormalForm.html">Hessian normal form</a>
+by a unit length normal vector and a constant.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Plane" translate="no">new <a href="#Plane">Plane</a><span class="signature">( normal : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, constant : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>normal</strong>
+									</td>
+									<td class="description last">
+										<p>A unit length vector defining the normal of the plane.</p>
+										<p>Default is <code>(1,0,0)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>constant</strong>
+									</td>
+									<td class="description last">
+										<p>The signed distance from the origin to the plane.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="constant" translate="no">.<a href="#constant">constant</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The signed distance from the origin to the plane.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isPlane" translate="no">.<a href="#isPlane">isPlane</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normal" translate="no">.<a href="#normal">normal</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>A unit length vector defining the normal of the plane.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span>, optionalNormalMatrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Apply a 4x4 matrix to the plane. The matrix must be an affine, homogeneous transform.</p>
+<p>The optional normal matrix can be pre-computed like so:</p>
+<pre><code class="language-js">const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+</code></pre>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The transformation matrix.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>optionalNormalMatrix</strong>
+									</td>
+									<td class="description last">
+										<p>A pre-computed normal matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new plane with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="coplanarPoint" translate="no">.<a href="#coplanarPoint">coplanarPoint</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a coplanar vector to the plane, by calculating the
+projection of the normal at the origin onto the plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The coplanar point.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given plane to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="distanceToPoint" translate="no">.<a href="#distanceToPoint">distanceToPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the signed distance from the given point to this plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to compute the distance for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The signed distance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="distanceToSphere" translate="no">.<a href="#distanceToSphere">distanceToSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the signed distance from the given sphere to this plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to compute the distance for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The signed distance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this plane is equal with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane to test for equality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this plane is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectLine" translate="no">.<a href="#intersectLine">intersectLine</a><span class="signature">( line : <span class="param-type"><a href="Line3.html">Line3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the intersection point of the passed line and the plane. Returns
+<code>null</code> if the line does not intersect. Returns the line's starting point if
+the line is coplanar with the plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>line</strong>
+									</td>
+									<td class="description last">
+										<p>The line to compute the intersection for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The intersection point.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given bounding box intersects with the plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding box to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given bounding box intersects with the plane or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsLine" translate="no">.<a href="#intersectsLine">intersectsLine</a><span class="signature">( line : <span class="param-type"><a href="Line3.html">Line3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given line segment intersects with (passes through) the plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>line</strong>
+									</td>
+									<td class="description last">
+										<p>The line to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given line segment intersects with the plane or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given bounding sphere intersects with the plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding sphere to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given bounding sphere intersects with the plane or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="negate" translate="no">.<a href="#negate">negate</a><span class="signature">()</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Negates both the plane normal and the constant.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="normalize" translate="no">.<a href="#normalize">normalize</a><span class="signature">()</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Normalizes the plane normal and adjusts the constant accordingly.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="projectPoint" translate="no">.<a href="#projectPoint">projectPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Projects a the given point onto the plane.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to project.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The projected point on the plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( normal : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, constant : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the plane components by copying the given values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>normal</strong>
+									</td>
+									<td class="description last">
+										<p>The normal.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>constant</strong>
+									</td>
+									<td class="description last">
+										<p>The constant.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setComponents" translate="no">.<a href="#setComponents">setComponents</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, w : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the plane components by defining <code>x</code>, <code>y</code>, <code>z</code> as the
+plane normal and <code>w</code> as the constant.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the normal's x component.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the normal's y component.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the normal's z component.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The constant value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromCoplanarPoints" translate="no">.<a href="#setFromCoplanarPoints">setFromCoplanarPoints</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the plane from three coplanar points. The winding order is
+assumed to be counter-clockwise, and determines the direction of
+the plane normal.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first coplanar point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second coplanar point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The third coplanar point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromNormalAndCoplanarPoint" translate="no">.<a href="#setFromNormalAndCoplanarPoint">setFromNormalAndCoplanarPoint</a><span class="signature">( normal : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the plane from the given normal and coplanar point (that is a point
+that lies onto the plane).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>normal</strong>
+									</td>
+									<td class="description last">
+										<p>The normal.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>A coplanar point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( offset : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Translates the plane by the distance defined by the given offset vector.
+Note that this only affects the plane constant and will not affect the normal vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Plane.js" target="_blank" rel="noopener" translate="no">src/math/Plane.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

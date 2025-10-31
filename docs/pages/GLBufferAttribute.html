@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GLBufferAttribute - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">GLBufferAttribute</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An alternative version of a buffer attribute with more control over the VBO.</p>
+<p>The renderer does not construct a VBO for this kind of attribute. Instead, it uses
+whatever VBO is passed in constructor and can later be altered via the <code>buffer</code> property.</p>
+<p>The most common use case for this class is when some kind of GPGPU calculation interferes
+or even produces the VBOs in question.</p>
+<p>Notice that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="GLBufferAttribute" translate="no">new <a href="#GLBufferAttribute">GLBufferAttribute</a><span class="signature">( buffer : <span class="param-type">WebGLBuffer</span>, type : <span class="param-type">number</span>, itemSize : <span class="param-type">number</span>, elementSize : <span class="param-type">number</span>, count : <span class="param-type">number</span>, normalized : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new GL buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The native WebGL buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The native data type (e.g. <code>gl.FLOAT</code>).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>itemSize</strong>
+									</td>
+									<td class="description last">
+										<p>The item size.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>elementSize</strong>
+									</td>
+									<td class="description last">
+										<p>The corresponding size (in bytes) for the given <code>type</code> parameter.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The expected number of vertices in VBO.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normalized</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the data are normalized or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="buffer" translate="no">.<a href="#buffer">buffer</a><span class="type-signature"> : WebGLBuffer</span> </h3>
+					<div class="description">
+						<p>The native WebGL buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The expected number of vertices in VBO.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="elementSize" translate="no">.<a href="#elementSize">elementSize</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The corresponding size (in bytes) for the given <code>type</code> parameter.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isGLBufferAttribute" translate="no">.<a href="#isGLBufferAttribute">isGLBufferAttribute</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="itemSize" translate="no">.<a href="#itemSize">itemSize</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The item size, see <a href="BufferAttribute.html#itemSize">BufferAttribute#itemSize</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the buffer attribute.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Flag to indicate that this attribute has changed and should be re-sent to
+the GPU. Set this to <code>true</code> when you modify the value of the array.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalized" translate="no">.<a href="#normalized">normalized</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Applies to integer data only. Indicates how the underlying data in the buffer maps to
+the values in the GLSL code. For instance, if <code>buffer</code> contains data of <code>gl.UNSIGNED_SHORT</code>,
+and <code>normalized</code> is <code>true</code>, the values <code>0 - +65535</code> in the buffer data will be mapped to
+<code>0.0f - +1.0f</code> in the GLSL attribute. If <code>normalized</code> is <code>false</code>, the values will be converted
+to floats unmodified, i.e. <code>65535</code> becomes <code>65535.0f</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The native data type.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="version" translate="no">.<a href="#version">version</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>A version number, incremented every time the <code>needsUpdate</code> is set to <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setBuffer" translate="no">.<a href="#setBuffer">setBuffer</a><span class="signature">( buffer : <span class="param-type">WebGLBuffer</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given native WebGL buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setCount" translate="no">.<a href="#setCount">setCount</a><span class="signature">( count : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the count (the expected number of vertices in VBO).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setItemSize" translate="no">.<a href="#setItemSize">setItemSize</a><span class="signature">( itemSize : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the item size.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>itemSize</strong>
+									</td>
+									<td class="description last">
+										<p>The item size.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setType" translate="no">.<a href="#setType">setType</a><span class="signature">( type : <span class="param-type">number</span>, elementSize : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given native data type and element size.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The native data type (e.g. <code>gl.FLOAT</code>).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>elementSize</strong>
+									</td>
+									<td class="description last">
+										<p>The corresponding size (in bytes) for the given <code>type</code> parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/GLBufferAttribute.js" target="_blank" rel="noopener" translate="no">src/core/GLBufferAttribute.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

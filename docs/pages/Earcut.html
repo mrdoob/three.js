@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Earcut - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Earcut</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An implementation of the earcut polygon triangulation algorithm.
+The code is a port of <a href="https://github.com/mapbox/earcut">mapbox/earcut</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Earcut" translate="no">new <a href="#Earcut">Earcut</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="https://github.com/mapbox/earcut">https://github.com/mapbox/earcut</a></li>
+								</ul>
+							</dd>
+						</dl>
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".triangulate" translate="no">.<a href="#.triangulate">triangulate</a><span class="signature">( data : <span class="param-type">Array.&lt;number></span>, holeIndices : <span class="param-type">Array.&lt;number></span>, dim : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Triangulates the given shape definition by returning an array of triangles.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>An array with 2D points.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>holeIndices</strong>
+									</td>
+									<td class="description last">
+										<p>An array with indices defining holes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dim</strong>
+									</td>
+									<td class="description last">
+										<p>The number of coordinates per vertex in the input array.</p>
+										<p>Default is <code>2</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array representing the triangulated faces. Each face is defined by three consecutive numbers
+representing vertex indices.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/Earcut.js" target="_blank" rel="noopener" translate="no">src/extras/Earcut.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

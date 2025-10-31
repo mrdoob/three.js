@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ImageUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">ImageUtils</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A class containing utility functions for images.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".getDataURL" translate="no">.<a href="#.getDataURL">getDataURL</a><span class="signature">( image : <span class="param-type">HTMLImageElement | HTMLCanvasElement</span>, type : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a data URI containing a representation of the given image.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>image</strong>
+									</td>
+									<td class="description last">
+										<p>The image object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>Indicates the image format.</p>
+										<p>Default is <code>'image/png'</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The data URI.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".sRGBToLinear" translate="no">.<a href="#.sRGBToLinear">sRGBToLinear</a><span class="signature">( image : <span class="param-type">HTMLImageElement | HTMLCanvasElement | ImageBitmap | Object</span> )</span><span class="type-signature"> : HTMLCanvasElement | Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts the given sRGB image data to linear color space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>image</strong>
+									</td>
+									<td class="description last">
+										<p>The image object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The converted image.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/ImageUtils.js" target="_blank" rel="noopener" translate="no">src/extras/ImageUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

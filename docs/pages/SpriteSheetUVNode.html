@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SpriteSheetUVNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">SpriteSheetUVNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Can be used to compute texture coordinates for animated sprite sheets.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const uvNode = spritesheetUV( vec2( 6, 6 ), uv(), time.mul( animationSpeed ) );
+material.colorNode = texture( spriteSheet, uvNode );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SpriteSheetUVNode" translate="no">new <a href="#SpriteSheetUVNode">SpriteSheetUVNode</a><span class="signature">( countNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, frameNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new sprite sheet uv node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>countNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that defines the number of sprites in the x and y direction (e.g 6x6).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>uv()</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>frameNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that defines the current frame/sprite.</p>
+										<p>Default is <code>float()</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="countNode" translate="no">.<a href="#countNode">countNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>The node that defines the number of sprites in the x and y direction (e.g 6x6).</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="frameNode" translate="no">.<a href="#frameNode">frameNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The node that defines the current frame/sprite.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uvNode" translate="no">.<a href="#uvNode">uvNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>The uv node.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/utils/SpriteSheetUVNode.js" target="_blank" rel="noopener" translate="no">src/nodes/utils/SpriteSheetUVNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

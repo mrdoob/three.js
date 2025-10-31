@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ExternalTexture - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Texture.html">Texture</a> → </p>
+	<h1 translate="no">ExternalTexture</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a texture created externally with the same renderer context.</p>
+<p>This may be a texture from a protected media stream, device camera feed,
+or other data feeds like a depth sensor.</p>
+<p>Note that this class is only supported in <a href="WebGLRenderer.html">WebGLRenderer</a>, and in
+the <a href="WebGPURenderer.html">WebGPURenderer</a> WebGPU backend.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ExternalTexture" translate="no">new <a href="#ExternalTexture">ExternalTexture</a><span class="signature">( sourceTexture : <span class="param-type">WebGLTexture | GPUTexture</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new raw texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sourceTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The external texture.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isExternalTexture" translate="no">.<a href="#isExternalTexture">isExternalTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sourceTexture" translate="no">.<a href="#sourceTexture">sourceTexture</a><span class="type-signature"> : WebGLTexture | GPUTexture</span> </h3>
+					<div class="description">
+						<p>The external source texture.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/textures/ExternalTexture.js" target="_blank" rel="noopener" translate="no">src/textures/ExternalTexture.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

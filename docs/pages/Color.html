@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Color - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Color</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A Color instance is represented by RGB components in the linear <i>working
+color space</i>, which defaults to <code>LinearSRGBColorSpace</code>. Inputs
+conventionally using <code>SRGBColorSpace</code> (such as hexadecimals and CSS
+strings) are converted to the working color space automatically.</p>
+<p>Source color spaces may be specified explicitly, to ensure correct conversions.</p>
+<pre><code class="language-js">// assumed already LinearSRGBColorSpace; no conversion
+const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5 );
+// converted explicitly from SRGBColorSpace to LinearSRGBColorSpace
+const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
+</code></pre>
+<p>If THREE.ColorManagement is disabled, no conversions occur. For details,
+see <i>Color management</i>. Iterating through a Color instance will yield
+its components (r, g, b) in the corresponding order. A Color can be initialised
+in any of the following ways:</p>
+<pre><code class="language-js">//empty constructor - will default white
+const color1 = new THREE.Color();
+//Hexadecimal color (recommended)
+const color2 = new THREE.Color( 0xff0000 );
+//RGB string
+const color3 = new THREE.Color(&quot;rgb(255, 0, 0)&quot;);
+const color4 = new THREE.Color(&quot;rgb(100%, 0%, 0%)&quot;);
+//X11 color name - all 140 color names are supported.
+//Note the lack of CamelCase in the name
+const color5 = new THREE.Color( 'skyblue' );
+//HSL string
+const color6 = new THREE.Color(&quot;hsl(0, 100%, 50%)&quot;);
+//Separate RGB values between 0 and 1
+const color7 = new THREE.Color( 1, 0, 0 );
+</code></pre></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
+const color = new THREE.Color().setHex( 0x112233 );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Color" translate="no">new <a href="#Color">Color</a><span class="signature">( r : <span class="param-type">number | string | <a href="Color.html">Color</a></span>, g : <span class="param-type">number</span>, b : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new color.</p>
+<p>Note that standard method of specifying color in three.js is with a hexadecimal triplet,
+and that method is used throughout the rest of the documentation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>The red component of the color. If <code>g</code> and <code>b</code> are
+not provided, it can be hexadecimal triplet, a CSS-style string or another <code>Color</code> instance.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>g</strong>
+									</td>
+									<td class="description last">
+										<p>The green component.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The blue component.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="b" translate="no">.<a href="#b">b</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The blue component.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="g" translate="no">.<a href="#g">g</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The green component.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isColor" translate="no">.<a href="#isColor">isColor</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="r" translate="no">.<a href="#r">r</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The red component.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".NAMES" translate="no">.<a href="#.NAMES">NAMES</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>A dictionary with X11 color names.</p>
+<p>Note that multiple words such as Dark Orange become the string 'darkorange'.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the RGB values of the given color to the RGB values of this color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addColors" translate="no">.<a href="#addColors">addColors</a><span class="signature">( color1 : <span class="param-type"><a href="Color.html">Color</a></span>, color2 : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the RGB values of the given colors and stores the result in this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color1</strong>
+									</td>
+									<td class="description last">
+										<p>The first color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color2</strong>
+									</td>
+									<td class="description last">
+										<p>The second color.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addScalar" translate="no">.<a href="#addScalar">addScalar</a><span class="signature">( s : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given scalar value to the RGB values of this color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyMatrix3" translate="no">.<a href="#applyMatrix3">applyMatrix3</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Transforms this color with the given 3x3 matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new color with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="convertLinearToSRGB" translate="no">.<a href="#convertLinearToSRGB">convertLinearToSRGB</a><span class="signature">()</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts this color from <code>LinearSRGBColorSpace</code> to <code>SRGBColorSpace</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="convertSRGBToLinear" translate="no">.<a href="#convertSRGBToLinear">convertSRGBToLinear</a><span class="signature">()</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts this color from <code>SRGBColorSpace</code> to <code>LinearSRGBColorSpace</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given color to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copyLinearToSRGB" translate="no">.<a href="#copyLinearToSRGB">copyLinearToSRGB</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the given color into this color, and then converts this color from
+<code>LinearSRGBColorSpace</code> to <code>SRGBColorSpace</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to copy/convert.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copySRGBToLinear" translate="no">.<a href="#copySRGBToLinear">copySRGBToLinear</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the given color into this color, and then converts this color from
+<code>SRGBColorSpace</code> to <code>LinearSRGBColorSpace</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to copy/convert.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( c : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this color is equal with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The color to test for equality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this bounding color is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromArray" translate="no">.<a href="#fromArray">fromArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this color's RGB components from the given array.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding the RGB values.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset into the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromBufferAttribute" translate="no">.<a href="#fromBufferAttribute">fromBufferAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the components of this color from the given buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute holding color data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHSL" translate="no">.<a href="#getHSL">getHSL</a><span class="signature">( target : <span class="param-type">Object</span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts the colors RGB values into the HSL format and stores them into the
+given target object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>ColorManagement.workingColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The HSL representation of this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHex" translate="no">.<a href="#getHex">getHex</a><span class="signature">( colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the hexadecimal value of this color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The hexadecimal value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHexString" translate="no">.<a href="#getHexString">getHexString</a><span class="signature">( colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the hexadecimal value of this color as a string (for example, 'FFFFFF').</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The hexadecimal value as a string.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRGB" translate="no">.<a href="#getRGB">getRGB</a><span class="signature">( target : <span class="param-type"><a href="Color.html">Color</a></span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the RGB values of this color and stores them into the given target object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target color that is used to store the method's result.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>ColorManagement.workingColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The RGB representation of this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getStyle" translate="no">.<a href="#getStyle">getStyle</a><span class="signature">( colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the value of this color as a CSS style string. Example: <code>rgb(255,0,0)</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The CSS representation of this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lerp" translate="no">.<a href="#lerp">lerp</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Linearly interpolates this color's RGB values toward the RGB values of the
+given color. The alpha argument can be thought of as the ratio between
+the two colors, where <code>0.0</code> is this color and <code>1.0</code> is the first argument.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to converge on.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lerpColors" translate="no">.<a href="#lerpColors">lerpColors</a><span class="signature">( color1 : <span class="param-type"><a href="Color.html">Color</a></span>, color2 : <span class="param-type"><a href="Color.html">Color</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Linearly interpolates between the given colors and stores the result in this instance.
+The alpha argument can be thought of as the ratio between the two colors, where <code>0.0</code>
+is the first and <code>1.0</code> is the second color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color1</strong>
+									</td>
+									<td class="description last">
+										<p>The first color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color2</strong>
+									</td>
+									<td class="description last">
+										<p>The second color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lerpHSL" translate="no">.<a href="#lerpHSL">lerpHSL</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Linearly interpolates this color's HSL values toward the HSL values of the
+given color. It differs from <a href="Color.html#lerp">Color#lerp</a> by not interpolating straight
+from one color to the other, but instead going through all the hues in between
+those two colors. The alpha argument can be thought of as the ratio between
+the two colors, where 0.0 is this color and 1.0 is the first argument.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to converge on.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0,1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiply" translate="no">.<a href="#multiply">multiply</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies the RGB values of the given color with the RGB values of this color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to multiply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiplyScalar" translate="no">.<a href="#multiplyScalar">multiplyScalar</a><span class="signature">( s : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies the given scalar value with the RGB values of this color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar to multiply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="offsetHSL" translate="no">.<a href="#offsetHSL">offsetHSL</a><span class="signature">( h : <span class="param-type">number</span>, s : <span class="param-type">number</span>, l : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given HSL values to this color's values.
+Internally, this converts the color's RGB values to HSL, adds HSL
+and then converts the color back to RGB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>h</strong>
+									</td>
+									<td class="description last">
+										<p>Hue value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>Saturation value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>l</strong>
+									</td>
+									<td class="description last">
+										<p>Lightness value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( r : <span class="param-type">number | string | <a href="Color.html">Color</a></span>, g : <span class="param-type">number</span>, b : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the colors's components from the given values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>The red component of the color. If <code>g</code> and <code>b</code> are
+not provided, it can be hexadecimal triplet, a CSS-style string or another <code>Color</code> instance.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>g</strong>
+									</td>
+									<td class="description last">
+										<p>The green component.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The blue component.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setColorName" translate="no">.<a href="#setColorName">setColorName</a><span class="signature">( style : <span class="param-type">string</span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this color from a color name. Faster than <a href="Color.html#setStyle">Color#setStyle</a> if
+you don't need the other CSS-style formats.</p>
+<p>For convenience, the list of names is exposed in <code>Color.NAMES</code> as a hash.</p>
+<pre><code class="language-js">Color.NAMES.aliceblue // returns 0xF0F8FF
+</code></pre>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>style</strong>
+									</td>
+									<td class="description last">
+										<p>The color name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromVector3" translate="no">.<a href="#setFromVector3">setFromVector3</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the color's RGB components from the given 3D vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setHSL" translate="no">.<a href="#setHSL">setHSL</a><span class="signature">( h : <span class="param-type">number</span>, s : <span class="param-type">number</span>, l : <span class="param-type">number</span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this color from RGB values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>h</strong>
+									</td>
+									<td class="description last">
+										<p>Hue value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>Saturation value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>l</strong>
+									</td>
+									<td class="description last">
+										<p>Lightness value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>ColorManagement.workingColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setHex" translate="no">.<a href="#setHex">setHex</a><span class="signature">( hex : <span class="param-type">number</span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this color from a hexadecimal value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>hex</strong>
+									</td>
+									<td class="description last">
+										<p>The hexadecimal value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setRGB" translate="no">.<a href="#setRGB">setRGB</a><span class="signature">( r : <span class="param-type">number</span>, g : <span class="param-type">number</span>, b : <span class="param-type">number</span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this color from RGB values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>Red channel value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>g</strong>
+									</td>
+									<td class="description last">
+										<p>Green channel value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>Blue channel value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>ColorManagement.workingColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setScalar" translate="no">.<a href="#setScalar">setScalar</a><span class="signature">( scalar : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the colors's components to the given scalar value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scalar</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setStyle" translate="no">.<a href="#setStyle">setStyle</a><span class="signature">( style : <span class="param-type">string</span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this color from a CSS-style string. For example, <code>rgb(250, 0,0)</code>,
+<code>rgb(100%, 0%, 0%)</code>, <code>hsl(0, 100%, 50%)</code>, <code>#ff0000</code>, <code>#f00</code>, or <code>red</code> ( or
+any <a href="https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart">X11 color name</a> -
+all 140 color names are supported).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>style</strong>
+									</td>
+									<td class="description last">
+										<p>Color as a CSS-style string.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="sub" translate="no">.<a href="#sub">sub</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Subtracts the RGB values of the given color from the RGB values of this color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to subtract.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toArray" translate="no">.<a href="#toArray">toArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Writes the RGB components of this color to the given array. If no array is provided,
+the method returns a new instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The target array holding the color components.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first element in the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The color components.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This methods defines the serialization result of this class. Returns the color
+as a hexadecimal value.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The hexadecimal value.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Color.js" target="_blank" rel="noopener" translate="no">src/math/Color.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

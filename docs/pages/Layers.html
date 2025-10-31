@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Layers - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Layers</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A layers object assigns an 3D object to 1 or more of 32
+layers numbered <code>0</code> to <code>31</code> - internally the layers are stored as a
+bit mask], and by default all 3D objects are a member of layer <code>0</code>.</p>
+<p>This can be used to control visibility - an object must share a layer with
+a camera to be visible when that camera's view is
+rendered.</p>
+<p>All classes that inherit from <a href="Object3D.html">Object3D</a> have an <code>layers</code> property which
+is an instance of this class.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Layers" translate="no">new <a href="#Layers">Layers</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new layers instance, with membership
+initially set to layer <code>0</code>.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="mask" translate="no">.<a href="#mask">mask</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>A bit mask storing which of the 32 layers this layers object is currently
+a member of.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="disable" translate="no">.<a href="#disable">disable</a><span class="signature">( layer : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes membership of the given layer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>layer</strong>
+									</td>
+									<td class="description last">
+										<p>The layer to enable.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="disableAll" translate="no">.<a href="#disableAll">disableAll</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the membership from all layers.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="enable" translate="no">.<a href="#enable">enable</a><span class="signature">( layer : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds membership of the given layer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>layer</strong>
+									</td>
+									<td class="description last">
+										<p>The layer to enable.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="enableAll" translate="no">.<a href="#enableAll">enableAll</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds membership to all layers.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="isEnabled" translate="no">.<a href="#isEnabled">isEnabled</a><span class="signature">( layer : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given layer is enabled.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>layer</strong>
+									</td>
+									<td class="description last">
+										<p>The layer to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given layer is enabled or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( layer : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets membership to the given layer, and remove membership all other layers.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>layer</strong>
+									</td>
+									<td class="description last">
+										<p>The layer to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="test" translate="no">.<a href="#test">test</a><span class="signature">( layers : <span class="param-type"><a href="Layers.html">Layers</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this and the given layers object have at least one
+layer in common.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>layers</strong>
+									</td>
+									<td class="description last">
+										<p>The layers to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this and the given layers object have at least one layer in common or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toggle" translate="no">.<a href="#toggle">toggle</a><span class="signature">( layer : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Toggles the membership of the given layer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>layer</strong>
+									</td>
+									<td class="description last">
+										<p>The layer to toggle.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/Layers.js" target="_blank" rel="noopener" translate="no">src/core/Layers.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

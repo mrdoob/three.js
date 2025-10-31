@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LUTPass - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Pass.html">Pass</a> → <a href="ShaderPass.html">ShaderPass</a> → </p>
+	<h1 translate="no">LUTPass</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Pass for color grading via lookup tables.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const lutPass = new LUTPass( { lut: lut.texture3D } );
+composer.addPass( lutPass );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LUTPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LUTPass } from 'three/addons/postprocessing/LUTPass.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LUTPass" translate="no">new <a href="#LUTPass">LUTPass</a><span class="signature">( options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a LUT pass.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The pass options.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="intensity" translate="no">.<a href="#intensity">intensity</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The intensity.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lut" translate="no">.<a href="#lut">lut</a><span class="type-signature"> : <a href="Data3DTexture.html">Data3DTexture</a></span> </h3>
+					<div class="description">
+						<p>The LUT as a 3D texture.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/LUTPass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/LUTPass.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

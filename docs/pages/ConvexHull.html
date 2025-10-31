@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ConvexHull - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">ConvexHull</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Can be used to compute the convex hull in 3D space for a given set of points. It
+is primarily intended for <a href="ConvexGeometry.html">ConvexGeometry</a>.</p>
+<p>This Quickhull 3D implementation is a port of <a href="https://github.com/maurizzzio/quickhull3d/">quickhull3d</a>
+by Mauricio Poppe.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">ConvexHull</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ConvexHull } from 'three/addons/math/ConvexHull.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ConvexHull" translate="no">new <a href="#ConvexHull">ConvexHull</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new convex hull.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given point lies in the convex hull.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given point lies in the convex hull or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectRay" translate="no">.<a href="#intersectRay">intersectRay</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the intersections point of the given ray and this convex hull.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>ray</strong>
+									</td>
+									<td class="description last">
+										<p>The ray to test.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The intersection point. Returns <code>null</code> if not intersection was detected.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsRay" translate="no">.<a href="#intersectsRay">intersectsRay</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given ray intersects with this convex hull.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>ray</strong>
+									</td>
+									<td class="description last">
+										<p>The ray to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given ray intersects with this convex hull or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="makeEmpty" translate="no">.<a href="#makeEmpty">makeEmpty</a><span class="signature">()</span><span class="type-signature"> : <a href="ConvexHull.html">ConvexHull</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Makes the convex hull empty.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this convex hull.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromObject" translate="no">.<a href="#setFromObject">setFromObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="ConvexHull.html">ConvexHull</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the convex hull of the given 3D object (including its descendants),
+accounting for the world transforms of both the 3D object and its descendants.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to compute the convex hull for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this convex hull.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector3.html">Vector3</a>></span> )</span><span class="type-signature"> : <a href="ConvexHull.html">ConvexHull</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes to convex hull for the given array of points.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>The array of points in 3D space.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this convex hull.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/ConvexHull.js" target="_blank" rel="noopener" translate="no">examples/jsm/math/ConvexHull.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

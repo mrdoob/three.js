@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ShadowMapViewer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">ShadowMapViewer</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This is a helper for visualising a given light's shadow map.
+It works for shadow casting lights: DirectionalLight and SpotLight.
+It renders out the shadow map and displays it on a HUD.</p>
+<p>This module can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>. When using <a href="WebGPURenderer.html">WebGPURenderer</a>,
+import the class from <code>ShadowMapViewerGPU.js</code>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const lightShadowMapViewer = new ShadowMapViewer( light );
+lightShadowMapViewer.position.x = 10;
+lightShadowMapViewer.position.y = SCREEN_HEIGHT - ( SHADOW_MAP_HEIGHT / 4 ) - 10;
+lightShadowMapViewer.size.width = SHADOW_MAP_WIDTH / 4;
+lightShadowMapViewer.size.height = SHADOW_MAP_HEIGHT / 4;
+lightShadowMapViewer.update();
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">ShadowMapViewer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewer.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ShadowMapViewer" translate="no">new <a href="#ShadowMapViewer">ShadowMapViewer</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new shadow map viewer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow casting light.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="enabled" translate="no">.<a href="#enabled">enabled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to display the shadow map viewer or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="position" translate="no">.<a href="#position">position</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The position of the viewer. When changing this property, make sure
+to call <a href="ShadowMapViewer.html#update">ShadowMapViewer#update</a>.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The size of the viewer. When changing this property, make sure
+to call <a href="ShadowMapViewer.html#update">ShadowMapViewer#update</a>.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the viewer. This method must be called in the app's animation loop.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the viewer.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="updateForWindowResize" translate="no">.<a href="#updateForWindowResize">updateForWindowResize</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resizes the viewer. This method should be called whenever the app's
+window is resized.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/ShadowMapViewer.js" target="_blank" rel="noopener" translate="no">examples/jsm/utils/ShadowMapViewer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>XRControllerModelFactory - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">XRControllerModelFactory</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Allows to create controller models for WebXR controllers that can be added as a visual
+representation to your scene. <code>XRControllerModelFactory</code> will automatically fetch controller
+models that match what the user is holding as closely as possible. The models should be
+attached to the object returned from getControllerGrip in order to match the orientation of
+the held device.</p>
+<p>This module depends on the <a href="https://github.com/immersive-web/webxr-input-profiles/blob/main/packages/motion-controllers/README.md">motion-controllers</a>
+third-part library.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const controllerModelFactory = new XRControllerModelFactory();
+const controllerGrip = renderer.xr.getControllerGrip( 0 );
+controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
+scene.add( controllerGrip );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">XRControllerModelFactory</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="XRControllerModelFactory" translate="no">new <a href="#XRControllerModelFactory">XRControllerModelFactory</a><span class="signature">( gltfLoader : <span class="param-type"><a href="GLTFLoader.html">GLTFLoader</a></span>, onLoad : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new XR controller model factory.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>gltfLoader</strong>
+									</td>
+									<td class="description last">
+										<p>A glTF loader that is used to load controller models.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>A callback that is executed when a controller model has been loaded.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="gltfLoader" translate="no">.<a href="#gltfLoader">gltfLoader</a><span class="type-signature"> : <a href="GLTFLoader.html">GLTFLoader</a></span> </h3>
+					<div class="description">
+						<p>A glTF loader that is used to load controller models.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="onLoad" translate="no">.<a href="#onLoad">onLoad</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>A callback that is executed when a controller model has been loaded.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="path" translate="no">.<a href="#path">path</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The path to the model repository.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createControllerModel" translate="no">.<a href="#createControllerModel">createControllerModel</a><span class="signature">( controller : <span class="param-type"><a href="Group.html">Group</a></span> )</span><span class="type-signature"> : <a href="XRControllerModel.html">XRControllerModel</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a controller model for the given WebXR controller.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR controller model.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setPath" translate="no">.<a href="#setPath">setPath</a><span class="signature">( path : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="XRControllerModelFactory.html">XRControllerModelFactory</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the path to the model repository.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The path to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XRControllerModelFactory.js" target="_blank" rel="noopener" translate="no">examples/jsm/webxr/XRControllerModelFactory.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Texture - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → </p>
+	<h1 translate="no">Texture</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Base class for all textures.</p>
+<p>Note: After the initial use of a texture, its dimensions, format, and type
+cannot be changed. Instead, call <a href="Texture.html#dispose">Texture#dispose</a> on the texture and instantiate a new one.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Texture" translate="no">new <a href="#Texture">Texture</a><span class="signature">( image : <span class="param-type">Object</span>, mapping : <span class="param-type">number</span>, wrapS : <span class="param-type">number</span>, wrapT : <span class="param-type">number</span>, magFilter : <span class="param-type">number</span>, minFilter : <span class="param-type">number</span>, format : <span class="param-type">number</span>, type : <span class="param-type">number</span>, anisotropy : <span class="param-type">number</span>, colorSpace : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>image</strong>
+									</td>
+									<td class="description last">
+										<p>The image holding the texture data.</p>
+										<p>Default is <code>Texture.DEFAULT_IMAGE</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mapping</strong>
+									</td>
+									<td class="description last">
+										<p>The texture mapping.</p>
+										<p>Default is <code>Texture.DEFAULT_MAPPING</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapS</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapT</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapT value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>magFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The mag filter value.</p>
+										<p>Default is <code>LinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The min filter value.</p>
+										<p>Default is <code>LinearMipmapLinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>format</strong>
+									</td>
+									<td class="description last">
+										<p>The texture format.</p>
+										<p>Default is <code>RGBAFormat</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The texture type.</p>
+										<p>Default is <code>UnsignedByteType</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>anisotropy</strong>
+									</td>
+									<td class="description last">
+										<p>The anisotropy value.</p>
+										<p>Default is <code>Texture.DEFAULT_ANISOTROPY</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>NoColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="anisotropy" translate="no">.<a href="#anisotropy">anisotropy</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of samples taken along the axis through the pixel that has the
+highest density of texels. By default, this value is <code>1</code>. A higher value
+gives a less blurry result than a basic mipmap, at the cost of more
+texture samples being used.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="center" translate="no">.<a href="#center">center</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="description">
+						<p>The point around which rotation occurs. A value of <code>(0.5, 0.5)</code> corresponds
+to the center of the texture. Default is <code>(0, 0)</code>, the lower left.</p>
+						<p>Default is <code>(0,0)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="channel" translate="no">.<a href="#channel">channel</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Lets you select the uv attribute to map the texture to. <code>0</code> for <code>uv</code>,
+<code>1</code> for <code>uv1</code>, <code>2</code> for <code>uv2</code> and <code>3</code> for <code>uv3</code>.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="colorSpace" translate="no">.<a href="#colorSpace">colorSpace</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Textures containing color data should be annotated with <code>SRGBColorSpace</code> or <code>LinearSRGBColorSpace</code>.</p>
+						<p>Default is <code>NoColorSpace</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depth" translate="no">.<a href="#depth">depth</a> </h3>
+					<div class="description">
+						<p>The depth of the texture in pixels.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="flipY" translate="no">.<a href="#flipY">flipY</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, the texture is flipped along the vertical axis when
+uploaded to the GPU.</p>
+<p>Note that this property has no effect when using <code>ImageBitmap</code>. You need to
+configure the flip on bitmap creation instead.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="format" translate="no">.<a href="#format">format</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The format of the texture.</p>
+						<p>Default is <code>RGBAFormat</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="generateMipmaps" translate="no">.<a href="#generateMipmaps">generateMipmaps</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to generate mipmaps (if possible) for a texture.</p>
+<p>Set this to <code>false</code> if you are creating mipmaps manually.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="height" translate="no">.<a href="#height">height</a> </h3>
+					<div class="description">
+						<p>The height of the texture in pixels.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="id" translate="no">.<a href="#id">id</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The ID of the texture.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="image" translate="no">.<a href="#image">image</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The image object holding the texture data.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="internalFormat" translate="no">.<a href="#internalFormat">internalFormat</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The default internal format is derived from <a href="Texture.html#format">Texture#format</a> and <a href="Texture.html#type">Texture#type</a> and
+defines how the texture data is going to be stored on the GPU.</p>
+<p>This property allows to overwrite the default format.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isArrayTexture" translate="no">.<a href="#isArrayTexture">isArrayTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Indicates if a texture should be handled like a texture array.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isRenderTargetTexture" translate="no">.<a href="#isRenderTargetTexture">isRenderTargetTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Indicates whether a texture belongs to a render target or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isTexture" translate="no">.<a href="#isTexture">isTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="magFilter" translate="no">.<a href="#magFilter">magFilter</a><span class="type-signature"> : <a href="global.html#NearestFilter">NearestFilter</a> | <a href="global.html#NearestMipmapNearestFilter">NearestMipmapNearestFilter</a> | <a href="global.html#NearestMipmapLinearFilter">NearestMipmapLinearFilter</a> | <a href="global.html#LinearFilter">LinearFilter</a> | <a href="global.html#LinearMipmapNearestFilter">LinearMipmapNearestFilter</a> | <a href="global.html#LinearMipmapLinearFilter">LinearMipmapLinearFilter</a></span> </h3>
+					<div class="description">
+						<p>How the texture is sampled when a texel covers more than one pixel.</p>
+						<p>Default is <code>LinearFilter</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mapping" translate="no">.<a href="#mapping">mapping</a><span class="type-signature"> : <a href="global.html#UVMapping">UVMapping</a> | <a href="global.html#CubeReflectionMapping">CubeReflectionMapping</a> | <a href="global.html#CubeRefractionMapping">CubeRefractionMapping</a> | <a href="global.html#EquirectangularReflectionMapping">EquirectangularReflectionMapping</a> | <a href="global.html#EquirectangularRefractionMapping">EquirectangularRefractionMapping</a> | <a href="global.html#CubeUVReflectionMapping">CubeUVReflectionMapping</a></span> </h3>
+					<div class="description">
+						<p>How the texture is applied to the object. The value <code>UVMapping</code>
+is the default, where texture or uv coordinates are used to apply the map.</p>
+						<p>Default is <code>UVMapping</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrix" translate="no">.<a href="#matrix">matrix</a><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="description">
+						<p>The uv-transformation matrix of the texture.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrixAutoUpdate" translate="no">.<a href="#matrixAutoUpdate">matrixAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to update the texture's uv-transformation <a href="Texture.html#matrix">Texture#matrix</a>
+from the properties <a href="Texture.html#offset">Texture#offset</a>, <a href="Texture.html#repeat">Texture#repeat</a>,
+<a href="Texture.html#rotation">Texture#rotation</a>, and <a href="Texture.html#center">Texture#center</a>.</p>
+<p>Set this to <code>false</code> if you are specifying the uv-transform matrix directly.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minFilter" translate="no">.<a href="#minFilter">minFilter</a><span class="type-signature"> : <a href="global.html#NearestFilter">NearestFilter</a> | <a href="global.html#NearestMipmapNearestFilter">NearestMipmapNearestFilter</a> | <a href="global.html#NearestMipmapLinearFilter">NearestMipmapLinearFilter</a> | <a href="global.html#LinearFilter">LinearFilter</a> | <a href="global.html#LinearMipmapNearestFilter">LinearMipmapNearestFilter</a> | <a href="global.html#LinearMipmapLinearFilter">LinearMipmapLinearFilter</a></span> </h3>
+					<div class="description">
+						<p>How the texture is sampled when a texel covers less than one pixel.</p>
+						<p>Default is <code>LinearMipmapLinearFilter</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mipmaps" translate="no">.<a href="#mipmaps">mipmaps</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>An array holding user-defined mipmaps.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsPMREMUpdate" translate="no">.<a href="#needsPMREMUpdate">needsPMREMUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Setting this property to <code>true</code> indicates the engine the PMREM
+must be regenerated.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Setting this property to <code>true</code> indicates the engine the texture
+must be updated in the next render. This triggers a texture upload
+to the GPU and ensures correct texture parameter configuration.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="offset" translate="no">.<a href="#offset">offset</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="description">
+						<p>How much a single repetition of the texture is offset from the beginning,
+in each direction U and V. Typical range is <code>0.0</code> to <code>1.0</code>.</p>
+						<p>Default is <code>(0,0)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="onUpdate" translate="no">.<a href="#onUpdate">onUpdate</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>A callback function, called when the texture is updated (e.g., when
+<a href="Texture.html#needsUpdate">Texture#needsUpdate</a> has been set to true and then the texture is used).</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="pmremVersion" translate="no">.<a href="#pmremVersion">pmremVersion</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Indicates whether this texture should be processed by <code>PMREMGenerator</code> or not
+(only relevant for render target textures).</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="premultiplyAlpha" translate="no">.<a href="#premultiplyAlpha">premultiplyAlpha</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, the alpha channel, if present, is multiplied into the
+color channels when the texture is uploaded to the GPU.</p>
+<p>Note that this property has no effect when using <code>ImageBitmap</code>. You need to
+configure premultiply alpha on bitmap creation instead.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderTarget" translate="no">.<a href="#renderTarget">renderTarget</a><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a> | <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="description">
+						<p>An optional back reference to the textures render target.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="repeat" translate="no">.<a href="#repeat">repeat</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="description">
+						<p>How many times the texture is repeated across the surface, in each
+direction U and V. If repeat is set greater than <code>1</code> in either direction,
+the corresponding wrap parameter should also be set to <code>RepeatWrapping</code>
+or <code>MirroredRepeatWrapping</code> to achieve the desired tiling effect.</p>
+						<p>Default is <code>(1,1)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotation" translate="no">.<a href="#rotation">rotation</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How much the texture is rotated around the center point, in radians.
+Positive values are counter-clockwise.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="source" translate="no">.<a href="#source">source</a><span class="type-signature"> : <a href="Source.html">Source</a></span> </h3>
+					<div class="description">
+						<p>The data definition of a texture. A reference to the data source can be
+shared across textures. This is often useful in context of spritesheets
+where multiple textures render the same data but with different texture
+transformations.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The data type of the texture.</p>
+						<p>Default is <code>UnsignedByteType</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="unpackAlignment" translate="no">.<a href="#unpackAlignment">unpackAlignment</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Specifies the alignment requirements for the start of each pixel row in memory.
+The allowable values are <code>1</code> (byte-alignment), <code>2</code> (rows aligned to even-numbered bytes),
+<code>4</code> (word-alignment), and <code>8</code> (rows start on double-word boundaries).</p>
+						<p>Default is <code>4</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateRanges" translate="no">.<a href="#updateRanges">updateRanges</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>This can be used to only update a subregion or specific rows of the texture (for example, just the
+first 3 rows). Use the <code>addUpdateRange()</code> function to add ranges to this array.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="userData" translate="no">.<a href="#userData">userData</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>An object that can be used to store custom data about the texture. It
+should not hold references to functions as these will not be cloned.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uuid" translate="no">.<a href="#uuid">uuid</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The UUID of the material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="version" translate="no">.<a href="#version">version</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This starts at <code>0</code> and counts how many times <a href="Texture.html#needsUpdate">Texture#needsUpdate</a> is set to <code>true</code>.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="width" translate="no">.<a href="#width">width</a> </h3>
+					<div class="description">
+						<p>The width of the texture in pixels.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wrapS" translate="no">.<a href="#wrapS">wrapS</a><span class="type-signature"> : <a href="global.html#RepeatWrapping">RepeatWrapping</a> | <a href="global.html#ClampToEdgeWrapping">ClampToEdgeWrapping</a> | <a href="global.html#MirroredRepeatWrapping">MirroredRepeatWrapping</a></span> </h3>
+					<div class="description">
+						<p>This defines how the texture is wrapped horizontally and corresponds to
+<em>U</em> in UV mapping.</p>
+						<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wrapT" translate="no">.<a href="#wrapT">wrapT</a><span class="type-signature"> : <a href="global.html#RepeatWrapping">RepeatWrapping</a> | <a href="global.html#ClampToEdgeWrapping">ClampToEdgeWrapping</a> | <a href="global.html#MirroredRepeatWrapping">MirroredRepeatWrapping</a></span> </h3>
+					<div class="description">
+						<p>This defines how the texture is wrapped horizontally and corresponds to
+<em>V</em> in UV mapping.</p>
+						<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".DEFAULT_ANISOTROPY" translate="no">.<a href="#.DEFAULT_ANISOTROPY">DEFAULT_ANISOTROPY</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The default anisotropy value for all textures.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".DEFAULT_IMAGE" translate="no">.<a href="#.DEFAULT_IMAGE">DEFAULT_IMAGE</a><span class="type-signature"> : Image</span> </h3>
+					<div class="description">
+						<p>The default image for all textures.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".DEFAULT_MAPPING" translate="no">.<a href="#.DEFAULT_MAPPING">DEFAULT_MAPPING</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The default mapping for all textures.</p>
+						<p>Default is <code>UVMapping</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addUpdateRange" translate="no">.<a href="#addUpdateRange">addUpdateRange</a><span class="signature">( start : <span class="param-type">number</span>, count : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a range of data in the data texture to be updated on the GPU.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>Position at which to start update.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The number of components to update.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="clearUpdateRanges" translate="no">.<a href="#clearUpdateRanges">clearUpdateRanges</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clears the update ranges.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new texture with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given texture to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The texture to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+						<h5>Fires:</h5>
+						<ul>
+							<li><a href="Texture.html#event:dispose">Texture#event:dispose</a></li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="setValues" translate="no">.<a href="#setValues">setValues</a><span class="signature">( values : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this texture's properties based on <code>values</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>values</strong>
+									</td>
+									<td class="description last">
+										<p>A container with texture parameters.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">( meta : <span class="param-type">Object | string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the texture into JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>meta</strong>
+									</td>
+									<td class="description last">
+										<p>An optional value holding meta information about the serialization.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="ObjectLoader.html#parse">ObjectLoader#parse</a></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="transformUv" translate="no">.<a href="#transformUv">transformUv</a><span class="signature">( uv : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Transforms the given uv vector with the textures uv transformation matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uv</strong>
+									</td>
+									<td class="description last">
+										<p>The uv vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The transformed uv vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateMatrix" translate="no">.<a href="#updateMatrix">updateMatrix</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the texture transformation matrix from the from the properties <a href="Texture.html#offset">Texture#offset</a>,
+<a href="Texture.html#repeat">Texture#repeat</a>, <a href="Texture.html#rotation">Texture#rotation</a>, and <a href="Texture.html#center">Texture#center</a>.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:dispose" translate="no">.<a href="#event:dispose">dispose</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the texture has been disposed of.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/textures/Texture.js" target="_blank" rel="noopener" translate="no">src/textures/Texture.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CubeTexture - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Texture.html">Texture</a> → </p>
+	<h1 translate="no">CubeTexture</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Creates a cube texture made up of six images.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new THREE.CubeTextureLoader();
+loader.setPath( 'textures/cube/pisa/' );
+const textureCube = loader.load( [
+	'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'
+] );
+const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CubeTexture" translate="no">new <a href="#CubeTexture">CubeTexture</a><span class="signature">( images : <span class="param-type">Array.&lt;Image></span>, mapping : <span class="param-type">number</span>, wrapS : <span class="param-type">number</span>, wrapT : <span class="param-type">number</span>, magFilter : <span class="param-type">number</span>, minFilter : <span class="param-type">number</span>, format : <span class="param-type">number</span>, type : <span class="param-type">number</span>, anisotropy : <span class="param-type">number</span>, colorSpace : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new cube texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>images</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding a image for each side of a cube.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mapping</strong>
+									</td>
+									<td class="description last">
+										<p>The texture mapping.</p>
+										<p>Default is <code>CubeReflectionMapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapS</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapT</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapT value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>magFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The mag filter value.</p>
+										<p>Default is <code>LinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The min filter value.</p>
+										<p>Default is <code>LinearMipmapLinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>format</strong>
+									</td>
+									<td class="description last">
+										<p>The texture format.</p>
+										<p>Default is <code>RGBAFormat</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The texture type.</p>
+										<p>Default is <code>UnsignedByteType</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>anisotropy</strong>
+									</td>
+									<td class="description last">
+										<p>The anisotropy value.</p>
+										<p>Default is <code>Texture.DEFAULT_ANISOTROPY</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space value.</p>
+										<p>Default is <code>NoColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="flipY" translate="no">.<a href="#flipY">flipY</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, the texture is flipped along the vertical axis when
+uploaded to the GPU.</p>
+<p>Overwritten and set to <code>false</code> by default.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Texture.html#flipY">Texture#flipY</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="images" translate="no">.<a href="#images">images</a><span class="type-signature"> : Array.&lt;Image></span> </h3>
+					<div class="description">
+						<p>Alias for <a href="CubeTexture.html#image">CubeTexture#image</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isCubeTexture" translate="no">.<a href="#isCubeTexture">isCubeTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/textures/CubeTexture.js" target="_blank" rel="noopener" translate="no">src/textures/CubeTexture.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

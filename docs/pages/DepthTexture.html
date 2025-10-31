@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>DepthTexture - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Texture.html">Texture</a> → </p>
+	<h1 translate="no">DepthTexture</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to automatically save the depth information of a
+rendering into a texture.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="DepthTexture" translate="no">new <a href="#DepthTexture">DepthTexture</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, type : <span class="param-type">number</span>, mapping : <span class="param-type">number</span>, wrapS : <span class="param-type">number</span>, wrapT : <span class="param-type">number</span>, magFilter : <span class="param-type">number</span>, minFilter : <span class="param-type">number</span>, anisotropy : <span class="param-type">number</span>, format : <span class="param-type">number</span>, depth : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new depth texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The texture type.</p>
+										<p>Default is <code>UnsignedIntType</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mapping</strong>
+									</td>
+									<td class="description last">
+										<p>The texture mapping.</p>
+										<p>Default is <code>Texture.DEFAULT_MAPPING</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapS</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapT</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapT value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>magFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The mag filter value.</p>
+										<p>Default is <code>LinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The min filter value.</p>
+										<p>Default is <code>LinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>anisotropy</strong>
+									</td>
+									<td class="description last">
+										<p>The anisotropy value.</p>
+										<p>Default is <code>Texture.DEFAULT_ANISOTROPY</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>format</strong>
+									</td>
+									<td class="description last">
+										<p>The texture format.</p>
+										<p>Default is <code>DepthFormat</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>The depth of the texture.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="compareFunction" translate="no">.<a href="#compareFunction">compareFunction</a><span class="type-signature"> : <a href="global.html#NeverCompare">NeverCompare</a> | <a href="global.html#LessCompare">LessCompare</a> | <a href="global.html#EqualCompare">EqualCompare</a> | <a href="global.html#LessEqualCompare">LessEqualCompare</a> | <a href="global.html#GreaterCompare">GreaterCompare</a> | <a href="global.html#NotEqualCompare">NotEqualCompare</a> | <a href="global.html#GreaterEqualCompare">GreaterEqualCompare</a> | <a href="global.html#AlwaysCompare">AlwaysCompare</a></span> </h3>
+					<div class="description">
+						<p>Code corresponding to the depth compare function.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="flipY" translate="no">.<a href="#flipY">flipY</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, the texture is flipped along the vertical axis when
+uploaded to the GPU.</p>
+<p>Overwritten and set to <code>false</code> by default.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Texture.html#flipY">Texture#flipY</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="generateMipmaps" translate="no">.<a href="#generateMipmaps">generateMipmaps</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to generate mipmaps (if possible) for a texture.</p>
+<p>Overwritten and set to <code>false</code> by default.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Texture.html#generateMipmaps">Texture#generateMipmaps</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isDepthTexture" translate="no">.<a href="#isDepthTexture">isDepthTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/textures/DepthTexture.js" target="_blank" rel="noopener" translate="no">src/textures/DepthTexture.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

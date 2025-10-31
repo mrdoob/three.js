@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Triangle - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Triangle</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A geometric triangle as defined by three vectors representing its three corners.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Triangle" translate="no">new <a href="#Triangle">Triangle</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new triangle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first corner of the triangle.</p>
+										<p>Default is <code>(0,0,0)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second corner of the triangle.</p>
+										<p>Default is <code>(0,0,0)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The third corner of the triangle.</p>
+										<p>Default is <code>(0,0,0)</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="a" translate="no">.<a href="#a">a</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The first corner of the triangle.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="b" translate="no">.<a href="#b">b</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The second corner of the triangle.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="c" translate="no">.<a href="#c">c</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The third corner of the triangle.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Triangle.html">Triangle</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new triangle with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="closestPointToPoint" translate="no">.<a href="#closestPointToPoint">closestPointToPoint</a><span class="signature">( p : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the closest point on the triangle to the given point.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The point to compute the closest point for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The closest point on the triangle.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given point, when projected onto the plane of the
+triangle, lies within the triangle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point in 3D space to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given point, when projected onto the plane of the
+triangle, lies within the triangle or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( triangle : <span class="param-type"><a href="Triangle.html">Triangle</a></span> )</span><span class="type-signature"> : <a href="Triangle.html">Triangle</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given triangle to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>triangle</strong>
+									</td>
+									<td class="description last">
+										<p>The triangle to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this triangle.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( triangle : <span class="param-type"><a href="Triangle.html">Triangle</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this triangle is equal with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>triangle</strong>
+									</td>
+									<td class="description last">
+										<p>The triangle to test for equality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this triangle is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getArea" translate="no">.<a href="#getArea">getArea</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the area of the triangle.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The triangle's area.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBarycoord" translate="no">.<a href="#getBarycoord">getBarycoord</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes a barycentric coordinates from the given vector.
+Returns <code>null</code> if the triangle is degenerate.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>A point in 3D space.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The barycentric coordinates for the given point</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getInterpolation" translate="no">.<a href="#getInterpolation">getInterpolation</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v1 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v2 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v3 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the value barycentrically interpolated for the given point on the
+triangle. Returns <code>null</code> if the triangle is degenerate.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>Position of interpolated point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>v1</strong>
+									</td>
+									<td class="description last">
+										<p>Value to interpolate of first vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>v2</strong>
+									</td>
+									<td class="description last">
+										<p>Value to interpolate of second vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>v3</strong>
+									</td>
+									<td class="description last">
+										<p>Value to interpolate of third vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The interpolated value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMidpoint" translate="no">.<a href="#getMidpoint">getMidpoint</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the midpoint of the triangle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The triangle's midpoint.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNormal" translate="no">.<a href="#getNormal">getNormal</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the normal of the triangle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The triangle's normal.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPlane" translate="no">.<a href="#getPlane">getPlane</a><span class="signature">( target : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes a plane the triangle lies within.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The plane the triangle lies within.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this triangle intersects with the given box.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The box to intersect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this triangle intersects with the given box or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isFrontFacing" translate="no">.<a href="#isFrontFacing">isFrontFacing</a><span class="signature">( direction : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the triangle is oriented towards the given direction.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>direction</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) direction vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the triangle is oriented towards the given direction or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Triangle.html">Triangle</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the triangle's vertices by copying the given values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The third corner of the triangle.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this triangle.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromAttributeAndIndices" translate="no">.<a href="#setFromAttributeAndIndices">setFromAttributeAndIndices</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, i0 : <span class="param-type">number</span>, i1 : <span class="param-type">number</span>, i2 : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Triangle.html">Triangle</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the triangle's vertices by copying the given attribute values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>A buffer attribute with 3D points data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i0</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute index representing the first corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i1</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute index representing the second corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i2</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute index representing the third corner of the triangle.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this triangle.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromPointsAndIndices" translate="no">.<a href="#setFromPointsAndIndices">setFromPointsAndIndices</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector3.html">Vector3</a>></span>, i0 : <span class="param-type">number</span>, i1 : <span class="param-type">number</span>, i2 : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Triangle.html">Triangle</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the triangle's vertices by copying the given array values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array with 3D points.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i0</strong>
+									</td>
+									<td class="description last">
+										<p>The array index representing the first corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i1</strong>
+									</td>
+									<td class="description last">
+										<p>The array index representing the second corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i2</strong>
+									</td>
+									<td class="description last">
+										<p>The array index representing the third corner of the triangle.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this triangle.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".containsPoint" translate="no">.<a href="#.containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given point, when projected onto the plane of the
+triangle, lies within the triangle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point in 3D space to test.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The third corner of the triangle.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given point, when projected onto the plane of the
+triangle, lies within the triangle or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".getBarycoord" translate="no">.<a href="#.getBarycoord">getBarycoord</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes a barycentric coordinates from the given vector.
+Returns <code>null</code> if the triangle is degenerate.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>A point in 3D space.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The third corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The barycentric coordinates for the given point</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".getInterpolatedAttribute" translate="no">.<a href="#.getInterpolatedAttribute">getInterpolatedAttribute</a><span class="signature">( attr : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, i1 : <span class="param-type">number</span>, i2 : <span class="param-type">number</span>, i3 : <span class="param-type">number</span>, barycoord : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the value barycentrically interpolated for the given attribute and indices.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attr</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute to interpolate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i1</strong>
+									</td>
+									<td class="description last">
+										<p>Index of first vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i2</strong>
+									</td>
+									<td class="description last">
+										<p>Index of second vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>i3</strong>
+									</td>
+									<td class="description last">
+										<p>Index of third vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>barycoord</strong>
+									</td>
+									<td class="description last">
+										<p>The barycoordinate value to use to interpolate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The interpolated attribute value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".getInterpolation" translate="no">.<a href="#.getInterpolation">getInterpolation</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, p1 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, p2 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, p3 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v1 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v2 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v3 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the value barycentrically interpolated for the given point on the
+triangle. Returns <code>null</code> if the triangle is degenerate.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>Position of interpolated point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p1</strong>
+									</td>
+									<td class="description last">
+										<p>The first corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p2</strong>
+									</td>
+									<td class="description last">
+										<p>The second corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>p3</strong>
+									</td>
+									<td class="description last">
+										<p>The third corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>v1</strong>
+									</td>
+									<td class="description last">
+										<p>Value to interpolate of first vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>v2</strong>
+									</td>
+									<td class="description last">
+										<p>Value to interpolate of second vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>v3</strong>
+									</td>
+									<td class="description last">
+										<p>Value to interpolate of third vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The interpolated value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".getNormal" translate="no">.<a href="#.getNormal">getNormal</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the normal vector of a triangle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The third corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The triangle's normal.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".isFrontFacing" translate="no">.<a href="#.isFrontFacing">isFrontFacing</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, direction : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the triangle is oriented towards the given direction.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The third corner of the triangle.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>direction</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) direction vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the triangle is oriented towards the given direction or not.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Triangle.js" target="_blank" rel="noopener" translate="no">src/math/Triangle.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

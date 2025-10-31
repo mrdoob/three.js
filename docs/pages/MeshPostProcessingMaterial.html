@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshPostProcessingMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="MeshStandardMaterial.html">MeshStandardMaterial</a> → <a href="MeshPhysicalMaterial.html">MeshPhysicalMaterial</a> → </p>
+	<h1 translate="no">MeshPostProcessingMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>The aim of this mesh material is to use information from a post processing pass in the diffuse color pass.
+This material is based on the MeshPhysicalMaterial.</p>
+<p>In the current state, only the information of a screen space AO pass can be used in the material.
+Actually, the output of any screen space AO (SSAO, GTAO) can be used,
+as it is only necessary to provide the AO in one color channel of a texture,
+however the AO pass must be rendered prior to the color pass,
+which makes the post-processing pass somewhat of a pre-processing pass.
+Fot this purpose a new map (<code>aoPassMap</code>) is added to the material.
+The value of the map is used the same way as the <code>aoMap</code> value.</p>
+<p>Motivation to use the outputs AO pass directly in the material:
+The incident light of a fragment is composed of ambient light, direct light and indirect light
+Ambient Occlusion only occludes ambient light and environment light, but not direct light.
+Direct light is only occluded by geometry that casts shadows.
+And of course the emitted light should not be darkened by ambient occlusion either.
+This cannot be achieved if the AO post processing pass is simply blended with the diffuse render pass.</p>
+<p>Further extension work might be to use the output of an SSR pass or an HBIL pass from a previous frame.
+This would then create the possibility of SSR and IR depending on material properties such as <code>roughness</code>, <code>metalness</code> and <code>reflectivity</code>.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">MeshPostProcessingMaterial</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { MeshPostProcessingMaterial } from 'three/addons/materials/MeshPostProcessingMaterial.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshPostProcessingMaterial" translate="no">new <a href="#MeshPostProcessingMaterial">MeshPostProcessingMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new conditional line material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object with one or more properties
+defining the material's appearance. Any property of the material
+(including any property from inherited materials) can be passed
+in here. Color values can be passed any type of value accepted
+by <a href="Color.html#set">Color#set</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="aoPassMap" translate="no">.<a href="#aoPassMap">aoPassMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>A texture representing the AO pass.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="aoPassMapScale" translate="no">.<a href="#aoPassMapScale">aoPassMapScale</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The scale of the AO pass.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/materials/MeshPostProcessingMaterial.js" target="_blank" rel="noopener" translate="no">examples/jsm/materials/MeshPostProcessingMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

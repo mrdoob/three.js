@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CompressedTexture - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Texture.html">Texture</a> → </p>
+	<h1 translate="no">CompressedTexture</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Creates a texture based on data in compressed form.</p>
+<p>These texture are usually loaded with <a href="CompressedTextureLoader.html">CompressedTextureLoader</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CompressedTexture" translate="no">new <a href="#CompressedTexture">CompressedTexture</a><span class="signature">( mipmaps : <span class="param-type">Array.&lt;Object></span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, format : <span class="param-type">number</span>, type : <span class="param-type">number</span>, mapping : <span class="param-type">number</span>, wrapS : <span class="param-type">number</span>, wrapT : <span class="param-type">number</span>, magFilter : <span class="param-type">number</span>, minFilter : <span class="param-type">number</span>, anisotropy : <span class="param-type">number</span>, colorSpace : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new compressed texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mipmaps</strong>
+									</td>
+									<td class="description last">
+										<p>This array holds for all mipmaps (including the bases mip)
+the data and dimensions.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>format</strong>
+									</td>
+									<td class="description last">
+										<p>The texture format.</p>
+										<p>Default is <code>RGBAFormat</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The texture type.</p>
+										<p>Default is <code>UnsignedByteType</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mapping</strong>
+									</td>
+									<td class="description last">
+										<p>The texture mapping.</p>
+										<p>Default is <code>Texture.DEFAULT_MAPPING</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapS</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>wrapT</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapT value.</p>
+										<p>Default is <code>ClampToEdgeWrapping</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>magFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The mag filter value.</p>
+										<p>Default is <code>LinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The min filter value.</p>
+										<p>Default is <code>LinearMipmapLinearFilter</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>anisotropy</strong>
+									</td>
+									<td class="description last">
+										<p>The anisotropy value.</p>
+										<p>Default is <code>Texture.DEFAULT_ANISOTROPY</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>NoColorSpace</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="flipY" translate="no">.<a href="#flipY">flipY</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>If set to <code>true</code>, the texture is flipped along the vertical axis when
+uploaded to the GPU.</p>
+<p>Overwritten and set to <code>false</code> by default since it is not possible to
+flip compressed textures.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Texture.html#flipY">Texture#flipY</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="generateMipmaps" translate="no">.<a href="#generateMipmaps">generateMipmaps</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether to generate mipmaps (if possible) for a texture.</p>
+<p>Overwritten and set to <code>false</code> by default since it is not
+possible to generate mipmaps for compressed data. Mipmaps
+must be embedded in the compressed texture file.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Texture.html#generateMipmaps">Texture#generateMipmaps</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="image" translate="no">.<a href="#image">image</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The image property of a compressed texture just defines its dimensions.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Texture.html#image">Texture#image</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isCompressedTexture" translate="no">.<a href="#isCompressedTexture">isCompressedTexture</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mipmaps" translate="no">.<a href="#mipmaps">mipmaps</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>This array holds for all mipmaps (including the bases mip) the data and dimensions.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Texture.html#mipmaps">Texture#mipmaps</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/textures/CompressedTexture.js" target="_blank" rel="noopener" translate="no">src/textures/CompressedTexture.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

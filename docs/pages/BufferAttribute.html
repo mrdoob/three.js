@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BufferAttribute - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">BufferAttribute</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class stores data for an attribute (such as vertex positions, face
+indices, normals, colors, UVs, and any custom attributes ) associated with
+a geometry, which allows for more efficient passing of data to the GPU.</p>
+<p>When working with vector-like data, the <code>fromBufferAttribute( attribute, index )</code>
+helper methods on vector and color class might be helpful. E.g. <a href="Vector3.html#fromBufferAttribute">Vector3#fromBufferAttribute</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BufferAttribute" translate="no">new <a href="#BufferAttribute">BufferAttribute</a><span class="signature">( array : <span class="param-type">TypedArray</span>, itemSize : <span class="param-type">number</span>, normalized : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The array holding the attribute data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>itemSize</strong>
+									</td>
+									<td class="description last">
+										<p>The item size.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normalized</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the data are normalized or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="array" translate="no">.<a href="#array">array</a><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="description">
+						<p>The array holding the attribute data. It should have <code>itemSize * numVertices</code>
+elements, where <code>numVertices</code> is the number of vertices in the associated geometry.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Represents the number of items this buffer attribute stores. It is internally computed
+by dividing the <code>array</code> length by the <code>itemSize</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="gpuType" translate="no">.<a href="#gpuType">gpuType</a><span class="type-signature"> : <a href="global.html#FloatType">FloatType</a> | <a href="global.html#IntType">IntType</a></span> </h3>
+					<div class="description">
+						<p>Configures the bound GPU type for use in shaders.</p>
+<p>Note: this only has an effect for integer arrays and is not configurable for float arrays.
+For lower precision float types, use <code>Float16BufferAttribute</code>.</p>
+						<p>Default is <code>FloatType</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="id" translate="no">.<a href="#id">id</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The ID of the buffer attribute.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isBufferAttribute" translate="no">.<a href="#isBufferAttribute">isBufferAttribute</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="itemSize" translate="no">.<a href="#itemSize">itemSize</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of values of the array that should be associated with a particular vertex.
+For instance, if this attribute is storing a 3-component vector (such as a position,
+normal, or color), then the value should be <code>3</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the buffer attribute.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Flag to indicate that this attribute has changed and should be re-sent to
+the GPU. Set this to <code>true</code> when you modify the value of the array.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalized" translate="no">.<a href="#normalized">normalized</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Applies to integer data only. Indicates how the underlying data in the buffer maps to
+the values in the GLSL code. For instance, if <code>array</code> is an instance of <code>UInt16Array</code>,
+and <code>normalized</code> is <code>true</code>, the values <code>0 - +65535</code> in the array data will be mapped to
+<code>0.0f - +1.0f</code> in the GLSL attribute. If <code>normalized</code> is <code>false</code>, the values will be converted
+to floats unmodified, i.e. <code>65535</code> becomes <code>65535.0f</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateRanges" translate="no">.<a href="#updateRanges">updateRanges</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>This can be used to only update some components of stored vectors (for example, just the
+component related to color). Use the <code>addUpdateRange()</code> function to add ranges to this array.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="usage" translate="no">.<a href="#usage">usage</a><span class="type-signature"> : <a href="global.html#StaticDrawUsage">StaticDrawUsage</a> | <a href="global.html#DynamicDrawUsage">DynamicDrawUsage</a> | <a href="global.html#StreamDrawUsage">StreamDrawUsage</a> | <a href="global.html#StaticReadUsage">StaticReadUsage</a> | <a href="global.html#DynamicReadUsage">DynamicReadUsage</a> | <a href="global.html#StreamReadUsage">StreamReadUsage</a> | <a href="global.html#StaticCopyUsage">StaticCopyUsage</a> | <a href="global.html#DynamicCopyUsage">DynamicCopyUsage</a> | <a href="global.html#StreamCopyUsage">StreamCopyUsage</a></span> </h3>
+					<div class="description">
+						<p>Defines the intended usage pattern of the data store for optimization purposes.</p>
+<p>Note: After the initial use of a buffer, its usage cannot be changed. Instead,
+instantiate a new one and set the desired usage before the next render.</p>
+						<p>Default is <code>StaticDrawUsage</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="version" translate="no">.<a href="#version">version</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>A version number, incremented every time the <code>needsUpdate</code> is set to <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addUpdateRange" translate="no">.<a href="#addUpdateRange">addUpdateRange</a><span class="signature">( start : <span class="param-type">number</span>, count : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a range of data in the data array to be updated on the GPU.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>Position at which to start update.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The number of components to update.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="applyMatrix3" translate="no">.<a href="#applyMatrix3">applyMatrix3</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 3x3 matrix to the given attribute. Works with
+item size <code>2</code> and <code>3</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 4x4 matrix to the given attribute. Only works with
+item size <code>3</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyNormalMatrix" translate="no">.<a href="#applyNormalMatrix">applyNormalMatrix</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 3x3 normal matrix to the given attribute. Only works with
+item size <code>3</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The normal matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clearUpdateRanges" translate="no">.<a href="#clearUpdateRanges">clearUpdateRanges</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clears the update ranges.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new buffer attribute with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given buffer attribute to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copyArray" translate="no">.<a href="#copyArray">copyArray</a><span class="signature">( array : <span class="param-type">TypedArray | Array</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the given array data into this buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The array to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copyAt" translate="no">.<a href="#copyAt">copyAt</a><span class="signature">( index1 : <span class="param-type">number</span>, attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, index2 : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies a vector from the given buffer attribute to this one. The start
+and destination position in the attribute buffers are represented by the
+given indices.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index1</strong>
+									</td>
+									<td class="description last">
+										<p>The destination index into this buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute to copy from.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index2</strong>
+									</td>
+									<td class="description last">
+										<p>The source index into the given buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getComponent" translate="no">.<a href="#getComponent">getComponent</a><span class="signature">( index : <span class="param-type">number</span>, component : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the given component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>component</strong>
+									</td>
+									<td class="description last">
+										<p>The component index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The returned value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getW" translate="no">.<a href="#getW">getW</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the w component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The w component.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getX" translate="no">.<a href="#getX">getX</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the x component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The x component.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getY" translate="no">.<a href="#getY">getY</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the y component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The y component.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getZ" translate="no">.<a href="#getZ">getZ</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the z component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The z component.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="onUpload" translate="no">.<a href="#onUpload">onUpload</a><span class="signature">( callback : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given callback function that is executed after the Renderer has transferred
+the attribute array data to the GPU. Can be used to perform clean-up operations after
+the upload when attribute data are not needed anymore on the CPU side.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>onUpload()</code> callback.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="onUploadCallback" translate="no">.<a href="#onUploadCallback">onUploadCallback</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A callback function that is executed after the renderer has transferred the attribute
+array data to the GPU.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( value : <span class="param-type">TypedArray | Array</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given array data in the buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The array data to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset in this buffer attribute's array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setComponent" translate="no">.<a href="#setComponent">setComponent</a><span class="signature">( index : <span class="param-type">number</span>, component : <span class="param-type">number</span>, value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given value to the given component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>component</strong>
+									</td>
+									<td class="description last">
+										<p>The component index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setUsage" translate="no">.<a href="#setUsage">setUsage</a><span class="signature">( value : <span class="param-type"><a href="global.html#StaticDrawUsage">StaticDrawUsage</a> | <a href="global.html#DynamicDrawUsage">DynamicDrawUsage</a> | <a href="global.html#StreamDrawUsage">StreamDrawUsage</a> | <a href="global.html#StaticReadUsage">StaticReadUsage</a> | <a href="global.html#DynamicReadUsage">DynamicReadUsage</a> | <a href="global.html#StreamReadUsage">StreamReadUsage</a> | <a href="global.html#StaticCopyUsage">StaticCopyUsage</a> | <a href="global.html#DynamicCopyUsage">DynamicCopyUsage</a> | <a href="global.html#StreamCopyUsage">StreamCopyUsage</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the usage of this buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The usage to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this buffer attribute.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setW" translate="no">.<a href="#setW">setW</a><span class="signature">( index : <span class="param-type">number</span>, w : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the w component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setX" translate="no">.<a href="#setX">setX</a><span class="signature">( index : <span class="param-type">number</span>, x : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the x component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setXY" translate="no">.<a href="#setXY">setXY</a><span class="signature">( index : <span class="param-type">number</span>, x : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the x and y component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setXYZ" translate="no">.<a href="#setXYZ">setXYZ</a><span class="signature">( index : <span class="param-type">number</span>, x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the x, y and z component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the z component to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setXYZW" translate="no">.<a href="#setXYZW">setXYZW</a><span class="signature">( index : <span class="param-type">number</span>, x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, w : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the x, y, z and w component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the z component to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the w component to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setY" translate="no">.<a href="#setY">setY</a><span class="signature">( index : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the y component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setZ" translate="no">.<a href="#setZ">setZ</a><span class="signature">( index : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the z component of the vector at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the buffer attribute into JSON.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized buffer attribute.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="transformDirection" translate="no">.<a href="#transformDirection">transformDirection</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 4x4 matrix to the given attribute. Only works with
+item size <code>3</code> and with direction vectors.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js" target="_blank" rel="noopener" translate="no">src/core/BufferAttribute.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

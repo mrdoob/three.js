@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>RemapNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">RemapNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node allows to remap a node value from one range into another. E.g a value of
+<code>0.4</code> in the range <code>[ 0.3, 0.5 ]</code> should be remapped into the normalized range <code>[ 0, 1 ]</code>.
+<code>RemapNode</code> takes care of that and converts the original value of <code>0.4</code> to <code>0.5</code>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="RemapNode" translate="no">new <a href="#RemapNode">RemapNode</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, inLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, inHighNode : <span class="param-type"><a href="Node.html">Node</a></span>, outLowNode : <span class="param-type"><a href="Node.html">Node</a></span>, outHighNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new remap node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node that should be remapped.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>inLowNode</strong>
+									</td>
+									<td class="description last">
+										<p>The source or current lower bound of the range.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>inHighNode</strong>
+									</td>
+									<td class="description last">
+										<p>The source or current upper bound of the range.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>outLowNode</strong>
+									</td>
+									<td class="description last">
+										<p>The target lower bound of the range.</p>
+										<p>Default is <code>float(0)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>outHighNode</strong>
+									</td>
+									<td class="description last">
+										<p>The target upper bound of the range.</p>
+										<p>Default is <code>float(1)</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="doClamp" translate="no">.<a href="#doClamp">doClamp</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the node value should be clamped before
+remapping it to the target range.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="inHighNode" translate="no">.<a href="#inHighNode">inHighNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The source or current upper bound of the range.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="inLowNode" translate="no">.<a href="#inLowNode">inLowNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The source or current lower bound of the range.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="node" translate="no">.<a href="#node">node</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The node that should be remapped.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="outHighNode" translate="no">.<a href="#outHighNode">outHighNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The target upper bound of the range.</p>
+						<p>Default is <code>float(1)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="outLowNode" translate="no">.<a href="#outLowNode">outLowNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The target lower bound of the range.</p>
+						<p>Default is <code>float(0)</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/utils/RemapNode.js" target="_blank" rel="noopener" translate="no">src/nodes/utils/RemapNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

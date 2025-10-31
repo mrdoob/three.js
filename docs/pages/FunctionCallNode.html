@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>FunctionCallNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">FunctionCallNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This module represents the call of a <a href="FunctionNode.html">FunctionNode</a>. Developers are usually not confronted
+with this module since they use the predefined TSL syntax <code>wgslFn</code> and <code>glslFn</code> which encapsulate
+this logic.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="FunctionCallNode" translate="no">new <a href="#FunctionCallNode">FunctionCallNode</a><span class="signature">( functionNode : <span class="param-type"><a href="FunctionNode.html">FunctionNode</a></span>, parameters : <span class="param-type">Object.&lt;string, <a href="Node.html">Node</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new function call node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>functionNode</strong>
+									</td>
+									<td class="description last">
+										<p>The function node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The parameters for the function call.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="functionNode" translate="no">.<a href="#functionNode">functionNode</a><span class="type-signature"> : <a href="FunctionNode.html">FunctionNode</a></span> </h3>
+					<div class="description">
+						<p>The function node.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object.&lt;string, <a href="Node.html">Node</a>></span> </h3>
+					<div class="description">
+						<p>The parameters of the function call.</p>
+						<p>Default is <code>{}</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getMemberType" translate="no">.<a href="#getMemberType">getMemberType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the function node of this function call node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the member.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#getMemberType">TempNode#getMemberType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The type of the member.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the type of this function call node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#getNodeType">TempNode#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The type of this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getParameters" translate="no">.<a href="#getParameters">getParameters</a><span class="signature">()</span><span class="type-signature"> : Object.&lt;string, <a href="Node.html">Node</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the parameters of the function call node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The parameters of this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setParameters" translate="no">.<a href="#setParameters">setParameters</a><span class="signature">( parameters : <span class="param-type">Object.&lt;string, <a href="Node.html">Node</a>></span> )</span><span class="type-signature"> : <a href="FunctionCallNode.html">FunctionCallNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the parameters of the function call node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The parameters to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/code/FunctionCallNode.js" target="_blank" rel="noopener" translate="no">src/nodes/code/FunctionCallNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

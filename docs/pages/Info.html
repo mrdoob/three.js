@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Info - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Info</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This renderer module provides a series of statistical information
+about the GPU memory and the rendering process. Useful for debugging
+and monitoring.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Info" translate="no">new <a href="#Info">Info</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new info component.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="autoReset" translate="no">.<a href="#autoReset">autoReset</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether frame related metrics should automatically
+be resetted or not. This property should be set to <code>false</code>
+by apps which manage their own animation loop. They must
+then call <code>renderer.info.reset()</code> once per frame manually.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="calls" translate="no">.<a href="#calls">calls</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The number of render calls since the
+app has been started.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="compute" translate="no">.<a href="#compute">compute</a><span class="type-signature"> : Object</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Compute related metrics.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>calls</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of compute calls since the app has been started.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>frameCalls</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of compute calls of the current frame.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>timestamp</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The timestamp of the frame when using <code>renderer.computeAsync()</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="frame" translate="no">.<a href="#frame">frame</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The current frame ID. This ID is managed
+by <code>NodeFrame</code>.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="memory" translate="no">.<a href="#memory">memory</a><span class="type-signature"> : Object</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Memory related metrics.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>geometries</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of active geometries.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>frameCalls</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of active textures.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="render" translate="no">.<a href="#render">render</a><span class="type-signature"> : Object</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Render related metrics.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>calls</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of render calls since the app has been started.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>frameCalls</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of render calls of the current frame.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>drawCalls</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of draw calls of the current frame.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>triangles</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of rendered triangle primitives of the current frame.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>points</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of rendered point primitives of the current frame.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>lines</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of rendered line primitives of the current frame.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>timestamp</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The timestamp of the frame.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a complete reset of the object.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets frame related metrics.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, count : <span class="param-type">number</span>, instanceCount : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method should be executed per draw call and updates the corresponding metrics.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object that is going to be rendered.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The vertex or index count.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>instanceCount</strong>
+									</td>
+									<td class="description last">
+										<p>The instance count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/Info.js" target="_blank" rel="noopener" translate="no">src/renderers/common/Info.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

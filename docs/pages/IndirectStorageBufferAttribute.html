@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>IndirectStorageBufferAttribute - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="BufferAttribute.html">BufferAttribute</a> → <a href="StorageBufferAttribute.html">StorageBufferAttribute</a> → </p>
+	<h1 translate="no">IndirectStorageBufferAttribute</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This special type of buffer attribute is intended for compute shaders.
+It can be used to encode draw parameters for indirect draw calls.</p>
+<p>Note: This type of buffer attribute can only be used with <code>WebGPURenderer</code>
+and a WebGPU backend.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="IndirectStorageBufferAttribute" translate="no">new <a href="#IndirectStorageBufferAttribute">IndirectStorageBufferAttribute</a><span class="signature">( count : <span class="param-type">number | Uint32Array</span>, itemSize : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new storage buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The item count. It is also valid to pass a <code>Uint32Array</code> as an argument.
+The subsequent parameter is then obsolete.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>itemSize</strong>
+									</td>
+									<td class="description last">
+										<p>The item size.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isIndirectStorageBufferAttribute" translate="no">.<a href="#isIndirectStorageBufferAttribute">isIndirectStorageBufferAttribute</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/IndirectStorageBufferAttribute.js" target="_blank" rel="noopener" translate="no">src/renderers/common/IndirectStorageBufferAttribute.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

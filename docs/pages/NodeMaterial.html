@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → </p>
+	<h1 translate="no">NodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Base class for all node materials.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NodeMaterial" translate="no">new <a href="#NodeMaterial">NodeMaterial</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new node material.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="alphaTestNode" translate="no">.<a href="#alphaTestNode">alphaTestNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The alpha test of node materials is by default inferred from the <code>alphaTest</code>
+property. This node property allows to overwrite the default and define the
+alpha test with a node instead.</p>
+<p>If you don't want to overwrite the alpha test but modify the existing
+value instead, use <a href="TSL.html#materialAlphaTest">materialAlphaTest</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="aoNode" translate="no">.<a href="#aoNode">aoNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The lighting of node materials might be influenced by ambient occlusion.
+The default AO is inferred from an ambient occlusion map assigned to <code>aoMap</code>
+and the respective <code>aoMapIntensity</code>. This node property allows to overwrite
+the default and define the ambient occlusion with a custom node instead.</p>
+<p>If you don't want to overwrite the diffuse color but modify the existing
+values instead, use <a href="TSL.html#materialAO">materialAO</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="backdropAlphaNode" translate="no">.<a href="#backdropAlphaNode">backdropAlphaNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>This node allows to modulate the influence of <code>backdropNode</code> to the outgoing light.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="backdropNode" translate="no">.<a href="#backdropNode">backdropNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>This node can be used to implement a variety of filter-like effects. The idea is
+to store the current rendering into a texture e.g. via <code>viewportSharedTexture()</code>, use it
+to create an arbitrary effect and then assign the node composition to this property.
+Everything behind the object using this material will now be affected by a filter.</p>
+<pre><code class="language-js">const material = new NodeMaterial()
+material.transparent = true;
+// everything behind the object will be monochromatic
+material.backdropNode = saturation( viewportSharedTexture().rgb, 0 );
+</code></pre>
+<p>Backdrop computations are part of the lighting so only lit materials can use this property.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="castShadowNode" translate="no">.<a href="#castShadowNode">castShadowNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="description">
+						<p>This node can be used to influence how an object using this node material
+casts shadows. To apply a color to shadows, you can simply do:</p>
+<pre><code class="language-js">material.castShadowNode = vec4( 1, 0, 0, 1 );
+</code></pre>
+<p>Which can be nice to fake colored shadows of semi-transparent objects. It
+is also common to use the property with <code>Fn</code> function so checks are performed
+per fragment.</p>
+<pre><code class="language-js">materialCustomShadow.castShadowNode = Fn( () => {
+	hash( vertexIndex ).greaterThan( 0.5 ).discard();
+	return materialColor;
+} )();
+</code></pre>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="castShadowPositionNode" translate="no">.<a href="#castShadowPositionNode">castShadowPositionNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Allows to overwrite the geometry position used for shadow map projection which
+is by default <a href="TSL.html#positionLocal">positionLocal</a>, the vertex position in local space.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="colorNode" translate="no">.<a href="#colorNode">colorNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The diffuse color of node materials is by default inferred from the
+<code>color</code> and <code>map</code> properties. This node property allows to overwrite the default
+and define the diffuse color with a node instead.</p>
+<pre><code class="language-js">material.colorNode = color( 0xff0000 ); // define red color
+</code></pre>
+<p>If you don't want to overwrite the diffuse color but modify the existing
+values instead, use <a href="TSL.html#materialColor">materialColor</a>.</p>
+<pre><code class="language-js">material.colorNode = materialColor.mul( color( 0xff0000 ) ); // give diffuse colors a red tint
+</code></pre>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthNode" translate="no">.<a href="#depthNode">depthNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Allows to overwrite depth values in the fragment shader.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="envNode" translate="no">.<a href="#envNode">envNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The environment of node materials can be defined by an environment
+map assigned to the <code>envMap</code> property or by <code>Scene.environment</code>
+if the node material is a PBR material. This node property allows to overwrite
+the default behavior and define the environment with a custom node.</p>
+<pre><code class="language-js">material.envNode = pmremTexture( renderTarget.texture );
+</code></pre>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="fog" translate="no">.<a href="#fog">fog</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether this material is affected by fog or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="fragmentNode" translate="no">.<a href="#fragmentNode">fragmentNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="description">
+						<p>This node property can be used if you need complete freedom in implementing
+the fragment shader. Assigning a node will replace the built-in material
+logic used in the fragment stage.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="geometryNode" translate="no">.<a href="#geometryNode">geometryNode</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>This node property is intended for logic which modifies geometry data once or per animation step.
+Apps usually place such logic randomly in initialization routines or in the animation loop.
+<code>geometryNode</code> is intended as a dedicated API so there is an intended spot where geometry modifications
+can be implemented.</p>
+<p>The idea is to assign a <code>Fn</code> definition that holds the geometry modification logic. A typical example
+would be a GPU based particle system that provides a node material for usage on app level. The particle
+simulation would be implemented as compute shaders and managed inside a <code>Fn</code> function. This function is
+eventually assigned to <code>geometryNode</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="hardwareClipping" translate="no">.<a href="#hardwareClipping">hardwareClipping</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether this material uses hardware clipping or not.
+This property is managed by the engine and should not be
+modified by apps.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isNodeMaterial" translate="no">.<a href="#isNodeMaterial">isNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lights" translate="no">.<a href="#lights">lights</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether this material is affected by lights or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lightsNode" translate="no">.<a href="#lightsNode">lightsNode</a><span class="type-signature"> : <a href="LightsNode.html">LightsNode</a></span> </h3>
+					<div class="description">
+						<p>Node materials which set their <code>lights</code> property to <code>true</code>
+are affected by all lights of the scene. Sometimes selective
+lighting is wanted which means only <em>some</em> lights in the scene
+affect a material. This can be achieved by creating an instance
+of <a href="LightsNode.html">LightsNode</a> with a list of selective
+lights and assign the node to this property.</p>
+<pre><code class="language-js">const customLightsNode = lights( [ light1, light2 ] );
+material.lightsNode = customLightsNode;
+</code></pre>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maskNode" translate="no">.<a href="#maskNode">maskNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;bool></span> </h3>
+					<div class="description">
+						<p>Discards the fragment if the mask value is <code>false</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mrtNode" translate="no">.<a href="#mrtNode">mrtNode</a><span class="type-signature"> : <a href="MRTNode.html">MRTNode</a></span> </h3>
+					<div class="description">
+						<p>MRT configuration is done on renderer or pass level. This node allows to
+overwrite what values are written into MRT targets on material level. This
+can be useful for implementing selective FX features that should only affect
+specific objects.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalNode" translate="no">.<a href="#normalNode">normalNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The normals of node materials are by default inferred from the <code>normalMap</code>/<code>normalScale</code>
+or <code>bumpMap</code>/<code>bumpScale</code> properties. This node property allows to overwrite the default
+and define the normals with a node instead.</p>
+<p>If you don't want to overwrite the normals but modify the existing values instead,
+use <a href="TSL.html#materialNormal">materialNormal</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="opacityNode" translate="no">.<a href="#opacityNode">opacityNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The opacity of node materials is by default inferred from the <code>opacity</code>
+and <code>alphaMap</code> properties. This node property allows to overwrite the default
+and define the opacity with a node instead.</p>
+<p>If you don't want to overwrite the opacity but modify the existing
+value instead, use <a href="TSL.html#materialOpacity">materialOpacity</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="outputNode" translate="no">.<a href="#outputNode">outputNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="description">
+						<p>This node can be used to define the final output of the material.</p>
+<p>TODO: Explain the differences to <code>fragmentNode</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="positionNode" translate="no">.<a href="#positionNode">positionNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The local vertex positions are computed based on multiple factors like the
+attribute data, morphing or skinning. This node property allows to overwrite
+the default and define local vertex positions with nodes instead.</p>
+<p>If you don't want to overwrite the vertex positions but modify the existing
+values instead, use <a href="TSL.html#positionLocal">positionLocal</a>.</p>
+<pre><code class="language-js">material.positionNode = positionLocal.add( displace );
+</code></pre>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="receivedShadowNode" translate="no">.<a href="#receivedShadowNode">receivedShadowNode</a><span class="type-signature"> : function | <a href="FunctionNode.html">FunctionNode</a>.&lt;vec4></span> </h3>
+					<div class="description">
+						<p>This node can be used to influence how an object using this node material
+receive shadows.</p>
+<pre><code class="language-js">const totalShadows = float( 1 ).toVar();
+material.receivedShadowNode = Fn( ( [ shadow ] ) => {
+	totalShadows.mulAssign( shadow );
+	//return float( 1 ); // bypass received shadows
+	return shadow.mix( color( 0xff0000 ), 1 ); // modify shadow color
+} );</code></pre>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="receivedShadowPositionNode" translate="no">.<a href="#receivedShadowPositionNode">receivedShadowPositionNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Allows to overwrite the position used for shadow map rendering which
+is by default <a href="TSL.html#positionWorld">positionWorld</a>, the vertex position
+in world space.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Represents the type of the node material.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Material.html#type">Material#type</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="vertexNode" translate="no">.<a href="#vertexNode">vertexNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="description">
+						<p>This node property can be used if you need complete freedom in implementing
+the vertex shader. Assigning a node will replace the built-in material logic
+used in the vertex stage.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="build" translate="no">.<a href="#build">build</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Builds this material with the given node builder.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="NodeMaterial.html">NodeMaterial</a></span> )</span><span class="type-signature"> : <a href="NodeMaterial.html">NodeMaterial</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the properties of the given node material to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The material to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Material.html#copy">Material#copy</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node material.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="customProgramCacheKey" translate="no">.<a href="#customProgramCacheKey">customProgramCacheKey</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Allows to define a custom cache key that influence the material key computation
+for render objects.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Material.html#customProgramCacheKey">Material#customProgramCacheKey</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The custom cache key.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDefaultValues" translate="no">.<a href="#setDefaultValues">setDefaultValues</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Most classic material types have a node pendant e.g. for <code>MeshBasicMaterial</code>
+there is <code>MeshBasicNodeMaterial</code>. This utility method is intended for
+defining all material properties of the classic type in the node type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material to copy properties with their values to this node material.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the vertex and fragment stage of this node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setupClipping" translate="no">.<a href="#setupClipping">setupClipping</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="ClippingNode.html">ClippingNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the clipping node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clipping node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupDepth" translate="no">.<a href="#setupDepth">setupDepth</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the depth of this material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setupDiffuseColor" translate="no">.<a href="#setupDiffuseColor">setupDiffuseColor</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the computation of the material's diffuse color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setupEnvironment" translate="no">.<a href="#setupEnvironment">setupEnvironment</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the environment node from the material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The environment node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupFog" translate="no">.<a href="#setupFog">setupFog</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, outputNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setup the fog.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>outputNode</strong>
+									</td>
+									<td class="description last">
+										<p>The existing output node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupHardwareClipping" translate="no">.<a href="#setupHardwareClipping">setupHardwareClipping</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the hardware clipping if available on the current device.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setupLightMap" translate="no">.<a href="#setupLightMap">setupLightMap</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the light map node from the material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The light map node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLighting" translate="no">.<a href="#setupLighting">setupLighting</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the outgoing light node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The outgoing light node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLightingModel" translate="no">.<a href="#setupLightingModel">setupLightingModel</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="LightingModel.html">LightingModel</a></span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This method should be implemented by most derived materials
+since it defines the material's lighting model.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lighting model.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLights" translate="no">.<a href="#setupLights">setupLights</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="LightsNode.html">LightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the lights node based on the scene, environment and material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lights node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupModelViewProjection" translate="no">.<a href="#setupModelViewProjection">setupModelViewProjection</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the position in clip space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position in view space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupNormal" translate="no">.<a href="#setupNormal">setupNormal</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the normal node from the material.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The normal node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupObserver" translate="no">.<a href="#setupObserver">setupObserver</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="NodeMaterialObserver.html">NodeMaterialObserver</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups a node material observer with the given builder.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node material observer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupOutgoingLight" translate="no">.<a href="#setupOutgoingLight">setupOutgoingLight</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the outgoing light node variable</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The outgoing light node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupOutput" translate="no">.<a href="#setupOutput">setupOutput</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, outputNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the output node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>outputNode</strong>
+									</td>
+									<td class="description last">
+										<p>The existing output node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupPosition" translate="no">.<a href="#setupPosition">setupPosition</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the computation of the position in local space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position in local space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupPositionView" translate="no">.<a href="#setupPositionView">setupPositionView</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the position node in view space. This method exists
+so derived node materials can modify the implementation e.g. sprite materials.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position in view space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupPremultipliedAlpha" translate="no">.<a href="#setupPremultipliedAlpha">setupPremultipliedAlpha</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, outputNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups premultiplied alpha.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>outputNode</strong>
+									</td>
+									<td class="description last">
+										<p>The existing output node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupVariants" translate="no">.<a href="#setupVariants">setupVariants</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Abstract interface method that can be implemented by derived materials
+to setup material-specific node variables.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setupVertex" translate="no">.<a href="#setupVertex">setupVertex</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the logic for the vertex stage.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position in clip space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">( meta : <span class="param-type">Object | string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes this material to JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>meta</strong>
+									</td>
+									<td class="description last">
+										<p>The meta information for serialization.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Material.html#toJSON">Material#toJSON</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The serialized node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/NodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/NodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

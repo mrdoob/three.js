@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Volume - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Volume</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class had been written to handle the output of the <a href="NRRDLoader.html">NRRDLoader</a>.
+It contains a volume of data and information about it. For now it only handles 3 dimensional data.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">Volume</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { Volume } from 'three/addons/misc/Volume.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Volume" translate="no">new <a href="#Volume">Volume</a><span class="signature">( xLength : <span class="param-type">number</span>, yLength : <span class="param-type">number</span>, zLength : <span class="param-type">number</span>, type : <span class="param-type">string</span>, arrayBuffer : <span class="param-type">ArrayBuffer</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new volume.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>xLength</strong>
+									</td>
+									<td class="description last">
+										<p>Width of the volume.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>yLength</strong>
+									</td>
+									<td class="description last">
+										<p>Length of the volume.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>zLength</strong>
+									</td>
+									<td class="description last">
+										<p>Depth of the volume.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type of data (uint8, uint16, ...).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>arrayBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer with volume data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="RASDimensions" translate="no">.<a href="#RASDimensions">RASDimensions</a><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="description">
+						<p>This array holds the dimensions of the volume in the RAS space</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="axisOrder" translate="no">.<a href="#axisOrder">axisOrder</a><span class="type-signature"> : Array.&lt;string></span> </h3>
+					<div class="description">
+						<p>The order of the Axis dictated by the NRRD header</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="data" translate="no">.<a href="#data">data</a><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="description">
+						<p>The data of the volume.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="inverseMatrix" translate="no">.<a href="#inverseMatrix">inverseMatrix</a><span class="type-signature"> : Martrix3</span> </h3>
+					<div class="description">
+						<p>The RAS to IJK matrix.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lowerThreshold" translate="no">.<a href="#lowerThreshold">lowerThreshold</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The voxels with values under this threshold won't appear in the slices.
+If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrix" translate="no">.<a href="#matrix">matrix</a><span class="type-signature"> : Martrix3</span> </h3>
+					<div class="description">
+						<p>The IJK to RAS matrix.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="offset" translate="no">.<a href="#offset">offset</a><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="description">
+						<p>Offset of the volume in the RAS coordinate system</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="segmentation" translate="no">.<a href="#segmentation">segmentation</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to use segmentation mode or not.
+It can load 16-bits nrrds correctly.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sliceList" translate="no">.<a href="#sliceList">sliceList</a><span class="type-signature"> : Array.&lt;<a href="VolumeSlice.html">VolumeSlice</a>></span> </h3>
+					<div class="description">
+						<p>The list of all the slices associated to this volume</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="spacing" translate="no">.<a href="#spacing">spacing</a><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="description">
+						<p>Spacing to apply to the volume from IJK to RAS coordinate system</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="upperThreshold" translate="no">.<a href="#upperThreshold">upperThreshold</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The voxels with values over this threshold won't appear in the slices.
+If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="xLength" translate="no">.<a href="#xLength">xLength</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Width of the volume in the IJK coordinate system.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="yLength" translate="no">.<a href="#yLength">yLength</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Height of the volume in the IJK coordinate system.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="zLength" translate="no">.<a href="#zLength">zLength</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Depth of the volume in the IJK coordinate system.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="access" translate="no">.<a href="#access">access</a><span class="signature">( i : <span class="param-type">number</span>, j : <span class="param-type">number</span>, k : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Compute the index in the data array corresponding to the given coordinates in IJK system.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>i</strong>
+									</td>
+									<td class="description last">
+										<p>First coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>j</strong>
+									</td>
+									<td class="description last">
+										<p>Second coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>k</strong>
+									</td>
+									<td class="description last">
+										<p>Third coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The index.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="computeMinMax" translate="no">.<a href="#computeMinMax">computeMinMax</a><span class="signature">()</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Compute the minimum and the maximum of the data in the volume.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The min/max data as <code>[min,max]</code>.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="extractPerpendicularPlane" translate="no">.<a href="#extractPerpendicularPlane">extractPerpendicularPlane</a><span class="signature">( axis : <span class="param-type">'x' | 'y' | 'z'</span>, RASIndex : <span class="param-type">number</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Compute the orientation of the slice and returns all the information relative to the geometry such as sliceAccess,
+the plane matrix (orientation and position in RAS coordinate) and the dimensions of the plane in both coordinate system.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The normal axis to the slice.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>RASIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the slice.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object containing all the useful information on the geometry of the slice.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="extractSlice" translate="no">.<a href="#extractSlice">extractSlice</a><span class="signature">( axis : <span class="param-type">'x' | 'y' | 'z'</span>, index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="VolumeSlice.html">VolumeSlice</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a slice corresponding to the given axis and index.
+The coordinate are given in the Right Anterior Superior coordinate format.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The normal axis to the slice.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the slice.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The extracted slice.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getData" translate="no">.<a href="#getData">getData</a><span class="signature">( i : <span class="param-type">number</span>, j : <span class="param-type">number</span>, k : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Shortcut for data[access(i,j,k)].</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>i</strong>
+									</td>
+									<td class="description last">
+										<p>First coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>j</strong>
+									</td>
+									<td class="description last">
+										<p>Second coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>k</strong>
+									</td>
+									<td class="description last">
+										<p>Third coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The value in the data array.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="map" translate="no">.<a href="#map">map</a><span class="signature">( functionToMap : <span class="param-type">function</span>, context : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Volume.html">Volume</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Apply a function to all the voxels, be careful, the value will be replaced.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>functionToMap</strong>
+									</td>
+									<td class="description last">
+										<p>A function to apply to every voxel, will be called with the following parameters:
+value of the voxel, index of the voxel, the data (TypedArray).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>context</strong>
+									</td>
+									<td class="description last">
+										<p>You can specify a context in which call the function, default if this Volume.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="repaintAllSlices" translate="no">.<a href="#repaintAllSlices">repaintAllSlices</a><span class="signature">()</span><span class="type-signature"> : <a href="Volume.html">Volume</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Call repaint on all the slices extracted from this volume.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="VolumeSlice.html#repaint">VolumeSlice#repaint</a></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this volume.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="reverseAccess" translate="no">.<a href="#reverseAccess">reverseAccess</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Retrieve the IJK coordinates of the voxel corresponding of the given index in the data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the voxel.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The IJK coordinates as <code>[x,y,z]</code>.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/Volume.js" target="_blank" rel="noopener" translate="no">examples/jsm/misc/Volume.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

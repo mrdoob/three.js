@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>KTX2Loader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">KTX2Loader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for KTX 2.0 GPU Texture containers.</p>
+<p>KTX 2.0 is a container format for various GPU texture formats. The loader supports Basis Universal GPU textures,
+which can be quickly transcoded to a wide variety of GPU texture compression formats. While KTX 2.0 also allows
+other hardware-specific formats, this loader does not yet parse them.</p>
+<p>This loader parses the KTX 2.0 container and transcodes to a supported GPU compressed texture format.
+The required WASM transcoder and JS wrapper are available from the <code>examples/jsm/libs/basis</code> directory.</p>
+<p>This loader relies on Web Assembly which is not supported in older browsers.</p>
+<p>References:</p>
+<ul>
+<li><a href="http://github.khronos.org/KTX-Specification/">KTX specification</a></li>
+<li><a href="https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor">DFD</a></li>
+<li><a href="https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0">BasisU HDR</a></li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new KTX2Loader();
+loader.setTranscoderPath( 'examples/jsm/libs/basis/' );
+loader.detectSupport( renderer );
+const texture = loader.loadAsync( 'diffuse.ktx2' );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">KTX2Loader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="KTX2Loader" translate="no">new <a href="#KTX2Loader">KTX2Loader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new KTX2 loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="detectSupport" translate="no">.<a href="#detectSupport">detectSupport</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span><span class="type-signature"> : <a href="KTX2Loader.html">KTX2Loader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Detects hardware support for available compressed texture formats, to determine
+the output format for the transcoder. Must be called before loading a texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="detectSupportAsync" translate="no">.<a href="#detectSupportAsync">detectSupportAsync</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Async version of <a href="KTX2Loader.html#detectSupport">KTX2Loader#detectSupport</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the support has been detected.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources. This method should be called
+when the loader is no longer required.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URL and passes the loaded KTX2 texture
+to the <code>onLoad()</code> callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : Promise</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given KTX2 data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw KTX2 data as an array buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading/parsing process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the parsing has been finished.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setTranscoderPath" translate="no">.<a href="#setTranscoderPath">setTranscoderPath</a><span class="signature">( path : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="KTX2Loader.html">KTX2Loader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the transcoder path.</p>
+<p>The WASM transcoder and JS wrapper are available from the <code>examples/jsm/libs/basis</code> directory.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The transcoder path to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setWorkerLimit" translate="no">.<a href="#setWorkerLimit">setWorkerLimit</a><span class="signature">( workerLimit : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="KTX2Loader.html">KTX2Loader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the maximum number of Web Workers to be allocated by this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>workerLimit</strong>
+									</td>
+									<td class="description last">
+										<p>The worker limit.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/KTX2Loader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/KTX2Loader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>RapierPhysics - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">RapierPhysics</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Can be used to include Rapier as a Physics engine into
+<code>three.js</code> apps. The API can be initialized via:</p>
+<p>The component automatically imports Rapier from a CDN so make sure
+to use the component with an active Internet connection.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const physics = await RapierPhysics();
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">RapierPhysics</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';</code></pre>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addHeightfield" translate="no">.<a href="#addHeightfield">addHeightfield</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, width : <span class="param-type">number</span>, depth : <span class="param-type">number</span>, heights : <span class="param-type">Float32Array</span>, scale : <span class="param-type">Object</span> )</span><span class="type-signature"> : RigidBody</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a heightfield terrain to the physics simulation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The Three.js mesh representing the terrain.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The number of vertices along the width (x-axis) of the heightfield.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>The number of vertices along the depth (z-axis) of the heightfield.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>heights</strong>
+									</td>
+									<td class="description last">
+										<p>Array of height values for each vertex in the heightfield.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scale</strong>
+									</td>
+									<td class="description last">
+										<p>Scale factors for the heightfield dimensions.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>Scale factor for width.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>Scale factor for height.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>Scale factor for depth.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created Rapier rigid body for the heightfield.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addMesh" translate="no">.<a href="#addMesh">addMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, mass : <span class="param-type">number</span>, restitution : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given mesh to this physics simulation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to add.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mass</strong>
+									</td>
+									<td class="description last">
+										<p>The mass in kg of the mesh.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>restitution</strong>
+									</td>
+									<td class="description last">
+										<p>The restitution/friction of the mesh.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="addScene" translate="no">.<a href="#addScene">addScene</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given scene to this physics simulation. Only meshes with a
+<code>physics</code> object in their <a href="Object3D.html#userData">Object3D#userData</a> field will be honored.
+The object can be used to store the mass and restitution of the mesh. E.g.:</p>
+<pre><code class="language-js">box.userData.physics = { mass: 1, restitution: 0 };
+</code></pre>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or any type of 3D object to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="removeMesh" translate="no">.<a href="#removeMesh">removeMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the given mesh from this physics simulation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to remove.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setMeshPosition" translate="no">.<a href="#setMeshPosition">setMeshPosition</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, position : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, index : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Set the position of the given mesh which is part of the physics simulation. Calling this
+method will reset the current simulated velocity of the mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to update the position for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>position</strong>
+									</td>
+									<td class="description last">
+										<p>The new position.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>If the mesh is instanced, the index represents the instanced ID.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setMeshVelocity" translate="no">.<a href="#setMeshVelocity">setMeshVelocity</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, velocity : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, index : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Set the velocity of the given mesh which is part of the physics simulation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to update the velocity for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>velocity</strong>
+									</td>
+									<td class="description last">
+										<p>The new velocity.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>If the mesh is instanced, the index represents the instanced ID.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/physics/RapierPhysics.js" target="_blank" rel="noopener" translate="no">examples/jsm/physics/RapierPhysics.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

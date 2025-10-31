@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LDrawLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">LDrawLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for the LDraw format.</p>
+<p>[LDraw](https://ldraw.org/} (LEGO Draw) is an <a href="https://ldraw.org/article/218.html)">open format specification</a> from 'three/addons/loaders/LDrawLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LDrawLoader" translate="no">new <a href="#LDrawLoader">LDrawLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new LDraw loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addDefaultMaterials" translate="no">.<a href="#addDefaultMaterials">addDefaultMaterials</a><span class="signature">()</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the loader with default materials.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addMaterial" translate="no">.<a href="#addMaterial">addMaterial</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a single material to the loader's material library.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addMaterials" translate="no">.<a href="#addMaterials">addMaterials</a><span class="signature">( materials : <span class="param-type">Array.&lt;<a href="Material.html">Material</a>></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a list of materials to the loader's material library.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>materials</strong>
+									</td>
+									<td class="description last">
+										<p>The materials to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clearMaterials" translate="no">.<a href="#clearMaterials">clearMaterials</a><span class="signature">()</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clears the loader's material library.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMainEdgeMaterial" translate="no">.<a href="#getMainEdgeMaterial">getMainEdgeMaterial</a><span class="signature">()</span><span class="type-signature"> : <a href="Material.html">Material</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the material for the edges main LDraw color.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The material. Returns <code>null</code> if no material has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMainMaterial" translate="no">.<a href="#getMainMaterial">getMainMaterial</a><span class="signature">()</span><span class="type-signature"> : <a href="Material.html">Material</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the Material for the main LDraw color.</p>
+<p>For an already loaded LDraw asset, returns the Material associated with the main color code.
+This method can be useful to modify the main material of a model or part that exposes it.</p>
+<p>The main color code is the standard way to color an LDraw part. It is '16' for triangles and
+'24' for edges. Usually a complete model will not expose the main color (that is, no part
+uses the code '16' at the top level, because they are assigned other specific colors) An LDraw
+part file on the other hand will expose the code '16' to be colored, and can have additional
+fixed colors.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The material. Returns <code>null</code> if no material has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMaterial" translate="no">.<a href="#getMaterial">getMaterial</a><span class="signature">( colorCode : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Material.html">Material</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a material for the given color code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>colorCode</strong>
+									</td>
+									<td class="description last">
+										<p>The color code.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The material. Returns <code>null</code> if no material has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URL and passes the loaded LDraw asset
+to the <code>onLoad()</code> callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( text : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given LDraw data and returns the resulting group.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>text</strong>
+									</td>
+									<td class="description last">
+										<p>The raw VRML data as a string.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading/parsing process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="preloadMaterials" translate="no">.<a href="#preloadMaterials">preloadMaterials</a><span class="signature">( url : <span class="param-type">string</span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>This async method preloads materials from a single LDraw file. In the official
+parts library there is a special file which is loaded always the first (LDConfig.ldr)
+and contains all the standard color codes. This method is intended to be used with
+not packed files, for example in an editor where materials are preloaded and parts
+are loaded on demand.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>Path of the LDraw materials asset.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the preload has finished.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setConditionalLineMaterial" translate="no">.<a href="#setConditionalLineMaterial">setConditionalLineMaterial</a><span class="signature">( type : <span class="param-type">LDrawConditionalLineMaterial.constructor | LDrawConditionalLineNodeMaterial.constructor</span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the conditional line material type which depends on the used renderer.
+Use <a href="LDrawConditionalLineMaterial.html">LDrawConditionalLineMaterial</a> when using <code>WebGLRenderer</code> and
+LDrawConditionalLineNodeMaterial when using <code>WebGPURenderer</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The conditional line material type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFileMap" translate="no">.<a href="#setFileMap">setFileMap</a><span class="signature">( fileMap : <span class="param-type">Object.&lt;string, string></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets a map which maps referenced library filenames to new filenames.
+If a fileMap is not specified (the default), library parts will be accessed by trial and
+error in subfolders 'parts', 'p' and 'models'.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>fileMap</strong>
+									</td>
+									<td class="description last">
+										<p>The file map to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setMaterials" translate="no">.<a href="#setMaterials">setMaterials</a><span class="signature">( materials : <span class="param-type">Array.&lt;<a href="Material.html">Material</a>></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the loader's material library. This method clears existing
+material definitions.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>materials</strong>
+									</td>
+									<td class="description last">
+										<p>The materials to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setPartsLibraryPath" translate="no">.<a href="#setPartsLibraryPath">setPartsLibraryPath</a><span class="signature">( path : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method must be called prior to <code>load()</code> unless the model to load does not reference
+library parts (usually it will be a model with all its parts packed in a single file).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>Path to library parts files to load referenced parts from.
+This is different from Loader.setPath, which indicates the path to load the main asset from.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/LDrawLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/LDrawLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

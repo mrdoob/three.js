@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PointShadowNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="ShadowBaseNode.html">ShadowBaseNode</a> → <a href="ShadowNode.html">ShadowNode</a> → </p>
+	<h1 translate="no">PointShadowNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents the shadow implementation for point light nodes.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PointShadowNode" translate="no">new <a href="#PointShadowNode">PointShadowNode</a><span class="signature">( light : <span class="param-type"><a href="PointLight.html">PointLight</a></span>, shadow : <span class="param-type"><a href="PointLightShadow.html">PointLightShadow</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new point shadow node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow casting point light.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadow</strong>
+									</td>
+									<td class="description last">
+										<p>An optional point light shadow.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getShadowFilterFn" translate="no">.<a href="#getShadowFilterFn">getShadowFilterFn</a><span class="signature">( type : <span class="param-type">number</span> )</span><span class="type-signature"> : function</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation to return point light shadow specific
+filtering functions.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowNode.html#getShadowFilterFn">ShadowNode#getShadowFilterFn</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The filtering function.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="renderShadow" translate="no">.<a href="#renderShadow">renderShadow</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation with point light specific
+rendering code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowNode.html#renderShadow">ShadowNode#renderShadow</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupShadowCoord" translate="no">.<a href="#setupShadowCoord">setupShadowCoord</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, shadowPosition : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation so the unaltered shadow position is used.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadowPosition</strong>
+									</td>
+									<td class="description last">
+										<p>A node representing the shadow position.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowNode.html#setupShadowCoord">ShadowNode#setupShadowCoord</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shadow coordinates.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupShadowFilter" translate="no">.<a href="#setupShadowFilter">setupShadowFilter</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation to only use point light specific
+shadow filter functions.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>inputs</strong>
+									</td>
+									<td class="description last">
+										<p>A configuration object that defines the shadow filtering.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>filterFn</strong>
+									</td>
+									<td class="description last">
+										<p>This function defines the filtering type of the shadow map e.g. PCF.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadowTexture</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the shadow map's texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depthTexture</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the shadow map's texture data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadowCoord</strong>
+									</td>
+									<td class="description last">
+										<p>Shadow coordinates which are used to sample from the shadow map.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadow</strong>
+									</td>
+									<td class="description last">
+										<p>The light shadow.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowNode.html#setupShadowFilter">ShadowNode#setupShadowFilter</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result node of the shadow filtering.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/lighting/PointShadowNode.js" target="_blank" rel="noopener" translate="no">src/nodes/lighting/PointShadowNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

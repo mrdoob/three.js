@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Euler - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Euler</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A class representing Euler angles.</p>
+<p>Euler angles describe a rotational transformation by rotating an object on
+its various axes in specified amounts per axis, and a specified axis
+order.</p>
+<p>Iterating through an instance will yield its components (x, y, z,
+order) in the corresponding order.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const a = new THREE.Euler( 0, 1, 1.57, 'XYZ' );
+const b = new THREE.Vector3( 1, 0, 1 );
+b.applyEuler(a);
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Euler" translate="no">new <a href="#Euler">Euler</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, order : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new euler instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The angle of the x axis in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The angle of the y axis in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The angle of the z axis in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>order</strong>
+									</td>
+									<td class="description last">
+										<p>A string representing the order that the rotations are applied.</p>
+										<p>Default is <code>Euler.DEFAULT_ORDER</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isEuler" translate="no">.<a href="#isEuler">isEuler</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="order" translate="no">.<a href="#order">order</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>A string representing the order that the rotations are applied.</p>
+						<p>Default is <code>'XYZ'</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="x" translate="no">.<a href="#x">x</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The angle of the x axis in radians.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="y" translate="no">.<a href="#y">y</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The angle of the y axis in radians.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="z" translate="no">.<a href="#z">z</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The angle of the z axis in radians.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".DEFAULT_ORDER" translate="no">.<a href="#.DEFAULT_ORDER">DEFAULT_ORDER</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The default Euler angle order.</p>
+						<p>Default is <code>'XYZ'</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new Euler instance with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( euler : <span class="param-type"><a href="Euler.html">Euler</a></span> )</span><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given Euler instance to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>euler</strong>
+									</td>
+									<td class="description last">
+										<p>The Euler instance to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Euler instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( euler : <span class="param-type"><a href="Euler.html">Euler</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this Euler instance is equal with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>euler</strong>
+									</td>
+									<td class="description last">
+										<p>The Euler instance to test for equality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this Euler instance is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromArray" translate="no">.<a href="#fromArray">fromArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number, number, number, ?string></span> )</span><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this Euler instance's components to values from the given array. The first three
+entries of the array are assign to the x,y and z components. An optional fourth entry
+defines the Euler order.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding the Euler component values.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Euler instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="reorder" translate="no">.<a href="#reorder">reorder</a><span class="signature">( newOrder : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets the euler angle with a new order by creating a quaternion from this
+euler angle and then setting this euler angle with the quaternion and the
+new order.</p>
+<p>Warning: This discards revolution information.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>newOrder</strong>
+									</td>
+									<td class="description last">
+										<p>A string representing the new order that the rotations are applied.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Euler instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, order : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the Euler components.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The angle of the x axis in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The angle of the y axis in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The angle of the z axis in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>order</strong>
+									</td>
+									<td class="description last">
+										<p>A string representing the order that the rotations are applied.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Euler instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromQuaternion" translate="no">.<a href="#setFromQuaternion">setFromQuaternion</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, order : <span class="param-type">string</span>, update : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the angles of this Euler instance from a normalized quaternion.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>A normalized Quaternion.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>order</strong>
+									</td>
+									<td class="description last">
+										<p>A string representing the order that the rotations are applied.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>update</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the internal <code>onChange</code> callback should be executed or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Euler instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromRotationMatrix" translate="no">.<a href="#setFromRotationMatrix">setFromRotationMatrix</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span>, order : <span class="param-type">string</span>, update : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the angles of this Euler instance from a pure rotation matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>A 4x4 matrix of which the upper 3x3 of matrix is a pure rotation matrix (i.e. unscaled).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>order</strong>
+									</td>
+									<td class="description last">
+										<p>A string representing the order that the rotations are applied.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>update</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the internal <code>onChange</code> callback should be executed or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Euler instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromVector3" translate="no">.<a href="#setFromVector3">setFromVector3</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, order : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the angles of this Euler instance from the given vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>order</strong>
+									</td>
+									<td class="description last">
+										<p>A string representing the order that the rotations are applied.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Euler instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toArray" translate="no">.<a href="#toArray">toArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number, number, number, string></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number, number, number, string></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Writes the components of this Euler instance to the given array. If no array is provided,
+the method returns a new instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The target array holding the Euler components.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first element in the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The Euler components.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Euler.js" target="_blank" rel="noopener" translate="no">src/math/Euler.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

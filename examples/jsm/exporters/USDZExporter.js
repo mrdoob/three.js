@@ -794,13 +794,13 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			'uniform token info:id = "UsdPrimvarReader_float2"'
 		);
 		primvarReaderNode.addProperty( 'float2 inputs:fallback = (0.0, 0.0)' );
-		primvarReaderNode.addProperty( `token inputs:varname = "${uv}"` );
+		primvarReaderNode.addProperty( `string inputs:varname = "${uv}"` );
 		primvarReaderNode.addProperty( 'float2 outputs:result' );
 
 		const transform2dNode = new USDNode( `Transform2d_${mapType}`, 'Shader' );
 		transform2dNode.addProperty( 'uniform token info:id = "UsdTransform2d"' );
 		transform2dNode.addProperty(
-			`token inputs:in.connect = </Materials/Material_${material.id}/PrimvarReader_${mapType}.outputs:result>`
+			`float2 inputs:in.connect = </Materials/Material_${material.id}/PrimvarReader_${mapType}.outputs:result>`
 		);
 		transform2dNode.addProperty(
 			`float inputs:rotation = ${( rotation * ( 180 / Math.PI ) ).toFixed(
@@ -828,6 +828,13 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		if ( color !== undefined ) {
 
 			textureNode.addProperty( `float4 inputs:scale = ${buildColor4( color )}` );
+
+		}
+
+		if ( mapType === 'normal' ) {
+
+			textureNode.addProperty( 'float4 inputs:scale = (2, 2, 2, 1)' );
+			textureNode.addProperty( 'float4 inputs:bias = (-1, -1, -1, 0)' );
 
 		}
 

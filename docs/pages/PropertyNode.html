@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PropertyNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">PropertyNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class represents a shader property. It can be used
+to explicitly define a property and assign a value to it.</p>
+<p><code>PropertyNode</code> is used by the engine to predefined common material properties
+for TSL code.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const threshold = property( 'float', 'threshold' ).assign( THRESHOLD );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PropertyNode" translate="no">new <a href="#PropertyNode">PropertyNode</a><span class="signature">( nodeType : <span class="param-type">string</span>, name : <span class="param-type">string</span>, varying : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new property node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>nodeType</strong>
+									</td>
+									<td class="description last">
+										<p>The type of the node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property in the shader.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>varying</strong>
+									</td>
+									<td class="description last">
+										<p>Whether this property is a varying or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="global" translate="no">.<a href="#global">global</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>This flag is used for global cache.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#global">Node#global</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isPropertyNode" translate="no">.<a href="#isPropertyNode">isPropertyNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the property in the shader. If no name is defined,
+the node system auto-generates one.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#name">Node#name</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="varying" translate="no">.<a href="#varying">varying</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether this property is a varying or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/PropertyNode.js" target="_blank" rel="noopener" translate="no">src/nodes/core/PropertyNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

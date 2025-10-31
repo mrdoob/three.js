@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GlitchPass - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Pass.html">Pass</a> → </p>
+	<h1 translate="no">GlitchPass</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Pass for creating a glitch effect.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const glitchPass = new GlitchPass();
+composer.addPass( glitchPass );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">GlitchPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="GlitchPass" translate="no">new <a href="#GlitchPass">GlitchPass</a><span class="signature">( dt_size : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new glitch pass.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>dt_size</strong>
+									</td>
+									<td class="description last">
+										<p>The size of the displacement texture
+for digital glitch squares.</p>
+										<p>Default is <code>64</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="goWild" translate="no">.<a href="#goWild">goWild</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to noticeably increase the effect intensity or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="material" translate="no">.<a href="#material">material</a><span class="type-signature"> : <a href="ShaderMaterial.html">ShaderMaterial</a></span> </h3>
+					<div class="description">
+						<p>The pass material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uniforms" translate="no">.<a href="#uniforms">uniforms</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The pass uniforms.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever the pass is no longer used in your app.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#dispose">Pass#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, writeBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, readBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs the glitch pass.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>writeBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>readBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maskActive</strong>
+									</td>
+									<td class="description last">
+										<p>Whether masking is active or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#render">Pass#render</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/GlitchPass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/GlitchPass.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

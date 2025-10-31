@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Cache - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Cache</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A simple caching system, used internally by <a href="FileLoader.html">FileLoader</a>.
+To enable caching across all loaders that use <a href="FileLoader.html">FileLoader</a>, add <code>THREE.Cache.enabled = true.</code> once in your app.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id=".enabled" translate="no">.<a href="#.enabled">enabled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether caching is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".files" translate="no">.<a href="#.files">files</a><span class="type-signature"> : Object.&lt;string, Object></span> </h3>
+					<div class="description">
+						<p>A dictionary that holds cached files.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".add" translate="no">.<a href="#.add">add</a><span class="signature">( key : <span class="param-type">string</span>, file : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a cache entry with a key to reference the file. If this key already
+holds a file, it is overwritten.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>key</strong>
+									</td>
+									<td class="description last">
+										<p>The key to reference the cached file.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>file</strong>
+									</td>
+									<td class="description last">
+										<p>The file to be cached.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id=".clear" translate="no">.<a href="#.clear">clear</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Remove all values from the cache.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id=".get" translate="no">.<a href="#.get">get</a><span class="signature">( key : <span class="param-type">string</span> )</span><span class="type-signature"> : Object | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Gets the cached value for the given key.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>key</strong>
+									</td>
+									<td class="description last">
+										<p>The key to reference the cached file.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The cached file. If the key does not exist <code>undefined</code> is returned.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".remove" translate="no">.<a href="#.remove">remove</a><span class="signature">( key : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the cached file associated with the given key.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>key</strong>
+									</td>
+									<td class="description last">
+										<p>The key to reference the cached file.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/Cache.js" target="_blank" rel="noopener" translate="no">src/loaders/Cache.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

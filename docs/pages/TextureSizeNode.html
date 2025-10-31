@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TextureSizeNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">TextureSizeNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A node that represents the dimensions of a texture. The texture size is
+retrieved in the shader via built-in shader functions like <code>textureDimensions()</code>
+or <code>textureSize()</code>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TextureSizeNode" translate="no">new <a href="#TextureSizeNode">TextureSizeNode</a><span class="signature">( textureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new texture size node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>textureNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node which size should be retrieved.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelNode</strong>
+									</td>
+									<td class="description last">
+										<p>A level node which defines the requested mip.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isTextureSizeNode" translate="no">.<a href="#isTextureSizeNode">isTextureSizeNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="levelNode" translate="no">.<a href="#levelNode">levelNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;int></span> </h3>
+					<div class="description">
+						<p>A level node which defines the requested mip.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="textureNode" translate="no">.<a href="#textureNode">textureNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>A texture node which size should be retrieved.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/TextureSizeNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/TextureSizeNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

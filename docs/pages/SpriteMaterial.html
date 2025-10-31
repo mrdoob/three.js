@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SpriteMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → </p>
+	<h1 translate="no">SpriteMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A material for rendering instances of <a href="Sprite.html">Sprite</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const map = new THREE.TextureLoader().load( 'textures/sprite.png' );
+const material = new THREE.SpriteMaterial( { map: map, color: 0xffffff } );
+const sprite = new THREE.Sprite( material );
+sprite.scale.set(200, 200, 1)
+scene.add( sprite );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SpriteMaterial" translate="no">new <a href="#SpriteMaterial">SpriteMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new sprite material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object with one or more properties
+defining the material's appearance. Any property of the material
+(including any property from inherited materials) can be passed
+in here. Color values can be passed any type of value accepted
+by <a href="Color.html#set">Color#set</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="alphaMap" translate="no">.<a href="#alphaMap">alphaMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The alpha map is a grayscale texture that controls the opacity across the
+surface (black: fully transparent; white: fully opaque).</p>
+<p>Only the color of the texture is used, ignoring the alpha channel if one
+exists. For RGB and RGBA textures, the renderer will use the green channel
+when sampling this texture due to the extra bit of precision provided for
+green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
+luminance/alpha textures will also still work as expected.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="color" translate="no">.<a href="#color">color</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>Color of the material.</p>
+						<p>Default is <code>(1,1,1)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="fog" translate="no">.<a href="#fog">fog</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the material is affected by fog or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isSpriteMaterial" translate="no">.<a href="#isSpriteMaterial">isSpriteMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="map" translate="no">.<a href="#map">map</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The color map. May optionally include an alpha channel, typically combined
+with <a href="Material.html#transparent">Material#transparent</a> or <a href="Material.html#alphaTest">Material#alphaTest</a>. The texture map
+color is modulated by the diffuse <code>color</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotation" translate="no">.<a href="#rotation">rotation</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The rotation of the sprite in radians.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sizeAttenuation" translate="no">.<a href="#sizeAttenuation">sizeAttenuation</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Specifies whether size of the sprite is attenuated by the camera depth (perspective camera only).</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transparent" translate="no">.<a href="#transparent">transparent</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Overwritten since sprite materials are transparent
+by default.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Material.html#transparent">Material#transparent</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/SpriteMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/SpriteMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

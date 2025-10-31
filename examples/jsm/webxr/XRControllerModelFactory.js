@@ -245,7 +245,7 @@ function addAssetSceneToControllerModel( controllerModel, scene ) {
  * attached to the object returned from getControllerGrip in order to match the orientation of
  * the held device.
  *
- * This module depends on the [motion-controllers]{@link https://github.com/immersive-web/webxr-input-profiles/blob/main/packages/motion-controllers/README.md}
+ * This module depends on the [motion-controllers](https://github.com/immersive-web/webxr-input-profiles/blob/main/packages/motion-controllers/README.md)
  * third-part library.
  *
  * ```js

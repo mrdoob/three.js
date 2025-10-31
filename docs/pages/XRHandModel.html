@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>XRHandModel - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → </p>
+	<h1 translate="no">XRHandModel</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a XR hand model.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="XRHandModel" translate="no">new <a href="#XRHandModel">XRHandModel</a><span class="signature">( controller : <span class="param-type"><a href="Group.html">Group</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new XR hand model.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The hand controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="controller" translate="no">.<a href="#controller">controller</a><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="description">
+						<p>The hand controller.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="envMap" translate="no">.<a href="#envMap">envMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The controller's environment map.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mesh" translate="no">.<a href="#mesh">mesh</a><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="description">
+						<p>The model mesh.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="motionController" translate="no">.<a href="#motionController">motionController</a><span class="type-signature"> : MotionController</span> </h3>
+					<div class="description">
+						<p>The motion controller.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="updateMatrixWorld" translate="no">.<a href="#updateMatrixWorld">updateMatrixWorld</a><span class="signature">( force : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten with a custom implementation. Makes sure the motion controller updates the mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>force</strong>
+									</td>
+									<td class="description last">
+										<p>When set to <code>true</code>, a recomputation of world matrices is forced even
+when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Object3D.html#updateMatrixWorld">Object3D#updateMatrixWorld</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XRHandModelFactory.js" target="_blank" rel="noopener" translate="no">examples/jsm/webxr/XRHandModelFactory.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

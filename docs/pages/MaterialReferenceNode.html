@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MaterialReferenceNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="ReferenceNode.html">ReferenceNode</a> → </p>
+	<h1 translate="no">MaterialReferenceNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node is a special type of reference node which is intended
+for linking material properties with node values.</p>
+<p>When changing <code>material.opacity</code>, the node value of <code>opacityNode</code> will
+automatically be updated.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const opacityNode = materialReference( 'opacity', 'float', material );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MaterialReferenceNode" translate="no">new <a href="#MaterialReferenceNode">MaterialReferenceNode</a><span class="signature">( property : <span class="param-type">string</span>, inputType : <span class="param-type">string</span>, material : <span class="param-type"><a href="Material.html">Material</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new material reference node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property the node refers to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>inputType</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform type that should be used to represent the property value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material the property belongs to. When no material is set,
+the node refers to the material of the current rendered object.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isMaterialReferenceNode" translate="no">.<a href="#isMaterialReferenceNode">isMaterialReferenceNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="material" translate="no">.<a href="#material">material</a><span class="type-signature"> : <a href="Material.html">Material</a></span> </h3>
+					<div class="description">
+						<p>The material the property belongs to. When no material is set,
+the node refers to the material of the current rendered object.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a> | <a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the reference based on the given state. The state is only evaluated
+<a href="MaterialReferenceNode.html#material">MaterialReferenceNode#material</a> is not set.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>state</strong>
+									</td>
+									<td class="description last">
+										<p>The current state.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ReferenceNode.html#updateReference">ReferenceNode#updateReference</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated reference.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/MaterialReferenceNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/MaterialReferenceNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

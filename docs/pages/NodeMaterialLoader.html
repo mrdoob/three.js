@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeMaterialLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → <a href="MaterialLoader.html">MaterialLoader</a> → </p>
+	<h1 translate="no">NodeMaterialLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special type of material loader for loading node materials.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NodeMaterialLoader" translate="no">new <a href="#NodeMaterialLoader">NodeMaterialLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new node material loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to a loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="nodeMaterials" translate="no">.<a href="#nodeMaterials">nodeMaterials</a><span class="type-signature"> : Object.&lt;string, NodeMaterial.constructor></span> </h3>
+					<div class="description">
+						<p>Represents a dictionary of node material types.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="nodes" translate="no">.<a href="#nodes">nodes</a><span class="type-signature"> : Object.&lt;string, Node.constructor></span> </h3>
+					<div class="description">
+						<p>Represents a dictionary of node types.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="createMaterialFromType" translate="no">.<a href="#createMaterialFromType">createMaterialFromType</a><span class="signature">( type : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a node material from the given type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node material type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="MaterialLoader.html#createMaterialFromType">MaterialLoader#createMaterialFromType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created node material instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( json : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="NodeMaterial.html">NodeMaterial</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the node material from the given JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="MaterialLoader.html#parse">MaterialLoader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> . The parsed material.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setNodeMaterials" translate="no">.<a href="#setNodeMaterials">setNodeMaterials</a><span class="signature">( value : <span class="param-type">Object.&lt;string, NodeMaterial.constructor></span> )</span><span class="type-signature"> : <a href="NodeLoader.html">NodeLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the dictionary of node material types.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node material library defined as <code>&lt;classname,class&gt;</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setNodes" translate="no">.<a href="#setNodes">setNodes</a><span class="signature">( value : <span class="param-type">Object.&lt;string, Node.constructor></span> )</span><span class="type-signature"> : <a href="NodeLoader.html">NodeLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the dictionary of node types.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node library defined as <code>&lt;classname,class&gt;</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/nodes/NodeMaterialLoader.js" target="_blank" rel="noopener" translate="no">src/loaders/nodes/NodeMaterialLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

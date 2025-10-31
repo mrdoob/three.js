@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TextureUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">TextureUtils</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A class containing utility functions for textures.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".contain" translate="no">.<a href="#.contain">contain</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, aspect : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Scales the texture as large as possible within its surface without cropping
+or stretching the texture. The method preserves the original aspect ratio of
+the texture. Akin to CSS <code>object-fit: contain</code></p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aspect</strong>
+									</td>
+									<td class="description last">
+										<p>The texture's aspect ratio.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".cover" translate="no">.<a href="#.cover">cover</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, aspect : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Scales the texture to the smallest possible size to fill the surface, leaving
+no empty space. The method preserves the original aspect ratio of the texture.
+Akin to CSS <code>object-fit: cover</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aspect</strong>
+									</td>
+									<td class="description last">
+										<p>The texture's aspect ratio.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".fill" translate="no">.<a href="#.fill">fill</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Configures the texture to the default transformation. Akin to CSS <code>object-fit: fill</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".getByteLength" translate="no">.<a href="#.getByteLength">getByteLength</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, format : <span class="param-type">number</span>, type : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Determines how many bytes must be used to represent the texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>format</strong>
+									</td>
+									<td class="description last">
+										<p>The texture's format.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The texture's type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The byte length.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/TextureUtils.js" target="_blank" rel="noopener" translate="no">src/extras/TextureUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

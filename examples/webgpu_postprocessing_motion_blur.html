@@ -4,12 +4,18 @@
 		<title>three.js webgpu - motion blur</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - motion blur
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Motion Blur</span>
+			</div>
+
+			<small>Motion Blur based on Velocity (Motion Vectors).</small>
 		</div>
 
 		<script type="importmap">
@@ -26,22 +32,19 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, texture, uniform, output, mrt, mix, velocity, uv, screenUV } from 'three/tsl';
+			import { pass, texture, uniform, output, mrt, velocity, uv, screenUV } from 'three/tsl';
 			import { motionBlur } from 'three/addons/tsl/display/MotionBlur.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			let boxLeft, boxRight, model, mixer, clock;
 			let postProcessing;
 			let controls;
-			let stats;
 
 			const params = {
 				speed: 1.0
@@ -158,10 +161,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
@@ -177,7 +178,6 @@
 				// post-processing
 
 				const blurAmount = uniform( 1 );
-				const showVelocity = uniform( 0 );
 
 				const scenePass = pass( scene, camera );
 
@@ -186,24 +186,22 @@
 					velocity
 				} ) );
 
-				const beauty = scenePass.getTextureNode();
-				const vel = scenePass.getTextureNode( 'velocity' ).mul( blurAmount );
+				const beauty = scenePass.getTextureNode().toInspector( 'Color' );
+				const vel = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' ).mul( blurAmount );
 
 				const mBlur = motionBlur( beauty, vel );
 
 				const vignette = screenUV.distance( .5 ).remap( .6, 1 ).mul( 2 ).clamp().oneMinus();
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = mix( mBlur, vel, showVelocity ).mul( vignette );
+				postProcessing.outputNode = mBlur.mul( vignette );
 
 				//
 
-				const gui = new GUI();
-				gui.title( 'Motion Blur Settings' );
+				const gui = renderer.inspector.createParameters( 'Motion Blur Settings' );
 				gui.add( controls, 'autoRotate' );
 				gui.add( blurAmount, 'value', 0, 3 ).name( 'blur amount' );
 				gui.add( params, 'speed', 0, 2 );
-				gui.add( showVelocity, 'value', 0, 1 ).name( 'show velocity' );
 
 				//
 
@@ -221,8 +219,6 @@
 			}
 
 			function animate() {
-
-				stats.update();
 
 				controls.update();
 

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EXRLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → <a href="DataTextureLoader.html">DataTextureLoader</a> → </p>
+	<h1 translate="no">EXRLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for the OpenEXR texture format.</p>
+<p><code>EXRLoader</code> currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+Supports reading as UnsignedByte, HalfFloat and Float type data texture.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new EXRLoader();
+const texture = await loader.loadAsync( 'textures/memorial.exr' );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">EXRLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="EXRLoader" translate="no">new <a href="#EXRLoader">EXRLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new EXR loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="outputFormat" translate="no">.<a href="#outputFormat">outputFormat</a><span class="type-signature"> : <a href="global.html#RGBAFormat">RGBAFormat</a> | <a href="global.html#RGFormat">RGFormat</a> | <a href="global.html#RedFormat">RedFormat</a></span> </h3>
+					<div class="description">
+						<p>Texture output format.</p>
+						<p>Default is <code>RGBAFormat</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : <a href="global.html#HalfFloatType">HalfFloatType</a> | <a href="global.html#FloatType">FloatType</a></span> </h3>
+					<div class="description">
+						<p>The texture type.</p>
+						<p>Default is <code>HalfFloatType</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span> )</span><span class="type-signature"> : <a href="DataTextureLoader.html#~TexData">DataTextureLoader~TexData</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given EXR texture data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw texture data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="DataTextureLoader.html#parse">DataTextureLoader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object representing the parsed texture data.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDataType" translate="no">.<a href="#setDataType">setDataType</a><span class="signature">( value : <span class="param-type"><a href="global.html#HalfFloatType">HalfFloatType</a> | <a href="global.html#FloatType">FloatType</a></span> )</span><span class="type-signature"> : <a href="EXRLoader.html">EXRLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the texture type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The texture type to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setOutputFormat" translate="no">.<a href="#setOutputFormat">setOutputFormat</a><span class="signature">( value : <span class="param-type"><a href="global.html#RGBAFormat">RGBAFormat</a> | <a href="global.html#RGFormat">RGFormat</a> | <a href="global.html#RedFormat">RedFormat</a></span> )</span><span class="type-signature"> : <a href="EXRLoader.html">EXRLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets texture output format. Defaults to <code>RGBAFormat</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Texture output format.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/EXRLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/EXRLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

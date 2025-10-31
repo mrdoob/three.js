@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Lut3DNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">Lut3DNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A post processing node for color grading via lookup tables.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">Lut3DNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { lut3D } from 'three/addons/tsl/display/Lut3DNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Lut3DNode" translate="no">new <a href="#Lut3DNode">Lut3DNode</a><span class="signature">( inputNode : <span class="param-type"><a href="Node.html">Node</a></span>, lutNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, size : <span class="param-type">number</span>, intensityNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new LUT node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>inputNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that represents the input of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>lutNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the lookup table.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The size of the lookup table.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>intensityNode</strong>
+									</td>
+									<td class="description last">
+										<p>Controls the intensity of the effect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="inputNode" translate="no">.<a href="#inputNode">inputNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The node that represents the input of the effect.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="intensityNode" translate="no">.<a href="#intensityNode">intensityNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Controls the intensity of the effect.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lutNode" translate="no">.<a href="#lutNode">lutNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>A texture node that represents the lookup table.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The size of the lookup table.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to setup the effect's TSL code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/Lut3DNode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/Lut3DNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

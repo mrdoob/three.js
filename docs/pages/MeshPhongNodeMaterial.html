@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshPhongNodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="NodeMaterial.html">NodeMaterial</a> → </p>
+	<h1 translate="no">MeshPhongNodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Node material version of <a href="MeshPhongMaterial.html">MeshPhongMaterial</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshPhongNodeMaterial" translate="no">new <a href="#MeshPhongNodeMaterial">MeshPhongNodeMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new mesh lambert node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isMeshPhongNodeMaterial" translate="no">.<a href="#isMeshPhongNodeMaterial">isMeshPhongNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lights" translate="no">.<a href="#lights">lights</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> because phong materials react on lights.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#lights">NodeMaterial#lights</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shininessNode" translate="no">.<a href="#shininessNode">shininessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The shininess of phong materials is by default inferred from the <code>shininess</code>
+property. This node property allows to overwrite the default
+and define the shininess with a node instead.</p>
+<p>If you don't want to overwrite the shininess but modify the existing
+value instead, use <a href="TSL.html#materialShininess">materialShininess</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="specularNode" translate="no">.<a href="#specularNode">specularNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The specular color of phong materials is by default inferred from the
+<code>specular</code> property. This node property allows to overwrite the default
+and define the specular color with a node instead.</p>
+<p>If you don't want to overwrite the specular color but modify the existing
+value instead, use <a href="TSL.html#materialSpecular">materialSpecular</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupEnvironment" translate="no">.<a href="#setupEnvironment">setupEnvironment</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="BasicEnvironmentNode.html">BasicEnvironmentNode</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten since this type of material uses <a href="BasicEnvironmentNode.html">BasicEnvironmentNode</a>
+to implement the default environment mapping.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupEnvironment">NodeMaterial#setupEnvironment</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The environment node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLightingModel" translate="no">.<a href="#setupLightingModel">setupLightingModel</a><span class="signature">()</span><span class="type-signature"> : <a href="PhongLightingModel.html">PhongLightingModel</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the lighting model.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupLightingModel">NodeMaterial#setupLightingModel</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lighting model.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupVariants" translate="no">.<a href="#setupVariants">setupVariants</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the phong specific node variables.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupVariants">NodeMaterial#setupVariants</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/MeshPhongNodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/MeshPhongNodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

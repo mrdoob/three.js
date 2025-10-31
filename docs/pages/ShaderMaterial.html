@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ShaderMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → </p>
+	<h1 translate="no">ShaderMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A material rendered with custom shaders. A shader is a small program written in GLSL.
+that runs on the GPU. You may want to use a custom shader if you need to implement an
+effect not included with any of the built-in materials.</p>
+<p>There are the following notes to bear in mind when using a <code>ShaderMaterial</code>:</p>
+<ul>
+<li><code>ShaderMaterial</code> can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.</li>
+<li>Built in attributes and uniforms are passed to the shaders along with your code. If
+you don't want that, use <a href="RawShaderMaterial.html">RawShaderMaterial</a> instead.</li>
+<li>You can use the directive <code>#pragma unroll_loop_start</code> and <code>#pragma unroll_loop_end</code>
+in order to unroll a <code>for</code> loop in GLSL by the shader preprocessor. The directive has
+to be placed right above the loop. The loop formatting has to correspond to a defined standard.
+<ul>
+<li>The loop has to be <a href="https://en.wikipedia.org/wiki/Normalized_loop">normalized</a>.</li>
+<li>The loop variable has to be <em>i</em>.</li>
+<li>The value <code>UNROLLED_LOOP_INDEX</code> will be replaced with the explicitly
+value of <em>i</em> for the given iteration and can be used in preprocessor
+statements.</li>
+</ul>
+</li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const material = new THREE.ShaderMaterial( {
+	uniforms: {
+		time: { value: 1.0 },
+		resolution: { value: new THREE.Vector2() }
+	},
+	vertexShader: document.getElementById( 'vertexShader' ).textContent,
+	fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+} );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ShaderMaterial" translate="no">new <a href="#ShaderMaterial">ShaderMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new shader material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object with one or more properties
+defining the material's appearance. Any property of the material
+(including any property from inherited materials) can be passed
+in here. Color values can be passed any type of value accepted
+by <a href="Color.html#set">Color#set</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="clipping" translate="no">.<a href="#clipping">clipping</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Defines whether this material supports clipping; <code>true</code> to let the renderer
+pass the clippingPlanes uniform.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="defaultAttributeValues" translate="no">.<a href="#defaultAttributeValues">defaultAttributeValues</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>When the rendered geometry doesn't include these attributes but the
+material does, these default values will be passed to the shaders. This
+avoids errors when buffer data is missing.</p>
+<ul>
+<li>color: [ 1, 1, 1 ]</li>
+<li>uv: [ 0, 0 ]</li>
+<li>uv1: [ 0, 0 ]</li>
+</ul>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="defines" translate="no">.<a href="#defines">defines</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Defines custom constants using <code>#define</code> directives within the GLSL code
+for both the vertex shader and the fragment shader; each key/value pair
+yields another directive.</p>
+<pre><code class="language-js">defines: {
+	FOO: 15,
+	BAR: true
+}
+</code></pre>
+<p>Yields the lines:</p>
+<pre class="prettyprint source"><code>#define FOO 15
+#define BAR true
+</code></pre>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="extensions" translate="no">.<a href="#extensions">extensions</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>This object allows to enable certain WebGL 2 extensions.</p>
+<ul>
+<li>clipCullDistance: set to <code>true</code> to use vertex shader clipping</li>
+<li>multiDraw: set to <code>true</code> to use vertex shader multi_draw / enable gl_DrawID</li>
+</ul>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="fog" translate="no">.<a href="#fog">fog</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Define whether the material color is affected by global fog settings; <code>true</code>
+to pass fog uniforms to the shader.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="forceSinglePass" translate="no">.<a href="#forceSinglePass">forceSinglePass</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Overwritten and set to <code>true</code> by default.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Material.html#forceSinglePass">Material#forceSinglePass</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="fragmentShader" translate="no">.<a href="#fragmentShader">fragmentShader</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Fragment shader GLSL code. This is the actual code for the shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="glslVersion" translate="no">.<a href="#glslVersion">glslVersion</a><span class="type-signature"> : <a href="global.html#GLSL1">GLSL1</a> | <a href="global.html#GLSL3">GLSL3</a></span> </h3>
+					<div class="description">
+						<p>Defines the GLSL version of custom shader code.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="index0AttributeName" translate="no">.<a href="#index0AttributeName">index0AttributeName</a><span class="type-signature"> : string | undefined</span> </h3>
+					<div class="description">
+						<p>If set, this calls <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation">gl.bindAttribLocation</a>
+to bind a generic vertex index to an attribute variable.</p>
+						<p>Default is <code>undefined</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isShaderMaterial" translate="no">.<a href="#isShaderMaterial">isShaderMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lights" translate="no">.<a href="#lights">lights</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Defines whether this material uses lighting; <code>true</code> to pass uniform data
+related to lighting to this shader.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="linewidth" translate="no">.<a href="#linewidth">linewidth</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Controls line thickness or lines.</p>
+<p>WebGL and WebGPU ignore this setting and always render line primitives with a
+width of one pixel.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uniforms" translate="no">.<a href="#uniforms">uniforms</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>An object of the form:</p>
+<pre><code class="language-js">{
+	&quot;uniform1&quot;: { value: 1.0 },
+	&quot;uniform2&quot;: { value: 2 }
+}
+</code></pre>
+<p>specifying the uniforms to be passed to the shader code; keys are uniform
+names, values are definitions of the form</p>
+<pre class="prettyprint source"><code>{
+	value: 1.0
+}
+</code></pre>
+<p>where <code>value</code> is the value of the uniform. Names must match the name of
+the uniform, as defined in the GLSL code. Note that uniforms are refreshed
+on every frame, so updating the value of the uniform will immediately
+update the value available to the GLSL code.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uniformsGroups" translate="no">.<a href="#uniformsGroups">uniformsGroups</a><span class="type-signature"> : Array.&lt;<a href="UniformsGroup.html">UniformsGroup</a>></span> </h3>
+					<div class="description">
+						<p>An array holding uniforms groups for configuring UBOs.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uniformsNeedUpdate" translate="no">.<a href="#uniformsNeedUpdate">uniformsNeedUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Can be used to force a uniform update while changing uniforms in
+<a href="Object3D.html#onBeforeRender">Object3D#onBeforeRender</a>.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="vertexShader" translate="no">.<a href="#vertexShader">vertexShader</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Vertex shader GLSL code. This is the actual code for the shader.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wireframe" translate="no">.<a href="#wireframe">wireframe</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Renders the geometry as a wireframe.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wireframeLinewidth" translate="no">.<a href="#wireframeLinewidth">wireframeLinewidth</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Controls the thickness of the wireframe.</p>
+<p>WebGL and WebGPU ignore this property and always render
+1 pixel wide lines.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Shader" translate="no">.<a href="#~Shader">Shader</a> </h3>
+					<div class="description">
+						<p>This type represents the fields required to store and run the shader code.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>name</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The name of the shader.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>uniforms</strong>
+						<br>
+<span class="param-type">Object.&lt;string, <a href="Uniform.html">Uniform</a>></span>
+				</td>
+			<td class="description last">
+				<p>The uniforms of the shader.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>defines</strong>
+						<br>
+<span class="param-type">Object.&lt;string, <a href="TSL.html#any">any</a>></span>
+				</td>
+			<td class="description last">
+				<p>The defines of the shader.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>vertexShader</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The vertex shader code.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>fragmentShader</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The fragment shader code.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/ShaderMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/ShaderMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

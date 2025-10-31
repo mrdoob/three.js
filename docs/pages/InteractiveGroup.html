@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>InteractiveGroup - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Group.html">Group</a> → </p>
+	<h1 translate="no">InteractiveGroup</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to group 3D objects in an interactive group.
+The group itself can listen to Pointer, Mouse or XR controller events to
+detect selections of descendant 3D objects. If a 3D object is selected,
+the respective event is going to dispatched to it.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const group = new InteractiveGroup();
+group.listenToPointerEvents( renderer, camera );
+group.listenToXRControllerEvents( controller1 );
+group.listenToXRControllerEvents( controller2 );
+scene.add( group );
+// now add objects that should be interactive
+group.add( mesh1, mesh2, mesh3 );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">InteractiveGroup</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { InteractiveGroup } from 'three/addons/interactive/InteractiveGroup.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="InteractiveGroup" translate="no">new <a href="#InteractiveGroup">InteractiveGroup</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
+					<div class="description">
+						<p>The camera used for raycasting.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="controllers" translate="no">.<a href="#controllers">controllers</a><span class="type-signature"> : Array.&lt;<a href="Group.html">Group</a>></span> </h3>
+					<div class="description">
+						<p>An array of XR controllers.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="element" translate="no">.<a href="#element">element</a><span class="type-signature"> : HTMLElement</span> </h3>
+					<div class="description">
+						<p>The internal raycaster.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="raycaster" translate="no">.<a href="#raycaster">raycaster</a><span class="type-signature"> : <a href="Raycaster.html">Raycaster</a></span> </h3>
+					<div class="description">
+						<p>The internal raycaster.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="disconnect" translate="no">.<a href="#disconnect">disconnect</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Disconnects this interactive group from the DOM and all XR controllers.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="disconnectXrControllerEvents" translate="no">.<a href="#disconnectXrControllerEvents">disconnectXrControllerEvents</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Disconnects this interactive group from all XR controllers.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="disconnectionPointerEvents" translate="no">.<a href="#disconnectionPointerEvents">disconnectionPointerEvents</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Disconnects this interactive group from all Pointer and Mouse Events.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="listenToPointerEvents" translate="no">.<a href="#listenToPointerEvents">listenToPointerEvents</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calling this method makes sure the interactive group listens to Pointer and Mouse events.
+The target is the <code>domElement</code> of the given renderer. The camera is required for the internal
+raycasting so 3D objects can be detected based on the events.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="listenToXRControllerEvents" translate="no">.<a href="#listenToXRControllerEvents">listenToXRControllerEvents</a><span class="signature">( controller : <span class="param-type"><a href="Group.html">Group</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calling this method makes sure the interactive group listens to events of
+the given XR controller.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The XR controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/interactive/InteractiveGroup.js" target="_blank" rel="noopener" translate="no">examples/jsm/interactive/InteractiveGroup.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

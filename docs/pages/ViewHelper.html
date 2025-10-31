@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ViewHelper - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → </p>
+	<h1 translate="no">ViewHelper</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special type of helper that visualizes the camera's transformation
+in a small viewport area as an axes helper. Such a helper is often wanted
+in 3D modeling tools or scene editors like the <a href="https://threejs.org/editor">three.js editor</a>.</p>
+<p>The helper allows to click on the X, Y and Z axes which animates the camera
+so it looks along the selected axis.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">ViewHelper</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ViewHelper } from 'three/addons/helpers/ViewHelper.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ViewHelper" translate="no">new <a href="#ViewHelper">ViewHelper</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new view helper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera whose transformation should be visualized.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The DOM element that is used to render the view.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="animating" translate="no">.<a href="#animating">animating</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether the helper is currently animating or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="center" translate="no">.<a href="#center">center</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The helper's center point.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isViewHelper" translate="no">.<a href="#isViewHelper">isViewHelper</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="handleClick" translate="no">.<a href="#handleClick">handleClick</a><span class="signature">( event : <span class="param-type">PointerEvent</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method should be called when a click or pointer event
+has happened in the app.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>event</strong>
+									</td>
+									<td class="description last">
+										<p>The event to process.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether an intersection with the helper has been detected or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a> | <a href="WebGPURenderer.html">WebGPURenderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the helper in a separate view in the bottom-right corner
+of the viewport.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setLabelStyle" translate="no">.<a href="#setLabelStyle">setLabelStyle</a><span class="signature">( font : <span class="param-type">string</span>, color : <span class="param-type">string</span>, radius : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the label style. Has no effect when the axes are unlabeled.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>font</strong>
+									</td>
+									<td class="description last">
+										<p>The label font.</p>
+										<p>Default is <code>'24px Arial'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The label color.</p>
+										<p>Default is <code>'#000000'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The label radius.</p>
+										<p>Default is <code>14</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setLabels" translate="no">.<a href="#setLabels">setLabels</a><span class="signature">( labelX : <span class="param-type">string | undefined</span>, labelY : <span class="param-type">string | undefined</span>, labelZ : <span class="param-type">string | undefined</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets labels for each axis. By default, they are unlabeled.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>labelX</strong>
+									</td>
+									<td class="description last">
+										<p>The label for the x-axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>labelY</strong>
+									</td>
+									<td class="description last">
+										<p>The label for the y-axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>labelZ</strong>
+									</td>
+									<td class="description last">
+										<p>The label for the z-axis.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( delta : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the helper. This method should be called in the app's animation
+loop.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>delta</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/ViewHelper.js" target="_blank" rel="noopener" translate="no">examples/jsm/helpers/ViewHelper.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

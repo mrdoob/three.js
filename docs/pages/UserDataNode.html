@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>UserDataNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="ReferenceNode.html">ReferenceNode</a> → </p>
+	<h1 translate="no">UserDataNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special type of reference node that allows to link values in
+<code>userData</code> fields to node objects.</p>
+<p>Since <code>UserDataNode</code> is extended from <a href="ReferenceNode.html">ReferenceNode</a>, the node value
+will automatically be updated when the <code>rotation</code> user data field changes.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">sprite.userData.rotation = 1; // stores individual rotation per sprite
+const material = new THREE.SpriteNodeMaterial();
+material.rotationNode = userData( 'rotation', 'float' );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="UserDataNode" translate="no">new <a href="#UserDataNode">UserDataNode</a><span class="signature">( property : <span class="param-type">string</span>, inputType : <span class="param-type">string</span>, userData : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new user data node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The property name that should be referenced by the node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>inputType</strong>
+									</td>
+									<td class="description last">
+										<p>The node data type of the reference.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>userData</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the <code>userData</code> object. If not provided, the <code>userData</code> property of the 3D object that uses the node material is evaluated.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="userData" translate="no">.<a href="#userData">userData</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>A reference to the <code>userData</code> object. If not provided, the <code>userData</code>
+property of the 3D object that uses the node material is evaluated.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a> | <a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten to make sure <a href="ReferenceNode.html#reference">ReferenceNode#reference</a> points to the correct
+<code>userData</code> field.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>state</strong>
+									</td>
+									<td class="description last">
+										<p>The current state to evaluate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ReferenceNode.html#updateReference">ReferenceNode#updateReference</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to the <code>userData</code> field.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/UserDataNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/UserDataNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

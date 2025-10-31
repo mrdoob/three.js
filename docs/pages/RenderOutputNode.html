@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>RenderOutputNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">RenderOutputNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Normally, tone mapping and color conversion happens automatically
+before outputting pixel too the default (screen) framebuffer. In certain
+post processing setups this happens to late because certain effects
+require e.g. sRGB input. For such scenarios, <code>RenderOutputNode</code> can be used
+to apply tone mapping and color space conversion at an arbitrary point
+in the effect chain.</p>
+<p>When applying tone mapping and color space conversion manually with this node,
+you have to set <a href="PostProcessing.html#outputColorTransform">PostProcessing#outputColorTransform</a> to <code>false</code>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const postProcessing = new PostProcessing( renderer );
+postProcessing.outputColorTransform = false;
+const scenePass = pass( scene, camera );
+const outputPass = renderOutput( scenePass );
+postProcessing.outputNode = outputPass;
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="RenderOutputNode" translate="no">new <a href="#RenderOutputNode">RenderOutputNode</a><span class="signature">( colorNode : <span class="param-type"><a href="Node.html">Node</a></span>, toneMapping : <span class="param-type">number</span>, outputColorSpace : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new render output node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>colorNode</strong>
+									</td>
+									<td class="description last">
+										<p>The color node to process.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>toneMapping</strong>
+									</td>
+									<td class="description last">
+										<p>The tone mapping type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>outputColorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The output color space.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="colorNode" translate="no">.<a href="#colorNode">colorNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The color node to process.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isRenderOutputNode" translate="no">.<a href="#isRenderOutputNode">isRenderOutputNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="outputColorSpace" translate="no">.<a href="#outputColorSpace">outputColorSpace</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The output color space.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getToneMapping" translate="no">.<a href="#getToneMapping">getToneMapping</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Gets the tone mapping type.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The tone mapping type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setToneMapping" translate="no">.<a href="#setToneMapping">setToneMapping</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ToneMappingNode.html">ToneMappingNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the tone mapping type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The tone mapping type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/display/RenderOutputNode.js" target="_blank" rel="noopener" translate="no">src/nodes/display/RenderOutputNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

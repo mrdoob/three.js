@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BypassNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">BypassNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>The class generates the code of a given node but returns another node in the output.
+This can be used to call a method or node that does not return a value, i.e.
+type <code>void</code> on an input where returning a value is required. Example:</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">material.colorNode = myColor.bypass( runVoidFn() )
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BypassNode" translate="no">new <a href="#BypassNode">BypassNode</a><span class="signature">( outputNode : <span class="param-type"><a href="Node.html">Node</a></span>, callNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new bypass node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>outputNode</strong>
+									</td>
+									<td class="description last">
+										<p>The output node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>callNode</strong>
+									</td>
+									<td class="description last">
+										<p>The call node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="callNode" translate="no">.<a href="#callNode">callNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The call node.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isBypassNode" translate="no">.<a href="#isBypassNode">isBypassNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="outputNode" translate="no">.<a href="#outputNode">outputNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The output node.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/BypassNode.js" target="_blank" rel="noopener" translate="no">src/nodes/core/BypassNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

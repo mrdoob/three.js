@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ShapeUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">ShapeUtils</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A class containing utility functions for shapes.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".area" translate="no">.<a href="#.area">area</a><span class="signature">( contour : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calculate area of a ( 2D ) contour polygon.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>contour</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The area.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".isClockWise" translate="no">.<a href="#.isClockWise">isClockWise</a><span class="signature">( pts : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given contour uses a clockwise winding order.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pts</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points defining a polygon.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given contour uses a clockwise winding order or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".triangulateShape" translate="no">.<a href="#.triangulateShape">triangulateShape</a><span class="signature">( contour : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span>, holes : <span class="param-type">Array.&lt;Array.&lt;<a href="Vector2.html">Vector2</a>>></span> )</span><span class="type-signature"> : Array.&lt;Array.&lt;number>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Triangulates the given shape definition.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>contour</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points defining the contour.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>holes</strong>
+									</td>
+									<td class="description last">
+										<p>An array that holds arrays of 2D points defining the holes.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array that holds for each face definition an array with three indices.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/ShapeUtils.js" target="_blank" rel="noopener" translate="no">src/extras/ShapeUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>UniformGroupNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">UniformGroupNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node can be used to group single instances of <a href="UniformNode.html">UniformNode</a>
+and manage them as a uniform buffer.</p>
+<p>In most cases, the predefined nodes <code>objectGroup</code>, <code>renderGroup</code> and <code>frameGroup</code>
+will be used when defining the <a href="UniformNode.html#groupNode">UniformNode#groupNode</a> property.</p>
+<ul>
+<li><code>objectGroup</code>: Uniform buffer per object.</li>
+<li><code>renderGroup</code>: Shared uniform buffer, updated once per render call.</li>
+<li><code>frameGroup</code>: Shared uniform buffer, updated once per frame.</li>
+</ul></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="UniformGroupNode" translate="no">new <a href="#UniformGroupNode">UniformGroupNode</a><span class="signature">( name : <span class="param-type">string</span>, shared : <span class="param-type">boolean</span>, order : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new uniform group node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the uniform group node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shared</strong>
+									</td>
+									<td class="description last">
+										<p>Whether this uniform group node is shared or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>order</strong>
+									</td>
+									<td class="description last">
+										<p>Influences the internal sorting.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isUniformGroup" translate="no">.<a href="#isUniformGroup">isUniformGroup</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the uniform group node.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#name">Node#name</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="order" translate="no">.<a href="#order">order</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Influences the internal sorting.
+TODO: Add details when this property should be changed.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shared" translate="no">.<a href="#shared">shared</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether this uniform group node is shared or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/UniformGroupNode.js" target="_blank" rel="noopener" translate="no">src/nodes/core/UniformGroupNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

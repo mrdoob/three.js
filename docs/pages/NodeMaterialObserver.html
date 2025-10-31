@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeMaterialObserver - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">NodeMaterialObserver</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class is used by <a href="WebGPURenderer.html">WebGPURenderer</a> as management component.
+It's primary purpose is to determine whether render objects require a
+refresh right before they are going to be rendered or not.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="NodeMaterialObserver" translate="no">new <a href="#NodeMaterialObserver">NodeMaterialObserver</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new node material observer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="hasAnimation" translate="no">.<a href="#hasAnimation">hasAnimation</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the node builder's 3D object is animated or not.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="hasNode" translate="no">.<a href="#hasNode">hasNode</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the material uses node objects or not.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="refreshUniforms" translate="no">.<a href="#refreshUniforms">refreshUniforms</a><span class="type-signature"> : Array.&lt;string></span> </h3>
+					<div class="description">
+						<p>A list of all possible material uniforms</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderId" translate="no">.<a href="#renderId">renderId</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Holds the current render ID from the node frame.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderObjects" translate="no">.<a href="#renderObjects">renderObjects</a><span class="type-signature"> : WeakMap.&lt;<a href="RenderObject.html">RenderObject</a>, Object></span> </h3>
+					<div class="description">
+						<p>A node material can be used by more than one render object so the
+monitor must maintain a list of render objects.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="containsNode" translate="no">.<a href="#containsNode">containsNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the node builder's material uses
+node properties.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the node builder's material uses node properties or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, lightsData : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given render object has not changed its state.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>lightsData</strong>
+									</td>
+									<td class="description last">
+										<p>The current material lights.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given render object has changed its state or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="firstInitialization" translate="no">.<a href="#firstInitialization">firstInitialization</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given render object is verified for the first time of this observer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given render object is verified for the first time of this observer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getAttributesData" translate="no">.<a href="#getAttributesData">getAttributesData</a><span class="signature">( attributes : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an attribute data structure holding the attributes versions for
+monitoring.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attributes</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry attributes.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring the versions of attributes.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getLights" translate="no">.<a href="#getLights">getLights</a><span class="signature">( lightsNode : <span class="param-type"><a href="LightsNode.html">LightsNode</a></span>, renderId : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the lights for the given lights node and render ID.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>lightsNode</strong>
+									</td>
+									<td class="description last">
+										<p>The lights node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderId</strong>
+									</td>
+									<td class="description last">
+										<p>The render ID.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lights for the given lights node and render ID.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getLightsData" translate="no">.<a href="#getLightsData">getLightsData</a><span class="signature">( materialLights : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the lights data for the given material lights.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>materialLights</strong>
+									</td>
+									<td class="description last">
+										<p>The material lights.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lights data for the given material lights.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMaterialData" translate="no">.<a href="#getMaterialData">getMaterialData</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a material data structure holding the material property values for
+monitoring.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring material properties.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRenderObjectData" translate="no">.<a href="#getRenderObjectData">getRenderObjectData</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns monitoring data for the given render object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The monitoring data.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="needsRefresh" translate="no">.<a href="#needsRefresh">needsRefresh</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, nodeFrame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the given render object requires a refresh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>nodeFrame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given render object requires a refresh or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="needsVelocity" translate="no">.<a href="#needsVelocity">needsVelocity</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the current rendering produces motion vectors.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the current rendering produces motion vectors or not.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/manager/NodeMaterialObserver.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/manager/NodeMaterialObserver.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>EffectComposer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">EffectComposer</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Used to implement post-processing effects in three.js.
+The class manages a chain of post-processing passes to produce the final visual result.
+Post-processing passes are executed in order of their addition/insertion.
+The last pass is automatically rendered to screen.</p>
+<p>This module can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const composer = new EffectComposer( renderer );
+// adding some passes
+const renderPass = new RenderPass( scene, camera );
+composer.addPass( renderPass );
+const glitchPass = new GlitchPass();
+composer.addPass( glitchPass );
+const outputPass = new OutputPass()
+composer.addPass( outputPass );
+function animate() {
+	composer.render(); // instead of renderer.render()
+}
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">EffectComposer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="EffectComposer" translate="no">new <a href="#EffectComposer">EffectComposer</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new effect composer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>This render target and a clone will
+be used as the internal read and write buffers. If not given, the composer creates
+the buffers automatically.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="passes" translate="no">.<a href="#passes">passes</a><span class="type-signature"> : Array.&lt;<a href="Pass.html">Pass</a>></span> </h3>
+					<div class="description">
+						<p>An array representing the (ordered) chain of post-processing passes.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="readBuffer" translate="no">.<a href="#readBuffer">readBuffer</a><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="description">
+						<p>A reference to the internal read buffer. Passes usually read
+the previous render result from this buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderToScreen" translate="no">.<a href="#renderToScreen">renderToScreen</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the final pass is rendered to the screen (default framebuffer) or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderer" translate="no">.<a href="#renderer">renderer</a><span class="type-signature"> : <a href="WebGLRenderer.html">WebGLRenderer</a></span> </h3>
+					<div class="description">
+						<p>The renderer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="writeBuffer" translate="no">.<a href="#writeBuffer">writeBuffer</a><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<div class="description">
+						<p>A reference to the internal write buffer. Passes usually write
+their result into this buffer.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addPass" translate="no">.<a href="#addPass">addPass</a><span class="signature">( pass : <span class="param-type"><a href="Pass.html">Pass</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given pass to the pass chain.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pass</strong>
+									</td>
+									<td class="description last">
+										<p>The pass to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever the composer is no longer used in your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="insertPass" translate="no">.<a href="#insertPass">insertPass</a><span class="signature">( pass : <span class="param-type"><a href="Pass.html">Pass</a></span>, index : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Inserts the given pass at a given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pass</strong>
+									</td>
+									<td class="description last">
+										<p>The pass to insert.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the pass chain.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="isLastEnabledPass" translate="no">.<a href="#isLastEnabledPass">isLastEnabledPass</a><span class="signature">( passIndex : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the pass for the given index is the last enabled pass in the pass chain.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>passIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The pass index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the pass for the given index is the last pass in the pass chain.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="removePass" translate="no">.<a href="#removePass">removePass</a><span class="signature">( pass : <span class="param-type"><a href="Pass.html">Pass</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the given pass from the pass chain.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pass</strong>
+									</td>
+									<td class="description last">
+										<p>The pass to remove.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( deltaTime : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Executes all enabled post-processing passes in order to produce the final frame.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds. If not given, the composer computes
+its own time delta value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">( renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets the internal state of the EffectComposer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>This render target has the same purpose like
+the one from the constructor. If set, it is used to setup the read and write buffers.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setPixelRatio" translate="no">.<a href="#setPixelRatio">setPixelRatio</a><span class="signature">( pixelRatio : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent blurring output.
+Setting the pixel ratio will automatically resize the composer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pixelRatio</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel ratio to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resizes the internal read and write buffers as well as all passes. Similar to <a href="WebGLRenderer.html#setSize">WebGLRenderer#setSize</a>,
+this method honors the current pixel ration.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width in logical pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height in logical pixels.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="swapBuffers" translate="no">.<a href="#swapBuffers">swapBuffers</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Swaps the internal read/write buffers.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/EffectComposer.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/EffectComposer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

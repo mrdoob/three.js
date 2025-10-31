@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PositionalAudioHelper - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Line.html">Line</a> → </p>
+	<h1 translate="no">PositionalAudioHelper</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This helper displays the directional cone of a positional audio.</p>
+<p><code>PositionalAudioHelper</code> must be added as a child of the positional audio.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const positionalAudio = new THREE.PositionalAudio( listener );
+positionalAudio.setDirectionalCone( 180, 230, 0.1 );
+scene.add( positionalAudio );
+const helper = new PositionalAudioHelper( positionalAudio );
+positionalAudio.add( helper );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">PositionalAudioHelper</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PositionalAudioHelper" translate="no">new <a href="#PositionalAudioHelper">PositionalAudioHelper</a><span class="signature">( audio : <span class="param-type"><a href="PositionalAudio.html">PositionalAudio</a></span>, range : <span class="param-type">number</span>, divisionsInnerAngle : <span class="param-type">number</span>, divisionsOuterAngle : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new positional audio helper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>audio</strong>
+									</td>
+									<td class="description last">
+										<p>The audio to visualize.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>range</strong>
+									</td>
+									<td class="description last">
+										<p>The range of the directional cone.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>divisionsInnerAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions of the inner part of the directional cone.</p>
+										<p>Default is <code>16</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>divisionsOuterAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions of the outer part of the directional cone.</p>
+										<p>Default is <code>2</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="audio" translate="no">.<a href="#audio">audio</a><span class="type-signature"> : <a href="PositionalAudio.html">PositionalAudio</a></span> </h3>
+					<div class="description">
+						<p>The audio to visualize.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="divisionsInnerAngle" translate="no">.<a href="#divisionsInnerAngle">divisionsInnerAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of divisions of the inner part of the directional cone.</p>
+						<p>Default is <code>16</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="divisionsOuterAngle" translate="no">.<a href="#divisionsOuterAngle">divisionsOuterAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of divisions of the outer part of the directional cone.</p>
+						<p>Default is <code>2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="range" translate="no">.<a href="#range">range</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The range of the directional cone.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the helper. This method must be called whenever the directional cone
+of the positional audio is changed.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/PositionalAudioHelper.js" target="_blank" rel="noopener" translate="no">examples/jsm/helpers/PositionalAudioHelper.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

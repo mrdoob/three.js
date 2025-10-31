@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PositionalAudio - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Audio.html">Audio</a> → </p>
+	<h1 translate="no">PositionalAudio</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a positional audio object.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">// create an AudioListener and add it to the camera
+const listener = new THREE.AudioListener();
+camera.add( listener );
+// create the PositionalAudio object (passing in the listener)
+const sound = new THREE.PositionalAudio( listener );
+// load a sound and set it as the PositionalAudio object's buffer
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load( 'sounds/song.ogg', function( buffer ) {
+	sound.setBuffer( buffer );
+	sound.setRefDistance( 20 );
+	sound.play();
+});
+// create an object for the sound to play from
+const sphere = new THREE.SphereGeometry( 20, 32, 16 );
+const material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
+const mesh = new THREE.Mesh( sphere, material );
+scene.add( mesh );
+// finally add the sound to the mesh
+mesh.add( sound );</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PositionalAudio" translate="no">new <a href="#PositionalAudio">PositionalAudio</a><span class="signature">( listener : <span class="param-type"><a href="AudioListener.html">AudioListener</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a positional audio.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>listener</strong>
+									</td>
+									<td class="description last">
+										<p>The global audio listener.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="panner" translate="no">.<a href="#panner">panner</a><span class="type-signature"> : PannerNode</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The panner node represents the location, direction, and behavior of an audio
+source in 3D space.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getDistanceModel" translate="no">.<a href="#getDistanceModel">getDistanceModel</a><span class="signature">()</span><span class="type-signature"> : 'linear' | 'inverse' | 'exponential'</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current distance model.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The distance model.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMaxDistance" translate="no">.<a href="#getMaxDistance">getMaxDistance</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current max distance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The max distance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRefDistance" translate="no">.<a href="#getRefDistance">getRefDistance</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current reference distance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The reference distance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRolloffFactor" translate="no">.<a href="#getRolloffFactor">getRolloffFactor</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current rolloff factor.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The rolloff factor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDirectionalCone" translate="no">.<a href="#setDirectionalCone">setDirectionalCone</a><span class="signature">( coneInnerAngle : <span class="param-type">number</span>, coneOuterAngle : <span class="param-type">number</span>, coneOuterGain : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="PositionalAudio.html">PositionalAudio</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the directional cone in which the audio can be listened.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>coneInnerAngle</strong>
+									</td>
+									<td class="description last">
+										<p>An angle, in degrees, of a cone inside of which there will be no volume reduction.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>coneOuterAngle</strong>
+									</td>
+									<td class="description last">
+										<p>An angle, in degrees, of a cone outside of which the volume will be reduced by a constant value, defined by the <code>coneOuterGain</code> parameter.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>coneOuterGain</strong>
+									</td>
+									<td class="description last">
+										<p>The amount of volume reduction outside the cone defined by the <code>coneOuterAngle</code>. When set to <code>0</code>, no sound can be heard.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDistanceModel" translate="no">.<a href="#setDistanceModel">setDistanceModel</a><span class="signature">( value : <span class="param-type">'linear' | 'inverse' | 'exponential'</span> )</span><span class="type-signature"> : <a href="PositionalAudio.html">PositionalAudio</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines which algorithm to use to reduce the volume of the audio source
+as it moves away from the listener.</p>
+<p>Read <a href="https://www.w3.org/TR/webaudio-1.1/#enumdef-distancemodeltype">the spec</a>
+for more details.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The distance model to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setMaxDistance" translate="no">.<a href="#setMaxDistance">setMaxDistance</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="PositionalAudio.html">PositionalAudio</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the maximum distance between the audio source and the listener,
+after which the volume is not reduced any further.</p>
+<p>This value is used only by the <code>linear</code> distance model.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The max distance.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setRefDistance" translate="no">.<a href="#setRefDistance">setRefDistance</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="PositionalAudio.html">PositionalAudio</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the reference distance for reducing volume as the audio source moves
+further from the listener – i.e. the distance at which the volume reduction
+starts taking effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The reference distance to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setRolloffFactor" translate="no">.<a href="#setRolloffFactor">setRolloffFactor</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="PositionalAudio.html">PositionalAudio</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines how quickly the volume is reduced as the source moves away from the listener.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The rolloff factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/audio/PositionalAudio.js" target="_blank" rel="noopener" translate="no">src/audio/PositionalAudio.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

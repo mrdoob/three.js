@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ShapePath - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">ShapePath</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class is used to convert a series of paths to an array of
+shapes. It is specifically used in context of fonts and SVG.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ShapePath" translate="no">new <a href="#ShapePath">ShapePath</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new shape path.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="color" translate="no">.<a href="#color">color</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>The color of the shape.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="currentPath" translate="no">.<a href="#currentPath">currentPath</a><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="description">
+						<p>The current path that is being generated.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="subPaths" translate="no">.<a href="#subPaths">subPaths</a><span class="type-signature"> : Array.&lt;<a href="Path.html">Path</a>></span> </h3>
+					<div class="description">
+						<p>The paths that have been generated for this shape.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="bezierCurveTo" translate="no">.<a href="#bezierCurveTo">bezierCurveTo</a><span class="signature">( aCP1x : <span class="param-type">number</span>, aCP1y : <span class="param-type">number</span>, aCP2x : <span class="param-type">number</span>, aCP2y : <span class="param-type">number</span>, aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ShapePath.html">ShapePath</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an instance of <a href="CubicBezierCurve.html">CubicBezierCurve</a> to the path by connecting
+the current point with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aCP1x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the first control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aCP1y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the first control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aCP2x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the second control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aCP2y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the second control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this shape path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lineTo" translate="no">.<a href="#lineTo">lineTo</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ShapePath.html">ShapePath</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an instance of <a href="LineCurve.html">LineCurve</a> to the path by connecting
+the current point with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this shape path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="moveTo" translate="no">.<a href="#moveTo">moveTo</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ShapePath.html">ShapePath</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new path and moves it current point to the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this shape path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="quadraticCurveTo" translate="no">.<a href="#quadraticCurveTo">quadraticCurveTo</a><span class="signature">( aCPx : <span class="param-type">number</span>, aCPy : <span class="param-type">number</span>, aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ShapePath.html">ShapePath</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an instance of <a href="QuadraticBezierCurve.html">QuadraticBezierCurve</a> to the path by connecting
+the current point with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aCPx</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aCPy</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this shape path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="splineThru" translate="no">.<a href="#splineThru">splineThru</a><span class="signature">( pts : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : <a href="ShapePath.html">ShapePath</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an instance of <a href="SplineCurve.html">SplineCurve</a> to the path by connecting
+the current point with the given list of points.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pts</strong>
+									</td>
+									<td class="description last">
+										<p>An array of points in 2D space.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this shape path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toShapes" translate="no">.<a href="#toShapes">toShapes</a><span class="signature">( isCCW : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Array.&lt;<a href="Shape.html">Shape</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts the paths into an array of shapes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>isCCW</strong>
+									</td>
+									<td class="description last">
+										<p>By default solid shapes are  defined clockwise (CW) and holes are defined counterclockwise (CCW).
+If this flag is set to <code>true</code>, then those are flipped.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array of shapes.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/core/ShapePath.js" target="_blank" rel="noopener" translate="no">src/extras/core/ShapePath.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

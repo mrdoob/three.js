@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>OrbitControls - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Controls.html">Controls</a> → </p>
+	<h1 translate="no">OrbitControls</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Orbit controls allow the camera to orbit around a target.</p>
+<p>OrbitControls performs orbiting, dollying (zooming), and panning. Unlike <a href="TrackballControls.html">TrackballControls</a>,
+it maintains the &quot;up&quot; direction <code>object.up</code> (+Y by default).</p>
+<ul>
+<li>Orbit: Left mouse / touch: one-finger move.</li>
+<li>Zoom: Middle mouse, or mousewheel / touch: two-finger spread or squish.</li>
+<li>Pan: Right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move.</li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const controls = new OrbitControls( camera, renderer.domElement );
+// controls.update() must be called after any manual changes to the camera's transform
+camera.position.set( 0, 20, 100 );
+controls.update();
+function animate() {
+	// required if controls.enableDamping or controls.autoRotate are set to true
+	controls.update();
+	renderer.render( scene, camera );
+}
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">OrbitControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { OrbitControls } from 'three/addons/controls/OrbitControls.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="OrbitControls" translate="no">new <a href="#OrbitControls">OrbitControls</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new controls instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object that is managed by the controls.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="autoRotate" translate="no">.<a href="#autoRotate">autoRotate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to true to automatically rotate around the target</p>
+<p>Note that if this is enabled, you must call <code>update()</code> in your animation loop.
+If you want the auto-rotate speed to be independent of the frame rate (the refresh
+rate of the display), you must pass the time <code>deltaTime</code>, in seconds, to <code>update()</code>.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="autoRotateSpeed" translate="no">.<a href="#autoRotateSpeed">autoRotateSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How fast to rotate around the target if <code>autoRotate</code> is <code>true</code>. The default  equates to 30 seconds
+per orbit at 60fps.</p>
+<p>Note that if <code>autoRotate</code> is enabled, you must call <code>update()</code> in your animation loop.</p>
+						<p>Default is <code>2</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="cursor" translate="no">.<a href="#cursor">cursor</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The focus point of the <code>minTargetRadius</code> and <code>maxTargetRadius</code> limits.
+It can be updated manually at any point to change the center of interest
+for the <code>target</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dampingFactor" translate="no">.<a href="#dampingFactor">dampingFactor</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The damping inertia used if <code>enableDamping</code> is set to <code>true</code>.</p>
+<p>Note that for this to work, you must call <code>update()</code> in your animation loop.</p>
+						<p>Default is <code>0.05</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableDamping" translate="no">.<a href="#enableDamping">enableDamping</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> to enable damping (inertia), which can be used to give a sense of weight
+to the controls. Note that if this is enabled, you must call <code>update()</code> in your animation
+loop.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enablePan" translate="no">.<a href="#enablePan">enablePan</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable camera panning.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableRotate" translate="no">.<a href="#enableRotate">enableRotate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable horizontal and vertical rotation of the camera.</p>
+<p>Note that it is possible to disable a single axis by setting the min and max of the
+<code>minPolarAngle</code> or <code>minAzimuthAngle</code> to the same value, which will cause the vertical
+or horizontal rotation to be fixed at that value.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableZoom" translate="no">.<a href="#enableZoom">enableZoom</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable zooming (dollying) of the camera.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="keyPanSpeed" translate="no">.<a href="#keyPanSpeed">keyPanSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How fast to pan the camera when the keyboard is used in
+pixels per keypress.</p>
+						<p>Default is <code>7</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="keyRotateSpeed" translate="no">.<a href="#keyRotateSpeed">keyRotateSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How fast to rotate the camera when the keyboard is used.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="keys" translate="no">.<a href="#keys">keys</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>This object contains references to the keycodes for controlling camera panning.</p>
+<pre><code class="language-js">controls.keys = {
+	LEFT: 'ArrowLeft', //left arrow
+	UP: 'ArrowUp', // up arrow
+	RIGHT: 'ArrowRight', // right arrow
+	BOTTOM: 'ArrowDown' // down arrow
+}
+</code></pre>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Controls.html#keys">Controls#keys</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxAzimuthAngle" translate="no">.<a href="#maxAzimuthAngle">maxAzimuthAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can orbit horizontally, upper limit. If set, the interval <code>[ min, max ]</code>
+must be a sub-interval of <code>[ - 2 PI, 2 PI ]</code>, with <code>( max - min &lt; 2 PI )</code>.</p>
+						<p>Default is <code>-Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxDistance" translate="no">.<a href="#maxDistance">maxDistance</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can dolly out (perspective camera only).</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxPolarAngle" translate="no">.<a href="#maxPolarAngle">maxPolarAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can orbit vertically, upper limit. Range is <code>[0, Math.PI]</code> radians.</p>
+						<p>Default is <code>Math.PI</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxTargetRadius" translate="no">.<a href="#maxTargetRadius">maxTargetRadius</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can move the target from the 3D <code>cursor</code>.</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxZoom" translate="no">.<a href="#maxZoom">maxZoom</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can zoom out (orthographic camera only).</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minAzimuthAngle" translate="no">.<a href="#minAzimuthAngle">minAzimuthAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can orbit horizontally, lower limit. If set, the interval <code>[ min, max ]</code>
+must be a sub-interval of <code>[ - 2 PI, 2 PI ]</code>, with <code>( max - min &lt; 2 PI )</code>.</p>
+						<p>Default is <code>-Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minDistance" translate="no">.<a href="#minDistance">minDistance</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can dolly in (perspective camera only).</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minPolarAngle" translate="no">.<a href="#minPolarAngle">minPolarAngle</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can orbit vertically, lower limit. Range is <code>[0, Math.PI]</code> radians.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minTargetRadius" translate="no">.<a href="#minTargetRadius">minTargetRadius</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How close you can get the target to the 3D <code>cursor</code>.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minZoom" translate="no">.<a href="#minZoom">minZoom</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can zoom in (orthographic camera only).</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mouseButtons" translate="no">.<a href="#mouseButtons">mouseButtons</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>This object contains references to the mouse actions used by the controls.</p>
+<pre><code class="language-js">controls.mouseButtons = {
+	LEFT: THREE.MOUSE.ROTATE,
+	MIDDLE: THREE.MOUSE.DOLLY,
+	RIGHT: THREE.MOUSE.PAN
+}
+</code></pre>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Controls.html#mouseButtons">Controls#mouseButtons</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="panSpeed" translate="no">.<a href="#panSpeed">panSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Speed of panning.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="position0" translate="no">.<a href="#position0">position0</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>Used internally by <code>saveState()</code> and <code>reset()</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotateSpeed" translate="no">.<a href="#rotateSpeed">rotateSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Speed of rotation.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="screenSpacePanning" translate="no">.<a href="#screenSpacePanning">screenSpacePanning</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Defines how the camera's position is translated when panning. If <code>true</code>, the camera pans
+in screen space. Otherwise, the camera pans in the plane orthogonal to the camera's up
+direction.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="target" translate="no">.<a href="#target">target</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The focus point of the controls, the <code>object</code> orbits around this.
+It can be updated manually at any point to change the focus of the controls.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="target0" translate="no">.<a href="#target0">target0</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>Used internally by <code>saveState()</code> and <code>reset()</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="touches" translate="no">.<a href="#touches">touches</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>This object contains references to the touch actions used by the controls.</p>
+<pre><code class="language-js">controls.mouseButtons = {
+	ONE: THREE.TOUCH.ROTATE,
+	TWO: THREE.TOUCH.DOLLY_PAN
+}
+</code></pre>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Controls.html#touches">Controls#touches</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="zoom0" translate="no">.<a href="#zoom0">zoom0</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Used internally by <code>saveState()</code> and <code>reset()</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="zoomSpeed" translate="no">.<a href="#zoomSpeed">zoomSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Speed of zooming / dollying.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="zoomToCursor" translate="no">.<a href="#zoomToCursor">zoomToCursor</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Setting this property to <code>true</code> allows to zoom to the cursor's position.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getAzimuthalAngle" translate="no">.<a href="#getAzimuthalAngle">getAzimuthalAngle</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get the current horizontal rotation, in radians.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current horizontal rotation, in radians.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDistance" translate="no">.<a href="#getDistance">getDistance</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the distance from the camera to the target.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The distance from the camera to the target.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPolarAngle" translate="no">.<a href="#getPolarAngle">getPolarAngle</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get the current vertical rotation, in radians.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current vertical rotation, in radians.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="listenToKeyEvents" translate="no">.<a href="#listenToKeyEvents">listenToKeyEvents</a><span class="signature">( domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds key event listeners to the given DOM element.
+<code>window</code> is a recommended argument for using this method.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The DOM element</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Reset the controls to their state from either the last time the <code>saveState()</code>
+was called, or the initial state.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="saveState" translate="no">.<a href="#saveState">saveState</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Save the current state of the controls. This can later be recovered with <code>reset()</code>.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="stopListenToKeyEvents" translate="no">.<a href="#stopListenToKeyEvents">stopListenToKeyEvents</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the key event listener previously defined with <code>listenToKeyEvents()</code>.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:change" translate="no">.<a href="#event:change">change</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the camera has been transformed by the controls.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:end" translate="no">.<a href="#event:end">end</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when an interaction has finished.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:start" translate="no">.<a href="#event:start">start</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when an interaction was initiated.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/OrbitControls.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

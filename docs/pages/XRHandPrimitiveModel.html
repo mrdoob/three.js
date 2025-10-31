@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>XRHandPrimitiveModel - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">XRHandPrimitiveModel</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents one of the hand model types <a href="XRHandModelFactory.html">XRHandModelFactory</a> might produce
+depending on the selected profile. <code>XRHandPrimitiveModel</code> represents a hand
+with sphere or box primitives according to the selected <code>primitive</code> option.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">XRHandPrimitiveModel</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { XRHandPrimitiveModel } from 'three/addons/webxr/XRHandPrimitiveModel.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="XRHandPrimitiveModel" translate="no">new <a href="#XRHandPrimitiveModel">XRHandPrimitiveModel</a><span class="signature">( handModel : <span class="param-type"><a href="XRHandModel.html">XRHandModel</a></span>, controller : <span class="param-type"><a href="Group.html">Group</a></span>, path : <span class="param-type">string</span>, handedness : <span class="param-type">XRHandedness</span>, options : <span class="param-type"><a href="XRHandPrimitiveModel.html#~Options">XRHandPrimitiveModel~Options</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new XR hand primitive model.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>handModel</strong>
+									</td>
+									<td class="description last">
+										<p>The hand model.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The WebXR controller.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The model path.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>handedness</strong>
+									</td>
+									<td class="description last">
+										<p>The handedness of the XR input source.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The model options.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="controller" translate="no">.<a href="#controller">controller</a><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="description">
+						<p>The WebXR controller.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="envMap" translate="no">.<a href="#envMap">envMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The model's environment map.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="handModel" translate="no">.<a href="#handModel">handModel</a><span class="type-signature"> : <a href="XRHandModel.html">XRHandModel</a></span> </h3>
+					<div class="description">
+						<p>The hand model.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="updateMesh" translate="no">.<a href="#updateMesh">updateMesh</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the mesh based on the tracked XR joints data.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>Constructor options of <code>XRHandPrimitiveModel</code>.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>primitive</strong>
+						<br>
+<span class="param-type">'box'</span>
+|
+<span class="param-type">'sphere'</span>
+				</td>
+			<td class="description last">
+				<p>The primitive type.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XRHandPrimitiveModel.js" target="_blank" rel="noopener" translate="no">examples/jsm/webxr/XRHandPrimitiveModel.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

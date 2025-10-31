@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>JoltPhysics - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">JoltPhysics</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Can be used to include Jolt as a Physics engine into
+<code>three.js</code> apps. The API can be initialized via:</p>
+<p>The component automatically imports Jolt from a CDN so make sure
+to use the component with an active Internet connection.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const physics = await JoltPhysics();
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">JoltPhysics</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { JoltPhysics } from 'three/addons/physics/JoltPhysics.js';</code></pre>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addMesh" translate="no">.<a href="#addMesh">addMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, mass : <span class="param-type">number</span>, restitution : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given mesh to this physics simulation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to add.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mass</strong>
+									</td>
+									<td class="description last">
+										<p>The mass in kg of the mesh.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>restitution</strong>
+									</td>
+									<td class="description last">
+										<p>The restitution/friction of the mesh.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="addScene" translate="no">.<a href="#addScene">addScene</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given scene to this physics simulation. Only meshes with a
+<code>physics</code> object in their <a href="Object3D.html#userData">Object3D#userData</a> field will be honored.
+The object can be used to store the mass and restitution of the mesh. E.g.:</p>
+<pre><code class="language-js">box.userData.physics = { mass: 1, restitution: 0 };
+</code></pre>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or any type of 3D object to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setMeshPosition" translate="no">.<a href="#setMeshPosition">setMeshPosition</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, position : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, index : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Set the position of the given mesh which is part of the physics simulation. Calling this
+method will reset the current simulated velocity of the mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to update the position for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>position</strong>
+									</td>
+									<td class="description last">
+										<p>The new position.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>If the mesh is instanced, the index represents the instanced ID.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/physics/JoltPhysics.js" target="_blank" rel="noopener" translate="no">examples/jsm/physics/JoltPhysics.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

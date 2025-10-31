@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GridHelper - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Line.html">Line</a> → <a href="LineSegments.html">LineSegments</a> → </p>
+	<h1 translate="no">GridHelper</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>The helper is an object to define grids. Grids are two-dimensional
+arrays of lines.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const size = 10;
+const divisions = 10;
+const gridHelper = new THREE.GridHelper( size, divisions );
+scene.add( gridHelper );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="GridHelper" translate="no">new <a href="#GridHelper">GridHelper</a><span class="signature">( size : <span class="param-type">number</span>, divisions : <span class="param-type">number</span>, color1 : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, color2 : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new grid helper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The size of the grid.</p>
+										<p>Default is <code>10</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions across the grid.</p>
+										<p>Default is <code>10</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color1</strong>
+									</td>
+									<td class="description last">
+										<p>The color of the center line.</p>
+										<p>Default is <code>0x444444</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color2</strong>
+									</td>
+									<td class="description last">
+										<p>The color of the lines of the grid.</p>
+										<p>Default is <code>0x888888</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/helpers/GridHelper.js" target="_blank" rel="noopener" translate="no">src/helpers/GridHelper.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

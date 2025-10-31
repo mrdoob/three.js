@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>IcosahedronGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="BufferGeometry.html">BufferGeometry</a> → <a href="PolyhedronGeometry.html">PolyhedronGeometry</a> → </p>
+	<h1 translate="no">IcosahedronGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A geometry class for representing an icosahedron.</p></div>
+				<iframe id="viewer" src="../scenes/geometry-browser.html#IcosahedronGeometry"></iframe>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.IcosahedronGeometry();
+const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+const icosahedron = new THREE.Mesh( geometry, material );
+scene.add( icosahedron );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="IcosahedronGeometry" translate="no">new <a href="#IcosahedronGeometry">IcosahedronGeometry</a><span class="signature">( radius : <span class="param-type">number</span>, detail : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new icosahedron geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>Radius of the icosahedron.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>detail</strong>
+									</td>
+									<td class="description last">
+										<p>Setting this to a value greater than <code>0</code> adds vertices making it no longer a icosahedron.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Holds the constructor parameters that have been
+used to generate the geometry. Any modification
+after instantiation does not change the geometry.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="PolyhedronGeometry.html#parameters">PolyhedronGeometry#parameters</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".fromJSON" translate="no">.<a href="#.fromJSON">fromJSON</a><span class="signature">( data : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="IcosahedronGeometry.html">IcosahedronGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Factory method for creating an instance of this class from the given
+JSON object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>A JSON object representing the serialized geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A new instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/geometries/IcosahedronGeometry.js" target="_blank" rel="noopener" translate="no">src/geometries/IcosahedronGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

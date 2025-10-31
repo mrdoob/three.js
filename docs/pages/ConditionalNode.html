@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ConditionalNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">ConditionalNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a logical <code>if/else</code> statement. Can be used as an alternative
+to the <code>If()</code>/<code>Else()</code> syntax.</p>
+<p>The corresponding TSL <code>select()</code> looks like so:</p>
+<p>The <code>select()</code> method is called in a chaining fashion on a condition. The parameter nodes of <code>select()</code>
+determine the outcome of the entire statement.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ConditionalNode" translate="no">new <a href="#ConditionalNode">ConditionalNode</a><span class="signature">( condNode : <span class="param-type"><a href="Node.html">Node</a></span>, ifNode : <span class="param-type"><a href="Node.html">Node</a></span>, elseNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new conditional node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>condNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that defines the condition.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>ifNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that is evaluate when the condition ends up <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>elseNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that is evaluate when the condition ends up <code>false</code>.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="condNode" translate="no">.<a href="#condNode">condNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The node that defines the condition.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="elseNode" translate="no">.<a href="#elseNode">elseNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The node that is evaluate when the condition ends up <code>false</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ifNode" translate="no">.<a href="#ifNode">ifNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The node that is evaluate when the condition ends up <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type is inferred from the if/else
+nodes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getNodeType">Node#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/math/ConditionalNode.js" target="_blank" rel="noopener" translate="no">src/nodes/math/ConditionalNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SimplexNoise - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">SimplexNoise</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A utility class providing noise functions.</p>
+<p>The code is based on <a href="https://web.archive.org/web/20210210162332/http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf">Simplex noise demystified</a>
+by Stefan Gustavson, 2005.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SimplexNoise</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SimplexNoise" translate="no">new <a href="#SimplexNoise">SimplexNoise</a><span class="signature">( r : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new simplex noise object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>A math utility class that holds a <code>random()</code> method. This makes it
+possible to pass in custom random number generator.</p>
+										<p>Default is <code>Math</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="noise" translate="no">.<a href="#noise">noise</a><span class="signature">( xin : <span class="param-type">number</span>, yin : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A 2D simplex noise method.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>xin</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>yin</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The noise value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="noise3d" translate="no">.<a href="#noise3d">noise3d</a><span class="signature">( xin : <span class="param-type">number</span>, yin : <span class="param-type">number</span>, zin : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A 3D simplex noise method.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>xin</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>yin</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>zin</strong>
+									</td>
+									<td class="description last">
+										<p>The z coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The noise value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="noise4d" translate="no">.<a href="#noise4d">noise4d</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span>, w : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A 4D simplex noise method.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The w coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The noise value.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/SimplexNoise.js" target="_blank" rel="noopener" translate="no">examples/jsm/math/SimplexNoise.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

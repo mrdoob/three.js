@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>FlipNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">FlipNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This module is part of the TSL core and usually not used in app level code.
+It represents a flip operation during the shader generation process
+meaning it flips normalized values with the following formula:</p>
+<p><code>FlipNode</code> is internally used to implement any <code>flipXYZW()</code>, <code>flipRGBA()</code> and
+<code>flipSTPQ()</code> method invocations on node objects. For example:</p>
+<pre><code class="language-js">uvNode = uvNode.flipY();
+</code></pre></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre class="prettyprint source"><code>x = 1 - x;
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="FlipNode" translate="no">new <a href="#FlipNode">FlipNode</a><span class="signature">( sourceNode : <span class="param-type"><a href="Node.html">Node</a></span>, components : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new flip node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sourceNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node which component(s) should be flipped.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>components</strong>
+									</td>
+									<td class="description last">
+										<p>The components that should be flipped e.g. <code>'x'</code> or <code>'xy'</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="components" translate="no">.<a href="#components">components</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The components that should be flipped e.g. <code>'x'</code> or <code>'xy'</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sourceNode" translate="no">.<a href="#sourceNode">sourceNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The node which component(s) should be flipped.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is overwritten since the node type is inferred from the source node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#getNodeType">TempNode#getNodeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/utils/FlipNode.js" target="_blank" rel="noopener" translate="no">src/nodes/utils/FlipNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

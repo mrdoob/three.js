@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BufferGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → </p>
+	<h1 translate="no">BufferGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A representation of mesh, line, or point geometry. Includes vertex
+positions, face indices, normals, colors, UVs, and custom attributes
+within buffers, reducing the cost of passing all this data to the GPU.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.BufferGeometry();
+// create a simple square shape. We duplicate the top left and bottom right
+// vertices because each vertex needs to appear once per triangle.
+const vertices = new Float32Array( [
+	-1.0, -1.0,  1.0, // v0
+	 1.0, -1.0,  1.0, // v1
+	 1.0,  1.0,  1.0, // v2
+	 1.0,  1.0,  1.0, // v3
+	-1.0,  1.0,  1.0, // v4
+	-1.0, -1.0,  1.0  // v5
+] );
+// itemSize = 3 because there are 3 values (components) per vertex
+geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+const mesh = new THREE.Mesh( geometry, material );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BufferGeometry" translate="no">new <a href="#BufferGeometry">BufferGeometry</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new geometry.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="attributes" translate="no">.<a href="#attributes">attributes</a><span class="type-signature"> : Object.&lt;string, (<a href="BufferAttribute.html">BufferAttribute</a>|<a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a>)></span> </h3>
+					<div class="description">
+						<p>This dictionary has as id the name of the attribute to be set and as value
+the buffer attribute to set it to. Rather than accessing this property directly,
+use <code>setAttribute()</code> and <code>getAttribute()</code> to access attributes of this geometry.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="boundingBox" translate="no">.<a href="#boundingBox">boundingBox</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<div class="description">
+						<p>Bounding box for the geometry which can be calculated with <code>computeBoundingBox()</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="boundingSphere" translate="no">.<a href="#boundingSphere">boundingSphere</a><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<div class="description">
+						<p>Bounding sphere for the geometry which can be calculated with <code>computeBoundingSphere()</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="drawRange" translate="no">.<a href="#drawRange">drawRange</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Determines the part of the geometry to render. This should not be set directly,
+instead use <code>setDrawRange()</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="groups" translate="no">.<a href="#groups">groups</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>Split the geometry into groups, each of which will be rendered in a
+separate draw call. This allows an array of materials to be used with the geometry.</p>
+<p>Use <code>addGroup()</code> and <code>clearGroups()</code> to edit groups, rather than modifying this array directly.</p>
+<p>Every vertex and index must belong to exactly one group — groups must not share vertices or
+indices, and must not leave vertices or indices unused.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="id" translate="no">.<a href="#id">id</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The ID of the geometry.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="index" translate="no">.<a href="#index">index</a><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="description">
+						<p>Allows for vertices to be re-used across multiple triangles; this is
+called using &quot;indexed triangles&quot;. Each triangle is associated with the
+indices of three vertices. This attribute therefore stores the index of
+each vertex for each triangular face. If this attribute is not set, the
+renderer assumes that each three contiguous positions represent a single triangle.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="indirect" translate="no">.<a href="#indirect">indirect</a><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="description">
+						<p>A (storage) buffer attribute which was generated with a compute shader and
+now defines indirect draw calls.</p>
+<p>Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a> and a WebGPU backend.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isBufferGeometry" translate="no">.<a href="#isBufferGeometry">isBufferGeometry</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="morphAttributes" translate="no">.<a href="#morphAttributes">morphAttributes</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>This dictionary holds the morph targets of the geometry.</p>
+<p>Note: Once the geometry has been rendered, the morph attribute data cannot
+be changed. You will have to call `dispose()?, and create a new geometry instance.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="morphTargetsRelative" translate="no">.<a href="#morphTargetsRelative">morphTargetsRelative</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Used to control the morph target behavior; when set to <code>true</code>, the morph
+target data is treated as relative offsets, rather than as absolute
+positions/normals.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the geometry.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="userData" translate="no">.<a href="#userData">userData</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>An object that can be used to store custom data about the geometry.
+It should not hold references to functions as these will not be cloned.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uuid" translate="no">.<a href="#uuid">uuid</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The UUID of the geometry.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addGroup" translate="no">.<a href="#addGroup">addGroup</a><span class="signature">( start : <span class="param-type">number</span>, count : <span class="param-type">number</span>, materialIndex : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a group to this geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>The first element in this draw call. That is the first
+vertex for non-indexed geometry, otherwise the first triangle index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>Specifies how many vertices (or indices) are part of this group.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>materialIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The material array index to use.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given 4x4 transformation matrix to the geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyQuaternion" translate="no">.<a href="#applyQuaternion">applyQuaternion</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the rotation represented by the Quaternion to the geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The Quaternion to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="center" translate="no">.<a href="#center">center</a><span class="signature">()</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Center the geometry based on its bounding box.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clearGroups" translate="no">.<a href="#clearGroups">clearGroups</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clears all groups.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new geometry with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="computeBoundingBox" translate="no">.<a href="#computeBoundingBox">computeBoundingBox</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the bounding box of the geometry, and updates the <code>boundingBox</code> member.
+The bounding box is not computed by the engine; it must be computed by your app.
+You may need to recompute the bounding box if the geometry vertices are modified.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="computeBoundingSphere" translate="no">.<a href="#computeBoundingSphere">computeBoundingSphere</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the bounding sphere of the geometry, and updates the <code>boundingSphere</code> member.
+The engine automatically computes the bounding sphere when it is needed, e.g., for ray casting or view frustum culling.
+You may need to recompute the bounding sphere if the geometry vertices are modified.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="computeTangents" translate="no">.<a href="#computeTangents">computeTangents</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calculates and adds a tangent attribute to this geometry.</p>
+<p>The computation is only supported for indexed geometries and if position, normal, and uv attributes
+are defined. When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
+BufferGeometryUtils#computeMikkTSpaceTangents instead.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="computeVertexNormals" translate="no">.<a href="#computeVertexNormals">computeVertexNormals</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes vertex normals for the given vertex data. For indexed geometries, the method sets
+each vertex normal to be the average of the face normals of the faces that share that vertex.
+For non-indexed geometries, vertices are not shared, and the method sets each vertex normal
+to be the same as the face normal.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given geometry to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="deleteAttribute" translate="no">.<a href="#deleteAttribute">deleteAttribute</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Deletes the attribute for the given name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute name to delete.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+						<h5>Fires:</h5>
+						<ul>
+							<li>BufferGeometry#event:dispose</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="getAttribute" translate="no">.<a href="#getAttribute">getAttribute</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a> | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the buffer attribute for the given name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The buffer attribute.
+Returns <code>undefined</code> if not attribute has been found.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getIndex" translate="no">.<a href="#getIndex">getIndex</a><span class="signature">()</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the index of this geometry.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The index. Returns <code>null</code> if no index is defined.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getIndirect" translate="no">.<a href="#getIndirect">getIndirect</a><span class="signature">()</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the indirect attribute of this geometry.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The indirect attribute. Returns <code>null</code> if no indirect attribute is defined.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasAttribute" translate="no">.<a href="#hasAttribute">hasAttribute</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this geometry has an attribute for the given name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this geometry has an attribute for the given name or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lookAt" translate="no">.<a href="#lookAt">lookAt</a><span class="signature">( vector : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the geometry to face a point in 3D space. This is typically done as a one time
+operation, and not during a loop. Use <a href="Object3D.html#lookAt">Object3D#lookAt</a> for typical
+real-time mesh rotation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>vector</strong>
+									</td>
+									<td class="description last">
+										<p>The target point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="normalizeNormals" translate="no">.<a href="#normalizeNormals">normalizeNormals</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Ensures every normal vector in a geometry will have a magnitude of <code>1</code>. This will
+correct lighting on the geometry surfaces.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="rotateX" translate="no">.<a href="#rotateX">rotateX</a><span class="signature">( angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the geometry about the X axis. This is typically done as a one time
+operation, and not during a loop. Use <a href="Object3D.html#rotation">Object3D#rotation</a> for typical
+real-time mesh rotation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotateY" translate="no">.<a href="#rotateY">rotateY</a><span class="signature">( angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the geometry about the Y axis. This is typically done as a one time
+operation, and not during a loop. Use <a href="Object3D.html#rotation">Object3D#rotation</a> for typical
+real-time mesh rotation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotateZ" translate="no">.<a href="#rotateZ">rotateZ</a><span class="signature">( angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the geometry about the Z axis. This is typically done as a one time
+operation, and not during a loop. Use <a href="Object3D.html#rotation">Object3D#rotation</a> for typical
+real-time mesh rotation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="scale" translate="no">.<a href="#scale">scale</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Scales the geometry. This is typically done as a one time
+operation, and not during a loop. Use <a href="Object3D.html#scale">Object3D#scale</a> for typical
+real-time mesh rotation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x scale.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y scale.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z scale.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setAttribute" translate="no">.<a href="#setAttribute">setAttribute</a><span class="signature">( name : <span class="param-type">string</span>, attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given attribute for the given name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDrawRange" translate="no">.<a href="#setDrawRange">setDrawRange</a><span class="signature">( start : <span class="param-type">number</span>, count : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the draw range for this geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>The first vertex for non-indexed geometry, otherwise the first triangle index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>For non-indexed BufferGeometry, <code>count</code> is the number of vertices to render.
+For indexed BufferGeometry, <code>count</code> is the number of indices to render.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>> | Array.&lt;<a href="Vector3.html">Vector3</a>></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines a geometry by creating a <code>position</code> attribute based on the given array of points. The array
+can hold 2D or 3D vectors. When using two-dimensional data, the <code>z</code> coordinate for all vertices is
+set to <code>0</code>.</p>
+<p>If the method is used with an existing <code>position</code> attribute, the vertex data are overwritten with the
+data from the array. The length of the array must match the vertex count.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>The points.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setIndex" translate="no">.<a href="#setIndex">setIndex</a><span class="signature">( index : <span class="param-type">Array.&lt;number> | <a href="BufferAttribute.html">BufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given index to this geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setIndirect" translate="no">.<a href="#setIndirect">setIndirect</a><span class="signature">( indirect : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given indirect attribute to this geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>indirect</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute holding indirect draw calls.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the geometry into JSON.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toNonIndexed" translate="no">.<a href="#toNonIndexed">toNonIndexed</a><span class="signature">()</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Return a new non-index version of this indexed geometry. If the geometry
+is already non-indexed, the method is a NOOP.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The non-indexed version of this indexed geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Translates the geometry. This is typically done as a one time
+operation, and not during a loop. Use <a href="Object3D.html#position">Object3D#position</a> for typical
+real-time mesh rotation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x offset.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y offset.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z offset.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js" target="_blank" rel="noopener" translate="no">src/core/BufferGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WebXRManager - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → </p>
+	<h1 translate="no">WebXRManager</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class represents an abstraction of the WebXR Device API and is
+internally used by <a href="WebGLRenderer.html">WebGLRenderer</a>. <code>WebXRManager</code> also provides a public
+interface that allows users to enable/disable XR and perform XR related
+tasks like for instance retrieving controllers.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="cameraAutoUpdate" translate="no">.<a href="#cameraAutoUpdate">cameraAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the manager's XR camera should be automatically updated or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enabled" translate="no">.<a href="#enabled">enabled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>This flag notifies the renderer to be ready for XR rendering. Set it to <code>true</code>
+if you are going to use XR in your app.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isPresenting" translate="no">.<a href="#isPresenting">isPresenting</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether XR presentation is active or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getBaseLayer" translate="no">.<a href="#getBaseLayer">getBaseLayer</a><span class="signature">()</span><span class="type-signature"> : XRWebGLLayer | XRProjectionLayer</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current base layer.</p>
+<p>This is an <code>XRProjectionLayer</code> when the targeted XR device supports the
+WebXR Layers API, or an <code>XRWebGLLayer</code> otherwise.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR base layer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBinding" translate="no">.<a href="#getBinding">getBinding</a><span class="signature">()</span><span class="type-signature"> : XRWebGLBinding</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current XR binding.</p>
+<p>Creates a new binding if needed and the browser is
+capable of doing so.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR binding. Returns <code>null</code> if one cannot be created.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getCamera" translate="no">.<a href="#getCamera">getCamera</a><span class="signature">()</span><span class="type-signature"> : <a href="ArrayCamera.html">ArrayCamera</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an instance of <a href="ArrayCamera.html">ArrayCamera</a> which represents the XR camera
+of the active XR session. For each view it holds a separate camera object.</p>
+<p>The camera's <code>fov</code> is currently not used and does not reflect the fov of
+the XR camera. If you need the fov on app level, you have to compute in
+manually from the XR camera's projection matrices.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR camera.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getCameraTexture" translate="no">.<a href="#getCameraTexture">getCameraTexture</a><span class="signature">( xrCamera : <span class="param-type">XRCamera</span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Retrieves an opaque texture from the view-aligned XRCamera.
+Only available during the current animation loop.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>xrCamera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to query.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An opaque texture representing the current raw camera frame.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getController" translate="no">.<a href="#getController">getController</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a group representing the <code>target ray</code> space of the XR controller.
+Use this space for visualizing 3D objects that support the user in pointing
+tasks like UI interaction.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group representing the <code>target ray</code> space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getControllerGrip" translate="no">.<a href="#getControllerGrip">getControllerGrip</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a group representing the <code>grip</code> space of the XR controller.
+Use this space for visualizing 3D objects that support the user in pointing
+tasks like UI interaction.</p>
+<p>Note: If you want to show something in the user's hand AND offer a
+pointing ray at the same time, you'll want to attached the handheld object
+to the group returned by <code>getControllerGrip()</code> and the ray to the
+group returned by <code>getController()</code>. The idea is to have two
+different groups in two different coordinate spaces for the same WebXR
+controller.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group representing the <code>grip</code> space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDepthSensingMesh" translate="no">.<a href="#getDepthSensingMesh">getDepthSensingMesh</a><span class="signature">()</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the depth sensing mesh.</p>
+<p>See <a href="WebXRDepthSensing.html#getMesh">WebXRDepthSensing#getMesh</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The depth sensing mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDepthTexture" translate="no">.<a href="#getDepthTexture">getDepthTexture</a><span class="signature">()</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current depth texture computed via depth sensing.</p>
+<p>See <a href="WebXRDepthSensing.html#getDepthTexture">WebXRDepthSensing#getDepthTexture</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The depth texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getEnvironmentBlendMode" translate="no">.<a href="#getEnvironmentBlendMode">getEnvironmentBlendMode</a><span class="signature">()</span><span class="type-signature"> : 'opaque' | 'additive' | 'alpha-blend' | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the environment blend mode from the current XR session.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The environment blend mode. Returns <code>undefined</code> when used outside of a XR session.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFoveation" translate="no">.<a href="#getFoveation">getFoveation</a><span class="signature">()</span><span class="type-signature"> : number | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the amount of foveation used by the XR compositor for the projection layer.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The amount of foveation.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFrame" translate="no">.<a href="#getFrame">getFrame</a><span class="signature">()</span><span class="type-signature"> : XRFrame</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current XR frame.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR frame. Returns <code>null</code> when used outside a XR session.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHand" translate="no">.<a href="#getHand">getHand</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a group representing the <code>hand</code> space of the XR controller.
+Use this space for visualizing 3D objects that support the user in pointing
+tasks like UI interaction.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the controller.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A group representing the <code>hand</code> space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getReferenceSpace" translate="no">.<a href="#getReferenceSpace">getReferenceSpace</a><span class="signature">()</span><span class="type-signature"> : XRReferenceSpace</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the XR reference space.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR reference space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSession" translate="no">.<a href="#getSession">getSession</a><span class="signature">()</span><span class="type-signature"> : XRSession</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current XR session.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The XR session. Returns <code>null</code> when used outside a XR session.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasDepthSensing" translate="no">.<a href="#hasDepthSensing">hasDepthSensing</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if depth sensing is supported.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether depth sensing is supported or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFoveation" translate="no">.<a href="#setFoveation">setFoveation</a><span class="signature">( value : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the foveation value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>A number in the range <code>[0,1]</code> where <code>0</code> means no foveation (full resolution)
+and <code>1</code> means maximum foveation (the edges render at lower resolution).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setFramebufferScaleFactor" translate="no">.<a href="#setFramebufferScaleFactor">setFramebufferScaleFactor</a><span class="signature">( value : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the framebuffer scale factor.</p>
+<p>This method can not be used during a XR session.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The framebuffer scale factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setReferenceSpace" translate="no">.<a href="#setReferenceSpace">setReferenceSpace</a><span class="signature">( space : <span class="param-type">XRReferenceSpace</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets a custom XR reference space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>space</strong>
+									</td>
+									<td class="description last">
+										<p>The XR reference space.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setReferenceSpaceType" translate="no">.<a href="#setReferenceSpaceType">setReferenceSpaceType</a><span class="signature">( value : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the reference space type. Can be used to configure a spatial relationship with the user's physical
+environment. Depending on how the user moves in 3D space, setting an appropriate reference space can
+improve tracking. Default is <code>local-floor</code>. Valid values can be found here
+https://developer.mozilla.org/en-US/docs/Web/API/XRReferenceSpace#reference_space_types.</p>
+<p>This method can not be used during a XR session.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The reference space type.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSession" translate="no">.<a href="#setSession">setSession</a><span class="signature">( value : <span class="param-type">XRSession</span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>After a XR session has been requested usually with one of the <code>*Button</code> modules, it
+is injected into the renderer with this method. This method triggers the start of
+the actual XR rendering.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The XR session to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the session has been set.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateCamera" translate="no">.<a href="#updateCamera">updateCamera</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the state of the XR camera. Use this method on app level if you
+set <code>cameraAutoUpdate</code> to <code>false</code>. The method requires the non-XR
+camera of the scene as a parameter. The passed in camera's transformation
+is automatically adjusted to the position of the XR camera when calling
+this method.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/webxr/WebXRManager.js" target="_blank" rel="noopener" translate="no">src/renderers/webxr/WebXRManager.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

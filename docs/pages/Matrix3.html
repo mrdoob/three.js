@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Matrix3 - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Matrix3</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a 3x3 matrix.</p>
+<p>A Note on Row-Major and Column-Major Ordering:</p>
+<p>The constructor and <a href="Matrix3.html#set">Matrix3#set</a> method take arguments in
+<a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order">row-major</a>
+order, while internally they are stored in the <a href="Matrix3.html#elements">Matrix3#elements</a> array in column-major order.
+This means that calling:</p>
+<p>will result in the elements array containing:</p>
+<pre><code class="language-js">m.elements = [ 11, 21, 31,
+               12, 22, 32,
+               13, 23, 33 ];
+</code></pre>
+<p>and internally all calculations are performed using column-major ordering.
+However, as the actual ordering makes no difference mathematically and
+most people are used to thinking about matrices in row-major order, the
+three.js documentation shows matrices in row-major order. Just bear in
+mind that if you are reading the source code, you'll have to take the
+transpose of any matrices outlined here to make sense of the calculations.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const m = new THREE.Matrix();
+m.set( 11, 12, 13,
+       21, 22, 23,
+       31, 32, 33 );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Matrix3" translate="no">new <a href="#Matrix3">Matrix3</a><span class="signature">( n11 : <span class="param-type">number</span>, n12 : <span class="param-type">number</span>, n13 : <span class="param-type">number</span>, n21 : <span class="param-type">number</span>, n22 : <span class="param-type">number</span>, n23 : <span class="param-type">number</span>, n31 : <span class="param-type">number</span>, n32 : <span class="param-type">number</span>, n33 : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new 3x3 matrix. The arguments are supposed to be
+in row-major order. If no arguments are provided, the constructor
+initializes the matrix as an identity matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>n11</strong>
+									</td>
+									<td class="description last">
+										<p>1-1 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n12</strong>
+									</td>
+									<td class="description last">
+										<p>1-2 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n13</strong>
+									</td>
+									<td class="description last">
+										<p>1-3 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n21</strong>
+									</td>
+									<td class="description last">
+										<p>2-1 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n22</strong>
+									</td>
+									<td class="description last">
+										<p>2-2 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n23</strong>
+									</td>
+									<td class="description last">
+										<p>2-3 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n31</strong>
+									</td>
+									<td class="description last">
+										<p>3-1 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n32</strong>
+									</td>
+									<td class="description last">
+										<p>3-2 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n33</strong>
+									</td>
+									<td class="description last">
+										<p>3-3 matrix element.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="elements" translate="no">.<a href="#elements">elements</a><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="description">
+						<p>A column-major list of matrix values.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMatrix3" translate="no">.<a href="#isMatrix3">isMatrix3</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a matrix with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given matrix to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="determinant" translate="no">.<a href="#determinant">determinant</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes and returns the determinant of this matrix.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The determinant.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this matrix is equal with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to test for equality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this matrix is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="extractBasis" translate="no">.<a href="#extractBasis">extractBasis</a><span class="signature">( xAxis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, yAxis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, zAxis : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Extracts the basis of this matrix into the three axis vectors provided.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>xAxis</strong>
+									</td>
+									<td class="description last">
+										<p>The basis's x axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>yAxis</strong>
+									</td>
+									<td class="description last">
+										<p>The basis's y axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>zAxis</strong>
+									</td>
+									<td class="description last">
+										<p>The basis's z axis.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromArray" translate="no">.<a href="#fromArray">fromArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the elements of the matrix from the given array.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix elements in column-major order.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first element in the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNormalMatrix" translate="no">.<a href="#getNormalMatrix">getNormalMatrix</a><span class="signature">( matrix4 : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the normal matrix which is the inverse transpose of the upper
+left 3x3 portion of the given 4x4 matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>matrix4</strong>
+									</td>
+									<td class="description last">
+										<p>The 4x4 matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="identity" translate="no">.<a href="#identity">identity</a><span class="signature">()</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this matrix to the 3x3 identity matrix.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="invert" translate="no">.<a href="#invert">invert</a><span class="signature">()</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Inverts this matrix, using the <a href="https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution">analytic method</a>.
+You can not invert with a determinant of zero. If you attempt this, the method produces
+a zero matrix instead.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="makeRotation" translate="no">.<a href="#makeRotation">makeRotation</a><span class="signature">( theta : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this matrix as a 2D rotational transformation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>theta</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="makeScale" translate="no">.<a href="#makeScale">makeScale</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this matrix as a 2D scale transform.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The amount to scale in the X axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The amount to scale in the Y axis.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="makeTranslation" translate="no">.<a href="#makeTranslation">makeTranslation</a><span class="signature">( x : <span class="param-type">number | <a href="Vector2.html">Vector2</a></span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this matrix as a 2D translation transform.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The amount to translate in the X axis or alternatively a translation vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The amount to translate in the Y axis.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiply" translate="no">.<a href="#multiply">multiply</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Post-multiplies this matrix by the given 3x3 matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to multiply with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiplyMatrices" translate="no">.<a href="#multiplyMatrices">multiplyMatrices</a><span class="signature">( a : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span>, b : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiples the given 3x3 matrices and stores the result
+in this matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first matrix.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiplyScalar" translate="no">.<a href="#multiplyScalar">multiplyScalar</a><span class="signature">( s : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies every component of the matrix by the given scalar.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="premultiply" translate="no">.<a href="#premultiply">premultiply</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Pre-multiplies this matrix by the given 3x3 matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to multiply with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="rotate" translate="no">.<a href="#rotate">rotate</a><span class="signature">( theta : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates this matrix by the given angle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>theta</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="scale" translate="no">.<a href="#scale">scale</a><span class="signature">( sx : <span class="param-type">number</span>, sy : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Scales this matrix with the given scalar values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sx</strong>
+									</td>
+									<td class="description last">
+										<p>The amount to scale in the X axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sy</strong>
+									</td>
+									<td class="description last">
+										<p>The amount to scale in the Y axis.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( n11 : <span class="param-type">number</span>, n12 : <span class="param-type">number</span>, n13 : <span class="param-type">number</span>, n21 : <span class="param-type">number</span>, n22 : <span class="param-type">number</span>, n23 : <span class="param-type">number</span>, n31 : <span class="param-type">number</span>, n32 : <span class="param-type">number</span>, n33 : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the elements of the matrix.The arguments are supposed to be
+in row-major order.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>n11</strong>
+									</td>
+									<td class="description last">
+										<p>1-1 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n12</strong>
+									</td>
+									<td class="description last">
+										<p>1-2 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n13</strong>
+									</td>
+									<td class="description last">
+										<p>1-3 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n21</strong>
+									</td>
+									<td class="description last">
+										<p>2-1 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n22</strong>
+									</td>
+									<td class="description last">
+										<p>2-2 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n23</strong>
+									</td>
+									<td class="description last">
+										<p>2-3 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n31</strong>
+									</td>
+									<td class="description last">
+										<p>3-1 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n32</strong>
+									</td>
+									<td class="description last">
+										<p>3-2 matrix element.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>n33</strong>
+									</td>
+									<td class="description last">
+										<p>3-3 matrix element.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromMatrix4" translate="no">.<a href="#setFromMatrix4">setFromMatrix4</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Set this matrix to the upper 3x3 matrix of the given 4x4 matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The 4x4 matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setUvTransform" translate="no">.<a href="#setUvTransform">setUvTransform</a><span class="signature">( tx : <span class="param-type">number</span>, ty : <span class="param-type">number</span>, sx : <span class="param-type">number</span>, sy : <span class="param-type">number</span>, rotation : <span class="param-type">number</span>, cx : <span class="param-type">number</span>, cy : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the UV transform matrix from offset, repeat, rotation, and center.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>tx</strong>
+									</td>
+									<td class="description last">
+										<p>Offset x.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>ty</strong>
+									</td>
+									<td class="description last">
+										<p>Offset y.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sx</strong>
+									</td>
+									<td class="description last">
+										<p>Repeat x.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sy</strong>
+									</td>
+									<td class="description last">
+										<p>Repeat y.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>rotation</strong>
+									</td>
+									<td class="description last">
+										<p>Rotation, in radians. Positive values rotate counterclockwise.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>cx</strong>
+									</td>
+									<td class="description last">
+										<p>Center x of rotation.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>cy</strong>
+									</td>
+									<td class="description last">
+										<p>Center y of rotation</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toArray" translate="no">.<a href="#toArray">toArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Writes the elements of this matrix to the given array. If no array is provided,
+the method returns a new instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The target array holding the matrix elements in column-major order.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first element in the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The matrix elements in column-major order.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( tx : <span class="param-type">number</span>, ty : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Translates this matrix by the given scalar values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>tx</strong>
+									</td>
+									<td class="description last">
+										<p>The amount to translate in the X axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>ty</strong>
+									</td>
+									<td class="description last">
+										<p>The amount to translate in the Y axis.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="transpose" translate="no">.<a href="#transpose">transpose</a><span class="signature">()</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Transposes this matrix in place.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="transposeIntoArray" translate="no">.<a href="#transposeIntoArray">transposeIntoArray</a><span class="signature">( r : <span class="param-type">Array.&lt;number></span> )</span><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Transposes this matrix into the supplied array, and returns itself unchanged.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>An array to store the transposed matrix elements.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Matrix3.js" target="_blank" rel="noopener" translate="no">src/math/Matrix3.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>DragControls - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Controls.html">Controls</a> → </p>
+	<h1 translate="no">DragControls</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to provide a drag'n'drop interaction.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const controls = new DragControls( objects, camera, renderer.domElement );
+// add event listener to highlight dragged objects
+controls.addEventListener( 'dragstart', function ( event ) {
+	event.object.material.emissive.set( 0xaaaaaa );
+} );
+controls.addEventListener( 'dragend', function ( event ) {
+	event.object.material.emissive.set( 0x000000 );
+} );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">DragControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { DragControls } from 'three/addons/controls/DragControls.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="DragControls" translate="no">new <a href="#DragControls">DragControls</a><span class="signature">( objects : <span class="param-type">Array.&lt;<a href="Object3D.html">Object3D</a>></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new controls instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>objects</strong>
+									</td>
+									<td class="description last">
+										<p>An array of draggable 3D objects.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera of the rendered scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML DOM element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="objects" translate="no">.<a href="#objects">objects</a><span class="type-signature"> : Array.&lt;<a href="Object3D.html">Object3D</a>></span> </h3>
+					<div class="description">
+						<p>An array of draggable 3D objects.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="raycaster" translate="no">.<a href="#raycaster">raycaster</a><span class="type-signature"> : <a href="Raycaster.html">Raycaster</a></span> </h3>
+					<div class="description">
+						<p>The raycaster used for detecting 3D objects.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="recursive" translate="no">.<a href="#recursive">recursive</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether children of draggable objects can be dragged independently from their parent.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotateSpeed" translate="no">.<a href="#rotateSpeed">rotateSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The speed at which the object will rotate when dragged in <code>rotate</code> mode.
+The higher the number the faster the rotation.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transformGroup" translate="no">.<a href="#transformGroup">transformGroup</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>This option only works if the <code>objects</code> array contains a single draggable  group object.
+If set to <code>true</code>, the controls does not transform individual objects but the entire group.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:drag" translate="no">.<a href="#event:drag">drag</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the user drags a 3D object.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:dragend" translate="no">.<a href="#event:dragend">dragend</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the user has finished dragging a 3D object.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:hoveroff" translate="no">.<a href="#event:hoveroff">hoveroff</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the pointer is moved out of a 3D object.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:hoveron" translate="no">.<a href="#event:hoveron">hoveron</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the pointer is moved onto a 3D object, or onto one of its children.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/DragControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/DragControls.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

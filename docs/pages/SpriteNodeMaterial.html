@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SpriteNodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="NodeMaterial.html">NodeMaterial</a> → </p>
+	<h1 translate="no">SpriteNodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Node material version of <a href="SpriteMaterial.html">SpriteMaterial</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SpriteNodeMaterial" translate="no">new <a href="#SpriteNodeMaterial">SpriteNodeMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new sprite node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isSpriteNodeMaterial" translate="no">.<a href="#isSpriteNodeMaterial">isSpriteNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="positionNode" translate="no">.<a href="#positionNode">positionNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>This property makes it possible to define the position of the sprite with a
+node. That can be useful when the material is used with instanced rendering
+and node data are defined with an instanced attribute node:</p>
+<pre><code class="language-js">const positionAttribute = new InstancedBufferAttribute( new Float32Array( positions ), 3 );
+material.positionNode = instancedBufferAttribute( positionAttribute );
+</code></pre>
+<p>Another possibility is to compute the instanced data with a compute shader:</p>
+<pre><code class="language-js">const positionBuffer = instancedArray( particleCount, 'vec3' );
+particleMaterial.positionNode = positionBuffer.toAttribute();
+</code></pre>
+						<p>Default is <code>null</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#positionNode">NodeMaterial#positionNode</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotationNode" translate="no">.<a href="#rotationNode">rotationNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The rotation of sprite materials is by default inferred from the <code>rotation</code>,
+property. This node property allows to overwrite the default and define
+the rotation with a node instead.</p>
+<p>If you don't want to overwrite the rotation but modify the existing
+value instead, use <a href="TSL.html#materialRotation">materialRotation</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scaleNode" translate="no">.<a href="#scaleNode">scaleNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="description">
+						<p>This node property provides an additional way to scale sprites next to
+<code>Object3D.scale</code>. The scale transformation based in <code>Object3D.scale</code>
+is multiplied with the scale value of this node in the vertex shader.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sizeAttenuation" translate="no">.<a href="#sizeAttenuation">sizeAttenuation</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to use size attenuation or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transparent" translate="no">.<a href="#transparent">transparent</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>In Sprites, the transparent property is enabled by default.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#transparent">NodeMaterial#transparent</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupPositionView" translate="no">.<a href="#setupPositionView">setupPositionView</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the position node in view space. This method implements
+the sprite specific vertex shader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupPositionView">NodeMaterial#setupPositionView</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The position in view space.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/SpriteNodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/SpriteNodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

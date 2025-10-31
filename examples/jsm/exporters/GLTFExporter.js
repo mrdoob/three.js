@@ -65,13 +65,13 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
 /**
  * An exporter for `glTF` 2.0.
  *
- * glTF (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/master/specification/2.0}
+ * glTF (GL Transmission Format) is an [open format specification](https://github.com/KhronosGroup/glTF/tree/master/specification/2.0)
  * for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
  * or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
  * data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
  * textures, skins, skeletons, morph targets, animations, lights, and/or cameras.
  *
- * GLTFExporter supports the [glTF 2.0 extensions]{@link https://github.com/KhronosGroup/glTF/tree/master/extensions/}:
+ * GLTFExporter supports the [glTF 2.0 extensions](https://github.com/KhronosGroup/glTF/tree/master/extensions/):
  *
  * - KHR_lights_punctual
  * - KHR_materials_clearcoat
@@ -91,7 +91,7 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
  *
- * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
+ * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  *
  * ```js
  * const exporter = new GLTFExporter();

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BufferGeometryUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">BufferGeometryUtils</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">BufferGeometryUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="~computeMikkTSpaceTangents" translate="no">.<a href="#~computeMikkTSpaceTangents">computeMikkTSpaceTangents</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, MikkTSpace : <span class="param-type">Object</span>, negateSign : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes vertex tangents using the MikkTSpace algorithm. MikkTSpace generates the same tangents consistently,
+and is used in most modelling tools and normal map bakers. Use MikkTSpace for materials with normal maps,
+because inconsistent tangents may lead to subtle visual issues in the normal map, particularly around mirrored
+UV seams.</p>
+<p>In comparison to this method, <a href="BufferGeometry.html#computeTangents">BufferGeometry#computeTangents</a> (a custom algorithm) generates tangents that
+probably will not match the tangents in other software. The custom algorithm is sufficient for general use with a
+custom material, and may be faster than MikkTSpace.</p>
+<p>Returns the original BufferGeometry. Indexed geometries will be de-indexed. Requires position, normal, and uv attributes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to compute tangents for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>MikkTSpace</strong>
+									</td>
+									<td class="description last">
+										<p>Instance of <code>examples/jsm/libs/mikktspace.module.js</code>, or <code>mikktspace</code> npm package.
+Await <code>MikkTSpace.ready</code> before use.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>negateSign</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to negate the sign component (.w) of each tangent.
+Required for normal map conventions in some formats, including glTF.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The updated geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~computeMorphedAttributes" translate="no">.<a href="#~computeMorphedAttributes">computeMorphedAttributes</a><span class="signature">( object : <span class="param-type"><a href="Mesh.html">Mesh</a> | <a href="Line.html">Line</a> | <a href="Points.html">Points</a></span> )</span><span class="type-signature"> : Object</span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Calculates the morphed attributes of a morphed/skinned BufferGeometry.</p>
+<p>Helpful for Raytracing or Decals (i.e. a <code>DecalGeometry</code> applied to a morphed Object with a <code>BufferGeometry</code>
+will use the original <code>BufferGeometry</code>, not the morphed/skinned one, generating an incorrect result.
+Using this function to create a shadow <code>Object3</code>D the <code>DecalGeometry</code> can be correctly generated).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to compute morph attributes for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object with original position/normal attributes and morphed ones.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~deepCloneAttribute" translate="no">.<a href="#~deepCloneAttribute">deepCloneAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a deep clone of the given buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute to clone.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The cloned attribute.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~deinterleaveAttribute" translate="no">.<a href="#~deinterleaveAttribute">deinterleaveAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new, non-interleaved version of the given attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The interleaved attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The non-interleaved attribute.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~deinterleaveGeometry" translate="no">.<a href="#~deinterleaveGeometry">deinterleaveGeometry</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Deinterleaves all attributes on the given geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to deinterleave.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="~estimateBytesUsed" translate="no">.<a href="#~estimateBytesUsed">estimateBytesUsed</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span><span class="type-signature"> : number</span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the amount of bytes used by all attributes to represent the geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The estimate bytes used.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~interleaveAttributes" translate="no">.<a href="#~interleaveAttributes">interleaveAttributes</a><span class="signature">( attributes : <span class="param-type">Array.&lt;<a href="BufferAttribute.html">BufferAttribute</a>></span> )</span><span class="type-signature"> : Array.&lt;<a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a>></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Interleaves a set of attributes and returns a new array of corresponding attributes that share a
+single <a href="InterleavedBuffer.html">InterleavedBuffer</a> instance. All attributes must have compatible types.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attributes</strong>
+									</td>
+									<td class="description last">
+										<p>The attributes to interleave.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array of interleaved attributes. If interleave does not succeed, the method returns <code>null</code>.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~mergeAttributes" translate="no">.<a href="#~mergeAttributes">mergeAttributes</a><span class="signature">( attributes : <span class="param-type">Array.&lt;<a href="BufferAttribute.html">BufferAttribute</a>></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Merges a set of attributes into a single instance. All attributes must have compatible properties and types.
+Instances of <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a> are not supported.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attributes</strong>
+									</td>
+									<td class="description last">
+										<p>The attributes to merge.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The merged attribute. Returns <code>null</code> if the merge does not succeed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~mergeGeometries" translate="no">.<a href="#~mergeGeometries">mergeGeometries</a><span class="signature">( geometries : <span class="param-type">Array.&lt;<a href="BufferGeometry.html">BufferGeometry</a>></span>, useGroups : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Merges a set of geometries into a single instance. All geometries must have compatible attributes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometries</strong>
+									</td>
+									<td class="description last">
+										<p>The geometries to merge.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>useGroups</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to use groups or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The merged geometry. Returns <code>null</code> if the merge does not succeed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~mergeGroups" translate="no">.<a href="#~mergeGroups">mergeGroups</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Merges the <a href="BufferGeometry.html#groups">BufferGeometry#groups</a> for the given geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to modify.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>The updated geometry</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~mergeVertices" translate="no">.<a href="#~mergeVertices">mergeVertices</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, tolerance : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new geometry with vertices for which all similar vertex attributes (within tolerance) are merged.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to merge vertices for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>tolerance</strong>
+									</td>
+									<td class="description last">
+										<p>The tolerance value.</p>
+										<p>Default is <code>1e-4</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>The new geometry with merged vertices.</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~toCreasedNormals" translate="no">.<a href="#~toCreasedNormals">toCreasedNormals</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, creaseAngle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Modifies the supplied geometry if it is non-indexed, otherwise creates a new,
+non-indexed geometry. Returns the geometry with smooth normals everywhere except
+faces that meet at an angle greater than the crease angle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to modify.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>creaseAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The crease angle in radians.</p>
+										<p>Default is <code>Math.PI/3</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>The updated geometry</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~toTrianglesDrawMode" translate="no">.<a href="#~toTrianglesDrawMode">toTrianglesDrawMode</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, drawMode : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new indexed geometry based on <code>TrianglesDrawMode</code> draw mode.
+This mode corresponds to the <code>gl.TRIANGLES</code> primitive in WebGL.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to convert.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>drawMode</strong>
+									</td>
+									<td class="description last">
+										<p>The current draw mode.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The new geometry using <code>TrianglesDrawMode</code>.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/BufferGeometryUtils.js" target="_blank" rel="noopener" translate="no">examples/jsm/utils/BufferGeometryUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

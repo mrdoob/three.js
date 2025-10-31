@@ -15,7 +15,7 @@ import {
  * in data textures for further use in the renderer.
  *
  * Reference: Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
- * by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt. [Code]{@link https://github.com/selfshadow/ltc_code/}.
+ * by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt. [Code](https://github.com/selfshadow/ltc_code/).
  *
  * NOTE: This is a temporary location for the BRDF approximation texture data
  * based off of Eric Heitz's work (see citation). BRDF data for

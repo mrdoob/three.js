@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>VertexNormalsHelper - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Line.html">Line</a> → <a href="LineSegments.html">LineSegments</a> → </p>
+	<h1 translate="no">VertexNormalsHelper</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Visualizes an object's vertex normals.</p>
+<p>Requires that normals have been specified in the geometry as a buffer attribute or
+have been calculated using <a href="BufferGeometry.html#computeVertexNormals">BufferGeometry#computeVertexNormals</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
+const material = new THREE.MeshStandardMaterial();
+const mesh = new THREE.Mesh( geometry, material );
+scene.add( mesh );
+const helper = new VertexNormalsHelper( mesh, 1, 0xff0000 );
+scene.add( helper );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">VertexNormalsHelper</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="VertexNormalsHelper" translate="no">new <a href="#VertexNormalsHelper">VertexNormalsHelper</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, size : <span class="param-type">number</span>, color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new vertex normals helper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object for which to visualize vertex normals.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The helper's size.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The helper's color.</p>
+										<p>Default is <code>0xff0000</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isVertexNormalsHelper" translate="no">.<a href="#isVertexNormalsHelper">isVertexNormalsHelper</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="matrixAutoUpdate" translate="no">.<a href="#matrixAutoUpdate">matrixAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Overwritten and set to <code>false</code> since the object's world transformation
+is encoded in the helper's geometry data.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LineSegments.html#matrixAutoUpdate">LineSegments#matrixAutoUpdate</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="object" translate="no">.<a href="#object">object</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="description">
+						<p>The object for which to visualize vertex normals.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The helper's size.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the vertex normals preview based on the object's world transform.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/VertexNormalsHelper.js" target="_blank" rel="noopener" translate="no">examples/jsm/helpers/VertexNormalsHelper.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

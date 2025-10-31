@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LensflareNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+	<h1 translate="no">LensflareNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Post processing node for adding a bloom-based lens flare effect. This effect
+requires that you extract the bloom of the scene via a bloom pass first.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://john-chapman-graphics.blogspot.com/2013/02/pseudo-lens-flare.html">https://john-chapman-graphics.blogspot.com/2013/02/pseudo-lens-flare.html</a>.</li>
+<li><a href="https://john-chapman.github.io/2017/11/05/pseudo-lens-flare.html">https://john-chapman.github.io/2017/11/05/pseudo-lens-flare.html</a>.</li>
+</ul></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LensflareNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { lensflare } from 'three/addons/tsl/display/LensflareNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LensflareNode" translate="no">new <a href="#LensflareNode">LensflareNode</a><span class="signature">( textureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, params : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new lens flare node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>textureNode</strong>
+									</td>
+									<td class="description last">
+										<p>The texture node that represents the scene's bloom.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>params</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter object for configuring the effect.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>ghostTint</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the tint of the flare/ghosts.</p>
+										<p>Default is <code>vec3(1, 1, 1)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>threshold</strong>
+									</td>
+									<td class="description last">
+										<p>Controls the size and strength of the effect. A higher threshold results in smaller flares.</p>
+										<p>Default is <code>float(0.5)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>ghostSamples</strong>
+									</td>
+									<td class="description last">
+										<p>Represents the number of flares/ghosts per bright spot which pivot around the center.</p>
+										<p>Default is <code>float(4)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>ghostSpacing</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the spacing of the flares/ghosts.</p>
+										<p>Default is <code>float(0.25)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>ghostAttenuationFactor</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the attenuation factor of flares/ghosts.</p>
+										<p>Default is <code>float(25)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>downSampleRatio</strong>
+									</td>
+									<td class="description last">
+										<p>Defines how downsampling since the effect is usually not rendered at full resolution.</p>
+										<p>Default is <code>4</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="downSampleRatio" translate="no">.<a href="#downSampleRatio">downSampleRatio</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Defines how downsampling since the effect is usually not rendered at full resolution.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ghostAttenuationFactorNode" translate="no">.<a href="#ghostAttenuationFactorNode">ghostAttenuationFactorNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Defines the attenuation factor of flares/ghosts.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ghostSamplesNode" translate="no">.<a href="#ghostSamplesNode">ghostSamplesNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Represents the number of flares/ghosts per bright spot which pivot around the center.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ghostSpacingNode" translate="no">.<a href="#ghostSpacingNode">ghostSpacingNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Defines the spacing of the flares/ghosts.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="ghostTintNode" translate="no">.<a href="#ghostTintNode">ghostTintNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>Defines the tint of the flare/ghosts.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="textureNode" translate="no">.<a href="#textureNode">textureNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>The texture node that represents the scene's bloom.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="thresholdNode" translate="no">.<a href="#thresholdNode">thresholdNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Controls the size and strength of the effect. A higher threshold results in smaller flares.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders
+its effect once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources. This method should be called
+when the effect is no longer required.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#dispose">TempNode#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTextureNode" translate="no">.<a href="#getTextureNode">getTextureNode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the result of the effect as a texture node.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A texture node that represents the result of the effect.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to setup the effect's TSL code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to render the effect once per frame.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBefore">TempNode#updateBefore</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/LensflareNode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/LensflareNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

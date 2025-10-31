@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SkyMesh - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">SkyMesh</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a skydome for scene backgrounds. Based on <a href="https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight">A Practical Analytic Model for Daylight</a>
+aka The Preetham Model, the de facto standard for analytical skydomes.</p>
+<p>Note that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.
+When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="SkyMesh.html">SkyMesh</a>.</p>
+<p>More references:</p>
+<ul>
+<li><a href="http://simonwallner.at/project/atmospheric-scattering/">http://simonwallner.at/project/atmospheric-scattering/</a></li>
+<li><a href="http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR">http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR</a></li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const sky = new SkyMesh();
+sky.scale.setScalar( 10000 );
+scene.add( sky );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SkyMesh</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SkyMesh } from 'three/addons/objects/SkyMesh.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SkyMesh" translate="no">new <a href="#SkyMesh">SkyMesh</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new skydome.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isSky" translate="no">.<a href="#isSky">isSky</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mieCoefficient" translate="no">.<a href="#mieCoefficient">mieCoefficient</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The mieCoefficient uniform.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mieDirectionalG" translate="no">.<a href="#mieDirectionalG">mieDirectionalG</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The mieDirectionalG uniform.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rayleigh" translate="no">.<a href="#rayleigh">rayleigh</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The rayleigh uniform.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sunPosition" translate="no">.<a href="#sunPosition">sunPosition</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The sun position uniform.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="turbidity" translate="no">.<a href="#turbidity">turbidity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The turbidity uniform.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="upUniform" translate="no">.<a href="#upUniform">upUniform</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The up position.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/SkyMesh.js" target="_blank" rel="noopener" translate="no">examples/jsm/objects/SkyMesh.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

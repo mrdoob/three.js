@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>STLLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">STLLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for the STL format, as created by Solidworks and other CAD programs.</p>
+<p>Supports both binary and ASCII encoded files. The loader returns a non-indexed buffer geometry.</p>
+<p>Limitations:</p>
+<ul>
+<li>Binary decoding supports &quot;Magics&quot; color format (http://en.wikipedia.org/wiki/STL_(file_format)#Color_in_binary_STL).</li>
+<li>There is perhaps some question as to how valid it is to always assume little-endian-ness.</li>
+<li>ASCII decoding assumes file is UTF-8.</li>
+</ul>
+<p>For binary STLs geometry might contain colors for vertices. To use it:</p>
+<pre><code class="language-js">// use the same code to load STL as above
+if ( geometry.hasColors ) {
+	material = new THREE.MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: true } );
+}
+const mesh = new THREE.Mesh( geometry, material );
+</code></pre>
+<p>For ASCII STLs containing multiple solids, each solid is assigned to a different group.
+Groups can be used to assign a different color by defining an array of materials with the same length of
+geometry.groups and passing it to the Mesh constructor:</p>
+<pre><code class="language-js">const materials = [];
+const nGeometryGroups = geometry.groups.length;
+for ( let i = 0; i &lt; nGeometryGroups; i ++ ) {
+	const material = new THREE.MeshPhongMaterial( { color: colorMap[ i ], wireframe: false } );
+	materials.push( material );
+}
+const mesh = new THREE.Mesh(geometry, materials);
+</code></pre></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new STLLoader();
+const geometry = await loader.loadAsync( './models/stl/slotted_disk.stl' )
+scene.add( new THREE.Mesh( geometry ) );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">STLLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { STLLoader } from 'three/addons/loaders/STLLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="STLLoader" translate="no">new <a href="#STLLoader">STLLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new STL loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URL and passes the loaded STL asset
+to the <code>onLoad()</code> callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( data : <span class="param-type">ArrayBuffer</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given STL data and returns the resulting geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The raw STL data as an array buffer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The parsed geometry.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/STLLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/STLLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Material - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → </p>
+	<h1 translate="no">Material</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Abstract base class for materials.</p>
+<p>Materials define the appearance of renderable 3D objects.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Material" translate="no">new <a href="#Material">Material</a><span class="signature">()</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new material.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="allowOverride" translate="no">.<a href="#allowOverride">allowOverride</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether it's possible to override the material with <a href="Scene.html#overrideMaterial">Scene#overrideMaterial</a> or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="alphaHash" translate="no">.<a href="#alphaHash">alphaHash</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enables alpha hashed transparency, an alternative to <a href="Material.html#transparent">Material#transparent</a> or
+<a href="Material.html#alphaTest">Material#alphaTest</a>. The material will not be rendered if opacity is lower than
+a random threshold. Randomization introduces some grain or noise, but approximates alpha
+blending without the associated problems of sorting. Using TAA can reduce the resulting noise.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="alphaTest" translate="no">.<a href="#alphaTest">alphaTest</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Sets the alpha value to be used when running an alpha test. The material
+will not be rendered if the opacity is lower than this value.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="alphaToCoverage" translate="no">.<a href="#alphaToCoverage">alphaToCoverage</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether alpha to coverage should be enabled or not. Can only be used with MSAA-enabled contexts
+(meaning when the renderer was created with <em>antialias</em> parameter set to <code>true</code>). Enabling this
+will smooth aliasing on clip plane edges and alphaTest-clipped edges.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendAlpha" translate="no">.<a href="#blendAlpha">blendAlpha</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Represents the alpha value of the constant blend color.</p>
+<p>This property has only an effect when using custom blending with <code>ConstantAlpha</code> or <code>OneMinusConstantAlpha</code>.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendColor" translate="no">.<a href="#blendColor">blendColor</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>Represents the RGB values of the constant blend color.</p>
+<p>This property has only an effect when using custom blending with <code>ConstantColor</code> or <code>OneMinusConstantColor</code>.</p>
+						<p>Default is <code>(0,0,0)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendDst" translate="no">.<a href="#blendDst">blendDst</a><span class="type-signature"> : <a href="global.html#ZeroFactor">ZeroFactor</a> | <a href="global.html#OneFactor">OneFactor</a> | <a href="global.html#SrcColorFactor">SrcColorFactor</a> | <a href="global.html#OneMinusSrcColorFactor">OneMinusSrcColorFactor</a> | <a href="global.html#SrcAlphaFactor">SrcAlphaFactor</a> | <a href="global.html#OneMinusSrcAlphaFactor">OneMinusSrcAlphaFactor</a> | <a href="global.html#DstAlphaFactor">DstAlphaFactor</a> | <a href="global.html#OneMinusDstAlphaFactor">OneMinusDstAlphaFactor</a> | <a href="global.html#DstColorFactor">DstColorFactor</a> | <a href="global.html#OneMinusDstColorFactor">OneMinusDstColorFactor</a> | <a href="global.html#SrcAlphaSaturateFactor">SrcAlphaSaturateFactor</a> | <a href="global.html#ConstantColorFactor">ConstantColorFactor</a> | <a href="global.html#OneMinusConstantColorFactor">OneMinusConstantColorFactor</a> | <a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a> | <a href="global.html#OneMinusConstantAlphaFactor">OneMinusConstantAlphaFactor</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending destination factor.</p>
+						<p>Default is <code>OneMinusSrcAlphaFactor</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendDstAlpha" translate="no">.<a href="#blendDstAlpha">blendDstAlpha</a><span class="type-signature"> : <a href="global.html#ZeroFactor">ZeroFactor</a> | <a href="global.html#OneFactor">OneFactor</a> | <a href="global.html#SrcColorFactor">SrcColorFactor</a> | <a href="global.html#OneMinusSrcColorFactor">OneMinusSrcColorFactor</a> | <a href="global.html#SrcAlphaFactor">SrcAlphaFactor</a> | <a href="global.html#OneMinusSrcAlphaFactor">OneMinusSrcAlphaFactor</a> | <a href="global.html#DstAlphaFactor">DstAlphaFactor</a> | <a href="global.html#OneMinusDstAlphaFactor">OneMinusDstAlphaFactor</a> | <a href="global.html#DstColorFactor">DstColorFactor</a> | <a href="global.html#OneMinusDstColorFactor">OneMinusDstColorFactor</a> | <a href="global.html#SrcAlphaSaturateFactor">SrcAlphaSaturateFactor</a> | <a href="global.html#ConstantColorFactor">ConstantColorFactor</a> | <a href="global.html#OneMinusConstantColorFactor">OneMinusConstantColorFactor</a> | <a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a> | <a href="global.html#OneMinusConstantAlphaFactor">OneMinusConstantAlphaFactor</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending destination alpha factor.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendEquation" translate="no">.<a href="#blendEquation">blendEquation</a><span class="type-signature"> : <a href="global.html#AddEquation">AddEquation</a> | <a href="global.html#SubtractEquation">SubtractEquation</a> | <a href="global.html#ReverseSubtractEquation">ReverseSubtractEquation</a> | <a href="global.html#MinEquation">MinEquation</a> | <a href="global.html#MaxEquation">MaxEquation</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending equation.</p>
+						<p>Default is <code>AddEquation</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendEquationAlpha" translate="no">.<a href="#blendEquationAlpha">blendEquationAlpha</a><span class="type-signature"> : <a href="global.html#AddEquation">AddEquation</a> | <a href="global.html#SubtractEquation">SubtractEquation</a> | <a href="global.html#ReverseSubtractEquation">ReverseSubtractEquation</a> | <a href="global.html#MinEquation">MinEquation</a> | <a href="global.html#MaxEquation">MaxEquation</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending equation of the alpha channel.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendSrc" translate="no">.<a href="#blendSrc">blendSrc</a><span class="type-signature"> : <a href="global.html#ZeroFactor">ZeroFactor</a> | <a href="global.html#OneFactor">OneFactor</a> | <a href="global.html#SrcColorFactor">SrcColorFactor</a> | <a href="global.html#OneMinusSrcColorFactor">OneMinusSrcColorFactor</a> | <a href="global.html#SrcAlphaFactor">SrcAlphaFactor</a> | <a href="global.html#OneMinusSrcAlphaFactor">OneMinusSrcAlphaFactor</a> | <a href="global.html#DstAlphaFactor">DstAlphaFactor</a> | <a href="global.html#OneMinusDstAlphaFactor">OneMinusDstAlphaFactor</a> | <a href="global.html#DstColorFactor">DstColorFactor</a> | <a href="global.html#OneMinusDstColorFactor">OneMinusDstColorFactor</a> | <a href="global.html#SrcAlphaSaturateFactor">SrcAlphaSaturateFactor</a> | <a href="global.html#ConstantColorFactor">ConstantColorFactor</a> | <a href="global.html#OneMinusConstantColorFactor">OneMinusConstantColorFactor</a> | <a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a> | <a href="global.html#OneMinusConstantAlphaFactor">OneMinusConstantAlphaFactor</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending source factor.</p>
+						<p>Default is <code>SrcAlphaFactor</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blendSrcAlpha" translate="no">.<a href="#blendSrcAlpha">blendSrcAlpha</a><span class="type-signature"> : <a href="global.html#ZeroFactor">ZeroFactor</a> | <a href="global.html#OneFactor">OneFactor</a> | <a href="global.html#SrcColorFactor">SrcColorFactor</a> | <a href="global.html#OneMinusSrcColorFactor">OneMinusSrcColorFactor</a> | <a href="global.html#SrcAlphaFactor">SrcAlphaFactor</a> | <a href="global.html#OneMinusSrcAlphaFactor">OneMinusSrcAlphaFactor</a> | <a href="global.html#DstAlphaFactor">DstAlphaFactor</a> | <a href="global.html#OneMinusDstAlphaFactor">OneMinusDstAlphaFactor</a> | <a href="global.html#DstColorFactor">DstColorFactor</a> | <a href="global.html#OneMinusDstColorFactor">OneMinusDstColorFactor</a> | <a href="global.html#SrcAlphaSaturateFactor">SrcAlphaSaturateFactor</a> | <a href="global.html#ConstantColorFactor">ConstantColorFactor</a> | <a href="global.html#OneMinusConstantColorFactor">OneMinusConstantColorFactor</a> | <a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a> | <a href="global.html#OneMinusConstantAlphaFactor">OneMinusConstantAlphaFactor</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending source alpha factor.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="blending" translate="no">.<a href="#blending">blending</a><span class="type-signature"> : <a href="global.html#NoBlending">NoBlending</a> | <a href="global.html#NormalBlending">NormalBlending</a> | <a href="global.html#AdditiveBlending">AdditiveBlending</a> | <a href="global.html#SubtractiveBlending">SubtractiveBlending</a> | <a href="global.html#MultiplyBlending">MultiplyBlending</a> | <a href="global.html#CustomBlending">CustomBlending</a></span> </h3>
+					<div class="description">
+						<p>Defines the blending type of the material.</p>
+<p>It must be set to <code>CustomBlending</code> if custom blending properties like
+<a href="Material.html#blendSrc">Material#blendSrc</a>, <a href="Material.html#blendDst">Material#blendDst</a> or <a href="Material.html#blendEquation">Material#blendEquation</a>
+should have any effect.</p>
+						<p>Default is <code>NormalBlending</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clipIntersection" translate="no">.<a href="#clipIntersection">clipIntersection</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Changes the behavior of clipping planes so that only their intersection is
+clipped, rather than their union.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clipShadows" translate="no">.<a href="#clipShadows">clipShadows</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Defines whether to clip shadows according to the clipping planes specified
+on this material.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clippingPlanes" translate="no">.<a href="#clippingPlanes">clippingPlanes</a><span class="type-signature"> : Array.&lt;<a href="Plane.html">Plane</a>></span> </h3>
+					<div class="description">
+						<p>User-defined clipping planes specified as THREE.Plane objects in world
+space. These planes apply to the objects this material is attached to.
+Points in space whose signed distance to the plane is negative are clipped
+(not rendered). This requires <a href="WebGLRenderer.html#localClippingEnabled">WebGLRenderer#localClippingEnabled</a> to
+be <code>true</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="colorWrite" translate="no">.<a href="#colorWrite">colorWrite</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to render the material's color.</p>
+<p>This can be used in conjunction with Object3D#renderOder to create invisible
+objects that occlude other objects.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthFunc" translate="no">.<a href="#depthFunc">depthFunc</a><span class="type-signature"> : <a href="global.html#NeverDepth">NeverDepth</a> | <a href="global.html#AlwaysDepth">AlwaysDepth</a> | <a href="global.html#LessDepth">LessDepth</a> | <a href="global.html#LessEqualDepth">LessEqualDepth</a> | <a href="global.html#EqualDepth">EqualDepth</a> | <a href="global.html#GreaterEqualDepth">GreaterEqualDepth</a> | <a href="global.html#GreaterDepth">GreaterDepth</a> | <a href="global.html#NotEqualDepth">NotEqualDepth</a></span> </h3>
+					<div class="description">
+						<p>Defines the depth function.</p>
+						<p>Default is <code>LessEqualDepth</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthTest" translate="no">.<a href="#depthTest">depthTest</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to have depth test enabled when rendering this material.
+When the depth test is disabled, the depth write will also be implicitly disabled.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthWrite" translate="no">.<a href="#depthWrite">depthWrite</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether rendering this material has any effect on the depth buffer.</p>
+<p>When drawing 2D overlays it can be useful to disable the depth writing in
+order to layer several things together without creating z-index artifacts.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dithering" translate="no">.<a href="#dithering">dithering</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to apply dithering to the color to remove the appearance of banding.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="forceSinglePass" translate="no">.<a href="#forceSinglePass">forceSinglePass</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether double-sided, transparent objects should be rendered with a single pass or not.</p>
+<p>The engine renders double-sided, transparent objects with two draw calls (back faces first,
+then front faces) to mitigate transparency artifacts. There are scenarios however where this
+approach produces no quality gains but still doubles draw calls e.g. when rendering flat
+vegetation like grass sprites. In these cases, set the <code>forceSinglePass</code> flag to <code>true</code> to
+disable the two pass rendering to avoid performance issues.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="id" translate="no">.<a href="#id">id</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The ID of the material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMaterial" translate="no">.<a href="#isMaterial">isMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The name of the material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Setting this property to <code>true</code> indicates the engine the material
+needs to be recompiled.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="opacity" translate="no">.<a href="#opacity">opacity</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Defines how transparent the material is.
+A value of <code>0.0</code> indicates fully transparent, <code>1.0</code> is fully opaque.</p>
+<p>If the <a href="Material.html#transparent">Material#transparent</a> is not set to <code>true</code>,
+the material will remain fully opaque and this value will only affect its color.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="polygonOffset" translate="no">.<a href="#polygonOffset">polygonOffset</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to use polygon offset or not. When enabled, each fragment's depth value will
+be offset after it is interpolated from the depth values of the appropriate vertices.
+The offset is added before the depth test is performed and before the value is written
+into the depth buffer.</p>
+<p>Can be useful for rendering hidden-line images, for applying decals to surfaces, and for
+rendering solids with highlighted edges.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="polygonOffsetFactor" translate="no">.<a href="#polygonOffsetFactor">polygonOffsetFactor</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Specifies a scale factor that is used to create a variable depth offset for each polygon.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="polygonOffsetUnits" translate="no">.<a href="#polygonOffsetUnits">polygonOffsetUnits</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Is multiplied by an implementation-specific value to create a constant depth offset.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="precision" translate="no">.<a href="#precision">precision</a><span class="type-signature"> : 'highp' | 'mediump' | 'lowp'</span> </h3>
+					<div class="description">
+						<p>Override the renderer's default precision for this material.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="premultipliedAlpha" translate="no">.<a href="#premultipliedAlpha">premultipliedAlpha</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to premultiply the alpha (transparency) value.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadowSide" translate="no">.<a href="#shadowSide">shadowSide</a><span class="type-signature"> : <a href="global.html#FrontSide">FrontSide</a> | <a href="global.html#BackSide">BackSide</a> | <a href="global.html#DoubleSide">DoubleSide</a></span> </h3>
+					<div class="description">
+						<p>Defines which side of faces cast shadows. If <code>null</code>, the side casting shadows
+is determined as follows:</p>
+<ul>
+<li>When <a href="Material.html#side">Material#side</a> is set to <code>FrontSide</code>, the back side cast shadows.</li>
+<li>When <a href="Material.html#side">Material#side</a> is set to <code>BackSide</code>, the front side cast shadows.</li>
+<li>When <a href="Material.html#side">Material#side</a> is set to <code>DoubleSide</code>, both sides cast shadows.</li>
+</ul>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="side" translate="no">.<a href="#side">side</a><span class="type-signature"> : <a href="global.html#FrontSide">FrontSide</a> | <a href="global.html#BackSide">BackSide</a> | <a href="global.html#DoubleSide">DoubleSide</a></span> </h3>
+					<div class="description">
+						<p>Defines which side of faces will be rendered - front, back or both.</p>
+						<p>Default is <code>FrontSide</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencilFail" translate="no">.<a href="#stencilFail">stencilFail</a><span class="type-signature"> : <a href="global.html#ZeroStencilOp">ZeroStencilOp</a> | <a href="global.html#KeepStencilOp">KeepStencilOp</a> | <a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a> | <a href="global.html#IncrementStencilOp">IncrementStencilOp</a> | <a href="global.html#DecrementStencilOp">DecrementStencilOp</a> | <a href="global.html#IncrementWrapStencilOp">IncrementWrapStencilOp</a> | <a href="global.html#DecrementWrapStencilOp">DecrementWrapStencilOp</a> | <a href="global.html#InvertStencilOp">InvertStencilOp</a></span> </h3>
+					<div class="description">
+						<p>Which stencil operation to perform when the comparison function returns <code>false</code>.</p>
+						<p>Default is <code>KeepStencilOp</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencilFunc" translate="no">.<a href="#stencilFunc">stencilFunc</a><span class="type-signature"> : <a href="global.html#NeverStencilFunc">NeverStencilFunc</a> | <a href="global.html#LessStencilFunc">LessStencilFunc</a> | <a href="global.html#EqualStencilFunc">EqualStencilFunc</a> | <a href="global.html#LessEqualStencilFunc">LessEqualStencilFunc</a> | <a href="global.html#GreaterStencilFunc">GreaterStencilFunc</a> | <a href="global.html#NotEqualStencilFunc">NotEqualStencilFunc</a> | <a href="global.html#GreaterEqualStencilFunc">GreaterEqualStencilFunc</a> | <a href="global.html#AlwaysStencilFunc">AlwaysStencilFunc</a></span> </h3>
+					<div class="description">
+						<p>The stencil comparison function to use.</p>
+						<p>Default is <code>AlwaysStencilFunc</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencilFuncMask" translate="no">.<a href="#stencilFuncMask">stencilFuncMask</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The bit mask to use when comparing against the stencil buffer.</p>
+						<p>Default is <code>0xff</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencilRef" translate="no">.<a href="#stencilRef">stencilRef</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The value to use when performing stencil comparisons or stencil operations.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencilWrite" translate="no">.<a href="#stencilWrite">stencilWrite</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether stencil operations are performed against the stencil buffer. In
+order to perform writes or comparisons against the stencil buffer this
+value must be <code>true</code>.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencilWriteMask" translate="no">.<a href="#stencilWriteMask">stencilWriteMask</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The bit mask to use when writing to the stencil buffer.</p>
+						<p>Default is <code>0xff</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencilZFail" translate="no">.<a href="#stencilZFail">stencilZFail</a><span class="type-signature"> : <a href="global.html#ZeroStencilOp">ZeroStencilOp</a> | <a href="global.html#KeepStencilOp">KeepStencilOp</a> | <a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a> | <a href="global.html#IncrementStencilOp">IncrementStencilOp</a> | <a href="global.html#DecrementStencilOp">DecrementStencilOp</a> | <a href="global.html#IncrementWrapStencilOp">IncrementWrapStencilOp</a> | <a href="global.html#DecrementWrapStencilOp">DecrementWrapStencilOp</a> | <a href="global.html#InvertStencilOp">InvertStencilOp</a></span> </h3>
+					<div class="description">
+						<p>Which stencil operation to perform when the comparison function returns
+<code>true</code> but the depth test fails.</p>
+						<p>Default is <code>KeepStencilOp</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencilZPass" translate="no">.<a href="#stencilZPass">stencilZPass</a><span class="type-signature"> : <a href="global.html#ZeroStencilOp">ZeroStencilOp</a> | <a href="global.html#KeepStencilOp">KeepStencilOp</a> | <a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a> | <a href="global.html#IncrementStencilOp">IncrementStencilOp</a> | <a href="global.html#DecrementStencilOp">DecrementStencilOp</a> | <a href="global.html#IncrementWrapStencilOp">IncrementWrapStencilOp</a> | <a href="global.html#DecrementWrapStencilOp">DecrementWrapStencilOp</a> | <a href="global.html#InvertStencilOp">InvertStencilOp</a></span> </h3>
+					<div class="description">
+						<p>Which stencil operation to perform when the comparison function returns
+<code>true</code> and the depth test passes.</p>
+						<p>Default is <code>KeepStencilOp</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="toneMapped" translate="no">.<a href="#toneMapped">toneMapped</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Defines whether this material is tone mapped according to the renderer's tone mapping setting.</p>
+<p>It is ignored when rendering to a render target or using post processing or when using
+<code>WebGPURenderer</code>. In all these cases, all materials are honored by tone mapping.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transparent" translate="no">.<a href="#transparent">transparent</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Defines whether this material is transparent. This has an effect on
+rendering as transparent objects need special treatment and are rendered
+after non-transparent objects.</p>
+<p>When set to true, the extent to which the material is transparent is
+controlled by <a href="Material.html#opacity">Material#opacity</a>.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The type property is used for detecting the object type
+in context of serialization/deserialization.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="userData" translate="no">.<a href="#userData">userData</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>An object that can be used to store custom data about the Material. It
+should not hold references to functions as these will not be cloned.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="uuid" translate="no">.<a href="#uuid">uuid</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The UUID of the material.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="version" translate="no">.<a href="#version">version</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This starts at <code>0</code> and counts how many times <a href="Material.html#needsUpdate">Material#needsUpdate</a> is set to <code>true</code>.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="vertexColors" translate="no">.<a href="#vertexColors">vertexColors</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, vertex colors should be used.</p>
+<p>The engine supports RGB and RGBA vertex colors depending on whether a three (RGB) or
+four (RGBA) component color buffer attribute is used.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="visible" translate="no">.<a href="#visible">visible</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Defines whether 3D objects using this material are visible.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Material.html">Material</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new material with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : <a href="Material.html">Material</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given material to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The material to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="customProgramCacheKey" translate="no">.<a href="#customProgramCacheKey">customProgramCacheKey</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>In case <a href="Material.html#onBeforeCompile">Material#onBeforeCompile</a> is used, this callback can be used to identify
+values of settings used in <code>onBeforeCompile()</code>, so three.js can reuse a cached
+shader or recompile the shader for this material as needed.</p>
+<p>This method can only be used when rendering with <a href="WebGLRenderer.html">WebGLRenderer</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The custom program cache key.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+						<h5>Fires:</h5>
+						<ul>
+							<li><a href="Material.html#event:dispose">Material#event:dispose</a></li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="onBeforeCompile" translate="no">.<a href="#onBeforeCompile">onBeforeCompile</a><span class="signature">( shaderobject : <span class="param-type">Object</span>, renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>An optional callback that is executed immediately before the shader
+program is compiled. This function is called with the shader source code
+as a parameter. Useful for the modification of built-in materials.</p>
+<p>This method can only be used when rendering with <a href="WebGLRenderer.html">WebGLRenderer</a>. The
+recommended approach when customizing materials is to use <code>WebGPURenderer</code> with the new
+Node Material system and <a href="https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language">TSL</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shaderobject</strong>
+									</td>
+									<td class="description last">
+										<p>The object holds the uniforms and the vertex and fragment shader source.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="onBeforeRender" translate="no">.<a href="#onBeforeRender">onBeforeRender</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>An optional callback that is executed immediately before the material is used to render a 3D object.</p>
+<p>This method can only be used when rendering with <a href="WebGLRenderer.html">WebGLRenderer</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is used to render the scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry group data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setValues" translate="no">.<a href="#setValues">setValues</a><span class="signature">( values : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method can be used to set default values from parameter objects.
+It is a generic implementation so it can be used with different types
+of materials.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>values</strong>
+									</td>
+									<td class="description last">
+										<p>The material values to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">( meta : <span class="param-type">Object | string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Serializes the material into JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>meta</strong>
+									</td>
+									<td class="description last">
+										<p>An optional value holding meta information about the serialization.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="ObjectLoader.html#parse">ObjectLoader#parse</a></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized material.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:dispose" translate="no">.<a href="#event:dispose">dispose</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the material has been disposed of.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/Material.js" target="_blank" rel="noopener" translate="no">src/materials/Material.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

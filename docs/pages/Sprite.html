@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Sprite - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → </p>
+	<h1 translate="no">Sprite</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A sprite is a plane that always faces towards the camera, generally with a
+partially transparent texture applied.</p>
+<p>Sprites do not cast shadows, setting <a href="Object3D.html#castShadow">Object3D#castShadow</a> to <code>true</code> will
+have no effect.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const map = new THREE.TextureLoader().load( 'sprite.png' );
+const material = new THREE.SpriteMaterial( { map: map } );
+const sprite = new THREE.Sprite( material );
+scene.add( sprite );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Sprite" translate="no">new <a href="#Sprite">Sprite</a><span class="signature">( material : <span class="param-type"><a href="SpriteMaterial.html">SpriteMaterial</a> | <a href="SpriteNodeMaterial.html">SpriteNodeMaterial</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new sprite.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The sprite material.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="center" translate="no">.<a href="#center">center</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="description">
+						<p>The sprite's anchor point, and the point around which the sprite rotates.
+A value of <code>(0.5, 0.5)</code> corresponds to the midpoint of the sprite. A value
+of <code>(0, 0)</code> corresponds to the lower left corner of the sprite.</p>
+						<p>Default is <code>(0.5,0.5)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of instances of this sprite.
+Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="geometry" translate="no">.<a href="#geometry">geometry</a><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="description">
+						<p>The sprite geometry.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isSprite" translate="no">.<a href="#isSprite">isSprite</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="material" translate="no">.<a href="#material">material</a><span class="type-signature"> : <a href="SpriteMaterial.html">SpriteMaterial</a> | <a href="SpriteNodeMaterial.html">SpriteNodeMaterial</a></span> </h3>
+					<div class="description">
+						<p>The sprite material.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type"><a href="Raycaster.html">Raycaster</a></span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes intersection points between a casted ray and this sprite.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>raycaster</strong>
+									</td>
+									<td class="description last">
+										<p>The raycaster.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>intersects</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the intersection points.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Object3D.html#raycast">Object3D#raycast</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/objects/Sprite.js" target="_blank" rel="noopener" translate="no">src/objects/Sprite.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ArrayCamera - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Camera.html">Camera</a> → <a href="PerspectiveCamera.html">PerspectiveCamera</a> → </p>
+	<h1 translate="no">ArrayCamera</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This type of camera can be used in order to efficiently render a scene with a
+predefined set of cameras. This is an important performance aspect for
+rendering VR scenes.</p>
+<p>An instance of <code>ArrayCamera</code> always has an array of sub cameras. It's mandatory
+to define for each sub camera the <code>viewport</code> property which determines the
+part of the viewport that is rendered with this camera.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ArrayCamera" translate="no">new <a href="#ArrayCamera">ArrayCamera</a><span class="signature">( array : <span class="param-type">Array.&lt;<a href="PerspectiveCamera.html">PerspectiveCamera</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new array camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>An array of perspective sub cameras.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="cameras" translate="no">.<a href="#cameras">cameras</a><span class="type-signature"> : Array.&lt;<a href="PerspectiveCamera.html">PerspectiveCamera</a>></span> </h3>
+					<div class="description">
+						<p>An array of perspective sub cameras.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isArrayCamera" translate="no">.<a href="#isArrayCamera">isArrayCamera</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMultiViewCamera" translate="no">.<a href="#isMultiViewCamera">isMultiViewCamera</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether this camera is used with multiview rendering or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/cameras/ArrayCamera.js" target="_blank" rel="noopener" translate="no">src/cameras/ArrayCamera.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

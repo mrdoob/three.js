@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WebGLTextureUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">WebGLTextureUtils</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">WebGLTextureUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import * as WebGLTextureUtils from 'three/addons/utils/WebGLTextureUtils.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".decompress" translate="no">.<a href="#.decompress">decompress</a><span class="signature">( texture : <span class="param-type"><a href="CompressedTexture.html">CompressedTexture</a></span>, maxTextureSize : <span class="param-type">number</span>, renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span><span class="type-signature"> : <a href="CanvasTexture.html">CanvasTexture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an uncompressed version of the given compressed texture.</p>
+<p>This module can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>. When using <a href="WebGPURenderer.html">WebGPURenderer</a>,
+import the function from <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The compressed texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxTextureSize</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum size of the uncompressed texture.</p>
+										<p>Default is <code>Infinity</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to a renderer.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The uncompressed texture.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/WebGLTextureUtils.js" target="_blank" rel="noopener" translate="no">examples/jsm/utils/WebGLTextureUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

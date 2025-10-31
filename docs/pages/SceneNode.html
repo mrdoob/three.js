@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SceneNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">SceneNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This module allows access to a collection of scene properties. The following predefined TSL objects
+are available for easier use:</p>
+<ul>
+<li><code>backgroundBlurriness</code>: A node that represents the scene's background blurriness.</li>
+<li><code>backgroundIntensity</code>: A node that represents the scene's background intensity.</li>
+<li><code>backgroundRotation</code>: A node that represents the scene's background rotation.</li>
+</ul></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SceneNode" translate="no">new <a href="#SceneNode">SceneNode</a><span class="signature">( scope : <span class="param-type">'backgroundBlurriness' | 'backgroundIntensity' | 'backgroundRotation'</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new scene node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The scope defines the type of scene property that is accessed.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the scene.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="scene" translate="no">.<a href="#scene">scene</a><span class="type-signature"> : <a href="Scene.html">Scene</a></span> </h3>
+					<div class="description">
+						<p>A reference to the scene that is going to be accessed.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scope" translate="no">.<a href="#scope">scope</a><span class="type-signature"> : 'backgroundBlurriness' | 'backgroundIntensity' | 'backgroundRotation'</span> </h3>
+					<div class="description">
+						<p>The scope defines the type of scene property that is accessed.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Depending on the scope, the method returns a different type of node that represents
+the respective scene property.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/SceneNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/SceneNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

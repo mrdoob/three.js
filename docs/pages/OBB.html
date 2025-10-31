@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>OBB - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">OBB</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents an oriented bounding box (OBB) in 3D space.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">OBB</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { OBB } from 'three/addons/math/OBB.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="OBB" translate="no">new <a href="#OBB">OBB</a><span class="signature">( center : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, halfSize : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, rotation : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>center</strong>
+									</td>
+									<td class="description last">
+										<p>The center of the OBB.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>halfSize</strong>
+									</td>
+									<td class="description last">
+										<p>Positive halfwidth extents of the OBB along each axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>rotation</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation of the OBB.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="center" translate="no">.<a href="#center">center</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The center of the OBB.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="halfSize" translate="no">.<a href="#halfSize">halfSize</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>Positive halfwidth extents of the OBB along each axis.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotation" translate="no">.<a href="#rotation">rotation</a><span class="type-signature"> : <a href="Matrix3.html">Matrix3</a></span> </h3>
+					<div class="description">
+						<p>The rotation of the OBB.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="OBB.html">OBB</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given transformation matrix to this OBB. This method can be
+used to transform the bounding volume with the world matrix of a 3D object
+in order to keep both entities in sync.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference of this OBB.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clampPoint" translate="no">.<a href="#clampPoint">clampPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clamps the given point within the bounds of this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point that should be clamped within the bounds of this OBB.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>The clamped point.</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="OBB.html">OBB</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new OBB with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given point lies within this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>Whether the given point lies within this OBB or not.</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( obb : <span class="param-type"><a href="OBB.html">OBB</a></span> )</span><span class="type-signature"> : <a href="OBB.html">OBB</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given OBB to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>obb</strong>
+									</td>
+									<td class="description last">
+										<p>The OBB to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this OBB.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( obb : <span class="param-type"><a href="OBB.html">OBB</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given OBB is equal to this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>obb</strong>
+									</td>
+									<td class="description last">
+										<p>The OBB to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given OBB is equal to this OBB or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromBox3" translate="no">.<a href="#fromBox3">fromBox3</a><span class="signature">( box3 : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : <a href="OBB.html">OBB</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines an OBB based on the given AABB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>box3</strong>
+									</td>
+									<td class="description last">
+										<p>The AABB to setup the OBB from.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference of this OBB.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSize" translate="no">.<a href="#getSize">getSize</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the size of this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The size.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectRay" translate="no">.<a href="#intersectRay">intersectRay</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a ray/OBB intersection test and stores the intersection point
+in the given 3D vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>ray</strong>
+									</td>
+									<td class="description last">
+										<p>The ray to test.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The intersection point. If no intersection is detected, <code>null</code> is returned.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsBox3" translate="no">.<a href="#intersectsBox3">intersectsBox3</a><span class="signature">( box3 : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given AABB intersects this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>box3</strong>
+									</td>
+									<td class="description last">
+										<p>The AABB to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>Whether the given AABB intersects this OBB or not.</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsOBB" translate="no">.<a href="#intersectsOBB">intersectsOBB</a><span class="signature">( obb : <span class="param-type"><a href="OBB.html">OBB</a></span>, epsilon : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given OBB intersects this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>obb</strong>
+									</td>
+									<td class="description last">
+										<p>The OBB to test.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>epsilon</strong>
+									</td>
+									<td class="description last">
+										<p>A small value to prevent arithmetic errors.</p>
+										<p>Default is <code>Number.EPSILON</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>Whether the given OBB intersects this OBB or not.</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsPlane" translate="no">.<a href="#intersectsPlane">intersectsPlane</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given plane intersects this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given plane intersects this OBB or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsRay" translate="no">.<a href="#intersectsRay">intersectsRay</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given ray intersects this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>ray</strong>
+									</td>
+									<td class="description last">
+										<p>The ray to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given ray intersects this OBB or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given bounding sphere intersects this OBB.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding sphere to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>Whether the given bounding sphere intersects this OBB or not.</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( center : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, halfSize : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, rotation : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="OBB.html">OBB</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the OBBs components to the given values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>center</strong>
+									</td>
+									<td class="description last">
+										<p>The center of the OBB.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>halfSize</strong>
+									</td>
+									<td class="description last">
+										<p>Positive halfwidth extents of the OBB along each axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>rotation</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation of the OBB.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this OBB.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/OBB.js" target="_blank" rel="noopener" translate="no">examples/jsm/math/OBB.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

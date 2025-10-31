@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AnaglyphPassNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → <a href="PassNode.html">PassNode</a> → <a href="StereoCompositePassNode.html">StereoCompositePassNode</a> → </p>
+	<h1 translate="no">AnaglyphPassNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A render pass node that creates an anaglyph effect.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">AnaglyphPassNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="AnaglyphPassNode" translate="no">new <a href="#AnaglyphPassNode">AnaglyphPassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new anaglyph pass node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to render the scene with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="_colorMatrixLeft" translate="no">.<a href="#_colorMatrixLeft">_colorMatrixLeft</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;mat3></span> </h3>
+					<div class="description">
+						<p>Color matrix node for the left eye.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_colorMatrixRight" translate="no">.<a href="#_colorMatrixRight">_colorMatrixRight</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;mat3></span> </h3>
+					<div class="description">
+						<p>Color matrix node for the right eye.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isAnaglyphPassNode" translate="no">.<a href="#isAnaglyphPassNode">isAnaglyphPassNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to setup the effect's TSL code.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="StereoCompositePassNode.html#setup">StereoCompositePassNode#setup</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/AnaglyphPassNode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/AnaglyphPassNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

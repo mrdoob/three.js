@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MaterialNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
+	<h1 translate="no">MaterialNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class should simplify the node access to material properties.
+It internal uses reference nodes to make sure  changes to material
+properties are automatically reflected to predefined TSL objects
+like e.g. <code>materialColor</code>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MaterialNode" translate="no">new <a href="#MaterialNode">MaterialNode</a><span class="signature">( scope : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new material node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The scope defines what kind of material property is referred by the node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="scope" translate="no">.<a href="#scope">scope</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The scope defines what material property is referred by the node.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getCache" translate="no">.<a href="#getCache">getCache</a><span class="signature">( property : <span class="param-type">string</span>, type : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="MaterialReferenceNode.html">MaterialReferenceNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a cached reference node for the given property and type.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the material property.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform type of the property.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A material reference node representing the property access.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getColor" translate="no">.<a href="#getColor">getColor</a><span class="signature">( property : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="MaterialReferenceNode.html">MaterialReferenceNode</a>.&lt;color></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a color-typed material reference node for the given property name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the material property.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A material reference node representing the property access.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFloat" translate="no">.<a href="#getFloat">getFloat</a><span class="signature">( property : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="MaterialReferenceNode.html">MaterialReferenceNode</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a float-typed material reference node for the given property name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the material property.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A material reference node representing the property access.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTexture" translate="no">.<a href="#getTexture">getTexture</a><span class="signature">( property : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="MaterialReferenceNode.html">MaterialReferenceNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a texture-typed material reference node for the given property name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the material property.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A material reference node representing the property access.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The node setup is done depending on the selected scope. Multiple material properties
+might be grouped into a single node composition if they logically belong together.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node representing the selected scope.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/MaterialNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/MaterialNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

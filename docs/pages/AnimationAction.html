@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>AnimationAction - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">AnimationAction</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>An instance of <code>AnimationAction</code> schedules the playback of an animation which is
+stored in <a href="AnimationClip.html">AnimationClip</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="AnimationAction" translate="no">new <a href="#AnimationAction">AnimationAction</a><span class="signature">( mixer : <span class="param-type"><a href="AnimationMixer.html">AnimationMixer</a></span>, clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, localRoot : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, blendMode : <span class="param-type"><a href="global.html#NormalAnimationBlendMode">NormalAnimationBlendMode</a> | <a href="global.html#AdditiveAnimationBlendMode">AdditiveAnimationBlendMode</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new animation action.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mixer</strong>
+									</td>
+									<td class="description last">
+										<p>The mixer that is controlled by this action.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>The animation clip that holds the actual keyframes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>localRoot</strong>
+									</td>
+									<td class="description last">
+										<p>The root object on which this action is performed.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>blendMode</strong>
+									</td>
+									<td class="description last">
+										<p>The blend mode.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="blendMode" translate="no">.<a href="#blendMode">blendMode</a><span class="type-signature"> : <a href="global.html#NormalAnimationBlendMode">NormalAnimationBlendMode</a> | <a href="global.html#AdditiveAnimationBlendMode">AdditiveAnimationBlendMode</a></span> </h3>
+					<div class="description">
+						<p>Defines how the animation is blended/combined when two or more animations
+are simultaneously played.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="clampWhenFinished" translate="no">.<a href="#clampWhenFinished">clampWhenFinished</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to true the animation will automatically be paused on its last frame.</p>
+<p>If set to false, <a href="AnimationAction.html#enabled">AnimationAction#enabled</a> will automatically be switched
+to <code>false</code> when the last loop of the action has finished, so that this action has
+no further impact.</p>
+<p>Note: This member has no impact if the action is interrupted (it
+has only an effect if its last loop has really finished).</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enabled" translate="no">.<a href="#enabled">enabled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>false</code>, the action is disabled so it has no impact.</p>
+<p>When the action is re-enabled, the animation continues from its current
+time (setting <code>enabled</code> to <code>false</code> doesn't reset the action).</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="loop" translate="no">.<a href="#loop">loop</a><span class="type-signature"> : <a href="global.html#LoopRepeat">LoopRepeat</a> | <a href="global.html#LoopOnce">LoopOnce</a> | <a href="global.html#LoopPingPong">LoopPingPong</a></span> </h3>
+					<div class="description">
+						<p>The loop mode, set via <a href="AnimationAction.html#setLoop">AnimationAction#setLoop</a>.</p>
+						<p>Default is <code>LoopRepeat</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="paused" translate="no">.<a href="#paused">paused</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, the playback of the action is paused.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="repetitions" translate="no">.<a href="#repetitions">repetitions</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of repetitions of the performed clip over the course of this action.
+Can be set via <a href="AnimationAction.html#setLoop">AnimationAction#setLoop</a>.</p>
+<p>Setting this number has no effect if <a href="AnimationAction.html#loop">AnimationAction#loop</a> is set to
+<code>THREE:LoopOnce</code>.</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="time" translate="no">.<a href="#time">time</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The local time of this action (in seconds, starting with <code>0</code>).</p>
+<p>The value gets clamped or wrapped to <code>[0,clip.duration]</code> (according to the
+loop state).</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="timeScale" translate="no">.<a href="#timeScale">timeScale</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Scaling factor for the <a href="AnimationAction.html#time">AnimationAction#time</a>. A value of <code>0</code> causes the
+animation to pause. Negative values cause the animation to play backwards.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="weight" translate="no">.<a href="#weight">weight</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The degree of influence of this action (in the interval <code>[0, 1]</code>). Values
+between <code>0</code> (no impact) and <code>1</code> (full impact) can be used to blend between
+several actions.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="zeroSlopeAtEnd" translate="no">.<a href="#zeroSlopeAtEnd">zeroSlopeAtEnd</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enables smooth interpolation without separate clips for start, loop and end.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="zeroSlopeAtStart" translate="no">.<a href="#zeroSlopeAtStart">zeroSlopeAtStart</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enables smooth interpolation without separate clips for start, loop and end.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="crossFadeFrom" translate="no">.<a href="#crossFadeFrom">crossFadeFrom</a><span class="signature">( fadeOutAction : <span class="param-type"><a href="AnimationAction.html">AnimationAction</a></span>, duration : <span class="param-type">number</span>, warp : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Causes this action to fade in and the given action to fade out,
+within the passed time interval.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>fadeOutAction</strong>
+									</td>
+									<td class="description last">
+										<p>The animation action to fade out.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the fade.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>warp</strong>
+									</td>
+									<td class="description last">
+										<p>Whether warping should be used or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="crossFadeTo" translate="no">.<a href="#crossFadeTo">crossFadeTo</a><span class="signature">( fadeInAction : <span class="param-type"><a href="AnimationAction.html">AnimationAction</a></span>, duration : <span class="param-type">number</span>, warp : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Causes this action to fade out and the given action to fade in,
+within the passed time interval.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>fadeInAction</strong>
+									</td>
+									<td class="description last">
+										<p>The animation action to fade in.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the fade.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>warp</strong>
+									</td>
+									<td class="description last">
+										<p>Whether warping should be used or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fadeIn" translate="no">.<a href="#fadeIn">fadeIn</a><span class="signature">( duration : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fades the animation in by increasing its weight gradually from <code>0</code> to <code>1</code>,
+within the passed time interval.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the fade.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fadeOut" translate="no">.<a href="#fadeOut">fadeOut</a><span class="signature">( duration : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fades the animation out by decreasing its weight gradually from <code>1</code> to <code>0</code>,
+within the passed time interval.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the fade.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClip" translate="no">.<a href="#getClip">getClip</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the animation clip of this animation action.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The animation clip.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getEffectiveTimeScale" translate="no">.<a href="#getEffectiveTimeScale">getEffectiveTimeScale</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the effective time scale of this action.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The effective time scale.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getEffectiveWeight" translate="no">.<a href="#getEffectiveWeight">getEffectiveWeight</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the effective weight of this action.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The effective weight.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMixer" translate="no">.<a href="#getMixer">getMixer</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationMixer.html">AnimationMixer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the animation mixer of this animation action.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The animation mixer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRoot" translate="no">.<a href="#getRoot">getRoot</a><span class="signature">()</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the root object of this animation action.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The root object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="halt" translate="no">.<a href="#halt">halt</a><span class="signature">( duration : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Decelerates this animation's speed to <code>0</code> within the passed time interval.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isRunning" translate="no">.<a href="#isRunning">isRunning</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the animation is running.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the animation is running or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isScheduled" translate="no">.<a href="#isScheduled">isScheduled</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> when <a href="AnimationAction.html#play">AnimationAction#play</a> has been called.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the animation is scheduled or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="play" translate="no">.<a href="#play">play</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts the playback of the animation.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets the playback of the animation.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDuration" translate="no">.<a href="#setDuration">setDuration</a><span class="signature">( duration : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the duration for a single loop of this action.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setEffectiveTimeScale" translate="no">.<a href="#setEffectiveTimeScale">setEffectiveTimeScale</a><span class="signature">( timeScale : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the effective time scale of this action.</p>
+<p>An action has no effect and thus an effective time scale of zero when the
+action is paused.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>timeScale</strong>
+									</td>
+									<td class="description last">
+										<p>The time scale to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setEffectiveWeight" translate="no">.<a href="#setEffectiveWeight">setEffectiveWeight</a><span class="signature">( weight : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the effective weight of this action.</p>
+<p>An action has no effect and thus an effective weight of zero when the
+action is disabled.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>weight</strong>
+									</td>
+									<td class="description last">
+										<p>The weight to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setLoop" translate="no">.<a href="#setLoop">setLoop</a><span class="signature">( mode : <span class="param-type"><a href="global.html#LoopRepeat">LoopRepeat</a> | <a href="global.html#LoopOnce">LoopOnce</a> | <a href="global.html#LoopPingPong">LoopPingPong</a></span>, repetitions : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Configures the loop settings for this action.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mode</strong>
+									</td>
+									<td class="description last">
+										<p>The loop mode.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>repetitions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of repetitions.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="startAt" translate="no">.<a href="#startAt">startAt</a><span class="signature">( time : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the time when the animation should start.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>time</strong>
+									</td>
+									<td class="description last">
+										<p>The start time in seconds.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="stop" translate="no">.<a href="#stop">stop</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Stops the playback of the animation.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="stopFading" translate="no">.<a href="#stopFading">stopFading</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Stops any fading which is applied to this action.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="stopWarping" translate="no">.<a href="#stopWarping">stopWarping</a><span class="signature">()</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Stops any scheduled warping which is applied to this action.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="syncWith" translate="no">.<a href="#syncWith">syncWith</a><span class="signature">( action : <span class="param-type"><a href="AnimationAction.html">AnimationAction</a></span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Synchronizes this action with the passed other action.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>action</strong>
+									</td>
+									<td class="description last">
+										<p>The action to sync with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="warp" translate="no">.<a href="#warp">warp</a><span class="signature">( startTimeScale : <span class="param-type">number</span>, endTimeScale : <span class="param-type">number</span>, duration : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Changes the playback speed, within the passed time interval, by modifying
+<a href="AnimationAction.html#timeScale">AnimationAction#timeScale</a> gradually from <code>startTimeScale</code> to
+<code>endTimeScale</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>startTimeScale</strong>
+									</td>
+									<td class="description last">
+										<p>The start time scale.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>endTimeScale</strong>
+									</td>
+									<td class="description last">
+										<p>The end time scale.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/AnimationAction.js" target="_blank" rel="noopener" translate="no">src/animation/AnimationAction.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

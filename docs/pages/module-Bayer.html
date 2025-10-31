@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Bayer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Bayer</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">Bayer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { bayer16 } from 'three/addons/tsl/math/Bayer.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".bayer16" translate="no">.<a href="#.bayer16">bayer16</a><span class="signature">( uv : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This TSL function can be used to sample a Bayer16 texture which is a 16x16 texture with a Bayer Matrix pattern.
+It can be used for dithering effects but also as an alternative to blue-noise. When used with Ray Marching
+specifically in <a href="VolumeNodeMaterial.html#offsetNode">VolumeNodeMaterial#offsetNode</a>, it reduces banding problem, thus being able to use
+fewer steps without affecting the visuals as much.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uv</strong>
+									</td>
+									<td class="description last">
+										<p>The uv to sample the bayer16 texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The sampled bayer value.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/math/Bayer.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/math/Bayer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

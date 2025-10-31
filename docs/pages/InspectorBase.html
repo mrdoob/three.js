@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>InspectorBase - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">InspectorBase</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h3 class="name name-method" id="InspectorBase" translate="no">new <a href="#InspectorBase">InspectorBase</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>InspectorBase is the base class for all inspectors.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="currentFrame" translate="no">.<a href="#currentFrame">currentFrame</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The current frame being processed.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="nodeFrame" translate="no">.<a href="#nodeFrame">nodeFrame</a> </h3>
+					<div class="description">
+						<p>Returns the node frame for the current renderer.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="begin" translate="no">.<a href="#begin">begin</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a frame begins.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="beginCompute" translate="no">.<a href="#beginCompute">beginCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a compute operation begins.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="beginRender" translate="no">.<a href="#beginRender">beginRender</a><span class="signature">( uid : <span class="param-type">string</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a render operation begins.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene being rendered.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera being used for rendering.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target, if any.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span>, dispatchSizeOrCount : <span class="param-type">number | Array.&lt;number></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>When a compute operation is performed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dispatchSizeOrCount</strong>
+									</td>
+									<td class="description last">
+										<p>The dispatch size or count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copyFramebufferToTexture" translate="no">.<a href="#copyFramebufferToTexture">copyFramebufferToTexture</a><span class="signature">( framebufferTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a framebuffer copy operation is performed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>framebufferTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture associated with the framebuffer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copyTextureToTexture" translate="no">.<a href="#copyTextureToTexture">copyTextureToTexture</a><span class="signature">( srcTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, dstTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a texture copy operation is performed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>srcTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The source texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dstTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The destination texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="finish" translate="no">.<a href="#finish">finish</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a frame ends.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="finishCompute" translate="no">.<a href="#finishCompute">finishCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a compute operation ends.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="finishRender" translate="no">.<a href="#finishRender">finishRender</a><span class="signature">( uid : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when an animation loop ends.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="getRenderer" translate="no">.<a href="#getRenderer">getRenderer</a><span class="signature">()</span><span class="type-signature"> : <a href="WebGLRenderer.html">WebGLRenderer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the renderer associated with this inspector.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The associated renderer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="init" translate="no">.<a href="#init">init</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the inspector.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="inspect" translate="no">.<a href="#inspect">inspect</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Inspects a node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node to inspect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setRenderer" translate="no">.<a href="#setRenderer">setRenderer</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span><span class="type-signature"> : <a href="InspectorBase.html">InspectorBase</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the renderer for this inspector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer to associate with this inspector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> This inspector instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/InspectorBase.js" target="_blank" rel="noopener" translate="no">src/renderers/common/InspectorBase.js</a>
+				</p>
+			</article>
+		</section>
+		<section>
+			<header>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h3 class="name name-method" id="InspectorBase" translate="no">new <a href="#InspectorBase">InspectorBase</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a new InspectorBase.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="currentFrame" translate="no">.<a href="#currentFrame">currentFrame</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The current frame being processed.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="nodeFrame" translate="no">.<a href="#nodeFrame">nodeFrame</a> </h3>
+					<div class="description">
+						<p>Returns the node frame for the current renderer.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="begin" translate="no">.<a href="#begin">begin</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a frame begins.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="beginCompute" translate="no">.<a href="#beginCompute">beginCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a compute operation begins.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="beginRender" translate="no">.<a href="#beginRender">beginRender</a><span class="signature">( uid : <span class="param-type">string</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a render operation begins.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene being rendered.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera being used for rendering.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target, if any.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span>, dispatchSizeOrCount : <span class="param-type">number | Array.&lt;number></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>When a compute operation is performed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dispatchSizeOrCount</strong>
+									</td>
+									<td class="description last">
+										<p>The dispatch size or count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copyFramebufferToTexture" translate="no">.<a href="#copyFramebufferToTexture">copyFramebufferToTexture</a><span class="signature">( framebufferTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a framebuffer copy operation is performed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>framebufferTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture associated with the framebuffer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copyTextureToTexture" translate="no">.<a href="#copyTextureToTexture">copyTextureToTexture</a><span class="signature">( srcTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, dstTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a texture copy operation is performed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>srcTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The source texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dstTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The destination texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="finish" translate="no">.<a href="#finish">finish</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a frame ends.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="finishCompute" translate="no">.<a href="#finishCompute">finishCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when a compute operation ends.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="finishRender" translate="no">.<a href="#finishRender">finishRender</a><span class="signature">( uid : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Called when an animation loop ends.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="getRenderer" translate="no">.<a href="#getRenderer">getRenderer</a><span class="signature">()</span><span class="type-signature"> : <a href="WebGLRenderer.html">WebGLRenderer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the renderer associated with this inspector.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The associated renderer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="init" translate="no">.<a href="#init">init</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the inspector.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="inspect" translate="no">.<a href="#inspect">inspect</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Inspects a node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node to inspect.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setRenderer" translate="no">.<a href="#setRenderer">setRenderer</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span><span class="type-signature"> : <a href="InspectorBase.html">InspectorBase</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the renderer for this inspector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer to associate with this inspector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> This inspector instance.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/InspectorBase.js" target="_blank" rel="noopener" translate="no">src/renderers/common/InspectorBase.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

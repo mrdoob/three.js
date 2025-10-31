@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BatchedMesh - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">BatchedMesh</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A special version of a mesh with multi draw batch rendering support. Use
+this class if you have to render a large number of objects with the same
+material but with different geometries or world transformations. The usage of
+<code>BatchedMesh</code> will help you to reduce the number of draw calls and thus improve the overall
+rendering performance in your application.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const box = new THREE.BoxGeometry( 1, 1, 1 );
+const sphere = new THREE.SphereGeometry( 1, 12, 12 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+// initialize and add geometries into the batched mesh
+const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
+const boxGeometryId = batchedMesh.addGeometry( box );
+const sphereGeometryId = batchedMesh.addGeometry( sphere );
+// create instances of those geometries
+const boxInstancedId1 = batchedMesh.addInstance( boxGeometryId );
+const boxInstancedId2 = batchedMesh.addInstance( boxGeometryId );
+const sphereInstancedId1 = batchedMesh.addInstance( sphereGeometryId );
+const sphereInstancedId2 = batchedMesh.addInstance( sphereGeometryId );
+// position the geometries
+batchedMesh.setMatrixAt( boxInstancedId1, boxMatrix1 );
+batchedMesh.setMatrixAt( boxInstancedId2, boxMatrix2 );
+batchedMesh.setMatrixAt( sphereInstancedId1, sphereMatrix1 );
+batchedMesh.setMatrixAt( sphereInstancedId2, sphereMatrix2 );
+scene.add( batchedMesh );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BatchedMesh" translate="no">new <a href="#BatchedMesh">BatchedMesh</a><span class="signature">( maxInstanceCount : <span class="param-type">number</span>, maxVertexCount : <span class="param-type">number</span>, maxIndexCount : <span class="param-type">number</span>, material : <span class="param-type"><a href="Material.html">Material</a> | Array.&lt;<a href="Material.html">Material</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new batched mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>maxInstanceCount</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum number of individual instances planned to be added and rendered.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxVertexCount</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum number of vertices to be used by all unique geometries.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxIndexCount</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum number of indices to be used by all unique geometries</p>
+										<p>Default is <code>maxVertexCount*2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh material.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="boundingBox" translate="no">.<a href="#boundingBox">boundingBox</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<div class="description">
+						<p>The bounding box of the batched mesh. Can be computed via <a href="BatchedMesh.html#computeBoundingBox">BatchedMesh#computeBoundingBox</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="boundingSphere" translate="no">.<a href="#boundingSphere">boundingSphere</a><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<div class="description">
+						<p>The bounding sphere of the batched mesh. Can be computed via <a href="BatchedMesh.html#computeBoundingSphere">BatchedMesh#computeBoundingSphere</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="customSort" translate="no">.<a href="#customSort">customSort</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>Takes a sort a function that is run before render. The function takes a list of instances to
+sort and a camera. The objects in the list include a &quot;z&quot; field to perform a depth-ordered
+sort with.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="instanceCount" translate="no">.<a href="#instanceCount">instanceCount</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The instance count.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isBatchedMesh" translate="no">.<a href="#isBatchedMesh">isBatchedMesh</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxInstanceCount" translate="no">.<a href="#maxInstanceCount">maxInstanceCount</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The maximum number of individual instances that can be stored in the batch.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="perObjectFrustumCulled" translate="no">.<a href="#perObjectFrustumCulled">perObjectFrustumCulled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set ot <code>true</code>, the individual objects of a batch are frustum culled.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sortObjects" translate="no">.<a href="#sortObjects">sortObjects</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When set to <code>true</code>, the individual objects of a batch are sorted to improve overdraw-related artifacts.
+If the material is marked as &quot;transparent&quot; objects are rendered back to front and if not then they are
+rendered front to back.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="unusedIndexCount" translate="no">.<a href="#unusedIndexCount">unusedIndexCount</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The number of unused indices.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="unusedVertexCount" translate="no">.<a href="#unusedVertexCount">unusedVertexCount</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The number of unused vertices.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addGeometry" translate="no">.<a href="#addGeometry">addGeometry</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, reservedVertexCount : <span class="param-type">number</span>, reservedIndexCount : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given geometry to the batch and returns the associated
+geometry id referring to it to be used in other functions.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to add.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>reservedVertexCount</strong>
+									</td>
+									<td class="description last">
+										<p>Optional parameter specifying the amount of
+vertex buffer space to reserve for the added geometry. This is necessary if it is planned
+to set a new geometry at this index at a later time that is larger than the original geometry.
+Defaults to the length of the given geometry vertex buffer.</p>
+										<p>Default is <code>-1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>reservedIndexCount</strong>
+									</td>
+									<td class="description last">
+										<p>Optional parameter specifying the amount of index
+buffer space to reserve for the added geometry. This is necessary if it is planned to set a
+new geometry at this index at a later time that is larger than the original geometry. Defaults to
+the length of the given geometry index buffer.</p>
+										<p>Default is <code>-1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The geometry ID.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addInstance" translate="no">.<a href="#addInstance">addInstance</a><span class="signature">( geometryId : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds a new instance to the batch using the geometry of the given ID and returns
+a new id referring to the new instance to be used by other functions.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometryId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of a previously added geometry via <a href="BatchedMesh.html#addGeometry">BatchedMesh#addGeometry</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The instance ID.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="computeBoundingBox" translate="no">.<a href="#computeBoundingBox">computeBoundingBox</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the bounding box, updating <a href="BatchedMesh.html#boundingBox">BatchedMesh#boundingBox</a>.
+Bounding boxes aren't computed by default. They need to be explicitly computed,
+otherwise they are <code>null</code>.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="computeBoundingSphere" translate="no">.<a href="#computeBoundingSphere">computeBoundingSphere</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the bounding sphere, updating <a href="BatchedMesh.html#boundingSphere">BatchedMesh#boundingSphere</a>.
+Bounding spheres aren't computed by default. They need to be explicitly computed,
+otherwise they are <code>null</code>.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="deleteGeometry" translate="no">.<a href="#deleteGeometry">deleteGeometry</a><span class="signature">( geometryId : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Deletes the geometry defined by the given ID from this batch. Any instances referencing
+this geometry will also be removed as a side effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometryId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of the geometry to remove from the batch.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="deleteInstance" translate="no">.<a href="#deleteInstance">deleteInstance</a><span class="signature">( instanceId : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Deletes an existing instance from the batch using the given ID.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of the instance to remove from the batch.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="getBoundingBoxAt" translate="no">.<a href="#getBoundingBoxAt">getBoundingBoxAt</a><span class="signature">( geometryId : <span class="param-type">number</span>, target : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the bounding box for the given geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometryId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of the geometry to return the bounding box for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The geometry's bounding box. Returns <code>null</code> if no geometry has been found for the given ID.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBoundingSphereAt" translate="no">.<a href="#getBoundingSphereAt">getBoundingSphereAt</a><span class="signature">( geometryId : <span class="param-type">number</span>, target : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the bounding sphere for the given geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometryId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of the geometry to return the bounding sphere for.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The geometry's bounding sphere. Returns <code>null</code> if no geometry has been found for the given ID.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getColorAt" translate="no">.<a href="#getColorAt">getColorAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the color of the defined instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of an instance to get the color of.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The instance's color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getGeometryIdAt" translate="no">.<a href="#getGeometryIdAt">getGeometryIdAt</a><span class="signature">( instanceId : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the geometry ID of the defined instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of an instance to get the geometry ID of.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The instance's geometry ID.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getGeometryRangeAt" translate="no">.<a href="#getGeometryRangeAt">getGeometryRangeAt</a><span class="signature">( geometryId : <span class="param-type">number</span>, target : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get the range representing the subset of triangles related to the attached geometry,
+indicating the starting offset and count, or <code>null</code> if invalid.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometryId</strong>
+									</td>
+									<td class="description last">
+										<p>The id of the geometry to get the range of.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result object with range data.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMatrixAt" translate="no">.<a href="#getMatrixAt">getMatrixAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the local transformation matrix of the defined instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of an instance to get the matrix of.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The instance's local transformation matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getVisibleAt" translate="no">.<a href="#getVisibleAt">getVisibleAt</a><span class="signature">( instanceId : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the visibility state of the defined instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of an instance to get the visibility state of.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the instance is visible or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="optimize" translate="no">.<a href="#optimize">optimize</a><span class="signature">( instanceId : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Repacks the sub geometries in [name] to remove any unused space remaining from
+previously deleted geometry, freeing up space to add new geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of the instance to remove from the batch.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setColorAt" translate="no">.<a href="#setColorAt">setColorAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given color to the defined instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of an instance to set the color of.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to set the instance to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setCustomSort" translate="no">.<a href="#setCustomSort">setCustomSort</a><span class="signature">( func : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Takes a sort a function that is run before render. The function takes a list of instances to
+sort and a camera. The objects in the list include a &quot;z&quot; field to perform a depth-ordered sort with.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>func</strong>
+									</td>
+									<td class="description last">
+										<p>The custom sort function.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setGeometryAt" translate="no">.<a href="#setGeometryAt">setGeometryAt</a><span class="signature">( geometryId : <span class="param-type">number</span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Replaces the geometry at the given ID with the provided geometry. Throws an error if there
+is not enough space reserved for geometry. Calling this will change all instances that are
+rendering that geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometryId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of the geometry that should be replaced with the given geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The new geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The geometry ID.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setGeometryIdAt" translate="no">.<a href="#setGeometryIdAt">setGeometryIdAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, geometryId : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the geometry ID of the instance at the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of the instance to set the geometry ID of.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometryId</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry ID to be use by the instance.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setGeometrySize" translate="no">.<a href="#setGeometrySize">setGeometrySize</a><span class="signature">( maxVertexCount : <span class="param-type">number</span>, maxIndexCount : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resizes the available space in the batch's vertex and index buffer attributes to the provided sizes.
+If the provided arguments shrink the geometry buffers but there is not enough unused space at the
+end of the geometry attributes then an error is thrown.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>maxVertexCount</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum number of vertices to be used by all unique geometries to resize to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxIndexCount</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum number of indices to be used by all unique geometries to resize to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setInstanceCount" translate="no">.<a href="#setInstanceCount">setInstanceCount</a><span class="signature">( maxInstanceCount : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resizes the necessary buffers to support the provided number of instances.
+If the provided arguments shrink the number of instances but there are not enough
+unused Ids at the end of the list then an error is thrown.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>maxInstanceCount</strong>
+									</td>
+									<td class="description last">
+										<p>The max number of individual instances that can be added and rendered by the batch.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setMatrixAt" translate="no">.<a href="#setMatrixAt">setMatrixAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given local transformation matrix to the defined instance.
+Negatively scaled matrices are not supported.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The ID of an instance to set the matrix of.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>A 4x4 matrix representing the local transformation of a single instance.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setVisibleAt" translate="no">.<a href="#setVisibleAt">setVisibleAt</a><span class="signature">( instanceId : <span class="param-type">number</span>, visible : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the visibility of the instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The id of the instance to set the visibility of.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>visible</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the instance is visible or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="validateGeometryId" translate="no">.<a href="#validateGeometryId">validateGeometryId</a><span class="signature">( geometryId : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Validates the geometry defined by the given ID.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>geometryId</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to validate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="validateInstanceId" translate="no">.<a href="#validateInstanceId">validateInstanceId</a><span class="signature">( instanceId : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Validates the instance defined by the given ID.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>instanceId</strong>
+									</td>
+									<td class="description last">
+										<p>The instance to validate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/objects/BatchedMesh.js" target="_blank" rel="noopener" translate="no">src/objects/BatchedMesh.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

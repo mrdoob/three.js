@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SelectionBox - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">SelectionBox</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to select 3D objects in a scene with a selection box.
+It is recommended to visualize the selected area with the help of <a href="SelectionHelper.html">SelectionHelper</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const selectionBox = new SelectionBox( camera, scene );
+const selectedObjects = selectionBox.select( startPoint, endPoint );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SelectionBox</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SelectionBox } from 'three/addons/interactive/SelectionBox.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SelectionBox" translate="no">new <a href="#SelectionBox">SelectionBox</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, deep : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new selection box.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>deep</strong>
+									</td>
+									<td class="description last">
+										<p>How deep the selection frustum of perspective cameras should extend.</p>
+										<p>Default is <code>Number.MAX_VALUE</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="batches" translate="no">.<a href="#batches">batches</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The selected batches of batched meshes.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
+					<div class="description">
+						<p>The camera the scene is rendered with.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="collection" translate="no">.<a href="#collection">collection</a><span class="type-signature"> : Array.&lt;<a href="Object3D.html">Object3D</a>></span> </h3>
+					<div class="description">
+						<p>The selected 3D objects.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="deep" translate="no">.<a href="#deep">deep</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How deep the selection frustum of perspective cameras should extend.</p>
+						<p>Default is <code>Number.MAX_VALUE</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="endPoint" translate="no">.<a href="#endPoint">endPoint</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The end point of the selection.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="instances" translate="no">.<a href="#instances">instances</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The selected instance IDs of instanced meshes.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scene" translate="no">.<a href="#scene">scene</a><span class="type-signature"> : <a href="Scene.html">Scene</a></span> </h3>
+					<div class="description">
+						<p>The camera the scene is rendered with.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="startPoint" translate="no">.<a href="#startPoint">startPoint</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The start point of the selection.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="select" translate="no">.<a href="#select">select</a><span class="signature">( startPoint : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, endPoint : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : Array.&lt;<a href="Object3D.html">Object3D</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method selects 3D objects in the scene based on the given start
+and end point. If no parameters are provided, the method uses the start
+and end values of the respective members.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>startPoint</strong>
+									</td>
+									<td class="description last">
+										<p>The start point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>endPoint</strong>
+									</td>
+									<td class="description last">
+										<p>The end point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The selected 3D objects.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/interactive/SelectionBox.js" target="_blank" rel="noopener" translate="no">examples/jsm/interactive/SelectionBox.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Vector3 - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Vector3</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Class representing a 3D vector. A 3D vector is an ordered triplet of numbers
+(labeled x, y and z), which can be used to represent a number of things, such as:</p>
+<ul>
+<li>A point in 3D space.</li>
+<li>A direction and length in 3D space. In three.js the length will
+always be the Euclidean distance(straight-line distance) from <code>(0, 0, 0)</code> to <code>(x, y, z)</code>
+and the direction is also measured from <code>(0, 0, 0)</code> towards <code>(x, y, z)</code>.</li>
+<li>Any arbitrary ordered triplet of numbers.</li>
+</ul>
+<p>There are other things a 3D vector can be used to represent, such as
+momentum vectors and so on, however these are the most
+common uses in three.js.</p>
+<p>Iterating through a vector instance will yield its components <code>(x, y, z)</code> in
+the corresponding order.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const a = new THREE.Vector3( 0, 1, 0 );
+//no arguments; will be initialised to (0, 0, 0)
+const b = new THREE.Vector3( );
+const d = a.distanceTo( b );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Vector3" translate="no">new <a href="#Vector3">Vector3</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new 3D vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x value of this vector.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y value of this vector.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z value of this vector.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isVector3" translate="no">.<a href="#isVector3">isVector3</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="x" translate="no">.<a href="#x">x</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The x value of this vector.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="y" translate="no">.<a href="#y">y</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The y value of this vector.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="z" translate="no">.<a href="#z">z</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The z value of this vector.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given vector to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addScalar" translate="no">.<a href="#addScalar">addScalar</a><span class="signature">( s : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given scalar value to all components of this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addScaledVector" translate="no">.<a href="#addScaledVector">addScaledVector</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a> | <a href="Vector4.html">Vector4</a></span>, s : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given vector scaled by the given factor to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The factor that scales <code>v</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addVectors" translate="no">.<a href="#addVectors">addVectors</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given vectors and stores the result in this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="angleTo" translate="no">.<a href="#angleTo">angleTo</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the angle between the given vector and this instance in radians.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to compute the angle with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The angle in radians.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyAxisAngle" translate="no">.<a href="#applyAxisAngle">applyAxisAngle</a><span class="signature">( axis : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies a rotation specified by an axis and an angle to this vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>A normalized vector representing the rotation axis.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>The angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyEuler" translate="no">.<a href="#applyEuler">applyEuler</a><span class="signature">( euler : <span class="param-type"><a href="Euler.html">Euler</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given Euler rotation to this vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>euler</strong>
+									</td>
+									<td class="description last">
+										<p>The Euler angles.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyMatrix3" translate="no">.<a href="#applyMatrix3">applyMatrix3</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies this vector with the given 3x3 matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The 3x3 matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies this vector (with an implicit 1 in the 4th dimension) by m, and
+divides by perspective.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyNormalMatrix" translate="no">.<a href="#applyNormalMatrix">applyNormalMatrix</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies this vector by the given normal matrix and normalizes
+the result.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The normal matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="applyQuaternion" translate="no">.<a href="#applyQuaternion">applyQuaternion</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies the given Quaternion to this vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The Quaternion.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="ceil" translate="no">.<a href="#ceil">ceil</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The components of this vector are rounded up to the nearest integer value.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clamp" translate="no">.<a href="#clamp">clamp</a><span class="signature">( min : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, max : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>If this vector's x, y or z value is greater than the max vector's x, y or z
+value, it is replaced by the corresponding value.
+If this vector's x, y or z value is less than the min vector's x, y or z value,
+it is replaced by the corresponding value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>min</strong>
+									</td>
+									<td class="description last">
+										<p>The minimum x, y and z values.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>max</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum x, y and z values in the desired range.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clampLength" translate="no">.<a href="#clampLength">clampLength</a><span class="signature">( min : <span class="param-type">number</span>, max : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>If this vector's length is greater than the max value, it is replaced by
+the max value.
+If this vector's length is less than the min value, it is replaced by the
+min value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>min</strong>
+									</td>
+									<td class="description last">
+										<p>The minimum value the vector length will be clamped to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>max</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum value the vector length will be clamped to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clampScalar" translate="no">.<a href="#clampScalar">clampScalar</a><span class="signature">( minVal : <span class="param-type">number</span>, maxVal : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>If this vector's x, y or z values are greater than the max value, they are
+replaced by the max value.
+If this vector's x, y or z values are less than the min value, they are
+replaced by the min value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>minVal</strong>
+									</td>
+									<td class="description last">
+										<p>The minimum value the components will be clamped to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxVal</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum value the components will be clamped to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new vector with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given vector to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="cross" translate="no">.<a href="#cross">cross</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calculates the cross product of the given vector with this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to compute the cross product with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result of the cross product.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="crossVectors" translate="no">.<a href="#crossVectors">crossVectors</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calculates the cross product of the given vectors and stores the result
+in this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="distanceTo" translate="no">.<a href="#distanceTo">distanceTo</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the distance from the given vector to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to compute the distance to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The distance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="distanceToSquared" translate="no">.<a href="#distanceToSquared">distanceToSquared</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the squared distance from the given vector to this instance.
+If you are just comparing the distance with another distance, you should compare
+the distance squared instead as it is slightly more efficient to calculate.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to compute the squared distance to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The squared distance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="divide" translate="no">.<a href="#divide">divide</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Divides this instance by the given vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to divide.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="divideScalar" translate="no">.<a href="#divideScalar">divideScalar</a><span class="signature">( scalar : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Divides this vector by the given scalar.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scalar</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar to divide.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dot" translate="no">.<a href="#dot">dot</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Calculates the dot product of the given vector with this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to compute the dot product with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result of the dot product.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this vector is equal with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to test for equality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this vector is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="floor" translate="no">.<a href="#floor">floor</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The components of this vector are rounded down to the nearest integer value.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromArray" translate="no">.<a href="#fromArray">fromArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this vector's x value to be <code>array[ offset ]</code>, y value to be <code>array[ offset + 1 ]</code>
+and z value to be <code>array[ offset + 2 ]</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding the vector component values.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset into the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromBufferAttribute" translate="no">.<a href="#fromBufferAttribute">fromBufferAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the components of this vector from the given buffer attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute holding vector data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getComponent" translate="no">.<a href="#getComponent">getComponent</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the value of the vector component which matches the given index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The component index. <code>0</code> equals to x, <code>1</code> equals to y, <code>2</code> equals to z.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A vector component value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="length" translate="no">.<a href="#length">length</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the  Euclidean length (straight-line length) from (0, 0, 0) to (x, y, z).</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The length of this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lengthSq" translate="no">.<a href="#lengthSq">lengthSq</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the square of the Euclidean length (straight-line length) from
+(0, 0, 0) to (x, y, z). If you are comparing the lengths of vectors, you should
+compare the length squared instead as it is slightly more efficient to calculate.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The square length of this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lerp" translate="no">.<a href="#lerp">lerp</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Linearly interpolates between the given vector and this instance, where
+alpha is the percent distance along the line - alpha = 0 will be this
+vector, and alpha = 1 will be the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to interpolate towards.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor, typically in the closed interval <code>[0, 1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lerpVectors" translate="no">.<a href="#lerpVectors">lerpVectors</a><span class="signature">( v1 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v2 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Linearly interpolates between the given vectors, where alpha is the percent
+distance along the line - alpha = 0 will be first vector, and alpha = 1 will
+be the second one. The result is stored in this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v1</strong>
+									</td>
+									<td class="description last">
+										<p>The first vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>v2</strong>
+									</td>
+									<td class="description last">
+										<p>The second vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor, typically in the closed interval <code>[0, 1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="manhattanDistanceTo" translate="no">.<a href="#manhattanDistanceTo">manhattanDistanceTo</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the Manhattan distance from the given vector to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to compute the Manhattan distance to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The Manhattan distance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="manhattanLength" translate="no">.<a href="#manhattanLength">manhattanLength</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the Manhattan length of this vector.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The length of this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="max" translate="no">.<a href="#max">max</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>If this vector's x, y or z value is less than the given vector's x, y or z
+value, replace that value with the corresponding max value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="min" translate="no">.<a href="#min">min</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>If this vector's x, y or z value is greater than the given vector's x, y or z
+value, replace that value with the corresponding min value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiply" translate="no">.<a href="#multiply">multiply</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies the given vector with this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to multiply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiplyScalar" translate="no">.<a href="#multiplyScalar">multiplyScalar</a><span class="signature">( scalar : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies the given scalar value with all components of this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scalar</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar to multiply.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="multiplyVectors" translate="no">.<a href="#multiplyVectors">multiplyVectors</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Multiplies the given vectors and stores the result in this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="negate" translate="no">.<a href="#negate">negate</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Inverts this vector - i.e. sets x = -x, y = -y and z = -z.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="normalize" translate="no">.<a href="#normalize">normalize</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts this vector to a unit vector - that is, sets it equal to a vector
+with the same direction as this one, but with a vector length of <code>1</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="project" translate="no">.<a href="#project">project</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Projects this vector from world space into the camera's normalized
+device coordinate (NDC) space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="projectOnPlane" translate="no">.<a href="#projectOnPlane">projectOnPlane</a><span class="signature">( planeNormal : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Projects this vector onto a plane by subtracting this
+vector projected onto the plane's normal from this vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>planeNormal</strong>
+									</td>
+									<td class="description last">
+										<p>The plane normal.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="projectOnVector" translate="no">.<a href="#projectOnVector">projectOnVector</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Projects this vector onto the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to project to.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="random" translate="no">.<a href="#random">random</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets each component of this vector to a pseudo-random value between <code>0</code> and
+<code>1</code>, excluding <code>1</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="randomDirection" translate="no">.<a href="#randomDirection">randomDirection</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this vector to a uniformly random point on a unit sphere.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="reflect" translate="no">.<a href="#reflect">reflect</a><span class="signature">( normal : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Reflects this vector off a plane orthogonal to the given normal vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>normal</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) normal vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="round" translate="no">.<a href="#round">round</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The components of this vector are rounded to the nearest integer value</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="roundToZero" translate="no">.<a href="#roundToZero">roundToZero</a><span class="signature">()</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The components of this vector are rounded towards zero (up if negative,
+down if positive) to an integer value.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value of the x component.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value of the y component.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value of the z component.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setComponent" translate="no">.<a href="#setComponent">setComponent</a><span class="signature">( index : <span class="param-type">number</span>, value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Allows to set a vector component with an index.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The component index. <code>0</code> equals to x, <code>1</code> equals to y, <code>2</code> equals to z.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromColor" translate="no">.<a href="#setFromColor">setFromColor</a><span class="signature">( c : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components from the RGB components of the
+given color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The color to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromCylindrical" translate="no">.<a href="#setFromCylindrical">setFromCylindrical</a><span class="signature">( c : <span class="param-type"><a href="Cylindrical.html">Cylindrical</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components from the given cylindrical coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The cylindrical coordinates.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromCylindricalCoords" translate="no">.<a href="#setFromCylindricalCoords">setFromCylindricalCoords</a><span class="signature">( radius : <span class="param-type">number</span>, theta : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components from the given cylindrical coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>theta</strong>
+									</td>
+									<td class="description last">
+										<p>The theta angle in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromEuler" translate="no">.<a href="#setFromEuler">setFromEuler</a><span class="signature">( e : <span class="param-type"><a href="Euler.html">Euler</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components from the given Euler angles.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>e</strong>
+									</td>
+									<td class="description last">
+										<p>The Euler angles to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromMatrix3Column" translate="no">.<a href="#setFromMatrix3Column">setFromMatrix3Column</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span>, index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components from the specified matrix column.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The 3x3 matrix.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The column index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromMatrixColumn" translate="no">.<a href="#setFromMatrixColumn">setFromMatrixColumn</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span>, index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components from the specified matrix column.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The 4x4 matrix.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The column index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromMatrixPosition" translate="no">.<a href="#setFromMatrixPosition">setFromMatrixPosition</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components to the position elements of the
+given transformation matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The 4x4 matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromMatrixScale" translate="no">.<a href="#setFromMatrixScale">setFromMatrixScale</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components to the scale elements of the
+given transformation matrix.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The 4x4 matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromSpherical" translate="no">.<a href="#setFromSpherical">setFromSpherical</a><span class="signature">( s : <span class="param-type"><a href="Spherical.html">Spherical</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components from the given spherical coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The spherical coordinates.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromSphericalCoords" translate="no">.<a href="#setFromSphericalCoords">setFromSphericalCoords</a><span class="signature">( radius : <span class="param-type">number</span>, phi : <span class="param-type">number</span>, theta : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components from the given spherical coordinates.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>phi</strong>
+									</td>
+									<td class="description last">
+										<p>The phi angle in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>theta</strong>
+									</td>
+									<td class="description last">
+										<p>The theta angle in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setLength" translate="no">.<a href="#setLength">setLength</a><span class="signature">( length : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets this vector to a vector with the same direction as this one, but
+with the specified length.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>length</strong>
+									</td>
+									<td class="description last">
+										<p>The new length of this vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setScalar" translate="no">.<a href="#setScalar">setScalar</a><span class="signature">( scalar : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector components to the same value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scalar</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set for all vector components.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setX" translate="no">.<a href="#setX">setX</a><span class="signature">( x : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector's x component to the given value</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setY" translate="no">.<a href="#setY">setY</a><span class="signature">( y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector's y component to the given value</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setZ" translate="no">.<a href="#setZ">setZ</a><span class="signature">( z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the vector's z component to the given value</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="sub" translate="no">.<a href="#sub">sub</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Subtracts the given vector from this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to subtract.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="subScalar" translate="no">.<a href="#subScalar">subScalar</a><span class="signature">( s : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Subtracts the given scalar value from all components of this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar to subtract.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="subVectors" translate="no">.<a href="#subVectors">subVectors</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Subtracts the given vectors and stores the result in this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toArray" translate="no">.<a href="#toArray">toArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Writes the components of this vector to the given array. If no array is provided,
+the method returns a new instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The target array holding the vector components.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first element in the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The vector components.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="transformDirection" translate="no">.<a href="#transformDirection">transformDirection</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Transforms the direction of this vector by a matrix (the upper left 3 x 3
+subset of the given 4x4 matrix and then normalizes the result.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="unproject" translate="no">.<a href="#unproject">unproject</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Unprojects this vector from the camera's normalized device coordinate (NDC)
+space into world space.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this vector.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js" target="_blank" rel="noopener" translate="no">src/math/Vector3.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

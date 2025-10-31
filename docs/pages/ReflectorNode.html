@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ReflectorNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="InputNode.html">InputNode</a> → <a href="UniformNode.html">UniformNode</a> → <a href="TextureNode.html">TextureNode</a> → </p>
+	<h1 translate="no">ReflectorNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This node can be used to implement mirror-like flat reflective surfaces.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const groundReflector = reflector();
+material.colorNode = groundReflector;
+const plane = new Mesh( geometry, material );
+plane.add( groundReflector.target );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ReflectorNode" translate="no">new <a href="#ReflectorNode">ReflectorNode</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new reflector node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object holding configuration parameters.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object the reflector is linked to.</p>
+										<p>Default is <code>new Object3D()</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>resolutionScale</strong>
+									</td>
+									<td class="description last">
+										<p>The resolution scale.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>generateMipmaps</strong>
+									</td>
+									<td class="description last">
+										<p>Whether mipmaps should be generated or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bounces</strong>
+									</td>
+									<td class="description last">
+										<p>Whether reflectors can render other reflector nodes or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>Whether depth data should be generated or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>samples</strong>
+									</td>
+									<td class="description last">
+										<p>Anti-Aliasing samples of the internal render-target.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>defaultTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The default texture node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>reflector</strong>
+									</td>
+									<td class="description last">
+										<p>The reflector base node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="reflector" translate="no">.<a href="#reflector">reflector</a><span class="type-signature"> : <a href="ReflectorBaseNode.html">ReflectorBaseNode</a></span> </h3>
+					<div class="description">
+						<p>A reference to the internal reflector node.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="target" translate="no">.<a href="#target">target</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="description">
+						<p>A reference to 3D object the reflector is linked to.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources. Should be called when the node is no longer in use.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#dispose">TextureNode#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDepthNode" translate="no">.<a href="#getDepthNode">getDepthNode</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a node representing the mirror's depth. That can be used
+to implement more advanced reflection effects like distance attenuation.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The depth node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/utils/ReflectorNode.js" target="_blank" rel="noopener" translate="no">src/nodes/utils/ReflectorNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MathUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">MathUtils</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A collection of math utility functions.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".ceilPowerOfTwo" translate="no">.<a href="#.ceilPowerOfTwo">ceilPowerOfTwo</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the smallest power of two that is greater than or equal to the given number.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to find a POT for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The smallest power of two that is greater than or equal to the given number.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".clamp" translate="no">.<a href="#.clamp">clamp</a><span class="signature">( value : <span class="param-type">number</span>, min : <span class="param-type">number</span>, max : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Clamps the given value between min and max.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to clamp.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>min</strong>
+									</td>
+									<td class="description last">
+										<p>The min value.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>max</strong>
+									</td>
+									<td class="description last">
+										<p>The max value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clamped value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".damp" translate="no">.<a href="#.damp">damp</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, lambda : <span class="param-type">number</span>, dt : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Smoothly interpolate a number from <code>x</code> to <code>y</code> in  a spring-like manner using a delta
+time to maintain frame rate independent movement. For details, see
+<a href="http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/">Frame rate independent damping using lerp</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The current point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The target point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>lambda</strong>
+									</td>
+									<td class="description last">
+										<p>A higher lambda value will make the movement more sudden,
+and a lower value will make the movement more gradual.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dt</strong>
+									</td>
+									<td class="description last">
+										<p>Delta time in seconds.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The interpolated value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".degToRad" translate="no">.<a href="#.degToRad">degToRad</a><span class="signature">( degrees : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts degrees to radians.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>degrees</strong>
+									</td>
+									<td class="description last">
+										<p>A value in degrees.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The converted value in radians.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".denormalize" translate="no">.<a href="#.denormalize">denormalize</a><span class="signature">( value : <span class="param-type">number</span>, array : <span class="param-type">TypedArray</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Denormalizes the given value according to the given typed array.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to denormalize.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The typed array that defines the data type of the value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The denormalize (float) value in the range <code>[0,1]</code>.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".euclideanModulo" translate="no">.<a href="#.euclideanModulo">euclideanModulo</a><span class="signature">( n : <span class="param-type">number</span>, m : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the Euclidean modulo of the given parameters that
+is <code>( ( n % m ) + m ) % m</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>n</strong>
+									</td>
+									<td class="description last">
+										<p>The first parameter.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The second parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The Euclidean modulo.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".floorPowerOfTwo" translate="no">.<a href="#.floorPowerOfTwo">floorPowerOfTwo</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the largest power of two that is less than or equal to the given number.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to find a POT for.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The largest power of two that is less than or equal to the given number.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".generateUUID" translate="no">.<a href="#.generateUUID">generateUUID</a><span class="signature">()</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generate a <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a>
+(universally unique identifier).</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The UUID.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".inverseLerp" translate="no">.<a href="#.inverseLerp">inverseLerp</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, value : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the percentage in the closed interval <code>[0, 1]</code> of the given value
+between the start and end point.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The start point</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The end point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>A value between start and end.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The interpolation factor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".isPowerOfTwo" translate="no">.<a href="#.isPowerOfTwo">isPowerOfTwo</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given number is a power of two.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to check.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given number is a power of two or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".lerp" translate="no">.<a href="#.lerp">lerp</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, t : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a value linearly interpolated from two known points based on the given interval -
+<code>t = 0</code> will return <code>x</code> and <code>t = 1</code> will return <code>y</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The start point</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The end point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0, 1]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The interpolated value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".mapLinear" translate="no">.<a href="#.mapLinear">mapLinear</a><span class="signature">( x : <span class="param-type">number</span>, a1 : <span class="param-type">number</span>, a2 : <span class="param-type">number</span>, b1 : <span class="param-type">number</span>, b2 : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a linear mapping from range <code>&lt;a1, a2&gt;</code> to range <code>&lt;b1, b2&gt;</code>
+for the given value.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value to be mapped.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>a1</strong>
+									</td>
+									<td class="description last">
+										<p>Minimum value for range A.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>a2</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum value for range A.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b1</strong>
+									</td>
+									<td class="description last">
+										<p>Minimum value for range B.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b2</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum value for range B.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The mapped value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".normalize" translate="no">.<a href="#.normalize">normalize</a><span class="signature">( value : <span class="param-type">number</span>, array : <span class="param-type">TypedArray</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Normalizes the given value according to the given typed array.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The float value in the range <code>[0,1]</code> to normalize.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The typed array that defines the data type of the value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The normalize value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".pingpong" translate="no">.<a href="#.pingpong">pingpong</a><span class="signature">( x : <span class="param-type">number</span>, length : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a value that alternates between <code>0</code> and the given <code>length</code> parameter.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value to pingpong.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>length</strong>
+									</td>
+									<td class="description last">
+										<p>The positive value the function will pingpong to.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The alternated value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".radToDeg" translate="no">.<a href="#.radToDeg">radToDeg</a><span class="signature">( radians : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts radians to degrees.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>radians</strong>
+									</td>
+									<td class="description last">
+										<p>A value in radians.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The converted value in degrees.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".randFloat" translate="no">.<a href="#.randFloat">randFloat</a><span class="signature">( low : <span class="param-type">number</span>, high : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a random float from <code>&lt;low, high&gt;</code> interval.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>low</strong>
+									</td>
+									<td class="description last">
+										<p>The lower value boundary.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>high</strong>
+									</td>
+									<td class="description last">
+										<p>The upper value boundary</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A random float.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".randFloatSpread" translate="no">.<a href="#.randFloatSpread">randFloatSpread</a><span class="signature">( range : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a random integer from <code>&lt;-range/2, range/2&gt;</code> interval.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>range</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the value range.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A random float.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".randInt" translate="no">.<a href="#.randInt">randInt</a><span class="signature">( low : <span class="param-type">number</span>, high : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a random integer from <code>&lt;low, high&gt;</code> interval.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>low</strong>
+									</td>
+									<td class="description last">
+										<p>The lower value boundary.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>high</strong>
+									</td>
+									<td class="description last">
+										<p>The upper value boundary</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A random integer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".seededRandom" translate="no">.<a href="#.seededRandom">seededRandom</a><span class="signature">( s : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a deterministic pseudo-random float in the interval <code>[0, 1]</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The integer seed.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A random float.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".setQuaternionFromProperEuler" translate="no">.<a href="#.setQuaternionFromProperEuler">setQuaternionFromProperEuler</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, a : <span class="param-type">number</span>, b : <span class="param-type">number</span>, c : <span class="param-type">number</span>, order : <span class="param-type">'XYX' | 'XZX' | 'YXY' | 'YZY' | 'ZXZ' | 'ZYZ'</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given quaternion from the <a href="https://en.wikipedia.org/wiki/Euler_angles">Intrinsic Proper Euler Angles</a>
+defined by the given angles and order.</p>
+<p>Rotations are applied to the axes in the order specified by order:
+rotation by angle <code>a</code> is applied first, then by angle <code>b</code>, then by angle <code>c</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The quaternion to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation applied to the first axis, in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation applied to the second axis, in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation applied to the third axis, in radians.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>order</strong>
+									</td>
+									<td class="description last">
+										<p>A string specifying the axes order.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id=".smootherstep" translate="no">.<a href="#.smootherstep">smootherstep</a><span class="signature">( x : <span class="param-type">number</span>, min : <span class="param-type">number</span>, max : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A <a href="https://en.wikipedia.org/wiki/Smoothstep#Variations">variation on smoothstep</a>
+that has zero 1st and 2nd order derivatives at x=0 and x=1.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value to evaluate based on its position between min and max.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>min</strong>
+									</td>
+									<td class="description last">
+										<p>The min value. Any x value below min will be <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>max</strong>
+									</td>
+									<td class="description last">
+										<p>The max value. Any x value above max will be <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The alternated value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".smoothstep" translate="no">.<a href="#.smoothstep">smoothstep</a><span class="signature">( x : <span class="param-type">number</span>, min : <span class="param-type">number</span>, max : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a value in the range <code>[0,1]</code> that represents the percentage that <code>x</code> has
+moved between <code>min</code> and <code>max</code>, but smoothed or slowed down the closer <code>x</code> is to
+the <code>min</code> and <code>max</code>.</p>
+<p>See <a href="http://en.wikipedia.org/wiki/Smoothstep">Smoothstep</a> for more details.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value to evaluate based on its position between min and max.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>min</strong>
+									</td>
+									<td class="description last">
+										<p>The min value. Any x value below min will be <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>max</strong>
+									</td>
+									<td class="description last">
+										<p>The max value. Any x value above max will be <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The alternated value.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js" target="_blank" rel="noopener" translate="no">src/math/MathUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

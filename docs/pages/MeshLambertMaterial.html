@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshLambertMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → </p>
+	<h1 translate="no">MeshLambertMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A material for non-shiny surfaces, without specular highlights.</p>
+<p>The material uses a non-physically based <a href="https://en.wikipedia.org/wiki/Lambertian_reflectance">Lambertian</a>
+model for calculating reflectance. This can simulate some surfaces (such
+as untreated wood or stone) well, but cannot simulate shiny surfaces with
+specular highlights (such as varnished wood). <code>MeshLambertMaterial</code> uses per-fragment
+shading.</p>
+<p>Due to the simplicity of the reflectance and illumination models,
+performance will be greater when using this material over the
+<a href="MeshPhongMaterial.html">MeshPhongMaterial</a>, <a href="MeshStandardMaterial.html">MeshStandardMaterial</a> or
+<a href="MeshPhysicalMaterial.html">MeshPhysicalMaterial</a>, at the cost of some graphical accuracy.</p></div>
+				<iframe id="viewer" src="../scenes/material-browser.html#MeshLambertMaterial"></iframe>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshLambertMaterial" translate="no">new <a href="#MeshLambertMaterial">MeshLambertMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new mesh lambert material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object with one or more properties
+defining the material's appearance. Any property of the material
+(including any property from inherited materials) can be passed
+in here. Color values can be passed any type of value accepted
+by <a href="Color.html#set">Color#set</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="alphaMap" translate="no">.<a href="#alphaMap">alphaMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The alpha map is a grayscale texture that controls the opacity across the
+surface (black: fully transparent; white: fully opaque).</p>
+<p>Only the color of the texture is used, ignoring the alpha channel if one
+exists. For RGB and RGBA textures, the renderer will use the green channel
+when sampling this texture due to the extra bit of precision provided for
+green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
+luminance/alpha textures will also still work as expected.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="aoMap" translate="no">.<a href="#aoMap">aoMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The red channel of this texture is used as the ambient occlusion map.
+Requires a second set of UVs.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="aoMapIntensity" translate="no">.<a href="#aoMapIntensity">aoMapIntensity</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Intensity of the ambient occlusion effect. Range is <code>[0,1]</code>, where <code>0</code>
+disables ambient occlusion. Where intensity is <code>1</code> and the AO map's
+red channel is also <code>1</code>, ambient light is fully occluded on a surface.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bumpMap" translate="no">.<a href="#bumpMap">bumpMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The texture to create a bump map. The black and white values map to the
+perceived depth in relation to the lights. Bump doesn't actually affect
+the geometry of the object, only the lighting. If a normal map is defined
+this will be ignored.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bumpScale" translate="no">.<a href="#bumpScale">bumpScale</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How much the bump map affects the material. Typical range is <code>[0,1]</code>.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="color" translate="no">.<a href="#color">color</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>Color of the material.</p>
+						<p>Default is <code>(1,1,1)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="combine" translate="no">.<a href="#combine">combine</a><span class="type-signature"> : <a href="global.html#MultiplyOperation">MultiplyOperation</a> | <a href="global.html#MixOperation">MixOperation</a> | <a href="global.html#AddOperation">AddOperation</a></span> </h3>
+					<div class="description">
+						<p>How to combine the result of the surface's color with the environment map, if any.</p>
+<p>When set to <code>MixOperation</code>, the <a href="MeshBasicMaterial.html#reflectivity">MeshBasicMaterial#reflectivity</a> is used to
+blend between the two colors.</p>
+						<p>Default is <code>MultiplyOperation</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="displacementBias" translate="no">.<a href="#displacementBias">displacementBias</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The offset of the displacement map's values on the mesh's vertices.
+The bias is added to the scaled sample of the displacement map.
+Without a displacement map set, this value is not applied.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="displacementMap" translate="no">.<a href="#displacementMap">displacementMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The displacement map affects the position of the mesh's vertices. Unlike
+other maps which only affect the light and shade of the material the
+displaced vertices can cast shadows, block other objects, and otherwise
+act as real geometry. The displacement texture is an image where the value
+of each pixel (white being the highest) is mapped against, and
+repositions, the vertices of the mesh.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="displacementScale" translate="no">.<a href="#displacementScale">displacementScale</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How much the displacement map affects the mesh (where black is no
+displacement, and white is maximum displacement). Without a displacement
+map set, this value is not applied.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="emissive" translate="no">.<a href="#emissive">emissive</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="description">
+						<p>Emissive (light) color of the material, essentially a solid color
+unaffected by other lighting.</p>
+						<p>Default is <code>(0,0,0)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="emissiveIntensity" translate="no">.<a href="#emissiveIntensity">emissiveIntensity</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Intensity of the emissive light. Modulates the emissive color.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="emissiveMap" translate="no">.<a href="#emissiveMap">emissiveMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>Set emissive (glow) map. The emissive map color is modulated by the
+emissive color and the emissive intensity. If you have an emissive map,
+be sure to set the emissive color to something other than black.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="envMap" translate="no">.<a href="#envMap">envMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The environment map.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="envMapRotation" translate="no">.<a href="#envMapRotation">envMapRotation</a><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
+					<div class="description">
+						<p>The rotation of the environment map in radians.</p>
+						<p>Default is <code>(0,0,0)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="flatShading" translate="no">.<a href="#flatShading">flatShading</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the material is rendered with flat shading or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="fog" translate="no">.<a href="#fog">fog</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the material is affected by fog or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMeshLambertMaterial" translate="no">.<a href="#isMeshLambertMaterial">isMeshLambertMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lightMap" translate="no">.<a href="#lightMap">lightMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The light map. Requires a second set of UVs.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lightMapIntensity" translate="no">.<a href="#lightMapIntensity">lightMapIntensity</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Intensity of the baked light.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="map" translate="no">.<a href="#map">map</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The color map. May optionally include an alpha channel, typically combined
+with <a href="Material.html#transparent">Material#transparent</a> or <a href="Material.html#alphaTest">Material#alphaTest</a>. The texture map
+color is modulated by the diffuse <code>color</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalMap" translate="no">.<a href="#normalMap">normalMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The texture to create a normal map. The RGB values affect the surface
+normal for each pixel fragment and change the way the color is lit. Normal
+maps do not change the actual shape of the surface, only the lighting. In
+case the material has a normal map authored using the left handed
+convention, the <code>y</code> component of <code>normalScale</code> should be negated to compensate
+for the different handedness.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalMapType" translate="no">.<a href="#normalMapType">normalMapType</a><span class="type-signature"> : <a href="global.html#TangentSpaceNormalMap">TangentSpaceNormalMap</a> | <a href="global.html#ObjectSpaceNormalMap">ObjectSpaceNormalMap</a></span> </h3>
+					<div class="description">
+						<p>The type of normal map.</p>
+						<p>Default is <code>TangentSpaceNormalMap</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="normalScale" translate="no">.<a href="#normalScale">normalScale</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="description">
+						<p>How much the normal map affects the material. Typical value range is <code>[0,1]</code>.</p>
+						<p>Default is <code>(1,1)</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="reflectivity" translate="no">.<a href="#reflectivity">reflectivity</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How much the environment map affects the surface.
+The valid range is between <code>0</code> (no reflections) and <code>1</code> (full reflections).</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="refractionRatio" translate="no">.<a href="#refractionRatio">refractionRatio</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The index of refraction (IOR) of air (approximately 1) divided by the
+index of refraction of the material. It is used with environment mapping
+modes <a href="global.html#CubeRefractionMapping">CubeRefractionMapping</a> and <a href="global.html#EquirectangularRefractionMapping">EquirectangularRefractionMapping</a>.
+The refraction ratio should not exceed <code>1</code>.</p>
+						<p>Default is <code>0.98</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="specularMap" translate="no">.<a href="#specularMap">specularMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>Specular map used by the material.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wireframe" translate="no">.<a href="#wireframe">wireframe</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Renders the geometry as a wireframe.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wireframeLinecap" translate="no">.<a href="#wireframeLinecap">wireframeLinecap</a><span class="type-signature"> : 'round' | 'bevel' | 'miter'</span> </h3>
+					<div class="description">
+						<p>Defines appearance of wireframe ends.</p>
+<p>Can only be used with <a href="SVGRenderer.html">SVGRenderer</a>.</p>
+						<p>Default is <code>'round'</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wireframeLinejoin" translate="no">.<a href="#wireframeLinejoin">wireframeLinejoin</a><span class="type-signature"> : 'round' | 'bevel' | 'miter'</span> </h3>
+					<div class="description">
+						<p>Defines appearance of wireframe joints.</p>
+<p>Can only be used with <a href="SVGRenderer.html">SVGRenderer</a>.</p>
+						<p>Default is <code>'round'</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wireframeLinewidth" translate="no">.<a href="#wireframeLinewidth">wireframeLinewidth</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Controls the thickness of the wireframe.</p>
+<p>Can only be used with <a href="SVGRenderer.html">SVGRenderer</a>.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/MeshLambertMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/MeshLambertMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

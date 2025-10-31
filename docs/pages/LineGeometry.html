@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LineGeometry - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="InstancedBufferGeometry.html">InstancedBufferGeometry</a> → <a href="LineSegmentsGeometry.html">LineSegmentsGeometry</a> → </p>
+	<h1 translate="no">LineGeometry</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A chain of vertices, forming a polyline.</p>
+<p>This is used in <a href="Line2.html">Line2</a> to describe the shape.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const points = [
+	new THREE.Vector3( - 10, 0, 0 ),
+	new THREE.Vector3( 0, 5, 0 ),
+	new THREE.Vector3( 10, 0, 0 ),
+];
+const geometry = new LineGeometry();
+geometry.setFromPoints( points );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LineGeometry</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LineLineGeometry2 } from 'three/addons/lines/LineGeometry.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LineGeometry" translate="no">new <a href="#LineGeometry">LineGeometry</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new line geometry.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isLineGeometry" translate="no">.<a href="#isLineGeometry">isLineGeometry</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="fromLine" translate="no">.<a href="#fromLine">fromLine</a><span class="signature">( line : <span class="param-type"><a href="Line.html">Line</a></span> )</span><span class="type-signature"> : <a href="LineGeometry.html">LineGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups this line segments geometry from the given line.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>line</strong>
+									</td>
+									<td class="description last">
+										<p>The line that should be used as a data source for this geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setColors" translate="no">.<a href="#setColors">setColors</a><span class="signature">( array : <span class="param-type">Float32Array | Array.&lt;number></span> )</span><span class="type-signature"> : <a href="LineGeometry.html">LineGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given line colors for this geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The position data to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LineSegmentsGeometry.html#setColors">LineSegmentsGeometry#setColors</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;(<a href="Vector3.html">Vector3</a>|<a href="Vector2.html">Vector2</a>)></span> )</span><span class="type-signature"> : <a href="LineGeometry.html">LineGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups this line segments geometry from the given sequence of points.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array of points in 2D or 3D space.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setPositions" translate="no">.<a href="#setPositions">setPositions</a><span class="signature">( array : <span class="param-type">Float32Array | Array.&lt;number></span> )</span><span class="type-signature"> : <a href="LineGeometry.html">LineGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given line positions for this geometry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The position data to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LineSegmentsGeometry.html#setPositions">LineSegmentsGeometry#setPositions</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this geometry.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lines/LineGeometry.js" target="_blank" rel="noopener" translate="no">examples/jsm/lines/LineGeometry.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Interpolant - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Interpolant</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Abstract base class of interpolants over parametric samples.</p>
+<p>The parameter domain is one dimensional, typically the time or a path
+along a curve defined by the data.</p>
+<p>The sample values can have any dimensionality and derived classes may
+apply special interpretations to the data.</p>
+<p>This class provides the interval seek in a Template Method, deferring
+the actual interpolation to derived classes.</p>
+<p>Time complexity is O(1) for linear access crossing at most two points
+and O(log N) for random access, where N is the number of positions.</p>
+<p>References: <a href="http://www.oodesign.com/template-method-pattern.html">http://www.oodesign.com/template-method-pattern.html</a></p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Interpolant" translate="no">new <a href="#Interpolant">Interpolant</a><span class="signature">( parameterPositions : <span class="param-type">TypedArray</span>, sampleValues : <span class="param-type">TypedArray</span>, sampleSize : <span class="param-type">number</span>, resultBuffer : <span class="param-type">TypedArray</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new interpolant.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameterPositions</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter positions hold the interpolation factors.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sampleValues</strong>
+									</td>
+									<td class="description last">
+										<p>The sample values.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>sampleSize</strong>
+									</td>
+									<td class="description last">
+										<p>The sample size</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>resultBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The result buffer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="DefaultSettings_" translate="no">.<a href="#DefaultSettings_">DefaultSettings_</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The default settings object.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="parameterPositions" translate="no">.<a href="#parameterPositions">parameterPositions</a><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="description">
+						<p>The parameter positions.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="resultBuffer" translate="no">.<a href="#resultBuffer">resultBuffer</a><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="description">
+						<p>The result buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sampleValues" translate="no">.<a href="#sampleValues">sampleValues</a><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="description">
+						<p>The sample values.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="settings" translate="no">.<a href="#settings">settings</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The interpolation settings.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="valueSize" translate="no">.<a href="#valueSize">valueSize</a><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="description">
+						<p>The value size.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="copySampleValue_" translate="no">.<a href="#copySampleValue_">copySampleValue_</a><span class="signature">( index : <span class="param-type">number</span> )</span><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies a sample value to the result buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>An index into the sample value buffer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result buffer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="evaluate" translate="no">.<a href="#evaluate">evaluate</a><span class="signature">( t : <span class="param-type">number</span> )</span><span class="type-signature"> : TypedArray</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Evaluate the interpolant at position <code>t</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result buffer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSettings_" translate="no">.<a href="#getSettings_">getSettings_</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the interpolation settings.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The interpolation settings.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="interpolate_" translate="no">.<a href="#interpolate_">interpolate_</a><span class="signature">( i1 : <span class="param-type">number</span>, t0 : <span class="param-type">number</span>, t : <span class="param-type">number</span>, t1 : <span class="param-type">number</span> )</span><span class="type-signature"> : TypedArray</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies a sample value to the result buffer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>i1</strong>
+									</td>
+									<td class="description last">
+										<p>An index into the sample value buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t0</strong>
+									</td>
+									<td class="description last">
+										<p>The previous interpolation factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The current interpolation factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t1</strong>
+									</td>
+									<td class="description last">
+										<p>The next interpolation factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The result buffer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intervalChanged_" translate="no">.<a href="#intervalChanged_">intervalChanged_</a><span class="signature">( i1 : <span class="param-type">number</span>, t0 : <span class="param-type">number</span>, t : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Optional method that is executed when the interval has changed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>i1</strong>
+									</td>
+									<td class="description last">
+										<p>An index into the sample value buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t0</strong>
+									</td>
+									<td class="description last">
+										<p>The previous interpolation factor.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The current interpolation factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Interpolant.js" target="_blank" rel="noopener" translate="no">src/math/Interpolant.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

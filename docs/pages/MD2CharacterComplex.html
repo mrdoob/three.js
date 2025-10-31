@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MD2CharacterComplex - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">MD2CharacterComplex</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class represents a management component for animated MD2
+character assets. It provides a larger API compared to <a href="MD2Character.html">MD2Character</a>.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">MD2CharacterComplex</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { MD2CharacterComplex } from 'three/addons/misc/MD2CharacterComplex.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MD2CharacterComplex" translate="no">new <a href="#MD2CharacterComplex">MD2CharacterComplex</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new MD2 character.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="angularSpeed" translate="no">.<a href="#angularSpeed">angularSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The character's angular speed.</p>
+						<p>Default is <code>2.5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="animationFPS" translate="no">.<a href="#animationFPS">animationFPS</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The FPS</p>
+						<p>Default is <code>6</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="backAcceleration" translate="no">.<a href="#backAcceleration">backAcceleration</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The character's back acceleration.</p>
+						<p>Default is <code>600</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="controls" translate="no">.<a href="#controls">controls</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>The movement controls.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="currentSkin" translate="no">.<a href="#currentSkin">currentSkin</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The current skin.</p>
+						<p>Default is <code>undefined</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="frontAcceleration" translate="no">.<a href="#frontAcceleration">frontAcceleration</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The character's front acceleration.</p>
+						<p>Default is <code>600</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="frontDeceleration" translate="no">.<a href="#frontDeceleration">frontDeceleration</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The character's front deceleration.</p>
+						<p>Default is <code>600</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxReverseSpeed" translate="no">.<a href="#maxReverseSpeed">maxReverseSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The character's maximum reverse speed.</p>
+						<p>Default is <code>- 275</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxSpeed" translate="no">.<a href="#maxSpeed">maxSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The character's maximum speed.</p>
+						<p>Default is <code>275</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="meshBody" translate="no">.<a href="#meshBody">meshBody</a><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="description">
+						<p>The body mesh.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="meshWeapon" translate="no">.<a href="#meshWeapon">meshWeapon</a><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="description">
+						<p>The weapon mesh.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="root" translate="no">.<a href="#root">root</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
+					<div class="description">
+						<p>The root 3D object</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scale" translate="no">.<a href="#scale">scale</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The mesh scale.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="skinsBody" translate="no">.<a href="#skinsBody">skinsBody</a><span class="type-signature"> : Array.&lt;<a href="Texture.html">Texture</a>></span> </h3>
+					<div class="description">
+						<p>The body skins.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="skinsWeapon" translate="no">.<a href="#skinsWeapon">skinsWeapon</a><span class="type-signature"> : Array.&lt;<a href="Texture.html">Texture</a>></span> </h3>
+					<div class="description">
+						<p>The weapon skins.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transitionFrames" translate="no">.<a href="#transitionFrames">transitionFrames</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The transition frames.</p>
+						<p>Default is <code>15</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="weapons" translate="no">.<a href="#weapons">weapons</a><span class="type-signature"> : Array.&lt;<a href="Mesh.html">Mesh</a>></span> </h3>
+					<div class="description">
+						<p>The weapon meshes.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="enableShadows" translate="no">.<a href="#enableShadows">enableShadows</a><span class="signature">( enable : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Toggles shadow casting and receiving on the character's meshes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>enable</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to enable shadows or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="loadParts" translate="no">.<a href="#loadParts">loadParts</a><span class="signature">( config : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Loads the character model for the given config.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>config</strong>
+									</td>
+									<td class="description last">
+										<p>The config which defines the model and textures paths.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setAnimation" translate="no">.<a href="#setAnimation">setAnimation</a><span class="signature">( animationName : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the defined animation clip as the active animation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>animationName</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the animation clip.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setPlaybackRate" translate="no">.<a href="#setPlaybackRate">setPlaybackRate</a><span class="signature">( rate : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the animation playback rate.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>rate</strong>
+									</td>
+									<td class="description last">
+										<p>The playback rate to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSkin" translate="no">.<a href="#setSkin">setSkin</a><span class="signature">( index : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the skin defined by the given skin index. This will result in a different texture
+for the body mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The skin index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setVisible" translate="no">.<a href="#setVisible">setVisible</a><span class="signature">( enable : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Toggles visibility on the character's meshes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>enable</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the character is visible or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setWeapon" translate="no">.<a href="#setWeapon">setWeapon</a><span class="signature">( index : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the weapon defined by the given weapon index. This will result in a different weapon
+hold by the character.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The weapon index.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setWireframe" translate="no">.<a href="#setWireframe">setWireframe</a><span class="signature">( wireframeEnabled : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the wireframe material flag.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>wireframeEnabled</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to enable wireframe rendering or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="shareParts" translate="no">.<a href="#shareParts">shareParts</a><span class="signature">( original : <span class="param-type"><a href="MD2CharacterComplex.html">MD2CharacterComplex</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Shares certain resources from a different character model.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>original</strong>
+									</td>
+									<td class="description last">
+										<p>The original MD2 character.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateAnimations" translate="no">.<a href="#updateAnimations">updateAnimations</a><span class="signature">( delta : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the animations of the mesh. Must be called inside the animation loop.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>delta</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="updateBehaviors" translate="no">.<a href="#updateBehaviors">updateBehaviors</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the animation state based on the control inputs.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="updateMovementModel" translate="no">.<a href="#updateMovementModel">updateMovementModel</a><span class="signature">( delta : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Transforms the character model based on the control input.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>delta</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/MD2CharacterComplex.js" target="_blank" rel="noopener" translate="no">examples/jsm/misc/MD2CharacterComplex.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

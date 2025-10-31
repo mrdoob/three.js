@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Path - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Curve.html">Curve</a> → <a href="CurvePath.html">CurvePath</a> → </p>
+	<h1 translate="no">Path</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A 2D path representation. The class provides methods for creating paths
+and contours of 2D shapes similar to the 2D Canvas API.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const path = new THREE.Path();
+path.lineTo( 0, 0.8 );
+path.quadraticCurveTo( 0, 1, 0.2, 1 );
+path.lineTo( 1, 1 );
+const points = path.getPoints();
+const geometry = new THREE.BufferGeometry().setFromPoints( points );
+const material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+const line = new THREE.Line( geometry, material );
+scene.add( line );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Path" translate="no">new <a href="#Path">Path</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new path.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points defining the path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="currentPoint" translate="no">.<a href="#currentPoint">currentPoint</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="description">
+						<p>The current offset of the path. Any new curve added will start here.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="absarc" translate="no">.<a href="#absarc">absarc</a><span class="signature">( aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span>, aRadius : <span class="param-type">number</span>, aStartAngle : <span class="param-type">number</span>, aEndAngle : <span class="param-type">number</span>, aClockwise : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an absolutely positioned arc as an instance of <a href="EllipseCurve.html">EllipseCurve</a> to the path.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the center of the arc.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the center of the arc.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the arc.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aStartAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The start angle in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aEndAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The end angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aClockwise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sweep the arc clockwise or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="absellipse" translate="no">.<a href="#absellipse">absellipse</a><span class="signature">( aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span>, xRadius : <span class="param-type">number</span>, yRadius : <span class="param-type">number</span>, aStartAngle : <span class="param-type">number</span>, aEndAngle : <span class="param-type">number</span>, aClockwise : <span class="param-type">boolean</span>, aRotation : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an absolutely positioned ellipse as an instance of <a href="EllipseCurve.html">EllipseCurve</a> to the path.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the absolute center of the ellipse.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the absolute center of the ellipse.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>xRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the ellipse in the x axis.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>yRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the ellipse in the y axis.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aStartAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The start angle in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aEndAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The end angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aClockwise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sweep the ellipse clockwise or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aRotation</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="arc" translate="no">.<a href="#arc">arc</a><span class="signature">( aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span>, aRadius : <span class="param-type">number</span>, aStartAngle : <span class="param-type">number</span>, aEndAngle : <span class="param-type">number</span>, aClockwise : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an arc as an instance of <a href="EllipseCurve.html">EllipseCurve</a> to the path, positioned relative
+to the current point.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the center of the arc offsetted from the previous curve.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the center of the arc offsetted from the previous curve.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the arc.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aStartAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The start angle in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aEndAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The end angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aClockwise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sweep the arc clockwise or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="bezierCurveTo" translate="no">.<a href="#bezierCurveTo">bezierCurveTo</a><span class="signature">( aCP1x : <span class="param-type">number</span>, aCP1y : <span class="param-type">number</span>, aCP2x : <span class="param-type">number</span>, aCP2y : <span class="param-type">number</span>, aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an instance of <a href="CubicBezierCurve.html">CubicBezierCurve</a> to the path by connecting
+the current point with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aCP1x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the first control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aCP1y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the first control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aCP2x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the second control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aCP2y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the second control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="ellipse" translate="no">.<a href="#ellipse">ellipse</a><span class="signature">( aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span>, xRadius : <span class="param-type">number</span>, yRadius : <span class="param-type">number</span>, aStartAngle : <span class="param-type">number</span>, aEndAngle : <span class="param-type">number</span>, aClockwise : <span class="param-type">boolean</span>, aRotation : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an ellipse as an instance of <a href="EllipseCurve.html">EllipseCurve</a> to the path, positioned relative
+to the current point</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the center of the ellipse offsetted from the previous curve.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the center of the ellipse offsetted from the previous curve.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>xRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the ellipse in the x axis.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>yRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the ellipse in the y axis.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aStartAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The start angle in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aEndAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The end angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aClockwise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sweep the ellipse clockwise or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aRotation</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lineTo" translate="no">.<a href="#lineTo">lineTo</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an instance of <a href="LineCurve.html">LineCurve</a> to the path by connecting
+the current point with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="moveTo" translate="no">.<a href="#moveTo">moveTo</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Moves <a href="Path.html#currentPoint">Path#currentPoint</a> to the given point.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="quadraticCurveTo" translate="no">.<a href="#quadraticCurveTo">quadraticCurveTo</a><span class="signature">( aCPx : <span class="param-type">number</span>, aCPy : <span class="param-type">number</span>, aX : <span class="param-type">number</span>, aY : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an instance of <a href="QuadraticBezierCurve.html">QuadraticBezierCurve</a> to the path by connecting
+the current point with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aCPx</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aCPy</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the control point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a path from the given list of points. The points are added
+to the path as instances of <a href="LineCurve.html">LineCurve</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="splineThru" translate="no">.<a href="#splineThru">splineThru</a><span class="signature">( pts : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds an instance of <a href="SplineCurve.html">SplineCurve</a> to the path by connecting
+the current point with the given list of points.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>pts</strong>
+									</td>
+									<td class="description last">
+										<p>An array of points in 2D space.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/core/Path.js" target="_blank" rel="noopener" translate="no">src/extras/core/Path.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

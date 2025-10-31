@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>WebGPURenderer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Renderer.html">Renderer</a> → </p>
+	<h1 translate="no">WebGPURenderer</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This renderer is the new alternative of <code>WebGLRenderer</code>. <code>WebGPURenderer</code> has the ability
+to target different backends. By default, the renderer tries to use a WebGPU backend if the
+browser supports WebGPU. If not, <code>WebGPURenderer</code> falls backs to a WebGL 2 backend.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="WebGPURenderer" translate="no">new <a href="#WebGPURenderer">WebGPURenderer</a><span class="signature">( parameters : <span class="param-type"><a href="WebGPURenderer.html#~Options">WebGPURenderer~Options</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new WebGPU renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isWebGPURenderer" translate="no">.<a href="#isWebGPURenderer">isWebGPURenderer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="library" translate="no">.<a href="#library">library</a><span class="type-signature"> : <a href="StandardNodeLibrary.html">StandardNodeLibrary</a></span> </h3>
+					<div class="description">
+						<p>The generic default value is overwritten with the
+standard node library for type mapping.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Renderer.html#library">Renderer#library</a></dt>
+						</dl>
+				</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>WebGPURenderer options.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>logarithmicDepthBuffer</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether logarithmic depth buffer is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>alpha</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>depth</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer should have a depth buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>stencil</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer should have a stencil buffer or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>antialias</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether MSAA as the default anti-aliasing should be enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>samples</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>When <code>antialias</code> is <code>true</code>, <code>4</code> samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.</p>
+						<p>Default is <code>0</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>forceWebGL</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>If set to <code>true</code>, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>multiview</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>If set to <code>true</code>, the renderer will use multiview during WebXR rendering if supported.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>outputType</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>colorBufferType</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Defines the type of color buffers. The default <code>HalfFloatType</code> is recommend for best
+quality. To save memory and bandwidth, <code>UnsignedByteType</code> might be used. This will reduce rendering quality though.</p>
+						<p>Default is <code>HalfFloatType</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/webgpu/WebGPURenderer.js" target="_blank" rel="noopener" translate="no">src/renderers/webgpu/WebGPURenderer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -3,13 +3,20 @@
 		<title>three.js webgpu - animation retargeting</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - animation retargeting<br />
-			<a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo</a> to <a href="https://readyplayer.me/" target="_blank" rel="noopener">readyplayer.me</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Animation Retargeting</span>
+			</div>
+
+			<small>
+				Animation Retargeting from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">Mixamo</a> to <a href="https://readyplayer.me/" target="_blank" rel="noopener">readyplayer.me</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -28,11 +35,10 @@
 			import * as THREE from 'three/webgpu';
 			import { screenUV, color, vec2, vec4, reflector, positionWorld } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
@@ -55,9 +61,6 @@
 			//
 
 			const clock = new THREE.Clock();
-
-			const stats = new Stats();
-			document.body.appendChild( stats.dom );
 
 			// scene
 
@@ -103,10 +106,11 @@
 
 			// renderer
 			const renderer = new THREE.WebGPURenderer( { antialias: true } );
-			renderer.toneMapping = THREE.NeutralToneMapping;
-			renderer.setAnimationLoop( animate );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
+			renderer.inspector = new Inspector();
+			renderer.toneMapping = THREE.NeutralToneMapping;
 			document.body.appendChild( renderer.domElement );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
@@ -199,8 +203,6 @@
 				mixer.update( delta );
 
 				controls.update();
-
-				stats.update();
 
 				renderer.render( scene, camera );
 

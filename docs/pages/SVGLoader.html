@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SVGLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">SVGLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for the SVG format.</p>
+<p>Scalable Vector Graphics is an XML-based vector image format for two-dimensional graphics
+with support for interactivity and animation.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new SVGLoader();
+const data = await loader.loadAsync( 'data/svgSample.svg' );
+const paths = data.paths;
+const group = new THREE.Group();
+for ( let i = 0; i &lt; paths.length; i ++ ) {
+	const path = paths[ i ];
+	const material = new THREE.MeshBasicMaterial( {
+		color: path.color,
+		side: THREE.DoubleSide,
+		depthWrite: false
+	} );
+	const shapes = SVGLoader.createShapes( path );
+	for ( let j = 0; j &lt; shapes.length; j ++ ) {
+		const shape = shapes[ j ];
+		const geometry = new THREE.ShapeGeometry( shape );
+		const mesh = new THREE.Mesh( geometry, material );
+		group.add( mesh );
+	}
+}
+scene.add( group );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SVGLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SVGLoader" translate="no">new <a href="#SVGLoader">SVGLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new SVG loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="defaultDPI" translate="no">.<a href="#defaultDPI">defaultDPI</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Default dots per inch.</p>
+						<p>Default is <code>90</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="defaultUnit" translate="no">.<a href="#defaultUnit">defaultUnit</a><span class="type-signature"> : 'mm' | 'cm' | 'in' | 'pt' | 'pc' | 'px'</span> </h3>
+					<div class="description">
+						<p>Default unit.</p>
+						<p>Default is <code>'px'</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URL and passes the loaded SVG asset
+to the <code>onLoad()</code> callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( text : <span class="param-type">string</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given SVG data and returns the resulting data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>text</strong>
+									</td>
+									<td class="description last">
+										<p>The raw SVG data as a string.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object holding an array of shape paths and the
+SVG XML document.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".createShapes" translate="no">.<a href="#.createShapes">createShapes</a><span class="signature">( shapePath : <span class="param-type"><a href="ShapePath.html">ShapePath</a></span> )</span><span class="type-signature"> : Array.&lt;<a href="Shape.html">Shape</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates from the given shape path and array of shapes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shapePath</strong>
+									</td>
+									<td class="description last">
+										<p>The shape path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array of shapes.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".getStrokeStyle" translate="no">.<a href="#.getStrokeStyle">getStrokeStyle</a><span class="signature">( width : <span class="param-type">number</span>, color : <span class="param-type">string</span>, lineJoin : <span class="param-type">'round' | 'bevel' | 'miter' | 'miter-limit'</span>, lineCap : <span class="param-type">'round' | 'square' | 'butt'</span>, miterLimit : <span class="param-type">number</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a stroke style object from the given parameters.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The stroke width.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The stroke color, as  returned by <a href="Color.html#getStyle">Color#getStyle</a>.</p>
+										<p>Default is <code>'#000'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>lineJoin</strong>
+									</td>
+									<td class="description last">
+										<p>The line join style.</p>
+										<p>Default is <code>'miter'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>lineCap</strong>
+									</td>
+									<td class="description last">
+										<p>The line cap style.</p>
+										<p>Default is <code>'butt'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>miterLimit</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum join length, in multiples of the <code>width</code> parameter (join is truncated if it exceeds that distance).</p>
+										<p>Default is <code>4</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The style object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".pointsToStroke" translate="no">.<a href="#.pointsToStroke">pointsToStroke</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span>, style : <span class="param-type">Object</span>, arcDivisions : <span class="param-type">number</span>, minDistance : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a stroke from an array of points.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>The points in 2D space. Minimum 2 points. The path can be open or closed (last point equals to first point).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>style</strong>
+									</td>
+									<td class="description last">
+										<p>Object with SVG properties as returned by <code>SVGLoader.getStrokeStyle()</code>, or <code>SVGLoader.parse()</code> in the <code>path.userData.style</code> object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>arcDivisions</strong>
+									</td>
+									<td class="description last">
+										<p>Arc divisions for round joins and endcaps.</p>
+										<p>Default is <code>12</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minDistance</strong>
+									</td>
+									<td class="description last">
+										<p>Points closer to this distance will be merged.</p>
+										<p>Default is <code>0.001</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The stroke geometry. UV coordinates are generated ('u' along path. 'v' across it, from left to right).
+Returns <code>null</code> if not geometry was generated.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".pointsToStrokeWithBuffers" translate="no">.<a href="#.pointsToStrokeWithBuffers">pointsToStrokeWithBuffers</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span>, style : <span class="param-type">Object</span>, arcDivisions : <span class="param-type">number</span>, minDistance : <span class="param-type">number</span>, vertices : <span class="param-type">Array.&lt;number></span>, normals : <span class="param-type">Array.&lt;number></span>, uvs : <span class="param-type">Array.&lt;number></span>, vertexOffset : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a stroke from an array of points.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>The points in 2D space. Minimum 2 points.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>style</strong>
+									</td>
+									<td class="description last">
+										<p>Object with SVG properties as returned by <code>SVGLoader.getStrokeStyle()</code>, or <code>SVGLoader.parse()</code> in the <code>path.userData.style</code> object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>arcDivisions</strong>
+									</td>
+									<td class="description last">
+										<p>Arc divisions for round joins and endcaps.</p>
+										<p>Default is <code>12</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minDistance</strong>
+									</td>
+									<td class="description last">
+										<p>Points closer to this distance will be merged.</p>
+										<p>Default is <code>0.001</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>vertices</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding vertices.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>normals</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding normals.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvs</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding uvs.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>vertexOffset</strong>
+									</td>
+									<td class="description last">
+										<p>The vertex offset.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The number of vertices.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/SVGLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/SVGLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

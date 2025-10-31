@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>FirstPersonControls - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Controls.html">Controls</a> → </p>
+	<h1 translate="no">FirstPersonControls</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class is an alternative implementation of <a href="FlyControls.html">FlyControls</a>.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">FirstPersonControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="FirstPersonControls" translate="no">new <a href="#FirstPersonControls">FirstPersonControls</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new controls instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object that is managed by the controls.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="activeLook" translate="no">.<a href="#activeLook">activeLook</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether it's possible to look around or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="autoForward" translate="no">.<a href="#autoForward">autoForward</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the camera is automatically moved forward or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="constrainVertical" translate="no">.<a href="#constrainVertical">constrainVertical</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether or not looking around is vertically constrained by <code>verticalMin</code> and <code>verticalMax</code>.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="heightCoef" translate="no">.<a href="#heightCoef">heightCoef</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Determines how much faster the camera moves when it's y-component is near <code>heightMax</code>.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="heightMax" translate="no">.<a href="#heightMax">heightMax</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Upper camera height limit used for movement speed adjustment.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="heightMin" translate="no">.<a href="#heightMin">heightMin</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Lower camera height limit used for movement speed adjustment.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="heightSpeed" translate="no">.<a href="#heightSpeed">heightSpeed</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether or not the camera's height influences the forward movement speed.
+Use the properties <code>heightCoef</code>, <code>heightMin</code> and <code>heightMax</code> for configuration.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lookSpeed" translate="no">.<a href="#lookSpeed">lookSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The look around speed.</p>
+						<p>Default is <code>0.005</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lookVertical" translate="no">.<a href="#lookVertical">lookVertical</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether it's possible to vertically look around or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mouseDragOn" translate="no">.<a href="#mouseDragOn">mouseDragOn</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether the mouse is pressed down or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="movementSpeed" translate="no">.<a href="#movementSpeed">movementSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The movement speed.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="verticalMax" translate="no">.<a href="#verticalMax">verticalMax</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can vertically look around, upper limit. Range is <code>0</code> to <code>Math.PI</code> in radians.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="verticalMin" translate="no">.<a href="#verticalMin">verticalMin</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can vertically look around, lower limit. Range is <code>0</code> to <code>Math.PI</code> in radians.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="handleResize" translate="no">.<a href="#handleResize">handleResize</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Must be called if the application window is resized.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="lookAt" translate="no">.<a href="#lookAt">lookAt</a><span class="signature">( x : <span class="param-type">number | <a href="Vector3.html">Vector3</a></span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="FirstPersonControls.html">FirstPersonControls</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the camera towards the defined target position.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the target position or alternatively a vector representing the target position.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the target position.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The z coordinate of the target position.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this controls.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/FirstPersonControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/FirstPersonControls.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshStandardNodeMaterial - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Material.html">Material</a> → <a href="NodeMaterial.html">NodeMaterial</a> → </p>
+	<h1 translate="no">MeshStandardNodeMaterial</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Node material version of <a href="MeshStandardMaterial.html">MeshStandardMaterial</a>.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshStandardNodeMaterial" translate="no">new <a href="#MeshStandardNodeMaterial">MeshStandardNodeMaterial</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new mesh standard node material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="emissiveNode" translate="no">.<a href="#emissiveNode">emissiveNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The emissive color of standard materials is by default inferred from the <code>emissive</code>,
+<code>emissiveIntensity</code> and <code>emissiveMap</code> properties. This node property allows to
+overwrite the default and define the emissive color with a node instead.</p>
+<p>If you don't want to overwrite the emissive color but modify the existing
+value instead, use <a href="TSL.html#materialEmissive">materialEmissive</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMeshStandardNodeMaterial" translate="no">.<a href="#isMeshStandardNodeMaterial">isMeshStandardNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lights" translate="no">.<a href="#lights">lights</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> because standard materials react on lights.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#lights">NodeMaterial#lights</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="metalnessNode" translate="no">.<a href="#metalnessNode">metalnessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The metalness of standard materials is by default inferred from the <code>metalness</code>,
+and <code>metalnessMap</code> properties. This node property allows to
+overwrite the default and define the metalness with a node instead.</p>
+<p>If you don't want to overwrite the metalness but modify the existing
+value instead, use <a href="TSL.html#materialMetalness">materialMetalness</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="roughnessNode" translate="no">.<a href="#roughnessNode">roughnessNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The roughness of standard materials is by default inferred from the <code>roughness</code>,
+and <code>roughnessMap</code> properties. This node property allows to
+overwrite the default and define the roughness with a node instead.</p>
+<p>If you don't want to overwrite the roughness but modify the existing
+value instead, use <a href="TSL.html#materialRoughness">materialRoughness</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupEnvironment" translate="no">.<a href="#setupEnvironment">setupEnvironment</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="EnvironmentNode.html">EnvironmentNode</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten since this type of material uses <a href="EnvironmentNode.html">EnvironmentNode</a>
+to implement the PBR (PMREM based) environment mapping. Besides, the
+method honors <code>Scene.environment</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupEnvironment">NodeMaterial#setupEnvironment</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The environment node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLightingModel" translate="no">.<a href="#setupLightingModel">setupLightingModel</a><span class="signature">()</span><span class="type-signature"> : <a href="PhysicalLightingModel.html">PhysicalLightingModel</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the lighting model.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupLightingModel">NodeMaterial#setupLightingModel</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lighting model.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupSpecular" translate="no">.<a href="#setupSpecular">setupSpecular</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the specular related node variables.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="setupVariants" translate="no">.<a href="#setupVariants">setupVariants</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Setups the standard specific node variables.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupVariants">NodeMaterial#setupVariants</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/MeshStandardNodeMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/MeshStandardNodeMaterial.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

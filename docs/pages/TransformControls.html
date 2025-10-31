@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TransformControls - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Controls.html">Controls</a> → </p>
+	<h1 translate="no">TransformControls</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This class can be used to transform objects in 3D space by adapting a similar interaction model
+of DCC tools like Blender. Unlike other controls, it is not intended to transform the scene's camera.</p>
+<p><code>TransformControls</code> expects that its attached 3D object is part of the scene graph.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">TransformControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { TransformControls } from 'three/addons/controls/TransformControls.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TransformControls" translate="no">new <a href="#TransformControls">TransformControls</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new controls instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera of the rendered scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="axis" translate="no">.<a href="#axis">axis</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The current transformation axis.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
+					<div class="description">
+						<p>The camera of the rendered scene.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dragging" translate="no">.<a href="#dragging">dragging</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Whether dragging is currently performed or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxX" translate="no">.<a href="#maxX">maxX</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum allowed X position during translation.</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxY" translate="no">.<a href="#maxY">maxY</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum allowed Y position during translation.</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxZ" translate="no">.<a href="#maxZ">maxZ</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum allowed Z position during translation.</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minX" translate="no">.<a href="#minX">minX</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The minimum allowed X position during translation.</p>
+						<p>Default is <code>-Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minY" translate="no">.<a href="#minY">minY</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The minimum allowed y position during translation.</p>
+						<p>Default is <code>-Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minZ" translate="no">.<a href="#minZ">minZ</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The minimum allowed z position during translation.</p>
+						<p>Default is <code>-Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mode" translate="no">.<a href="#mode">mode</a><span class="type-signature"> : 'translate' | 'rotate' | 'scale'</span> </h3>
+					<div class="description">
+						<p>The current transformation axis.</p>
+						<p>Default is <code>'translate'</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotationSnap" translate="no">.<a href="#rotationSnap">rotationSnap</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>By default, 3D objects are continuously rotated. If you set this property to a numeric
+value (radians), you can define in which steps the 3D object should be rotated.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scaleSnap" translate="no">.<a href="#scaleSnap">scaleSnap</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>By default, 3D objects are continuously scaled. If you set this property to a numeric
+value, you can define in which steps the 3D object should be scaled.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="showX" translate="no">.<a href="#showX">showX</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the x-axis helper should be visible or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="showY" translate="no">.<a href="#showY">showY</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the y-axis helper should be visible or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="showZ" translate="no">.<a href="#showZ">showZ</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the z-axis helper should be visible or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The size of the helper UI (axes/planes).</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="space" translate="no">.<a href="#space">space</a><span class="type-signature"> : 'world' | 'local'</span> </h3>
+					<div class="description">
+						<p>Defines in which coordinate space transformations should be performed.</p>
+						<p>Default is <code>'world'</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="translationSnap" translate="no">.<a href="#translationSnap">translationSnap</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>By default, 3D objects are continuously translated. If you set this property to a numeric
+value (world units), you can define in which steps the 3D object should be translated.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="attach" translate="no">.<a href="#attach">attach</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="TransformControls.html">TransformControls</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the 3D object that should be transformed and ensures the controls UI is visible.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object that should be transformed.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this controls.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="detach" translate="no">.<a href="#detach">detach</a><span class="signature">()</span><span class="type-signature"> : <a href="TransformControls.html">TransformControls</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the current 3D object from the controls and makes the helper UI invisible.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this controls.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHelper" translate="no">.<a href="#getHelper">getHelper</a><span class="signature">()</span><span class="type-signature"> : TransformControlsRoot</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the visual representation of the controls. Add the helper to your scene to
+visually transform the attached  3D object.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The helper.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMode" translate="no">.<a href="#getMode">getMode</a><span class="signature">()</span><span class="type-signature"> : 'translate' | 'rotate' | 'scale'</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the transformation mode.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The transformation mode.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRaycaster" translate="no">.<a href="#getRaycaster">getRaycaster</a><span class="signature">()</span><span class="type-signature"> : <a href="Raycaster.html">Raycaster</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the raycaster that is used for user interaction. This object is shared between all
+instances of <code>TransformControls</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The internal raycaster.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets the object's position, rotation and scale to when the current transform began.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="setColors" translate="no">.<a href="#setColors">setColors</a><span class="signature">( xAxis : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, yAxis : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, zAxis : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, active : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the colors of the control's gizmo.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>xAxis</strong>
+									</td>
+									<td class="description last">
+										<p>The x-axis color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>yAxis</strong>
+									</td>
+									<td class="description last">
+										<p>The y-axis color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>zAxis</strong>
+									</td>
+									<td class="description last">
+										<p>The z-axis color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>active</strong>
+									</td>
+									<td class="description last">
+										<p>The color for active elements.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setMode" translate="no">.<a href="#setMode">setMode</a><span class="signature">( mode : <span class="param-type">'translate' | 'rotate' | 'scale'</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given transformation mode.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mode</strong>
+									</td>
+									<td class="description last">
+										<p>The transformation mode to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setRotationSnap" translate="no">.<a href="#setRotationSnap">setRotationSnap</a><span class="signature">( rotationSnap : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the rotation snap.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>rotationSnap</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation snap to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setScaleSnap" translate="no">.<a href="#setScaleSnap">setScaleSnap</a><span class="signature">( scaleSnap : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the scale snap.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scaleSnap</strong>
+									</td>
+									<td class="description last">
+										<p>The scale snap to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( size : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the helper UI.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The size to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSpace" translate="no">.<a href="#setSpace">setSpace</a><span class="signature">( space : <span class="param-type">'world' | 'local'</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the coordinate space in which transformations are applied.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>space</strong>
+									</td>
+									<td class="description last">
+										<p>The space to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setTranslationSnap" translate="no">.<a href="#setTranslationSnap">setTranslationSnap</a><span class="signature">( translationSnap : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the translation snap.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>translationSnap</strong>
+									</td>
+									<td class="description last">
+										<p>The translation snap to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:change" translate="no">.<a href="#event:change">change</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires if any type of change (object or property change) is performed. Property changes
+are separate events you can add event listeners to. The event type is &quot;propertyname-changed&quot;.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:mouseDown" translate="no">.<a href="#event:mouseDown">mouseDown</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires if a pointer (mouse/touch) becomes active.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:mouseUp" translate="no">.<a href="#event:mouseUp">mouseUp</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires if a pointer (mouse/touch) is no longer active.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:objectChange" translate="no">.<a href="#event:objectChange">objectChange</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires if the controlled 3D object is changed.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/TransformControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/TransformControls.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Renderer - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Renderer</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Base class for renderers.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Renderer" translate="no">new <a href="#Renderer">Renderer</a><span class="signature">( backend : <span class="param-type"><a href="Backend.html">Backend</a></span>, parameters : <span class="param-type"><a href="Renderer.html#~Options">Renderer~Options</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>backend</strong>
+									</td>
+									<td class="description last">
+										<p>The backend the renderer is targeting (e.g. WebGPU or WebGL 2).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="alpha" translate="no">.<a href="#alpha">alpha</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the default framebuffer should be transparent or opaque.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="autoClear" translate="no">.<a href="#autoClear">autoClear</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the renderer should automatically clear the current rendering target
+before execute a <code>render()</code> call. The target can be the canvas (default framebuffer)
+or the current bound render target (custom framebuffer).</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="autoClearColor" translate="no">.<a href="#autoClearColor">autoClearColor</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When <code>autoClear</code> is set to <code>true</code>, this property defines whether the renderer
+should clear the color buffer.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="autoClearDepth" translate="no">.<a href="#autoClearDepth">autoClearDepth</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When <code>autoClear</code> is set to <code>true</code>, this property defines whether the renderer
+should clear the depth buffer.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="autoClearStencil" translate="no">.<a href="#autoClearStencil">autoClearStencil</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>When <code>autoClear</code> is set to <code>true</code>, this property defines whether the renderer
+should clear the stencil buffer.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="backend" translate="no">.<a href="#backend">backend</a><span class="type-signature"> : <a href="Backend.html">Backend</a></span> </h3>
+					<div class="description">
+						<p>A reference to the current backend.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="coordinateSystem" translate="no">.<a href="#coordinateSystem">coordinateSystem</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The coordinate system of the renderer. The value of this property
+depends on the selected backend. Either <code>THREE.WebGLCoordinateSystem</code> or
+<code>THREE.WebGPUCoordinateSystem</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="currentColorSpace" translate="no">.<a href="#currentColorSpace">currentColorSpace</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>The current color space of the renderer. When not producing screen output,
+the color space is always the working color space.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="currentSamples" translate="no">.<a href="#currentSamples">currentSamples</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The current number of samples used for multi-sample anti-aliasing (MSAA).</p>
+<p>When rendering to a custom render target, the number of samples of that render target is used.
+If the renderer needs an internal framebuffer target for tone mapping or color space conversion,
+the number of samples is set to 0.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="currentToneMapping" translate="no">.<a href="#currentToneMapping">currentToneMapping</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The current tone mapping of the renderer. When not producing screen output,
+the tone mapping is always <code>NoToneMapping</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="debug" translate="no">.<a href="#debug">debug</a><span class="type-signature"> : <a href="global.html#DebugConfig">DebugConfig</a></span> </h3>
+					<div class="description">
+						<p>The renderer's debug configuration.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depth" translate="no">.<a href="#depth">depth</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the default framebuffer should have a depth buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="domElement" translate="no">.<a href="#domElement">domElement</a><span class="type-signature"> : HTMLCanvasElement | OffscreenCanvas</span> </h3>
+					<div class="description">
+						<p>A reference to the canvas element the renderer is drawing to.
+This value of this property will automatically be created by
+the renderer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="highPrecision" translate="no">.<a href="#highPrecision">highPrecision</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enables or disables high precision for model-view and normal-view matrices.
+When enabled, will use CPU 64-bit precision for higher precision instead of GPU 32-bit for higher performance.</p>
+<p>NOTE: 64-bit precision is not compatible with <code>InstancedMesh</code> and <code>SkinnedMesh</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="highPrecision" translate="no">.<a href="#highPrecision">highPrecision</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Returns whether high precision is enabled or not.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="info" translate="no">.<a href="#info">info</a><span class="type-signature"> : <a href="Info.html">Info</a></span> </h3>
+					<div class="description">
+						<p>Holds a series of statistical information about the GPU memory
+and the rendering process. Useful for debugging and monitoring.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="initialized" translate="no">.<a href="#initialized">initialized</a> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Returns whether the renderer has been initialized or not.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="inspector" translate="no">.<a href="#inspector">inspector</a> </h3>
+					<div class="description">
+						<p>Sets the inspector instance. The inspector can be any class that extends from <code>InspectorBase</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isOutputTarget" translate="no">.<a href="#isOutputTarget">isOutputTarget</a> </h3>
+					<div class="description">
+						<p>Returns <code>true</code> if the rendering settings are set to screen output.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isRenderer" translate="no">.<a href="#isRenderer">isRenderer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="library" translate="no">.<a href="#library">library</a><span class="type-signature"> : <a href="NodeLibrary.html">NodeLibrary</a></span> </h3>
+					<div class="description">
+						<p>The node library defines how certain library objects like materials, lights
+or tone mapping functions are mapped to node types. This is required since
+although instances of classes like <code>MeshBasicMaterial</code> or <code>PointLight</code> can
+be part of the scene graph, they are internally represented as nodes for
+further processing.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lighting" translate="no">.<a href="#lighting">lighting</a><span class="type-signature"> : <a href="Lighting.html">Lighting</a></span> </h3>
+					<div class="description">
+						<p>A map-like data structure for managing lights.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="logarithmicDepthBuffer" translate="no">.<a href="#logarithmicDepthBuffer">logarithmicDepthBuffer</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether logarithmic depth buffer is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsFrameBufferTarget" translate="no">.<a href="#needsFrameBufferTarget">needsFrameBufferTarget</a> </h3>
+					<div class="description">
+						<p>Returns <code>true</code> if a framebuffer target is needed to perform tone mapping or color space conversion.
+If this is the case, the renderer allocates an internal render target for that purpose.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="onDeviceLost" translate="no">.<a href="#onDeviceLost">onDeviceLost</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>A callback function that defines what should happen when a device/context lost occurs.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="opaque" translate="no">.<a href="#opaque">opaque</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the renderer should render opaque render objects or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="outputColorSpace" translate="no">.<a href="#outputColorSpace">outputColorSpace</a><span class="type-signature"> : string</span> </h3>
+					<div class="description">
+						<p>Defines the output color space of the renderer.</p>
+						<p>Default is <code>SRGBColorSpace</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="overrideNodes" translate="no">.<a href="#overrideNodes">overrideNodes</a><span class="type-signature"> : Object</span> </h3>
+					<div class="description">
+						<p>Stores override nodes for specific transformations or calculations.
+These nodes can be used to replace default behavior in the rendering pipeline.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>modelViewMatrix</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a></span>
+				</td>
+			<td class="description last">
+				<p>An override node for the model-view matrix.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>modelNormalViewMatrix</strong>
+						<br>
+<span class="param-type"><a href="Node.html">Node</a></span>
+				</td>
+			<td class="description last">
+				<p>An override node for the model normal view matrix.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="samples" translate="no">.<a href="#samples">samples</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The number of samples used for multi-sample anti-aliasing (MSAA).</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadowMap" translate="no">.<a href="#shadowMap">shadowMap</a><span class="type-signature"> : <a href="global.html#ShadowMapConfig">ShadowMapConfig</a></span> </h3>
+					<div class="description">
+						<p>The renderer's shadow configuration.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="sortObjects" translate="no">.<a href="#sortObjects">sortObjects</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the renderer should sort its render lists or not.</p>
+<p>Note: Sorting is used to attempt to properly render objects that have some degree of transparency.
+By definition, sorting objects may not work in all cases. Depending on the needs of application,
+it may be necessary to turn off sorting and use other methods to deal with transparency rendering
+e.g. manually determining each object's rendering order.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stencil" translate="no">.<a href="#stencil">stencil</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the default framebuffer should have a stencil buffer or not.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="toneMapping" translate="no">.<a href="#toneMapping">toneMapping</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Defines the tone mapping of the renderer.</p>
+						<p>Default is <code>NoToneMapping</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="toneMappingExposure" translate="no">.<a href="#toneMappingExposure">toneMappingExposure</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Defines the tone mapping exposure.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transparent" translate="no">.<a href="#transparent">transparent</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the renderer should render transparent render objects or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="xr" translate="no">.<a href="#xr">xr</a><span class="type-signature"> : <a href="XRManager.html">XRManager</a></span> </h3>
+					<div class="description">
+						<p>The renderer's XR manager.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="_getShadowNodes" translate="no">.<a href="#_getShadowNodes">_getShadowNodes</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Retrieves shadow nodes for the given material. This is used to setup shadow passes.
+The result is cached per material and updated when the material's version changes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <ul>
+<li>The shadow nodes for the material.</li>
+</ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="_projectObject" translate="no">.<a href="#_projectObject">_projectObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, groupOrder : <span class="param-type">number</span>, renderList : <span class="param-type"><a href="RenderList.html">RenderList</a></span>, clippingContext : <span class="param-type"><a href="ClippingContext.html">ClippingContext</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Analyzes the given 3D object's hierarchy and builds render lists from the
+processed hierarchy.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to process (usually a scene).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the object is rendered with.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>groupOrder</strong>
+									</td>
+									<td class="description last">
+										<p>The group order is derived from the <code>renderOrder</code> of groups and is used to group 3D objects within groups.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>renderList</strong>
+									</td>
+									<td class="description last">
+										<p>The current render list.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>clippingContext</strong>
+									</td>
+									<td class="description last">
+										<p>The current clipping context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="_resetXRState" translate="no">.<a href="#_resetXRState">_resetXRState</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets the renderer to the initial state before WebXR started.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="clear" translate="no">.<a href="#clear">clear</a><span class="signature">( color : <span class="param-type">boolean</span>, depth : <span class="param-type">boolean</span>, stencil : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a manual clear operation. This method ignores <code>autoClear</code> properties.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the color buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the depth buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>stencil</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the stencil buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="clearAsync" translate="no">.<a href="#clearAsync">clearAsync</a><span class="signature">( color : <span class="param-type">boolean</span>, depth : <span class="param-type">boolean</span>, stencil : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Async version of <a href="Renderer.html#clear">Renderer#clear</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the color buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the depth buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>stencil</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the stencil buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the clear operation has been executed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clearColor" translate="no">.<a href="#clearColor">clearColor</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a manual clear operation of the color buffer. This method ignores <code>autoClear</code> properties.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="clearColorAsync" translate="no">.<a href="#clearColorAsync">clearColorAsync</a><span class="signature">()</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Async version of <a href="Renderer.html#clearColor">Renderer#clearColor</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the clear operation has been executed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clearDepth" translate="no">.<a href="#clearDepth">clearDepth</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a manual clear operation of the depth buffer. This method ignores <code>autoClear</code> properties.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="clearDepthAsync" translate="no">.<a href="#clearDepthAsync">clearDepthAsync</a><span class="signature">()</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Async version of <a href="Renderer.html#clearDepth">Renderer#clearDepth</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the clear operation has been executed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clearStencil" translate="no">.<a href="#clearStencil">clearStencil</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Performs a manual clear operation of the stencil buffer. This method ignores <code>autoClear</code> properties.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="clearStencilAsync" translate="no">.<a href="#clearStencilAsync">clearStencilAsync</a><span class="signature">()</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Async version of <a href="Renderer.html#clearStencil">Renderer#clearStencil</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the clear operation has been executed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="compile" translate="no">.<a href="#compile">compile</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, targetScene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span><span class="type-signature"> : function</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Alias for <code>compileAsync()</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or 3D object to precompile.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is used to render the scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>targetScene</strong>
+									</td>
+									<td class="description last">
+										<p>If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the compile has been finished.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="compileAsync" translate="no">.<a href="#compileAsync">compileAsync</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, targetScene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span><span class="type-signature"> : Promise.&lt;(Array|undefined)></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Compiles all materials in the given scene. This can be useful to avoid a
+phenomenon which is called &quot;shader compilation stutter&quot;, which occurs when
+rendering an object with a new shader for the first time.</p>
+<p>If you want to add a 3D object to an existing scene, use the third optional
+parameter for applying the target scene. Note that the (target) scene's lighting
+and environment must be configured before calling this method.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or 3D object to precompile.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is used to render the scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>targetScene</strong>
+									</td>
+									<td class="description last">
+										<p>If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the compile has been finished.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="compute" translate="no">.<a href="#compute">compute</a><span class="signature">( computeNodes : <span class="param-type"><a href="Node.html">Node</a> | Array.&lt;<a href="Node.html">Node</a>></span>, dispatchSize : <span class="param-type">number | Array.&lt;number> | <a href="IndirectStorageBufferAttribute.html">IndirectStorageBufferAttribute</a></span> )</span><span class="type-signature"> : Promise | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Execute a single or an array of compute nodes. This method can only be called
+if the renderer has been initialized.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>computeNodes</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node(s).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dispatchSize</strong>
+									</td>
+									<td class="description last">
+										<ul>
+<li>A single number representing count, or</li>
+<li>An array [x, y, z] representing dispatch size, or</li>
+<li>A IndirectStorageBufferAttribute for indirect dispatch size.</li>
+</ul>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNodes : <span class="param-type"><a href="Node.html">Node</a> | Array.&lt;<a href="Node.html">Node</a>></span>, dispatchSize : <span class="param-type">number | Array.&lt;number> | <a href="IndirectStorageBufferAttribute.html">IndirectStorageBufferAttribute</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Execute a single or an array of compute nodes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>computeNodes</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node(s).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dispatchSize</strong>
+									</td>
+									<td class="description last">
+										<ul>
+<li>A single number representing count, or</li>
+<li>An array [x, y, z] representing dispatch size, or</li>
+<li>A IndirectStorageBufferAttribute for indirect dispatch size.</li>
+</ul>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolve when the compute has finished.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copyFramebufferToTexture" translate="no">.<a href="#copyFramebufferToTexture">copyFramebufferToTexture</a><span class="signature">( framebufferTexture : <span class="param-type"><a href="FramebufferTexture.html">FramebufferTexture</a></span>, rectangle : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector4.html">Vector4</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the current bound framebuffer into the given texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>framebufferTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>rectangle</strong>
+									</td>
+									<td class="description last">
+										<p>A two or four dimensional vector that defines the rectangular portion of the framebuffer that should be copied.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copyTextureToTexture" translate="no">.<a href="#copyTextureToTexture">copyTextureToTexture</a><span class="signature">( srcTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, dstTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, srcRegion : <span class="param-type"><a href="Box2.html">Box2</a> | <a href="Box3.html">Box3</a></span>, dstPosition : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span>, srcLevel : <span class="param-type">number</span>, dstLevel : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies data of the given source texture into a destination texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>srcTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The source texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dstTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The destination texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>srcRegion</strong>
+									</td>
+									<td class="description last">
+										<p>A bounding box which describes the source region. Can be two or three-dimensional.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dstPosition</strong>
+									</td>
+									<td class="description last">
+										<p>A vector that represents the origin of the destination region. Can be two or three-dimensional.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>srcLevel</strong>
+									</td>
+									<td class="description last">
+										<p>The source mip level to copy from.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dstLevel</strong>
+									</td>
+									<td class="description last">
+										<p>The destination mip level to copy to.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees all internal resources of the renderer. Call this method if the renderer
+is no longer in use by your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="getActiveCubeFace" translate="no">.<a href="#getActiveCubeFace">getActiveCubeFace</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the active cube face.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The active cube face.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getActiveMipmapLevel" translate="no">.<a href="#getActiveMipmapLevel">getActiveMipmapLevel</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the active mipmap level.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The active mipmap level.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getAnimationLoop" translate="no">.<a href="#getAnimationLoop">getAnimationLoop</a><span class="signature">()</span><span class="type-signature"> : function</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current animation loop callback.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current animation loop callback.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getArrayBufferAsync" translate="no">.<a href="#getArrayBufferAsync">getArrayBufferAsync</a><span class="signature">( attribute : <span class="param-type"><a href="StorageBufferAttribute.html">StorageBufferAttribute</a></span> )</span><span class="type-signature"> : Promise.&lt;ArrayBuffer></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Can be used to transfer buffer data from a storage buffer attribute
+from the GPU to the CPU in context of compute shaders.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The storage buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A promise that resolves with the buffer data when the data are ready.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getCanvasTarget" translate="no">.<a href="#getCanvasTarget">getCanvasTarget</a><span class="signature">()</span><span class="type-signature"> : <a href="CanvasTarget.html">CanvasTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current canvas target.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current canvas target.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClearAlpha" translate="no">.<a href="#getClearAlpha">getClearAlpha</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the clear alpha.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clear alpha.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClearColor" translate="no">.<a href="#getClearColor">getClearColor</a><span class="signature">( target : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the clear color.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The method writes the result in this target object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clear color.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClearDepth" translate="no">.<a href="#getClearDepth">getClearDepth</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the clear depth.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clear depth.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClearStencil" translate="no">.<a href="#getClearStencil">getClearStencil</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the clear stencil.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clear stencil.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getColorBufferType" translate="no">.<a href="#getColorBufferType">getColorBufferType</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the color buffer type.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The color buffer type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getContext" translate="no">.<a href="#getContext">getContext</a><span class="signature">()</span><span class="type-signature"> : GPUCanvasContext | WebGL2RenderingContext</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the rendering context.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The rendering context.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDrawingBufferSize" translate="no">.<a href="#getDrawingBufferSize">getDrawingBufferSize</a><span class="signature">( target : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the drawing buffer size in physical pixels. This method honors the pixel ratio.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The method writes the result in this target object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The drawing buffer size.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMRT" translate="no">.<a href="#getMRT">getMRT</a><span class="signature">()</span><span class="type-signature"> : <a href="MRTNode.html">MRTNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the MRT configuration.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The MRT configuration.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMaxAnisotropy" translate="no">.<a href="#getMaxAnisotropy">getMaxAnisotropy</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the maximum available anisotropy for texture filtering.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The maximum available anisotropy.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getOutputRenderTarget" translate="no">.<a href="#getOutputRenderTarget">getOutputRenderTarget</a><span class="signature">()</span><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current output target.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current output render target. Returns <code>null</code> if no output target is set.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPixelRatio" translate="no">.<a href="#getPixelRatio">getPixelRatio</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the pixel ratio.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The pixel ratio.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRenderObjectFunction" translate="no">.<a href="#getRenderObjectFunction">getRenderObjectFunction</a><span class="signature">()</span><span class="type-signature"> : function</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current render object function.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current render object function. Returns <code>null</code> if no function is set.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getRenderTarget" translate="no">.<a href="#getRenderTarget">getRenderTarget</a><span class="signature">()</span><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current render target.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The render target. Returns <code>null</code> if no render target is set.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getScissor" translate="no">.<a href="#getScissor">getScissor</a><span class="signature">( target : <span class="param-type"><a href="Vector4.html">Vector4</a></span> )</span><span class="type-signature"> : <a href="Vector4.html">Vector4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the scissor rectangle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The method writes the result in this target object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The scissor rectangle.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getScissorTest" translate="no">.<a href="#getScissorTest">getScissorTest</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the scissor test value.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the scissor test should be enabled or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSize" translate="no">.<a href="#getSize">getSize</a><span class="signature">( target : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the renderer's size in logical pixels. This method does not honor the pixel ratio.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The method writes the result in this target object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The renderer's size in logical pixels.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getViewport" translate="no">.<a href="#getViewport">getViewport</a><span class="signature">( target : <span class="param-type"><a href="Vector4.html">Vector4</a></span> )</span><span class="type-signature"> : <a href="Vector4.html">Vector4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the viewport definition.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The method writes the result in this target object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The viewport definition.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasFeature" translate="no">.<a href="#hasFeature">hasFeature</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the given feature is supported by the selected backend. If the
+renderer has not been initialized, this method always returns <code>false</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The feature's name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the feature is supported or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasFeatureAsync" translate="no">.<a href="#hasFeatureAsync">hasFeatureAsync</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : Promise.&lt;boolean></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if the given feature is supported by the selected backend.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The feature's name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with a bool that indicates whether the feature is supported or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasInitialized" translate="no">.<a href="#hasInitialized">hasInitialized</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> when the renderer has been initialized.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the renderer has been initialized or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="init" translate="no">.<a href="#init">init</a><span class="signature">()</span><span class="type-signature"> : Promise.&lt;this></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the renderer so it is ready for usage.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the renderer has been initialized.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="initTexture" translate="no">.<a href="#initTexture">initTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the given texture. Useful for preloading a texture rather than waiting until first render
+(which can cause noticeable lags due to decode and GPU upload overhead).</p>
+<p>This method can only be used if the renderer has been initialized.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="initTextureAsync" translate="no">.<a href="#initTextureAsync">initTextureAsync</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Initializes the given textures. Useful for preloading a texture rather than waiting until first render
+(which can cause noticeable lags due to decode and GPU upload overhead).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the texture has been initialized.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isOccluded" translate="no">.<a href="#isOccluded">isOccluded</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method performs an occlusion query for the given 3D object.
+It returns <code>true</code> if the given 3D object is fully occluded by other
+3D objects in the scene.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the 3D object is fully occluded or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="readRenderTargetPixelsAsync" translate="no">.<a href="#readRenderTargetPixelsAsync">readRenderTargetPixelsAsync</a><span class="signature">( renderTarget : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a></span>, x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, textureIndex : <span class="param-type">number</span>, faceIndex : <span class="param-type">number</span> )</span><span class="type-signature"> : Promise.&lt;TypedArray></span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Reads pixel data from the given render target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target to read from.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>x</code> coordinate of the copy region's origin.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>y</code> coordinate of the copy region's origin.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the copy region.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the copy region.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>textureIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The texture index of a MRT render target.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>faceIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The active cube face index.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the scene or 3D object with the given camera. This method can only be called
+if the renderer has been initialized. When using <code>render()</code> inside an animation loop,
+it's guaranteed the renderer will be initialized. The animation loop must be defined
+with <a href="Renderer.html#setAnimationLoop">Renderer#setAnimationLoop</a> though.</p>
+<p>For all other use cases (like when using on-demand rendering), you must call
+<a href="Renderer.html#init">Renderer#init</a> before rendering.</p>
+<p>The target of the method is the default framebuffer (meaning the canvas)
+or alternatively a render target when specified via <code>setRenderTarget()</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or 3D object to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to render the scene with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="renderAsync" translate="no">.<a href="#renderAsync">renderAsync</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the scene in an async fashion.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or 3D object to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the render has been finished.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="renderObject" translate="no">.<a href="#renderObject">renderObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span>, lightsNode : <span class="param-type"><a href="LightsNode.html">LightsNode</a></span>, clippingContext : <span class="param-type"><a href="ClippingContext.html">ClippingContext</a></span>, passId : <span class="param-type">string</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method represents the default render object function that manages the render lifecycle
+of the object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene the 3D object belongs to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the object should be rendered with.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The object's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The object's material.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>Only relevant for objects using multiple materials. This represents a group entry from the respective <code>BufferGeometry</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>lightsNode</strong>
+									</td>
+									<td class="description last">
+										<p>The current lights node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>clippingContext</strong>
+									</td>
+									<td class="description last">
+										<p>The clipping context.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>passId</strong>
+									</td>
+									<td class="description last">
+										<p>An optional ID for identifying the pass.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setAnimationLoop" translate="no">.<a href="#setAnimationLoop">setAnimationLoop</a><span class="signature">( callback : <span class="param-type"><a href="global.html#onAnimationCallback">onAnimationCallback</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Applications are advised to always define the animation loop
+with this method and not manually with <code>requestAnimationFrame()</code>
+for best compatibility.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>The application's animation loop.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the set has been executed.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setCanvasTarget" translate="no">.<a href="#setCanvasTarget">setCanvasTarget</a><span class="signature">( canvasTarget : <span class="param-type"><a href="CanvasTarget.html">CanvasTarget</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the canvas target. The canvas target manages the HTML canvas
+or the offscreen canvas the renderer draws into.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>canvasTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The canvas target.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setClearAlpha" translate="no">.<a href="#setClearAlpha">setClearAlpha</a><span class="signature">( alpha : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the clear alpha.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The clear alpha.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setClearColor" translate="no">.<a href="#setClearColor">setClearColor</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span>, alpha : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the clear color and optionally the clear alpha.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The clear color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The clear alpha.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setClearDepth" translate="no">.<a href="#setClearDepth">setClearDepth</a><span class="signature">( depth : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the clear depth.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>The clear depth.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setClearStencil" translate="no">.<a href="#setClearStencil">setClearStencil</a><span class="signature">( stencil : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the clear stencil.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>stencil</strong>
+									</td>
+									<td class="description last">
+										<p>The clear stencil.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setDrawingBufferSize" translate="no">.<a href="#setDrawingBufferSize">setDrawingBufferSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, pixelRatio : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method allows to define the drawing buffer size by specifying
+width, height and pixel ratio all at once. The size of the drawing
+buffer is computed with this formula:</p>
+<pre><code class="language-js">size.x = width * pixelRatio;
+size.y = height * pixelRatio;
+</code></pre>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width in logical pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height in logical pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>pixelRatio</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel ratio.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setMRT" translate="no">.<a href="#setMRT">setMRT</a><span class="signature">( mrt : <span class="param-type"><a href="MRTNode.html">MRTNode</a></span> )</span><span class="type-signature"> : <a href="Renderer.html">Renderer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given MRT configuration.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mrt</strong>
+									</td>
+									<td class="description last">
+										<p>The MRT node to set.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this renderer.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setOpaqueSort" translate="no">.<a href="#setOpaqueSort">setOpaqueSort</a><span class="signature">( method : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines a manual sort function for the opaque render list.
+Pass <code>null</code> to use the default sort.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>method</strong>
+									</td>
+									<td class="description last">
+										<p>The sort function.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setOutputRenderTarget" translate="no">.<a href="#setOutputRenderTarget">setOutputRenderTarget</a><span class="signature">( renderTarget : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the output render target for the renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target to set as the output target.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setPixelRatio" translate="no">.<a href="#setPixelRatio">setPixelRatio</a><span class="signature">( value : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given pixel ratio and resizes the canvas if necessary.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel ratio.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setRenderObjectFunction" translate="no">.<a href="#setRenderObjectFunction">setRenderObjectFunction</a><span class="signature">( renderObjectFunction : <span class="param-type"><a href="global.html#renderObjectFunction">renderObjectFunction</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given render object function. Calling this method overwrites the default implementation
+which is <a href="Renderer.html#renderObject">Renderer#renderObject</a>. Defining a custom function can be useful
+if you want to modify the way objects are rendered. For example you can define things like &quot;every
+object that has material of a certain type should perform a pre-pass with a special overwrite material&quot;.
+The custom function must always call <code>renderObject()</code> in its implementation.</p>
+<p>Use <code>null</code> as the first argument to reset the state.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderObjectFunction</strong>
+									</td>
+									<td class="description last">
+										<p>The render object function.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setRenderTarget" translate="no">.<a href="#setRenderTarget">setRenderTarget</a><span class="signature">( renderTarget : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a></span>, activeCubeFace : <span class="param-type">number</span>, activeMipmapLevel : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given render target. Calling this method means the renderer does not
+target the default framebuffer (meaning the canvas) anymore but a custom framebuffer.
+Use <code>null</code> as the first argument to reset the state.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target to set.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>activeCubeFace</strong>
+									</td>
+									<td class="description last">
+										<p>The active cube face.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>activeMipmapLevel</strong>
+									</td>
+									<td class="description last">
+										<p>The active mipmap level.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setScissor" translate="no">.<a href="#setScissor">setScissor</a><span class="signature">( x : <span class="param-type">number | <a href="Vector4.html">Vector4</a></span>, y : <span class="param-type">number</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the scissor rectangle.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+Instead of passing four arguments, the method also works with a single four-dimensional vector.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The vertical coordinate for the lower left corner of the box in logical pixel unit.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the scissor box in logical pixel unit.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the scissor box in logical pixel unit.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setScissorTest" translate="no">.<a href="#setScissorTest">setScissorTest</a><span class="signature">( boolean : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the scissor test.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>boolean</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the scissor test should be enabled or not.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, updateStyle : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width in logical pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height in logical pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>updateStyle</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to update the <code>style</code> attribute of the canvas or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setTransparentSort" translate="no">.<a href="#setTransparentSort">setTransparentSort</a><span class="signature">( method : <span class="param-type">function</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines a manual sort function for the transparent render list.
+Pass <code>null</code> to use the default sort.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>method</strong>
+									</td>
+									<td class="description last">
+										<p>The sort function.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setViewport" translate="no">.<a href="#setViewport">setViewport</a><span class="signature">( x : <span class="param-type">number | <a href="Vector4.html">Vector4</a></span>, y : <span class="param-type">number</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, minDepth : <span class="param-type">number</span>, maxDepth : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the viewport.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the viewport in logical pixel unit.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the viewport in logical pixel unit.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>minDepth</strong>
+									</td>
+									<td class="description last">
+										<p>The minimum depth value of the viewport. WebGPU only.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>maxDepth</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum depth value of the viewport. WebGPU only.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="waitForGPU" translate="no">.<a href="#waitForGPU">waitForGPU</a><span class="signature">()</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Can be used to synchronize CPU operations with GPU tasks. So when this method is called,
+the CPU waits for the GPU to complete its operation (e.g. a compute task).</p>
+						</div>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Yes</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when synchronization has been finished.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~Options" translate="no">.<a href="#~Options">Options</a> </h3>
+					<div class="description">
+						<p>Renderer options.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>logarithmicDepthBuffer</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether logarithmic depth buffer is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>alpha</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>depth</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer should have a depth buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>stencil</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer should have a stencil buffer or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>antialias</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether MSAA as the default anti-aliasing should be enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>samples</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>When <code>antialias</code> is <code>true</code>, <code>4</code> samples are used by default. This parameter can set to any other integer value than 0
+to overwrite the default.</p>
+						<p>Default is <code>0</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>getFallback</strong>
+						<br>
+<span class="param-type">function</span>
+				</td>
+			<td class="description last">
+				<p>This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.</p>
+						<p>Default is <code>null</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>colorBufferType</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Defines the type of color buffers. The default <code>HalfFloatType</code> is recommend for best
+quality. To save memory and bandwidth, <code>UnsignedByteType</code> might be used. This will reduce rendering quality though.</p>
+						<p>Default is <code>HalfFloatType</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>multiview</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>If set to <code>true</code>, the renderer will use multiview during WebXR rendering if supported.</p>
+						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/Renderer.js" target="_blank" rel="noopener" translate="no">src/renderers/common/Renderer.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

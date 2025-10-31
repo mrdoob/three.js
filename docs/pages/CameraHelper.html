@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CameraHelper - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Line.html">Line</a> → <a href="LineSegments.html">LineSegments</a> → </p>
+	<h1 translate="no">CameraHelper</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>This helps with visualizing what a camera contains in its frustum. It
+visualizes the frustum of a camera using a line segments.</p>
+<p>Based on frustum visualization in <a href="https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html">lightgl.js shadowmap example</a>.</p>
+<p><code>CameraHelper</code> must be a child of the scene.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const helper = new THREE.CameraHelper( camera );
+scene.add( helper );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CameraHelper" translate="no">new <a href="#CameraHelper">CameraHelper</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new arrow helper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to visualize.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
+					<div class="description">
+						<p>The camera being visualized.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="pointMap" translate="no">.<a href="#pointMap">pointMap</a><span class="type-signature"> : Object.&lt;string, Array.&lt;number>></span> </h3>
+					<div class="description">
+						<p>This contains the points used to visualize the camera.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="setColors" translate="no">.<a href="#setColors">setColors</a><span class="signature">( frustum : <span class="param-type"><a href="Color.html">Color</a></span>, cone : <span class="param-type"><a href="Color.html">Color</a></span>, up : <span class="param-type"><a href="Color.html">Color</a></span>, target : <span class="param-type"><a href="Color.html">Color</a></span>, cross : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="CameraHelper.html">CameraHelper</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Defines the colors of the helper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>frustum</strong>
+									</td>
+									<td class="description last">
+										<p>The frustum line color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>cone</strong>
+									</td>
+									<td class="description last">
+										<p>The cone line color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>up</strong>
+									</td>
+									<td class="description last">
+										<p>The up line color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target line color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>cross</strong>
+									</td>
+									<td class="description last">
+										<p>The cross line color.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this helper.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the helper based on the projection matrix of the camera.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/helpers/CameraHelper.js" target="_blank" rel="noopener" translate="no">src/helpers/CameraHelper.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

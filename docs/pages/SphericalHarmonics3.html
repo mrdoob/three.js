@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SphericalHarmonics3 - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">SphericalHarmonics3</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents a third-order spherical harmonics (SH). Light probes use this class
+to encode lighting information.</p>
+<ul>
+<li>Primary reference: <a href="https://graphics.stanford.edu/papers/envmap/envmap.pdf">https://graphics.stanford.edu/papers/envmap/envmap.pdf</a></li>
+<li>Secondary reference: <a href="https://www.ppsloan.org/publications/StupidSH36.pdf">https://www.ppsloan.org/publications/StupidSH36.pdf</a></li>
+</ul></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SphericalHarmonics3" translate="no">new <a href="#SphericalHarmonics3">SphericalHarmonics3</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new spherical harmonics.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="coefficients" translate="no">.<a href="#coefficients">coefficients</a><span class="type-signature"> : Array.&lt;<a href="Vector3.html">Vector3</a>></span> </h3>
+					<div class="description">
+						<p>An array holding the (9) SH coefficients.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isSphericalHarmonics3" translate="no">.<a href="#isSphericalHarmonics3">isSphericalHarmonics3</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( sh : <span class="param-type"><a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> )</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds the given SH to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sh</strong>
+									</td>
+									<td class="description last">
+										<p>The SH to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this spherical harmonics.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="addScaledSH" translate="no">.<a href="#addScaledSH">addScaledSH</a><span class="signature">( sh : <span class="param-type"><a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span>, s : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A convenience method for performing <a href="SphericalHarmonics3.html#add">SphericalHarmonics3#add</a> and
+<a href="SphericalHarmonics3.html#scale">SphericalHarmonics3#scale</a> at once.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sh</strong>
+									</td>
+									<td class="description last">
+										<p>The SH to add.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scale factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this spherical harmonics.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="clone" translate="no">.<a href="#clone">clone</a><span class="signature">()</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a new spherical harmonics with copied values from this instance.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( sh : <span class="param-type"><a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> )</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the values of the given spherical harmonics to this instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sh</strong>
+									</td>
+									<td class="description last">
+										<p>The spherical harmonics to copy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this spherical harmonics.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( sh : <span class="param-type"><a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if this spherical harmonics is equal with the given one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sh</strong>
+									</td>
+									<td class="description last">
+										<p>The spherical harmonics to test for equality.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this spherical harmonics is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromArray" translate="no">.<a href="#fromArray">fromArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the SH coefficients of this instance from the given array.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding the SH coefficients.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The array offset where to start copying.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getAt" translate="no">.<a href="#getAt">getAt</a><span class="signature">( normal : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the radiance in the direction of the given normal.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>normal</strong>
+									</td>
+									<td class="description last">
+										<p>The normal vector (assumed to be unit length)</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The radiance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getIrradianceAt" translate="no">.<a href="#getIrradianceAt">getIrradianceAt</a><span class="signature">( normal : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the irradiance (radiance convolved with cosine lobe) in the
+direction of the given normal.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>normal</strong>
+									</td>
+									<td class="description last">
+										<p>The normal vector (assumed to be unit length)</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The irradiance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="lerp" translate="no">.<a href="#lerp">lerp</a><span class="signature">( sh : <span class="param-type"><a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Linear interpolates between the given SH and this instance by the given
+alpha factor.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sh</strong>
+									</td>
+									<td class="description last">
+										<p>The SH to interpolate with.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The alpha factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this spherical harmonics.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="scale" translate="no">.<a href="#scale">scale</a><span class="signature">( s : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Scales this SH by the given scale factor.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scale factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this spherical harmonics.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( coefficients : <span class="param-type">Array.&lt;<a href="Vector3.html">Vector3</a>></span> )</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the given SH coefficients to this instance by copying
+the values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>coefficients</strong>
+									</td>
+									<td class="description last">
+										<p>The SH coefficients.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this spherical harmonics.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toArray" translate="no">.<a href="#toArray">toArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an array with the SH coefficients, or copies them into the provided
+array. The coefficients are represented as numbers.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The target array.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The array offset where to start copying.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An array with flat SH coefficients.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="zero" translate="no">.<a href="#zero">zero</a><span class="signature">()</span><span class="type-signature"> : <a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets all SH coefficients to <code>0</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this spherical harmonics.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".getBasisAt" translate="no">.<a href="#.getBasisAt">getBasisAt</a><span class="signature">( normal : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, shBasis : <span class="param-type">Array.&lt;number></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the SH basis for the given normal vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>normal</strong>
+									</td>
+									<td class="description last">
+										<p>The normal.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shBasis</strong>
+									</td>
+									<td class="description last">
+										<p>The target array holding the SH basis.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/SphericalHarmonics3.js" target="_blank" rel="noopener" translate="no">src/math/SphericalHarmonics3.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

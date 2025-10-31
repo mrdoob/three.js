@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ArcballControls - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Controls.html">Controls</a> → </p>
+	<h1 translate="no">ArcballControls</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Arcball controls allow the camera to be controlled by a virtual trackball with full touch support and advanced navigation functionality.
+Cursor/finger positions and movements are mapped over a virtual trackball surface represented by a gizmo and mapped in intuitive and
+consistent camera movements. Dragging cursor/fingers will cause camera to orbit around the center of the trackball in a conservative
+way (returning to the starting point will make the camera return to its starting orientation).</p>
+<p>In addition to supporting pan, zoom and pinch gestures, Arcball controls provide focus&lt; functionality with a double click/tap for intuitively
+moving the object's point of interest in the center of the virtual trackball. Focus allows a much better inspection and navigation in complex
+environment. Moreover Arcball controls allow FOV manipulation (in a vertigo-style method) and z-rotation. Saving and restoring of Camera State
+is supported also through clipboard (use ctrl+c and ctrl+v shortcuts for copy and paste the state).</p>
+<p>Unlike <a href="OrbitControls.html">OrbitControls</a> and <a href="TrackballControls.html">TrackballControls</a>, <code>ArcballControls</code> doesn't require <code>update()</code> to be called externally in an
+animation loop when animations are on.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">ArcballControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { ArcballControls } from 'three/addons/controls/ArcballControls.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="ArcballControls" translate="no">new <a href="#ArcballControls">ArcballControls</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, domElement : <span class="param-type">HTMLElement</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new controls instance.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene rendered by the camera. If not given, gizmos cannot be shown.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="adjustNearFar" translate="no">.<a href="#adjustNearFar">adjustNearFar</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, the camera's near and far values will be adjusted every time zoom is
+performed trying to maintain the same visible portion given by initial near and far
+values. Only works with perspective cameras.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="cursorZoom" translate="no">.<a href="#cursorZoom">cursorZoom</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> to make zoom become cursor centered.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dampingFactor" translate="no">.<a href="#dampingFactor">dampingFactor</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The damping inertia used if 'enableAnimations<code>is set to</code>true`.</p>
+						<p>Default is <code>25</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableAnimations" translate="no">.<a href="#enableAnimations">enableAnimations</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> to enable animations for rotation (damping) and focus operation.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableFocus" translate="no">.<a href="#enableFocus">enableFocus</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable camera focusing on double-tap (or click) operations.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableGizmos" translate="no">.<a href="#enableGizmos">enableGizmos</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable gizmos.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableGrid" translate="no">.<a href="#enableGrid">enableGrid</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>If set to <code>true</code>, a grid will appear when panning operation is being performed
+(desktop interaction only).</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enablePan" translate="no">.<a href="#enablePan">enablePan</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable camera panning.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableRotate" translate="no">.<a href="#enableRotate">enableRotate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable camera rotation.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enableZoom" translate="no">.<a href="#enableZoom">enableZoom</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable camera zoom.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="focusAnimationTime" translate="no">.<a href="#focusAnimationTime">focusAnimationTime</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Duration of focus animations in ms.</p>
+						<p>Default is <code>500</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxDistance" translate="no">.<a href="#maxDistance">maxDistance</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can dolly out. For perspective cameras only.</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxFov" translate="no">.<a href="#maxFov">maxFov</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum FOV in degrees.</p>
+						<p>Default is <code>90</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxZoom" translate="no">.<a href="#maxZoom">maxZoom</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can zoom out. For orthographic cameras only.</p>
+						<p>Default is <code>Infinity</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minDistance" translate="no">.<a href="#minDistance">minDistance</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can dolly in. For perspective cameras only.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minFov" translate="no">.<a href="#minFov">minFov</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The minimum FOV in degrees.</p>
+						<p>Default is <code>5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minZoom" translate="no">.<a href="#minZoom">minZoom</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How far you can zoom in. For orthographic cameras only.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mouseActions" translate="no">.<a href="#mouseActions">mouseActions</a><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="description">
+						<p>Holds the mouse actions of this controls. This property is maintained by the methods
+<code>setMouseAction()</code> and <code>unsetMouseAction()</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="radiusFactor" translate="no">.<a href="#radiusFactor">radiusFactor</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The size of the gizmo relative to the screen width and height.</p>
+						<p>Default is <code>0.67</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotateSpeed" translate="no">.<a href="#rotateSpeed">rotateSpeed</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Speed of rotation.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scaleFactor" translate="no">.<a href="#scaleFactor">scaleFactor</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The scaling factor used when performing zoom operation.</p>
+						<p>Default is <code>1.1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="scene" translate="no">.<a href="#scene">scene</a><span class="type-signature"> : <a href="Scene.html">Scene</a></span> </h3>
+					<div class="description">
+						<p>The scene rendered by the camera. If not given, gizmos cannot be shown.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="target" translate="no">.<a href="#target">target</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The control's focus point.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="wMax" translate="no">.<a href="#wMax">wMax</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Maximum angular velocity allowed on rotation animation start.</p>
+						<p>Default is <code>20</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="activateGizmos" translate="no">.<a href="#activateGizmos">activateGizmos</a><span class="signature">( isActive : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Makes rotation gizmos more or less visible.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>isActive</strong>
+									</td>
+									<td class="description last">
+										<p>If set to <code>true</code>, gizmos are more visible.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="copyState" translate="no">.<a href="#copyState">copyState</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copy the current state to clipboard (as a readable JSON text).</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="disposeGrid" translate="no">.<a href="#disposeGrid">disposeGrid</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Removes the grid from the scene.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="getRaycaster" translate="no">.<a href="#getRaycaster">getRaycaster</a><span class="signature">()</span><span class="type-signature"> : <a href="Raycaster.html">Raycaster</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the raycaster that is used for user interaction. This object is shared between all
+instances of <code>ArcballControls</code>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The internal raycaster.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="pasteState" translate="no">.<a href="#pasteState">pasteState</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Set the controls state from the clipboard, assumes that the clipboard stores a JSON
+text as saved from <code>copyState()</code>.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resets the controls.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="saveState" translate="no">.<a href="#saveState">saveState</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Saves the current state of the control. This can later be recover with <code>reset()</code>.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="setCamera" translate="no">.<a href="#setCamera">setCamera</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the camera to be controlled.  Must be called in order to set a new camera to be controlled.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to be controlled.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setGizmosVisible" translate="no">.<a href="#setGizmosVisible">setGizmosVisible</a><span class="signature">( value : <span class="param-type">boolean</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets gizmos visibility.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Value of gizmos visibility.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="setMouseAction" translate="no">.<a href="#setMouseAction">setMouseAction</a><span class="signature">( operation : <span class="param-type">'PAN' | 'ROTATE' | 'ZOOM' | 'FOV'</span>, mouse : <span class="param-type">0 | 1 | 2 | 'WHEEL'</span>, key : <span class="param-type">'CTRL' | 'SHIFT'</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Set a new mouse action by specifying the operation to be performed and a mouse/key combination. In case of conflict, replaces the existing one.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>operation</strong>
+									</td>
+									<td class="description last">
+										<p>The operation to be performed ('PAN', 'ROTATE', 'ZOOM', 'FOV').</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>mouse</strong>
+									</td>
+									<td class="description last">
+										<p>A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>key</strong>
+									</td>
+									<td class="description last">
+										<p>The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <code>true</code> if the mouse action has been successfully added, <code>false</code> otherwise.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setTbRadius" translate="no">.<a href="#setTbRadius">setTbRadius</a><span class="signature">( value : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets gizmos radius factor and redraws gizmos.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Value of radius factor.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="unsetMouseAction" translate="no">.<a href="#unsetMouseAction">unsetMouseAction</a><span class="signature">( mouse : <span class="param-type">0 | 1 | 2 | 'WHEEL'</span>, key : <span class="param-type">'CTRL' | 'SHIFT'</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Remove a mouse action by specifying its mouse/key combination.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>mouse</strong>
+									</td>
+									<td class="description last">
+										<p>A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>key</strong>
+									</td>
+									<td class="description last">
+										<p>The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> <code>true</code> if the operation has been successfully removed, <code>false</code> otherwise.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:change" translate="no">.<a href="#event:change">change</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the camera has been transformed by the controls.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:end" translate="no">.<a href="#event:end">end</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when an interaction has finished.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:start" translate="no">.<a href="#event:start">start</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when an interaction was initiated.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/ArcballControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/ArcballControls.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>
