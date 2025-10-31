@@ -18,9 +18,6 @@ console.log(`Generating Sheen LUT: ${RESOLUTION}x${RESOLUTION}, ${SAMPLES_PER_TE
 // Math utilities
 // ============================================================================
 
-function dot(a, b) {
-    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-}
 
 function normalize(v) {
     const len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
