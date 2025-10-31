@@ -213,7 +213,6 @@ body table td:first-child {
 }
 
 body table code {
-	padding: 0px;
 	margin: 0px;
 	width: auto;
 }
