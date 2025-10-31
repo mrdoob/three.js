@@ -9,18 +9,10 @@
 					<?js } ?>
 					<?js if (data.description) { ?>
 					<div class="description">
-						<?js
-							var desc = data.description;
-							if (typeof data.defaultvalue !== 'undefined') {
-								var defaultText = '<br/>Default is <code>' + self.htmlsafe(data.defaultvalue) + '</code>.';
-								// If description ends with </p>, insert default before closing tag
-								if (desc.trim().endsWith('</p>')) {
-									desc = desc.trim().slice(0, -4) + defaultText + '</p>';
-								} else {
-									desc = desc + defaultText;
-								}
-							}
-						?><?js= desc ?>
+						<?js= data.description ?>
+						<?js if (typeof data.defaultvalue !== 'undefined') { ?>
+						<p>Default is <code><?js= self.htmlsafe(data.defaultvalue) ?></code>.</p>
+						<?js } ?>
 					</div>
 					<?js } ?>
 					<?js= this.partial('details.tmpl', data) ?>

@@ -30,9 +30,15 @@ if ( typeof hljs !== 'undefined' ) {
 
 	document.addEventListener( 'click', function ( event ) {
 
-		const target = event.target.closest( 'a[href^="#"]' );
+		const target = event.target.closest( 'a' );
 
 		if ( ! target || ! target.hash ) return;
+
+		// Check if it's a same-page link (either starting with # or pointing to current page)
+		const href = target.getAttribute( 'href' );
+		const isSamePageLink = href.startsWith( '#' ) || ( target.hostname === window.location.hostname && target.pathname === window.location.pathname );
+
+		if ( ! isSamePageLink ) return;
 
 		const hash = target.hash.substring( 1 );
 		const newHash = ( hash !== className ) ? `#${className}.${hash}` : `#${hash}`;

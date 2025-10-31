@@ -13,7 +13,6 @@
 		var properties = data.properties;
 		if (properties && properties.length && properties.forEach && !data.hideconstructor) {
 	?>
-						<h5 class="subsection-title">Properties:</h5>
 						<?js= this.partial('properties.tmpl', data) ?>
 	<?js } ?>
 	<?js if (data.overrides || data.deprecated || (data.see && see.length)) { ?>

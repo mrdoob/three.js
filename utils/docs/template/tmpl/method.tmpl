@@ -41,7 +41,7 @@
 							<?js }); ?>
 						</ul>
 						<?js } ?>
-						<?js if (data.returns && returns.length) { ?>
+						<?js if (data.returns && returns.length && returns.some(function(r) { return r.description; })) { ?>
 							<?js if (returns.length > 1) { ?>
 						<h5>Returns:</h5>
 						<ul>

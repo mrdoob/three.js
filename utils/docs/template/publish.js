@@ -113,7 +113,7 @@ function addParamAttributes( params ) {
 
 		if ( param.type && param.type.names && param.type.names.length ) {
 
-			const escapedTypes = param.type.names.map( name => htmlsafe( name ) );
+			const escapedTypes = param.type.names.map( name => linkto( name, htmlsafe( name ) ) );
 			itemName += ' : <span class="param-type">' + escapedTypes.join( ' | ' ) + '</span>';
 
 		}
