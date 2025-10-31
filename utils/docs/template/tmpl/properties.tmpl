@@ -51,6 +51,11 @@
 			<?js if (props.hasName) {?>
 				<td class="name">
 					<strong><?js= prop.name ?></strong>
+
+					<?js if (prop.type && prop.type.names) {?>
+						<br><?js= self.partial('type.tmpl', prop.type.names) ?>
+					<?js } ?>
+
 				</td>
 			<?js } ?>
 
@@ -59,23 +64,8 @@
 
 				<?js if (props.hasDefault) {?>
 					<?js if (typeof prop.defaultvalue !== 'undefined') { ?>
-						<p><br>Default is <code><?js= self.htmlsafe(prop.defaultvalue) ?></code>.</p>
+						<p>Default is <code><?js= self.htmlsafe(prop.defaultvalue) ?></code>.</p>
 					<?js } ?>
-				<?js } ?>
-
-				<?js if (prop.type && prop.type.names) {?>
-					<p><br>
-					<?js= self.partial('type.tmpl', prop.type.names) ?>
-					<?js if (props.hasAttributes) {?>
-						<?js if (prop.optional) { ?>
-							&nbsp;(optional)
-						<?js } ?>
-
-						<?js if (prop.nullable) { ?>
-							&nbsp;(nullable)
-						<?js } ?>
-					<?js } ?>
-					</p>
 				<?js } ?>
 
 				<?js if (prop.subprops) { ?>
