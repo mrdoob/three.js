@@ -55,12 +55,12 @@
 								?>
 								<tr>
 									<?js if (params.hasName) {?>
-									<td class="name"><strong><?js= param.name ?></strong></td>
+									<td class="name">
+										<strong><?js= param.name ?></strong>
+									</td>
 									<?js } ?>
 									<td class="description last">
-										<?js if (param.description) { ?>
 										<?js= param.description ?>
-										<?js } ?>
 										<?js if (typeof param.defaultvalue !== 'undefined') { ?>
 										<p>Default is <code><?js= self.htmlsafe(param.defaultvalue) ?></code>.</p>
 										<?js } ?>

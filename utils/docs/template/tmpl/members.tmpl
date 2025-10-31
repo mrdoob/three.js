@@ -9,7 +9,7 @@
 					<?js } ?>
 					<?js if (data.description) { ?>
 					<div class="description">
-						<p><?js= data.description ?></p>
+						<?js= data.description ?>
 						<?js if (typeof data.defaultvalue !== 'undefined') { ?>
 						<p>Default is <code><?js= self.htmlsafe(data.defaultvalue) ?></code>.</p>
 						<?js } ?>
