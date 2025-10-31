@@ -20,6 +20,23 @@ if ( typeof hljs !== 'undefined' ) {
 
 } )();
 
+// Open external URLs in new tabs
+( function () {
+
+	const links = document.querySelectorAll( 'a' );
+
+	for ( const link of links ) {
+
+		if ( link.href.match( /^https?:\/\//i ) ) {
+
+			link.setAttribute( 'target', '_blank' );
+
+		}
+
+	}
+
+} )();
+
 // Update URL hash when clicking on method/property links
 ( function () {
 
