@@ -5,6 +5,9 @@
   "type": "module",
   "main": "./build/three.cjs",
   "module": "./build/three.module.js",
+  "engines": {
+    "node": ">=20"
+  },
   "exports": {
     ".": {
       "import": "./build/three.module.js",
