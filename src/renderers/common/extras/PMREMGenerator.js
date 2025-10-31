@@ -44,7 +44,7 @@ const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 const MAX_SAMPLES = 20;
 
 // GGX VNDF importance sampling configuration
-const GGX_SAMPLES = 2048;
+const GGX_SAMPLES = 512;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
@@ -105,6 +105,7 @@ class PMREMGenerator {
 
 		this._blurMaterial = null;
 		this._ggxMaterial = null;
+
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 		this._backgroundBox = null;
@@ -489,29 +490,32 @@ class PMREMGenerator {
 
 		renderer.autoClear = false;
 
-		let backgroundBox = this._backgroundBox;
+		if ( this._backgroundBox === null ) {
 
-		if ( backgroundBox === null ) {
-
-			const backgroundMaterial = new MeshBasicMaterial( {
-				name: 'PMREM.Background',
-				side: BackSide,
-				depthWrite: false,
-				depthTest: false
-			} );
-
-			backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
+			this._backgroundBox = new Mesh(
+				new BoxGeometry(),
+				new MeshBasicMaterial( {
+					name: 'PMREM.Background',
+					side: BackSide,
+					depthWrite: false,
+					depthTest: false,
+				} )
+			);
 
 		}
 
+		const backgroundBox = this._backgroundBox;
+		const backgroundMaterial = backgroundBox.material;
+
 		let useSolidColor = false;
+
 		const background = scene.background;
 
 		if ( background ) {
 
 			if ( background.isColor ) {
 
-				backgroundBox.material.color.copy( background );
+				backgroundMaterial.color.copy( background );
 				scene.background = null;
 				useSolidColor = true;
 
@@ -519,7 +523,7 @@ class PMREMGenerator {
 
 		} else {
 
-			backgroundBox.material.color.copy( _clearColor );
+			backgroundMaterial.color.copy( _clearColor );
 			useSolidColor = true;
 
 		}

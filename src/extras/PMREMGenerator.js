@@ -36,7 +36,7 @@ const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 const MAX_SAMPLES = 20;
 
 // GGX VNDF importance sampling configuration
-const GGX_SAMPLES = 2048;
+const GGX_SAMPLES = 512;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 const _clearColor = /*@__PURE__*/ new Color();
@@ -80,13 +80,18 @@ class PMREMGenerator {
 		this._lodPlanes = [];
 		this._sizeLods = [];
 		this._sigmas = [];
+		this._lodMeshes = [];
 
-		this._blurMaterial = null;
-		this._ggxMaterial = null;
+		this._backgroundBox = null;
+
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
 
+		this._blurMaterial = null;
+		this._ggxMaterial = null;
+
 		this._compileMaterial( this._blurMaterial );
+		this._compileMaterial( this._ggxMaterial );
 
 	}
 
@@ -211,6 +216,13 @@ class PMREMGenerator {
 		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
 		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
 
+		if ( this._backgroundBox !== null ) {
+
+			this._backgroundBox.geometry.dispose();
+			this._backgroundBox.material.dispose();
+
+		}
+
 	}
 
 	// private interface
@@ -303,7 +315,7 @@ class PMREMGenerator {
 			this._pingPongRenderTarget = _createRenderTarget( width, height, params );
 
 			const { _lodMax } = this;
-			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas } = _createPlanes( _lodMax ) );
+			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas, lodMeshes: this._lodMeshes } = _createPlanes( _lodMax ) );
 
 			this._blurMaterial = _getBlurShader( _lodMax, width, height );
 
@@ -347,16 +359,25 @@ class PMREMGenerator {
 
 		}
 
-		const backgroundMaterial = new MeshBasicMaterial( {
-			name: 'PMREM.Background',
-			side: BackSide,
-			depthWrite: false,
-			depthTest: false,
-		} );
+		if ( this._backgroundBox === null ) {
 
-		const backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
+			this._backgroundBox = new Mesh(
+				new BoxGeometry(),
+				new MeshBasicMaterial( {
+					name: 'PMREM.Background',
+					side: BackSide,
+					depthWrite: false,
+					depthTest: false,
+				} )
+			);
+
+		}
+
+		const backgroundBox = this._backgroundBox;
+		const backgroundMaterial = backgroundBox.material;
 
 		let useSolidColor = false;
+
 		const background = scene.background;
 
 		if ( background ) {
@@ -417,9 +438,6 @@ class PMREMGenerator {
 
 		}
 
-		backgroundBox.geometry.dispose();
-		backgroundBox.material.dispose();
-
 		renderer.toneMapping = toneMapping;
 		renderer.autoClear = originalAutoClear;
 		scene.background = background;
@@ -453,7 +471,9 @@ class PMREMGenerator {
 		}
 
 		const material = isCubeTexture ? this._cubemapMaterial : this._equirectMaterial;
-		const mesh = new Mesh( this._lodPlanes[ 0 ], material );
+
+		const mesh = this._lodMeshes[ 0 ];
+		mesh.material = material;
 
 		const uniforms = material.uniforms;
 
@@ -511,7 +531,9 @@ class PMREMGenerator {
 		}
 
 		const ggxMaterial = this._ggxMaterial;
-		const ggxMesh = new Mesh( this._lodPlanes[ lodOut ], ggxMaterial );
+		const ggxMesh = this._lodMeshes[ lodOut ];
+		ggxMesh.material = ggxMaterial;
+
 		const ggxUniforms = ggxMaterial.uniforms;
 
 		// Calculate incremental roughness between LOD levels
@@ -604,7 +626,9 @@ class PMREMGenerator {
 		// Number of standard deviations at which to cut off the discrete approximation.
 		const STANDARD_DEVIATIONS = 3;
 
-		const blurMesh = new Mesh( this._lodPlanes[ lodOut ], blurMaterial );
+		const blurMesh = this._lodMeshes[ lodOut ];
+		blurMesh.material = blurMaterial;
+
 		const blurUniforms = blurMaterial.uniforms;
 
 		const pixels = this._sizeLods[ lodIn ] - 1;
@@ -681,6 +705,7 @@ function _createPlanes( lodMax ) {
 	const lodPlanes = [];
 	const sizeLods = [];
 	const sigmas = [];
+	const lodMeshes = [];
 
 	let lod = lodMax;
 
@@ -743,6 +768,7 @@ function _createPlanes( lodMax ) {
 		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
 		planes.setAttribute( 'faceIndex', new BufferAttribute( faceIndex, faceIndexSize ) );
 		lodPlanes.push( planes );
+		lodMeshes.push( new Mesh( planes, null ) );
 
 		if ( lod > LOD_MIN ) {
 
@@ -752,7 +778,7 @@ function _createPlanes( lodMax ) {
 
 	}
 
-	return { lodPlanes, sizeLods, sigmas };
+	return { lodPlanes, sizeLods, sigmas, lodMeshes };
 
 }
 
