@@ -27,7 +27,7 @@ composer.addPass( renderTransitionPass );
 				<pre><code class="language-js">import { RenderTransitionPass } from 'three/addons/postprocessing/RenderTransitionPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="RenderTransitionPass" translate="no">new <a href="#RenderTransitionPass">RenderTransitionPass</a><span class="signature">( sceneA : <span class="param-type">Scene</span>, cameraA : <span class="param-type">Camera</span>, sceneB : <span class="param-type">Scene</span>, cameraB : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="RenderTransitionPass" translate="no">new <a href="#RenderTransitionPass">RenderTransitionPass</a><span class="signature">( sceneA : <span class="param-type"><a href="Scene.html">Scene</a></span>, cameraA : <span class="param-type"><a href="Camera.html">Camera</a></span>, sceneB : <span class="param-type"><a href="Scene.html">Scene</a></span>, cameraB : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a render transition pass.</p>
@@ -35,20 +35,36 @@ composer.addPass( renderTransitionPass );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sceneA</code></td>
-									<td class="description last"><p>The first scene.</p></td>
+									<td class="name">
+										<strong>sceneA</strong>
+									</td>
+									<td class="description last">
+										<p>The first scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>cameraA</code></td>
-									<td class="description last"><p>The camera of the first scene.</p></td>
+									<td class="name">
+										<strong>cameraA</strong>
+									</td>
+									<td class="description last">
+										<p>The camera of the first scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>sceneB</code></td>
-									<td class="description last"><p>The second scene.</p></td>
+									<td class="name">
+										<strong>sceneB</strong>
+									</td>
+									<td class="description last">
+										<p>The second scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>cameraB</code></td>
-									<td class="description last"><p>The camera of the second scene.</p></td>
+									<td class="name">
+										<strong>cameraB</strong>
+									</td>
+									<td class="description last">
+										<p>The camera of the second scene.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -96,7 +112,7 @@ method whenever the pass is no longer used in your app.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#dispose">Pass#dispose</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, writeBuffer : <span class="param-type">WebGLRenderTarget</span>, readBuffer : <span class="param-type">WebGLRenderTarget</span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, writeBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, readBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs the transition pass.</p>
@@ -104,26 +120,46 @@ method whenever the pass is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>writeBuffer</code></td>
-									<td class="description last"><p>The write buffer. This buffer is intended as the rendering
-destination for the pass.</p></td>
+									<td class="name">
+										<strong>writeBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>readBuffer</code></td>
-									<td class="description last"><p>The read buffer. The pass can access the result from the
-previous pass from this buffer.</p></td>
+									<td class="name">
+										<strong>readBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>deltaTime</code></td>
-									<td class="description last"><p>The delta time in seconds.</p></td>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maskActive</code></td>
-									<td class="description last"><p>Whether masking is active or not.</p></td>
+									<td class="name">
+										<strong>maskActive</strong>
+									</td>
+									<td class="description last">
+										<p>Whether masking is active or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -139,12 +175,20 @@ previous pass from this buffer.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width to set.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height to set.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -152,7 +196,7 @@ previous pass from this buffer.</p></td>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#setSize">Pass#setSize</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setTexture" translate="no">.<a href="#setTexture">setTexture</a><span class="signature">( value : <span class="param-type">Texture</span> )</span> </h3>
+					<h3 class="name name-method" id="setTexture" translate="no">.<a href="#setTexture">setTexture</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the effect texture.</p>
@@ -160,8 +204,12 @@ previous pass from this buffer.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The effect texture.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The effect texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -175,8 +223,12 @@ the transition. Must be in the range <code>[0,1]</code> (0 means full effect, 1 
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The threshold value.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The threshold value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -190,8 +242,12 @@ This value determines to what degree both scenes are mixed.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The transition factor.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The transition factor.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -204,8 +260,12 @@ This value determines to what degree both scenes are mixed.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>Whether to use a texture for the transition effect or not.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to use a texture for the transition effect or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

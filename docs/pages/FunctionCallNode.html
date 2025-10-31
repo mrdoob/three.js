@@ -20,7 +20,7 @@ this logic.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="FunctionCallNode" translate="no">new <a href="#FunctionCallNode">FunctionCallNode</a><span class="signature">( functionNode : <span class="param-type">FunctionNode</span>, parameters : <span class="param-type">Object.&lt;string, Node></span> )</span> </h3>
+					<h3 class="name name-method" id="FunctionCallNode" translate="no">new <a href="#FunctionCallNode">FunctionCallNode</a><span class="signature">( functionNode : <span class="param-type"><a href="FunctionNode.html">FunctionNode</a></span>, parameters : <span class="param-type">Object.&lt;string, <a href="Node.html">Node</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new function call node.</p>
@@ -28,12 +28,22 @@ this logic.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>functionNode</code></td>
-									<td class="description last"><p>The function node.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>functionNode</strong>
+									</td>
+									<td class="description last">
+										<p>The function node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>The parameters for the function call.<br/>Default is <code>{}</code>.</p></td>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The parameters for the function call.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -43,17 +53,19 @@ this logic.</p></div>
 				<div class="member">
 					<h3 class="name" id="functionNode" translate="no">.<a href="#functionNode">functionNode</a><span class="type-signature"> : <a href="FunctionNode.html">FunctionNode</a></span> </h3>
 					<div class="description">
-						<p>The function node.<br/>Default is <code>null</code>.</p>
+						<p>The function node.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object.&lt;string, <a href="Node.html">Node</a>></span> </h3>
 					<div class="description">
-						<p>The parameters of the function call.<br/>Default is <code>{}</code>.</p>
+						<p>The parameters of the function call.</p>
+						<p>Default is <code>{}</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getMemberType" translate="no">.<a href="#getMemberType">getMemberType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getMemberType" translate="no">.<a href="#getMemberType">getMemberType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the function node of this function call node.</p>
@@ -61,12 +73,20 @@ this logic.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the member.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the member.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -77,7 +97,7 @@ this logic.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> The type of the member.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the type of this function call node.</p>
@@ -85,8 +105,12 @@ this logic.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -106,7 +130,7 @@ this logic.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> The parameters of this node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setParameters" translate="no">.<a href="#setParameters">setParameters</a><span class="signature">( parameters : <span class="param-type">Object.&lt;string, Node></span> )</span><span class="type-signature"> : <a href="FunctionCallNode.html">FunctionCallNode</a></span> </h3>
+					<h3 class="name name-method" id="setParameters" translate="no">.<a href="#setParameters">setParameters</a><span class="signature">( parameters : <span class="param-type">Object.&lt;string, <a href="Node.html">Node</a>></span> )</span><span class="type-signature"> : <a href="FunctionCallNode.html">FunctionCallNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the parameters of the function call node.</p>
@@ -114,8 +138,12 @@ this logic.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>The parameters to set.</p></td>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The parameters to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

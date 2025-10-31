@@ -17,7 +17,7 @@
 <p>[LDraw](https://ldraw.org/} (LEGO Draw) is an <a href="https://ldraw.org/article/218.html)">open format specification</a> from 'three/addons/loaders/LDrawLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="LDrawLoader" translate="no">new <a href="#LDrawLoader">LDrawLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="LDrawLoader" translate="no">new <a href="#LDrawLoader">LDrawLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new LDraw loader.</p>
@@ -25,8 +25,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -42,7 +46,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="addMaterial" translate="no">.<a href="#addMaterial">addMaterial</a><span class="signature">( material : <span class="param-type">Material</span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<h3 class="name name-method" id="addMaterial" translate="no">.<a href="#addMaterial">addMaterial</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds a single material to the loader's material library.</p>
@@ -50,8 +54,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>material</code></td>
-									<td class="description last"><p>The material to add.</p></td>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -59,7 +67,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="addMaterials" translate="no">.<a href="#addMaterials">addMaterials</a><span class="signature">( materials : <span class="param-type">Array.&lt;Material></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<h3 class="name name-method" id="addMaterials" translate="no">.<a href="#addMaterials">addMaterials</a><span class="signature">( materials : <span class="param-type">Array.&lt;<a href="Material.html">Material</a>></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds a list of materials to the loader's material library.</p>
@@ -67,8 +75,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>materials</code></td>
-									<td class="description last"><p>The materials to add.</p></td>
+									<td class="name">
+										<strong>materials</strong>
+									</td>
+									<td class="description last">
+										<p>The materials to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -118,8 +130,12 @@ fixed colors.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>colorCode</code></td>
-									<td class="description last"><p>The color code.</p></td>
+									<td class="name">
+										<strong>colorCode</strong>
+									</td>
+									<td class="description last">
+										<p>The color code.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -127,7 +143,7 @@ fixed colors.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The material. Returns <code>null</code> if no material has been found.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded LDraw asset
@@ -136,20 +152,36 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -157,7 +189,7 @@ to the <code>onLoad()</code> callback.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( text : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( text : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the given LDraw data and returns the resulting group.</p>
@@ -165,16 +197,28 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>text</code></td>
-									<td class="description last"><p>The raw VRML data as a string.</p></td>
+									<td class="name">
+										<strong>text</strong>
+									</td>
+									<td class="description last">
+										<p>The raw VRML data as a string.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading/parsing process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading/parsing process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -194,8 +238,12 @@ are loaded on demand.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>Path of the LDraw materials asset.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>Path of the LDraw materials asset.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -213,8 +261,12 @@ LDrawConditionalLineNodeMaterial when using <code>WebGPURenderer</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The conditional line material type.</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The conditional line material type.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -232,8 +284,12 @@ error in subfolders 'parts', 'p' and 'models'.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>fileMap</code></td>
-									<td class="description last"><p>The file map to set.</p></td>
+									<td class="name">
+										<strong>fileMap</strong>
+									</td>
+									<td class="description last">
+										<p>The file map to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -241,7 +297,7 @@ error in subfolders 'parts', 'p' and 'models'.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setMaterials" translate="no">.<a href="#setMaterials">setMaterials</a><span class="signature">( materials : <span class="param-type">Array.&lt;Material></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
+					<h3 class="name name-method" id="setMaterials" translate="no">.<a href="#setMaterials">setMaterials</a><span class="signature">( materials : <span class="param-type">Array.&lt;<a href="Material.html">Material</a>></span> )</span><span class="type-signature"> : <a href="LDrawLoader.html">LDrawLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the loader's material library. This method clears existing
@@ -250,8 +306,12 @@ material definitions.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>materials</code></td>
-									<td class="description last"><p>The materials to set.</p></td>
+									<td class="name">
+										<strong>materials</strong>
+									</td>
+									<td class="description last">
+										<p>The materials to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -268,9 +328,13 @@ library parts (usually it will be a model with all its parts packed in a single 
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>path</code></td>
-									<td class="description last"><p>Path to library parts files to load referenced parts from.
-This is different from Loader.setPath, which indicates the path to load the main asset from.</p></td>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>Path to library parts files to load referenced parts from.
+This is different from Loader.setPath, which indicates the path to load the main asset from.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

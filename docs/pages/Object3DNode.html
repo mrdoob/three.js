@@ -27,7 +27,7 @@ in the shader. The following scopes are supported:</p>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Object3DNode" translate="no">new <a href="#Object3DNode">Object3DNode</a><span class="signature">( scope : <span class="param-type">'position' | 'viewPosition' | 'direction' | 'scale' | 'worldMatrix'</span>, object3d : <span class="param-type">Object3D</span> )</span> </h3>
+					<h3 class="name name-method" id="Object3DNode" translate="no">new <a href="#Object3DNode">Object3DNode</a><span class="signature">( scope : <span class="param-type">'position' | 'viewPosition' | 'direction' | 'scale' | 'worldMatrix'</span>, object3d : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new object 3D node.</p>
@@ -35,12 +35,21 @@ in the shader. The following scopes are supported:</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scope</code></td>
-									<td class="description last"><p>The node represents a different type of transformation depending on the scope.</p></td>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The node represents a different type of transformation depending on the scope.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>object3d</code></td>
-									<td class="description last"><p>The 3D object.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>object3d</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -50,7 +59,8 @@ in the shader. The following scopes are supported:</p>
 				<div class="member">
 					<h3 class="name" id="object3d" translate="no">.<a href="#object3d">object3d</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
 					<div class="description">
-						<p>The 3D object.<br/>Default is <code>null</code>.</p>
+						<p>The 3D object.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -68,14 +78,15 @@ in the shader. The following scopes are supported:</p>
 				<div class="member">
 					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>Overwritten since this type of node is updated per object.<br/>Default is <code>'object'</code>.</p>
+						<p>Overwritten since this type of node is updated per object.</p>
+						<p>Default is <code>'object'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateType">Node#updateType</a></dt>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the code snippet of the uniform node. The node type of the uniform
@@ -84,8 +95,12 @@ node also depends on the selected scope.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -108,7 +123,7 @@ node also depends on the selected scope.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the uniform value depending on the scope.</p>
@@ -116,8 +131,12 @@ node also depends on the selected scope.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>The current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

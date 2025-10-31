@@ -17,7 +17,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Loader" translate="no">new <a href="#Loader">Loader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="Loader" translate="no">new <a href="#Loader">Loader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new loader.</p>
@@ -25,8 +25,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -37,13 +41,15 @@
 					<h3 class="name" id="crossOrigin" translate="no">.<a href="#crossOrigin">crossOrigin</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The crossOrigin string to implement CORS for loading the url from a
-different domain that allows CORS.<br/>Default is <code>'anonymous'</code>.</p>
+different domain that allows CORS.</p>
+						<p>Default is <code>'anonymous'</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="manager" translate="no">.<a href="#manager">manager</a><span class="type-signature"> : <a href="LoadingManager.html">LoadingManager</a></span> </h3>
 					<div class="description">
-						<p>The loading manager.<br/>Default is <code>DefaultLoadingManager</code>.</p>
+						<p>The loading manager.</p>
+						<p>Default is <code>DefaultLoadingManager</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -68,7 +74,8 @@ used in HTTP request.</p>
 				<div class="member">
 					<h3 class="name" id="withCredentials" translate="no">.<a href="#withCredentials">withCredentials</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the XMLHttpRequest uses credentials.<br/>Default is <code>false</code>.</p>
+						<p>Whether the XMLHttpRequest uses credentials.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -76,7 +83,8 @@ used in HTTP request.</p>
 					<div class="description">
 						<p>The default material name that is used by loaders
 when creating materials for loaded 3D objects.</p>
-<p>Note: Not all loaders might honor this setting.<br/>Default is <code>'__DEFAULT'</code>.</p>
+<p>Note: Not all loaders might honor this setting.</p>
+						<p>Default is <code>'__DEFAULT'</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -89,7 +97,7 @@ when creating materials for loaded 3D objects.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method needs to be implemented by all concrete loaders. It holds the
@@ -98,25 +106,41 @@ logic for loading assets from the backend.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="loadAsync" translate="no">.<a href="#loadAsync">loadAsync</a><span class="signature">( url : <span class="param-type">string</span>, onProgress : <span class="param-type">onProgressCallback</span> )</span><span class="type-signature"> : Promise</span> </h3>
+					<h3 class="name name-method" id="loadAsync" translate="no">.<a href="#loadAsync">loadAsync</a><span class="signature">( url : <span class="param-type">string</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span> )</span><span class="type-signature"> : Promise</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>A async version of <a href="Loader.html#load">Loader#load</a>.</p>
@@ -124,12 +148,20 @@ logic for loading assets from the backend.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -137,7 +169,7 @@ logic for loading assets from the backend.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the asset has been loaded.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( data : <span class="param-type">any</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( data : <span class="param-type"><a href="global.html#any">any</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method needs to be implemented by all concrete loaders. It holds the
@@ -146,8 +178,12 @@ logic for parsing the asset into three.js entities.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>The data to parse.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The data to parse.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -161,8 +197,12 @@ from a different domain that allows CORS.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>crossOrigin</code></td>
-									<td class="description last"><p>The <code>crossOrigin</code> value.</p></td>
+									<td class="name">
+										<strong>crossOrigin</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>crossOrigin</code> value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -178,8 +218,12 @@ from a different domain that allows CORS.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>path</code></td>
-									<td class="description last"><p>The base path.</p></td>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The base path.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -195,9 +239,13 @@ from a different domain that allows CORS.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>requestHeader</code></td>
-									<td class="description last"><p>A <a href="https://developer.mozilla.org/en-US/docs/Glossary/Request_header">request header</a>
-for configuring the HTTP request.</p></td>
+									<td class="name">
+										<strong>requestHeader</strong>
+									</td>
+									<td class="description last">
+										<p>A <a href="https://developer.mozilla.org/en-US/docs/Glossary/Request_header">request header</a>
+for configuring the HTTP request.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -213,8 +261,12 @@ for configuring the HTTP request.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>resourcePath</code></td>
-									<td class="description last"><p>The resource path.</p></td>
+									<td class="name">
+										<strong>resourcePath</strong>
+									</td>
+									<td class="description last">
+										<p>The resource path.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -232,8 +284,12 @@ headers or TLS client certificates, see <a href="https://developer.mozilla.org/e
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The <code>withCredentials</code> value.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>withCredentials</code> value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

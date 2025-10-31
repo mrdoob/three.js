@@ -29,7 +29,7 @@ scene.add( line );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Line" translate="no">new <a href="#Line">Line</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, material : <span class="param-type">Material | Array.&lt;Material></span> )</span> </h3>
+					<h3 class="name name-method" id="Line" translate="no">new <a href="#Line">Line</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a> | Array.&lt;<a href="Material.html">Material</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new line.</p>
@@ -37,12 +37,20 @@ scene.add( line );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>geometry</code></td>
-									<td class="description last"><p>The line geometry.</p></td>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The line geometry.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>material</code></td>
-									<td class="description last"><p>The line material.</p></td>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The line material.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -58,13 +66,15 @@ scene.add( line );
 				<div class="member">
 					<h3 class="name" id="isLine" translate="no">.<a href="#isLine">isLine</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="material" translate="no">.<a href="#material">material</a><span class="type-signature"> : <a href="Material.html">Material</a> | Array.&lt;<a href="Material.html">Material</a>></span> </h3>
 					<div class="description">
-						<p>The line material.<br/>Default is <code>LineBasicMaterial</code>.</p>
+						<p>The line material.</p>
+						<p>Default is <code>LineBasicMaterial</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -72,7 +82,8 @@ scene.add( line );
 					<div class="description">
 						<p>A dictionary representing the morph targets in the geometry. The key is the
 morph targets name, the value its attribute index. This member is <code>undefined</code>
-by default and only set when morph targets are detected in the geometry.<br/>Default is <code>undefined</code>.</p>
+by default and only set when morph targets are detected in the geometry.</p>
+						<p>Default is <code>undefined</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -80,7 +91,8 @@ by default and only set when morph targets are detected in the geometry.<br/>Def
 					<div class="description">
 						<p>An array of weights typically in the range <code>[0,1]</code> that specify how much of the morph
 is applied. This member is <code>undefined</code> by default and only set when morph targets are
-detected in the geometry.<br/>Default is <code>undefined</code>.</p>
+detected in the geometry.</p>
+						<p>Default is <code>undefined</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -95,7 +107,7 @@ current point to the very beginning of the line.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this line.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type">Raycaster</span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
+					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type"><a href="Raycaster.html">Raycaster</a></span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes intersection points between a casted ray and this line.</p>
@@ -103,12 +115,20 @@ current point to the very beginning of the line.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>raycaster</code></td>
-									<td class="description last"><p>The raycaster.</p></td>
+									<td class="name">
+										<strong>raycaster</strong>
+									</td>
+									<td class="description last">
+										<p>The raycaster.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intersects</code></td>
-									<td class="description last"><p>The target array that holds the intersection points.</p></td>
+									<td class="name">
+										<strong>intersects</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the intersection points.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

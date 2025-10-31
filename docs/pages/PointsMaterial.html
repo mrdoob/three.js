@@ -41,12 +41,16 @@ scene.add( points );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>An object with one or more properties
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object with one or more properties
 defining the material's appearance. Any property of the material
 (including any property from inherited materials) can be passed
 in here. Color values can be passed any type of value accepted
-by <a href="Color.html#set">Color#set</a>.</p></td>
+by <a href="Color.html#set">Color#set</a>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,25 +66,29 @@ surface (black: fully transparent; white: fully opaque).</p>
 exists. For RGB and RGBA textures, the renderer will use the green channel
 when sampling this texture due to the extra bit of precision provided for
 green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
-luminance/alpha textures will also still work as expected.<br/>Default is <code>null</code>.</p>
+luminance/alpha textures will also still work as expected.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="color" translate="no">.<a href="#color">color</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="description">
-						<p>Color of the material.<br/>Default is <code>(1,1,1)</code>.</p>
+						<p>Color of the material.</p>
+						<p>Default is <code>(1,1,1)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="fog" translate="no">.<a href="#fog">fog</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the material is affected by fog or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether the material is affected by fog or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isPointsMaterial" translate="no">.<a href="#isPointsMaterial">isPointsMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -88,20 +96,23 @@ luminance/alpha textures will also still work as expected.<br/>Default is <code>
 					<div class="description">
 						<p>The color map. May optionally include an alpha channel, typically combined
 with <a href="Material.html#transparent">Material#transparent</a> or <a href="Material.html#alphaTest">Material#alphaTest</a>. The texture map
-color is modulated by the diffuse <code>color</code>.<br/>Default is <code>null</code>.</p>
+color is modulated by the diffuse <code>color</code>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Defines the size of the points in pixels.</p>
-<p>Might be capped if the value exceeds hardware dependent parameters like <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParamete">gl.ALIASED_POINT_SIZE_RANGE</a>.<br/>Default is <code>1</code>.</p>
+<p>Might be capped if the value exceeds hardware dependent parameters like <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParamete">gl.ALIASED_POINT_SIZE_RANGE</a>.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sizeAttenuation" translate="no">.<a href="#sizeAttenuation">sizeAttenuation</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Specifies whether size of individual points is attenuated by the camera depth (perspective camera only).<br/>Default is <code>true</code>.</p>
+						<p>Specifies whether size of individual points is attenuated by the camera depth (perspective camera only).</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>

@@ -47,7 +47,7 @@ const sssBlur = boxBlur( sssPass.r, { size: 2, separation: 1 } ); // optional bl
 				<pre><code class="language-js">import { sss } from 'three/addons/tsl/display/SSSNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SSSNode" translate="no">new <a href="#SSSNode">SSSNode</a><span class="signature">( depthNode : <span class="param-type">TextureNode</span>, camera : <span class="param-type">Camera</span>, mainLight : <span class="param-type">DirectionalLight</span> )</span> </h3>
+					<h3 class="name name-method" id="SSSNode" translate="no">new <a href="#SSSNode">SSSNode</a><span class="signature">( depthNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, mainLight : <span class="param-type"><a href="DirectionalLight.html">DirectionalLight</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new SSS node.</p>
@@ -55,16 +55,28 @@ const sssBlur = boxBlur( sssPass.r, { size: 2, separation: 1 } ); // optional bl
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>depthNode</code></td>
-									<td class="description last"><p>A texture node that represents the scene's depth.</p></td>
+									<td class="name">
+										<strong>depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the scene's depth.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera the scene is rendered with.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>mainLight</code></td>
-									<td class="description last"><p>The main directional light of the scene.</p></td>
+									<td class="name">
+										<strong>mainLight</strong>
+									</td>
+									<td class="description last">
+										<p>The main directional light of the scene.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -93,7 +105,8 @@ const sssBlur = boxBlur( sssPass.r, { size: 2, separation: 1 } ); // optional bl
 					<h3 class="name" id="maxDistance" translate="no">.<a href="#maxDistance">maxDistance</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>Maximum shadow length in world units. Longer shadows result in more computational
-overhead.<br/>Default is <code>0.1</code>.</p>
+overhead.</p>
+						<p>Default is <code>0.1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -104,7 +117,8 @@ The value ranges is <code>[0,1]</code> where <code>1</code> means best quality (
 of raymarching iterations/samples) and <code>0</code> means no samples at all.</p>
 <p>A quality of <code>0.5</code> is usually sufficient for most use cases. Try to keep
 this parameter as low as possible. Larger values result in noticeable more
-overhead.<br/>Default is <code>0.5</code>.</p>
+overhead.</p>
+						<p>Default is <code>0.5</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -113,26 +127,30 @@ overhead.<br/>Default is <code>0.5</code>.</p>
 						<p>The resolution scale. Valid values are in the range
 <code>[0,1]</code>. <code>1</code> means best quality but also results in
 more computational overhead. Setting to <code>0.5</code> means
-the effect is computed in half-resolution.<br/>Default is <code>1</code>.</p>
+the effect is computed in half-resolution.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="shadowIntensity" translate="no">.<a href="#shadowIntensity">shadowIntensity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
 					<div class="description">
-						<p>Shadow intensity. Must be in the range <code>[0, 1]</code>.<br/>Default is <code>0.5</code>.</p>
+						<p>Shadow intensity. Must be in the range <code>[0, 1]</code>.</p>
+						<p>Default is <code>0.5</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="thickness" translate="no">.<a href="#thickness">thickness</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
 					<div class="description">
-						<p>Depth testing thickness.<br/>Default is <code>0.01</code>.</p>
+						<p>Depth testing thickness.</p>
+						<p>Default is <code>0.01</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders
-its effect once per frame in <code>updateBefore()</code>.<br/>Default is <code>'frame'</code>.</p>
+its effect once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
@@ -144,7 +162,8 @@ its effect once per frame in <code>updateBefore()</code>.<br/>Default is <code>'
 						<p>Whether to use temporal filtering or not. Setting this property to
 <code>true</code> requires the usage of <code>TRAANode</code>. This will help to reduce noice
 although it introduces typical TAA artifacts like ghosting and temporal
-instabilities.<br/>Default is <code>false</code>.</p>
+instabilities.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -175,17 +194,25 @@ when the effect is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the effect.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the effect.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>
@@ -193,19 +220,20 @@ when the effect is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
 						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
-						</dl>
 					</div>
-					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to render the effect once per frame.</p>
@@ -213,8 +241,12 @@ when the effect is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>The current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

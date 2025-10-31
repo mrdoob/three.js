@@ -28,9 +28,14 @@ use alpha-to-coverage for anti-aliasing clipped edges.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scope</code></td>
-									<td class="description last"><p>The node's scope. Similar to other nodes,
-the selected scope influences the behavior of the node and what type of code is generated.<br/>Default is <code>'default'</code>.</p></td>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The node's scope. Similar to other nodes,
+the selected scope influences the behavior of the node and what type of code is generated.</p>
+										<p>Default is <code>'default'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -45,7 +50,7 @@ the behavior of the node and what type of code is generated.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the node depending on the selected scope.</p>
@@ -53,8 +58,12 @@ the behavior of the node and what type of code is generated.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -65,7 +74,7 @@ the behavior of the node and what type of code is generated.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The result node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setupAlphaToCoverage" translate="no">.<a href="#setupAlphaToCoverage">setupAlphaToCoverage</a><span class="signature">( intersectionPlanes : <span class="param-type">Array.&lt;Vector4></span>, unionPlanes : <span class="param-type">Array.&lt;Vector4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="setupAlphaToCoverage" translate="no">.<a href="#setupAlphaToCoverage">setupAlphaToCoverage</a><span class="signature">( intersectionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, unionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups alpha to coverage.</p>
@@ -73,12 +82,20 @@ the behavior of the node and what type of code is generated.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>intersectionPlanes</code></td>
-									<td class="description last"><p>The intersection planes.</p></td>
+									<td class="name">
+										<strong>intersectionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The intersection planes.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>unionPlanes</code></td>
-									<td class="description last"><p>The union planes.</p></td>
+									<td class="name">
+										<strong>unionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The union planes.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -86,7 +103,7 @@ the behavior of the node and what type of code is generated.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The result node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setupDefault" translate="no">.<a href="#setupDefault">setupDefault</a><span class="signature">( intersectionPlanes : <span class="param-type">Array.&lt;Vector4></span>, unionPlanes : <span class="param-type">Array.&lt;Vector4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="setupDefault" translate="no">.<a href="#setupDefault">setupDefault</a><span class="signature">( intersectionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, unionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the default clipping.</p>
@@ -94,12 +111,20 @@ the behavior of the node and what type of code is generated.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>intersectionPlanes</code></td>
-									<td class="description last"><p>The intersection planes.</p></td>
+									<td class="name">
+										<strong>intersectionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The intersection planes.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>unionPlanes</code></td>
-									<td class="description last"><p>The union planes.</p></td>
+									<td class="name">
+										<strong>unionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The union planes.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -107,7 +132,7 @@ the behavior of the node and what type of code is generated.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The result node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setupHardwareClipping" translate="no">.<a href="#setupHardwareClipping">setupHardwareClipping</a><span class="signature">( unionPlanes : <span class="param-type">Array.&lt;Vector4></span>, builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="setupHardwareClipping" translate="no">.<a href="#setupHardwareClipping">setupHardwareClipping</a><span class="signature">( unionPlanes : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups hardware clipping.</p>
@@ -115,12 +140,20 @@ the behavior of the node and what type of code is generated.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>unionPlanes</code></td>
-									<td class="description last"><p>The union planes.</p></td>
+									<td class="name">
+										<strong>unionPlanes</strong>
+									</td>
+									<td class="description last">
+										<p>The union planes.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

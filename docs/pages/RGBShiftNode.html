@@ -22,7 +22,7 @@ separates color channels and offsets them from each other.</p></div>
 				<pre><code class="language-js">import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="RGBShiftNode" translate="no">new <a href="#RGBShiftNode">RGBShiftNode</a><span class="signature">( textureNode : <span class="param-type">TextureNode</span>, amount : <span class="param-type">number</span>, angle : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="RGBShiftNode" translate="no">new <a href="#RGBShiftNode">RGBShiftNode</a><span class="signature">( textureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, amount : <span class="param-type">number</span>, angle : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new RGB shift node.</p>
@@ -30,16 +30,30 @@ separates color channels and offsets them from each other.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>textureNode</code></td>
-									<td class="description last"><p>The texture node that represents the input of the effect.</p></td>
+									<td class="name">
+										<strong>textureNode</strong>
+									</td>
+									<td class="description last">
+										<p>The texture node that represents the input of the effect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>amount</code></td>
-									<td class="description last"><p>The amount of the RGB shift.<br/>Default is <code>0.005</code>.</p></td>
+									<td class="name">
+										<strong>amount</strong>
+									</td>
+									<td class="description last">
+										<p>The amount of the RGB shift.</p>
+										<p>Default is <code>0.005</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>angle</code></td>
-									<td class="description last"><p>Defines the orientation in which colors are shifted.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>Defines the orientation in which colors are shifted.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -65,7 +79,7 @@ separates color channels and offsets them from each other.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>
@@ -73,16 +87,17 @@ separates color channels and offsets them from each other.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

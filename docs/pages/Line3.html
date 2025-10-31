@@ -17,7 +17,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Line3" translate="no">new <a href="#Line3">Line3</a><span class="signature">( start : <span class="param-type">Vector3</span>, end : <span class="param-type">Vector3</span> )</span> </h3>
+					<h3 class="name name-method" id="Line3" translate="no">new <a href="#Line3">Line3</a><span class="signature">( start : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, end : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new line segment.</p>
@@ -25,12 +25,22 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>start</code></td>
-									<td class="description last"><p>Start of the line segment.<br/>Default is <code>(0,0,0)</code>.</p></td>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>Start of the line segment.</p>
+										<p>Default is <code>(0,0,0)</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>end</code></td>
-									<td class="description last"><p>End of the line segment.<br/>Default is <code>(0,0,0)</code>.</p></td>
+									<td class="name">
+										<strong>end</strong>
+									</td>
+									<td class="description last">
+										<p>End of the line segment.</p>
+										<p>Default is <code>(0,0,0)</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -50,7 +60,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type">Matrix4</span> )</span><span class="type-signature"> : <a href="Line3.html">Line3</a></span> </h3>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Line3.html">Line3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Applies a 4x4 transformation matrix to this line segment.</p>
@@ -58,8 +68,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>matrix</code></td>
-									<td class="description last"><p>The transformation matrix.</p></td>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The transformation matrix.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -67,7 +81,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this line segment.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="at" translate="no">.<a href="#at">at</a><span class="signature">( t : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="at" translate="no">.<a href="#at">at</a><span class="signature">( t : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a vector at a certain position along the line segment.</p>
@@ -75,12 +89,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>A value between <code>[0,1]</code> to represent a position along the line segment.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>A value between <code>[0,1]</code> to represent a position along the line segment.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -97,7 +119,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="closestPointToPoint" translate="no">.<a href="#closestPointToPoint">closestPointToPoint</a><span class="signature">( point : <span class="param-type">Vector3</span>, clampToLine : <span class="param-type">boolean</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="closestPointToPoint" translate="no">.<a href="#closestPointToPoint">closestPointToPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, clampToLine : <span class="param-type">boolean</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the closest point on the line for a given point.</p>
@@ -105,16 +127,28 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point to compute the closest point on the line for.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to compute the closest point on the line for.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>clampToLine</code></td>
-									<td class="description last"><p>Whether to clamp the result to the range <code>[0,1]</code> or not.</p></td>
+									<td class="name">
+										<strong>clampToLine</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to clamp the result to the range <code>[0,1]</code> or not.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -122,7 +156,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> The closest point on the line.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="closestPointToPointParameter" translate="no">.<a href="#closestPointToPointParameter">closestPointToPointParameter</a><span class="signature">( point : <span class="param-type">Vector3</span>, clampToLine : <span class="param-type">boolean</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="closestPointToPointParameter" translate="no">.<a href="#closestPointToPointParameter">closestPointToPointParameter</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, clampToLine : <span class="param-type">boolean</span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a point parameter based on the closest point as projected on the line segment.</p>
@@ -130,12 +164,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point for which to return a point parameter.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point for which to return a point parameter.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>clampToLine</code></td>
-									<td class="description last"><p>Whether to clamp the result to the range <code>[0,1]</code> or not.</p></td>
+									<td class="name">
+										<strong>clampToLine</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to clamp the result to the range <code>[0,1]</code> or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -143,7 +185,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> The point parameter.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( line : <span class="param-type">Line3</span> )</span><span class="type-signature"> : <a href="Line3.html">Line3</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( line : <span class="param-type"><a href="Line3.html">Line3</a></span> )</span><span class="type-signature"> : <a href="Line3.html">Line3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given line segment to this instance.</p>
@@ -151,8 +193,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>line</code></td>
-									<td class="description last"><p>The line segment to copy.</p></td>
+									<td class="name">
+										<strong>line</strong>
+									</td>
+									<td class="description last">
+										<p>The line segment to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -160,7 +206,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this line segment.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="delta" translate="no">.<a href="#delta">delta</a><span class="signature">( target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="delta" translate="no">.<a href="#delta">delta</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the delta vector of the line segment's start and end point.</p>
@@ -168,8 +214,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -195,7 +245,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> The squared Euclidean distance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="distanceSqToLine3" translate="no">.<a href="#distanceSqToLine3">distanceSqToLine3</a><span class="signature">( line : <span class="param-type">Line3</span>, c1 : <span class="param-type">Vector3</span>, c2 : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="distanceSqToLine3" translate="no">.<a href="#distanceSqToLine3">distanceSqToLine3</a><span class="signature">( line : <span class="param-type"><a href="Line3.html">Line3</a></span>, c1 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c2 : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the closest squared distance between this line segment and the given one.</p>
@@ -203,16 +253,28 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>line</code></td>
-									<td class="description last"><p>The line segment to compute the closest squared distance to.</p></td>
+									<td class="name">
+										<strong>line</strong>
+									</td>
+									<td class="description last">
+										<p>The line segment to compute the closest squared distance to.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>c1</code></td>
-									<td class="description last"><p>The closest point on this line segment.</p></td>
+									<td class="name">
+										<strong>c1</strong>
+									</td>
+									<td class="description last">
+										<p>The closest point on this line segment.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>c2</code></td>
-									<td class="description last"><p>The closest point on the given line segment.</p></td>
+									<td class="name">
+										<strong>c2</strong>
+									</td>
+									<td class="description last">
+										<p>The closest point on the given line segment.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -220,7 +282,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> The squared distance between this line segment and the given one.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( line : <span class="param-type">Line3</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( line : <span class="param-type"><a href="Line3.html">Line3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this line segment is equal with the given one.</p>
@@ -228,8 +290,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>line</code></td>
-									<td class="description last"><p>The line segment to test for equality.</p></td>
+									<td class="name">
+										<strong>line</strong>
+									</td>
+									<td class="description last">
+										<p>The line segment to test for equality.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -237,7 +303,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this line segment is equal with the given one.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getCenter" translate="no">.<a href="#getCenter">getCenter</a><span class="signature">( target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getCenter" translate="no">.<a href="#getCenter">getCenter</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the center of the line segment.</p>
@@ -245,8 +311,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -254,7 +324,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> The center point.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( start : <span class="param-type">Vector3</span>, end : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Line3.html">Line3</a></span> </h3>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( start : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, end : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Line3.html">Line3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the start and end values by copying the given vectors.</p>
@@ -262,12 +332,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>start</code></td>
-									<td class="description last"><p>The start point.</p></td>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>The start point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>end</code></td>
-									<td class="description last"><p>The end point.</p></td>
+									<td class="name">
+										<strong>end</strong>
+									</td>
+									<td class="description last">
+										<p>The end point.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

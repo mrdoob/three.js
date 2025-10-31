@@ -21,7 +21,7 @@
 				<pre><code class="language-js">import { lut3D } from 'three/addons/tsl/display/Lut3DNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Lut3DNode" translate="no">new <a href="#Lut3DNode">Lut3DNode</a><span class="signature">( inputNode : <span class="param-type">Node</span>, lutNode : <span class="param-type">TextureNode</span>, size : <span class="param-type">number</span>, intensityNode : <span class="param-type">Node.&lt;float></span> )</span> </h3>
+					<h3 class="name name-method" id="Lut3DNode" translate="no">new <a href="#Lut3DNode">Lut3DNode</a><span class="signature">( inputNode : <span class="param-type"><a href="Node.html">Node</a></span>, lutNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, size : <span class="param-type">number</span>, intensityNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new LUT node.</p>
@@ -29,20 +29,36 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>inputNode</code></td>
-									<td class="description last"><p>The node that represents the input of the effect.</p></td>
+									<td class="name">
+										<strong>inputNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that represents the input of the effect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>lutNode</code></td>
-									<td class="description last"><p>A texture node that represents the lookup table.</p></td>
+									<td class="name">
+										<strong>lutNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the lookup table.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>size</code></td>
-									<td class="description last"><p>The size of the lookup table.</p></td>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The size of the lookup table.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intensityNode</code></td>
-									<td class="description last"><p>Controls the intensity of the effect.</p></td>
+									<td class="name">
+										<strong>intensityNode</strong>
+									</td>
+									<td class="description last">
+										<p>Controls the intensity of the effect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -74,7 +90,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>
@@ -82,16 +98,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

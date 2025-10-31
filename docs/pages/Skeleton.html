@@ -31,7 +31,7 @@ const armSkeleton = new THREE.Skeleton( bones );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Skeleton" translate="no">new <a href="#Skeleton">Skeleton</a><span class="signature">( bones : <span class="param-type">Array.&lt;Bone></span>, boneInverses : <span class="param-type">Array.&lt;Matrix4></span> )</span> </h3>
+					<h3 class="name name-method" id="Skeleton" translate="no">new <a href="#Skeleton">Skeleton</a><span class="signature">( bones : <span class="param-type">Array.&lt;<a href="Bone.html">Bone</a>></span>, boneInverses : <span class="param-type">Array.&lt;<a href="Matrix4.html">Matrix4</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new skeleton.</p>
@@ -39,13 +39,21 @@ const armSkeleton = new THREE.Skeleton( bones );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>bones</code></td>
-									<td class="description last"><p>An array of bones.</p></td>
+									<td class="name">
+										<strong>bones</strong>
+									</td>
+									<td class="description last">
+										<p>An array of bones.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>boneInverses</code></td>
-									<td class="description last"><p>An array of bone inverse matrices.
-If not provided, these matrices will be computed automatically via <a href="Skeleton.html#calculateInverses">Skeleton#calculateInverses</a>.</p></td>
+									<td class="name">
+										<strong>boneInverses</strong>
+									</td>
+									<td class="description last">
+										<p>An array of bone inverse matrices.
+If not provided, these matrices will be computed automatically via <a href="Skeleton.html#calculateInverses">Skeleton#calculateInverses</a>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,14 +70,16 @@ If not provided, these matrices will be computed automatically via <a href="Skel
 					<h3 class="name" id="boneMatrices" translate="no">.<a href="#boneMatrices">boneMatrices</a><span class="type-signature"> : Float32Array</span> </h3>
 					<div class="description">
 						<p>An array buffer holding the bone data.
-Input data for <a href="Skeleton.html#boneTexture">Skeleton#boneTexture</a>.<br/>Default is <code>null</code>.</p>
+Input data for <a href="Skeleton.html#boneTexture">Skeleton#boneTexture</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="boneTexture" translate="no">.<a href="#boneTexture">boneTexture</a><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
 					<div class="description">
 						<p>A texture holding the bone data for use
-in the vertex shader.<br/>Default is <code>null</code>.</p>
+in the vertex shader.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -111,7 +121,7 @@ and fills it with new matrices.</p>
 method whenever this instance is no longer used in your app.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="fromJSON" translate="no">.<a href="#fromJSON">fromJSON</a><span class="signature">( json : <span class="param-type">Object</span>, bones : <span class="param-type">Object.&lt;string, Bone></span> )</span><span class="type-signature"> : <a href="Skeleton.html">Skeleton</a></span> </h3>
+					<h3 class="name name-method" id="fromJSON" translate="no">.<a href="#fromJSON">fromJSON</a><span class="signature">( json : <span class="param-type">Object</span>, bones : <span class="param-type">Object.&lt;string, <a href="Bone.html">Bone</a>></span> )</span><span class="type-signature"> : <a href="Skeleton.html">Skeleton</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the skeleton by the given JSON and bones.</p>
@@ -119,12 +129,20 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The skeleton as serialized JSON.</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The skeleton as serialized JSON.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>bones</code></td>
-									<td class="description last"><p>An array of bones.</p></td>
+									<td class="name">
+										<strong>bones</strong>
+									</td>
+									<td class="description last">
+										<p>An array of bones.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -141,8 +159,12 @@ matching name.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the bone.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the bone.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

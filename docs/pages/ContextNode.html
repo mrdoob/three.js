@@ -23,7 +23,7 @@ this node allows the modify the context. A typical use case is to overwrite <cod
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ContextNode" translate="no">new <a href="#ContextNode">ContextNode</a><span class="signature">( node : <span class="param-type">Node</span>, value : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="ContextNode" translate="no">new <a href="#ContextNode">ContextNode</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, value : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new context node.</p>
@@ -31,12 +31,21 @@ this node allows the modify the context. A typical use case is to overwrite <cod
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>node</code></td>
-									<td class="description last"><p>The node whose context should be modified.</p></td>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node whose context should be modified.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The modified context data.<br/>Default is <code>{}</code>.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The modified context data.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -46,7 +55,8 @@ this node allows the modify the context. A typical use case is to overwrite <cod
 				<div class="member">
 					<h3 class="name" id="isContextNode" translate="no">.<a href="#isContextNode">isContextNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -58,11 +68,12 @@ this node allows the modify the context. A typical use case is to overwrite <cod
 				<div class="member">
 					<h3 class="name" id="value" translate="no">.<a href="#value">value</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
-						<p>The modified context data.<br/>Default is <code>{}</code>.</p>
+						<p>The modified context data.</p>
+						<p>Default is <code>{}</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getMemberType" translate="no">.<a href="#getMemberType">getMemberType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getMemberType" translate="no">.<a href="#getMemberType">getMemberType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is overwritten to ensure it returns the member type of <a href="ContextNode.html#node">ContextNode#node</a>.</p>
@@ -70,12 +81,20 @@ this node allows the modify the context. A typical use case is to overwrite <cod
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The member name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The member name.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -86,7 +105,7 @@ this node allows the modify the context. A typical use case is to overwrite <cod
 							<dt class="tag-returns"><strong>Returns:</strong> The member type.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is overwritten to ensure it returns the type of <a href="ContextNode.html#node">ContextNode#node</a>.</p>
@@ -94,8 +113,12 @@ this node allows the modify the context. A typical use case is to overwrite <cod
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

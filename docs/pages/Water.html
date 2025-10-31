@@ -29,7 +29,7 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="WaterM
 				<pre><code class="language-js">import { Water } from 'three/addons/objects/Water.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Water" translate="no">new <a href="#Water">Water</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, options : <span class="param-type">Water~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="Water" translate="no">new <a href="#Water">Water</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, options : <span class="param-type"><a href="Water.html#~Options">Water~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new water instance.</p>
@@ -37,12 +37,20 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="WaterM
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>geometry</code></td>
-									<td class="description last"><p>The water's geometry.</p></td>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The water's geometry.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The configuration options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -52,7 +60,8 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="WaterM
 				<div class="member">
 					<h3 class="name" id="isWater" translate="no">.<a href="#isWater">isWater</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Type Definitions</h2>
@@ -61,198 +70,161 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="WaterM
 					<div class="description">
 						<p>Constructor options of <code>Water</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>textureWidth</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>textureWidth</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture width. A higher value results in more clear reflections but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					512
-				</td>
-			<td class="description last"><p>The texture width. A higher value results in more clear reflections but is also more expensive.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>textureHeight</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>textureHeight</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture height. A higher value results in more clear reflections but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					512
-				</td>
-			<td class="description last"><p>The texture height. A higher value results in more clear reflections but is also more expensive.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>clipBias</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>clipBias</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The clip bias.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0
-				</td>
-			<td class="description last"><p>The clip bias.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>alpha</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>alpha</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The alpha value.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>The alpha value.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>time</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>time</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The time value.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0
-				</td>
-			<td class="description last"><p>The time value.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>waterNormals</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>waterNormals</strong>
+						<br>
 <span class="param-type"><a href="Texture.html">Texture</a></span>
+				</td>
+			<td class="description last">
+				<p>The water's normal map.</p>
+						<p>Default is <code>null</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-					&lt;nullable><br>
-				</td>
-				<td class="default">
-					null
-				</td>
-			<td class="description last"><p>The water's normal map.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>sunDirection</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>sunDirection</strong>
+						<br>
 <span class="param-type"><a href="Vector3.html">Vector3</a></span>
+				</td>
+			<td class="description last">
+				<p>The sun direction.</p>
+						<p>Default is <code>(0.70707,0.70707,0.0)</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					(0.70707,0.70707,0.0)
-				</td>
-			<td class="description last"><p>The sun direction.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>sunColor</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>sunColor</strong>
+						<br>
 <span class="param-type">number</span>
 |
 <span class="param-type"><a href="Color.html">Color</a></span>
 |
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The sun color.</p>
+						<p>Default is <code>0xffffff</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0xffffff
-				</td>
-			<td class="description last"><p>The sun color.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>waterColor</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>waterColor</strong>
+						<br>
 <span class="param-type">number</span>
 |
 <span class="param-type"><a href="Color.html">Color</a></span>
 |
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The water color.</p>
+						<p>Default is <code>0x7F7F7F</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0x7F7F7F
-				</td>
-			<td class="description last"><p>The water color.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>eye</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>eye</strong>
+						<br>
 <span class="param-type"><a href="Vector3.html">Vector3</a></span>
+				</td>
+			<td class="description last">
+				<p>The eye vector.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The eye vector.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>distortionScale</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>distortionScale</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The distortion scale.</p>
+						<p>Default is <code>20</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					20
-				</td>
-			<td class="description last"><p>The distortion scale.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>side</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>side</strong>
+						<br>
 <span class="param-type"><a href="global.html#FrontSide">FrontSide</a></span>
 |
 <span class="param-type"><a href="global.html#BackSide">BackSide</a></span>
 |
 <span class="param-type"><a href="global.html#DoubleSide">DoubleSide</a></span>
+				</td>
+			<td class="description last">
+				<p>The water material's <code>side</code> property.</p>
+						<p>Default is <code>FrontSide</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					FrontSide
-				</td>
-			<td class="description last"><p>The water material's <code>side</code> property.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>fog</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>fog</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the water should be affected by fog or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether the water should be affected by fog or not.</p></td>
 		</tr>
 	</tbody>
 </table>

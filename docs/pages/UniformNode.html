@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="UniformNode" translate="no">new <a href="#UniformNode">UniformNode</a><span class="signature">( value : <span class="param-type">any</span>, nodeType : <span class="param-type">string</span> )</span> </h3>
+					<h3 class="name name-method" id="UniformNode" translate="no">new <a href="#UniformNode">UniformNode</a><span class="signature">( value : <span class="param-type"><a href="global.html#any">any</a></span>, nodeType : <span class="param-type">string</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new uniform node.</p>
@@ -26,12 +26,21 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value of this node. Usually a JS primitive or three.js object (vector, matrix, color, texture).</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>nodeType</code></td>
-									<td class="description last"><p>The node type. If no explicit type is defined, the node tries to derive the type from its value.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>nodeType</strong>
+									</td>
+									<td class="description last">
+										<p>The node type. If no explicit type is defined, the node tries to derive the type from its value.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -49,13 +58,15 @@ which is updated per frame or render call.</p>
 				<div class="member">
 					<h3 class="name" id="isUniformNode" translate="no">.<a href="#isUniformNode">isUniformNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The name or label of the uniform.<br/>Default is <code>''</code>.</p>
+						<p>The name or label of the uniform.</p>
+						<p>Default is <code>''</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="InputNode.html#name">InputNode#name</a></dt>
@@ -71,7 +82,7 @@ which is updated per frame or render call.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The uniform group.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getUniformHash" translate="no">.<a href="#getUniformHash">getUniformHash</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getUniformHash" translate="no">.<a href="#getUniformHash">getUniformHash</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>By default, this method returns the result of <a href="Node.html#getHash">Node#getHash</a> but derived
@@ -80,8 +91,12 @@ classes might overwrite this method with a different implementation.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -97,8 +112,12 @@ classes might overwrite this method with a different implementation.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the uniform.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -109,7 +128,7 @@ classes might overwrite this method with a different implementation.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setGroup" translate="no">.<a href="#setGroup">setGroup</a><span class="signature">( group : <span class="param-type">UniformGroupNode</span> )</span><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<h3 class="name name-method" id="setGroup" translate="no">.<a href="#setGroup">setGroup</a><span class="signature">( group : <span class="param-type"><a href="UniformGroupNode.html">UniformGroupNode</a></span> )</span><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the <a href="UniformNode.html#groupNode">UniformNode#groupNode</a> property.</p>
@@ -117,8 +136,12 @@ classes might overwrite this method with a different implementation.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>group</code></td>
-									<td class="description last"><p>The uniform group.</p></td>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform group.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -134,8 +157,12 @@ classes might overwrite this method with a different implementation.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the uniform.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

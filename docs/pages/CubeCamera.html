@@ -38,7 +38,7 @@ renderer.render( scene, camera );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CubeCamera" translate="no">new <a href="#CubeCamera">CubeCamera</a><span class="signature">( near : <span class="param-type">number</span>, far : <span class="param-type">number</span>, renderTarget : <span class="param-type">WebGLCubeRenderTarget</span> )</span> </h3>
+					<h3 class="name name-method" id="CubeCamera" translate="no">new <a href="#CubeCamera">CubeCamera</a><span class="signature">( near : <span class="param-type">number</span>, far : <span class="param-type">number</span>, renderTarget : <span class="param-type"><a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new cube camera.</p>
@@ -46,16 +46,28 @@ renderer.render( scene, camera );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>near</code></td>
-									<td class="description last"><p>The camera's near plane.</p></td>
+									<td class="name">
+										<strong>near</strong>
+									</td>
+									<td class="description last">
+										<p>The camera's near plane.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>far</code></td>
-									<td class="description last"><p>The camera's far plane.</p></td>
+									<td class="name">
+										<strong>far</strong>
+									</td>
+									<td class="description last">
+										<p>The camera's far plane.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderTarget</code></td>
-									<td class="description last"><p>The cube render target.</p></td>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The cube render target.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -65,13 +77,15 @@ renderer.render( scene, camera );
 				<div class="member">
 					<h3 class="name" id="activeMipmapLevel" translate="no">.<a href="#activeMipmapLevel">activeMipmapLevel</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The current active mipmap level<br/>Default is <code>0</code>.</p>
+						<p>The current active mipmap level</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="coordinateSystem" translate="no">.<a href="#coordinateSystem">coordinateSystem</a><span class="type-signature"> : <a href="global.html#WebGLCoordinateSystem">WebGLCoordinateSystem</a> | <a href="global.html#WebGPUCoordinateSystem">WebGPUCoordinateSystem</a></span> </h3>
 					<div class="description">
-						<p>The current active coordinate system.<br/>Default is <code>null</code>.</p>
+						<p>The current active coordinate system.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -81,7 +95,7 @@ renderer.render( scene, camera );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( renderer : <span class="param-type">Renderer | WebGLRenderer</span>, scene : <span class="param-type">Scene</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Calling this method will render the given scene with the given renderer
@@ -90,12 +104,20 @@ into the cube render target of the camera.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene to render.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

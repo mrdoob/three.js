@@ -24,7 +24,7 @@ are available for easier use:</p>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SceneNode" translate="no">new <a href="#SceneNode">SceneNode</a><span class="signature">( scope : <span class="param-type">'backgroundBlurriness' | 'backgroundIntensity' | 'backgroundRotation'</span>, scene : <span class="param-type">Scene</span> )</span> </h3>
+					<h3 class="name name-method" id="SceneNode" translate="no">new <a href="#SceneNode">SceneNode</a><span class="signature">( scope : <span class="param-type">'backgroundBlurriness' | 'backgroundIntensity' | 'backgroundRotation'</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new scene node.</p>
@@ -32,12 +32,21 @@ are available for easier use:</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scope</code></td>
-									<td class="description last"><p>The scope defines the type of scene property that is accessed.</p></td>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The scope defines the type of scene property that is accessed.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>A reference to the scene.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the scene.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -47,7 +56,8 @@ are available for easier use:</p>
 				<div class="member">
 					<h3 class="name" id="scene" translate="no">.<a href="#scene">scene</a><span class="type-signature"> : <a href="Scene.html">Scene</a></span> </h3>
 					<div class="description">
-						<p>A reference to the scene that is going to be accessed.<br/>Default is <code>null</code>.</p>
+						<p>A reference to the scene that is going to be accessed.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -57,7 +67,7 @@ are available for easier use:</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Depending on the scope, the method returns a different type of node that represents
@@ -66,8 +76,12 @@ the respective scene property.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

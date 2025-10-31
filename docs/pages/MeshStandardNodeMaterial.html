@@ -26,8 +26,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>The configuration parameter.</p></td>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -41,19 +45,22 @@
 <code>emissiveIntensity</code> and <code>emissiveMap</code> properties. This node property allows to
 overwrite the default and define the emissive color with a node instead.</p>
 <p>If you don't want to overwrite the emissive color but modify the existing
-value instead, use <a href="TSL.html#materialEmissive">materialEmissive</a>.<br/>Default is <code>null</code>.</p>
+value instead, use <a href="TSL.html#materialEmissive">materialEmissive</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isMeshStandardNodeMaterial" translate="no">.<a href="#isMeshStandardNodeMaterial">isMeshStandardNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="lights" translate="no">.<a href="#lights">lights</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Set to <code>true</code> because standard materials react on lights.<br/>Default is <code>true</code>.</p>
+						<p>Set to <code>true</code> because standard materials react on lights.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#lights">NodeMaterial#lights</a></dt>
@@ -66,7 +73,8 @@ value instead, use <a href="TSL.html#materialEmissive">materialEmissive</a>.<br/
 and <code>metalnessMap</code> properties. This node property allows to
 overwrite the default and define the metalness with a node instead.</p>
 <p>If you don't want to overwrite the metalness but modify the existing
-value instead, use <a href="TSL.html#materialMetalness">materialMetalness</a>.<br/>Default is <code>null</code>.</p>
+value instead, use <a href="TSL.html#materialMetalness">materialMetalness</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -76,11 +84,12 @@ value instead, use <a href="TSL.html#materialMetalness">materialMetalness</a>.<b
 and <code>roughnessMap</code> properties. This node property allows to
 overwrite the default and define the roughness with a node instead.</p>
 <p>If you don't want to overwrite the roughness but modify the existing
-value instead, use <a href="TSL.html#materialRoughness">materialRoughness</a>.<br/>Default is <code>null</code>.</p>
+value instead, use <a href="TSL.html#materialRoughness">materialRoughness</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setupEnvironment" translate="no">.<a href="#setupEnvironment">setupEnvironment</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="EnvironmentNode.html">EnvironmentNode</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="setupEnvironment" translate="no">.<a href="#setupEnvironment">setupEnvironment</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="EnvironmentNode.html">EnvironmentNode</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Overwritten since this type of material uses <a href="EnvironmentNode.html">EnvironmentNode</a>
@@ -90,8 +99,12 @@ method honors <code>Scene.environment</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -120,7 +133,7 @@ method honors <code>Scene.environment</code>.</p>
 							<p>Setups the specular related node variables.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="setupVariants" translate="no">.<a href="#setupVariants">setupVariants</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> </h3>
+					<h3 class="name name-method" id="setupVariants" translate="no">.<a href="#setupVariants">setupVariants</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the standard specific node variables.</p>
@@ -128,8 +141,12 @@ method honors <code>Scene.environment</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

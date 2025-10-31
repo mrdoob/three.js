@@ -34,16 +34,29 @@ material.rotationNode = userData( 'rotation', 'float' );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>property</code></td>
-									<td class="description last"><p>The property name that should be referenced by the node.</p></td>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The property name that should be referenced by the node.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>inputType</code></td>
-									<td class="description last"><p>The node data type of the reference.</p></td>
+									<td class="name">
+										<strong>inputType</strong>
+									</td>
+									<td class="description last">
+										<p>The node data type of the reference.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>userData</code></td>
-									<td class="description last"><p>A reference to the <code>userData</code> object. If not provided, the <code>userData</code> property of the 3D object that uses the node material is evaluated.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>userData</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the <code>userData</code> object. If not provided, the <code>userData</code> property of the 3D object that uses the node material is evaluated.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -54,11 +67,12 @@ material.rotationNode = userData( 'rotation', 'float' );
 					<h3 class="name" id="userData" translate="no">.<a href="#userData">userData</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>A reference to the <code>userData</code> object. If not provided, the <code>userData</code>
-property of the 3D object that uses the node material is evaluated.<br/>Default is <code>null</code>.</p>
+property of the 3D object that uses the node material is evaluated.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type">NodeFrame | NodeBuilder</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a> | <a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Overwritten to make sure <a href="ReferenceNode.html#reference">ReferenceNode#reference</a> points to the correct
@@ -67,8 +81,12 @@ property of the 3D object that uses the node material is evaluated.<br/>Default 
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>state</code></td>
-									<td class="description last"><p>The current state to evaluate.</p></td>
+									<td class="name">
+										<strong>state</strong>
+									</td>
+									<td class="description last">
+										<p>The current state to evaluate.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

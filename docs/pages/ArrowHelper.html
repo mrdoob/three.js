@@ -28,7 +28,7 @@ scene.add( arrowHelper );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ArrowHelper" translate="no">new <a href="#ArrowHelper">ArrowHelper</a><span class="signature">( dir : <span class="param-type">Vector3</span>, origin : <span class="param-type">Vector3</span>, length : <span class="param-type">number</span>, color : <span class="param-type">number | Color | string</span>, headLength : <span class="param-type">number</span>, headWidth : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="ArrowHelper" translate="no">new <a href="#ArrowHelper">ArrowHelper</a><span class="signature">( dir : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, origin : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, length : <span class="param-type">number</span>, color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, headLength : <span class="param-type">number</span>, headWidth : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new arrow helper.</p>
@@ -36,28 +36,58 @@ scene.add( arrowHelper );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>dir</code></td>
-									<td class="description last"><p>The (normalized) direction vector.<br/>Default is <code>(0, 0, 1)</code>.</p></td>
+									<td class="name">
+										<strong>dir</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) direction vector.</p>
+										<p>Default is <code>(0, 0, 1)</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>origin</code></td>
-									<td class="description last"><p>Point at which the arrow starts.<br/>Default is <code>(0, 0, 0)</code>.</p></td>
+									<td class="name">
+										<strong>origin</strong>
+									</td>
+									<td class="description last">
+										<p>Point at which the arrow starts.</p>
+										<p>Default is <code>(0, 0, 0)</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>length</code></td>
-									<td class="description last"><p>Length of the arrow in world units.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>length</strong>
+									</td>
+									<td class="description last">
+										<p>Length of the arrow in world units.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>Color of the arrow.<br/>Default is <code>0xffff00</code>.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>Color of the arrow.</p>
+										<p>Default is <code>0xffff00</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>headLength</code></td>
-									<td class="description last"><p>The length of the head of the arrow.<br/>Default is <code>length*0.2</code>.</p></td>
+									<td class="name">
+										<strong>headLength</strong>
+									</td>
+									<td class="description last">
+										<p>The length of the head of the arrow.</p>
+										<p>Default is <code>length*0.2</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>headWidth</code></td>
-									<td class="description last"><p>The width of the head of the arrow.<br/>Default is <code>headLength*0.2</code>.</p></td>
+									<td class="name">
+										<strong>headWidth</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the head of the arrow.</p>
+										<p>Default is <code>headLength*0.2</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -84,7 +114,7 @@ scene.add( arrowHelper );
 method whenever this instance is no longer used in your app.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="setColor" translate="no">.<a href="#setColor">setColor</a><span class="signature">( color : <span class="param-type">number | Color | string</span> )</span> </h3>
+					<h3 class="name name-method" id="setColor" translate="no">.<a href="#setColor">setColor</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the color of the helper.</p>
@@ -92,13 +122,17 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to set.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setDirection" translate="no">.<a href="#setDirection">setDirection</a><span class="signature">( dir : <span class="param-type">Vector3</span> )</span> </h3>
+					<h3 class="name name-method" id="setDirection" translate="no">.<a href="#setDirection">setDirection</a><span class="signature">( dir : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the direction of the helper.</p>
@@ -106,8 +140,12 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>dir</code></td>
-									<td class="description last"><p>The normalized direction vector.</p></td>
+									<td class="name">
+										<strong>dir</strong>
+									</td>
+									<td class="description last">
+										<p>The normalized direction vector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -120,16 +158,30 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>length</code></td>
-									<td class="description last"><p>Length of the arrow in world units.</p></td>
+									<td class="name">
+										<strong>length</strong>
+									</td>
+									<td class="description last">
+										<p>Length of the arrow in world units.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>headLength</code></td>
-									<td class="description last"><p>The length of the head of the arrow.<br/>Default is <code>length*0.2</code>.</p></td>
+									<td class="name">
+										<strong>headLength</strong>
+									</td>
+									<td class="description last">
+										<p>The length of the head of the arrow.</p>
+										<p>Default is <code>length*0.2</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>headWidth</code></td>
-									<td class="description last"><p>The width of the head of the arrow.<br/>Default is <code>headLength*0.2</code>.</p></td>
+									<td class="name">
+										<strong>headWidth</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the head of the arrow.</p>
+										<p>Default is <code>headLength*0.2</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

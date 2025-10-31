@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="WebGLCubeRenderTarget" translate="no">new <a href="#WebGLCubeRenderTarget">WebGLCubeRenderTarget</a><span class="signature">( size : <span class="param-type">number</span>, options : <span class="param-type">RenderTarget~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="WebGLCubeRenderTarget" translate="no">new <a href="#WebGLCubeRenderTarget">WebGLCubeRenderTarget</a><span class="signature">( size : <span class="param-type">number</span>, options : <span class="param-type"><a href="RenderTarget.html#~Options">RenderTarget~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new cube render target.</p>
@@ -26,12 +26,21 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>size</code></td>
-									<td class="description last"><p>The size of the render target.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The size of the render target.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The configuration object.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -41,7 +50,8 @@
 				<div class="member">
 					<h3 class="name" id="isWebGLCubeRenderTarget" translate="no">.<a href="#isWebGLCubeRenderTarget">isWebGLCubeRenderTarget</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -54,7 +64,7 @@
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="clear" translate="no">.<a href="#clear">clear</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, color : <span class="param-type">boolean</span>, depth : <span class="param-type">boolean</span>, stencil : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="clear" translate="no">.<a href="#clear">clear</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, color : <span class="param-type">boolean</span>, depth : <span class="param-type">boolean</span>, stencil : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Clears this cube render target.</p>
@@ -62,25 +72,44 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>Whether the color buffer should be cleared or not.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the color buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>depth</code></td>
-									<td class="description last"><p>Whether the depth buffer should be cleared or not.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the depth buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>stencil</code></td>
-									<td class="description last"><p>Whether the stencil buffer should be cleared or not.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>stencil</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the stencil buffer should be cleared or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="fromEquirectangularTexture" translate="no">.<a href="#fromEquirectangularTexture">fromEquirectangularTexture</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, texture : <span class="param-type">Texture</span> )</span><span class="type-signature"> : <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> </h3>
+					<h3 class="name name-method" id="fromEquirectangularTexture" translate="no">.<a href="#fromEquirectangularTexture">fromEquirectangularTexture</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Converts the given equirectangular texture to a cube map.</p>
@@ -88,12 +117,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The equirectangular texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The equirectangular texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

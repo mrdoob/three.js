@@ -21,7 +21,7 @@
 				<pre><code class="language-js">import { NURBSSurface } from 'three/addons/curves/NURBSSurface.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="NURBSSurface" translate="no">new <a href="#NURBSSurface">NURBSSurface</a><span class="signature">( degree1 : <span class="param-type">number</span>, degree2 : <span class="param-type">number</span>, knots1 : <span class="param-type">Array.&lt;number></span>, knots2 : <span class="param-type">Array.&lt;number></span>, controlPoints : <span class="param-type">Array.&lt;Array.&lt;(Vector2|Vector3|Vector4)>></span> )</span> </h3>
+					<h3 class="name name-method" id="NURBSSurface" translate="no">new <a href="#NURBSSurface">NURBSSurface</a><span class="signature">( degree1 : <span class="param-type">number</span>, degree2 : <span class="param-type">number</span>, knots1 : <span class="param-type">Array.&lt;number></span>, knots2 : <span class="param-type">Array.&lt;number></span>, controlPoints : <span class="param-type">Array.&lt;Array.&lt;(<a href="Vector2.html">Vector2</a>|<a href="Vector3.html">Vector3</a>|<a href="Vector4.html">Vector4</a>)>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new NURBS surface.</p>
@@ -29,24 +29,44 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>degree1</code></td>
-									<td class="description last"><p>The first NURBS degree.</p></td>
+									<td class="name">
+										<strong>degree1</strong>
+									</td>
+									<td class="description last">
+										<p>The first NURBS degree.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>degree2</code></td>
-									<td class="description last"><p>The second NURBS degree.</p></td>
+									<td class="name">
+										<strong>degree2</strong>
+									</td>
+									<td class="description last">
+										<p>The second NURBS degree.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>knots1</code></td>
-									<td class="description last"><p>The first knots as a flat array of numbers.</p></td>
+									<td class="name">
+										<strong>knots1</strong>
+									</td>
+									<td class="description last">
+										<p>The first knots as a flat array of numbers.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>knots2</code></td>
-									<td class="description last"><p>The second knots as a flat array of numbers.</p></td>
+									<td class="name">
+										<strong>knots2</strong>
+									</td>
+									<td class="description last">
+										<p>The second knots as a flat array of numbers.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>controlPoints</code></td>
-									<td class="description last"><p>An array^2 holding control points.</p></td>
+									<td class="name">
+										<strong>controlPoints</strong>
+									</td>
+									<td class="description last">
+										<p>An array^2 holding control points.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -84,7 +104,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t1 : <span class="param-type">number</span>, t2 : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span> </h3>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t1 : <span class="param-type">number</span>, t2 : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method returns a vector in 3D space for the given interpolation factor. This vector lies on the NURBS surface.</p>
@@ -92,16 +112,28 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t1</code></td>
-									<td class="description last"><p>The first interpolation factor representing the <code>u</code> position on the surface. Must be in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t1</strong>
+									</td>
+									<td class="description last">
+										<p>The first interpolation factor representing the <code>u</code> position on the surface. Must be in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>t2</code></td>
-									<td class="description last"><p>The second interpolation factor representing the <code>v</code> position on the surface. Must be in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t2</strong>
+									</td>
+									<td class="description last">
+										<p>The second interpolation factor representing the <code>v</code> position on the surface. Must be in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

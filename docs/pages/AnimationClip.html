@@ -17,7 +17,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="AnimationClip" translate="no">new <a href="#AnimationClip">AnimationClip</a><span class="signature">( name : <span class="param-type">string</span>, duration : <span class="param-type">number</span>, tracks : <span class="param-type">Array.&lt;KeyframeTrack></span>, blendMode : <span class="param-type">NormalAnimationBlendMode | AdditiveAnimationBlendMode</span> )</span> </h3>
+					<h3 class="name name-method" id="AnimationClip" translate="no">new <a href="#AnimationClip">AnimationClip</a><span class="signature">( name : <span class="param-type">string</span>, duration : <span class="param-type">number</span>, tracks : <span class="param-type">Array.&lt;<a href="KeyframeTrack.html">KeyframeTrack</a>></span>, blendMode : <span class="param-type"><a href="global.html#NormalAnimationBlendMode">NormalAnimationBlendMode</a> | <a href="global.html#AdditiveAnimationBlendMode">AdditiveAnimationBlendMode</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new animation clip.</p>
@@ -28,22 +28,41 @@ will automatically be created by loaders when importing animated 3D assets.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The clip's name.<br/>Default is <code>''</code>.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The clip's name.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The clip's duration in seconds. If a negative value is passed,
-the duration will be calculated from the passed keyframes.<br/>Default is <code>-1</code>.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The clip's duration in seconds. If a negative value is passed,
+the duration will be calculated from the passed keyframes.</p>
+										<p>Default is <code>-1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>tracks</code></td>
-									<td class="description last"><p>An array of keyframe tracks.</p></td>
+									<td class="name">
+										<strong>tracks</strong>
+									</td>
+									<td class="description last">
+										<p>An array of keyframe tracks.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>blendMode</code></td>
-									<td class="description last"><p>Defines how the animation
-is blended/combined when two or more animations are simultaneously played.<br/>Default is <code>NormalAnimationBlendMode</code>.</p></td>
+									<td class="name">
+										<strong>blendMode</strong>
+									</td>
+									<td class="description last">
+										<p>Defines how the animation
+is blended/combined when two or more animations are simultaneously played.</p>
+										<p>Default is <code>NormalAnimationBlendMode</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -157,16 +176,28 @@ animation-group-based patterns like &quot;Walk_001, Walk_002, Run_001, Run_002..
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>morphTargets</code></td>
-									<td class="description last"><p>A sequence of morph targets.</p></td>
+									<td class="name">
+										<strong>morphTargets</strong>
+									</td>
+									<td class="description last">
+										<p>A sequence of morph targets.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>fps</code></td>
-									<td class="description last"><p>The Frames-Per-Second value.</p></td>
+									<td class="name">
+										<strong>fps</strong>
+									</td>
+									<td class="description last">
+										<p>The Frames-Per-Second value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>noLoop</code></td>
-									<td class="description last"><p>Whether the clip should be no loop or not.</p></td>
+									<td class="name">
+										<strong>noLoop</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clip should be no loop or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -185,20 +216,36 @@ overridden via <a href="AnimationAction.html#setDuration">AnimationAction#setDur
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the animation clip.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the animation clip.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>morphTargetSequence</code></td>
-									<td class="description last"><p>A sequence of morph targets.</p></td>
+									<td class="name">
+										<strong>morphTargetSequence</strong>
+									</td>
+									<td class="description last">
+										<p>A sequence of morph targets.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>fps</code></td>
-									<td class="description last"><p>The Frames-Per-Second value.</p></td>
+									<td class="name">
+										<strong>fps</strong>
+									</td>
+									<td class="description last">
+										<p>The Frames-Per-Second value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>noLoop</code></td>
-									<td class="description last"><p>Whether the clip should be no loop or not.</p></td>
+									<td class="name">
+										<strong>noLoop</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clip should be no loop or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -206,7 +253,7 @@ overridden via <a href="AnimationAction.html#setDuration">AnimationAction#setDur
 							<dt class="tag-returns"><strong>Returns:</strong> The new animation clip.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id=".findByName" translate="no">.<a href="#.findByName">findByName</a><span class="signature">( objectOrClipArray : <span class="param-type">Array.&lt;AnimationClip> | Object3D</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<h3 class="name name-method" id=".findByName" translate="no">.<a href="#.findByName">findByName</a><span class="signature">( objectOrClipArray : <span class="param-type">Array.&lt;<a href="AnimationClip.html">AnimationClip</a>> | <a href="Object3D.html">Object3D</a></span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Searches for an animation clip by name, taking as its first parameter
@@ -216,12 +263,20 @@ array named &quot;animations&quot; property.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>objectOrClipArray</code></td>
-									<td class="description last"><p>The array or object to search through.</p></td>
+									<td class="name">
+										<strong>objectOrClipArray</strong>
+									</td>
+									<td class="description last">
+										<p>The array or object to search through.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name to search for.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to search for.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -237,8 +292,12 @@ array named &quot;animations&quot; property.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The serialized animation clip.</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The serialized animation clip.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -254,12 +313,20 @@ array named &quot;animations&quot; property.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>animation</code></td>
-									<td class="description last"><p>A serialized animation clip as JSON.</p></td>
+									<td class="name">
+										<strong>animation</strong>
+									</td>
+									<td class="description last">
+										<p>A serialized animation clip as JSON.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>bones</code></td>
-									<td class="description last"><p>An array of bones.</p></td>
+									<td class="name">
+										<strong>bones</strong>
+									</td>
+									<td class="description last">
+										<p>An array of bones.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -270,7 +337,7 @@ array named &quot;animations&quot; property.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The new animation clip.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id=".toJSON" translate="no">.<a href="#.toJSON">toJSON</a><span class="signature">( clip : <span class="param-type">AnimationClip</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id=".toJSON" translate="no">.<a href="#.toJSON">toJSON</a><span class="signature">( clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Serializes the given animation clip into JSON.</p>
@@ -278,8 +345,12 @@ array named &quot;animations&quot; property.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>clip</code></td>
-									<td class="description last"><p>The animation clip to serialize.</p></td>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>The animation clip to serialize.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

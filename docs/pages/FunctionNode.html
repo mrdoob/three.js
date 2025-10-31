@@ -39,7 +39,7 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="FunctionNode" translate="no">new <a href="#FunctionNode">FunctionNode</a><span class="signature">( code : <span class="param-type">string</span>, includes : <span class="param-type">Array.&lt;Node></span>, language : <span class="param-type">'js' | 'wgsl' | 'glsl'</span> )</span> </h3>
+					<h3 class="name name-method" id="FunctionNode" translate="no">new <a href="#FunctionNode">FunctionNode</a><span class="signature">( code : <span class="param-type">string</span>, includes : <span class="param-type">Array.&lt;<a href="Node.html">Node</a>></span>, language : <span class="param-type">'js' | 'wgsl' | 'glsl'</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new function node.</p>
@@ -47,23 +47,38 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>code</code></td>
-									<td class="description last"><p>The native code.<br/>Default is <code>''</code>.</p></td>
+									<td class="name">
+										<strong>code</strong>
+									</td>
+									<td class="description last">
+										<p>The native code.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>includes</code></td>
-									<td class="description last"><p>An array of includes.<br/>Default is <code>[]</code>.</p></td>
+									<td class="name">
+										<strong>includes</strong>
+									</td>
+									<td class="description last">
+										<p>An array of includes.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>language</code></td>
-									<td class="description last"><p>The used language.<br/>Default is <code>''</code>.</p></td>
+									<td class="name">
+										<strong>language</strong>
+									</td>
+									<td class="description last">
+										<p>The used language.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getInputs" translate="no">.<a href="#getInputs">getInputs</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : Array.&lt;<a href="NodeFunctionInput.html">NodeFunctionInput</a>></span> </h3>
+					<h3 class="name name-method" id="getInputs" translate="no">.<a href="#getInputs">getInputs</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Array.&lt;<a href="NodeFunctionInput.html">NodeFunctionInput</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the inputs of this function node.</p>
@@ -71,8 +86,12 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -80,7 +99,7 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 							<dt class="tag-returns"><strong>Returns:</strong> The inputs.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getMemberType" translate="no">.<a href="#getMemberType">getMemberType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getMemberType" translate="no">.<a href="#getMemberType">getMemberType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the type of a member of this function node.</p>
@@ -88,12 +107,20 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the member.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the member.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -104,7 +131,7 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 							<dt class="tag-returns"><strong>Returns:</strong> The type of the member.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getNodeFunction" translate="no">.<a href="#getNodeFunction">getNodeFunction</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="NodeFunction.html">NodeFunction</a></span> </h3>
+					<h3 class="name name-method" id="getNodeFunction" translate="no">.<a href="#getNodeFunction">getNodeFunction</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="NodeFunction.html">NodeFunction</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the node function for this function node.</p>
@@ -112,8 +139,12 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -121,7 +152,7 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 							<dt class="tag-returns"><strong>Returns:</strong> The node function.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the type of this function node.</p>
@@ -129,8 +160,12 @@ material.colorNode = someWGSLFn( { color: texture( map ) } );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

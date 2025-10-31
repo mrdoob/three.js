@@ -42,7 +42,7 @@ scene.add( mesh );
 				<pre><code class="language-js">import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="MeshSurfaceSampler" translate="no">new <a href="#MeshSurfaceSampler">MeshSurfaceSampler</a><span class="signature">( mesh : <span class="param-type">Mesh</span> )</span> </h3>
+					<h3 class="name name-method" id="MeshSurfaceSampler" translate="no">new <a href="#MeshSurfaceSampler">MeshSurfaceSampler</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a mesh surface sampler.</p>
@@ -50,8 +50,12 @@ scene.add( mesh );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mesh</code></td>
-									<td class="description last"><p>Surface mesh from which to sample.</p></td>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>Surface mesh from which to sample.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -69,7 +73,7 @@ for a surface with n faces.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sampler.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="sample" translate="no">.<a href="#sample">sample</a><span class="signature">( targetPosition : <span class="param-type">Vector3</span>, targetNormal : <span class="param-type">Vector3</span>, targetColor : <span class="param-type">Color</span>, targetUV : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="MeshSurfaceSampler.html">MeshSurfaceSampler</a></span> </h3>
+					<h3 class="name name-method" id="sample" translate="no">.<a href="#sample">sample</a><span class="signature">( targetPosition : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, targetNormal : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, targetColor : <span class="param-type"><a href="Color.html">Color</a></span>, targetUV : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="MeshSurfaceSampler.html">MeshSurfaceSampler</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Selects a random point on the surface of the input geometry, returning the
@@ -79,20 +83,36 @@ Time complexity is O(log n) for a surface with n faces.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>targetPosition</code></td>
-									<td class="description last"><p>The target object holding the sampled position.</p></td>
+									<td class="name">
+										<strong>targetPosition</strong>
+									</td>
+									<td class="description last">
+										<p>The target object holding the sampled position.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>targetNormal</code></td>
-									<td class="description last"><p>The target object holding the sampled normal.</p></td>
+									<td class="name">
+										<strong>targetNormal</strong>
+									</td>
+									<td class="description last">
+										<p>The target object holding the sampled normal.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>targetColor</code></td>
-									<td class="description last"><p>The target object holding the sampled color.</p></td>
+									<td class="name">
+										<strong>targetColor</strong>
+									</td>
+									<td class="description last">
+										<p>The target object holding the sampled color.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>targetUV</code></td>
-									<td class="description last"><p>The target object holding the sampled uv coordinates.</p></td>
+									<td class="name">
+										<strong>targetUV</strong>
+									</td>
+									<td class="description last">
+										<p>The target object holding the sampled uv coordinates.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -108,8 +128,12 @@ Time complexity is O(log n) for a surface with n faces.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>randomFunction</code></td>
-									<td class="description last"><p>A random number generator.</p></td>
+									<td class="name">
+										<strong>randomFunction</strong>
+									</td>
+									<td class="description last">
+										<p>A random number generator.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -128,8 +152,12 @@ zero will not be sampled at all. For vector attributes, only .x is used in sampl
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The attribute name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute name.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

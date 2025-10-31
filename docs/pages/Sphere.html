@@ -18,7 +18,7 @@ used as a Bounding Sphere for 3D objects.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Sphere" translate="no">new <a href="#Sphere">Sphere</a><span class="signature">( center : <span class="param-type">Vector3</span>, radius : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="Sphere" translate="no">new <a href="#Sphere">Sphere</a><span class="signature">( center : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, radius : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new sphere.</p>
@@ -26,12 +26,22 @@ used as a Bounding Sphere for 3D objects.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>center</code></td>
-									<td class="description last"><p>The center of the sphere<br/>Default is <code>(0,0,0)</code>.</p></td>
+									<td class="name">
+										<strong>center</strong>
+									</td>
+									<td class="description last">
+										<p>The center of the sphere</p>
+										<p>Default is <code>(0,0,0)</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>radius</code></td>
-									<td class="description last"><p>The radius of the sphere.<br/>Default is <code>-1</code>.</p></td>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the sphere.</p>
+										<p>Default is <code>-1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -47,7 +57,8 @@ used as a Bounding Sphere for 3D objects.</p></div>
 				<div class="member">
 					<h3 class="name" id="isSphere" translate="no">.<a href="#isSphere">isSphere</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -57,7 +68,7 @@ used as a Bounding Sphere for 3D objects.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type">Matrix4</span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Transforms this sphere with the given 4x4 transformation matrix.</p>
@@ -65,8 +76,12 @@ used as a Bounding Sphere for 3D objects.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>matrix</code></td>
-									<td class="description last"><p>The transformation matrix.</p></td>
+									<td class="name">
+										<strong>matrix</strong>
+									</td>
+									<td class="description last">
+										<p>The transformation matrix.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -74,7 +89,7 @@ used as a Bounding Sphere for 3D objects.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sphere.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="clampPoint" translate="no">.<a href="#clampPoint">clampPoint</a><span class="signature">( point : <span class="param-type">Vector3</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="clampPoint" translate="no">.<a href="#clampPoint">clampPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Clamps a point within the sphere. If the point is outside the sphere, it
@@ -84,12 +99,20 @@ already inside the sphere will not be affected.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The plane to clamp.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The plane to clamp.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -106,7 +129,7 @@ already inside the sphere will not be affected.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this sphere contains the given point inclusive of
@@ -115,8 +138,12 @@ the surface of the sphere.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point to check.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to check.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -124,7 +151,7 @@ the surface of the sphere.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this sphere contains the given point or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( sphere : <span class="param-type">Sphere</span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given sphere to this instance.</p>
@@ -132,8 +159,12 @@ the surface of the sphere.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The sphere to copy.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -141,7 +172,7 @@ the surface of the sphere.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sphere.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="distanceToPoint" translate="no">.<a href="#distanceToPoint">distanceToPoint</a><span class="signature">( point : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="distanceToPoint" translate="no">.<a href="#distanceToPoint">distanceToPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the closest distance from the boundary of the sphere to the
@@ -151,8 +182,12 @@ be negative.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point to compute the distance to.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to compute the distance to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -160,7 +195,7 @@ be negative.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The distance to the point.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( sphere : <span class="param-type">Sphere</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this sphere is equal with the given one.</p>
@@ -168,8 +203,12 @@ be negative.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The sphere to test for equality.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to test for equality.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -177,7 +216,7 @@ be negative.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this bounding sphere is equal with the given one.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="expandByPoint" translate="no">.<a href="#expandByPoint">expandByPoint</a><span class="signature">( point : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<h3 class="name name-method" id="expandByPoint" translate="no">.<a href="#expandByPoint">expandByPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Expands the boundaries of this sphere to include the given point.</p>
@@ -185,8 +224,12 @@ be negative.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point to include.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to include.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -202,8 +245,12 @@ be negative.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The serialized json to set the sphere from.</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The serialized json to set the sphere from.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -211,7 +258,7 @@ be negative.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding sphere.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getBoundingBox" translate="no">.<a href="#getBoundingBox">getBoundingBox</a><span class="signature">( target : <span class="param-type">Box3</span> )</span><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<h3 class="name name-method" id="getBoundingBox" translate="no">.<a href="#getBoundingBox">getBoundingBox</a><span class="signature">( target : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a bounding box that encloses this sphere.</p>
@@ -219,8 +266,12 @@ be negative.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target box that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target box that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -228,7 +279,7 @@ be negative.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The bounding box that encloses this sphere.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type">Box3</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this sphere intersects with the given box.</p>
@@ -236,8 +287,12 @@ be negative.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The box to test.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The box to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -245,7 +300,7 @@ be negative.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this sphere intersects with the given box or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsPlane" translate="no">.<a href="#intersectsPlane">intersectsPlane</a><span class="signature">( plane : <span class="param-type">Plane</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsPlane" translate="no">.<a href="#intersectsPlane">intersectsPlane</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this sphere intersects with the given plane.</p>
@@ -253,8 +308,12 @@ be negative.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>plane</code></td>
-									<td class="description last"><p>The plane to test.</p></td>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -262,7 +321,7 @@ be negative.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this sphere intersects with the given plane or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type">Sphere</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this sphere intersects with the given one.</p>
@@ -270,8 +329,12 @@ be negative.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The sphere to test.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -299,7 +362,7 @@ considered to be empty.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sphere.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( center : <span class="param-type">Vector3</span>, radius : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( center : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, radius : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the sphere's components by copying the given values.</p>
@@ -307,12 +370,20 @@ considered to be empty.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>center</code></td>
-									<td class="description last"><p>The center.</p></td>
+									<td class="name">
+										<strong>center</strong>
+									</td>
+									<td class="description last">
+										<p>The center.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>radius</code></td>
-									<td class="description last"><p>The radius.</p></td>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -320,7 +391,7 @@ considered to be empty.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sphere.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;Vector3></span>, optionalCenter : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector3.html">Vector3</a>></span>, optionalCenter : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the minimum bounding sphere for list of points.
@@ -331,12 +402,20 @@ encompassing the points is calculated.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>points</code></td>
-									<td class="description last"><p>A list of points in 3D space.</p></td>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>A list of points in 3D space.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalCenter</code></td>
-									<td class="description last"><p>The center of the sphere.</p></td>
+									<td class="name">
+										<strong>optionalCenter</strong>
+									</td>
+									<td class="description last">
+										<p>The center of the sphere.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -353,7 +432,7 @@ encompassing the points is calculated.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Serialized structure with fields representing the object state.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( offset : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( offset : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Translates the sphere's center by the given offset.</p>
@@ -361,8 +440,12 @@ encompassing the points is calculated.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>offset</code></td>
-									<td class="description last"><p>The offset.</p></td>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -370,7 +453,7 @@ encompassing the points is calculated.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sphere.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="union" translate="no">.<a href="#union">union</a><span class="signature">( sphere : <span class="param-type">Sphere</span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<h3 class="name name-method" id="union" translate="no">.<a href="#union">union</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Expands this sphere to enclose both the original sphere and the given sphere.</p>
@@ -378,8 +461,12 @@ encompassing the points is calculated.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The sphere to include.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to include.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

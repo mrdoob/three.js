@@ -23,7 +23,7 @@ You can arbitrarily transform the camera in 3D space without any limitations
 				<pre><code class="language-js">import { FlyControls } from 'three/addons/controls/FlyControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="FlyControls" translate="no">new <a href="#FlyControls">FlyControls</a><span class="signature">( object : <span class="param-type">Object3D</span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<h3 class="name name-method" id="FlyControls" translate="no">new <a href="#FlyControls">FlyControls</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new controls instance.</p>
@@ -31,12 +31,21 @@ You can arbitrarily transform the camera in 3D space without any limitations
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The object that is managed by the controls.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object that is managed by the controls.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>domElement</code></td>
-									<td class="description last"><p>The HTML element used for event listeners.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -46,25 +55,29 @@ You can arbitrarily transform the camera in 3D space without any limitations
 				<div class="member">
 					<h3 class="name" id="autoForward" translate="no">.<a href="#autoForward">autoForward</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>If set to <code>true</code>, the camera automatically moves forward (and does not stop) when initially translated.<br/>Default is <code>false</code>.</p>
+						<p>If set to <code>true</code>, the camera automatically moves forward (and does not stop) when initially translated.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="dragToLook" translate="no">.<a href="#dragToLook">dragToLook</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>If set to <code>true</code>, you can only look around by performing a drag interaction.<br/>Default is <code>false</code>.</p>
+						<p>If set to <code>true</code>, you can only look around by performing a drag interaction.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="movementSpeed" translate="no">.<a href="#movementSpeed">movementSpeed</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The movement speed.<br/>Default is <code>1</code>.</p>
+						<p>The movement speed.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="rollSpeed" translate="no">.<a href="#rollSpeed">rollSpeed</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The rotation speed.<br/>Default is <code>0.005</code>.</p>
+						<p>The rotation speed.</p>
+						<p>Default is <code>0.005</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Events</h2>

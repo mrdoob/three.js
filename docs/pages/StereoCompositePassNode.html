@@ -25,7 +25,7 @@ anaglyph or parallax barrier.</p></div>
 				<pre><code class="language-js">import { StereoCompositePassNode } from 'three/addons/tsl/display/StereoCompositePassNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="StereoCompositePassNode" translate="no">new <a href="#StereoCompositePassNode">StereoCompositePassNode</a><span class="signature">( scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="StereoCompositePassNode" translate="no">new <a href="#StereoCompositePassNode">StereoCompositePassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new stereo composite pass node.</p>
@@ -33,12 +33,20 @@ anaglyph or parallax barrier.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene to render.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera to render the scene with.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to render the scene with.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -79,7 +87,8 @@ derived effect passes must provide an instance for rendering.</p>
 				<div class="member">
 					<h3 class="name" id="isStereoCompositePassNode" translate="no">.<a href="#isStereoCompositePassNode">isStereoCompositePassNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -107,12 +116,20 @@ when the pass is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the pass.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the pass.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the pass.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -120,7 +137,7 @@ when the pass is no longer required.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="PassNode.html#setSize">PassNode#setSize</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to render the effect once per frame.</p>
@@ -128,8 +145,12 @@ when the pass is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>The current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -145,8 +166,12 @@ when the pass is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>coordinateSystem</code></td>
-									<td class="description last"><p>The current coordinate system.</p></td>
+									<td class="name">
+										<strong>coordinateSystem</strong>
+									</td>
+									<td class="description last">
+										<p>The current coordinate system.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

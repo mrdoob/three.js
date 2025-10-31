@@ -39,7 +39,7 @@ const texture = loader.loadAsync( 'diffuse.ktx2' );
 				<pre><code class="language-js">import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="KTX2Loader" translate="no">new <a href="#KTX2Loader">KTX2Loader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="KTX2Loader" translate="no">new <a href="#KTX2Loader">KTX2Loader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new KTX2 loader.</p>
@@ -47,15 +47,19 @@ const texture = loader.loadAsync( 'diffuse.ktx2' );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="detectSupport" translate="no">.<a href="#detectSupport">detectSupport</a><span class="signature">( renderer : <span class="param-type">WebGPURenderer | WebGLRenderer</span> )</span><span class="type-signature"> : <a href="KTX2Loader.html">KTX2Loader</a></span> </h3>
+					<h3 class="name name-method" id="detectSupport" translate="no">.<a href="#detectSupport">detectSupport</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span><span class="type-signature"> : <a href="KTX2Loader.html">KTX2Loader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Detects hardware support for available compressed texture formats, to determine
@@ -64,8 +68,12 @@ the output format for the transcoder. Must be called before loading a texture.</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -73,7 +81,7 @@ the output format for the transcoder. Must be called before loading a texture.</
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="detectSupportAsync" translate="no">.<a href="#detectSupportAsync">detectSupportAsync</a><span class="signature">( renderer : <span class="param-type">WebGPURenderer</span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id="detectSupportAsync" translate="no">.<a href="#detectSupportAsync">detectSupportAsync</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Async version of <a href="KTX2Loader.html#detectSupport">KTX2Loader#detectSupport</a>.</p>
@@ -81,8 +89,12 @@ the output format for the transcoder. Must be called before loading a texture.</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -100,7 +112,7 @@ the output format for the transcoder. Must be called before loading a texture.</
 when the loader is no longer required.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded KTX2 texture
@@ -109,20 +121,36 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -130,7 +158,7 @@ to the <code>onLoad()</code> callback.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type">onErrorCallback</span> )</span><span class="type-signature"> : Promise</span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : Promise</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the given KTX2 data.</p>
@@ -138,16 +166,28 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>buffer</code></td>
-									<td class="description last"><p>The raw KTX2 data as an array buffer.</p></td>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw KTX2 data as an array buffer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading/parsing process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading/parsing process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -167,8 +207,12 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>path</code></td>
-									<td class="description last"><p>The transcoder path to set.</p></td>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The transcoder path to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -184,8 +228,12 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>workerLimit</code></td>
-									<td class="description last"><p>The worker limit.</p></td>
+									<td class="name">
+										<strong>workerLimit</strong>
+									</td>
+									<td class="description last">
+										<p>The worker limit.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

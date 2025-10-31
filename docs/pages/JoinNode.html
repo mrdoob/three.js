@@ -20,7 +20,7 @@ For example in can compose/join two single floats into a <code>vec2</code> type.
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="JoinNode" translate="no">new <a href="#JoinNode">JoinNode</a><span class="signature">( nodes : <span class="param-type">Array.&lt;Node></span>, nodeType : <span class="param-type">string</span> )</span> </h3>
+					<h3 class="name name-method" id="JoinNode" translate="no">new <a href="#JoinNode">JoinNode</a><span class="signature">( nodes : <span class="param-type">Array.&lt;<a href="Node.html">Node</a>></span>, nodeType : <span class="param-type">string</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new join node.</p>
@@ -28,12 +28,21 @@ For example in can compose/join two single floats into a <code>vec2</code> type.
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>nodes</code></td>
-									<td class="description last"><p>An array of nodes that should be joined.</p></td>
+									<td class="name">
+										<strong>nodes</strong>
+									</td>
+									<td class="description last">
+										<p>An array of nodes that should be joined.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>nodeType</code></td>
-									<td class="description last"><p>The node type.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>nodeType</strong>
+									</td>
+									<td class="description last">
+										<p>The node type.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -47,7 +56,7 @@ For example in can compose/join two single floats into a <code>vec2</code> type.
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is overwritten since the node type must be inferred from the
@@ -56,8 +65,12 @@ joined data length if not explicitly defined.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

@@ -27,7 +27,7 @@ composer.addPass( ssaaRenderPass );
 				<pre><code class="language-js">import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SSAARenderPass" translate="no">new <a href="#SSAARenderPass">SSAARenderPass</a><span class="signature">( scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span>, clearColor : <span class="param-type">number | Color | string</span>, clearAlpha : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="SSAARenderPass" translate="no">new <a href="#SSAARenderPass">SSAARenderPass</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, clearColor : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, clearAlpha : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new SSAA render pass.</p>
@@ -35,20 +35,38 @@ composer.addPass( ssaaRenderPass );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene to render.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>clearColor</code></td>
-									<td class="description last"><p>The clear color of the render pass.<br/>Default is <code>0x000000</code>.</p></td>
+									<td class="name">
+										<strong>clearColor</strong>
+									</td>
+									<td class="description last">
+										<p>The clear color of the render pass.</p>
+										<p>Default is <code>0x000000</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>clearAlpha</code></td>
-									<td class="description last"><p>The clear alpha of the render pass.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>clearAlpha</strong>
+									</td>
+									<td class="description last">
+										<p>The clear alpha of the render pass.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -64,20 +82,23 @@ composer.addPass( ssaaRenderPass );
 				<div class="member">
 					<h3 class="name" id="clearAlpha" translate="no">.<a href="#clearAlpha">clearAlpha</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The clear alpha of the render pass.<br/>Default is <code>0</code>.</p>
+						<p>The clear alpha of the render pass.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="clearColor" translate="no">.<a href="#clearColor">clearColor</a><span class="type-signature"> : number | <a href="Color.html">Color</a> | string</span> </h3>
 					<div class="description">
-						<p>The clear color of the render pass.<br/>Default is <code>0x000000</code>.</p>
+						<p>The clear color of the render pass.</p>
+						<p>Default is <code>0x000000</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sampleLevel" translate="no">.<a href="#sampleLevel">sampleLevel</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The sample level. Specified as n, where the number of
-samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.<br/>Default is <code>4</code>.</p>
+samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.</p>
+						<p>Default is <code>4</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -90,7 +111,8 @@ samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.<br/>Default is <code>4</
 					<h3 class="name" id="stencilBuffer" translate="no">.<a href="#stencilBuffer">stencilBuffer</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether to use a stencil buffer or not. This property can't
-be changed after the first render.<br/>Default is <code>false</code>.</p>
+be changed after the first render.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -98,7 +120,8 @@ be changed after the first render.<br/>Default is <code>false</code>.</p>
 					<div class="description">
 						<p>Whether the pass should be unbiased or not. This property has the most
 visible effect when rendering to a RGBA8 buffer because it mitigates
-rounding errors. By default RGBA16F is used.<br/>Default is <code>true</code>.</p>
+rounding errors. By default RGBA16F is used.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -112,7 +135,7 @@ method whenever the pass is no longer used in your app.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#dispose">Pass#dispose</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, writeBuffer : <span class="param-type">WebGLRenderTarget</span>, readBuffer : <span class="param-type">WebGLRenderTarget</span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, writeBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, readBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs the SSAA render pass.</p>
@@ -120,26 +143,46 @@ method whenever the pass is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>writeBuffer</code></td>
-									<td class="description last"><p>The write buffer. This buffer is intended as the rendering
-destination for the pass.</p></td>
+									<td class="name">
+										<strong>writeBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>readBuffer</code></td>
-									<td class="description last"><p>The read buffer. The pass can access the result from the
-previous pass from this buffer.</p></td>
+									<td class="name">
+										<strong>readBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>deltaTime</code></td>
-									<td class="description last"><p>The delta time in seconds.</p></td>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maskActive</code></td>
-									<td class="description last"><p>Whether masking is active or not.</p></td>
+									<td class="name">
+										<strong>maskActive</strong>
+									</td>
+									<td class="description last">
+										<p>Whether masking is active or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -155,12 +198,20 @@ previous pass from this buffer.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width to set.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height to set.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

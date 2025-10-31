@@ -20,7 +20,7 @@
 				<div class="container-overview">
 				</div>
 				<h2 class="subsection-title">Static Methods</h2>
-					<h3 class="name name-method" id=".decompress" translate="no">.<a href="#.decompress">decompress</a><span class="signature">( texture : <span class="param-type">CompressedTexture</span>, maxTextureSize : <span class="param-type">number</span>, renderer : <span class="param-type">WebGLRenderer</span> )</span><span class="type-signature"> : <a href="CanvasTexture.html">CanvasTexture</a></span> </h3>
+					<h3 class="name name-method" id=".decompress" translate="no">.<a href="#.decompress">decompress</a><span class="signature">( texture : <span class="param-type"><a href="CompressedTexture.html">CompressedTexture</a></span>, maxTextureSize : <span class="param-type">number</span>, renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span><span class="type-signature"> : <a href="CanvasTexture.html">CanvasTexture</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns an uncompressed version of the given compressed texture.</p>
@@ -30,16 +30,30 @@ import the function from <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The compressed texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The compressed texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maxTextureSize</code></td>
-									<td class="description last"><p>The maximum size of the uncompressed texture.<br/>Default is <code>Infinity</code>.</p></td>
+									<td class="name">
+										<strong>maxTextureSize</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum size of the uncompressed texture.</p>
+										<p>Default is <code>Infinity</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>A reference to a renderer.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to a renderer.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

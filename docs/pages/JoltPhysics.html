@@ -29,7 +29,7 @@ to use the component with an active Internet connection.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="addMesh" translate="no">.<a href="#addMesh">addMesh</a><span class="signature">( mesh : <span class="param-type">Mesh</span>, mass : <span class="param-type">number</span>, restitution : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="addMesh" translate="no">.<a href="#addMesh">addMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, mass : <span class="param-type">number</span>, restitution : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the given mesh to this physics simulation.</p>
@@ -37,21 +37,35 @@ to use the component with an active Internet connection.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mesh</code></td>
-									<td class="description last"><p>The mesh to add.</p></td>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to add.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>mass</code></td>
-									<td class="description last"><p>The mass in kg of the mesh.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>mass</strong>
+									</td>
+									<td class="description last">
+										<p>The mass in kg of the mesh.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>restitution</code></td>
-									<td class="description last"><p>The restitution/friction of the mesh.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>restitution</strong>
+									</td>
+									<td class="description last">
+										<p>The restitution/friction of the mesh.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="addScene" translate="no">.<a href="#addScene">addScene</a><span class="signature">( scene : <span class="param-type">Object3D</span> )</span> </h3>
+					<h3 class="name name-method" id="addScene" translate="no">.<a href="#addScene">addScene</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the given scene to this physics simulation. Only meshes with a
@@ -63,13 +77,17 @@ The object can be used to store the mass and restitution of the mesh. E.g.:</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene or any type of 3D object to add.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or any type of 3D object to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setMeshPosition" translate="no">.<a href="#setMeshPosition">setMeshPosition</a><span class="signature">( mesh : <span class="param-type">Mesh</span>, position : <span class="param-type">Vector3</span>, index : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="setMeshPosition" translate="no">.<a href="#setMeshPosition">setMeshPosition</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, position : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, index : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Set the position of the given mesh which is part of the physics simulation. Calling this
@@ -78,16 +96,29 @@ method will reset the current simulated velocity of the mesh.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mesh</code></td>
-									<td class="description last"><p>The mesh to update the position for.</p></td>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to update the position for.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>position</code></td>
-									<td class="description last"><p>The new position.</p></td>
+									<td class="name">
+										<strong>position</strong>
+									</td>
+									<td class="description last">
+										<p>The new position.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>If the mesh is instanced, the index represents the instanced ID.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>If the mesh is instanced, the index represents the instanced ID.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

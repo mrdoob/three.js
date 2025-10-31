@@ -21,7 +21,7 @@
 				<pre><code class="language-js">import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ParallaxBarrierPassNode" translate="no">new <a href="#ParallaxBarrierPassNode">ParallaxBarrierPassNode</a><span class="signature">( scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="ParallaxBarrierPassNode" translate="no">new <a href="#ParallaxBarrierPassNode">ParallaxBarrierPassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new parallax barrier pass node.</p>
@@ -29,12 +29,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene to render.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera to render the scene with.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to render the scene with.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -44,11 +52,12 @@
 				<div class="member">
 					<h3 class="name" id="isParallaxBarrierPassNode" translate="no">.<a href="#isParallaxBarrierPassNode">isParallaxBarrierPassNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>
@@ -56,16 +65,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="StereoCompositePassNode.html#setup">StereoCompositePassNode#setup</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

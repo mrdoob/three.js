@@ -37,7 +37,7 @@ function animate() {
 				<pre><code class="language-js">import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="EffectComposer" translate="no">new <a href="#EffectComposer">EffectComposer</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, renderTarget : <span class="param-type">WebGLRenderTarget</span> )</span> </h3>
+					<h3 class="name name-method" id="EffectComposer" translate="no">new <a href="#EffectComposer">EffectComposer</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new effect composer.</p>
@@ -45,14 +45,22 @@ function animate() {
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderTarget</code></td>
-									<td class="description last"><p>This render target and a clone will
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>This render target and a clone will
 be used as the internal read and write buffers. If not given, the composer creates
-the buffers automatically.</p></td>
+the buffers automatically.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -75,7 +83,8 @@ the previous render result from this buffer.</p>
 				<div class="member">
 					<h3 class="name" id="renderToScreen" translate="no">.<a href="#renderToScreen">renderToScreen</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the final pass is rendered to the screen (default framebuffer) or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether the final pass is rendered to the screen (default framebuffer) or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -92,7 +101,7 @@ their result into this buffer.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="addPass" translate="no">.<a href="#addPass">addPass</a><span class="signature">( pass : <span class="param-type">Pass</span> )</span> </h3>
+					<h3 class="name name-method" id="addPass" translate="no">.<a href="#addPass">addPass</a><span class="signature">( pass : <span class="param-type"><a href="Pass.html">Pass</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the given pass to the pass chain.</p>
@@ -100,8 +109,12 @@ their result into this buffer.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pass</code></td>
-									<td class="description last"><p>The pass to add.</p></td>
+									<td class="name">
+										<strong>pass</strong>
+									</td>
+									<td class="description last">
+										<p>The pass to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -113,7 +126,7 @@ their result into this buffer.</p>
 method whenever the composer is no longer used in your app.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="insertPass" translate="no">.<a href="#insertPass">insertPass</a><span class="signature">( pass : <span class="param-type">Pass</span>, index : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="insertPass" translate="no">.<a href="#insertPass">insertPass</a><span class="signature">( pass : <span class="param-type"><a href="Pass.html">Pass</a></span>, index : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Inserts the given pass at a given index.</p>
@@ -121,12 +134,20 @@ method whenever the composer is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pass</code></td>
-									<td class="description last"><p>The pass to insert.</p></td>
+									<td class="name">
+										<strong>pass</strong>
+									</td>
+									<td class="description last">
+										<p>The pass to insert.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the pass chain.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the pass chain.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -139,8 +160,12 @@ method whenever the composer is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>passIndex</code></td>
-									<td class="description last"><p>The pass index.</p></td>
+									<td class="name">
+										<strong>passIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The pass index.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -148,7 +173,7 @@ method whenever the composer is no longer used in your app.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the pass for the given index is the last pass in the pass chain.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="removePass" translate="no">.<a href="#removePass">removePass</a><span class="signature">( pass : <span class="param-type">Pass</span> )</span> </h3>
+					<h3 class="name name-method" id="removePass" translate="no">.<a href="#removePass">removePass</a><span class="signature">( pass : <span class="param-type"><a href="Pass.html">Pass</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Removes the given pass from the pass chain.</p>
@@ -156,8 +181,12 @@ method whenever the composer is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pass</code></td>
-									<td class="description last"><p>The pass to remove.</p></td>
+									<td class="name">
+										<strong>pass</strong>
+									</td>
+									<td class="description last">
+										<p>The pass to remove.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -170,14 +199,18 @@ method whenever the composer is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>deltaTime</code></td>
-									<td class="description last"><p>The delta time in seconds. If not given, the composer computes
-its own time delta value.</p></td>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds. If not given, the composer computes
+its own time delta value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">( renderTarget : <span class="param-type">WebGLRenderTarget</span> )</span> </h3>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">( renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Resets the internal state of the EffectComposer.</p>
@@ -185,9 +218,13 @@ its own time delta value.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderTarget</code></td>
-									<td class="description last"><p>This render target has the same purpose like
-the one from the constructor. If set, it is used to setup the read and write buffers.</p></td>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>This render target has the same purpose like
+the one from the constructor. If set, it is used to setup the read and write buffers.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -201,8 +238,12 @@ Setting the pixel ratio will automatically resize the composer.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pixelRatio</code></td>
-									<td class="description last"><p>The pixel ratio to set.</p></td>
+									<td class="name">
+										<strong>pixelRatio</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel ratio to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -216,12 +257,20 @@ this method honors the current pixel ration.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width in logical pixels.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width in logical pixels.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height in logical pixels.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height in logical pixels.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

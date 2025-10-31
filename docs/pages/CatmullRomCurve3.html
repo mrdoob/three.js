@@ -33,7 +33,7 @@ const curveObject = new THREE.Line( geometry, material );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CatmullRomCurve3" translate="no">new <a href="#CatmullRomCurve3">CatmullRomCurve3</a><span class="signature">( points : <span class="param-type">Array.&lt;Vector3></span>, closed : <span class="param-type">boolean</span>, curveType : <span class="param-type">'centripetal' | 'chordal' | 'catmullrom'</span>, tension : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="CatmullRomCurve3" translate="no">new <a href="#CatmullRomCurve3">CatmullRomCurve3</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector3.html">Vector3</a>></span>, closed : <span class="param-type">boolean</span>, curveType : <span class="param-type">'centripetal' | 'chordal' | 'catmullrom'</span>, tension : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new Catmull-Rom curve.</p>
@@ -41,20 +41,39 @@ const curveObject = new THREE.Line( geometry, material );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>points</code></td>
-									<td class="description last"><p>An array of 3D points defining the curve.</p></td>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 3D points defining the curve.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>closed</code></td>
-									<td class="description last"><p>Whether the curve is closed or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>closed</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the curve is closed or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>curveType</code></td>
-									<td class="description last"><p>The curve type.<br/>Default is <code>'centripetal'</code>.</p></td>
+									<td class="name">
+										<strong>curveType</strong>
+									</td>
+									<td class="description last">
+										<p>The curve type.</p>
+										<p>Default is <code>'centripetal'</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>tension</code></td>
-									<td class="description last"><p>Tension of the curve.<br/>Default is <code>0.5</code>.</p></td>
+									<td class="name">
+										<strong>tension</strong>
+									</td>
+									<td class="description last">
+										<p>Tension of the curve.</p>
+										<p>Default is <code>0.5</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -64,19 +83,22 @@ const curveObject = new THREE.Line( geometry, material );
 				<div class="member">
 					<h3 class="name" id="closed" translate="no">.<a href="#closed">closed</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the curve is closed or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether the curve is closed or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="curveType" translate="no">.<a href="#curveType">curveType</a><span class="type-signature"> : 'centripetal' | 'chordal' | 'catmullrom'</span> </h3>
 					<div class="description">
-						<p>The curve type.<br/>Default is <code>'centripetal'</code>.</p>
+						<p>The curve type.</p>
+						<p>Default is <code>'centripetal'</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isCatmullRomCurve3" translate="no">.<a href="#isCatmullRomCurve3">isCatmullRomCurve3</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -88,11 +110,12 @@ const curveObject = new THREE.Line( geometry, material );
 				<div class="member">
 					<h3 class="name" id="tension" translate="no">.<a href="#tension">tension</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Tension of the curve.<br/>Default is <code>0.5</code>.</p>
+						<p>Tension of the curve.</p>
+						<p>Default is <code>0.5</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a point on the curve.</p>
@@ -100,12 +123,20 @@ const curveObject = new THREE.Line( geometry, material );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalTarget</code></td>
-									<td class="description last"><p>The optional target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

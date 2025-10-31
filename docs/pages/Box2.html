@@ -17,7 +17,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Box2" translate="no">new <a href="#Box2">Box2</a><span class="signature">( min : <span class="param-type">Vector2</span>, max : <span class="param-type">Vector2</span> )</span> </h3>
+					<h3 class="name name-method" id="Box2" translate="no">new <a href="#Box2">Box2</a><span class="signature">( min : <span class="param-type"><a href="Vector2.html">Vector2</a></span>, max : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new bounding box.</p>
@@ -25,12 +25,22 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>min</code></td>
-									<td class="description last"><p>A vector representing the lower boundary of the box.<br/>Default is <code>(Infinity,Infinity)</code>.</p></td>
+									<td class="name">
+										<strong>min</strong>
+									</td>
+									<td class="description last">
+										<p>A vector representing the lower boundary of the box.</p>
+										<p>Default is <code>(Infinity,Infinity)</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>max</code></td>
-									<td class="description last"><p>A vector representing the upper boundary of the box.<br/>Default is <code>(-Infinity,-Infinity)</code>.</p></td>
+									<td class="name">
+										<strong>max</strong>
+									</td>
+									<td class="description last">
+										<p>A vector representing the upper boundary of the box.</p>
+										<p>Default is <code>(-Infinity,-Infinity)</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -40,7 +50,8 @@
 				<div class="member">
 					<h3 class="name" id="isBox2" translate="no">.<a href="#isBox2">isBox2</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -56,7 +67,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="clampPoint" translate="no">.<a href="#clampPoint">clampPoint</a><span class="signature">( point : <span class="param-type">Vector2</span>, target : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<h3 class="name name-method" id="clampPoint" translate="no">.<a href="#clampPoint">clampPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector2.html">Vector2</a></span>, target : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Clamps the given point within the bounds of this box.</p>
@@ -64,12 +75,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point to clamp.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to clamp.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -86,7 +105,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="containsBox" translate="no">.<a href="#containsBox">containsBox</a><span class="signature">( box : <span class="param-type">Box2</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="containsBox" translate="no">.<a href="#containsBox">containsBox</a><span class="signature">( box : <span class="param-type"><a href="Box2.html">Box2</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this bounding box includes the entirety of the given bounding box.
@@ -95,8 +114,12 @@ If this box and the given one are identical, this function also returns <code>tr
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The bounding box to test.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding box to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -104,7 +127,7 @@ If this box and the given one are identical, this function also returns <code>tr
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the bounding box contains the given bounding box or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="containsPoint" translate="no">.<a href="#containsPoint">containsPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given point lies within or on the boundaries of this box.</p>
@@ -112,8 +135,12 @@ If this box and the given one are identical, this function also returns <code>tr
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point to test.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -121,7 +148,7 @@ If this box and the given one are identical, this function also returns <code>tr
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the bounding box contains the given point or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( box : <span class="param-type">Box2</span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( box : <span class="param-type"><a href="Box2.html">Box2</a></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given box to this instance.</p>
@@ -129,8 +156,12 @@ If this box and the given one are identical, this function also returns <code>tr
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The box to copy.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The box to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -138,7 +169,7 @@ If this box and the given one are identical, this function also returns <code>tr
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="distanceToPoint" translate="no">.<a href="#distanceToPoint">distanceToPoint</a><span class="signature">( point : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="distanceToPoint" translate="no">.<a href="#distanceToPoint">distanceToPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the euclidean distance from any edge of this box to the specified point. If
@@ -147,8 +178,12 @@ the given point lies inside of this box, the distance will be <code>0</code>.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point to compute the distance to.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point to compute the distance to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -156,7 +191,7 @@ the given point lies inside of this box, the distance will be <code>0</code>.</p
 							<dt class="tag-returns"><strong>Returns:</strong> The euclidean distance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( box : <span class="param-type">Box2</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( box : <span class="param-type"><a href="Box2.html">Box2</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this bounding box is equal with the given one.</p>
@@ -164,8 +199,12 @@ the given point lies inside of this box, the distance will be <code>0</code>.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The box to test for equality.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The box to test for equality.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -173,7 +212,7 @@ the given point lies inside of this box, the distance will be <code>0</code>.</p
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this bounding box is equal with the given one.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="expandByPoint" translate="no">.<a href="#expandByPoint">expandByPoint</a><span class="signature">( point : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="expandByPoint" translate="no">.<a href="#expandByPoint">expandByPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Expands the boundaries of this box to include the given point.</p>
@@ -181,8 +220,12 @@ the given point lies inside of this box, the distance will be <code>0</code>.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>The point that should be included by the bounding box.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>The point that should be included by the bounding box.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -199,8 +242,12 @@ dimensions of the box will be contracted.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scalar</code></td>
-									<td class="description last"><p>The scalar value that should expand the bounding box.</p></td>
+									<td class="name">
+										<strong>scalar</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar value that should expand the bounding box.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -208,7 +255,7 @@ dimensions of the box will be contracted.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="expandByVector" translate="no">.<a href="#expandByVector">expandByVector</a><span class="signature">( vector : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="expandByVector" translate="no">.<a href="#expandByVector">expandByVector</a><span class="signature">( vector : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Expands this box equilaterally by the given vector. The width of this
@@ -219,8 +266,12 @@ the vector in both directions.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>vector</code></td>
-									<td class="description last"><p>The vector that should expand the bounding box.</p></td>
+									<td class="name">
+										<strong>vector</strong>
+									</td>
+									<td class="description last">
+										<p>The vector that should expand the bounding box.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -228,7 +279,7 @@ the vector in both directions.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getCenter" translate="no">.<a href="#getCenter">getCenter</a><span class="signature">( target : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<h3 class="name name-method" id="getCenter" translate="no">.<a href="#getCenter">getCenter</a><span class="signature">( target : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the center point of this box.</p>
@@ -236,8 +287,12 @@ the vector in both directions.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -245,7 +300,7 @@ the vector in both directions.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The center point.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getParameter" translate="no">.<a href="#getParameter">getParameter</a><span class="signature">( point : <span class="param-type">Vector2</span>, target : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<h3 class="name name-method" id="getParameter" translate="no">.<a href="#getParameter">getParameter</a><span class="signature">( point : <span class="param-type"><a href="Vector2.html">Vector2</a></span>, target : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a point as a proportion of this box's width and height.</p>
@@ -253,12 +308,20 @@ the vector in both directions.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>A point in 2D space.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>A point in 2D space.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -266,7 +329,7 @@ the vector in both directions.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A point as a proportion of this box's width and height.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getSize" translate="no">.<a href="#getSize">getSize</a><span class="signature">( target : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<h3 class="name name-method" id="getSize" translate="no">.<a href="#getSize">getSize</a><span class="signature">( target : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the dimensions of this box.</p>
@@ -274,8 +337,12 @@ the vector in both directions.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -283,7 +350,7 @@ the vector in both directions.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The size.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersect" translate="no">.<a href="#intersect">intersect</a><span class="signature">( box : <span class="param-type">Box2</span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="intersect" translate="no">.<a href="#intersect">intersect</a><span class="signature">( box : <span class="param-type"><a href="Box2.html">Box2</a></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the intersection of this bounding box and the given one, setting the upper
@@ -294,8 +361,12 @@ there's no overlap, makes this box empty.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The bounding box to intersect with.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding box to intersect with.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -303,7 +374,7 @@ there's no overlap, makes this box empty.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type">Box2</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box2.html">Box2</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given bounding box intersects with this bounding box.</p>
@@ -311,8 +382,12 @@ there's no overlap, makes this box empty.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The bounding box to test.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding box to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -340,7 +415,7 @@ point, the one both bounds share.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( min : <span class="param-type">Vector2</span>, max : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( min : <span class="param-type"><a href="Vector2.html">Vector2</a></span>, max : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the lower and upper boundaries of this box.
@@ -349,12 +424,20 @@ Please note that this method only copies the values from the given objects.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>min</code></td>
-									<td class="description last"><p>The lower boundary of the box.</p></td>
+									<td class="name">
+										<strong>min</strong>
+									</td>
+									<td class="description last">
+										<p>The lower boundary of the box.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>max</code></td>
-									<td class="description last"><p>The upper boundary of the box.</p></td>
+									<td class="name">
+										<strong>max</strong>
+									</td>
+									<td class="description last">
+										<p>The upper boundary of the box.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -362,7 +445,7 @@ Please note that this method only copies the values from the given objects.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setFromCenterAndSize" translate="no">.<a href="#setFromCenterAndSize">setFromCenterAndSize</a><span class="signature">( center : <span class="param-type">Vector2</span>, size : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="setFromCenterAndSize" translate="no">.<a href="#setFromCenterAndSize">setFromCenterAndSize</a><span class="signature">( center : <span class="param-type"><a href="Vector2.html">Vector2</a></span>, size : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Centers this box on the given center vector and sets this box's width, height and
@@ -371,12 +454,20 @@ depth to the given size values.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>center</code></td>
-									<td class="description last"><p>The center of the box.</p></td>
+									<td class="name">
+										<strong>center</strong>
+									</td>
+									<td class="description last">
+										<p>The center of the box.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>size</code></td>
-									<td class="description last"><p>The x and y dimensions of the box.</p></td>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The x and y dimensions of the box.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -384,7 +475,7 @@ depth to the given size values.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;Vector2></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the upper and lower bounds of this box so it encloses the position data
@@ -393,8 +484,12 @@ in the given array.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>points</code></td>
-									<td class="description last"><p>An array holding 2D position data as instances of <a href="Vector2.html">Vector2</a>.</p></td>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding 2D position data as instances of <a href="Vector2.html">Vector2</a>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -402,7 +497,7 @@ in the given array.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( offset : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( offset : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the given offset to both the upper and lower bounds of this bounding box,
@@ -411,8 +506,12 @@ effectively moving it in 2D space.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>offset</code></td>
-									<td class="description last"><p>The offset that should be used to translate the bounding box.</p></td>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset that should be used to translate the bounding box.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -420,7 +519,7 @@ effectively moving it in 2D space.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this bounding box.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="union" translate="no">.<a href="#union">union</a><span class="signature">( box : <span class="param-type">Box2</span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
+					<h3 class="name name-method" id="union" translate="no">.<a href="#union">union</a><span class="signature">( box : <span class="param-type"><a href="Box2.html">Box2</a></span> )</span><span class="type-signature"> : <a href="Box2.html">Box2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the union of this box and another and the given one, setting the upper
@@ -430,8 +529,12 @@ lower bound of this box to the lesser of the two boxes' lower bounds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The bounding box that will be unioned with this instance.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding box that will be unioned with this instance.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

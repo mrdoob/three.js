@@ -25,7 +25,7 @@ scene graph. All other types of renderable 3D objects (like meshes or point clou
 				<pre><code class="language-js">import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CSS2DRenderer" translate="no">new <a href="#CSS2DRenderer">CSS2DRenderer</a><span class="signature">( parameters : <span class="param-type">CSS2DRenderer~Parameters</span> )</span> </h3>
+					<h3 class="name name-method" id="CSS2DRenderer" translate="no">new <a href="#CSS2DRenderer">CSS2DRenderer</a><span class="signature">( parameters : <span class="param-type"><a href="CSS2DRenderer.html#~Parameters">CSS2DRenderer~Parameters</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new CSS2D renderer.</p>
@@ -33,8 +33,12 @@ scene graph. All other types of renderable 3D objects (like meshes or point clou
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>The parameters.</p></td>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The parameters.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -52,7 +56,8 @@ scene graph. All other types of renderable 3D objects (like meshes or point clou
 					<div class="description">
 						<p>Controls whether the renderer assigns <code>z-index</code> values to CSS2DObject DOM elements.
 If set to <code>true</code>, z-index values are assigned first based on the <code>renderOrder</code>
-and secondly - the distance to the camera. If set to <code>false</code>, no z-index values are assigned.<br/>Default is <code>true</code>.</p>
+and secondly - the distance to the camera. If set to <code>false</code>, no z-index values are assigned.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -65,7 +70,7 @@ and secondly - the distance to the camera. If set to <code>false</code>, no z-in
 							<dt class="tag-returns"><strong>Returns:</strong> The size of the renderer.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type">Object3D</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Renders the given scene using the given camera.</p>
@@ -73,12 +78,20 @@ and secondly - the distance to the camera. If set to <code>false</code>, no z-in
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>A scene or any other type of 3D object.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A scene or any other type of 3D object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -91,12 +104,20 @@ and secondly - the distance to the camera. If set to <code>false</code>, no z-in
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the renderer.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the renderer.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -107,27 +128,18 @@ and secondly - the distance to the camera. If set to <code>false</code>, no z-in
 					<div class="description">
 						<p>Constructor parameters of <code>CSS2DRenderer</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>element</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>element</strong>
+						<br>
 <span class="param-type">HTMLElement</span>
-			</td>
-				<td class="attributes">
-					&lt;optional><br>
 				</td>
-			<td class="description last"><p>A DOM element where the renderer appends its child-elements.
-If not passed in here, a new div element will be created.</p></td>
+			<td class="description last">
+				<p>A DOM element where the renderer appends its child-elements.
+If not passed in here, a new div element will be created.</p>
+			</td>
 		</tr>
 	</tbody>
 </table>

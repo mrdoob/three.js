@@ -26,8 +26,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>The configuration parameter.</p></td>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -37,7 +41,8 @@
 				<div class="member">
 					<h3 class="name" id="isMeshBasicNodeMaterial" translate="no">.<a href="#isMeshBasicNodeMaterial">isMeshBasicNodeMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -45,14 +50,15 @@
 					<div class="description">
 						<p>Although the basic material is by definition unlit, we set
 this property to <code>true</code> since we use a lighting model to compute
-the outgoing light of the fragment shader.<br/>Default is <code>true</code>.</p>
+the outgoing light of the fragment shader.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#lights">NodeMaterial#lights</a></dt>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setupEnvironment" translate="no">.<a href="#setupEnvironment">setupEnvironment</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="BasicEnvironmentNode.html">BasicEnvironmentNode</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="setupEnvironment" translate="no">.<a href="#setupEnvironment">setupEnvironment</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="BasicEnvironmentNode.html">BasicEnvironmentNode</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Overwritten since this type of material uses <a href="BasicEnvironmentNode.html">BasicEnvironmentNode</a>
@@ -61,8 +67,12 @@ to implement the default environment mapping.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -73,7 +83,7 @@ to implement the default environment mapping.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The environment node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setupLightMap" translate="no">.<a href="#setupLightMap">setupLightMap</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="BasicLightMapNode.html">BasicLightMapNode</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="setupLightMap" translate="no">.<a href="#setupLightMap">setupLightMap</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="BasicLightMapNode.html">BasicLightMapNode</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method must be overwritten since light maps are evaluated
@@ -82,8 +92,12 @@ with a special scaling factor for basic materials.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

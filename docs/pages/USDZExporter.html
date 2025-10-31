@@ -35,11 +35,12 @@ const arraybuffer = await exporter.parseAsync( scene );
 				<div class="member">
 					<h3 class="name" id="textureUtils" translate="no">.<a href="#textureUtils">textureUtils</a><span class="type-signature"> : <a href="WebGLTextureUtils.html">WebGLTextureUtils</a> | <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a></span> </h3>
 					<div class="description">
-						<p>A reference to a texture utils module.<br/>Default is <code>null</code>.</p>
+						<p>A reference to a texture utils module.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( scene : <span class="param-type">Object3D</span>, onDone : <span class="param-type">USDZExporter~OnDone</span>, onError : <span class="param-type">USDZExporter~OnError</span>, options : <span class="param-type">USDZExporter~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, onDone : <span class="param-type"><a href="USDZExporter.html#~OnDone">USDZExporter~OnDone</a></span>, onError : <span class="param-type"><a href="USDZExporter.html#~OnError">USDZExporter~OnError</a></span>, options : <span class="param-type"><a href="USDZExporter.html#~Options">USDZExporter~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parse the given 3D object and generates the USDZ output.</p>
@@ -47,25 +48,41 @@ const arraybuffer = await exporter.parseAsync( scene );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The 3D object to export.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to export.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onDone</code></td>
-									<td class="description last"><p>A callback function that is executed when the export has finished.</p></td>
+									<td class="name">
+										<strong>onDone</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that is executed when the export has finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>A callback function that is executed when an error happens.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that is executed when an error happens.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The export options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The export options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="parseAsync" translate="no">.<a href="#parseAsync">parseAsync</a><span class="signature">( scene : <span class="param-type">Object3D</span>, options : <span class="param-type">USDZExporter~Options</span> )</span><span class="type-signature"> : Promise.&lt;ArrayBuffer></span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id="parseAsync" translate="no">.<a href="#parseAsync">parseAsync</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, options : <span class="param-type"><a href="USDZExporter.html#~Options">USDZExporter~Options</a></span> )</span><span class="type-signature"> : Promise.&lt;ArrayBuffer></span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Async version of <a href="USDZExporter.html#parse">USDZExporter#parse</a>.</p>
@@ -73,12 +90,20 @@ const arraybuffer = await exporter.parseAsync( scene );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The 3D object to export.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to export.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The export options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The export options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -86,7 +111,7 @@ const arraybuffer = await exporter.parseAsync( scene );
 							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolved with the exported USDZ data.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setTextureUtils" translate="no">.<a href="#setTextureUtils">setTextureUtils</a><span class="signature">( utils : <span class="param-type">WebGLTextureUtils | WebGPUTextureUtils</span> )</span> </h3>
+					<h3 class="name name-method" id="setTextureUtils" translate="no">.<a href="#setTextureUtils">setTextureUtils</a><span class="signature">( utils : <span class="param-type"><a href="WebGLTextureUtils.html">WebGLTextureUtils</a> | <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.</p>
@@ -96,8 +121,12 @@ corresponding texture utils <a href="WebGLTextureUtils.html">WebGLTextureUtils</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>utils</code></td>
-									<td class="description last"><p>The texture utils.</p></td>
+									<td class="name">
+										<strong>utils</strong>
+									</td>
+									<td class="description last">
+										<p>The texture utils.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -111,8 +140,12 @@ corresponding texture utils <a href="WebGLTextureUtils.html">WebGLTextureUtils</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>result</code></td>
-									<td class="description last"><p>The generated USDZ.</p></td>
+									<td class="name">
+										<strong>result</strong>
+									</td>
+									<td class="description last">
+										<p>The generated USDZ.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -125,8 +158,12 @@ corresponding texture utils <a href="WebGLTextureUtils.html">WebGLTextureUtils</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>error</code></td>
-									<td class="description last"><p>The error object.</p></td>
+									<td class="name">
+										<strong>error</strong>
+									</td>
+									<td class="description last">
+										<p>The error object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -136,83 +173,63 @@ corresponding texture utils <a href="WebGLTextureUtils.html">WebGLTextureUtils</
 					<div class="description">
 						<p>Export options of <code>USDZExporter</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>maxTextureSize</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>maxTextureSize</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The maximum texture size that is going to be exported.</p>
+						<p>Default is <code>1024</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1024
-				</td>
-			<td class="description last"><p>The maximum texture size that is going to be exported.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>includeAnchoringProperties</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>includeAnchoringProperties</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to include anchoring properties or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether to include anchoring properties or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>onlyVisible</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>onlyVisible</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Export only visible 3D objects.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Export only visible 3D objects.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>ar</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>ar</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>If <code>includeAnchoringProperties</code> is set to <code>true</code>, the anchoring type and alignment
+can be configured via <code>ar.anchoring.type</code> and <code>ar.planeAnchoring.alignment</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>If <code>includeAnchoringProperties</code> is set to <code>true</code>, the anchoring type and alignment
-can be configured via <code>ar.anchoring.type</code> and <code>ar.planeAnchoring.alignment</code>.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>quickLookCompatible</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>quickLookCompatible</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to make the exported USDZ compatible to QuickLook
+which means the asset is modified to accommodate the bugs FB10036297 and FB11442287 (Apple Feedback).</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to make the exported USDZ compatible to QuickLook
-which means the asset is modified to accommodate the bugs FB10036297 and FB11442287 (Apple Feedback).</p></td>
 		</tr>
 	</tbody>
 </table>

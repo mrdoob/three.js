@@ -29,7 +29,7 @@ const result = octree.capsuleIntersect( playerCollider ); // collision detection
 				<pre><code class="language-js">import { Octree } from 'three/addons/math/Octree.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Octree" translate="no">new <a href="#Octree">Octree</a><span class="signature">( box : <span class="param-type">Box3</span> )</span> </h3>
+					<h3 class="name name-method" id="Octree" translate="no">new <a href="#Octree">Octree</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new Octree.</p>
@@ -37,8 +37,12 @@ const result = octree.capsuleIntersect( playerCollider ); // collision detection
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The base box with enclose the entire Octree.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The base box with enclose the entire Octree.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -68,17 +72,19 @@ margin is applied.</p>
 					<h3 class="name" id="maxLevel" translate="no">.<a href="#maxLevel">maxLevel</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The maximum level of the Octree. It defines the maximum
-hierarchical depth of the data structure.<br/>Default is <code>16</code>.</p>
+hierarchical depth of the data structure.</p>
+						<p>Default is <code>16</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="trianglesPerLeaf" translate="no">.<a href="#trianglesPerLeaf">trianglesPerLeaf</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The number of triangles a leaf can store before it is split.<br/>Default is <code>8</code>.</p>
+						<p>The number of triangles a leaf can store before it is split.</p>
+						<p>Default is <code>8</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="addTriangle" translate="no">.<a href="#addTriangle">addTriangle</a><span class="signature">( triangle : <span class="param-type">Triangle</span> )</span><span class="type-signature"> : <a href="Octree.html">Octree</a></span> </h3>
+					<h3 class="name name-method" id="addTriangle" translate="no">.<a href="#addTriangle">addTriangle</a><span class="signature">( triangle : <span class="param-type"><a href="Triangle.html">Triangle</a></span> )</span><span class="type-signature"> : <a href="Octree.html">Octree</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the given triangle to the Octree. The triangle vertices are clamped if they exceed
@@ -87,8 +93,12 @@ the bounds of the Octree.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>triangle</code></td>
-									<td class="description last"><p>The triangle to add.</p></td>
+									<td class="name">
+										<strong>triangle</strong>
+									</td>
+									<td class="description last">
+										<p>The triangle to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -114,7 +124,7 @@ the bounds of the Octree.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Octree.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="capsuleIntersect" translate="no">.<a href="#capsuleIntersect">capsuleIntersect</a><span class="signature">( capsule : <span class="param-type">Capsule</span> )</span><span class="type-signature"> : Object | boolean</span> </h3>
+					<h3 class="name name-method" id="capsuleIntersect" translate="no">.<a href="#capsuleIntersect">capsuleIntersect</a><span class="signature">( capsule : <span class="param-type"><a href="Capsule.html">Capsule</a></span> )</span><span class="type-signature"> : Object | boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs a capsule intersection test with this Octree.</p>
@@ -122,8 +132,12 @@ the bounds of the Octree.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>capsule</code></td>
-									<td class="description last"><p>The capsule to test.</p></td>
+									<td class="name">
+										<strong>capsule</strong>
+									</td>
+									<td class="description last">
+										<p>The capsule to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -141,7 +155,7 @@ is detected, the method returns <code>false</code>.</dt>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Octree.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="fromGraphNode" translate="no">.<a href="#fromGraphNode">fromGraphNode</a><span class="signature">( group : <span class="param-type">Object3D</span> )</span><span class="type-signature"> : <a href="Octree.html">Octree</a></span> </h3>
+					<h3 class="name name-method" id="fromGraphNode" translate="no">.<a href="#fromGraphNode">fromGraphNode</a><span class="signature">( group : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Octree.html">Octree</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs the Octree from the given 3D object.</p>
@@ -149,8 +163,12 @@ is detected, the method returns <code>false</code>.</dt>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>group</code></td>
-									<td class="description last"><p>The scene graph node.</p></td>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The scene graph node.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -158,7 +176,7 @@ is detected, the method returns <code>false</code>.</dt>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Octree.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getCapsuleTriangles" translate="no">.<a href="#getCapsuleTriangles">getCapsuleTriangles</a><span class="signature">( capsule : <span class="param-type">Capsule</span>, triangles : <span class="param-type">Array.&lt;Triangle></span> )</span> </h3>
+					<h3 class="name name-method" id="getCapsuleTriangles" translate="no">.<a href="#getCapsuleTriangles">getCapsuleTriangles</a><span class="signature">( capsule : <span class="param-type"><a href="Capsule.html">Capsule</a></span>, triangles : <span class="param-type">Array.&lt;<a href="Triangle.html">Triangle</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the triangles that potentially intersect with the given capsule.</p>
@@ -166,17 +184,25 @@ is detected, the method returns <code>false</code>.</dt>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>capsule</code></td>
-									<td class="description last"><p>The capsule to test.</p></td>
+									<td class="name">
+										<strong>capsule</strong>
+									</td>
+									<td class="description last">
+										<p>The capsule to test.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>triangles</code></td>
-									<td class="description last"><p>The target array that holds the triangles.</p></td>
+									<td class="name">
+										<strong>triangles</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the triangles.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="getRayTriangles" translate="no">.<a href="#getRayTriangles">getRayTriangles</a><span class="signature">( ray : <span class="param-type">Ray</span>, triangles : <span class="param-type">Array.&lt;Triangle></span> )</span> </h3>
+					<h3 class="name name-method" id="getRayTriangles" translate="no">.<a href="#getRayTriangles">getRayTriangles</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span>, triangles : <span class="param-type">Array.&lt;<a href="Triangle.html">Triangle</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the triangles that potentially intersect with the given ray.</p>
@@ -184,17 +210,25 @@ is detected, the method returns <code>false</code>.</dt>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>ray</code></td>
-									<td class="description last"><p>The ray to test.</p></td>
+									<td class="name">
+										<strong>ray</strong>
+									</td>
+									<td class="description last">
+										<p>The ray to test.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>triangles</code></td>
-									<td class="description last"><p>The target array that holds the triangles.</p></td>
+									<td class="name">
+										<strong>triangles</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the triangles.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="getSphereTriangles" translate="no">.<a href="#getSphereTriangles">getSphereTriangles</a><span class="signature">( sphere : <span class="param-type">Sphere</span>, triangles : <span class="param-type">Array.&lt;Triangle></span> )</span> </h3>
+					<h3 class="name name-method" id="getSphereTriangles" translate="no">.<a href="#getSphereTriangles">getSphereTriangles</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span>, triangles : <span class="param-type">Array.&lt;<a href="Triangle.html">Triangle</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the triangles that potentially intersect with the given bounding sphere.</p>
@@ -202,17 +236,25 @@ is detected, the method returns <code>false</code>.</dt>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The sphere to test.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to test.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>triangles</code></td>
-									<td class="description last"><p>The target array that holds the triangles.</p></td>
+									<td class="name">
+										<strong>triangles</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the triangles.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="rayIntersect" translate="no">.<a href="#rayIntersect">rayIntersect</a><span class="signature">( ray : <span class="param-type">Ray</span> )</span><span class="type-signature"> : Object | boolean</span> </h3>
+					<h3 class="name name-method" id="rayIntersect" translate="no">.<a href="#rayIntersect">rayIntersect</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span> )</span><span class="type-signature"> : Object | boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs a ray intersection test with this Octree.</p>
@@ -220,8 +262,12 @@ is detected, the method returns <code>false</code>.</dt>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>ray</code></td>
-									<td class="description last"><p>The ray to test.</p></td>
+									<td class="name">
+										<strong>ray</strong>
+									</td>
+									<td class="description last">
+										<p>The ray to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -230,7 +276,7 @@ is detected, the method returns <code>false</code>.</dt>
 is detected, the method returns <code>false</code>.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="sphereIntersect" translate="no">.<a href="#sphereIntersect">sphereIntersect</a><span class="signature">( sphere : <span class="param-type">Sphere</span> )</span><span class="type-signature"> : Object | boolean</span> </h3>
+					<h3 class="name name-method" id="sphereIntersect" translate="no">.<a href="#sphereIntersect">sphereIntersect</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : Object | boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs a bounding sphere intersection test with this Octree.</p>
@@ -238,8 +284,12 @@ is detected, the method returns <code>false</code>.</dt>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The bounding sphere to test.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding sphere to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -257,8 +307,12 @@ building the Octree.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>level</code></td>
-									<td class="description last"><p>The current level.</p></td>
+									<td class="name">
+										<strong>level</strong>
+									</td>
+									<td class="description last">
+										<p>The current level.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -266,7 +320,7 @@ building the Octree.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this Octree.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="triangleCapsuleIntersect" translate="no">.<a href="#triangleCapsuleIntersect">triangleCapsuleIntersect</a><span class="signature">( capsule : <span class="param-type">Capsule</span>, triangle : <span class="param-type">Triangle</span> )</span><span class="type-signature"> : Object | false</span> </h3>
+					<h3 class="name name-method" id="triangleCapsuleIntersect" translate="no">.<a href="#triangleCapsuleIntersect">triangleCapsuleIntersect</a><span class="signature">( capsule : <span class="param-type"><a href="Capsule.html">Capsule</a></span>, triangle : <span class="param-type"><a href="Triangle.html">Triangle</a></span> )</span><span class="type-signature"> : Object | false</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the intersection between the given capsule and triangle.</p>
@@ -274,12 +328,20 @@ building the Octree.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>capsule</code></td>
-									<td class="description last"><p>The capsule to test.</p></td>
+									<td class="name">
+										<strong>capsule</strong>
+									</td>
+									<td class="description last">
+										<p>The capsule to test.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>triangle</code></td>
-									<td class="description last"><p>The triangle to test.</p></td>
+									<td class="name">
+										<strong>triangle</strong>
+									</td>
+									<td class="description last">
+										<p>The triangle to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -288,7 +350,7 @@ building the Octree.</p>
 is detected, the method returns <code>false</code>.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="triangleSphereIntersect" translate="no">.<a href="#triangleSphereIntersect">triangleSphereIntersect</a><span class="signature">( sphere : <span class="param-type">Sphere</span>, triangle : <span class="param-type">Triangle</span> )</span><span class="type-signature"> : Object | false</span> </h3>
+					<h3 class="name name-method" id="triangleSphereIntersect" translate="no">.<a href="#triangleSphereIntersect">triangleSphereIntersect</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span>, triangle : <span class="param-type"><a href="Triangle.html">Triangle</a></span> )</span><span class="type-signature"> : Object | false</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the intersection between the given sphere and triangle.</p>
@@ -296,12 +358,20 @@ is detected, the method returns <code>false</code>.</dt>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The sphere to test.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to test.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>triangle</code></td>
-									<td class="description last"><p>The triangle to test.</p></td>
+									<td class="name">
+										<strong>triangle</strong>
+									</td>
+									<td class="description last">
+										<p>The triangle to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

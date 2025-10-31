@@ -35,7 +35,7 @@ const geometry = new TextGeometry( 'Hello three.js!', {
 				<pre><code class="language-js">import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="TextGeometry" translate="no">new <a href="#TextGeometry">TextGeometry</a><span class="signature">( text : <span class="param-type">string</span>, parameters : <span class="param-type">TextGeometry~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="TextGeometry" translate="no">new <a href="#TextGeometry">TextGeometry</a><span class="signature">( text : <span class="param-type">string</span>, parameters : <span class="param-type"><a href="TextGeometry.html#~Options">TextGeometry~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new text geometry.</p>
@@ -43,12 +43,20 @@ const geometry = new TextGeometry( 'Hello three.js!', {
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>text</code></td>
-									<td class="description last"><p>The text that should be transformed into a geometry.</p></td>
+									<td class="name">
+										<strong>text</strong>
+									</td>
+									<td class="description last">
+										<p>The text that should be transformed into a geometry.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>The text settings.</p></td>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The text settings.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -60,185 +68,148 @@ const geometry = new TextGeometry( 'Hello three.js!', {
 					<div class="description">
 						<p>Represents the <code>options</code> type of the geometry's constructor.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>font</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>font</strong>
+						<br>
 <span class="param-type"><a href="Font.html">Font</a></span>
+				</td>
+			<td class="description last">
+				<p>The font.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The font.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>size</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>size</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The text size.</p>
+						<p>Default is <code>100</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					100
-				</td>
-			<td class="description last"><p>The text size.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>depth</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>depth</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Depth to extrude the shape.</p>
+						<p>Default is <code>50</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					50
-				</td>
-			<td class="description last"><p>Depth to extrude the shape.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>curveSegments</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>curveSegments</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Number of points on the curves.</p>
+						<p>Default is <code>12</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					12
-				</td>
-			<td class="description last"><p>Number of points on the curves.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>steps</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>steps</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Number of points used for subdividing segments along the depth of the extruded spline.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>Number of points used for subdividing segments along the depth of the extruded spline.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelEnabled</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelEnabled</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to beveling to the shape or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to beveling to the shape or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelThickness</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelThickness</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>How deep into the original shape the bevel goes.</p>
+						<p>Default is <code>10</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					10
-				</td>
-			<td class="description last"><p>How deep into the original shape the bevel goes.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelSize</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelSize</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Distance from the shape outline that the bevel extends.</p>
+						<p>Default is <code>8</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					8
-				</td>
-			<td class="description last"><p>Distance from the shape outline that the bevel extends.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelOffset</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelOffset</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Distance from the shape outline that the bevel starts.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0
-				</td>
-			<td class="description last"><p>Distance from the shape outline that the bevel starts.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelSegments</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelSegments</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Number of bevel layers.</p>
+						<p>Default is <code>3</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					3
-				</td>
-			<td class="description last"><p>Number of bevel layers.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>direction</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>direction</strong>
+						<br>
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>Char direction: ltr(left to right), rtl(right to left) &amp; tb(top bottom).</p>
+						<p>Default is <code>'ltr'</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					'ltr'
-				</td>
-			<td class="description last"><p>Char direction: ltr(left to right), rtl(right to left) &amp; tb(top bottom).</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>extrudePath</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>extrudePath</strong>
+						<br>
 <span class="param-type"><a href="Curve.html">Curve</a></span>
+				</td>
+			<td class="description last">
+				<p>A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.</p>
+						<p>Default is <code>null</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-					&lt;nullable><br>
-				</td>
-				<td class="default">
-					null
-				</td>
-			<td class="description last"><p>A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>UVGenerator</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>UVGenerator</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>An object that provides UV generator functions for custom UV generation.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>An object that provides UV generator functions for custom UV generation.</p></td>
 		</tr>
 	</tbody>
 </table>

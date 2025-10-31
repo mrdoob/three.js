@@ -20,7 +20,7 @@
 				<pre><code class="language-js">import { CSMFrustum } from 'three/addons/csm/CSMFrustum.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CSMFrustum" translate="no">new <a href="#CSMFrustum">CSMFrustum</a><span class="signature">( data : <span class="param-type">CSMFrustum~Data</span> )</span> </h3>
+					<h3 class="name name-method" id="CSMFrustum" translate="no">new <a href="#CSMFrustum">CSMFrustum</a><span class="signature">( data : <span class="param-type"><a href="CSMFrustum.html#~Data">CSMFrustum~Data</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new CSM frustum.</p>
@@ -28,8 +28,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>The CSM data.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The CSM data.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -52,7 +56,7 @@ conventions for their projection matrices.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setFromProjectionMatrix" translate="no">.<a href="#setFromProjectionMatrix">setFromProjectionMatrix</a><span class="signature">( projectionMatrix : <span class="param-type">Matrix4</span>, maxFar : <span class="param-type">number</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id="setFromProjectionMatrix" translate="no">.<a href="#setFromProjectionMatrix">setFromProjectionMatrix</a><span class="signature">( projectionMatrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span>, maxFar : <span class="param-type">number</span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups this CSM frustum from the given projection matrix and max far value.</p>
@@ -60,12 +64,20 @@ conventions for their projection matrices.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>projectionMatrix</code></td>
-									<td class="description last"><p>The projection matrix, usually of the scene's camera.</p></td>
+									<td class="name">
+										<strong>projectionMatrix</strong>
+									</td>
+									<td class="description last">
+										<p>The projection matrix, usually of the scene's camera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maxFar</code></td>
-									<td class="description last"><p>The maximum far value.</p></td>
+									<td class="name">
+										<strong>maxFar</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum far value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -73,7 +85,7 @@ conventions for their projection matrices.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> An object representing the vertices of the near and far plane in view space.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="split" translate="no">.<a href="#split">split</a><span class="signature">( breaks : <span class="param-type">Array.&lt;number></span>, target : <span class="param-type">Array.&lt;CSMFrustum></span> )</span> </h3>
+					<h3 class="name name-method" id="split" translate="no">.<a href="#split">split</a><span class="signature">( breaks : <span class="param-type">Array.&lt;number></span>, target : <span class="param-type">Array.&lt;<a href="CSMFrustum.html">CSMFrustum</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Splits the CSM frustum by the given array. The new CSM frustum are pushed into the given
@@ -82,18 +94,26 @@ target array.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>breaks</code></td>
-									<td class="description last"><p>An array of numbers in the range <code>[0,1]</code> the defines how the
-CSM frustum should be split up.</p></td>
+									<td class="name">
+										<strong>breaks</strong>
+									</td>
+									<td class="description last">
+										<p>An array of numbers in the range <code>[0,1]</code> the defines how the
+CSM frustum should be split up.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target array that holds the new CSM frustums.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the new CSM frustums.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="toSpace" translate="no">.<a href="#toSpace">toSpace</a><span class="signature">( cameraMatrix : <span class="param-type">Matrix4</span>, target : <span class="param-type">CSMFrustum</span> )</span> </h3>
+					<h3 class="name name-method" id="toSpace" translate="no">.<a href="#toSpace">toSpace</a><span class="signature">( cameraMatrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span>, target : <span class="param-type"><a href="CSMFrustum.html">CSMFrustum</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Transforms the given target CSM frustum into the different coordinate system defined by the
@@ -102,12 +122,20 @@ given camera matrix.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>cameraMatrix</code></td>
-									<td class="description last"><p>The matrix that defines the new coordinate system.</p></td>
+									<td class="name">
+										<strong>cameraMatrix</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix that defines the new coordinate system.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The CSM to convert.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The CSM to convert.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -118,46 +146,37 @@ given camera matrix.</p>
 					<div class="description">
 						<p>Constructor data of <code>CSMFrustum</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>webGL</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>webGL</strong>
+						<br>
 <span class="param-type">boolean</span>
-			</td>
-				<td class="attributes">
-					&lt;optional><br>
 				</td>
-			<td class="description last"><p>Whether this CSM frustum is used with WebGL or WebGPU.</p></td>
+			<td class="description last">
+				<p>Whether this CSM frustum is used with WebGL or WebGPU.</p>
+			</td>
 		</tr>
 		<tr>
-				<td class="name"><code>projectionMatrix</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>projectionMatrix</strong>
+						<br>
 <span class="param-type"><a href="Matrix4.html">Matrix4</a></span>
-			</td>
-				<td class="attributes">
-					&lt;optional><br>
 				</td>
-			<td class="description last"><p>A projection matrix usually of the scene's camera.</p></td>
+			<td class="description last">
+				<p>A projection matrix usually of the scene's camera.</p>
+			</td>
 		</tr>
 		<tr>
-				<td class="name"><code>maxFar</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>maxFar</strong>
+						<br>
 <span class="param-type">number</span>
-			</td>
-				<td class="attributes">
-					&lt;optional><br>
 				</td>
-			<td class="description last"><p>The maximum far value.</p></td>
+			<td class="description last">
+				<p>The maximum far value.</p>
+			</td>
 		</tr>
 	</tbody>
 </table>

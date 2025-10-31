@@ -46,13 +46,15 @@ scene.add( lod );
 					<div class="description">
 						<p>Whether the LOD object is updated automatically by the renderer per frame
 or not. If set to <code>false</code>, you have to call <a href="LOD.html#update">LOD#update</a> in the
-render loop by yourself.<br/>Default is <code>true</code>.</p>
+render loop by yourself.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isLOD" translate="no">.<a href="#isLOD">isLOD</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -62,7 +64,7 @@ render loop by yourself.<br/>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="addLevel" translate="no">.<a href="#addLevel">addLevel</a><span class="signature">( object : <span class="param-type">Object3D</span>, distance : <span class="param-type">number</span>, hysteresis : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="LOD.html">LOD</a></span> </h3>
+					<h3 class="name name-method" id="addLevel" translate="no">.<a href="#addLevel">addLevel</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, distance : <span class="param-type">number</span>, hysteresis : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="LOD.html">LOD</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds a mesh that will display at a certain distance and greater. Typically
@@ -71,16 +73,30 @@ the further away the distance, the lower the detail on the mesh.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object to display at this level.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to display at this level.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>The distance at which to display this level of detail.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The distance at which to display this level of detail.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>hysteresis</code></td>
-									<td class="description last"><p>Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>hysteresis</strong>
+									</td>
+									<td class="description last">
+										<p>Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -106,8 +122,12 @@ the given distance.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>The LOD distance.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The LOD distance.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -115,7 +135,7 @@ the given distance.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The found 3D object. <code>null</code> if no 3D object has been found.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type">Raycaster</span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
+					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type"><a href="Raycaster.html">Raycaster</a></span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes intersection points between a casted ray and this LOD.</p>
@@ -123,12 +143,20 @@ the given distance.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>raycaster</code></td>
-									<td class="description last"><p>The raycaster.</p></td>
+									<td class="name">
+										<strong>raycaster</strong>
+									</td>
+									<td class="description last">
+										<p>The raycaster.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intersects</code></td>
-									<td class="description last"><p>The target array that holds the intersection points.</p></td>
+									<td class="name">
+										<strong>intersects</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the intersection points.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -145,8 +173,12 @@ Returns <code>true</code> when the level has been removed. Otherwise <code>false
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>Distance of the level to remove.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>Distance of the level to remove.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -154,7 +186,7 @@ Returns <code>true</code> when the level has been removed. Otherwise <code>false
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the level has been removed or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the LOD by computing which LOD level should be visible according
@@ -163,8 +195,12 @@ to the current distance of the given camera.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera the scene is rendered with.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

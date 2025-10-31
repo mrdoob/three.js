@@ -21,7 +21,7 @@ their requirements.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ShadowBaseNode" translate="no">new <a href="#ShadowBaseNode">ShadowBaseNode</a><span class="signature">( light : <span class="param-type">Light</span> )</span> </h3>
+					<h3 class="name name-method" id="ShadowBaseNode" translate="no">new <a href="#ShadowBaseNode">ShadowBaseNode</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new shadow base node.</p>
@@ -29,8 +29,12 @@ their requirements.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>light</code></td>
-									<td class="description last"><p>The shadow casting light.</p></td>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow casting light.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -40,7 +44,8 @@ their requirements.</p></div>
 				<div class="member">
 					<h3 class="name" id="isShadowBaseNode" translate="no">.<a href="#isShadowBaseNode">isShadowBaseNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -52,14 +57,15 @@ their requirements.</p></div>
 				<div class="member">
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>Overwritten since shadows are updated by default per render.<br/>Default is <code>'render'</code>.</p>
+						<p>Overwritten since shadows are updated by default per render.</p>
+						<p>Default is <code>'render'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBeforeType">Node#updateBeforeType</a></dt>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setupShadowPosition" translate="no">.<a href="#setupShadowPosition">setupShadowPosition</a><span class="signature">( object : <span class="param-type">NodeBuilder</span> )</span> </h3>
+					<h3 class="name name-method" id="setupShadowPosition" translate="no">.<a href="#setupShadowPosition">setupShadowPosition</a><span class="signature">( object : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the shadow position node which is by default the predefined TSL node object <code>shadowPositionWorld</code>.</p>
@@ -67,8 +73,12 @@ their requirements.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>A configuration object that must at least hold a material reference.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>A configuration object that must at least hold a material reference.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

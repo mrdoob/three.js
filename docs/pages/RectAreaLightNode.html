@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="RectAreaLightNode" translate="no">new <a href="#RectAreaLightNode">RectAreaLightNode</a><span class="signature">( light : <span class="param-type">RectAreaLight</span> )</span> </h3>
+					<h3 class="name name-method" id="RectAreaLightNode" translate="no">new <a href="#RectAreaLightNode">RectAreaLightNode</a><span class="signature">( light : <span class="param-type"><a href="RectAreaLight.html">RectAreaLight</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new rect area light node.</p>
@@ -26,8 +26,13 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>light</code></td>
-									<td class="description last"><p>The rect area light source.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The rect area light source.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -50,14 +55,15 @@
 					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The <code>updateType</code> is set to <code>NodeUpdateType.RENDER</code> since the light
-relies on <code>viewMatrix</code> which might vary per render call.<br/>Default is <code>'render'</code>.</p>
+relies on <code>viewMatrix</code> which might vary per render call.</p>
+						<p>Default is <code>'render'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="AnalyticLightNode.html#updateType">AnalyticLightNode#updateType</a></dt>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Overwritten to updated rect area light specific uniforms.</p>
@@ -65,8 +71,12 @@ relies on <code>viewMatrix</code> which might vary per render call.<br/>Default 
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>A reference to the current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -75,7 +85,7 @@ relies on <code>viewMatrix</code> which might vary per render call.<br/>Default 
 						</dl>
 					</div>
 				<h2 class="subsection-title">Static Methods</h2>
-					<h3 class="name name-method" id=".setLTC" translate="no">.<a href="#.setLTC">setLTC</a><span class="signature">( ltc : <span class="param-type">RectAreaLightTexturesLib</span> )</span> </h3>
+					<h3 class="name name-method" id=".setLTC" translate="no">.<a href="#.setLTC">setLTC</a><span class="signature">( ltc : <span class="param-type"><a href="RectAreaLightTexturesLib.html">RectAreaLightTexturesLib</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Used to configure the internal BRDF approximation texture data.</p>
@@ -83,8 +93,12 @@ relies on <code>viewMatrix</code> which might vary per render call.<br/>Default 
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>ltc</code></td>
-									<td class="description last"><p>The BRDF approximation texture data.</p></td>
+									<td class="name">
+										<strong>ltc</strong>
+									</td>
+									<td class="description last">
+										<p>The BRDF approximation texture data.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

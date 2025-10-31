@@ -29,17 +29,19 @@
 				<div class="member">
 					<h3 class="name" id="envMap" translate="no">.<a href="#envMap">envMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
-						<p>The controller's environment map.<br/>Default is <code>null</code>.</p>
+						<p>The controller's environment map.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="motionController" translate="no">.<a href="#motionController">motionController</a><span class="type-signature"> : MotionController</span> </h3>
 					<div class="description">
-						<p>The motion controller.<br/>Default is <code>null</code>.</p>
+						<p>The motion controller.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setEnvironmentMap" translate="no">.<a href="#setEnvironmentMap">setEnvironmentMap</a><span class="signature">( envMap : <span class="param-type">Texture</span> )</span><span class="type-signature"> : <a href="XRControllerModel.html">XRControllerModel</a></span> </h3>
+					<h3 class="name name-method" id="setEnvironmentMap" translate="no">.<a href="#setEnvironmentMap">setEnvironmentMap</a><span class="signature">( envMap : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : <a href="XRControllerModel.html">XRControllerModel</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets an environment map that is applied to the controller model.</p>
@@ -47,8 +49,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>envMap</code></td>
-									<td class="description last"><p>The environment map to apply.</p></td>
+									<td class="name">
+										<strong>envMap</strong>
+									</td>
+									<td class="description last">
+										<p>The environment map to apply.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -65,9 +71,14 @@ model's components to match the real world data.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>force</code></td>
-									<td class="description last"><p>When set to <code>true</code>, a recomputation of world matrices is forced even
-when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>force</strong>
+									</td>
+									<td class="description last">
+										<p>When set to <code>true</code>, a recomputation of world matrices is forced even
+when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

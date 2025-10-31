@@ -35,7 +35,8 @@ This is where you place 3D objects like meshes, lines or lights.</p></div>
 <li>A color for defining a uniform colored background.</li>
 <li>A texture for defining a (flat) textured background.</li>
 <li>Cube textures or equirectangular textures for defining a skybox.</li>
-</ul><br/>Default is <code>null</code>.
+</ul>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -43,20 +44,23 @@ This is where you place 3D objects like meshes, lines or lights.</p></div>
 					<div class="description">
 						<p>Sets the blurriness of the background. Only influences environment maps
 assigned to <a href="Scene.html#background">Scene#background</a>. Valid input is a float between <code>0</code>
-and <code>1</code>.<br/>Default is <code>0</code>.</p>
+and <code>1</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="backgroundIntensity" translate="no">.<a href="#backgroundIntensity">backgroundIntensity</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Attenuates the color of the background. Only applies to background textures.<br/>Default is <code>1</code>.</p>
+						<p>Attenuates the color of the background. Only applies to background textures.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="backgroundRotation" translate="no">.<a href="#backgroundRotation">backgroundRotation</a><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
 					<div class="description">
 						<p>The rotation of the background in radians. Only influences environment maps
-assigned to <a href="Scene.html#background">Scene#background</a>.<br/>Default is <code>(0,0,0)</code>.</p>
+assigned to <a href="Scene.html#background">Scene#background</a>.</p>
+						<p>Default is <code>(0,0,0)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -64,41 +68,47 @@ assigned to <a href="Scene.html#background">Scene#background</a>.<br/>Default is
 					<div class="description">
 						<p>Sets the environment map for all physical materials in the scene. However,
 it's not possible to overwrite an existing texture assigned to the <code>envMap</code>
-material property.<br/>Default is <code>null</code>.</p>
+material property.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="environmentIntensity" translate="no">.<a href="#environmentIntensity">environmentIntensity</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Attenuates the color of the environment. Only influences environment maps
-assigned to <a href="Scene.html#environment">Scene#environment</a>.<br/>Default is <code>1</code>.</p>
+assigned to <a href="Scene.html#environment">Scene#environment</a>.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="environmentRotation" translate="no">.<a href="#environmentRotation">environmentRotation</a><span class="type-signature"> : <a href="Euler.html">Euler</a></span> </h3>
 					<div class="description">
 						<p>The rotation of the environment map in radians. Only influences physical materials
-in the scene when <a href="Scene.html#environment">Scene#environment</a> is used.<br/>Default is <code>(0,0,0)</code>.</p>
+in the scene when <a href="Scene.html#environment">Scene#environment</a> is used.</p>
+						<p>Default is <code>(0,0,0)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="fog" translate="no">.<a href="#fog">fog</a><span class="type-signature"> : <a href="Fog.html">Fog</a> | <a href="FogExp2.html">FogExp2</a></span> </h3>
 					<div class="description">
 						<p>A fog instance defining the type of fog that affects everything
-rendered in the scene.<br/>Default is <code>null</code>.</p>
+rendered in the scene.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isScene" translate="no">.<a href="#isScene">isScene</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="overrideMaterial" translate="no">.<a href="#overrideMaterial">overrideMaterial</a><span class="type-signature"> : <a href="Material.html">Material</a></span> </h3>
 					<div class="description">
 						<p>Forces everything in the scene to be rendered with the defined material. It is possible
-to exclude materials from override by setting <a href="Material.html#allowOverride">Material#allowOverride</a> to <code>false</code>.<br/>Default is <code>null</code>.</p>
+to exclude materials from override by setting <a href="Material.html#allowOverride">Material#allowOverride</a> to <code>false</code>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>

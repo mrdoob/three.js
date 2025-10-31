@@ -19,7 +19,7 @@ amongst other things.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Raycaster" translate="no">new <a href="#Raycaster">Raycaster</a><span class="signature">( origin : <span class="param-type">Vector3</span>, direction : <span class="param-type">Vector3</span>, near : <span class="param-type">number</span>, far : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="Raycaster" translate="no">new <a href="#Raycaster">Raycaster</a><span class="signature">( origin : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, direction : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, near : <span class="param-type">number</span>, far : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new raycaster.</p>
@@ -27,20 +27,38 @@ amongst other things.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>origin</code></td>
-									<td class="description last"><p>The origin vector where the ray casts from.</p></td>
+									<td class="name">
+										<strong>origin</strong>
+									</td>
+									<td class="description last">
+										<p>The origin vector where the ray casts from.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>direction</code></td>
-									<td class="description last"><p>The (normalized) direction vector that gives direction to the ray.</p></td>
+									<td class="name">
+										<strong>direction</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) direction vector that gives direction to the ray.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>near</code></td>
-									<td class="description last"><p>All results returned are further away than near. Near can't be negative.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>near</strong>
+									</td>
+									<td class="description last">
+										<p>All results returned are further away than near. Near can't be negative.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>far</code></td>
-									<td class="description last"><p>All results returned are closer than far. Far can't be lower than near.<br/>Default is <code>Infinity</code>.</p></td>
+									<td class="name">
+										<strong>far</strong>
+									</td>
+									<td class="description last">
+										<p>All results returned are closer than far. Far can't be lower than near.</p>
+										<p>Default is <code>Infinity</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -52,13 +70,15 @@ amongst other things.</p></div>
 					<div class="description">
 						<p>The camera to use when raycasting against view-dependent objects such as
 billboarded objects like sprites. This field can be set manually or
-is set when calling <code>setFromCamera()</code>.<br/>Default is <code>null</code>.</p>
+is set when calling <code>setFromCamera()</code>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="far" translate="no">.<a href="#far">far</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>All results returned are further away than near. Near can't be negative.<br/>Default is <code>Infinity</code>.</p>
+						<p>All results returned are further away than near. Near can't be negative.</p>
+						<p>Default is <code>Infinity</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -75,7 +95,8 @@ object.layers.enable( 1 );
 				<div class="member">
 					<h3 class="name" id="near" translate="no">.<a href="#near">near</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>All results returned are further away than near. Near can't be negative.<br/>Default is <code>0</code>.</p>
+						<p>All results returned are further away than near. Near can't be negative.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -100,7 +121,7 @@ object.layers.enable( 1 );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="intersectObject" translate="no">.<a href="#intersectObject">intersectObject</a><span class="signature">( object : <span class="param-type">Object3D</span>, recursive : <span class="param-type">boolean</span>, intersects : <span class="param-type">Array.&lt;Raycaster~Intersection></span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
+					<h3 class="name name-method" id="intersectObject" translate="no">.<a href="#intersectObject">intersectObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, recursive : <span class="param-type">boolean</span>, intersects : <span class="param-type">Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Checks all intersection between the ray and the object with or without the
@@ -116,17 +137,31 @@ to <code>THREE.DoubleSide</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object to check for intersection with the ray.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to check for intersection with the ray.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>recursive</code></td>
-									<td class="description last"><p>If set to <code>true</code>, it also checks all descendants.
-Otherwise it only checks intersection with the object.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>recursive</strong>
+									</td>
+									<td class="description last">
+										<p>If set to <code>true</code>, it also checks all descendants.
+Otherwise it only checks intersection with the object.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intersects</code></td>
-									<td class="description last"><p>The target array that holds the result of the method.<br/>Default is <code>[]</code>.</p></td>
+									<td class="name">
+										<strong>intersects</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the result of the method.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -134,7 +169,7 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 							<dt class="tag-returns"><strong>Returns:</strong> An array holding the intersection points.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectObjects" translate="no">.<a href="#intersectObjects">intersectObjects</a><span class="signature">( objects : <span class="param-type">Array.&lt;Object3D></span>, recursive : <span class="param-type">boolean</span>, intersects : <span class="param-type">Array.&lt;Raycaster~Intersection></span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
+					<h3 class="name name-method" id="intersectObjects" translate="no">.<a href="#intersectObjects">intersectObjects</a><span class="signature">( objects : <span class="param-type">Array.&lt;<a href="Object3D.html">Object3D</a>></span>, recursive : <span class="param-type">boolean</span>, intersects : <span class="param-type">Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Checks all intersection between the ray and the objects with or without
@@ -143,17 +178,31 @@ the descendants. Intersections are returned sorted by distance, closest first.</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>objects</code></td>
-									<td class="description last"><p>The 3D objects to check for intersection with the ray.</p></td>
+									<td class="name">
+										<strong>objects</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D objects to check for intersection with the ray.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>recursive</code></td>
-									<td class="description last"><p>If set to <code>true</code>, it also checks all descendants.
-Otherwise it only checks intersection with the object.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>recursive</strong>
+									</td>
+									<td class="description last">
+										<p>If set to <code>true</code>, it also checks all descendants.
+Otherwise it only checks intersection with the object.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intersects</code></td>
-									<td class="description last"><p>The target array that holds the result of the method.<br/>Default is <code>[]</code>.</p></td>
+									<td class="name">
+										<strong>intersects</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the result of the method.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -161,7 +210,7 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 							<dt class="tag-returns"><strong>Returns:</strong> An array holding the intersection points.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( origin : <span class="param-type">Vector3</span>, direction : <span class="param-type">Vector3</span> )</span> </h3>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( origin : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, direction : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the ray with a new origin and direction by copying the values from the arguments.</p>
@@ -169,17 +218,25 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>origin</code></td>
-									<td class="description last"><p>The origin vector where the ray casts from.</p></td>
+									<td class="name">
+										<strong>origin</strong>
+									</td>
+									<td class="description last">
+										<p>The origin vector where the ray casts from.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>direction</code></td>
-									<td class="description last"><p>The (normalized) direction vector that gives direction to the ray.</p></td>
+									<td class="name">
+										<strong>direction</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) direction vector that gives direction to the ray.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setFromCamera" translate="no">.<a href="#setFromCamera">setFromCamera</a><span class="signature">( coords : <span class="param-type">Vector2</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="setFromCamera" translate="no">.<a href="#setFromCamera">setFromCamera</a><span class="signature">( coords : <span class="param-type"><a href="Vector2.html">Vector2</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Uses the given coordinates and camera to compute a new origin and direction for the internal ray.</p>
@@ -187,18 +244,26 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>coords</code></td>
-									<td class="description last"><p>2D coordinates of the mouse, in normalized device coordinates (NDC).
-X and Y components should be between <code>-1</code> and <code>1</code>.</p></td>
+									<td class="name">
+										<strong>coords</strong>
+									</td>
+									<td class="description last">
+										<p>2D coordinates of the mouse, in normalized device coordinates (NDC).
+X and Y components should be between <code>-1</code> and <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera from which the ray should originate.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera from which the ray should originate.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setFromXRController" translate="no">.<a href="#setFromXRController">setFromXRController</a><span class="signature">( controller : <span class="param-type">WebXRController</span> )</span><span class="type-signature"> : <a href="Raycaster.html">Raycaster</a></span> </h3>
+					<h3 class="name name-method" id="setFromXRController" translate="no">.<a href="#setFromXRController">setFromXRController</a><span class="signature">( controller : <span class="param-type"><a href="WebXRController.html">WebXRController</a></span> )</span><span class="type-signature"> : <a href="Raycaster.html">Raycaster</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Uses the given WebXR controller to compute a new origin and direction for the internal ray.</p>
@@ -206,8 +271,12 @@ X and Y components should be between <code>-1</code> and <code>1</code>.</p></td
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>controller</code></td>
-									<td class="description last"><p>The controller to copy the position and direction from.</p></td>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The controller to copy the position and direction from.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -221,87 +290,109 @@ X and Y components should be between <code>-1</code> and <code>1</code>.</p></td
 					<div class="description">
 						<p>The intersection point of a raycaster intersection test.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>distance</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>distance</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The distance from the ray's origin to the intersection point.</p>
 			</td>
-			<td class="description last"><p>The distance from the ray's origin to the intersection point.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>distanceToRay</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>distanceToRay</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Some 3D objects e.g. <a href="Points.html">Points</a> provide the distance of the
+intersection to the nearest point on the ray. For other objects it will be <code>undefined</code>.</p>
 			</td>
-			<td class="description last"><p>Some 3D objects e.g. <a href="Points.html">Points</a> provide the distance of the
-intersection to the nearest point on the ray. For other objects it will be <code>undefined</code>.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>point</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>point</strong>
+						<br>
 <span class="param-type"><a href="Vector3.html">Vector3</a></span>
+				</td>
+			<td class="description last">
+				<p>The intersection point, in world coordinates.</p>
 			</td>
-			<td class="description last"><p>The intersection point, in world coordinates.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>face</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>face</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>The face that has been intersected.</p>
 			</td>
-			<td class="description last"><p>The face that has been intersected.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>faceIndex</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>faceIndex</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The face index.</p>
 			</td>
-			<td class="description last"><p>The face index.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>object</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>object</strong>
+						<br>
 <span class="param-type"><a href="Object3D.html">Object3D</a></span>
+				</td>
+			<td class="description last">
+				<p>The 3D object that has been intersected.</p>
 			</td>
-			<td class="description last"><p>The 3D object that has been intersected.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>uv</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>uv</strong>
+						<br>
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
+				</td>
+			<td class="description last">
+				<p>U,V coordinates at point of intersection.</p>
 			</td>
-			<td class="description last"><p>U,V coordinates at point of intersection.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>uv1</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>uv1</strong>
+						<br>
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
+				</td>
+			<td class="description last">
+				<p>Second set of U,V coordinates at point of intersection.</p>
 			</td>
-			<td class="description last"><p>Second set of U,V coordinates at point of intersection.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>uv1</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>uv1</strong>
+						<br>
 <span class="param-type"><a href="Vector3.html">Vector3</a></span>
+				</td>
+			<td class="description last">
+				<p>Interpolated normal vector at point of intersection.</p>
 			</td>
-			<td class="description last"><p>Interpolated normal vector at point of intersection.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>instanceId</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>instanceId</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The index number of the instance where the ray
+intersects the <a href="InstancedMesh.html">InstancedMesh</a>.</p>
 			</td>
-			<td class="description last"><p>The index number of the instance where the ray
-intersects the <a href="InstancedMesh.html">InstancedMesh</a>.</p></td>
 		</tr>
 	</tbody>
 </table>

@@ -79,7 +79,7 @@ gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 				<pre><code class="language-js">import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="GPUComputationRenderer" translate="no">new <a href="#GPUComputationRenderer">GPUComputationRenderer</a><span class="signature">( sizeX : <span class="param-type">number</span>, sizeY : <span class="param-type">number</span>, renderer : <span class="param-type">WebGLRenderer</span> )</span> </h3>
+					<h3 class="name name-method" id="GPUComputationRenderer" translate="no">new <a href="#GPUComputationRenderer">GPUComputationRenderer</a><span class="signature">( sizeX : <span class="param-type">number</span>, sizeY : <span class="param-type">number</span>, renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new GPU computation renderer.</p>
@@ -87,16 +87,28 @@ gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sizeX</code></td>
-									<td class="description last"><p>Computation problem size is always 2d: sizeX * sizeY elements.</p></td>
+									<td class="name">
+										<strong>sizeX</strong>
+									</td>
+									<td class="description last">
+										<p>Computation problem size is always 2d: sizeX * sizeY elements.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>sizeY</code></td>
-									<td class="description last"><p>Computation problem size is always 2d: sizeX * sizeY elements.</p></td>
+									<td class="name">
+										<strong>sizeY</strong>
+									</td>
+									<td class="description last">
+										<p>Computation problem size is always 2d: sizeX * sizeY elements.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -110,7 +122,7 @@ gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="addVariable" translate="no">.<a href="#addVariable">addVariable</a><span class="signature">( variableName : <span class="param-type">string</span>, computeFragmentShader : <span class="param-type">string</span>, initialValueTexture : <span class="param-type">Texture</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id="addVariable" translate="no">.<a href="#addVariable">addVariable</a><span class="signature">( variableName : <span class="param-type">string</span>, computeFragmentShader : <span class="param-type">string</span>, initialValueTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds a compute variable to the renderer.</p>
@@ -118,16 +130,28 @@ gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>variableName</code></td>
-									<td class="description last"><p>The variable name.</p></td>
+									<td class="name">
+										<strong>variableName</strong>
+									</td>
+									<td class="description last">
+										<p>The variable name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>computeFragmentShader</code></td>
-									<td class="description last"><p>The compute (fragment) shader source.</p></td>
+									<td class="name">
+										<strong>computeFragmentShader</strong>
+									</td>
+									<td class="description last">
+										<p>The compute (fragment) shader source.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>initialValueTexture</code></td>
-									<td class="description last"><p>The initial value texture.</p></td>
+									<td class="name">
+										<strong>initialValueTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The initial value texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -149,28 +173,52 @@ gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sizeXTexture</code></td>
-									<td class="description last"><p>The width of the render target.</p></td>
+									<td class="name">
+										<strong>sizeXTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the render target.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>sizeYTexture</code></td>
-									<td class="description last"><p>The height of the render target.</p></td>
+									<td class="name">
+										<strong>sizeYTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the render target.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>wrapS</code></td>
-									<td class="description last"><p>The wrapS value.</p></td>
+									<td class="name">
+										<strong>wrapS</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>wrapT</code></td>
-									<td class="description last"><p>The wrapS value.</p></td>
+									<td class="name">
+										<strong>wrapT</strong>
+									</td>
+									<td class="description last">
+										<p>The wrapS value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>minFilter</code></td>
-									<td class="description last"><p>The minFilter value.</p></td>
+									<td class="name">
+										<strong>minFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The minFilter value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>magFilter</code></td>
-									<td class="description last"><p>The magFilter value.</p></td>
+									<td class="name">
+										<strong>magFilter</strong>
+									</td>
+									<td class="description last">
+										<p>The magFilter value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -194,7 +242,7 @@ gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 renderer anymore.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="doRenderTarget" translate="no">.<a href="#doRenderTarget">doRenderTarget</a><span class="signature">( material : <span class="param-type">Material</span>, output : <span class="param-type">WebGLRenderTarget</span> )</span> </h3>
+					<h3 class="name name-method" id="doRenderTarget" translate="no">.<a href="#doRenderTarget">doRenderTarget</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span>, output : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Renders the given material into the given render target
@@ -203,12 +251,20 @@ with a full-screen pass.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>material</code></td>
-									<td class="description last"><p>The material.</p></td>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>output</code></td>
-									<td class="description last"><p>The output.</p></td>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The output.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -221,8 +277,12 @@ with a full-screen pass.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>variable</code></td>
-									<td class="description last"><p>The compute variable.</p></td>
+									<td class="name">
+										<strong>variable</strong>
+									</td>
+									<td class="description last">
+										<p>The compute variable.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -238,8 +298,12 @@ with a full-screen pass.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>variable</code></td>
-									<td class="description last"><p>The compute variable.</p></td>
+									<td class="name">
+										<strong>variable</strong>
+									</td>
+									<td class="description last">
+										<p>The compute variable.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -256,7 +320,7 @@ with a full-screen pass.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Returns <code>null</code> if no errors are detected. Otherwise returns the error message.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="renderTexture" translate="no">.<a href="#renderTexture">renderTexture</a><span class="signature">( input : <span class="param-type">Texture</span>, output : <span class="param-type">WebGLRenderTarget</span> )</span> </h3>
+					<h3 class="name name-method" id="renderTexture" translate="no">.<a href="#renderTexture">renderTexture</a><span class="signature">( input : <span class="param-type"><a href="Texture.html">Texture</a></span>, output : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Renders the given texture into the given render target.</p>
@@ -264,17 +328,25 @@ with a full-screen pass.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>input</code></td>
-									<td class="description last"><p>The input.</p></td>
+									<td class="name">
+										<strong>input</strong>
+									</td>
+									<td class="description last">
+										<p>The input.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>output</code></td>
-									<td class="description last"><p>The output.</p></td>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The output.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setDataType" translate="no">.<a href="#setDataType">setDataType</a><span class="signature">( type : <span class="param-type">FloatType | HalfFloatType</span> )</span><span class="type-signature"> : <a href="GPUComputationRenderer.html">GPUComputationRenderer</a></span> </h3>
+					<h3 class="name name-method" id="setDataType" translate="no">.<a href="#setDataType">setDataType</a><span class="signature">( type : <span class="param-type"><a href="global.html#FloatType">FloatType</a> | <a href="global.html#HalfFloatType">HalfFloatType</a></span> )</span><span class="type-signature"> : <a href="GPUComputationRenderer.html">GPUComputationRenderer</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the data type of the internal textures.</p>
@@ -282,8 +354,12 @@ with a full-screen pass.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The type to set.</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -299,12 +375,20 @@ with a full-screen pass.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>variable</code></td>
-									<td class="description last"><p>The compute variable.</p></td>
+									<td class="name">
+										<strong>variable</strong>
+									</td>
+									<td class="description last">
+										<p>The compute variable.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>dependencies</code></td>
-									<td class="description last"><p>Other compute variables that represents the dependencies.</p></td>
+									<td class="name">
+										<strong>dependencies</strong>
+									</td>
+									<td class="description last">
+										<p>Other compute variables that represents the dependencies.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

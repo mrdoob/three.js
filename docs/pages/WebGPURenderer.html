@@ -20,7 +20,7 @@ browser supports WebGPU. If not, <code>WebGPURenderer</code> falls backs to a We
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="WebGPURenderer" translate="no">new <a href="#WebGPURenderer">WebGPURenderer</a><span class="signature">( parameters : <span class="param-type">WebGPURenderer~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="WebGPURenderer" translate="no">new <a href="#WebGPURenderer">WebGPURenderer</a><span class="signature">( parameters : <span class="param-type"><a href="WebGPURenderer.html#~Options">WebGPURenderer~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new WebGPU renderer.</p>
@@ -28,8 +28,12 @@ browser supports WebGPU. If not, <code>WebGPURenderer</code> falls backs to a We
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>The configuration parameter.</p></td>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -39,7 +43,8 @@ browser supports WebGPU. If not, <code>WebGPURenderer</code> falls backs to a We
 				<div class="member">
 					<h3 class="name" id="isWebGPURenderer" translate="no">.<a href="#isWebGPURenderer">isWebGPURenderer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -58,147 +63,117 @@ standard node library for type mapping.</p>
 					<div class="description">
 						<p>WebGPURenderer options.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>logarithmicDepthBuffer</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>logarithmicDepthBuffer</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether logarithmic depth buffer is enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether logarithmic depth buffer is enabled or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>alpha</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>alpha</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>depth</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>depth</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer should have a depth buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether the default framebuffer should have a depth buffer or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>stencil</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>stencil</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the default framebuffer should have a stencil buffer or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether the default framebuffer should have a stencil buffer or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>antialias</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>antialias</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether MSAA as the default anti-aliasing should be enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether MSAA as the default anti-aliasing should be enabled or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>samples</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>samples</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>When <code>antialias</code> is <code>true</code>, <code>4</code> samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0
-				</td>
-			<td class="description last"><p>When <code>antialias</code> is <code>true</code>, <code>4</code> samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>forceWebGL</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>forceWebGL</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>If set to <code>true</code>, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>If set to <code>true</code>, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>multiview</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>multiview</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>If set to <code>true</code>, the renderer will use multiview during WebXR rendering if supported.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>If set to <code>true</code>, the renderer will use multiview during WebXR rendering if supported.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>outputType</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>outputType</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>colorBufferType</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>colorBufferType</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Defines the type of color buffers. The default <code>HalfFloatType</code> is recommend for best
+quality. To save memory and bandwidth, <code>UnsignedByteType</code> might be used. This will reduce rendering quality though.</p>
+						<p>Default is <code>HalfFloatType</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					HalfFloatType
-				</td>
-			<td class="description last"><p>Defines the type of color buffers. The default <code>HalfFloatType</code> is recommend for best
-quality. To save memory and bandwidth, <code>UnsignedByteType</code> might be used. This will reduce rendering quality though.</p></td>
 		</tr>
 	</tbody>
 </table>

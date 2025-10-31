@@ -33,7 +33,7 @@ scene.add( reflector );
 				<pre><code class="language-js">import { Reflector } from 'three/addons/objects/Reflector.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Reflector" translate="no">new <a href="#Reflector">Reflector</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, options : <span class="param-type">Reflector~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="Reflector" translate="no">new <a href="#Reflector">Reflector</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, options : <span class="param-type"><a href="Reflector.html#~Options">Reflector~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new reflector.</p>
@@ -41,12 +41,20 @@ scene.add( reflector );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>geometry</code></td>
-									<td class="description last"><p>The reflector's geometry.</p></td>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The reflector's geometry.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The configuration options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -64,13 +72,15 @@ the scene from the mirror's point of view.</p>
 					<h3 class="name" id="forceUpdate" translate="no">.<a href="#forceUpdate">forceUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether to force an update, no matter if the reflector
-is in view or not.<br/>Default is <code>false</code>.</p>
+is in view or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isReflector" translate="no">.<a href="#isReflector">isReflector</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -96,98 +106,76 @@ method whenever this instance is no longer used in your app.</p>
 					<div class="description">
 						<p>Constructor options of <code>Reflector</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>color</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>color</strong>
+						<br>
 <span class="param-type">number</span>
 |
 <span class="param-type"><a href="Color.html">Color</a></span>
 |
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The reflector's color.</p>
+						<p>Default is <code>0x7F7F7F</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0x7F7F7F
-				</td>
-			<td class="description last"><p>The reflector's color.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>textureWidth</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>textureWidth</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture width. A higher value results in more clear reflections but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					512
-				</td>
-			<td class="description last"><p>The texture width. A higher value results in more clear reflections but is also more expensive.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>textureHeight</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>textureHeight</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture height. A higher value results in more clear reflections but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					512
-				</td>
-			<td class="description last"><p>The texture height. A higher value results in more clear reflections but is also more expensive.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>clipBias</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>clipBias</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The clip bias.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0
-				</td>
-			<td class="description last"><p>The clip bias.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>shader</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>shader</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>Can be used to pass in a custom shader that defines how the reflective view is projected onto the reflector's geometry.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Can be used to pass in a custom shader that defines how the reflective view is projected onto the reflector's geometry.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>multisample</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>multisample</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>How many samples to use for MSAA. <code>0</code> disables MSAA.</p>
+						<p>Default is <code>4</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					4
-				</td>
-			<td class="description last"><p>How many samples to use for MSAA. <code>0</code> disables MSAA.</p></td>
 		</tr>
 	</tbody>
 </table>

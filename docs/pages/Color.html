@@ -49,7 +49,7 @@ const color = new THREE.Color().setHex( 0x112233 );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Color" translate="no">new <a href="#Color">Color</a><span class="signature">( r : <span class="param-type">number | string | Color</span>, g : <span class="param-type">number</span>, b : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="Color" translate="no">new <a href="#Color">Color</a><span class="signature">( r : <span class="param-type">number | string | <a href="Color.html">Color</a></span>, g : <span class="param-type">number</span>, b : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new color.</p>
@@ -59,17 +59,29 @@ and that method is used throughout the rest of the documentation.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>r</code></td>
-									<td class="description last"><p>The red component of the color. If <code>g</code> and <code>b</code> are
-not provided, it can be hexadecimal triplet, a CSS-style string or another <code>Color</code> instance.</p></td>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>The red component of the color. If <code>g</code> and <code>b</code> are
+not provided, it can be hexadecimal triplet, a CSS-style string or another <code>Color</code> instance.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>g</code></td>
-									<td class="description last"><p>The green component.</p></td>
+									<td class="name">
+										<strong>g</strong>
+									</td>
+									<td class="description last">
+										<p>The green component.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>b</code></td>
-									<td class="description last"><p>The blue component.</p></td>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The blue component.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -79,25 +91,29 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 				<div class="member">
 					<h3 class="name" id="b" translate="no">.<a href="#b">b</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The blue component.<br/>Default is <code>1</code>.</p>
+						<p>The blue component.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="g" translate="no">.<a href="#g">g</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The green component.<br/>Default is <code>1</code>.</p>
+						<p>The green component.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isColor" translate="no">.<a href="#isColor">isColor</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="r" translate="no">.<a href="#r">r</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The red component.<br/>Default is <code>1</code>.</p>
+						<p>The red component.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -108,7 +124,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( color : <span class="param-type">Color</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the RGB values of the given color to the RGB values of this color.</p>
@@ -116,8 +132,12 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to add.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -125,7 +145,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="addColors" translate="no">.<a href="#addColors">addColors</a><span class="signature">( color1 : <span class="param-type">Color</span>, color2 : <span class="param-type">Color</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="addColors" translate="no">.<a href="#addColors">addColors</a><span class="signature">( color1 : <span class="param-type"><a href="Color.html">Color</a></span>, color2 : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the RGB values of the given colors and stores the result in this instance.</p>
@@ -133,12 +153,20 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color1</code></td>
-									<td class="description last"><p>The first color.</p></td>
+									<td class="name">
+										<strong>color1</strong>
+									</td>
+									<td class="description last">
+										<p>The first color.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>color2</code></td>
-									<td class="description last"><p>The second color.</p></td>
+									<td class="name">
+										<strong>color2</strong>
+									</td>
+									<td class="description last">
+										<p>The second color.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -154,8 +182,12 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>s</code></td>
-									<td class="description last"><p>The scalar to add.</p></td>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -163,7 +195,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="applyMatrix3" translate="no">.<a href="#applyMatrix3">applyMatrix3</a><span class="signature">( m : <span class="param-type">Matrix3</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="applyMatrix3" translate="no">.<a href="#applyMatrix3">applyMatrix3</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Transforms this color with the given 3x3 matrix.</p>
@@ -171,8 +203,12 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>m</code></td>
-									<td class="description last"><p>The matrix.</p></td>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -207,7 +243,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( color : <span class="param-type">Color</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given color to this instance.</p>
@@ -215,8 +251,12 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to copy.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -224,7 +264,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copyLinearToSRGB" translate="no">.<a href="#copyLinearToSRGB">copyLinearToSRGB</a><span class="signature">( color : <span class="param-type">Color</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="copyLinearToSRGB" translate="no">.<a href="#copyLinearToSRGB">copyLinearToSRGB</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the given color into this color, and then converts this color from
@@ -233,8 +273,12 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to copy/convert.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to copy/convert.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -242,7 +286,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copySRGBToLinear" translate="no">.<a href="#copySRGBToLinear">copySRGBToLinear</a><span class="signature">( color : <span class="param-type">Color</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="copySRGBToLinear" translate="no">.<a href="#copySRGBToLinear">copySRGBToLinear</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the given color into this color, and then converts this color from
@@ -251,8 +295,12 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to copy/convert.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to copy/convert.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -260,7 +308,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( c : <span class="param-type">Color</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( c : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this color is equal with the given one.</p>
@@ -268,8 +316,12 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>c</code></td>
-									<td class="description last"><p>The color to test for equality.</p></td>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The color to test for equality.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -285,12 +337,21 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>array</code></td>
-									<td class="description last"><p>An array holding the RGB values.</p></td>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding the RGB values.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offset</code></td>
-									<td class="description last"><p>The offset into the array.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset into the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -298,7 +359,7 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="fromBufferAttribute" translate="no">.<a href="#fromBufferAttribute">fromBufferAttribute</a><span class="signature">( attribute : <span class="param-type">BufferAttribute</span>, index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="fromBufferAttribute" translate="no">.<a href="#fromBufferAttribute">fromBufferAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, index : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the components of this color from the given buffer attribute.</p>
@@ -306,12 +367,20 @@ not provided, it can be hexadecimal triplet, a CSS-style string or another <code
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>attribute</code></td>
-									<td class="description last"><p>The buffer attribute holding color data.</p></td>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute holding color data.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the attribute.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -328,12 +397,21 @@ given target object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target object that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>ColorManagement.workingColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>ColorManagement.workingColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -349,8 +427,13 @@ given target object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>SRGBColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -366,8 +449,13 @@ given target object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>SRGBColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -375,7 +463,7 @@ given target object.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The hexadecimal value as a string.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getRGB" translate="no">.<a href="#getRGB">getRGB</a><span class="signature">( target : <span class="param-type">Color</span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="getRGB" translate="no">.<a href="#getRGB">getRGB</a><span class="signature">( target : <span class="param-type"><a href="Color.html">Color</a></span>, colorSpace : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the RGB values of this color and stores them into the given target object.</p>
@@ -383,12 +471,21 @@ given target object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target color that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target color that is used to store the method's result.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>ColorManagement.workingColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>ColorManagement.workingColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -404,8 +501,13 @@ given target object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>SRGBColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -413,7 +515,7 @@ given target object.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The CSS representation of this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="lerp" translate="no">.<a href="#lerp">lerp</a><span class="signature">( color : <span class="param-type">Color</span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="lerp" translate="no">.<a href="#lerp">lerp</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Linearly interpolates this color's RGB values toward the RGB values of the
@@ -423,12 +525,20 @@ the two colors, where <code>0.0</code> is this color and <code>1.0</code> is the
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to converge on.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to converge on.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>alpha</code></td>
-									<td class="description last"><p>The interpolation factor in the closed interval <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -436,7 +546,7 @@ the two colors, where <code>0.0</code> is this color and <code>1.0</code> is the
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="lerpColors" translate="no">.<a href="#lerpColors">lerpColors</a><span class="signature">( color1 : <span class="param-type">Color</span>, color2 : <span class="param-type">Color</span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="lerpColors" translate="no">.<a href="#lerpColors">lerpColors</a><span class="signature">( color1 : <span class="param-type"><a href="Color.html">Color</a></span>, color2 : <span class="param-type"><a href="Color.html">Color</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Linearly interpolates between the given colors and stores the result in this instance.
@@ -446,16 +556,28 @@ is the first and <code>1.0</code> is the second color.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color1</code></td>
-									<td class="description last"><p>The first color.</p></td>
+									<td class="name">
+										<strong>color1</strong>
+									</td>
+									<td class="description last">
+										<p>The first color.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>color2</code></td>
-									<td class="description last"><p>The second color.</p></td>
+									<td class="name">
+										<strong>color2</strong>
+									</td>
+									<td class="description last">
+										<p>The second color.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>alpha</code></td>
-									<td class="description last"><p>The interpolation factor in the closed interval <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -463,7 +585,7 @@ is the first and <code>1.0</code> is the second color.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="lerpHSL" translate="no">.<a href="#lerpHSL">lerpHSL</a><span class="signature">( color : <span class="param-type">Color</span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="lerpHSL" translate="no">.<a href="#lerpHSL">lerpHSL</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Linearly interpolates this color's HSL values toward the HSL values of the
@@ -475,12 +597,20 @@ the two colors, where 0.0 is this color and 1.0 is the first argument.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to converge on.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to converge on.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>alpha</code></td>
-									<td class="description last"><p>The interpolation factor in the closed interval <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor in the closed interval <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -488,7 +618,7 @@ the two colors, where 0.0 is this color and 1.0 is the first argument.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="multiply" translate="no">.<a href="#multiply">multiply</a><span class="signature">( color : <span class="param-type">Color</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="multiply" translate="no">.<a href="#multiply">multiply</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Multiplies the RGB values of the given color with the RGB values of this color.</p>
@@ -496,8 +626,12 @@ the two colors, where 0.0 is this color and 1.0 is the first argument.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to multiply.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to multiply.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -513,8 +647,12 @@ the two colors, where 0.0 is this color and 1.0 is the first argument.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>s</code></td>
-									<td class="description last"><p>The scalar to multiply.</p></td>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar to multiply.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -532,16 +670,28 @@ and then converts the color back to RGB.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>h</code></td>
-									<td class="description last"><p>Hue value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>h</strong>
+									</td>
+									<td class="description last">
+										<p>Hue value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>s</code></td>
-									<td class="description last"><p>Saturation value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>Saturation value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>l</code></td>
-									<td class="description last"><p>Lightness value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>l</strong>
+									</td>
+									<td class="description last">
+										<p>Lightness value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -549,7 +699,7 @@ and then converts the color back to RGB.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( r : <span class="param-type">number | string | Color</span>, g : <span class="param-type">number</span>, b : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( r : <span class="param-type">number | string | <a href="Color.html">Color</a></span>, g : <span class="param-type">number</span>, b : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the colors's components from the given values.</p>
@@ -557,17 +707,29 @@ and then converts the color back to RGB.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>r</code></td>
-									<td class="description last"><p>The red component of the color. If <code>g</code> and <code>b</code> are
-not provided, it can be hexadecimal triplet, a CSS-style string or another <code>Color</code> instance.</p></td>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>The red component of the color. If <code>g</code> and <code>b</code> are
+not provided, it can be hexadecimal triplet, a CSS-style string or another <code>Color</code> instance.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>g</code></td>
-									<td class="description last"><p>The green component.</p></td>
+									<td class="name">
+										<strong>g</strong>
+									</td>
+									<td class="description last">
+										<p>The green component.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>b</code></td>
-									<td class="description last"><p>The blue component.</p></td>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The blue component.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -587,12 +749,21 @@ you don't need the other CSS-style formats.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>style</code></td>
-									<td class="description last"><p>The color name.</p></td>
+									<td class="name">
+										<strong>style</strong>
+									</td>
+									<td class="description last">
+										<p>The color name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>SRGBColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -600,7 +771,7 @@ you don't need the other CSS-style formats.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setFromVector3" translate="no">.<a href="#setFromVector3">setFromVector3</a><span class="signature">( v : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="setFromVector3" translate="no">.<a href="#setFromVector3">setFromVector3</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the color's RGB components from the given 3D vector.</p>
@@ -608,8 +779,12 @@ you don't need the other CSS-style formats.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>v</code></td>
-									<td class="description last"><p>The vector to set.</p></td>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -625,20 +800,37 @@ you don't need the other CSS-style formats.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>h</code></td>
-									<td class="description last"><p>Hue value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>h</strong>
+									</td>
+									<td class="description last">
+										<p>Hue value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>s</code></td>
-									<td class="description last"><p>Saturation value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>s</strong>
+									</td>
+									<td class="description last">
+										<p>Saturation value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>l</code></td>
-									<td class="description last"><p>Lightness value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>l</strong>
+									</td>
+									<td class="description last">
+										<p>Lightness value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>ColorManagement.workingColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>ColorManagement.workingColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -654,12 +846,21 @@ you don't need the other CSS-style formats.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>hex</code></td>
-									<td class="description last"><p>The hexadecimal value.</p></td>
+									<td class="name">
+										<strong>hex</strong>
+									</td>
+									<td class="description last">
+										<p>The hexadecimal value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>SRGBColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -675,20 +876,37 @@ you don't need the other CSS-style formats.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>r</code></td>
-									<td class="description last"><p>Red channel value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>Red channel value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>g</code></td>
-									<td class="description last"><p>Green channel value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>g</strong>
+									</td>
+									<td class="description last">
+										<p>Green channel value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>b</code></td>
-									<td class="description last"><p>Blue channel value between <code>0.0</code> and <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>Blue channel value between <code>0.0</code> and <code>1.0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>ColorManagement.workingColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>ColorManagement.workingColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -704,8 +922,12 @@ you don't need the other CSS-style formats.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scalar</code></td>
-									<td class="description last"><p>The scalar value.</p></td>
+									<td class="name">
+										<strong>scalar</strong>
+									</td>
+									<td class="description last">
+										<p>The scalar value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -724,12 +946,21 @@ all 140 color names are supported).</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>style</code></td>
-									<td class="description last"><p>Color as a CSS-style string.</p></td>
+									<td class="name">
+										<strong>style</strong>
+									</td>
+									<td class="description last">
+										<p>Color as a CSS-style string.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>colorSpace</code></td>
-									<td class="description last"><p>The color space.<br/>Default is <code>SRGBColorSpace</code>.</p></td>
+									<td class="name">
+										<strong>colorSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The color space.</p>
+										<p>Default is <code>SRGBColorSpace</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -737,7 +968,7 @@ all 140 color names are supported).</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this color.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="sub" translate="no">.<a href="#sub">sub</a><span class="signature">( color : <span class="param-type">Color</span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
+					<h3 class="name name-method" id="sub" translate="no">.<a href="#sub">sub</a><span class="signature">( color : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Subtracts the RGB values of the given color from the RGB values of this color.</p>
@@ -745,8 +976,12 @@ all 140 color names are supported).</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The color to subtract.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The color to subtract.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -763,12 +998,22 @@ the method returns a new instance.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>array</code></td>
-									<td class="description last"><p>The target array holding the color components.<br/>Default is <code>[]</code>.</p></td>
+									<td class="name">
+										<strong>array</strong>
+									</td>
+									<td class="description last">
+										<p>The target array holding the color components.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offset</code></td>
-									<td class="description last"><p>Index of the first element in the array.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first element in the array.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

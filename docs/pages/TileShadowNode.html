@@ -24,7 +24,7 @@ to improve shadow quality and performance for large scenes.</p>
 				<pre><code class="language-js">import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="TileShadowNode" translate="no">new <a href="#TileShadowNode">TileShadowNode</a><span class="signature">( light : <span class="param-type">Light</span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="TileShadowNode" translate="no">new <a href="#TileShadowNode">TileShadowNode</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates an instance of <code>TileShadowNode</code>.</p>
@@ -32,30 +32,56 @@ to improve shadow quality and performance for large scenes.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>light</code></td>
-									<td class="description last"><p>The original light source used for shadow mapping.</p></td>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The original light source used for shadow mapping.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>Configuration options for the tiled shadow node.<br/>Default is <code>{}</code>.</p>
-										<h6>Properties</h6>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>Configuration options for the tiled shadow node.</p>
+										<p>Default is <code>{}</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>tilesX</code></td>
-									<td class="description last"><p>The number of tiles along the X-axis.<br/>Default is <code>2</code>.</p></td>
+									<td class="name">
+										<strong>tilesX</strong>
+									</td>
+									<td class="description last">
+										<p>The number of tiles along the X-axis.</p>
+										<p>Default is <code>2</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>tilesY</code></td>
-									<td class="description last"><p>The number of tiles along the Y-axis.<br/>Default is <code>2</code>.</p></td>
+									<td class="name">
+										<strong>tilesY</strong>
+									</td>
+									<td class="description last">
+										<p>The number of tiles along the Y-axis.</p>
+										<p>Default is <code>2</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>resolution</code></td>
-									<td class="description last"><p>The resolution of the shadow map.</p></td>
+									<td class="name">
+										<strong>resolution</strong>
+									</td>
+									<td class="description last">
+										<p>The resolution of the shadow map.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>debug</code></td>
-									<td class="description last"><p>Whether to enable debug mode.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>debug</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to enable debug mode.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -81,12 +107,20 @@ Used internally during dispose and potential re-initialization.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>tilesX</code></td>
-									<td class="description last"><p>The number of tiles along the X-axis.</p></td>
+									<td class="name">
+										<strong>tilesX</strong>
+									</td>
+									<td class="description last">
+										<p>The number of tiles along the X-axis.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>tilesY</code></td>
-									<td class="description last"><p>The number of tiles along the Y-axis.</p></td>
+									<td class="name">
+										<strong>tilesY</strong>
+									</td>
+									<td class="description last">
+										<p>The number of tiles along the Y-axis.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -102,8 +136,12 @@ Used internally during dispose and potential re-initialization.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The builder used to create render targets and other resources.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The builder used to create render targets and other resources.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -116,8 +154,12 @@ Used internally during dispose and potential re-initialization.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The builder used to set up the shadow node.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The builder used to set up the shadow node.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -128,7 +170,7 @@ Used internally during dispose and potential re-initialization.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A node representing the shadow value.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="syncLightTransformation" translate="no">.<a href="#syncLightTransformation">syncLightTransformation</a><span class="signature">( lwLight : <span class="param-type">LwLight</span>, sourceLight : <span class="param-type">Light</span> )</span> </h3>
+					<h3 class="name name-method" id="syncLightTransformation" translate="no">.<a href="#syncLightTransformation">syncLightTransformation</a><span class="signature">( lwLight : <span class="param-type">LwLight</span>, sourceLight : <span class="param-type"><a href="Light.html">Light</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Synchronizes the transformation of a tile light with the source light.</p>
@@ -136,12 +178,20 @@ Used internally during dispose and potential re-initialization.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>lwLight</code></td>
-									<td class="description last"><p>The tile light to synchronize.</p></td>
+									<td class="name">
+										<strong>lwLight</strong>
+									</td>
+									<td class="description last">
+										<p>The tile light to synchronize.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>sourceLight</code></td>
-									<td class="description last"><p>The source light to copy transformations from.</p></td>
+									<td class="name">
+										<strong>sourceLight</strong>
+									</td>
+									<td class="description last">
+										<p>The source light to copy transformations from.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -155,7 +205,7 @@ Used internally during dispose and potential re-initialization.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowBaseNode.html#update">ShadowBaseNode#update</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>The implementation performs the update of the shadow map if necessary.</p>
@@ -163,8 +213,12 @@ Used internally during dispose and potential re-initialization.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>A reference to the current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -178,7 +232,7 @@ Used internally during dispose and potential re-initialization.</p>
 							<p>Updates the initial light direction based on the light's target position.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="updateShadow" translate="no">.<a href="#updateShadow">updateShadow</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="updateShadow" translate="no">.<a href="#updateShadow">updateShadow</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the shadow map rendering.</p>
@@ -186,8 +240,12 @@ Used internally during dispose and potential re-initialization.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>A reference to the current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

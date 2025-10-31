@@ -20,7 +20,7 @@ fragment or for depth evaluation purposes.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ViewportDepthNode" translate="no">new <a href="#ViewportDepthNode">ViewportDepthNode</a><span class="signature">( scope : <span class="param-type">'depth' | 'depthBase' | 'linearDepth'</span>, valueNode : <span class="param-type">Node</span> )</span> </h3>
+					<h3 class="name name-method" id="ViewportDepthNode" translate="no">new <a href="#ViewportDepthNode">ViewportDepthNode</a><span class="signature">( scope : <span class="param-type">'depth' | 'depthBase' | 'linearDepth'</span>, valueNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new viewport depth node.</p>
@@ -28,12 +28,21 @@ fragment or for depth evaluation purposes.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scope</code></td>
-									<td class="description last"><p>The node's scope.</p></td>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The node's scope.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>valueNode</code></td>
-									<td class="description last"><p>The value node.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>valueNode</strong>
+									</td>
+									<td class="description last">
+										<p>The value node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -43,7 +52,8 @@ fragment or for depth evaluation purposes.</p></div>
 				<div class="member">
 					<h3 class="name" id="isViewportDepthNode" translate="no">.<a href="#isViewportDepthNode">isViewportDepthNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -62,7 +72,8 @@ If a <code>valueNode</code> is set, the scope can be used to convert perspective
 					<h3 class="name" id="valueNode" translate="no">.<a href="#valueNode">valueNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="description">
 						<p>Can be used to define a custom depth value.
-The property is ignored in the <code>ViewportDepthNode.DEPTH</code> scope.<br/>Default is <code>null</code>.</p>
+The property is ignored in the <code>ViewportDepthNode.DEPTH</code> scope.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>

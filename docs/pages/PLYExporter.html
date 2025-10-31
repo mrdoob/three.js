@@ -33,7 +33,7 @@ const data = exporter.parse( scene, options );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( object : <span class="param-type">Object3D</span>, onDone : <span class="param-type">PLYExporter~OnDone</span>, options : <span class="param-type">PLYExporter~Options</span> )</span><span class="type-signature"> : string | ArrayBuffer</span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, onDone : <span class="param-type"><a href="PLYExporter.html#~OnDone">PLYExporter~OnDone</a></span>, options : <span class="param-type"><a href="PLYExporter.html#~Options">PLYExporter~Options</a></span> )</span><span class="type-signature"> : string | ArrayBuffer</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the given 3D object and generates the PLY output.</p>
@@ -42,16 +42,28 @@ const data = exporter.parse( scene, options );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object to export.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to export.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onDone</code></td>
-									<td class="description last"><p>A callback function that is executed when the export has finished.</p></td>
+									<td class="name">
+										<strong>onDone</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that is executed when the export has finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The export options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The export options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -68,8 +80,12 @@ const data = exporter.parse( scene, options );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>result</code></td>
-									<td class="description last"><p>The generated PLY ascii or binary.</p></td>
+									<td class="name">
+										<strong>result</strong>
+									</td>
+									<td class="description last">
+										<p>The generated PLY ascii or binary.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -79,57 +95,41 @@ const data = exporter.parse( scene, options );
 					<div class="description">
 						<p>Export options of <code>PLYExporter</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>binary</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>binary</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to export in binary format or ASCII.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to export in binary format or ASCII.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>excludeAttributes</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>excludeAttributes</strong>
+						<br>
 <span class="param-type">Array.&lt;string></span>
-			</td>
-				<td class="attributes">
-					&lt;optional><br>
 				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Which properties to explicitly exclude from
+			<td class="description last">
+				<p>Which properties to explicitly exclude from
 the exported PLY file. Valid values are <code>'color'</code>, <code>'normal'</code>, <code>'uv'</code>, and <code>'index'</code>. If triangle
-indices are excluded, then a point cloud is exported.</p></td>
+indices are excluded, then a point cloud is exported.</p>
+			</td>
 		</tr>
 		<tr>
-				<td class="name"><code>littleEndian</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>littleEndian</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the binary export uses little or big endian.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether the binary export uses little or big endian.</p></td>
 		</tr>
 	</tbody>
 </table>

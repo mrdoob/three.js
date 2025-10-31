@@ -19,7 +19,7 @@ properties and methods described here.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Light" translate="no">new <a href="#Light">Light</a><span class="signature">( color : <span class="param-type">number | Color | string</span>, intensity : <span class="param-type">number</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="Light" translate="no">new <a href="#Light">Light</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, intensity : <span class="param-type">number</span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new light.</p>
@@ -27,12 +27,22 @@ properties and methods described here.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The light's color.<br/>Default is <code>0xffffff</code>.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The light's color.</p>
+										<p>Default is <code>0xffffff</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intensity</code></td>
-									<td class="description last"><p>The light's strength/intensity.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>intensity</strong>
+									</td>
+									<td class="description last">
+										<p>The light's strength/intensity.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -48,13 +58,15 @@ properties and methods described here.</p></div>
 				<div class="member">
 					<h3 class="name" id="intensity" translate="no">.<a href="#intensity">intensity</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The light's intensity.<br/>Default is <code>1</code>.</p>
+						<p>The light's intensity.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isLight" translate="no">.<a href="#isLight">isLight</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>

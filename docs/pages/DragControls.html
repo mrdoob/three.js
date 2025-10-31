@@ -31,7 +31,7 @@ controls.addEventListener( 'dragend', function ( event ) {
 				<pre><code class="language-js">import { DragControls } from 'three/addons/controls/DragControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="DragControls" translate="no">new <a href="#DragControls">DragControls</a><span class="signature">( objects : <span class="param-type">Array.&lt;Object3D></span>, camera : <span class="param-type">Camera</span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<h3 class="name name-method" id="DragControls" translate="no">new <a href="#DragControls">DragControls</a><span class="signature">( objects : <span class="param-type">Array.&lt;<a href="Object3D.html">Object3D</a>></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new controls instance.</p>
@@ -39,16 +39,29 @@ controls.addEventListener( 'dragend', function ( event ) {
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>objects</code></td>
-									<td class="description last"><p>An array of draggable 3D objects.</p></td>
+									<td class="name">
+										<strong>objects</strong>
+									</td>
+									<td class="description last">
+										<p>An array of draggable 3D objects.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera of the rendered scene.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera of the rendered scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>domElement</code></td>
-									<td class="description last"><p>The HTML DOM element used for event listeners.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML DOM element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -70,21 +83,24 @@ controls.addEventListener( 'dragend', function ( event ) {
 				<div class="member">
 					<h3 class="name" id="recursive" translate="no">.<a href="#recursive">recursive</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether children of draggable objects can be dragged independently from their parent.<br/>Default is <code>true</code>.</p>
+						<p>Whether children of draggable objects can be dragged independently from their parent.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="rotateSpeed" translate="no">.<a href="#rotateSpeed">rotateSpeed</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The speed at which the object will rotate when dragged in <code>rotate</code> mode.
-The higher the number the faster the rotation.<br/>Default is <code>1</code>.</p>
+The higher the number the faster the rotation.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="transformGroup" translate="no">.<a href="#transformGroup">transformGroup</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>This option only works if the <code>objects</code> array contains a single draggable  group object.
-If set to <code>true</code>, the controls does not transform individual objects but the entire group.<br/>Default is <code>false</code>.</p>
+If set to <code>true</code>, the controls does not transform individual objects but the entire group.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Events</h2>

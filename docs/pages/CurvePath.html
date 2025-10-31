@@ -31,7 +31,8 @@ array of connected curves, but retains the API of a curve.</p></div>
 					<h3 class="name" id="autoClose" translate="no">.<a href="#autoClose">autoClose</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether the path should automatically be closed
-by a line curve.<br/>Default is <code>false</code>.</p>
+by a line curve.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -42,7 +43,7 @@ path.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( curve : <span class="param-type">Curve</span> )</span> </h3>
+					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( curve : <span class="param-type"><a href="Curve.html">Curve</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds a curve to this curve path.</p>
@@ -50,8 +51,12 @@ path.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>curve</code></td>
-									<td class="description last"><p>The curve to add.</p></td>
+									<td class="name">
+										<strong>curve</strong>
+									</td>
+									<td class="description last">
+										<p>The curve to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -74,7 +79,7 @@ path.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The curve lengths.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type">Vector2 | Vector3</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method returns a vector in 2D or 3D space (depending on the curve definitions)
@@ -83,12 +88,20 @@ for the given interpolation factor.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalTarget</code></td>
-									<td class="description last"><p>The optional target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

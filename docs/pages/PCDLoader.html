@@ -36,7 +36,7 @@ scene.add( points );
 				<pre><code class="language-js">import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PCDLoader" translate="no">new <a href="#PCDLoader">PCDLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="PCDLoader" translate="no">new <a href="#PCDLoader">PCDLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new PCD loader.</p>
@@ -44,8 +44,12 @@ scene.add( points );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -55,7 +59,8 @@ scene.add( points );
 				<div class="member">
 					<h3 class="name" id="littleEndian" translate="no">.<a href="#littleEndian">littleEndian</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to use little Endian or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether to use little Endian or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -67,20 +72,36 @@ scene.add( points );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>dataview</code></td>
-									<td class="description last"><p>The DataView to read from.</p></td>
+									<td class="name">
+										<strong>dataview</strong>
+									</td>
+									<td class="description last">
+										<p>The DataView to read from.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offset</code></td>
-									<td class="description last"><p>The offset to start reading from.</p></td>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset to start reading from.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>Field type.</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>Field type.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>size</code></td>
-									<td class="description last"><p>Field size.</p></td>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>Field size.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -88,7 +109,7 @@ scene.add( points );
 							<dt class="tag-returns"><strong>Returns:</strong> Field value.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded PCD asset
@@ -97,20 +118,36 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -126,8 +163,12 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>The raw PCD data as an array buffer.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The raw PCD data as an array buffer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

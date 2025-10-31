@@ -21,7 +21,7 @@ on the screen.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="RenderTarget" translate="no">new <a href="#RenderTarget">RenderTarget</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, options : <span class="param-type">RenderTarget~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="RenderTarget" translate="no">new <a href="#RenderTarget">RenderTarget</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, options : <span class="param-type"><a href="RenderTarget.html#~Options">RenderTarget~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new render target.</p>
@@ -29,16 +29,30 @@ on the screen.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the render target.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the render target.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the render target.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the render target.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The configuration object.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -48,13 +62,15 @@ on the screen.</p></div>
 				<div class="member">
 					<h3 class="name" id="depth" translate="no">.<a href="#depth">depth</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The depth of the render target.<br/>Default is <code>1</code>.</p>
+						<p>The depth of the render target.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="depthBuffer" translate="no">.<a href="#depthBuffer">depthBuffer</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to allocate a depth buffer or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether to allocate a depth buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -62,64 +78,74 @@ on the screen.</p></div>
 					<div class="description">
 						<p>Instead of saving the depth in a renderbuffer, a texture
 can be used instead which is useful for further processing
-e.g. in context of post-processing.<br/>Default is <code>null</code>.</p>
+e.g. in context of post-processing.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="height" translate="no">.<a href="#height">height</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The height of the render target.<br/>Default is <code>1</code>.</p>
+						<p>The height of the render target.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isRenderTarget" translate="no">.<a href="#isRenderTarget">isRenderTarget</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="multiview" translate="no">.<a href="#multiview">multiview</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to this target is used in multiview rendering.<br/>Default is <code>false</code>.</p>
+						<p>Whether to this target is used in multiview rendering.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="resolveDepthBuffer" translate="no">.<a href="#resolveDepthBuffer">resolveDepthBuffer</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to resolve the depth buffer or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether to resolve the depth buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="resolveStencilBuffer" translate="no">.<a href="#resolveStencilBuffer">resolveStencilBuffer</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to resolve the stencil buffer or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether to resolve the stencil buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="samples" translate="no">.<a href="#samples">samples</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The number of MSAA samples.</p>
-<p>A value of <code>0</code> disables MSAA.<br/>Default is <code>0</code>.</p>
+<p>A value of <code>0</code> disables MSAA.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="scissor" translate="no">.<a href="#scissor">scissor</a><span class="type-signature"> : <a href="Vector4.html">Vector4</a></span> </h3>
 					<div class="description">
 						<p>A rectangular area inside the render target's viewport. Fragments that are
-outside the area will be discarded.<br/>Default is <code>(0,0,width,height)</code>.</p>
+outside the area will be discarded.</p>
+						<p>Default is <code>(0,0,width,height)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="scissorTest" translate="no">.<a href="#scissorTest">scissorTest</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Indicates whether the scissor test should be enabled when rendering into
-this render target or not.<br/>Default is <code>false</code>.</p>
+this render target or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="stencilBuffer" translate="no">.<a href="#stencilBuffer">stencilBuffer</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to allocate a stencil buffer or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether to allocate a stencil buffer or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -138,13 +164,15 @@ Has at least a single entry for the default color attachment.</p>
 				<div class="member">
 					<h3 class="name" id="viewport" translate="no">.<a href="#viewport">viewport</a><span class="type-signature"> : <a href="Vector4.html">Vector4</a></span> </h3>
 					<div class="description">
-						<p>A rectangular area representing the render target's viewport.<br/>Default is <code>(0,0,width,height)</code>.</p>
+						<p>A rectangular area representing the render target's viewport.</p>
+						<p>Default is <code>(0,0,width,height)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="width" translate="no">.<a href="#width">width</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The width of the render target.<br/>Default is <code>1</code>.</p>
+						<p>The width of the render target.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -157,7 +185,7 @@ Has at least a single entry for the default color attachment.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type">RenderTarget</span> )</span><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a></span> )</span><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the settings of the given render target. This is a structural copy so
@@ -167,8 +195,12 @@ all MRT textures and the depth texture.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>source</code></td>
-									<td class="description last"><p>The render target to copy.</p></td>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The render target to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -195,16 +227,29 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>depth</code></td>
-									<td class="description last"><p>The depth.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>depth</strong>
+									</td>
+									<td class="description last">
+										<p>The depth.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -215,266 +260,216 @@ method whenever this instance is no longer used in your app.</p>
 					<div class="description">
 						<p>Render target options.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>generateMipmaps</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>generateMipmaps</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to generate mipmaps or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to generate mipmaps or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>magFilter</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>magFilter</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The mag filter.</p>
+						<p>Default is <code>LinearFilter</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					LinearFilter
-				</td>
-			<td class="description last"><p>The mag filter.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>minFilter</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>minFilter</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The min filter.</p>
+						<p>Default is <code>LinearFilter</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					LinearFilter
-				</td>
-			<td class="description last"><p>The min filter.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>format</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>format</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture format.</p>
+						<p>Default is <code>RGBAFormat</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					RGBAFormat
-				</td>
-			<td class="description last"><p>The texture format.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>type</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>type</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture type.</p>
+						<p>Default is <code>UnsignedByteType</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					UnsignedByteType
-				</td>
-			<td class="description last"><p>The texture type.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>internalFormat</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>internalFormat</strong>
+						<br>
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The texture's internal format.</p>
+						<p>Default is <code>null</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-					&lt;nullable><br>
-				</td>
-				<td class="default">
-					null
-				</td>
-			<td class="description last"><p>The texture's internal format.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>wrapS</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>wrapS</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture's uv wrapping mode.</p>
+						<p>Default is <code>ClampToEdgeWrapping</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					ClampToEdgeWrapping
-				</td>
-			<td class="description last"><p>The texture's uv wrapping mode.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>wrapT</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>wrapT</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture's uv wrapping mode.</p>
+						<p>Default is <code>ClampToEdgeWrapping</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					ClampToEdgeWrapping
-				</td>
-			<td class="description last"><p>The texture's uv wrapping mode.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>anisotropy</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>anisotropy</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture's anisotropy value.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>The texture's anisotropy value.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>colorSpace</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>colorSpace</strong>
+						<br>
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The texture's color space.</p>
+						<p>Default is <code>NoColorSpace</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					NoColorSpace
-				</td>
-			<td class="description last"><p>The texture's color space.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>depthBuffer</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>depthBuffer</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to allocate a depth buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether to allocate a depth buffer or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>stencilBuffer</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>stencilBuffer</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to allocate a stencil buffer or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to allocate a stencil buffer or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>resolveDepthBuffer</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>resolveDepthBuffer</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to resolve the depth buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether to resolve the depth buffer or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>resolveStencilBuffer</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>resolveStencilBuffer</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether  to resolve the stencil buffer or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether  to resolve the stencil buffer or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>depthTexture</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>depthTexture</strong>
+						<br>
 <span class="param-type"><a href="Texture.html">Texture</a></span>
+				</td>
+			<td class="description last">
+				<p>Reference to a depth texture.</p>
+						<p>Default is <code>null</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-					&lt;nullable><br>
-				</td>
-				<td class="default">
-					null
-				</td>
-			<td class="description last"><p>Reference to a depth texture.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>samples</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>samples</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The MSAA samples count.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0
-				</td>
-			<td class="description last"><p>The MSAA samples count.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>count</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>count</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Defines the number of color attachments . Must be at least <code>1</code>.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>Defines the number of color attachments . Must be at least <code>1</code>.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>depth</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>depth</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture depth.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>The texture depth.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>multiview</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>multiview</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether this target is used for multiview rendering.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether this target is used for multiview rendering.</p></td>
 		</tr>
 	</tbody>
 </table>

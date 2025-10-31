@@ -25,7 +25,7 @@ or <a href="FBXLoader.html">FBXLoader</a> import respective models.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SkinnedMesh" translate="no">new <a href="#SkinnedMesh">SkinnedMesh</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, material : <span class="param-type">Material | Array.&lt;Material></span> )</span> </h3>
+					<h3 class="name name-method" id="SkinnedMesh" translate="no">new <a href="#SkinnedMesh">SkinnedMesh</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a> | Array.&lt;<a href="Material.html">Material</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new skinned mesh.</p>
@@ -33,12 +33,20 @@ or <a href="FBXLoader.html">FBXLoader</a> import respective models.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>geometry</code></td>
-									<td class="description last"><p>The mesh geometry.</p></td>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh geometry.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>material</code></td>
-									<td class="description last"><p>The mesh material.</p></td>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh material.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,29 +70,33 @@ or <a href="FBXLoader.html">FBXLoader</a> import respective models.</p></div>
 					<div class="description">
 						<p><code>AttachedBindMode</code> means the skinned mesh shares the same world space as the skeleton.
 This is not true when using <code>DetachedBindMode</code> which is useful when sharing a skeleton
-across multiple skinned meshes.<br/>Default is <code>AttachedBindMode</code>.</p>
+across multiple skinned meshes.</p>
+						<p>Default is <code>AttachedBindMode</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="boundingBox" translate="no">.<a href="#boundingBox">boundingBox</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
 					<div class="description">
-						<p>The bounding box of the skinned mesh. Can be computed via <a href="SkinnedMesh.html#computeBoundingBox">SkinnedMesh#computeBoundingBox</a>.<br/>Default is <code>null</code>.</p>
+						<p>The bounding box of the skinned mesh. Can be computed via <a href="SkinnedMesh.html#computeBoundingBox">SkinnedMesh#computeBoundingBox</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="boundingSphere" translate="no">.<a href="#boundingSphere">boundingSphere</a><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
 					<div class="description">
-						<p>The bounding sphere of the skinned mesh. Can be computed via <a href="SkinnedMesh.html#computeBoundingSphere">SkinnedMesh#computeBoundingSphere</a>.<br/>Default is <code>null</code>.</p>
+						<p>The bounding sphere of the skinned mesh. Can be computed via <a href="SkinnedMesh.html#computeBoundingSphere">SkinnedMesh#computeBoundingSphere</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isSkinnedMesh" translate="no">.<a href="#isSkinnedMesh">isSkinnedMesh</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="applyBoneTransform" translate="no">.<a href="#applyBoneTransform">applyBoneTransform</a><span class="signature">( index : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="applyBoneTransform" translate="no">.<a href="#applyBoneTransform">applyBoneTransform</a><span class="signature">( index : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Applies the bone transform associated with the given index to the given
@@ -93,13 +105,21 @@ vertex position. Returns the updated vector.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The vertex index.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The vertex index.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target object that is used to store the method's result.
-the skinned mesh's world matrix will be used instead.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target object that is used to store the method's result.
+the skinned mesh's world matrix will be used instead.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -107,7 +127,7 @@ the skinned mesh's world matrix will be used instead.</p></td>
 							<dt class="tag-returns"><strong>Returns:</strong> The updated vertex position.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="bind" translate="no">.<a href="#bind">bind</a><span class="signature">( skeleton : <span class="param-type">Skeleton</span>, bindMatrix : <span class="param-type">Matrix4</span> )</span> </h3>
+					<h3 class="name name-method" id="bind" translate="no">.<a href="#bind">bind</a><span class="signature">( skeleton : <span class="param-type"><a href="Skeleton.html">Skeleton</a></span>, bindMatrix : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Binds the given skeleton to the skinned mesh.</p>
@@ -115,13 +135,21 @@ the skinned mesh's world matrix will be used instead.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>skeleton</code></td>
-									<td class="description last"><p>The skeleton to bind.</p></td>
+									<td class="name">
+										<strong>skeleton</strong>
+									</td>
+									<td class="description last">
+										<p>The skeleton to bind.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>bindMatrix</code></td>
-									<td class="description last"><p>The bind matrix. If no bind matrix is provided,
-the skinned mesh's world matrix will be used instead.</p></td>
+									<td class="name">
+										<strong>bindMatrix</strong>
+									</td>
+									<td class="description last">
+										<p>The bind matrix. If no bind matrix is provided,
+the skinned mesh's world matrix will be used instead.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

@@ -21,7 +21,7 @@
 				<pre><code class="language-js">import { transition } from 'three/addons/tsl/display/TransitionNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="TransitionNode" translate="no">new <a href="#TransitionNode">TransitionNode</a><span class="signature">( textureNodeA : <span class="param-type">TextureNode</span>, textureNodeB : <span class="param-type">TextureNode</span>, mixTextureNode : <span class="param-type">TextureNode</span>, mixRatioNode : <span class="param-type">Node.&lt;float></span>, thresholdNode : <span class="param-type">Node.&lt;float></span>, useTextureNode : <span class="param-type">Node.&lt;float></span> )</span> </h3>
+					<h3 class="name name-method" id="TransitionNode" translate="no">new <a href="#TransitionNode">TransitionNode</a><span class="signature">( textureNodeA : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, textureNodeB : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, mixTextureNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, mixRatioNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, thresholdNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, useTextureNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new transition node.</p>
@@ -29,28 +29,52 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>textureNodeA</code></td>
-									<td class="description last"><p>A texture node that represents the beauty pass of the first scene.</p></td>
+									<td class="name">
+										<strong>textureNodeA</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the beauty pass of the first scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textureNodeB</code></td>
-									<td class="description last"><p>A texture node that represents the beauty pass of the second scene.</p></td>
+									<td class="name">
+										<strong>textureNodeB</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that represents the beauty pass of the second scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>mixTextureNode</code></td>
-									<td class="description last"><p>A texture node that defines how the transition effect should look like.</p></td>
+									<td class="name">
+										<strong>mixTextureNode</strong>
+									</td>
+									<td class="description last">
+										<p>A texture node that defines how the transition effect should look like.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>mixRatioNode</code></td>
-									<td class="description last"><p>The interpolation factor that controls the mix.</p></td>
+									<td class="name">
+										<strong>mixRatioNode</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor that controls the mix.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>thresholdNode</code></td>
-									<td class="description last"><p>Can be used to tweak the linear interpolation.</p></td>
+									<td class="name">
+										<strong>thresholdNode</strong>
+									</td>
+									<td class="description last">
+										<p>Can be used to tweak the linear interpolation.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>useTextureNode</code></td>
-									<td class="description last"><p>Whether <code>mixTextureNode</code> should influence the transition or not.</p></td>
+									<td class="name">
+										<strong>useTextureNode</strong>
+									</td>
+									<td class="description last">
+										<p>Whether <code>mixTextureNode</code> should influence the transition or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -94,7 +118,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>
@@ -102,16 +126,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

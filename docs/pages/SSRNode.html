@@ -22,7 +22,7 @@
 				<pre><code class="language-js">import { ssr } from 'three/addons/tsl/display/SSRNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SSRNode" translate="no">new <a href="#SSRNode">SSRNode</a><span class="signature">( colorNode : <span class="param-type">Node.&lt;vec4></span>, depthNode : <span class="param-type">Node.&lt;float></span>, normalNode : <span class="param-type">Node.&lt;vec3></span>, metalnessNode : <span class="param-type">Node.&lt;float></span>, roughnessNode : <span class="param-type">Node.&lt;float></span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="SSRNode" translate="no">new <a href="#SSRNode">SSRNode</a><span class="signature">( colorNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, depthNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, metalnessNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, roughnessNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new SSR node.</p>
@@ -30,28 +30,54 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>colorNode</code></td>
-									<td class="description last"><p>The node that represents the beauty pass.</p></td>
+									<td class="name">
+										<strong>colorNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that represents the beauty pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>depthNode</code></td>
-									<td class="description last"><p>A node that represents the beauty pass's depth.</p></td>
+									<td class="name">
+										<strong>depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the beauty pass's depth.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>normalNode</code></td>
-									<td class="description last"><p>A node that represents the beauty pass's normals.</p></td>
+									<td class="name">
+										<strong>normalNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the beauty pass's normals.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>metalnessNode</code></td>
-									<td class="description last"><p>A node that represents the beauty pass's metalness.</p></td>
+									<td class="name">
+										<strong>metalnessNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the beauty pass's metalness.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>roughnessNode</code></td>
-									<td class="description last"><p>A node that represents the beauty pass's roughness.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>roughnessNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the beauty pass's roughness.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera the scene is rendered with.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -124,7 +150,8 @@ overhead.</p>
 						<p>The resolution scale. Valid values are in the range
 <code>[0,1]</code>. <code>1</code> means best quality but also results in
 more computational overhead. Setting to <code>0.5</code> means
-the effect is computed in half-resolution.<br/>Default is <code>1</code>.</p>
+the effect is computed in half-resolution.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -137,7 +164,8 @@ the effect is computed in half-resolution.<br/>Default is <code>1</code>.</p>
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders
-its effect once per frame in <code>updateBefore()</code>.<br/>Default is <code>'frame'</code>.</p>
+its effect once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
@@ -171,17 +199,25 @@ when the effect is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the effect.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the effect.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>
@@ -189,19 +225,20 @@ when the effect is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
 						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
-						</dl>
 					</div>
-					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to render the effect once per frame.</p>
@@ -209,8 +246,12 @@ when the effect is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>The current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

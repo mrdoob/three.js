@@ -31,7 +31,7 @@ scene.add( helper );
 				<pre><code class="language-js">import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="VertexNormalsHelper" translate="no">new <a href="#VertexNormalsHelper">VertexNormalsHelper</a><span class="signature">( object : <span class="param-type">Object3D</span>, size : <span class="param-type">number</span>, color : <span class="param-type">number | Color | string</span> )</span> </h3>
+					<h3 class="name name-method" id="VertexNormalsHelper" translate="no">new <a href="#VertexNormalsHelper">VertexNormalsHelper</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, size : <span class="param-type">number</span>, color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new vertex normals helper.</p>
@@ -39,16 +39,30 @@ scene.add( helper );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The object for which to visualize vertex normals.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The object for which to visualize vertex normals.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>size</code></td>
-									<td class="description last"><p>The helper's size.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>size</strong>
+									</td>
+									<td class="description last">
+										<p>The helper's size.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The helper's color.<br/>Default is <code>0xff0000</code>.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The helper's color.</p>
+										<p>Default is <code>0xff0000</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -58,14 +72,16 @@ scene.add( helper );
 				<div class="member">
 					<h3 class="name" id="isVertexNormalsHelper" translate="no">.<a href="#isVertexNormalsHelper">isVertexNormalsHelper</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="matrixAutoUpdate" translate="no">.<a href="#matrixAutoUpdate">matrixAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Overwritten and set to <code>false</code> since the object's world transformation
-is encoded in the helper's geometry data.<br/>Default is <code>false</code>.</p>
+is encoded in the helper's geometry data.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LineSegments.html#matrixAutoUpdate">LineSegments#matrixAutoUpdate</a></dt>
@@ -80,7 +96,8 @@ is encoded in the helper's geometry data.<br/>Default is <code>false</code>.</p>
 				<div class="member">
 					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The helper's size.<br/>Default is <code>1</code>.</p>
+						<p>The helper's size.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>

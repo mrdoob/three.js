@@ -19,7 +19,7 @@ subtraction or comparisons (e.g. <code>equal()</code>).</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="OperatorNode" translate="no">new <a href="#OperatorNode">OperatorNode</a><span class="signature">( op : <span class="param-type">string</span>, aNode : <span class="param-type">Node</span>, bNode : <span class="param-type">Node</span>, &hellip;params : <span class="param-type">Node</span> )</span> </h3>
+					<h3 class="name name-method" id="OperatorNode" translate="no">new <a href="#OperatorNode">OperatorNode</a><span class="signature">( op : <span class="param-type">string</span>, aNode : <span class="param-type"><a href="Node.html">Node</a></span>, bNode : <span class="param-type"><a href="Node.html">Node</a></span>, &hellip;params : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new operator node.</p>
@@ -27,20 +27,36 @@ subtraction or comparisons (e.g. <code>equal()</code>).</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>op</code></td>
-									<td class="description last"><p>The operator.</p></td>
+									<td class="name">
+										<strong>op</strong>
+									</td>
+									<td class="description last">
+										<p>The operator.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aNode</code></td>
-									<td class="description last"><p>The first input.</p></td>
+									<td class="name">
+										<strong>aNode</strong>
+									</td>
+									<td class="description last">
+										<p>The first input.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>bNode</code></td>
-									<td class="description last"><p>The second input.</p></td>
+									<td class="name">
+										<strong>bNode</strong>
+									</td>
+									<td class="description last">
+										<p>The second input.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>params</code></td>
-									<td class="description last"><p>Additional input parameters.</p></td>
+									<td class="name">
+										<strong>params</strong>
+									</td>
+									<td class="description last">
+										<p>Additional input parameters.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,7 +78,8 @@ subtraction or comparisons (e.g. <code>equal()</code>).</p></div>
 				<div class="member">
 					<h3 class="name" id="isOperatorNode" translate="no">.<a href="#isOperatorNode">isOperatorNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -72,7 +89,7 @@ subtraction or comparisons (e.g. <code>equal()</code>).</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is overwritten since the node type is inferred from the operator
@@ -81,12 +98,21 @@ and the input node types.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>output</code></td>
-									<td class="description last"><p>The output type.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The output type.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -97,7 +123,7 @@ and the input node types.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The node type.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getOperatorMethod" translate="no">.<a href="#getOperatorMethod">getOperatorMethod</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getOperatorMethod" translate="no">.<a href="#getOperatorMethod">getOperatorMethod</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the operator method name.</p>
@@ -105,12 +131,20 @@ and the input node types.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>output</code></td>
-									<td class="description last"><p>The output type.</p></td>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The output type.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

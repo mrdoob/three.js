@@ -20,7 +20,7 @@
 				<div class="container-overview">
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="~clone" translate="no">.<a href="#~clone">clone</a><span class="signature">( source : <span class="param-type">Object3D</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~clone" translate="no">.<a href="#~clone">clone</a><span class="signature">( source : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Clones the given 3D object and its descendants, ensuring that any <code>SkinnedMesh</code> instances are
@@ -30,8 +30,12 @@ object passed to this method. Other data, like geometries and materials, are reu
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>source</code></td>
-									<td class="description last"><p>The 3D object to clone.</p></td>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to clone.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -39,7 +43,7 @@ object passed to this method. Other data, like geometries and materials, are reu
 							<dt class="tag-returns"><strong>Returns:</strong> The cloned 3D object.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~retarget" translate="no">.<a href="#~retarget">retarget</a><span class="signature">( target : <span class="param-type">Object3D</span>, source : <span class="param-type">Object3D</span>, options : <span class="param-type">module:SkeletonUtils~RetargetOptions</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~retarget" translate="no">.<a href="#~retarget">retarget</a><span class="signature">( target : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, source : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, options : <span class="param-type"><a href="module-SkeletonUtils.html#~RetargetOptions">module:SkeletonUtils~RetargetOptions</a></span> )</span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Retargets the skeleton from the given source 3D object to the
@@ -48,21 +52,33 @@ target 3D object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target 3D object.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target 3D object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>source</code></td>
-									<td class="description last"><p>The source 3D object.</p></td>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The source 3D object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="~retargetClip" translate="no">.<a href="#~retargetClip">retargetClip</a><span class="signature">( target : <span class="param-type">Object3D</span>, source : <span class="param-type">Object3D</span>, clip : <span class="param-type">AnimationClip</span>, options : <span class="param-type">module:SkeletonUtils~RetargetOptions</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~retargetClip" translate="no">.<a href="#~retargetClip">retargetClip</a><span class="signature">( target : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, source : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, options : <span class="param-type"><a href="module-SkeletonUtils.html#~RetargetOptions">module:SkeletonUtils~RetargetOptions</a></span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Retargets the animation clip of the source object to the
@@ -71,20 +87,36 @@ target 3D object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target 3D object.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target 3D object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>source</code></td>
-									<td class="description last"><p>The source 3D object.</p></td>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The source 3D object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>clip</code></td>
-									<td class="description last"><p>The animation clip.</p></td>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>The animation clip.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -98,156 +130,124 @@ target 3D object.</p>
 					<div class="description">
 						<p>Retarget options of <code>SkeletonUtils</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>useFirstFramePosition</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>useFirstFramePosition</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to use the position of the first frame or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to use the position of the first frame or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>fps</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>fps</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The FPS of the clip.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The FPS of the clip.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>names</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>names</strong>
+						<br>
 <span class="param-type">Object.&lt;string, string></span>
+				</td>
+			<td class="description last">
+				<p>A dictionary for mapping target to source bone names.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>A dictionary for mapping target to source bone names.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>getBoneName</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>getBoneName</strong>
+						<br>
 <span class="param-type">function</span>
+				</td>
+			<td class="description last">
+				<p>A function for mapping bone names. Alternative to <code>names</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>A function for mapping bone names. Alternative to <code>names</code>.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>trim</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>trim</strong>
+						<br>
 <span class="param-type">Array.&lt;number></span>
+				</td>
+			<td class="description last">
+				<p>Whether to trim the clip or not. If set the array should hold two values for the start and end.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Whether to trim the clip or not. If set the array should hold two values for the start and end.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>preserveBoneMatrix</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>preserveBoneMatrix</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to preserve bone matrices or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether to preserve bone matrices or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>preserveBonePositions</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>preserveBonePositions</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to preserve bone positions or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether to preserve bone positions or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>useTargetMatrix</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>useTargetMatrix</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to use the target matrix or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to use the target matrix or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>hip</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>hip</strong>
+						<br>
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The name of the source's hip bone.</p>
+						<p>Default is <code>'hip'</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					'hip'
-				</td>
-			<td class="description last"><p>The name of the source's hip bone.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>hipInfluence</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>hipInfluence</strong>
+						<br>
 <span class="param-type"><a href="Vector3.html">Vector3</a></span>
+				</td>
+			<td class="description last">
+				<p>The hip influence.</p>
+						<p>Default is <code>(1,1,1)</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					(1,1,1)
-				</td>
-			<td class="description last"><p>The hip influence.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>scale</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>scale</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The scale.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>The scale.</p></td>
 		</tr>
 	</tbody>
 </table>

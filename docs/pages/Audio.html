@@ -34,7 +34,7 @@ audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Audio" translate="no">new <a href="#Audio">Audio</a><span class="signature">( listener : <span class="param-type">AudioListener</span> )</span> </h3>
+					<h3 class="name name-method" id="Audio" translate="no">new <a href="#Audio">Audio</a><span class="signature">( listener : <span class="param-type"><a href="AudioListener.html">AudioListener</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new audio.</p>
@@ -42,8 +42,12 @@ audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>listener</code></td>
-									<td class="description last"><p>The global audio listener.</p></td>
+									<td class="name">
+										<strong>listener</strong>
+									</td>
+									<td class="description last">
+										<p>The global audio listener.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -53,14 +57,16 @@ audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 				<div class="member">
 					<h3 class="name" id="autoplay" translate="no">.<a href="#autoplay">autoplay</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to start playback automatically or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether to start playback automatically or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="buffer" translate="no">.<a href="#buffer">buffer</a><span class="type-signature"> : AudioBuffer</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>A reference to an audio buffer.</p>
-<p>Defined via <a href="Audio.html#setBuffer">Audio#setBuffer</a>.<br/>Default is <code>null</code>.</p>
+<p>Defined via <a href="Audio.html#setBuffer">Audio#setBuffer</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -74,13 +80,15 @@ audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 					<div class="description">
 						<p>Modify pitch, measured in cents. +/- 100 is a semitone.
 +/- 1200 is an octave.</p>
-<p>Defined via <a href="Audio.html#setDetune">Audio#setDetune</a>.<br/>Default is <code>0</code>.</p>
+<p>Defined via <a href="Audio.html#setDetune">Audio#setDetune</a>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="duration" translate="no">.<a href="#duration">duration</a><span class="type-signature"> : undefined | number</span> </h3>
 					<div class="description">
-						<p>Overrides the default duration of the audio.<br/>Default is <code>undefined</code>.</p>
+						<p>Overrides the default duration of the audio.</p>
+						<p>Default is <code>undefined</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -103,7 +111,8 @@ more complex sound effects e.g. via <code>BiquadFilterNode</code>.</p>
 						<p>Indicates whether the audio playback can be controlled
 with method like <a href="Audio.html#play">Audio#play</a> or <a href="Audio.html#pause">Audio#pause</a>.</p>
 <p>This flag will be automatically set when audio sources are
-defined.<br/>Default is <code>true</code>.</p>
+defined.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -111,7 +120,8 @@ defined.<br/>Default is <code>true</code>.</p>
 					<div class="description">
 						<p>Indicates whether the audio is playing or not.</p>
 <p>This flag will be automatically set when using <a href="Audio.html#play">Audio#play</a>,
-<a href="Audio.html#pause">Audio#pause</a>, <a href="Audio.html#stop">Audio#stop</a>.<br/>Default is <code>false</code>.</p>
+<a href="Audio.html#pause">Audio#pause</a>, <a href="Audio.html#stop">Audio#stop</a>.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -124,49 +134,56 @@ defined.<br/>Default is <code>true</code>.</p>
 					<h3 class="name" id="loop" translate="no">.<a href="#loop">loop</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>Whether the audio should loop or not.</p>
-<p>Defined via <a href="Audio.html#setLoop">Audio#setLoop</a>.<br/>Default is <code>false</code>.</p>
+<p>Defined via <a href="Audio.html#setLoop">Audio#setLoop</a>.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="loopEnd" translate="no">.<a href="#loopEnd">loopEnd</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Defines where in the audio buffer the replay should
-stop, in seconds.<br/>Default is <code>0</code>.</p>
+stop, in seconds.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="loopStart" translate="no">.<a href="#loopStart">loopStart</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Defines where in the audio buffer the replay should
-start, in seconds.<br/>Default is <code>0</code>.</p>
+start, in seconds.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="offset" translate="no">.<a href="#offset">offset</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>An offset to the time within the audio buffer the playback
-should begin, in seconds.<br/>Default is <code>0</code>.</p>
+should begin, in seconds.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="playbackRate" translate="no">.<a href="#playbackRate">playbackRate</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>The playback speed.</p>
-<p>Defined via <a href="Audio.html#setPlaybackRate">Audio#setPlaybackRate</a>.<br/>Default is <code>1</code>.</p>
+<p>Defined via <a href="Audio.html#setPlaybackRate">Audio#setPlaybackRate</a>.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="source" translate="no">.<a href="#source">source</a><span class="type-signature"> : AudioNode</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>Holds a reference to the current audio source.</p>
-<p>The property is automatically by one of the <code>set*()</code> methods.<br/>Default is <code>null</code>.</p>
+<p>The property is automatically by one of the <code>set*()</code> methods.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sourceType" translate="no">.<a href="#sourceType">sourceType</a><span class="type-signature"> : 'empty' | 'audioNode' | 'mediaNode' | 'mediaStreamNode' | 'buffer'</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>Defines the source type.</p>
-<p>The property is automatically by one of the <code>set*()</code> methods.<br/>Default is <code>'empty'</code>.</p>
+<p>The property is automatically by one of the <code>set*()</code> methods.</p>
+						<p>Default is <code>'empty'</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -279,8 +296,13 @@ initialisation and when setting / removing filters.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>delay</code></td>
-									<td class="description last"><p>The delay, in seconds, at which the audio should start playing.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>delay</strong>
+									</td>
+									<td class="description last">
+										<p>The delay, in seconds, at which the audio should start playing.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -297,8 +319,12 @@ initialisation and when setting / removing filters.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>audioBuffer</code></td>
-									<td class="description last"><p>The audio buffer.</p></td>
+									<td class="name">
+										<strong>audioBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The audio buffer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -314,8 +340,12 @@ initialisation and when setting / removing filters.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The detuning of oscillation in cents.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The detuning of oscillation in cents.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -331,8 +361,12 @@ initialisation and when setting / removing filters.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>filter</code></td>
-									<td class="description last"><p>The filter to set.</p></td>
+									<td class="name">
+										<strong>filter</strong>
+									</td>
+									<td class="description last">
+										<p>The filter to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -348,8 +382,12 @@ initialisation and when setting / removing filters.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>A list of filters.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>A list of filters.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -366,8 +404,12 @@ initialisation and when setting / removing filters.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>Whether the audio should loop or not.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the audio should loop or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -384,8 +426,12 @@ stop, in seconds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The loop end value.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The loop end value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -402,8 +448,12 @@ start, in seconds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The loop start value.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The loop start value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -420,8 +470,12 @@ start, in seconds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mediaElement</code></td>
-									<td class="description last"><p>The media element.</p></td>
+									<td class="name">
+										<strong>mediaElement</strong>
+									</td>
+									<td class="description last">
+										<p>The media element.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -438,8 +492,12 @@ start, in seconds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mediaStream</code></td>
-									<td class="description last"><p>The media stream.</p></td>
+									<td class="name">
+										<strong>mediaStream</strong>
+									</td>
+									<td class="description last">
+										<p>The media stream.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -456,8 +514,12 @@ start, in seconds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>audioNode</code></td>
-									<td class="description last"><p>The audio node like an instance of <code>OscillatorNode</code>.</p></td>
+									<td class="name">
+										<strong>audioNode</strong>
+									</td>
+									<td class="description last">
+										<p>The audio node like an instance of <code>OscillatorNode</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -474,8 +536,12 @@ start, in seconds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The playback rate to set.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The playback rate to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -491,8 +557,12 @@ start, in seconds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The volume to set.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The volume to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -509,8 +579,13 @@ start, in seconds.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>delay</code></td>
-									<td class="description last"><p>The delay, in seconds, at which the audio should stop playing.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>delay</strong>
+									</td>
+									<td class="description last">
+										<p>The delay, in seconds, at which the audio should stop playing.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

@@ -43,7 +43,7 @@ material.colorNode = scriptableNode;
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ScriptableNode" translate="no">new <a href="#ScriptableNode">ScriptableNode</a><span class="signature">( codeNode : <span class="param-type">CodeNode</span>, parameters : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="ScriptableNode" translate="no">new <a href="#ScriptableNode">ScriptableNode</a><span class="signature">( codeNode : <span class="param-type"><a href="CodeNode.html">CodeNode</a></span>, parameters : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new scriptable node.</p>
@@ -51,12 +51,22 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>codeNode</code></td>
-									<td class="description last"><p>The code node.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>codeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The code node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>The parameters definition.<br/>Default is <code>{}</code>.</p></td>
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The parameters definition.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -66,19 +76,22 @@ material.colorNode = scriptableNode;
 				<div class="member">
 					<h3 class="name" id="codeNode" translate="no">.<a href="#codeNode">codeNode</a><span class="type-signature"> : <a href="CodeNode.html">CodeNode</a></span> </h3>
 					<div class="description">
-						<p>The code node.<br/>Default is <code>null</code>.</p>
+						<p>The code node.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isScriptableNode" translate="no">.<a href="#isScriptableNode">isScriptableNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="parameters" translate="no">.<a href="#parameters">parameters</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
-						<p>The parameters definition.<br/>Default is <code>{}</code>.</p>
+						<p>The parameters definition.</p>
+						<p>Default is <code>{}</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -88,7 +101,7 @@ material.colorNode = scriptableNode;
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="call" translate="no">.<a href="#call">call</a><span class="signature">( name : <span class="param-type">string</span>, &hellip;params : <span class="param-type">any</span> )</span><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
+					<h3 class="name name-method" id="call" translate="no">.<a href="#call">call</a><span class="signature">( name : <span class="param-type">string</span>, &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Calls a function from the script.</p>
@@ -96,12 +109,20 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The function name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The function name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>params</code></td>
-									<td class="description last"><p>A list of parameters.</p></td>
+									<td class="name">
+										<strong>params</strong>
+									</td>
+									<td class="description last">
+										<p>A list of parameters.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -109,7 +130,7 @@ material.colorNode = scriptableNode;
 							<dt class="tag-returns"><strong>Returns:</strong> The result of the function call.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="callAsync" translate="no">.<a href="#callAsync">callAsync</a><span class="signature">( name : <span class="param-type">string</span>, &hellip;params : <span class="param-type">any</span> )</span><span class="type-signature"> : Promise.&lt;<a href="global.html#any">any</a>></span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id="callAsync" translate="no">.<a href="#callAsync">callAsync</a><span class="signature">( name : <span class="param-type">string</span>, &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : Promise.&lt;<a href="global.html#any">any</a>></span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Asynchronously calls a function from the script.</p>
@@ -117,12 +138,20 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The function name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The function name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>params</code></td>
-									<td class="description last"><p>A list of parameters.</p></td>
+									<td class="name">
+										<strong>params</strong>
+									</td>
+									<td class="description last">
+										<p>A list of parameters.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -147,8 +176,12 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The parameter to remove.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter to remove.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -191,8 +224,12 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>id</code></td>
-									<td class="description last"><p>The id/name of the input.</p></td>
+									<td class="name">
+										<strong>id</strong>
+									</td>
+									<td class="description last">
+										<p>The id/name of the input.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -217,8 +254,12 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The variable name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The variable name.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -235,7 +276,7 @@ material.colorNode = scriptableNode;
 							<dt class="tag-returns"><strong>Returns:</strong> The function representing the node's code.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getNodeType" translate="no">.<a href="#getNodeType">getNodeType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Overwritten since the node types is inferred from the script's output.</p>
@@ -243,8 +284,12 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -272,8 +317,12 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the output.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the output.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -289,8 +338,12 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>id</code></td>
-									<td class="description last"><p>The id/name of the output.</p></td>
+									<td class="name">
+										<strong>id</strong>
+									</td>
+									<td class="description last">
+										<p>The id/name of the output.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -306,8 +359,12 @@ material.colorNode = scriptableNode;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the parameter.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the parameter.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -339,8 +396,13 @@ the default output.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>output</code></td>
-									<td class="description last"><p>An optional output.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>An optional output.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -353,12 +415,20 @@ the default output.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The variable name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The variable name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The reference to set.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The reference to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -366,7 +436,7 @@ the default output.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The resource map</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setOutput" translate="no">.<a href="#setOutput">setOutput</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type">Node</span> )</span><span class="type-signature"> : <a href="ScriptableNode.html">ScriptableNode</a></span> </h3>
+					<h3 class="name name-method" id="setOutput" translate="no">.<a href="#setOutput">setOutput</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ScriptableNode.html">ScriptableNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Defines a script output for the given name and value.</p>
@@ -374,12 +444,20 @@ the default output.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the output.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the output.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The node value.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -387,7 +465,7 @@ the default output.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setParameter" translate="no">.<a href="#setParameter">setParameter</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type">any</span> )</span><span class="type-signature"> : <a href="ScriptableNode.html">ScriptableNode</a></span> </h3>
+					<h3 class="name name-method" id="setParameter" translate="no">.<a href="#setParameter">setParameter</a><span class="signature">( name : <span class="param-type">string</span>, value : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="ScriptableNode.html">ScriptableNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets a value for the given parameter name.</p>
@@ -395,12 +473,20 @@ the default output.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The parameter name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The parameter value.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The parameter value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

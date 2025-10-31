@@ -22,7 +22,7 @@ material.colorNode = texture( spriteSheet, uvNode );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SpriteSheetUVNode" translate="no">new <a href="#SpriteSheetUVNode">SpriteSheetUVNode</a><span class="signature">( countNode : <span class="param-type">Node.&lt;vec2></span>, uvNode : <span class="param-type">Node.&lt;vec2></span>, frameNode : <span class="param-type">Node.&lt;float></span> )</span> </h3>
+					<h3 class="name name-method" id="SpriteSheetUVNode" translate="no">new <a href="#SpriteSheetUVNode">SpriteSheetUVNode</a><span class="signature">( countNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, frameNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new sprite sheet uv node.</p>
@@ -30,16 +30,30 @@ material.colorNode = texture( spriteSheet, uvNode );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>countNode</code></td>
-									<td class="description last"><p>The node that defines the number of sprites in the x and y direction (e.g 6x6).</p></td>
+									<td class="name">
+										<strong>countNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that defines the number of sprites in the x and y direction (e.g 6x6).</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvNode</code></td>
-									<td class="description last"><p>The uv node.<br/>Default is <code>uv()</code>.</p></td>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>uv()</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>frameNode</code></td>
-									<td class="description last"><p>The node that defines the current frame/sprite.<br/>Default is <code>float()</code>.</p></td>
+									<td class="name">
+										<strong>frameNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that defines the current frame/sprite.</p>
+										<p>Default is <code>float()</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

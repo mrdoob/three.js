@@ -40,17 +40,19 @@ const data = exporter.parse( mesh, options );
 				<div class="member">
 					<h3 class="name" id=".MESH_EDGEBREAKER_ENCODING" translate="no">.<a href="#.MESH_EDGEBREAKER_ENCODING">MESH_EDGEBREAKER_ENCODING</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>Edgebreaker encoding.<br/>Default is <code>1</code>.</p>
+						<p>Edgebreaker encoding.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id=".MESH_SEQUENTIAL_ENCODING" translate="no">.<a href="#.MESH_SEQUENTIAL_ENCODING">MESH_SEQUENTIAL_ENCODING</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>Sequential encoding.<br/>Default is <code>0</code>.</p>
+						<p>Sequential encoding.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( object : <span class="param-type">Mesh | Points</span>, options : <span class="param-type">DRACOExporter~Options</span> )</span><span class="type-signature"> : Int8Array</span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( object : <span class="param-type"><a href="Mesh.html">Mesh</a> | <a href="Points.html">Points</a></span>, options : <span class="param-type"><a href="DRACOExporter.html#~Options">DRACOExporter~Options</a></span> )</span><span class="type-signature"> : Int8Array</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the given mesh or point cloud and generates the Draco output.</p>
@@ -58,12 +60,20 @@ const data = exporter.parse( mesh, options );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The mesh or point cloud to export.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh or point cloud to export.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The export options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The export options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -77,108 +87,84 @@ const data = exporter.parse( mesh, options );
 					<div class="description">
 						<p>Export options of <code>DRACOExporter</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>decodeSpeed</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>decodeSpeed</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Indicates how to tune the encoder regarding decode speed (0 gives better speed but worst quality).</p>
+						<p>Default is <code>5</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					5
-				</td>
-			<td class="description last"><p>Indicates how to tune the encoder regarding decode speed (0 gives better speed but worst quality).</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>encodeSpeed</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>encodeSpeed</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Indicates how to tune the encoder parameters (0 gives better speed but worst quality).</p>
+						<p>Default is <code>5</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					5
-				</td>
-			<td class="description last"><p>Indicates how to tune the encoder parameters (0 gives better speed but worst quality).</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>encoderMethod</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>encoderMethod</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Either sequential (very little compression) or Edgebreaker. Edgebreaker traverses the triangles of the mesh in a deterministic, spiral-like way which provides most of the benefits of this data format.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>Either sequential (very little compression) or Edgebreaker. Edgebreaker traverses the triangles of the mesh in a deterministic, spiral-like way which provides most of the benefits of this data format.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>quantization</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>quantization</strong>
+						<br>
 <span class="param-type">Array.&lt;number></span>
+				</td>
+			<td class="description last">
+				<p>Indicates the precision of each type of data stored in the draco file in the order (POSITION, NORMAL, COLOR, TEX_COORD, GENERIC).</p>
+						<p>Default is <code>[ 16, 8, 8, 8, 8 ]</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					[ 16, 8, 8, 8, 8 ]
-				</td>
-			<td class="description last"><p>Indicates the precision of each type of data stored in the draco file in the order (POSITION, NORMAL, COLOR, TEX_COORD, GENERIC).</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>exportUvs</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>exportUvs</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to export UVs or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether to export UVs or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>exportNormals</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>exportNormals</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to export normals or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether to export normals or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>exportColor</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>exportColor</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to export colors or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to export colors or not.</p></td>
 		</tr>
 	</tbody>
 </table>

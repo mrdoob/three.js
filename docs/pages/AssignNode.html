@@ -19,7 +19,7 @@ to another node.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="AssignNode" translate="no">new <a href="#AssignNode">AssignNode</a><span class="signature">( targetNode : <span class="param-type">Node</span>, sourceNode : <span class="param-type">Node</span> )</span> </h3>
+					<h3 class="name name-method" id="AssignNode" translate="no">new <a href="#AssignNode">AssignNode</a><span class="signature">( targetNode : <span class="param-type"><a href="Node.html">Node</a></span>, sourceNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new assign node.</p>
@@ -27,12 +27,20 @@ to another node.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>targetNode</code></td>
-									<td class="description last"><p>The target node.</p></td>
+									<td class="name">
+										<strong>targetNode</strong>
+									</td>
+									<td class="description last">
+										<p>The target node.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>sourceNode</code></td>
-									<td class="description last"><p>The source type.</p></td>
+									<td class="name">
+										<strong>sourceNode</strong>
+									</td>
+									<td class="description last">
+										<p>The source type.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -42,7 +50,8 @@ to another node.</p></div>
 				<div class="member">
 					<h3 class="name" id="isAssignNode" translate="no">.<a href="#isAssignNode">isAssignNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -71,7 +80,7 @@ is overwritten since it always returns <code>false</code> (assigns are unique).<
 							<dt class="tag-returns"><strong>Returns:</strong> A flag that indicates if there is more than one dependency to other nodes. Always <code>false</code>.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="needsSplitAssign" translate="no">.<a href="#needsSplitAssign">needsSplitAssign</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="needsSplitAssign" translate="no">.<a href="#needsSplitAssign">needsSplitAssign</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Whether a split is required when assigning source to target. This can happen when the component length of
@@ -80,8 +89,12 @@ target and source data type does not match.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

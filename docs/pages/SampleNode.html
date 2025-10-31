@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SampleNode" translate="no">new <a href="#SampleNode">SampleNode</a><span class="signature">( callback : <span class="param-type">function</span>, uvNode : <span class="param-type">Node.&lt;vec2></span> )</span> </h3>
+					<h3 class="name name-method" id="SampleNode" translate="no">new <a href="#SampleNode">SampleNode</a><span class="signature">( callback : <span class="param-type">function</span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates an instance of SampleNode.</p>
@@ -26,12 +26,21 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>callback</code></td>
-									<td class="description last"><p>The function to be called when sampling. Should accept a UV node and return a value.</p></td>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>The function to be called when sampling. Should accept a UV node and return a value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvNode</code></td>
-									<td class="description last"><p>The UV node to be used in the texture sampling.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The UV node to be used in the texture sampling.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -41,13 +50,15 @@
 				<div class="member">
 					<h3 class="name" id="isSampleNode" translate="no">.<a href="#isSampleNode">isSampleNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="uvNode" translate="no">.<a href="#uvNode">uvNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;(vec2|vec3)></span> </h3>
 					<div class="description">
-						<p>Represents the texture coordinates.<br/>Default is <code>null</code>.</p>
+						<p>Represents the texture coordinates.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -57,7 +68,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="sample" translate="no">.<a href="#sample">sample</a><span class="signature">( uv : <span class="param-type">Node.&lt;vec2></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="sample" translate="no">.<a href="#sample">sample</a><span class="signature">( uv : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Calls the callback function with the provided UV node.</p>
@@ -65,8 +76,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uv</code></td>
-									<td class="description last"><p>The UV node or value to be passed to the callback.</p></td>
+									<td class="name">
+										<strong>uv</strong>
+									</td>
+									<td class="description last">
+										<p>The UV node or value to be passed to the callback.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

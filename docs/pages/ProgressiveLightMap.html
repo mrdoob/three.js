@@ -30,7 +30,7 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, import from <code>P
 				<pre><code class="language-js">import { ProgressiveLightMap } from 'three/addons/misc/ProgressiveLightMap.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ProgressiveLightMap" translate="no">new <a href="#ProgressiveLightMap">ProgressiveLightMap</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, res : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="ProgressiveLightMap" translate="no">new <a href="#ProgressiveLightMap">ProgressiveLightMap</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, res : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new progressive light map.</p>
@@ -38,12 +38,21 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, import from <code>P
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>res</code></td>
-									<td class="description last"><p>The side-long dimension of the total lightmap.<br/>Default is <code>1024</code>.</p></td>
+									<td class="name">
+										<strong>res</strong>
+									</td>
+									<td class="description last">
+										<p>The side-long dimension of the total lightmap.</p>
+										<p>Default is <code>1024</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -59,11 +68,12 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, import from <code>P
 				<div class="member">
 					<h3 class="name" id="res" translate="no">.<a href="#res">res</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The side-long dimension of the total lightmap.<br/>Default is <code>1024</code>.</p>
+						<p>The side-long dimension of the total lightmap.</p>
+						<p>Default is <code>1024</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="addObjectsToLightMap" translate="no">.<a href="#addObjectsToLightMap">addObjectsToLightMap</a><span class="signature">( objects : <span class="param-type">Array.&lt;Object3D></span> )</span> </h3>
+					<h3 class="name name-method" id="addObjectsToLightMap" translate="no">.<a href="#addObjectsToLightMap">addObjectsToLightMap</a><span class="signature">( objects : <span class="param-type">Array.&lt;<a href="Object3D.html">Object3D</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets these objects' materials' lightmaps and modifies their uv1's.</p>
@@ -71,8 +81,12 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, import from <code>P
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>objects</code></td>
-									<td class="description last"><p>An array of objects and lights to set up your lightmap.</p></td>
+									<td class="name">
+										<strong>objects</strong>
+									</td>
+									<td class="description last">
+										<p>An array of objects and lights to set up your lightmap.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -83,7 +97,7 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, import from <code>P
 							<p>Frees all internal resources.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="showDebugLightmap" translate="no">.<a href="#showDebugLightmap">showDebugLightmap</a><span class="signature">( visible : <span class="param-type">boolean</span>, position : <span class="param-type">Vector3</span> )</span> </h3>
+					<h3 class="name name-method" id="showDebugLightmap" translate="no">.<a href="#showDebugLightmap">showDebugLightmap</a><span class="signature">( visible : <span class="param-type">boolean</span>, position : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Draws the lightmap in the main scene. Call this after adding the objects to it.</p>
@@ -91,17 +105,25 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, import from <code>P
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>visible</code></td>
-									<td class="description last"><p>Whether the debug plane should be visible</p></td>
+									<td class="name">
+										<strong>visible</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the debug plane should be visible</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>position</code></td>
-									<td class="description last"><p>Where the debug plane should be drawn</p></td>
+									<td class="name">
+										<strong>position</strong>
+									</td>
+									<td class="description last">
+										<p>Where the debug plane should be drawn</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( camera : <span class="param-type">Camera</span>, blendWindow : <span class="param-type">number</span>, blurEdges : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, blendWindow : <span class="param-type">number</span>, blurEdges : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This function renders each mesh one at a time into their respective surface maps.</p>
@@ -109,16 +131,30 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, import from <code>P
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera the scene is rendered with.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>blendWindow</code></td>
-									<td class="description last"><p>When &gt;1, samples will accumulate over time.<br/>Default is <code>100</code>.</p></td>
+									<td class="name">
+										<strong>blendWindow</strong>
+									</td>
+									<td class="description last">
+										<p>When &gt;1, samples will accumulate over time.</p>
+										<p>Default is <code>100</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>blurEdges</code></td>
-									<td class="description last"><p>Whether to fix UV Edges via blurring.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>blurEdges</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to fix UV Edges via blurring.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

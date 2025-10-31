@@ -33,14 +33,16 @@ and monitoring.</p></div>
 						<p>Whether frame related metrics should automatically
 be resetted or not. This property should be set to <code>false</code>
 by apps which manage their own animation loop. They must
-then call <code>renderer.info.reset()</code> once per frame manually.<br/>Default is <code>true</code>.</p>
+then call <code>renderer.info.reset()</code> once per frame manually.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="calls" translate="no">.<a href="#calls">calls</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>The number of render calls since the
-app has been started.<br/>Default is <code>0</code>.</p>
+app has been started.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -48,36 +50,37 @@ app has been started.<br/>Default is <code>0</code>.</p>
 					<div class="description">
 						<p>Compute related metrics.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>calls</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>calls</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of compute calls since the app has been started.</p>
 			</td>
-			<td class="description last"><p>The number of compute calls since the app has been started.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>frameCalls</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>frameCalls</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of compute calls of the current frame.</p>
 			</td>
-			<td class="description last"><p>The number of compute calls of the current frame.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>timestamp</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>timestamp</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The timestamp of the frame when using <code>renderer.computeAsync()</code>.</p>
 			</td>
-			<td class="description last"><p>The timestamp of the frame when using <code>renderer.computeAsync()</code>.</p></td>
 		</tr>
 	</tbody>
 </table>
@@ -86,7 +89,8 @@ app has been started.<br/>Default is <code>0</code>.</p>
 					<h3 class="name" id="frame" translate="no">.<a href="#frame">frame</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>The current frame ID. This ID is managed
-by <code>NodeFrame</code>.<br/>Default is <code>0</code>.</p>
+by <code>NodeFrame</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -94,29 +98,27 @@ by <code>NodeFrame</code>.<br/>Default is <code>0</code>.</p>
 					<div class="description">
 						<p>Memory related metrics.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>geometries</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>geometries</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of active geometries.</p>
 			</td>
-			<td class="description last"><p>The number of active geometries.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>frameCalls</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>frameCalls</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of active textures.</p>
 			</td>
-			<td class="description last"><p>The number of active textures.</p></td>
 		</tr>
 	</tbody>
 </table>
@@ -126,64 +128,77 @@ by <code>NodeFrame</code>.<br/>Default is <code>0</code>.</p>
 					<div class="description">
 						<p>Render related metrics.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>calls</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>calls</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of render calls since the app has been started.</p>
 			</td>
-			<td class="description last"><p>The number of render calls since the app has been started.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>frameCalls</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>frameCalls</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of render calls of the current frame.</p>
 			</td>
-			<td class="description last"><p>The number of render calls of the current frame.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>drawCalls</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>drawCalls</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of draw calls of the current frame.</p>
 			</td>
-			<td class="description last"><p>The number of draw calls of the current frame.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>triangles</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>triangles</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of rendered triangle primitives of the current frame.</p>
 			</td>
-			<td class="description last"><p>The number of rendered triangle primitives of the current frame.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>points</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>points</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of rendered point primitives of the current frame.</p>
 			</td>
-			<td class="description last"><p>The number of rendered point primitives of the current frame.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>lines</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>lines</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of rendered line primitives of the current frame.</p>
 			</td>
-			<td class="description last"><p>The number of rendered line primitives of the current frame.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>timestamp</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>timestamp</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The timestamp of the frame.</p>
 			</td>
-			<td class="description last"><p>The timestamp of the frame.</p></td>
 		</tr>
 	</tbody>
 </table>
@@ -201,7 +216,7 @@ by <code>NodeFrame</code>.<br/>Default is <code>0</code>.</p>
 							<p>Resets frame related metrics.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( object : <span class="param-type">Object3D</span>, count : <span class="param-type">number</span>, instanceCount : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, count : <span class="param-type">number</span>, instanceCount : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method should be executed per draw call and updates the corresponding metrics.</p>
@@ -209,16 +224,28 @@ by <code>NodeFrame</code>.<br/>Default is <code>0</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object that is going to be rendered.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object that is going to be rendered.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>count</code></td>
-									<td class="description last"><p>The vertex or index count.</p></td>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The vertex or index count.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>instanceCount</code></td>
-									<td class="description last"><p>The instance count.</p></td>
+									<td class="name">
+										<strong>instanceCount</strong>
+									</td>
+									<td class="description last">
+										<p>The instance count.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

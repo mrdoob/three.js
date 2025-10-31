@@ -21,7 +21,7 @@
 				<pre><code class="language-js">import { OculusHandModel } from 'three/addons/webxr/OculusHandModel.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="OculusHandModel" translate="no">new <a href="#OculusHandModel">OculusHandModel</a><span class="signature">( controller : <span class="param-type">Group</span>, loader : <span class="param-type">Loader</span>, onLoad : <span class="param-type">function</span> )</span> </h3>
+					<h3 class="name name-method" id="OculusHandModel" translate="no">new <a href="#OculusHandModel">OculusHandModel</a><span class="signature">( controller : <span class="param-type"><a href="Group.html">Group</a></span>, loader : <span class="param-type"><a href="Loader.html">Loader</a></span>, onLoad : <span class="param-type">function</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new Oculus hand model.</p>
@@ -29,16 +29,30 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>controller</code></td>
-									<td class="description last"><p>The hand controller.</p></td>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The hand controller.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>loader</code></td>
-									<td class="description last"><p>A loader that is used to load hand models.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>loader</strong>
+									</td>
+									<td class="description last">
+										<p>A loader that is used to load hand models.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>A callback that is executed when a hand model has been loaded.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>A callback that is executed when a hand model has been loaded.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -54,37 +68,43 @@
 				<div class="member">
 					<h3 class="name" id="envMap" translate="no">.<a href="#envMap">envMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
-						<p>The model's environment map.<br/>Default is <code>null</code>.</p>
+						<p>The model's environment map.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="loader" translate="no">.<a href="#loader">loader</a><span class="type-signature"> : <a href="Loader.html">Loader</a></span> </h3>
 					<div class="description">
-						<p>A loader that is used to load hand models.<br/>Default is <code>null</code>.</p>
+						<p>A loader that is used to load hand models.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="mesh" translate="no">.<a href="#mesh">mesh</a><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
 					<div class="description">
-						<p>The model mesh.<br/>Default is <code>null</code>.</p>
+						<p>The model mesh.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="motionController" translate="no">.<a href="#motionController">motionController</a><span class="type-signature"> : MotionController</span> </h3>
 					<div class="description">
-						<p>The motion controller.<br/>Default is <code>null</code>.</p>
+						<p>The motion controller.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="onLoad" translate="no">.<a href="#onLoad">onLoad</a><span class="type-signature"> : function</span> </h3>
 					<div class="description">
-						<p>A callback that is executed when a hand model has been loaded.<br/>Default is <code>null</code>.</p>
+						<p>A callback that is executed when a hand model has been loaded.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="path" translate="no">.<a href="#path">path</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The path to the model repository.<br/>Default is <code>null</code>.</p>
+						<p>The path to the model repository.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -97,8 +117,12 @@ the given button.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>button</code></td>
-									<td class="description last"><p>The button.</p></td>
+									<td class="name">
+										<strong>button</strong>
+									</td>
+									<td class="description last">
+										<p>The button.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -112,7 +136,7 @@ the given button.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The pointer position. Returns <code>null</code> if not index finger tip joint was found.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectBoxObject" translate="no">.<a href="#intersectBoxObject">intersectBoxObject</a><span class="signature">( boxObject : <span class="param-type">Mesh</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectBoxObject" translate="no">.<a href="#intersectBoxObject">intersectBoxObject</a><span class="signature">( boxObject : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the current pointer position (the index finger tip) intersections
@@ -121,8 +145,12 @@ with the given box object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>boxObject</code></td>
-									<td class="description last"><p>The box object.</p></td>
+									<td class="name">
+										<strong>boxObject</strong>
+									</td>
+									<td class="description last">
+										<p>The box object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -138,9 +166,14 @@ with the given box object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>force</code></td>
-									<td class="description last"><p>When set to <code>true</code>, a recomputation of world matrices is forced even
-when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>force</strong>
+									</td>
+									<td class="description last">
+										<p>When set to <code>true</code>, a recomputation of world matrices is forced even
+when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

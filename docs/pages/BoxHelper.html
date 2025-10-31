@@ -29,7 +29,7 @@ scene.add( box );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="BoxHelper" translate="no">new <a href="#BoxHelper">BoxHelper</a><span class="signature">( object : <span class="param-type">Object3D</span>, color : <span class="param-type">number | Color | string</span> )</span> </h3>
+					<h3 class="name name-method" id="BoxHelper" translate="no">new <a href="#BoxHelper">BoxHelper</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new box helper.</p>
@@ -37,12 +37,21 @@ scene.add( box );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object to show the world-axis-aligned bounding box.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to show the world-axis-aligned bounding box.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The box's color.<br/>Default is <code>0xffff00</code>.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The box's color.</p>
+										<p>Default is <code>0xffff00</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -63,7 +72,7 @@ scene.add( box );
 method whenever this instance is no longer used in your app.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="setFromObject" translate="no">.<a href="#setFromObject">setFromObject</a><span class="signature">( object : <span class="param-type">Object3D</span> )</span><span class="type-signature"> : <a href="BoxHelper.html">BoxHelper</a></span> </h3>
+					<h3 class="name name-method" id="setFromObject" translate="no">.<a href="#setFromObject">setFromObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="BoxHelper.html">BoxHelper</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the wireframe box for the passed object.</p>
@@ -71,8 +80,12 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object to create the helper for.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to create the helper for.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

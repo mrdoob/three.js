@@ -22,7 +22,7 @@ a XR session. It relies on the WebXR Lighting Estimation API.</p></div>
 				<pre><code class="language-js">import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="XREstimatedLight" translate="no">new <a href="#XREstimatedLight">XREstimatedLight</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, environmentEstimation : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="XREstimatedLight" translate="no">new <a href="#XREstimatedLight">XREstimatedLight</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, environmentEstimation : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new light.</p>
@@ -30,12 +30,21 @@ a XR session. It relies on the WebXR Lighting Estimation API.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>environmentEstimation</code></td>
-									<td class="description last"><p>Whether to use environment estimation or not.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>environmentEstimation</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to use environment estimation or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -57,7 +66,8 @@ a XR session. It relies on the WebXR Lighting Estimation API.</p></div>
 					<h3 class="name" id="environment" translate="no">.<a href="#environment">environment</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>Will be set to a cube map in the SessionLightProbe if environment estimation is
-available and requested.<br/>Default is <code>null</code>.</p>
+available and requested.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">

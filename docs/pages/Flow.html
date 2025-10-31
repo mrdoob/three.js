@@ -22,7 +22,7 @@ import the class from <code>CurveModifierGPU.js</code>.</p></div>
 				<pre><code class="language-js">import { Flow } from 'three/addons/modifiers/CurveModifier.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Flow" translate="no">new <a href="#Flow">Flow</a><span class="signature">( mesh : <span class="param-type">Mesh</span>, numberOfCurves : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="Flow" translate="no">new <a href="#Flow">Flow</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, numberOfCurves : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new Flow instance.</p>
@@ -30,12 +30,21 @@ import the class from <code>CurveModifierGPU.js</code>.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mesh</code></td>
-									<td class="description last"><p>The mesh to clone and modify to bend around the curve.</p></td>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to clone and modify to bend around the curve.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>numberOfCurves</code></td>
-									<td class="description last"><p>The amount of space that should preallocated for additional curves.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>numberOfCurves</strong>
+									</td>
+									<td class="description last">
+										<p>The amount of space that should preallocated for additional curves.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -55,13 +64,17 @@ import the class from <code>CurveModifierGPU.js</code>.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>amount</code></td>
-									<td class="description last"><p>The offset.</p></td>
+									<td class="name">
+										<strong>amount</strong>
+									</td>
+									<td class="description last">
+										<p>The offset.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="updateCurve" translate="no">.<a href="#updateCurve">updateCurve</a><span class="signature">( index : <span class="param-type">number</span>, curve : <span class="param-type">Curve</span> )</span> </h3>
+					<h3 class="name name-method" id="updateCurve" translate="no">.<a href="#updateCurve">updateCurve</a><span class="signature">( index : <span class="param-type">number</span>, curve : <span class="param-type"><a href="Curve.html">Curve</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the curve for the given curve index.</p>
@@ -69,12 +82,20 @@ import the class from <code>CurveModifierGPU.js</code>.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The curve index.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The curve index.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>curve</code></td>
-									<td class="description last"><p>The curve that should be used to bend the mesh.</p></td>
+									<td class="name">
+										<strong>curve</strong>
+									</td>
+									<td class="description last">
+										<p>The curve that should be used to bend the mesh.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

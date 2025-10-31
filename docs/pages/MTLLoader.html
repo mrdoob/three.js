@@ -35,7 +35,7 @@ objLoader.setMaterials( materials );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded MTL asset
@@ -44,20 +44,36 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -73,12 +89,20 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>text</code></td>
-									<td class="description last"><p>The raw MTL data as a string.</p></td>
+									<td class="name">
+										<strong>text</strong>
+									</td>
+									<td class="description last">
+										<p>The raw MTL data as a string.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>path</code></td>
-									<td class="description last"><p>The URL base path.</p></td>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The URL base path.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -89,7 +113,7 @@ to the <code>onLoad()</code> callback.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The material creator.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setMaterialOptions" translate="no">.<a href="#setMaterialOptions">setMaterialOptions</a><span class="signature">( value : <span class="param-type">MTLLoader~MaterialOptions</span> )</span><span class="type-signature"> : <a href="MTLLoader.html">MTLLoader</a></span> </h3>
+					<h3 class="name name-method" id="setMaterialOptions" translate="no">.<a href="#setMaterialOptions">setMaterialOptions</a><span class="signature">( value : <span class="param-type"><a href="MTLLoader.html#~MaterialOptions">MTLLoader~MaterialOptions</a></span> )</span><span class="type-signature"> : <a href="MTLLoader.html">MTLLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the material options.</p>
@@ -97,8 +121,12 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The material options.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The material options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -112,77 +140,59 @@ to the <code>onLoad()</code> callback.</p>
 					<div class="description">
 						<p>Material options of <code>MTLLoader</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>side</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>side</strong>
+						<br>
 <span class="param-type"><a href="global.html#FrontSide">FrontSide</a></span>
 |
 <span class="param-type"><a href="global.html#BackSide">BackSide</a></span>
 |
 <span class="param-type"><a href="global.html#DoubleSide">DoubleSide</a></span>
+				</td>
+			<td class="description last">
+				<p>Which side to apply the material.</p>
+						<p>Default is <code>FrontSide</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					FrontSide
-				</td>
-			<td class="description last"><p>Which side to apply the material.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>wrap</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>wrap</strong>
+						<br>
 <span class="param-type"><a href="global.html#RepeatWrapping">RepeatWrapping</a></span>
 |
 <span class="param-type"><a href="global.html#ClampToEdgeWrapping">ClampToEdgeWrapping</a></span>
 |
 <span class="param-type"><a href="global.html#MirroredRepeatWrapping">MirroredRepeatWrapping</a></span>
+				</td>
+			<td class="description last">
+				<p>What type of wrapping to apply for textures.</p>
+						<p>Default is <code>RepeatWrapping</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					RepeatWrapping
-				</td>
-			<td class="description last"><p>What type of wrapping to apply for textures.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>normalizeRGB</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>normalizeRGB</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether RGB colors should be normalized to <code>0-1</code> from <code>0-255</code>.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether RGB colors should be normalized to <code>0-1</code> from <code>0-255</code>.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>ignoreZeroRGBs</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>ignoreZeroRGBs</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Ignore values of RGBs (Ka,Kd,Ks) that are all 0's.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Ignore values of RGBs (Ka,Kd,Ks) that are all 0's.</p></td>
 		</tr>
 	</tbody>
 </table>

@@ -19,7 +19,7 @@ equirectangular format into the cube map format.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CubeMapNode" translate="no">new <a href="#CubeMapNode">CubeMapNode</a><span class="signature">( envNode : <span class="param-type">Node</span> )</span> </h3>
+					<h3 class="name name-method" id="CubeMapNode" translate="no">new <a href="#CubeMapNode">CubeMapNode</a><span class="signature">( envNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new cube map node.</p>
@@ -27,8 +27,12 @@ equirectangular format into the cube map format.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>envNode</code></td>
-									<td class="description last"><p>The node representing the environment map.</p></td>
+									<td class="name">
+										<strong>envNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node representing the environment map.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -45,7 +49,8 @@ equirectangular format into the cube map format.</p></div>
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.RENDER</code> since the node updates
-the texture once per render in its <a href="CubeMapNode.html#updateBefore">CubeMapNode#updateBefore</a> method.<br/>Default is <code>'render'</code>.</p>
+the texture once per render in its <a href="CubeMapNode.html#updateBefore">CubeMapNode#updateBefore</a> method.</p>
+						<p>Default is <code>'render'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>

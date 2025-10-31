@@ -28,7 +28,7 @@ composer.addPass( maskPass );
 				<pre><code class="language-js">import { MaskPass } from 'three/addons/postprocessing/MaskPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="MaskPass" translate="no">new <a href="#MaskPass">MaskPass</a><span class="signature">( scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="MaskPass" translate="no">new <a href="#MaskPass">MaskPass</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new mask pass.</p>
@@ -36,12 +36,20 @@ composer.addPass( maskPass );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The 3D objects in this scene will define the mask.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D objects in this scene will define the mask.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -57,7 +65,8 @@ composer.addPass( maskPass );
 				<div class="member">
 					<h3 class="name" id="clear" translate="no">.<a href="#clear">clear</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Overwritten to perform a clear operation by default.<br/>Default is <code>true</code>.</p>
+						<p>Overwritten to perform a clear operation by default.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#clear">Pass#clear</a></dt>
@@ -66,13 +75,15 @@ composer.addPass( maskPass );
 				<div class="member">
 					<h3 class="name" id="inverse" translate="no">.<a href="#inverse">inverse</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to inverse the mask or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether to inverse the mask or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="needsSwap" translate="no">.<a href="#needsSwap">needsSwap</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Overwritten to disable the swap.<br/>Default is <code>false</code>.</p>
+						<p>Overwritten to disable the swap.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#needsSwap">Pass#needsSwap</a></dt>
@@ -85,7 +96,7 @@ composer.addPass( maskPass );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, writeBuffer : <span class="param-type">WebGLRenderTarget</span>, readBuffer : <span class="param-type">WebGLRenderTarget</span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, writeBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, readBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs a mask pass with the configured scene and camera.</p>
@@ -93,26 +104,46 @@ composer.addPass( maskPass );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>writeBuffer</code></td>
-									<td class="description last"><p>The write buffer. This buffer is intended as the rendering
-destination for the pass.</p></td>
+									<td class="name">
+										<strong>writeBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>readBuffer</code></td>
-									<td class="description last"><p>The read buffer. The pass can access the result from the
-previous pass from this buffer.</p></td>
+									<td class="name">
+										<strong>readBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>deltaTime</code></td>
-									<td class="description last"><p>The delta time in seconds.</p></td>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maskActive</code></td>
-									<td class="description last"><p>Whether masking is active or not.</p></td>
+									<td class="name">
+										<strong>maskActive</strong>
+									</td>
+									<td class="description last">
+										<p>Whether masking is active or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

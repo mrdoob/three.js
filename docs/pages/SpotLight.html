@@ -32,7 +32,7 @@ spotLight.shadow.camera.fov = 30;s
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SpotLight" translate="no">new <a href="#SpotLight">SpotLight</a><span class="signature">( color : <span class="param-type">number | Color | string</span>, intensity : <span class="param-type">number</span>, distance : <span class="param-type">number</span>, angle : <span class="param-type">number</span>, penumbra : <span class="param-type">number</span>, decay : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="SpotLight" translate="no">new <a href="#SpotLight">SpotLight</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, intensity : <span class="param-type">number</span>, distance : <span class="param-type">number</span>, angle : <span class="param-type">number</span>, penumbra : <span class="param-type">number</span>, decay : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new spot light.</p>
@@ -40,28 +40,58 @@ spotLight.shadow.camera.fov = 30;s
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The light's color.<br/>Default is <code>0xffffff</code>.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The light's color.</p>
+										<p>Default is <code>0xffffff</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intensity</code></td>
-									<td class="description last"><p>The light's strength/intensity measured in candela (cd).<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>intensity</strong>
+									</td>
+									<td class="description last">
+										<p>The light's strength/intensity measured in candela (cd).</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>Maximum range of the light. <code>0</code> means no limit.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum range of the light. <code>0</code> means no limit.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>angle</code></td>
-									<td class="description last"><p>Maximum angle of light dispersion from its direction whose upper bound is <code>Math.PI/2</code>.<br/>Default is <code>Math.PI/3</code>.</p></td>
+									<td class="name">
+										<strong>angle</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum angle of light dispersion from its direction whose upper bound is <code>Math.PI/2</code>.</p>
+										<p>Default is <code>Math.PI/3</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>penumbra</code></td>
-									<td class="description last"><p>Percent of the spotlight cone that is attenuated due to penumbra. Value range is <code>[0,1]</code>.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>penumbra</strong>
+									</td>
+									<td class="description last">
+										<p>Percent of the spotlight cone that is attenuated due to penumbra. Value range is <code>[0,1]</code>.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>decay</code></td>
-									<td class="description last"><p>The amount the light dims along the distance of the light.<br/>Default is <code>2</code>.</p></td>
+									<td class="name">
+										<strong>decay</strong>
+									</td>
+									<td class="description last">
+										<p>The amount the light dims along the distance of the light.</p>
+										<p>Default is <code>2</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -71,26 +101,30 @@ spotLight.shadow.camera.fov = 30;s
 				<div class="member">
 					<h3 class="name" id="angle" translate="no">.<a href="#angle">angle</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Maximum angle of light dispersion from its direction whose upper bound is <code>Math.PI/2</code>.<br/>Default is <code>Math.PI/3</code>.</p>
+						<p>Maximum angle of light dispersion from its direction whose upper bound is <code>Math.PI/2</code>.</p>
+						<p>Default is <code>Math.PI/3</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="decay" translate="no">.<a href="#decay">decay</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The amount the light dims along the distance of the light. In context of
-physically-correct rendering the default value should not be changed.<br/>Default is <code>2</code>.</p>
+physically-correct rendering the default value should not be changed.</p>
+						<p>Default is <code>2</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="distance" translate="no">.<a href="#distance">distance</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Maximum range of the light. <code>0</code> means no limit.<br/>Default is <code>0</code>.</p>
+						<p>Maximum range of the light. <code>0</code> means no limit.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isSpotLight" translate="no">.<a href="#isSpotLight">isSpotLight</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -100,14 +134,16 @@ physically-correct rendering the default value should not be changed.<br/>Defaul
 color is mixed with the RGB value of this texture, with a ratio
 corresponding to its alpha value. The cookie-like masking effect is
 reproduced using pixel values (0, 0, 0, 1-cookie_value).</p>
-<p><em>Warning</em>: This property is disabled if <a href="Object3D.html#castShadow">Object3D#castShadow</a> is set to <code>false</code>.<br/>Default is <code>null</code>.</p>
+<p><em>Warning</em>: This property is disabled if <a href="Object3D.html#castShadow">Object3D#castShadow</a> is set to <code>false</code>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="penumbra" translate="no">.<a href="#penumbra">penumbra</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Percent of the spotlight cone that is attenuated due to penumbra.
-Value range is <code>[0,1]</code>.<br/>Default is <code>0</code>.</p>
+Value range is <code>[0,1]</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">

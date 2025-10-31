@@ -32,7 +32,7 @@ scene.add( cubeShadow );
 				<pre><code class="language-js">import { ShadowMesh } from 'three/addons/objects/ShadowMesh.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ShadowMesh" translate="no">new <a href="#ShadowMesh">ShadowMesh</a><span class="signature">( mesh : <span class="param-type">Mesh</span> )</span> </h3>
+					<h3 class="name name-method" id="ShadowMesh" translate="no">new <a href="#ShadowMesh">ShadowMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new shadow mesh.</p>
@@ -40,8 +40,12 @@ scene.add( cubeShadow );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mesh</code></td>
-									<td class="description last"><p>The shadow-casting reference mesh.</p></td>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow-casting reference mesh.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -51,7 +55,8 @@ scene.add( cubeShadow );
 				<div class="member">
 					<h3 class="name" id="frustumCulled" translate="no">.<a href="#frustumCulled">frustumCulled</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Overwritten to disable view-frustum culling by default.<br/>Default is <code>false</code>.</p>
+						<p>Overwritten to disable view-frustum culling by default.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Mesh.html#frustumCulled">Mesh#frustumCulled</a></dt>
@@ -60,14 +65,16 @@ scene.add( cubeShadow );
 				<div class="member">
 					<h3 class="name" id="isShadowMesh" translate="no">.<a href="#isShadowMesh">isShadowMesh</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="matrixAutoUpdate" translate="no">.<a href="#matrixAutoUpdate">matrixAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Overwritten to disable automatic matrix update. The local
-matrix is computed manually in <a href="ShadowMesh.html#update">ShadowMesh#update</a>.<br/>Default is <code>false</code>.</p>
+matrix is computed manually in <a href="ShadowMesh.html#update">ShadowMesh#update</a>.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Mesh.html#matrixAutoUpdate">Mesh#matrixAutoUpdate</a></dt>
@@ -80,7 +87,7 @@ matrix is computed manually in <a href="ShadowMesh.html#update">ShadowMesh#updat
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( plane : <span class="param-type">Plane</span>, lightPosition4D : <span class="param-type">Vector4</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span>, lightPosition4D : <span class="param-type"><a href="Vector4.html">Vector4</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the shadow mesh so it follows its shadow-casting reference mesh.</p>
@@ -88,12 +95,20 @@ matrix is computed manually in <a href="ShadowMesh.html#update">ShadowMesh#updat
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>plane</code></td>
-									<td class="description last"><p>The plane onto the shadow mesh is projected.</p></td>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane onto the shadow mesh is projected.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>lightPosition4D</code></td>
-									<td class="description last"><p>The light position.</p></td>
+									<td class="name">
+										<strong>lightPosition4D</strong>
+									</td>
+									<td class="description last">
+										<p>The light position.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

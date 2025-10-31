@@ -42,7 +42,7 @@
 							<p>Called when a frame begins.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="beginCompute" translate="no">.<a href="#beginCompute">beginCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type">ComputeNode</span> )</span> </h3>
+					<h3 class="name name-method" id="beginCompute" translate="no">.<a href="#beginCompute">beginCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a compute operation begins.</p>
@@ -50,17 +50,25 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uid</code></td>
-									<td class="description last"><p>A unique identifier for the render context.</p></td>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>computeNode</code></td>
-									<td class="description last"><p>The compute node being executed.</p></td>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="beginRender" translate="no">.<a href="#beginRender">beginRender</a><span class="signature">( uid : <span class="param-type">string</span>, scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span>, renderTarget : <span class="param-type">WebGLRenderTarget</span> )</span> </h3>
+					<h3 class="name name-method" id="beginRender" translate="no">.<a href="#beginRender">beginRender</a><span class="signature">( uid : <span class="param-type">string</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a render operation begins.</p>
@@ -68,25 +76,41 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uid</code></td>
-									<td class="description last"><p>A unique identifier for the render context.</p></td>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene being rendered.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene being rendered.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera being used for rendering.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera being used for rendering.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderTarget</code></td>
-									<td class="description last"><p>The render target, if any.</p></td>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target, if any.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNode : <span class="param-type">ComputeNode</span>, dispatchSizeOrCount : <span class="param-type">number | Array.&lt;number></span> )</span> </h3>
+					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span>, dispatchSizeOrCount : <span class="param-type">number | Array.&lt;number></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>When a compute operation is performed.</p>
@@ -94,17 +118,25 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>computeNode</code></td>
-									<td class="description last"><p>The compute node being executed.</p></td>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>dispatchSizeOrCount</code></td>
-									<td class="description last"><p>The dispatch size or count.</p></td>
+									<td class="name">
+										<strong>dispatchSizeOrCount</strong>
+									</td>
+									<td class="description last">
+										<p>The dispatch size or count.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="copyFramebufferToTexture" translate="no">.<a href="#copyFramebufferToTexture">copyFramebufferToTexture</a><span class="signature">( framebufferTexture : <span class="param-type">Texture</span> )</span> </h3>
+					<h3 class="name name-method" id="copyFramebufferToTexture" translate="no">.<a href="#copyFramebufferToTexture">copyFramebufferToTexture</a><span class="signature">( framebufferTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a framebuffer copy operation is performed.</p>
@@ -112,13 +144,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>framebufferTexture</code></td>
-									<td class="description last"><p>The texture associated with the framebuffer.</p></td>
+									<td class="name">
+										<strong>framebufferTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture associated with the framebuffer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="copyTextureToTexture" translate="no">.<a href="#copyTextureToTexture">copyTextureToTexture</a><span class="signature">( srcTexture : <span class="param-type">Texture</span>, dstTexture : <span class="param-type">Texture</span> )</span> </h3>
+					<h3 class="name name-method" id="copyTextureToTexture" translate="no">.<a href="#copyTextureToTexture">copyTextureToTexture</a><span class="signature">( srcTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, dstTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a texture copy operation is performed.</p>
@@ -126,12 +162,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>srcTexture</code></td>
-									<td class="description last"><p>The source texture.</p></td>
+									<td class="name">
+										<strong>srcTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The source texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>dstTexture</code></td>
-									<td class="description last"><p>The destination texture.</p></td>
+									<td class="name">
+										<strong>dstTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The destination texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -142,7 +186,7 @@
 							<p>Called when a frame ends.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="finishCompute" translate="no">.<a href="#finishCompute">finishCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type">ComputeNode</span> )</span> </h3>
+					<h3 class="name name-method" id="finishCompute" translate="no">.<a href="#finishCompute">finishCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a compute operation ends.</p>
@@ -150,12 +194,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uid</code></td>
-									<td class="description last"><p>A unique identifier for the render context.</p></td>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>computeNode</code></td>
-									<td class="description last"><p>The compute node being executed.</p></td>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -168,8 +220,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uid</code></td>
-									<td class="description last"><p>A unique identifier for the render context.</p></td>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -189,7 +245,7 @@
 							<p>Initializes the inspector.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="inspect" translate="no">.<a href="#inspect">inspect</a><span class="signature">( node : <span class="param-type">Node</span> )</span> </h3>
+					<h3 class="name name-method" id="inspect" translate="no">.<a href="#inspect">inspect</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Inspects a node.</p>
@@ -197,13 +253,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>node</code></td>
-									<td class="description last"><p>The node to inspect.</p></td>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node to inspect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setRenderer" translate="no">.<a href="#setRenderer">setRenderer</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span> )</span><span class="type-signature"> : <a href="InspectorBase.html">InspectorBase</a></span> </h3>
+					<h3 class="name name-method" id="setRenderer" translate="no">.<a href="#setRenderer">setRenderer</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span><span class="type-signature"> : <a href="InspectorBase.html">InspectorBase</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the renderer for this inspector.</p>
@@ -211,8 +271,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer to associate with this inspector.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer to associate with this inspector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -258,7 +322,7 @@
 							<p>Called when a frame begins.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="beginCompute" translate="no">.<a href="#beginCompute">beginCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type">ComputeNode</span> )</span> </h3>
+					<h3 class="name name-method" id="beginCompute" translate="no">.<a href="#beginCompute">beginCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a compute operation begins.</p>
@@ -266,17 +330,25 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uid</code></td>
-									<td class="description last"><p>A unique identifier for the render context.</p></td>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>computeNode</code></td>
-									<td class="description last"><p>The compute node being executed.</p></td>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="beginRender" translate="no">.<a href="#beginRender">beginRender</a><span class="signature">( uid : <span class="param-type">string</span>, scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span>, renderTarget : <span class="param-type">WebGLRenderTarget</span> )</span> </h3>
+					<h3 class="name name-method" id="beginRender" translate="no">.<a href="#beginRender">beginRender</a><span class="signature">( uid : <span class="param-type">string</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a render operation begins.</p>
@@ -284,25 +356,41 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uid</code></td>
-									<td class="description last"><p>A unique identifier for the render context.</p></td>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene being rendered.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene being rendered.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera being used for rendering.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera being used for rendering.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderTarget</code></td>
-									<td class="description last"><p>The render target, if any.</p></td>
+									<td class="name">
+										<strong>renderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The render target, if any.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNode : <span class="param-type">ComputeNode</span>, dispatchSizeOrCount : <span class="param-type">number | Array.&lt;number></span> )</span> </h3>
+					<h3 class="name name-method" id="computeAsync" translate="no">.<a href="#computeAsync">computeAsync</a><span class="signature">( computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span>, dispatchSizeOrCount : <span class="param-type">number | Array.&lt;number></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>When a compute operation is performed.</p>
@@ -310,17 +398,25 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>computeNode</code></td>
-									<td class="description last"><p>The compute node being executed.</p></td>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>dispatchSizeOrCount</code></td>
-									<td class="description last"><p>The dispatch size or count.</p></td>
+									<td class="name">
+										<strong>dispatchSizeOrCount</strong>
+									</td>
+									<td class="description last">
+										<p>The dispatch size or count.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="copyFramebufferToTexture" translate="no">.<a href="#copyFramebufferToTexture">copyFramebufferToTexture</a><span class="signature">( framebufferTexture : <span class="param-type">Texture</span> )</span> </h3>
+					<h3 class="name name-method" id="copyFramebufferToTexture" translate="no">.<a href="#copyFramebufferToTexture">copyFramebufferToTexture</a><span class="signature">( framebufferTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a framebuffer copy operation is performed.</p>
@@ -328,13 +424,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>framebufferTexture</code></td>
-									<td class="description last"><p>The texture associated with the framebuffer.</p></td>
+									<td class="name">
+										<strong>framebufferTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture associated with the framebuffer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="copyTextureToTexture" translate="no">.<a href="#copyTextureToTexture">copyTextureToTexture</a><span class="signature">( srcTexture : <span class="param-type">Texture</span>, dstTexture : <span class="param-type">Texture</span> )</span> </h3>
+					<h3 class="name name-method" id="copyTextureToTexture" translate="no">.<a href="#copyTextureToTexture">copyTextureToTexture</a><span class="signature">( srcTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, dstTexture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a texture copy operation is performed.</p>
@@ -342,12 +442,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>srcTexture</code></td>
-									<td class="description last"><p>The source texture.</p></td>
+									<td class="name">
+										<strong>srcTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The source texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>dstTexture</code></td>
-									<td class="description last"><p>The destination texture.</p></td>
+									<td class="name">
+										<strong>dstTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The destination texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -358,7 +466,7 @@
 							<p>Called when a frame ends.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="finishCompute" translate="no">.<a href="#finishCompute">finishCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type">ComputeNode</span> )</span> </h3>
+					<h3 class="name name-method" id="finishCompute" translate="no">.<a href="#finishCompute">finishCompute</a><span class="signature">( uid : <span class="param-type">string</span>, computeNode : <span class="param-type"><a href="ComputeNode.html">ComputeNode</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Called when a compute operation ends.</p>
@@ -366,12 +474,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uid</code></td>
-									<td class="description last"><p>A unique identifier for the render context.</p></td>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>computeNode</code></td>
-									<td class="description last"><p>The compute node being executed.</p></td>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The compute node being executed.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -384,8 +500,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uid</code></td>
-									<td class="description last"><p>A unique identifier for the render context.</p></td>
+									<td class="name">
+										<strong>uid</strong>
+									</td>
+									<td class="description last">
+										<p>A unique identifier for the render context.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -405,7 +525,7 @@
 							<p>Initializes the inspector.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="inspect" translate="no">.<a href="#inspect">inspect</a><span class="signature">( node : <span class="param-type">Node</span> )</span> </h3>
+					<h3 class="name name-method" id="inspect" translate="no">.<a href="#inspect">inspect</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Inspects a node.</p>
@@ -413,13 +533,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>node</code></td>
-									<td class="description last"><p>The node to inspect.</p></td>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node to inspect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setRenderer" translate="no">.<a href="#setRenderer">setRenderer</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span> )</span><span class="type-signature"> : <a href="InspectorBase.html">InspectorBase</a></span> </h3>
+					<h3 class="name name-method" id="setRenderer" translate="no">.<a href="#setRenderer">setRenderer</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span><span class="type-signature"> : <a href="InspectorBase.html">InspectorBase</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the renderer for this inspector.</p>
@@ -427,8 +551,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer to associate with this inspector.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer to associate with this inspector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

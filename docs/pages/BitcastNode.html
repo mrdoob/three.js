@@ -19,7 +19,7 @@ in one type as a value in another type.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="BitcastNode" translate="no">new <a href="#BitcastNode">BitcastNode</a><span class="signature">( valueNode : <span class="param-type">Node</span>, conversionType : <span class="param-type">string</span>, inputType : <span class="param-type">string</span> )</span> </h3>
+					<h3 class="name name-method" id="BitcastNode" translate="no">new <a href="#BitcastNode">BitcastNode</a><span class="signature">( valueNode : <span class="param-type"><a href="Node.html">Node</a></span>, conversionType : <span class="param-type">string</span>, inputType : <span class="param-type">string</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new bitcast node.</p>
@@ -27,16 +27,29 @@ in one type as a value in another type.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>valueNode</code></td>
-									<td class="description last"><p>The value to convert.</p></td>
+									<td class="name">
+										<strong>valueNode</strong>
+									</td>
+									<td class="description last">
+										<p>The value to convert.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>conversionType</code></td>
-									<td class="description last"><p>The type to convert to.</p></td>
+									<td class="name">
+										<strong>conversionType</strong>
+									</td>
+									<td class="description last">
+										<p>The type to convert to.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>inputType</code></td>
-									<td class="description last"><p>The expected input data type of the bitcast operation.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>inputType</strong>
+									</td>
+									<td class="description last">
+										<p>The expected input data type of the bitcast operation.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -52,13 +65,15 @@ in one type as a value in another type.</p></div>
 				<div class="member">
 					<h3 class="name" id="inputType" translate="no">.<a href="#inputType">inputType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The expected input data type of the bitcast operation.<br/>Default is <code>null</code>.</p>
+						<p>The expected input data type of the bitcast operation.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isBitcastNode" translate="no">.<a href="#isBitcastNode">isBitcastNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">

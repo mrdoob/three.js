@@ -25,7 +25,7 @@ process.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="ambientOcclusion" translate="no">.<a href="#ambientOcclusion">ambientOcclusion</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="ambientOcclusion" translate="no">.<a href="#ambientOcclusion">ambientOcclusion</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is intended for implementing the ambient occlusion term.
@@ -35,13 +35,17 @@ model in its indirect term.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="direct" translate="no">.<a href="#direct">direct</a><span class="signature">( lightData : <span class="param-type">Object</span>, builder : <span class="param-type">NodeBuilder</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="direct" translate="no">.<a href="#direct">direct</a><span class="signature">( lightData : <span class="param-type">Object</span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is intended for implementing the direct light term and
@@ -50,17 +54,25 @@ executed during the build process of directional, point and spot light nodes.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>lightData</code></td>
-									<td class="description last"><p>The light data.</p></td>
+									<td class="name">
+										<strong>lightData</strong>
+									</td>
+									<td class="description last">
+										<p>The light data.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="directRectArea" translate="no">.<a href="#directRectArea">directRectArea</a><span class="signature">( lightData : <span class="param-type">Object</span>, builder : <span class="param-type">NodeBuilder</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="directRectArea" translate="no">.<a href="#directRectArea">directRectArea</a><span class="signature">( lightData : <span class="param-type">Object</span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is intended for implementing the direct light term for
@@ -69,17 +81,25 @@ rect area light nodes.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>lightData</code></td>
-									<td class="description last"><p>The light data.</p></td>
+									<td class="name">
+										<strong>lightData</strong>
+									</td>
+									<td class="description last">
+										<p>The light data.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="finish" translate="no">.<a href="#finish">finish</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="finish" translate="no">.<a href="#finish">finish</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is intended for executing final tasks like final updates
@@ -88,13 +108,17 @@ to the outgoing light.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="indirect" translate="no">.<a href="#indirect">indirect</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="indirect" translate="no">.<a href="#indirect">indirect</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is intended for implementing the indirect light term.</p>
@@ -102,13 +126,17 @@ to the outgoing light.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="start" translate="no">.<a href="#start">start</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="start" translate="no">.<a href="#start">start</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is intended for setting up lighting model and context data
@@ -117,8 +145,12 @@ which are later used in the evaluation process.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

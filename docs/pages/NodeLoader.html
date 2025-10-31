@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="NodeLoader" translate="no">new <a href="#NodeLoader">NodeLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="NodeLoader" translate="no">new <a href="#NodeLoader">NodeLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new node loader.</p>
@@ -26,8 +26,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>A reference to a loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to a loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -55,8 +59,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The node type.</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node type.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -72,20 +80,36 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Will be called when load completes.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Will be called when load completes.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Will be called while load progresses.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Will be called while load progresses.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Will be called when errors are thrown during the loading process.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Will be called when errors are thrown during the loading process.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -101,26 +125,44 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The JSON definition</p>
-										<h6>Properties</h6>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The node type.</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node type.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uuid</code></td>
-									<td class="description last"><p>The node UUID.</p></td>
+									<td class="name">
+										<strong>uuid</strong>
+									</td>
+									<td class="description last">
+										<p>The node UUID.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>nodes</code></td>
-									<td class="description last"><p>The node dependencies.</p></td>
+									<td class="name">
+										<strong>nodes</strong>
+									</td>
+									<td class="description last">
+										<p>The node dependencies.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>meta</code></td>
-									<td class="description last"><p>The meta data.</p></td>
+									<td class="name">
+										<strong>meta</strong>
+									</td>
+									<td class="description last">
+										<p>The meta data.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -143,8 +185,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The JSON definition</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -160,8 +206,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The node library defined as <code>&lt;classname,class&gt;</code>.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node library defined as <code>&lt;classname,class&gt;</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -169,7 +219,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setTextures" translate="no">.<a href="#setTextures">setTextures</a><span class="signature">( value : <span class="param-type">Object.&lt;string, Texture></span> )</span><span class="type-signature"> : <a href="NodeLoader.html">NodeLoader</a></span> </h3>
+					<h3 class="name name-method" id="setTextures" translate="no">.<a href="#setTextures">setTextures</a><span class="signature">( value : <span class="param-type">Object.&lt;string, <a href="Texture.html">Texture</a>></span> )</span><span class="type-signature"> : <a href="NodeLoader.html">NodeLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Defines the dictionary of textures.</p>
@@ -177,8 +227,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The texture library defines as <code>&lt;uuid,texture&gt;</code>.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The texture library defines as <code>&lt;uuid,texture&gt;</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

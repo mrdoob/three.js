@@ -31,7 +31,8 @@ light in a given lighting context.</p></div>
 				<div class="member">
 					<h3 class="name" id="global" translate="no">.<a href="#global">global</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p><code>LightsNode</code> sets this property to <code>true</code> by default.<br/>Default is <code>true</code>.</p>
+						<p><code>LightsNode</code> sets this property to <code>true</code> by default.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#global">Node#global</a></dt>
@@ -75,7 +76,7 @@ light data into the cache key.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The custom cache key.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getHash" translate="no">.<a href="#getHash">getHash</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getHash" translate="no">.<a href="#getHash">getHash</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes a hash value for identifying the current light nodes setup.</p>
@@ -83,8 +84,12 @@ light data into the cache key.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>A reference to the current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -104,7 +109,7 @@ light data into the cache key.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The scene's lights.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setLights" translate="no">.<a href="#setLights">setLights</a><span class="signature">( lights : <span class="param-type">Array.&lt;Light></span> )</span><span class="type-signature"> : <a href="LightsNode.html">LightsNode</a></span> </h3>
+					<h3 class="name name-method" id="setLights" translate="no">.<a href="#setLights">setLights</a><span class="signature">( lights : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : <a href="LightsNode.html">LightsNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Configures this node with an array of lights.</p>
@@ -112,8 +117,12 @@ light data into the cache key.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>lights</code></td>
-									<td class="description last"><p>An array of lights.</p></td>
+									<td class="name">
+										<strong>lights</strong>
+									</td>
+									<td class="description last">
+										<p>An array of lights.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -121,7 +130,7 @@ light data into the cache key.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>The implementation makes sure that for each light in the scene
@@ -131,8 +140,12 @@ and evaluating the lighting model the outgoing light is computed.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>A reference to the current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -151,21 +164,33 @@ and evaluating the lighting model the outgoing light is computed.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The builder object containing the context and stack.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The builder object containing the context and stack.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>lightNode</code></td>
-									<td class="description last"><p>The light node.</p></td>
+									<td class="name">
+										<strong>lightNode</strong>
+									</td>
+									<td class="description last">
+										<p>The light node.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>lightData</code></td>
-									<td class="description last"><p>The light object containing color and direction properties.</p></td>
+									<td class="name">
+										<strong>lightData</strong>
+									</td>
+									<td class="description last">
+										<p>The light object containing color and direction properties.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setupLights" translate="no">.<a href="#setupLights">setupLights</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, lightNodes : <span class="param-type">Array.&lt;LightingNode></span> )</span> </h3>
+					<h3 class="name name-method" id="setupLights" translate="no">.<a href="#setupLights">setupLights</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, lightNodes : <span class="param-type">Array.&lt;<a href="LightingNode.html">LightingNode</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the internal lights by building all respective
@@ -174,17 +199,25 @@ light nodes.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>A reference to the current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>lightNodes</code></td>
-									<td class="description last"><p>An array of lighting nodes.</p></td>
+									<td class="name">
+										<strong>lightNodes</strong>
+									</td>
+									<td class="description last">
+										<p>An array of lighting nodes.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setupLightsNode" translate="no">.<a href="#setupLightsNode">setupLightsNode</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> </h3>
+					<h3 class="name name-method" id="setupLightsNode" translate="no">.<a href="#setupLightsNode">setupLightsNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates lighting nodes for each scene light. This makes it possible to further
@@ -193,8 +226,12 @@ process lights in the node system.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>A reference to the current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

@@ -21,7 +21,7 @@ on this module, the node system can automatically ensure texture input if requir
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="RTTNode" translate="no">new <a href="#RTTNode">RTTNode</a><span class="signature">( node : <span class="param-type">Node</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="RTTNode" translate="no">new <a href="#RTTNode">RTTNode</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, options : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new RTT node.</p>
@@ -29,20 +29,39 @@ on this module, the node system can automatically ensure texture input if requir
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>node</code></td>
-									<td class="description last"><p>The node to render a texture with.</p></td>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node to render a texture with.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the internal render target. If not width is applied, the render target is automatically resized.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the internal render target. If not width is applied, the render target is automatically resized.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the internal render target.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the internal render target.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The options for the internal render target.<br/>Default is <code>{type:HalfFloatType}</code>.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The options for the internal render target.</p>
+										<p>Default is <code>{type:HalfFloatType}</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -52,25 +71,29 @@ on this module, the node system can automatically ensure texture input if requir
 				<div class="member">
 					<h3 class="name" id="autoResize" translate="no">.<a href="#autoResize">autoResize</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>Whether the internal render target should automatically be resized or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether the internal render target should automatically be resized or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="autoUpdate" translate="no">.<a href="#autoUpdate">autoUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the texture should automatically be updated or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether the texture should automatically be updated or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="height" translate="no">.<a href="#height">height</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The height of the internal render target.<br/>Default is <code>null</code>.</p>
+						<p>The height of the internal render target.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isRTTNode" translate="no">.<a href="#isRTTNode">isRTTNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -82,7 +105,8 @@ on this module, the node system can automatically ensure texture input if requir
 				<div class="member">
 					<h3 class="name" id="pixelRatio" translate="no">.<a href="#pixelRatio">pixelRatio</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The pixel ratio<br/>Default is <code>1</code>.</p>
+						<p>The pixel ratio</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -94,14 +118,16 @@ on this module, the node system can automatically ensure texture input if requir
 				<div class="member">
 					<h3 class="name" id="textureNeedsUpdate" translate="no">.<a href="#textureNeedsUpdate">textureNeedsUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the texture requires an update or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether the texture requires an update or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.RENDER</code> since the node updates
-the texture once per render in its <a href="RTTNode.html#updateBefore">RTTNode#updateBefore</a> method.<br/>Default is <code>'render'</code>.</p>
+the texture once per render in its <a href="RTTNode.html#updateBefore">RTTNode#updateBefore</a> method.</p>
+						<p>Default is <code>'render'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#updateBeforeType">TextureNode#updateBeforeType</a></dt>
@@ -111,7 +137,8 @@ the texture once per render in its <a href="RTTNode.html#updateBefore">RTTNode#u
 					<h3 class="name" id="width" translate="no">.<a href="#width">width</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The width of the internal render target.
-If not width is applied, the render target is automatically resized.<br/>Default is <code>null</code>.</p>
+If not width is applied, the render target is automatically resized.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -123,8 +150,12 @@ If not width is applied, the render target is automatically resized.<br/>Default
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pixelRatio</code></td>
-									<td class="description last"><p>The pixel ratio to set.</p></td>
+									<td class="name">
+										<strong>pixelRatio</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel ratio to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -137,12 +168,20 @@ If not width is applied, the render target is automatically resized.<br/>Default
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width to set.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The width to set.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The width to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

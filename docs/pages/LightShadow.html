@@ -18,7 +18,7 @@ represent the shadow configuration for different light types.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="LightShadow" translate="no">new <a href="#LightShadow">LightShadow</a><span class="signature">( camera : <span class="param-type">Camera</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="LightShadow" translate="no">new <a href="#LightShadow">LightShadow</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new light shadow.</p>
@@ -26,8 +26,12 @@ represent the shadow configuration for different light types.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The light's view of the world.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The light's view of the world.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -38,7 +42,8 @@ represent the shadow configuration for different light types.</p></div>
 					<h3 class="name" id="autoUpdate" translate="no">.<a href="#autoUpdate">autoUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Enables automatic updates of the light's shadow. If you do not require dynamic
-lighting / shadows, you may set this to <code>false</code>.<br/>Default is <code>true</code>.</p>
+lighting / shadows, you may set this to <code>false</code>.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -47,13 +52,15 @@ lighting / shadows, you may set this to <code>false</code>.<br/>Default is <code
 						<p>Shadow map bias, how much to add or subtract from the normalized depth
 when deciding whether a surface is in shadow.</p>
 <p>The default is <code>0</code>. Very tiny adjustments here (in the order of <code>0.0001</code>)
-may help reduce artifacts in shadows.<br/>Default is <code>0</code>.</p>
+may help reduce artifacts in shadows.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="blurSamples" translate="no">.<a href="#blurSamples">blurSamples</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The amount of samples to use when blurring a VSM shadow map.<br/>Default is <code>8</code>.</p>
+						<p>The amount of samples to use when blurring a VSM shadow map.</p>
+						<p>Default is <code>8</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -66,14 +73,16 @@ may help reduce artifacts in shadows.<br/>Default is <code>0</code>.</p>
 					<h3 class="name" id="intensity" translate="no">.<a href="#intensity">intensity</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The intensity of the shadow. The default is <code>1</code>.
-Valid values are in the range <code>[0, 1]</code>.<br/>Default is <code>1</code>.</p>
+Valid values are in the range <code>[0, 1]</code>.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="map" translate="no">.<a href="#map">map</a><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
 					<div class="description">
 						<p>The depth map generated using the internal camera; a location beyond a
-pixel's depth is in shadow. Computed internally during rendering.<br/>Default is <code>null</code>.</p>
+pixel's depth is in shadow. Computed internally during rendering.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -81,20 +90,23 @@ pixel's depth is in shadow. Computed internally during rendering.<br/>Default is
 					<div class="description">
 						<p>The distribution map generated using the internal camera; an occlusion is
 calculated based on the distribution of depths. Computed internally during
-rendering.<br/>Default is <code>null</code>.</p>
+rendering.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="mapSize" translate="no">.<a href="#mapSize">mapSize</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="description">
 						<p>Defines the width and height of the shadow map. Higher values give better quality
-shadows at the cost of computation time. Values must be powers of two.<br/>Default is <code>(512,512)</code>.</p>
+shadows at the cost of computation time. Values must be powers of two.</p>
+						<p>Default is <code>(512,512)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="mapType" translate="no">.<a href="#mapType">mapType</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The type of shadow texture. The default is <code>UnsignedByteType</code>.<br/>Default is <code>UnsignedByteType</code>.</p>
+						<p>The type of shadow texture. The default is <code>UnsignedByteType</code>.</p>
+						<p>Default is <code>UnsignedByteType</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -109,7 +121,8 @@ This is computed internally during rendering.</p>
 					<div class="description">
 						<p>When set to <code>true</code>, shadow maps will be updated in the next <code>render</code> call.
 If you have set <a href="LightShadow.html#autoUpdate">LightShadow#autoUpdate</a> to <code>false</code>, you will need to
-set this property to <code>true</code> and then make a render call to update the light's shadow.<br/>Default is <code>false</code>.</p>
+set this property to <code>true</code> and then make a render call to update the light's shadow.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -118,7 +131,8 @@ set this property to <code>true</code> and then make a render call to update the
 						<p>Defines how much the position used to query the shadow map is offset along
 the object normal. The default is <code>0</code>. Increasing this value can be used to
 reduce shadow acne especially in large scenes where light shines onto
-geometry at a shallow angle. The cost is that shadows may appear distorted.<br/>Default is <code>0</code>.</p>
+geometry at a shallow angle. The cost is that shadows may appear distorted.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -130,7 +144,8 @@ map size will allow for a higher value to be used here before these effects
 become visible.</p>
 <p>The property has no effect when the shadow map type is <code>PCFSoftShadowMap</code> and
 and it is recommended to increase softness by decreasing the shadow map size instead.</p>
-<p>The property has no effect when the shadow map type is <code>BasicShadowMap</code>.<br/>Default is <code>1</code>.</p>
+<p>The property has no effect when the shadow map type is <code>BasicShadowMap</code>.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -143,7 +158,7 @@ and it is recommended to increase softness by decreasing the shadow map size ins
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type">LightShadow</span> )</span><span class="type-signature"> : <a href="LightShadow.html">LightShadow</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="LightShadow.html">LightShadow</a></span> )</span><span class="type-signature"> : <a href="LightShadow.html">LightShadow</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given light shadow instance to this instance.</p>
@@ -151,8 +166,12 @@ and it is recommended to increase softness by decreasing the shadow map size ins
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>source</code></td>
-									<td class="description last"><p>The light shadow to copy.</p></td>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The light shadow to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -193,8 +212,12 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>viewportIndex</code></td>
-									<td class="description last"><p>The viewport index.</p></td>
+									<td class="name">
+										<strong>viewportIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The viewport index.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -229,7 +252,7 @@ to be rendered for this shadow.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized light shadow.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateMatrices" translate="no">.<a href="#updateMatrices">updateMatrices</a><span class="signature">( light : <span class="param-type">Light</span> )</span> </h3>
+					<h3 class="name name-method" id="updateMatrices" translate="no">.<a href="#updateMatrices">updateMatrices</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Update the matrices for the camera and shadow, used internally by the renderer.</p>
@@ -237,8 +260,12 @@ to be rendered for this shadow.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>light</code></td>
-									<td class="description last"><p>The light for which the shadow is being rendered.</p></td>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The light for which the shadow is being rendered.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

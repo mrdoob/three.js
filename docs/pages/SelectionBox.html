@@ -25,7 +25,7 @@ const selectedObjects = selectionBox.select( startPoint, endPoint );
 				<pre><code class="language-js">import { SelectionBox } from 'three/addons/interactive/SelectionBox.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SelectionBox" translate="no">new <a href="#SelectionBox">SelectionBox</a><span class="signature">( camera : <span class="param-type">Camera</span>, scene : <span class="param-type">Scene</span>, deep : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="SelectionBox" translate="no">new <a href="#SelectionBox">SelectionBox</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, deep : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new selection box.</p>
@@ -33,16 +33,29 @@ const selectedObjects = selectionBox.select( startPoint, endPoint );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera the scene is rendered with.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>deep</code></td>
-									<td class="description last"><p>How deep the selection frustum of perspective cameras should extend.<br/>Default is <code>Number.MAX_VALUE</code>.</p></td>
+									<td class="name">
+										<strong>deep</strong>
+									</td>
+									<td class="description last">
+										<p>How deep the selection frustum of perspective cameras should extend.</p>
+										<p>Default is <code>Number.MAX_VALUE</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -70,7 +83,8 @@ const selectedObjects = selectionBox.select( startPoint, endPoint );
 				<div class="member">
 					<h3 class="name" id="deep" translate="no">.<a href="#deep">deep</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>How deep the selection frustum of perspective cameras should extend.<br/>Default is <code>Number.MAX_VALUE</code>.</p>
+						<p>How deep the selection frustum of perspective cameras should extend.</p>
+						<p>Default is <code>Number.MAX_VALUE</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -98,7 +112,7 @@ const selectedObjects = selectionBox.select( startPoint, endPoint );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="select" translate="no">.<a href="#select">select</a><span class="signature">( startPoint : <span class="param-type">Vector3</span>, endPoint : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : Array.&lt;<a href="Object3D.html">Object3D</a>></span> </h3>
+					<h3 class="name name-method" id="select" translate="no">.<a href="#select">select</a><span class="signature">( startPoint : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, endPoint : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : Array.&lt;<a href="Object3D.html">Object3D</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method selects 3D objects in the scene based on the given start
@@ -108,12 +122,20 @@ and end values of the respective members.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>startPoint</code></td>
-									<td class="description last"><p>The start point.</p></td>
+									<td class="name">
+										<strong>startPoint</strong>
+									</td>
+									<td class="description last">
+										<p>The start point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>endPoint</code></td>
-									<td class="description last"><p>The end point.</p></td>
+									<td class="name">
+										<strong>endPoint</strong>
+									</td>
+									<td class="description last">
+										<p>The end point.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

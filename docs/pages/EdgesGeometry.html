@@ -25,7 +25,7 @@ scene.add( line );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="EdgesGeometry" translate="no">new <a href="#EdgesGeometry">EdgesGeometry</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, thresholdAngle : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="EdgesGeometry" translate="no">new <a href="#EdgesGeometry">EdgesGeometry</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, thresholdAngle : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new edges geometry.</p>
@@ -33,13 +33,23 @@ scene.add( line );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>geometry</code></td>
-									<td class="description last"><p>The geometry.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>thresholdAngle</code></td>
-									<td class="description last"><p>An edge is only rendered if the angle (in degrees)
-between the face normals of the adjoining faces exceeds this value.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>thresholdAngle</strong>
+									</td>
+									<td class="description last">
+										<p>An edge is only rendered if the angle (in degrees)
+between the face normals of the adjoining faces exceeds this value.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

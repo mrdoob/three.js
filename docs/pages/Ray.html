@@ -20,7 +20,7 @@ amongst other things.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Ray" translate="no">new <a href="#Ray">Ray</a><span class="signature">( origin : <span class="param-type">Vector3</span>, direction : <span class="param-type">Vector3</span> )</span> </h3>
+					<h3 class="name name-method" id="Ray" translate="no">new <a href="#Ray">Ray</a><span class="signature">( origin : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, direction : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new ray.</p>
@@ -28,12 +28,22 @@ amongst other things.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>origin</code></td>
-									<td class="description last"><p>The origin of the ray.<br/>Default is <code>(0,0,0)</code>.</p></td>
+									<td class="name">
+										<strong>origin</strong>
+									</td>
+									<td class="description last">
+										<p>The origin of the ray.</p>
+										<p>Default is <code>(0,0,0)</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>direction</code></td>
-									<td class="description last"><p>The (normalized) direction of the ray.<br/>Default is <code>(0,0,-1)</code>.</p></td>
+									<td class="name">
+										<strong>direction</strong>
+									</td>
+									<td class="description last">
+										<p>The (normalized) direction of the ray.</p>
+										<p>Default is <code>(0,0,-1)</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -53,7 +63,7 @@ amongst other things.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix4 : <span class="param-type">Matrix4</span> )</span><span class="type-signature"> : <a href="Ray.html">Ray</a></span> </h3>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( matrix4 : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="Ray.html">Ray</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Transforms this ray with the given 4x4 transformation matrix.</p>
@@ -61,8 +71,12 @@ amongst other things.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>matrix4</code></td>
-									<td class="description last"><p>The transformation matrix.</p></td>
+									<td class="name">
+										<strong>matrix4</strong>
+									</td>
+									<td class="description last">
+										<p>The transformation matrix.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -70,7 +84,7 @@ amongst other things.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this ray.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="at" translate="no">.<a href="#at">at</a><span class="signature">( t : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="at" translate="no">.<a href="#at">at</a><span class="signature">( t : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a vector that is located at a given distance along this ray.</p>
@@ -78,12 +92,20 @@ amongst other things.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>The distance along the ray to retrieve a position for.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The distance along the ray to retrieve a position for.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -100,7 +122,7 @@ amongst other things.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="closestPointToPoint" translate="no">.<a href="#closestPointToPoint">closestPointToPoint</a><span class="signature">( point : <span class="param-type">Vector3</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="closestPointToPoint" translate="no">.<a href="#closestPointToPoint">closestPointToPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the point along this ray that is closest to the given point.</p>
@@ -108,12 +130,20 @@ amongst other things.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>A point in 3D space to get the closet location on the ray for.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>A point in 3D space to get the closet location on the ray for.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -121,7 +151,7 @@ amongst other things.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> The closest point on this ray.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( ray : <span class="param-type">Ray</span> )</span><span class="type-signature"> : <a href="Ray.html">Ray</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span> )</span><span class="type-signature"> : <a href="Ray.html">Ray</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given ray to this instance.</p>
@@ -129,8 +159,12 @@ amongst other things.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>ray</code></td>
-									<td class="description last"><p>The ray to copy.</p></td>
+									<td class="name">
+										<strong>ray</strong>
+									</td>
+									<td class="description last">
+										<p>The ray to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -138,7 +172,7 @@ amongst other things.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this ray.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="distanceSqToPoint" translate="no">.<a href="#distanceSqToPoint">distanceSqToPoint</a><span class="signature">( point : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="distanceSqToPoint" translate="no">.<a href="#distanceSqToPoint">distanceSqToPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the squared distance of the closest approach between this ray and the given point.</p>
@@ -146,8 +180,12 @@ amongst other things.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>A point in 3D space to compute the distance to.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>A point in 3D space to compute the distance to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -155,7 +193,7 @@ amongst other things.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> The squared distance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="distanceSqToSegment" translate="no">.<a href="#distanceSqToSegment">distanceSqToSegment</a><span class="signature">( v0 : <span class="param-type">Vector3</span>, v1 : <span class="param-type">Vector3</span>, optionalPointOnRay : <span class="param-type">Vector3</span>, optionalPointOnSegment : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="distanceSqToSegment" translate="no">.<a href="#distanceSqToSegment">distanceSqToSegment</a><span class="signature">( v0 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v1 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, optionalPointOnRay : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, optionalPointOnSegment : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the squared distance between this ray and the given line segment.</p>
@@ -163,20 +201,36 @@ amongst other things.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>v0</code></td>
-									<td class="description last"><p>The start point of the line segment.</p></td>
+									<td class="name">
+										<strong>v0</strong>
+									</td>
+									<td class="description last">
+										<p>The start point of the line segment.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>v1</code></td>
-									<td class="description last"><p>The end point of the line segment.</p></td>
+									<td class="name">
+										<strong>v1</strong>
+									</td>
+									<td class="description last">
+										<p>The end point of the line segment.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalPointOnRay</code></td>
-									<td class="description last"><p>When provided, it receives the point on this ray that is closest to the segment.</p></td>
+									<td class="name">
+										<strong>optionalPointOnRay</strong>
+									</td>
+									<td class="description last">
+										<p>When provided, it receives the point on this ray that is closest to the segment.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalPointOnSegment</code></td>
-									<td class="description last"><p>When provided, it receives the point on the line segment that is closest to this ray.</p></td>
+									<td class="name">
+										<strong>optionalPointOnSegment</strong>
+									</td>
+									<td class="description last">
+										<p>When provided, it receives the point on the line segment that is closest to this ray.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -184,7 +238,7 @@ amongst other things.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> The squared distance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="distanceToPlane" translate="no">.<a href="#distanceToPlane">distanceToPlane</a><span class="signature">( plane : <span class="param-type">Plane</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="distanceToPlane" translate="no">.<a href="#distanceToPlane">distanceToPlane</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the distance from the ray's origin to the given plane. Returns <code>null</code> if the ray
@@ -193,8 +247,12 @@ does not intersect with the plane.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>plane</code></td>
-									<td class="description last"><p>The plane to compute the distance to.</p></td>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane to compute the distance to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -202,7 +260,7 @@ does not intersect with the plane.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this ray intersects with the given sphere or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="distanceToPoint" translate="no">.<a href="#distanceToPoint">distanceToPoint</a><span class="signature">( point : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id="distanceToPoint" translate="no">.<a href="#distanceToPoint">distanceToPoint</a><span class="signature">( point : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the distance of the closest approach between this ray and the given point.</p>
@@ -210,8 +268,12 @@ does not intersect with the plane.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>point</code></td>
-									<td class="description last"><p>A point in 3D space to compute the distance to.</p></td>
+									<td class="name">
+										<strong>point</strong>
+									</td>
+									<td class="description last">
+										<p>A point in 3D space to compute the distance to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -219,7 +281,7 @@ does not intersect with the plane.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The distance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( ray : <span class="param-type">Ray</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this ray is equal with the given one.</p>
@@ -227,8 +289,12 @@ does not intersect with the plane.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>ray</code></td>
-									<td class="description last"><p>The ray to test for equality.</p></td>
+									<td class="name">
+										<strong>ray</strong>
+									</td>
+									<td class="description last">
+										<p>The ray to test for equality.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -236,7 +302,7 @@ does not intersect with the plane.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this ray is equal with the given one.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectBox" translate="no">.<a href="#intersectBox">intersectBox</a><span class="signature">( box : <span class="param-type">Box3</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="intersectBox" translate="no">.<a href="#intersectBox">intersectBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Intersects this ray with the given bounding box, returning the intersection
@@ -245,12 +311,20 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The box to intersect.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The box to intersect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -258,7 +332,7 @@ point or <code>null</code> if there is no intersection.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The intersection point.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectPlane" translate="no">.<a href="#intersectPlane">intersectPlane</a><span class="signature">( plane : <span class="param-type">Plane</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="intersectPlane" translate="no">.<a href="#intersectPlane">intersectPlane</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Intersects this ray with the given plane, returning the intersection
@@ -267,12 +341,20 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>plane</code></td>
-									<td class="description last"><p>The plane to intersect.</p></td>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane to intersect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -280,7 +362,7 @@ point or <code>null</code> if there is no intersection.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The intersection point.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectSphere" translate="no">.<a href="#intersectSphere">intersectSphere</a><span class="signature">( sphere : <span class="param-type">Sphere</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="intersectSphere" translate="no">.<a href="#intersectSphere">intersectSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Intersects this ray with the given sphere, returning the intersection
@@ -289,12 +371,20 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The sphere to intersect.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to intersect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -302,7 +392,7 @@ point or <code>null</code> if there is no intersection.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The intersection point.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectTriangle" translate="no">.<a href="#intersectTriangle">intersectTriangle</a><span class="signature">( a : <span class="param-type">Vector3</span>, b : <span class="param-type">Vector3</span>, c : <span class="param-type">Vector3</span>, backfaceCulling : <span class="param-type">boolean</span>, target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="intersectTriangle" translate="no">.<a href="#intersectTriangle">intersectTriangle</a><span class="signature">( a : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, b : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, c : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, backfaceCulling : <span class="param-type">boolean</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Intersects this ray with the given triangle, returning the intersection
@@ -311,24 +401,44 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>a</code></td>
-									<td class="description last"><p>The first vertex of the triangle.</p></td>
+									<td class="name">
+										<strong>a</strong>
+									</td>
+									<td class="description last">
+										<p>The first vertex of the triangle.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>b</code></td>
-									<td class="description last"><p>The second vertex of the triangle.</p></td>
+									<td class="name">
+										<strong>b</strong>
+									</td>
+									<td class="description last">
+										<p>The second vertex of the triangle.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>c</code></td>
-									<td class="description last"><p>The third vertex of the triangle.</p></td>
+									<td class="name">
+										<strong>c</strong>
+									</td>
+									<td class="description last">
+										<p>The third vertex of the triangle.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>backfaceCulling</code></td>
-									<td class="description last"><p>Whether to use backface culling or not.</p></td>
+									<td class="name">
+										<strong>backfaceCulling</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to use backface culling or not.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -336,7 +446,7 @@ point or <code>null</code> if there is no intersection.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The intersection point.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type">Box3</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this ray intersects with the given box.</p>
@@ -344,8 +454,12 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The box to intersect.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The box to intersect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -353,7 +467,7 @@ point or <code>null</code> if there is no intersection.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this ray intersects with the given box or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsPlane" translate="no">.<a href="#intersectsPlane">intersectsPlane</a><span class="signature">( plane : <span class="param-type">Plane</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsPlane" translate="no">.<a href="#intersectsPlane">intersectsPlane</a><span class="signature">( plane : <span class="param-type"><a href="Plane.html">Plane</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this ray intersects with the given plane.</p>
@@ -361,8 +475,12 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>plane</code></td>
-									<td class="description last"><p>The plane to intersect.</p></td>
+									<td class="name">
+										<strong>plane</strong>
+									</td>
+									<td class="description last">
+										<p>The plane to intersect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -370,7 +488,7 @@ point or <code>null</code> if there is no intersection.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this ray intersects with the given plane or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type">Sphere</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsSphere" translate="no">.<a href="#intersectsSphere">intersectsSphere</a><span class="signature">( sphere : <span class="param-type"><a href="Sphere.html">Sphere</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if this ray intersects with the given sphere.</p>
@@ -378,8 +496,12 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphere</code></td>
-									<td class="description last"><p>The sphere to intersect.</p></td>
+									<td class="name">
+										<strong>sphere</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere to intersect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -387,7 +509,7 @@ point or <code>null</code> if there is no intersection.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this ray intersects with the given sphere or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="lookAt" translate="no">.<a href="#lookAt">lookAt</a><span class="signature">( v : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Ray.html">Ray</a></span> </h3>
+					<h3 class="name name-method" id="lookAt" translate="no">.<a href="#lookAt">lookAt</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Ray.html">Ray</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adjusts the direction of the ray to point at the given vector in world space.</p>
@@ -395,8 +517,12 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>v</code></td>
-									<td class="description last"><p>The target position.</p></td>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The target position.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -412,8 +538,12 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>The distance along the ray to interpolate.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The distance along the ray to interpolate.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -421,7 +551,7 @@ point or <code>null</code> if there is no intersection.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this ray.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( origin : <span class="param-type">Vector3</span>, direction : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Ray.html">Ray</a></span> </h3>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( origin : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, direction : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Ray.html">Ray</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the ray's components by copying the given values.</p>
@@ -429,12 +559,20 @@ point or <code>null</code> if there is no intersection.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>origin</code></td>
-									<td class="description last"><p>The origin.</p></td>
+									<td class="name">
+										<strong>origin</strong>
+									</td>
+									<td class="description last">
+										<p>The origin.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>direction</code></td>
-									<td class="description last"><p>The direction.</p></td>
+									<td class="name">
+										<strong>direction</strong>
+									</td>
+									<td class="description last">
+										<p>The direction.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

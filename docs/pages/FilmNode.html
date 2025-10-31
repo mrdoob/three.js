@@ -21,7 +21,7 @@
 				<pre><code class="language-js">import { film } from 'three/addons/tsl/display/FilmNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="FilmNode" translate="no">new <a href="#FilmNode">FilmNode</a><span class="signature">( inputNode : <span class="param-type">Node</span>, intensityNode : <span class="param-type">Node.&lt;float></span>, uvNode : <span class="param-type">Node.&lt;vec2></span> )</span> </h3>
+					<h3 class="name name-method" id="FilmNode" translate="no">new <a href="#FilmNode">FilmNode</a><span class="signature">( inputNode : <span class="param-type"><a href="Node.html">Node</a></span>, intensityNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new film node.</p>
@@ -29,16 +29,30 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>inputNode</code></td>
-									<td class="description last"><p>The node that represents the input of the effect.</p></td>
+									<td class="name">
+										<strong>inputNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node that represents the input of the effect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intensityNode</code></td>
-									<td class="description last"><p>A node that represents the effect's intensity.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>intensityNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the effect's intensity.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvNode</code></td>
-									<td class="description last"><p>A node that allows to pass custom (e.g. animated) uv data.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that allows to pass custom (e.g. animated) uv data.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -54,17 +68,19 @@
 				<div class="member">
 					<h3 class="name" id="intensityNode" translate="no">.<a href="#intensityNode">intensityNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
-						<p>A node that represents the effect's intensity.<br/>Default is <code>null</code>.</p>
+						<p>A node that represents the effect's intensity.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="uvNode" translate="no">.<a href="#uvNode">uvNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
 					<div class="description">
-						<p>A node that allows to pass custom (e.g. animated) uv data.<br/>Default is <code>null</code>.</p>
+						<p>A node that allows to pass custom (e.g. animated) uv data.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>
@@ -72,16 +88,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

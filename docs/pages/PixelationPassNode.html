@@ -21,7 +21,7 @@
 				<pre><code class="language-js">import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PixelationPassNode" translate="no">new <a href="#PixelationPassNode">PixelationPassNode</a><span class="signature">( scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span>, pixelSize : <span class="param-type">Node.&lt;float> | number</span>, normalEdgeStrength : <span class="param-type">Node.&lt;float> | number</span>, depthEdgeStrength : <span class="param-type">Node.&lt;float> | number</span> )</span> </h3>
+					<h3 class="name name-method" id="PixelationPassNode" translate="no">new <a href="#PixelationPassNode">PixelationPassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, pixelSize : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span>, normalEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span>, depthEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new pixelation pass node.</p>
@@ -29,24 +29,47 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene to render.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera to render the scene with.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to render the scene with.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>pixelSize</code></td>
-									<td class="description last"><p>The pixel size.<br/>Default is <code>6</code>.</p></td>
+									<td class="name">
+										<strong>pixelSize</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel size.</p>
+										<p>Default is <code>6</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>normalEdgeStrength</code></td>
-									<td class="description last"><p>The normal edge strength.<br/>Default is <code>0.3</code>.</p></td>
+									<td class="name">
+										<strong>normalEdgeStrength</strong>
+									</td>
+									<td class="description last">
+										<p>The normal edge strength.</p>
+										<p>Default is <code>0.3</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>depthEdgeStrength</code></td>
-									<td class="description last"><p>The depth edge strength.<br/>Default is <code>0.4</code>.</p></td>
+									<td class="name">
+										<strong>depthEdgeStrength</strong>
+									</td>
+									<td class="description last">
+										<p>The depth edge strength.</p>
+										<p>Default is <code>0.4</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -56,25 +79,29 @@
 				<div class="member">
 					<h3 class="name" id="depthEdgeStrength" translate="no">.<a href="#depthEdgeStrength">depthEdgeStrength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The depth edge strength.<br/>Default is <code>0.4</code>.</p>
+						<p>The depth edge strength.</p>
+						<p>Default is <code>0.4</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isPixelationPassNode" translate="no">.<a href="#isPixelationPassNode">isPixelationPassNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="normalEdgeStrength" translate="no">.<a href="#normalEdgeStrength">normalEdgeStrength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The normal edge strength.<br/>Default is <code>0.3</code>.</p>
+						<p>The normal edge strength.</p>
+						<p>Default is <code>0.3</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="pixelSize" translate="no">.<a href="#pixelSize">pixelSize</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The pixel size.<br/>Default is <code>6</code>.</p>
+						<p>The pixel size.</p>
+						<p>Default is <code>6</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -86,12 +113,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the pass.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the pass.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the pass.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -99,7 +134,7 @@
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="PassNode.html#setSize">PassNode#setSize</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="PixelationNode.html">PixelationNode</a></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PixelationNode.html">PixelationNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>
@@ -107,16 +142,17 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="PassNode.html#setup">PassNode#setup</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

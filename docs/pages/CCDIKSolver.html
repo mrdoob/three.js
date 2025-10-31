@@ -21,17 +21,26 @@
 				<pre><code class="language-js">import { CCDIKSolver } from 'three/addons/animation/CCDIKSolver.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CCDIKSolver" translate="no">new <a href="#CCDIKSolver">CCDIKSolver</a><span class="signature">( mesh : <span class="param-type">SkinnedMesh</span>, iks : <span class="param-type">Array.&lt;CCDIKSolver~IK></span> )</span> </h3>
+					<h3 class="name name-method" id="CCDIKSolver" translate="no">new <a href="#CCDIKSolver">CCDIKSolver</a><span class="signature">( mesh : <span class="param-type"><a href="SkinnedMesh.html">SkinnedMesh</a></span>, iks : <span class="param-type">Array.&lt;<a href="CCDIKSolver.html#~IK">CCDIKSolver~IK</a>></span> )</span> </h3>
 					<div class="method">
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mesh</code></td>
-									<td class="description last"><p>The skinned mesh.</p></td>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The skinned mesh.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>iks</code></td>
-									<td class="description last"><p>The IK objects.<br/>Default is <code>[]</code>.</p></td>
+									<td class="name">
+										<strong>iks</strong>
+									</td>
+									<td class="description last">
+										<p>The IK objects.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -59,8 +68,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sphereSize</code></td>
-									<td class="description last"><p>The sphere size.</p></td>
+									<td class="name">
+										<strong>sphereSize</strong>
+									</td>
+									<td class="description last">
+										<p>The sphere size.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -76,8 +89,13 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>globalBlendFactor</code></td>
-									<td class="description last"><p>Blend factor applied if an IK chain doesn't have its own .blendFactor.<br/>Default is <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>globalBlendFactor</strong>
+									</td>
+									<td class="description last">
+										<p>Blend factor applied if an IK chain doesn't have its own .blendFactor.</p>
+										<p>Default is <code>1.0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -85,7 +103,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateOne" translate="no">.<a href="#updateOne">updateOne</a><span class="signature">( ik : <span class="param-type">CCDIKSolver~IK</span>, overrideBlend : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="CCDIKSolver.html">CCDIKSolver</a></span> </h3>
+					<h3 class="name name-method" id="updateOne" translate="no">.<a href="#updateOne">updateOne</a><span class="signature">( ik : <span class="param-type"><a href="CCDIKSolver.html#~IK">CCDIKSolver~IK</a></span>, overrideBlend : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="CCDIKSolver.html">CCDIKSolver</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates one IK bone solving the CCD algorithm.</p>
@@ -93,12 +111,21 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>ik</code></td>
-									<td class="description last"><p>The IK to update.</p></td>
+									<td class="name">
+										<strong>ik</strong>
+									</td>
+									<td class="description last">
+										<p>The IK to update.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>overrideBlend</code></td>
-									<td class="description last"><p>If the IK object does not define <code>blendFactor</code>, this value is used.<br/>Default is <code>1.0</code>.</p></td>
+									<td class="name">
+										<strong>overrideBlend</strong>
+									</td>
+									<td class="description last">
+										<p>If the IK object does not define <code>blendFactor</code>, this value is used.</p>
+										<p>Default is <code>1.0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -112,77 +139,58 @@
 					<div class="description">
 						<p>This type represents bone links.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>index</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>index</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The index of a linked bone which refers to a bone in the <code>Skeleton.bones</code> array.</p>
 			</td>
-				<td class="attributes">
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The index of a linked bone which refers to a bone in the <code>Skeleton.bones</code> array.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>limitation</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>limitation</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Rotation axis.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Rotation axis.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>rotationMin</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>rotationMin</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Rotation minimum limit.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Rotation minimum limit.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>rotationMax</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>rotationMax</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Rotation maximum limit.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Rotation maximum limit.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>enabled</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>enabled</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether the link is enabled or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether the link is enabled or not.</p></td>
 		</tr>
 	</tbody>
 </table>
@@ -192,99 +200,78 @@
 					<div class="description">
 						<p>This type represents IK configuration objects.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>target</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>target</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The target bone index which refers to a bone in the <code>Skeleton.bones</code> array.</p>
 			</td>
-				<td class="attributes">
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The target bone index which refers to a bone in the <code>Skeleton.bones</code> array.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>effector</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>effector</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The effector bone index which refers to a bone in the <code>Skeleton.bones</code> array.</p>
 			</td>
-				<td class="attributes">
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The effector bone index which refers to a bone in the <code>Skeleton.bones</code> array.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>links</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>links</strong>
+						<br>
 <span class="param-type">Array.&lt;<a href="CCDIKSolver.html#~BoneLink">CCDIKSolver~BoneLink</a>></span>
+				</td>
+			<td class="description last">
+				<p>An array of bone links.</p>
 			</td>
-				<td class="attributes">
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>An array of bone links.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>iteration</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>iteration</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Iteration number of calculation. Smaller is faster but less precise.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>Iteration number of calculation. Smaller is faster but less precise.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>minAngle</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>minAngle</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Minimum rotation angle in a step in radians.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Minimum rotation angle in a step in radians.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>maxAngle</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>maxAngle</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Minimum rotation angle in a step in radians.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Minimum rotation angle in a step in radians.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>blendFactor</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>blendFactor</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The blend factor.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The blend factor.</p></td>
 		</tr>
 	</tbody>
 </table>

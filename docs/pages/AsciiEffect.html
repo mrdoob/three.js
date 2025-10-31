@@ -21,7 +21,7 @@
 				<pre><code class="language-js">import { AsciiEffect } from 'three/addons/effects/AsciiEffect.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="AsciiEffect" translate="no">new <a href="#AsciiEffect">AsciiEffect</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, charSet : <span class="param-type">string</span>, options : <span class="param-type">AsciiEffect~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="AsciiEffect" translate="no">new <a href="#AsciiEffect">AsciiEffect</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, charSet : <span class="param-type">string</span>, options : <span class="param-type"><a href="AsciiEffect.html#~Options">AsciiEffect~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new ASCII effect.</p>
@@ -29,16 +29,29 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>charSet</code></td>
-									<td class="description last"><p>The char set.<br/>Default is <code>' .:-=+*#%@'</code>.</p></td>
+									<td class="name">
+										<strong>charSet</strong>
+									</td>
+									<td class="description last">
+										<p>The char set.</p>
+										<p>Default is <code>' .:-=+*#%@'</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The configuration parameter.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -53,7 +66,7 @@ default <a href="WebGLRenderer.html#domElement">WebGLRenderer#domElement</a>.</p
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type">Object3D</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>When using this effect, this method should be called instead of the
@@ -62,12 +75,20 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene to render.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -80,12 +101,20 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>w</code></td>
-									<td class="description last"><p>The width of the effect in logical pixels.</p></td>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect in logical pixels.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>h</code></td>
-									<td class="description last"><p>The height of the effect in logical pixels.</p></td>
+									<td class="name">
+										<strong>h</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect in logical pixels.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -96,112 +125,88 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 					<div class="description">
 						<p>This type represents configuration settings of <code>AsciiEffect</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>resolution</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>resolution</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>A higher value leads to more details.</p>
+						<p>Default is <code>0.15</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0.15
-				</td>
-			<td class="description last"><p>A higher value leads to more details.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>scale</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>scale</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The scale of the effect.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>The scale of the effect.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>color</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>color</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether colors should be enabled or not. Better quality but slows down rendering.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether colors should be enabled or not. Better quality but slows down rendering.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>alpha</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>alpha</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether transparency should be enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether transparency should be enabled or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>block</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>block</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether blocked characters should be enabled or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether blocked characters should be enabled or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>invert</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>invert</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether colors should be inverted or not.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether colors should be inverted or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>strResolution</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>strResolution</strong>
+						<br>
 <span class="param-type">'low'</span>
 |
 <span class="param-type">'medium'</span>
 |
 <span class="param-type">'high'</span>
+				</td>
+			<td class="description last">
+				<p>The string resolution.</p>
+						<p>Default is <code>'low'</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					'low'
-				</td>
-			<td class="description last"><p>The string resolution.</p></td>
 		</tr>
 	</tbody>
 </table>

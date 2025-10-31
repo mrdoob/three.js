@@ -30,7 +30,7 @@ irradiance environment map.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="LightProbe" translate="no">new <a href="#LightProbe">LightProbe</a><span class="signature">( sh : <span class="param-type">SphericalHarmonics3</span>, intensity : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="LightProbe" translate="no">new <a href="#LightProbe">LightProbe</a><span class="signature">( sh : <span class="param-type"><a href="SphericalHarmonics3.html">SphericalHarmonics3</a></span>, intensity : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new light probe.</p>
@@ -38,12 +38,21 @@ irradiance environment map.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>sh</code></td>
-									<td class="description last"><p>The spherical harmonics which represents encoded lighting information.</p></td>
+									<td class="name">
+										<strong>sh</strong>
+									</td>
+									<td class="description last">
+										<p>The spherical harmonics which represents encoded lighting information.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intensity</code></td>
-									<td class="description last"><p>The light's strength/intensity.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>intensity</strong>
+									</td>
+									<td class="description last">
+										<p>The light's strength/intensity.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -53,7 +62,8 @@ irradiance environment map.</p></div>
 				<div class="member">
 					<h3 class="name" id="isLightProbe" translate="no">.<a href="#isLightProbe">isLightProbe</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -71,8 +81,12 @@ irradiance environment map.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The JSON holding the serialized light probe.</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON holding the serialized light probe.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

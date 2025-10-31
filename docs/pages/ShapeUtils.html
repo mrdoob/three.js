@@ -20,7 +20,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Static Methods</h2>
-					<h3 class="name name-method" id=".area" translate="no">.<a href="#.area">area</a><span class="signature">( contour : <span class="param-type">Array.&lt;Vector2></span> )</span><span class="type-signature"> : number</span> </h3>
+					<h3 class="name name-method" id=".area" translate="no">.<a href="#.area">area</a><span class="signature">( contour : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Calculate area of a ( 2D ) contour polygon.</p>
@@ -28,8 +28,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>contour</code></td>
-									<td class="description last"><p>An array of 2D points.</p></td>
+									<td class="name">
+										<strong>contour</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -37,7 +41,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> The area.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id=".isClockWise" translate="no">.<a href="#.isClockWise">isClockWise</a><span class="signature">( pts : <span class="param-type">Array.&lt;Vector2></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id=".isClockWise" translate="no">.<a href="#.isClockWise">isClockWise</a><span class="signature">( pts : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given contour uses a clockwise winding order.</p>
@@ -45,8 +49,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pts</code></td>
-									<td class="description last"><p>An array of 2D points defining a polygon.</p></td>
+									<td class="name">
+										<strong>pts</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points defining a polygon.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -54,7 +62,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the given contour uses a clockwise winding order or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id=".triangulateShape" translate="no">.<a href="#.triangulateShape">triangulateShape</a><span class="signature">( contour : <span class="param-type">Array.&lt;Vector2></span>, holes : <span class="param-type">Array.&lt;Array.&lt;Vector2>></span> )</span><span class="type-signature"> : Array.&lt;Array.&lt;number>></span> </h3>
+					<h3 class="name name-method" id=".triangulateShape" translate="no">.<a href="#.triangulateShape">triangulateShape</a><span class="signature">( contour : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span>, holes : <span class="param-type">Array.&lt;Array.&lt;<a href="Vector2.html">Vector2</a>>></span> )</span><span class="type-signature"> : Array.&lt;Array.&lt;number>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Triangulates the given shape definition.</p>
@@ -62,12 +70,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>contour</code></td>
-									<td class="description last"><p>An array of 2D points defining the contour.</p></td>
+									<td class="name">
+										<strong>contour</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points defining the contour.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>holes</code></td>
-									<td class="description last"><p>An array that holds arrays of 2D points defining the holes.</p></td>
+									<td class="name">
+										<strong>holes</strong>
+									</td>
+									<td class="description last">
+										<p>An array that holds arrays of 2D points defining the holes.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

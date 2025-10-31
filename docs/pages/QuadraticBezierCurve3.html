@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="QuadraticBezierCurve3" translate="no">new <a href="#QuadraticBezierCurve3">QuadraticBezierCurve3</a><span class="signature">( v0 : <span class="param-type">Vector3</span>, v1 : <span class="param-type">Vector3</span>, v2 : <span class="param-type">Vector3</span> )</span> </h3>
+					<h3 class="name name-method" id="QuadraticBezierCurve3" translate="no">new <a href="#QuadraticBezierCurve3">QuadraticBezierCurve3</a><span class="signature">( v0 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v1 : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, v2 : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new Quadratic Bezier curve.</p>
@@ -26,16 +26,28 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>v0</code></td>
-									<td class="description last"><p>The start point.</p></td>
+									<td class="name">
+										<strong>v0</strong>
+									</td>
+									<td class="description last">
+										<p>The start point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>v1</code></td>
-									<td class="description last"><p>The control point.</p></td>
+									<td class="name">
+										<strong>v1</strong>
+									</td>
+									<td class="description last">
+										<p>The control point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>v2</code></td>
-									<td class="description last"><p>The end point.</p></td>
+									<td class="name">
+										<strong>v2</strong>
+									</td>
+									<td class="description last">
+										<p>The end point.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -45,7 +57,8 @@
 				<div class="member">
 					<h3 class="name" id="isQuadraticBezierCurve3" translate="no">.<a href="#isQuadraticBezierCurve3">isQuadraticBezierCurve3</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -67,7 +80,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a point on the curve.</p>
@@ -75,12 +88,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalTarget</code></td>
-									<td class="description last"><p>The optional target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>

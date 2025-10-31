@@ -19,7 +19,7 @@ node materials.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="NodeObjectLoader" translate="no">new <a href="#NodeObjectLoader">NodeObjectLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="NodeObjectLoader" translate="no">new <a href="#NodeObjectLoader">NodeObjectLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new node object loader.</p>
@@ -27,8 +27,12 @@ node materials.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>A reference to a loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to a loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -56,12 +60,20 @@ node materials.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The JSON definition</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>The onLoad callback function.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>The onLoad callback function.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -72,7 +84,7 @@ node materials.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> . The parsed 3D object.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parseMaterials" translate="no">.<a href="#parseMaterials">parseMaterials</a><span class="signature">( json : <span class="param-type">Object</span>, textures : <span class="param-type">Object.&lt;string, Texture></span> )</span><span class="type-signature"> : Object.&lt;string, <a href="NodeMaterial.html">NodeMaterial</a>></span> </h3>
+					<h3 class="name name-method" id="parseMaterials" translate="no">.<a href="#parseMaterials">parseMaterials</a><span class="signature">( json : <span class="param-type">Object</span>, textures : <span class="param-type">Object.&lt;string, <a href="Texture.html">Texture</a>></span> )</span><span class="type-signature"> : Object.&lt;string, <a href="NodeMaterial.html">NodeMaterial</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the node objects from the given JSON and textures.</p>
@@ -80,12 +92,20 @@ node materials.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The JSON definition</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textures</code></td>
-									<td class="description last"><p>The texture library.</p></td>
+									<td class="name">
+										<strong>textures</strong>
+									</td>
+									<td class="description last">
+										<p>The texture library.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -93,7 +113,7 @@ node materials.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> . The parsed materials.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parseNodes" translate="no">.<a href="#parseNodes">parseNodes</a><span class="signature">( json : <span class="param-type">Array.&lt;Object></span>, textures : <span class="param-type">Object.&lt;string, Texture></span> )</span><span class="type-signature"> : Object.&lt;string, <a href="Node.html">Node</a>></span> </h3>
+					<h3 class="name name-method" id="parseNodes" translate="no">.<a href="#parseNodes">parseNodes</a><span class="signature">( json : <span class="param-type">Array.&lt;Object></span>, textures : <span class="param-type">Object.&lt;string, <a href="Texture.html">Texture</a>></span> )</span><span class="type-signature"> : Object.&lt;string, <a href="Node.html">Node</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the node objects from the given JSON and textures.</p>
@@ -101,12 +121,20 @@ node materials.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The JSON definition</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON definition</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textures</code></td>
-									<td class="description last"><p>The texture library.</p></td>
+									<td class="name">
+										<strong>textures</strong>
+									</td>
+									<td class="description last">
+										<p>The texture library.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -122,8 +150,12 @@ node materials.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The node material library defined as <code>&lt;classname,class&gt;</code>.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node material library defined as <code>&lt;classname,class&gt;</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -139,8 +171,12 @@ node materials.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The node library defined as <code>&lt;classname,class&gt;</code>.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node library defined as <code>&lt;classname,class&gt;</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
