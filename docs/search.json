@@ -18339,10 +18339,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "GTAONode#_temporalDirection",
-			"kind": "member"
-		},
-		{
 			"title": "GTAONode#depthNode",
 			"kind": "member"
 		},
