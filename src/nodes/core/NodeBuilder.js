@@ -1224,9 +1224,9 @@ class NodeBuilder {
 			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
 			else if ( type === 'bool' ) value = false;
 			else if ( type === 'color' ) value = new Color();
-			else if ( type === 'vec2' || type === 'uvec2' ) value = new Vector2();
-			else if ( type === 'vec3' || type === 'uvec3' ) value = new Vector3();
-			else if ( type === 'vec4' || type === 'uvec4' ) value = new Vector4();
+			else if ( type === 'vec2' || type === 'uvec2' || type === 'ivec2' ) value = new Vector2();
+			else if ( type === 'vec3' || type === 'uvec3' || type === 'ivec3' ) value = new Vector3();
+			else if ( type === 'vec4' || type === 'uvec4' || type === 'ivec4' ) value = new Vector4();
 
 		}
 
