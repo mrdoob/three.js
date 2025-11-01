@@ -117,7 +117,8 @@
 				?>
 				<h3><?js= subCategory ?></h3>
 				<?js 
-							membersBySubCategory[subCategory].forEach(function(p) { 
+							membersBySubCategory[subCategory].forEach(function(p) {
+								p.isTSLItem = true;
 				?>
 					<?js= self.partial('members.tmpl', p) ?>
 				<?js 
@@ -172,7 +173,8 @@
 				?>
 				<h3><?js= subCategory ?></h3>
 				<?js 
-							methodsBySubCategory[subCategory].forEach(function(m) { 
+							methodsBySubCategory[subCategory].forEach(function(m) {
+								m.isTSLItem = true;
 				?>
 					<?js= self.partial('method.tmpl', m) ?>
 				<?js 
@@ -212,7 +214,8 @@
 				?>
 				<h3><?js= subCategory ?></h3>
 				<?js 
-							staticMethodsBySubCategory[subCategory].forEach(function(m) { 
+							staticMethodsBySubCategory[subCategory].forEach(function(m) {
+								m.isTSLItem = true;
 				?>
 					<?js= self.partial('method.tmpl', m) ?>
 				<?js 
