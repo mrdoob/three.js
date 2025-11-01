@@ -74,6 +74,7 @@ class PixelationNode extends TempNode {
 		/**
 		 * Uniform node that represents the resolution.
 		 *
+		 * @private
 		 * @type {Node<vec4>}
 		 */
 		this._resolution = uniform( new Vector4() );
