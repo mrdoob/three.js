@@ -149,8 +149,6 @@ class BitcountNode extends MathNode {
 			]
 		} );
 
-		console.log( fnDef );
-
 		return fnDef;
 
 	}
@@ -259,8 +257,6 @@ class BitcountNode extends MathNode {
 				{ name: 'value', type: elementType }
 			]
 		} );
-
-		console.log( fnDef );
 
 		return fnDef;
 
