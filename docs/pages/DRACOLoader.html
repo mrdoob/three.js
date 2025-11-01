@@ -14,13 +14,13 @@
 		<section>
 			<header>
 				<div class="class-description"><p>A loader for the Draco format.</p>
-<p><a href="https://google.github.io/draco/">Draco</a> is an open source library for compressing
+<p><a href="https://google.github.io/draco/" target="_blank" rel="noopener">Draco</a> is an open source library for compressing
 and decompressing 3D meshes and point clouds. Compressed geometry can be significantly smaller,
 at the cost of additional decoding time on the client device.</p>
 <p>Standalone Draco files have a <code>.drc</code> extension, and contain vertex positions, normals, colors,
 and other attributes. Draco files do not contain materials, textures, animation, or node hierarchies –
 to use these features, embed Draco geometry inside of a glTF file. A normal glTF file can be converted
-to a Draco-compressed glTF file using <a href="https://github.com/CesiumGS/gltf-pipeline">glTF-Pipeline</a>.
+to a Draco-compressed glTF file using <a href="https://github.com/CesiumGS/gltf-pipeline" target="_blank" rel="noopener">glTF-Pipeline</a>.
 When using Draco with glTF, an instance of <code>DRACOLoader</code> will be used internally by <a href="GLTFLoader.html">GLTFLoader</a>.</p>
 <p>It is recommended to create one DRACOLoader instance and reuse it to avoid loading and creating
 multiple decoder instances.</p>
@@ -36,7 +36,7 @@ dracoLoader.dispose();
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">DRACOLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">DRACOLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -209,7 +209,7 @@ A lower limit may be preferable if workers are also for other tasks in the appli
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DRACOLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/DRACOLoader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DRACOLoader.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/DRACOLoader.js</a>
 				</p>
 			</article>
 		</section>

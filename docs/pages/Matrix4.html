@@ -14,14 +14,14 @@
 			<header>
 				<div class="class-description"><p>Represents a 4x4 matrix.</p>
 <p>The most common use of a 4x4 matrix in 3D computer graphics is as a transformation matrix.
-For an introduction to transformation matrices as used in WebGL, check out <a href="https://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices">this tutorial</a></p>
+For an introduction to transformation matrices as used in WebGL, check out <a href="https://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices" target="_blank" rel="noopener">this tutorial</a></p>
 <p>This allows a 3D vector representing a point in 3D space to undergo
 transformations such as translation, rotation, shear, scale, reflection,
 orthogonal or perspective projection and so on, by being multiplied by the
 matrix. This is known as <code>applying</code> the matrix to the vector.</p>
 <p>A Note on Row-Major and Column-Major Ordering:</p>
 <p>The constructor and <a href="Matrix3.html#set">Matrix3#set</a> method take arguments in
-<a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order">row-major</a>
+<a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order" target="_blank" rel="noopener">row-major</a>
 order, while internally they are stored in the <a href="Matrix3.html#elements">Matrix3#elements</a> array in column-major order.
 This means that calling:</p>
 <p>will result in the elements array containing:</p>
@@ -338,7 +338,7 @@ may not be decomposable, and this method may not be appropriate.</p>
 					<div class="method">
 						<div class="description">
 							<p>Computes and returns the determinant of this matrix.</p>
-<p>Based on the method outlined <a href="http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.html">here</a>.</p>
+<p>Based on the method outlined <a href="http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.html" target="_blank" rel="noopener">here</a>.</p>
 						</div>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The determinant.</dt>
@@ -476,7 +476,7 @@ into this matrix's rotation component.</p>
 					<h3 class="name name-method" id="invert" translate="no">.<a href="#invert">invert</a><span class="signature">()</span><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Inverts this matrix, using the <a href="https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution">analytic method</a>.
+							<p>Inverts this matrix, using the <a href="https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution" target="_blank" rel="noopener">analytic method</a>.
 You can not invert with a determinant of zero. If you attempt this, the method produces
 a zero matrix instead.</p>
 						</div>
@@ -725,7 +725,7 @@ a zero matrix instead.</p>
 							<p>Sets this matrix as a rotational transformation around the given axis by
 the given angle.</p>
 <p>This is a somewhat controversial but mathematically sound alternative to
-rotating via Quaternions. See the discussion <a href="https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199">here</a>.</p>
+rotating via Quaternions. See the discussion <a href="https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199" target="_blank" rel="noopener">here</a>.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -757,7 +757,7 @@ rotating via Quaternions. See the discussion <a href="https://www.gamedev.net/ar
 							<p>Sets the rotation component (the upper left 3x3 matrix) of this matrix to
 the rotation specified by the given Euler angles. The rest of
 the matrix is set to the identity. Depending on the <a href="Euler.html#order">Euler#order</a>,
-there are six possible outcomes. See <a href="https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix">this page</a>
+there are six possible outcomes. See <a href="https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix" target="_blank" rel="noopener">this page</a>
 for a complete list.</p>
 						</div>
 						<table class="params">
@@ -780,7 +780,7 @@ for a complete list.</p>
 					<div class="method">
 						<div class="description">
 							<p>Sets the rotation component of this matrix to the rotation specified by
-the given Quaternion as outlined <a href="https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion">here</a>
+the given Quaternion as outlined <a href="https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion" target="_blank" rel="noopener">here</a>
 The rest of the matrix is set to the identity.</p>
 						</div>
 						<table class="params">
@@ -1358,7 +1358,7 @@ the method returns a new instance.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Matrix4.js" target="_blank" rel="noopener" translate="no">src/math/Matrix4.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/math/Matrix4.js" translate="no" target="_blank" rel="noopener">src/math/Matrix4.js</a>
 				</p>
 			</article>
 		</section>
