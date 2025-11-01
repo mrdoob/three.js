@@ -100,6 +100,7 @@ class PCDLoader extends Loader {
 	/**
 	 * Get dataview value by field type and size.
 	 *
+	 * @private
 	 * @param {DataView} dataview - The DataView to read from.
 	 * @param {number} offset - The offset to start reading from.
 	 * @param {'F' | 'U' | 'I'} type - Field type.

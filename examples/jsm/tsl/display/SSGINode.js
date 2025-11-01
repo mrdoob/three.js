@@ -197,6 +197,7 @@ class SSGINode extends TempNode {
 		/**
 		 * The resolution of the effect.
 		 *
+		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
 		this._resolution = uniform( new Vector2() );
@@ -204,6 +205,7 @@ class SSGINode extends TempNode {
 		/**
 		 * Used to compute the effective step radius when viewSpaceSampling is `false`.
 		 *
+		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
 		this._halfProjScale = uniform( 1 );
@@ -211,6 +213,7 @@ class SSGINode extends TempNode {
 		/**
 		 * Temporal direction that influences the rotation angle for each slice.
 		 *
+		 * @private
 		 * @type {UniformNode<float>}
 		 */
 		this._temporalDirection = uniform( 0 );
@@ -218,6 +221,7 @@ class SSGINode extends TempNode {
 		/**
 		 * Temporal offset added to the initial ray step.
 		 *
+		 * @private
 		 * @type {UniformNode<float>}
 		 */
 		this._temporalOffset = uniform( 0 );

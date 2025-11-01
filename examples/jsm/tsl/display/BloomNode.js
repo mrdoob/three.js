@@ -448,6 +448,7 @@ class BloomNode extends TempNode {
 	/**
 	 * Create a separable blur material for the given kernel radius.
 	 *
+	 * @private
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {number} kernelRadius - The kernel radius.
 	 * @return {NodeMaterial}

@@ -50,11 +50,13 @@ class StereoCompositePassNode extends PassNode {
 		 * @type {StereoCamera}
 		 */
 		this.stereo = new StereoCamera();
+
 		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, type: HalfFloatType };
 
 		/**
 		 * The render target for rendering the left eye's view.
 		 *
+		 * @private
 		 * @type {RenderTarget}
 		 */
 		this._renderTargetL = new RenderTarget( 1, 1, _params );
@@ -62,6 +64,7 @@ class StereoCompositePassNode extends PassNode {
 		/**
 		 * The render target for rendering the right eye's view.
 		 *
+		 * @private
 		 * @type {RenderTarget}
 		 */
 		this._renderTargetR = new RenderTarget( 1, 1, _params );
@@ -69,6 +72,7 @@ class StereoCompositePassNode extends PassNode {
 		/**
 		 * A texture node representing the left's eye view.
 		 *
+		 * @private
 		 * @type {TextureNode}
 		 */
 		this._mapLeft = texture( this._renderTargetL.texture );
@@ -76,6 +80,7 @@ class StereoCompositePassNode extends PassNode {
 		/**
 		 * A texture node representing the right's eye view.
 		 *
+		 * @private
 		 * @type {TextureNode}
 		 */
 		this._mapRight = texture( this._renderTargetR.texture );
@@ -84,7 +89,9 @@ class StereoCompositePassNode extends PassNode {
 		 * The node material that implements the composite. All
 		 * derived effect passes must provide an instance for rendering.
 		 *
-		 * @type {NodeMaterial}
+		 * @private
+		 * @type {?NodeMaterial}
+		 * @default null
 		 */
 		this._material = null;
 
