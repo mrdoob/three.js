@@ -95,9 +95,43 @@
 					if (members && members.length && members.forEach) {
 				?>
 				<h2 class="subsection-title">Properties</h2>
-				<?js members.forEach(function(p) { ?>
+				<?js 
+					if (isTSLPage) {
+						// Group TSL properties by sub-category
+						var membersBySubCategory = {};
+						members.forEach(function(m) {
+							var subCategory = 'Other';
+							if (m.meta && m.meta.filename) {
+								var filename = m.meta.filename.replace(/\.js$/, '');
+								subCategory = filename.replace(/Node$/, '');
+							}
+							if (!membersBySubCategory[subCategory]) {
+								membersBySubCategory[subCategory] = [];
+							}
+							membersBySubCategory[subCategory].push(m);
+						});
+						
+						// Sort sub-categories and render
+						var sortedSubCategories = Object.keys(membersBySubCategory).sort();
+						sortedSubCategories.forEach(function(subCategory) {
+				?>
+				<h3><?js= subCategory ?></h3>
+				<?js 
+							membersBySubCategory[subCategory].forEach(function(p) { 
+				?>
 					<?js= self.partial('members.tmpl', p) ?>
-				<?js }); ?>
+				<?js 
+							}); 
+						});
+					} else {
+						// Regular rendering for non-TSL pages
+						members.forEach(function(p) { 
+				?>
+					<?js= self.partial('members.tmpl', p) ?>
+				<?js 
+						}); 
+					}
+				?>
 				<?js } ?>
 				<?js
 					var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
@@ -116,15 +150,83 @@
 					if (instanceMethods.length) {
 				?>
 				<h2 class="subsection-title">Methods</h2>
-				<?js instanceMethods.forEach(function(m) { ?>
+				<?js 
+					if (isTSLPage) {
+						// Group TSL methods by sub-category
+						var methodsBySubCategory = {};
+						instanceMethods.forEach(function(m) {
+							var subCategory = 'Other';
+							if (m.meta && m.meta.filename) {
+								var filename = m.meta.filename.replace(/\.js$/, '');
+								subCategory = filename.replace(/Node$/, '');
+							}
+							if (!methodsBySubCategory[subCategory]) {
+								methodsBySubCategory[subCategory] = [];
+							}
+							methodsBySubCategory[subCategory].push(m);
+						});
+						
+						// Sort sub-categories and render
+						var sortedSubCategories = Object.keys(methodsBySubCategory).sort();
+						sortedSubCategories.forEach(function(subCategory) {
+				?>
+				<h3><?js= subCategory ?></h3>
+				<?js 
+							methodsBySubCategory[subCategory].forEach(function(m) { 
+				?>
 					<?js= self.partial('method.tmpl', m) ?>
-				<?js }); ?>
+				<?js 
+							}); 
+						});
+					} else {
+						// Regular rendering for non-TSL pages
+						instanceMethods.forEach(function(m) { 
+				?>
+					<?js= self.partial('method.tmpl', m) ?>
+				<?js 
+						}); 
+					}
+				?>
 				<?js } ?>
 				<?js if (staticMethods.length) { ?>
 				<h2 class="subsection-title">Static Methods</h2>
-				<?js staticMethods.forEach(function(m) { ?>
+				<?js 
+					if (isTSLPage) {
+						// Group TSL static methods by sub-category
+						var staticMethodsBySubCategory = {};
+						staticMethods.forEach(function(m) {
+							var subCategory = 'Other';
+							if (m.meta && m.meta.filename) {
+								var filename = m.meta.filename.replace(/\.js$/, '');
+								subCategory = filename.replace(/Node$/, '');
+							}
+							if (!staticMethodsBySubCategory[subCategory]) {
+								staticMethodsBySubCategory[subCategory] = [];
+							}
+							staticMethodsBySubCategory[subCategory].push(m);
+						});
+						
+						// Sort sub-categories and render
+						var sortedSubCategories = Object.keys(staticMethodsBySubCategory).sort();
+						sortedSubCategories.forEach(function(subCategory) {
+				?>
+				<h3><?js= subCategory ?></h3>
+				<?js 
+							staticMethodsBySubCategory[subCategory].forEach(function(m) { 
+				?>
 					<?js= self.partial('method.tmpl', m) ?>
-				<?js }); ?>
+				<?js 
+							}); 
+						});
+					} else {
+						// Regular rendering for non-TSL pages
+						staticMethods.forEach(function(m) { 
+				?>
+					<?js= self.partial('method.tmpl', m) ?>
+				<?js 
+						}); 
+					}
+				?>
 				<?js } ?>
 				<?js
 					var typedefs = self.find({kind: 'typedef', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
