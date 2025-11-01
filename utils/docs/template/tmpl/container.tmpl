@@ -92,49 +92,7 @@
 							return isTSLPage ? hasTslTag : !hasTslTag;
 						});
 					}
-					if (members && members.length && members.forEach) {
-				?>
-				<h2 class="subsection-title">Properties</h2>
-				<?js 
-					if (isTSLPage) {
-						// Group TSL properties by sub-category
-						var membersBySubCategory = {};
-						members.forEach(function(m) {
-							var subCategory = 'Other';
-							if (m.meta && m.meta.filename) {
-								var filename = m.meta.filename.replace(/\.js$/, '');
-								subCategory = filename.replace(/Node$/, '');
-							}
-							if (!membersBySubCategory[subCategory]) {
-								membersBySubCategory[subCategory] = [];
-							}
-							membersBySubCategory[subCategory].push(m);
-						});
-						
-						// Sort sub-categories and render
-						var sortedSubCategories = Object.keys(membersBySubCategory).sort();
-						sortedSubCategories.forEach(function(subCategory) {
-				?>
-				<h3><?js= subCategory ?></h3>
-				<?js 
-							membersBySubCategory[subCategory].forEach(function(p) {
-								p.isTSLItem = true;
-				?>
-					<?js= self.partial('members.tmpl', p) ?>
-				<?js 
-							}); 
-						});
-					} else {
-						// Regular rendering for non-TSL pages
-						members.forEach(function(p) { 
-				?>
-					<?js= self.partial('members.tmpl', p) ?>
-				<?js 
-						}); 
-					}
-				?>
-				<?js } ?>
-				<?js
+
 					var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
 
 					// Filter methods for TSL vs Global
@@ -148,89 +106,101 @@
 					var staticMethods = methods.filter(function(m) { return m.scope === 'static'; });
 					var instanceMethods = methods.filter(function(m) { return m.scope !== 'static'; });
 
-					if (instanceMethods.length) {
+					// For TSL pages, group everything by sub-category
+					if (isTSLPage && ((members && members.length) || instanceMethods.length || staticMethods.length)) {
+						// Collect all items and group by sub-category
+						var allItemsBySubCategory = {};
+
+						function addToSubCategory(item, type) {
+							var subCategory = 'Other';
+							if (item.meta && item.meta.filename) {
+								var filename = item.meta.filename.replace(/\.js$/, '');
+								subCategory = filename.replace(/Node$/, '');
+							}
+							if (!allItemsBySubCategory[subCategory]) {
+								allItemsBySubCategory[subCategory] = {
+									properties: [],
+									methods: [],
+									staticMethods: []
+								};
+							}
+							item.isTSLItem = true;
+							allItemsBySubCategory[subCategory][type].push(item);
+						}
+
+						if (members && members.length) {
+							members.forEach(function(m) { addToSubCategory(m, 'properties'); });
+						}
+						if (instanceMethods.length) {
+							instanceMethods.forEach(function(m) { addToSubCategory(m, 'methods'); });
+						}
+						if (staticMethods.length) {
+							staticMethods.forEach(function(m) { addToSubCategory(m, 'staticMethods'); });
+						}
+
+						// Sort sub-categories and render
+						var sortedSubCategories = Object.keys(allItemsBySubCategory).sort();
+				?>
+				<h2 class="subsection-title">TSL Functions</h2>
+				<?js 
+						sortedSubCategories.forEach(function(subCategory) {
+							var items = allItemsBySubCategory[subCategory];
+				?>
+				<h3><?js= subCategory ?></h3>
+				<?js 
+							// Render properties first
+							items.properties.forEach(function(p) {
+				?>
+					<?js= self.partial('members.tmpl', p) ?>
+				<?js 
+							});
+							// Then methods
+							items.methods.forEach(function(m) {
+				?>
+					<?js= self.partial('method.tmpl', m) ?>
+				<?js 
+							});
+							// Then static methods
+							items.staticMethods.forEach(function(m) {
+				?>
+					<?js= self.partial('method.tmpl', m) ?>
+				<?js 
+							});
+						});
+					} else {
+						// Regular rendering for non-TSL pages
+						if (members && members.length && members.forEach) {
+				?>
+				<h2 class="subsection-title">Properties</h2>
+				<?js 
+							members.forEach(function(p) { 
+				?>
+					<?js= self.partial('members.tmpl', p) ?>
+				<?js 
+							}); 
+						}
+						if (instanceMethods.length) {
 				?>
 				<h2 class="subsection-title">Methods</h2>
 				<?js 
-					if (isTSLPage) {
-						// Group TSL methods by sub-category
-						var methodsBySubCategory = {};
-						instanceMethods.forEach(function(m) {
-							var subCategory = 'Other';
-							if (m.meta && m.meta.filename) {
-								var filename = m.meta.filename.replace(/\.js$/, '');
-								subCategory = filename.replace(/Node$/, '');
-							}
-							if (!methodsBySubCategory[subCategory]) {
-								methodsBySubCategory[subCategory] = [];
-							}
-							methodsBySubCategory[subCategory].push(m);
-						});
-						
-						// Sort sub-categories and render
-						var sortedSubCategories = Object.keys(methodsBySubCategory).sort();
-						sortedSubCategories.forEach(function(subCategory) {
-				?>
-				<h3><?js= subCategory ?></h3>
-				<?js 
-							methodsBySubCategory[subCategory].forEach(function(m) {
-								m.isTSLItem = true;
+							instanceMethods.forEach(function(m) { 
 				?>
 					<?js= self.partial('method.tmpl', m) ?>
 				<?js 
 							}); 
-						});
-					} else {
-						// Regular rendering for non-TSL pages
-						instanceMethods.forEach(function(m) { 
+						}
+						if (staticMethods.length) {
 				?>
-					<?js= self.partial('method.tmpl', m) ?>
-				<?js 
-						}); 
-					}
-				?>
-				<?js } ?>
-				<?js if (staticMethods.length) { ?>
 				<h2 class="subsection-title">Static Methods</h2>
 				<?js 
-					if (isTSLPage) {
-						// Group TSL static methods by sub-category
-						var staticMethodsBySubCategory = {};
-						staticMethods.forEach(function(m) {
-							var subCategory = 'Other';
-							if (m.meta && m.meta.filename) {
-								var filename = m.meta.filename.replace(/\.js$/, '');
-								subCategory = filename.replace(/Node$/, '');
-							}
-							if (!staticMethodsBySubCategory[subCategory]) {
-								staticMethodsBySubCategory[subCategory] = [];
-							}
-							staticMethodsBySubCategory[subCategory].push(m);
-						});
-						
-						// Sort sub-categories and render
-						var sortedSubCategories = Object.keys(staticMethodsBySubCategory).sort();
-						sortedSubCategories.forEach(function(subCategory) {
-				?>
-				<h3><?js= subCategory ?></h3>
-				<?js 
-							staticMethodsBySubCategory[subCategory].forEach(function(m) {
-								m.isTSLItem = true;
+							staticMethods.forEach(function(m) { 
 				?>
 					<?js= self.partial('method.tmpl', m) ?>
 				<?js 
 							}); 
-						});
-					} else {
-						// Regular rendering for non-TSL pages
-						staticMethods.forEach(function(m) { 
-				?>
-					<?js= self.partial('method.tmpl', m) ?>
-				<?js 
-						}); 
+						}
 					}
 				?>
-				<?js } ?>
 				<?js
 					var typedefs = self.find({kind: 'typedef', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});
 					if (typedefs && typedefs.length && typedefs.forEach) {
