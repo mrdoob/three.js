@@ -436,12 +436,6 @@ export const countLeadingZeros = /*@__PURE__*/ nodeProxyIntent( BitcountNode, Bi
  */
 export const countOneBits = /*@__PURE__*/ nodeProxyIntent( BitcountNode, BitcountNode.COUNT_ONE_BITS ).setParameterLength( 1 );
 
-// GLSL alias function
-
-export const findLSB = countTrailingZeros;
-export const findMSB = countLeadingZeros;
-export const bitCount = countOneBits;
-
 addMethodChaining( 'countTrailingZeros', countTrailingZeros );
 addMethodChaining( 'countLeadingZeros', countLeadingZeros );
 addMethodChaining( 'countOneBits', countOneBits );
