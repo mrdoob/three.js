@@ -2424,7 +2424,7 @@ class Renderer {
 	 * @param {number|Array<number>|IndirectStorageBufferAttribute} [dispatchSize=null]
 	 * - A single number representing count, or
 	 * - An array [x, y, z] representing dispatch size, or
-	 * - A IndirectStorageBufferAttribute for indirect dispatch size.
+	 * - A IndirectStorageBufferAttribute for indirect dispatch containing the X, Y, and Z dimensions of the grid of workgroups.
 	 * @return {Promise|undefined} A Promise that resolve when the compute has finished. Only returned when the renderer has not been initialized.
 	 */
 	compute( computeNodes, dispatchSize = null ) {
