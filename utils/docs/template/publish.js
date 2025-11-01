@@ -387,6 +387,9 @@ function generate( title, docs, filename, resolveLinks ) {
 	html = html.replace( /<pre class="prettyprint source lang-(\w+)"[^>]*><code>/g, '<pre><code class="language-$1">' );
 	html = html.replace( /<pre class="prettyprint"><code>/g, '<pre><code>' );
 
+	// Add target="_blank" to external links
+	html = html.replace( /<a\s+([^>]*href=["'](https?:\/\/[^"']+)["'][^>]*)>/gi, '<a $1 target="_blank" rel="noopener">' );
+
 	// Remove lines that only contain whitespace
 	html = html.replace( /^\s*\n/gm, '' );
 
