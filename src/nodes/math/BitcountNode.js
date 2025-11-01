@@ -41,6 +41,7 @@ class BitcountNode extends MathNode {
 	/**
 	 * Casts the input value of the function to an integer if necessary.
 	 *
+	 * @private
 	 * @param {Node<uint>|Node<int>} inputNode - The input value.
 	 * @param {Node<uint>} outputNode - The output value.
 	 * @param {string} elementType - The type of the input value.
@@ -54,22 +55,6 @@ class BitcountNode extends MathNode {
 		} else {
 
 			outputNode.assign( inputNode );
-
-		}
-
-	}
-
-	_returnBaseDataNode( elementType ) {
-
-		if ( elementType === 'uint' ) {
-
-			return uint;
-
-		}
-
-		if ( elementType === 'int' ) {
-
-			return int;
 
 		}
 
@@ -127,13 +112,18 @@ class BitcountNode extends MathNode {
 
 			}
 
-
 		}
-
-
 
 	}
 
+	/**
+	 * Creates and registers a reusable GLSL function that emulates the behavior of countTrailingZeros.
+	 *
+	 * @private
+	 * @param {string} method - The name of the function to create.
+	 * @param {string} elementType - The type of the input value.
+	 * @returns {Function} - The generated function
+	 */
 	_createTrailingZerosBaseLayout( method, elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
@@ -159,10 +149,20 @@ class BitcountNode extends MathNode {
 			]
 		} );
 
+		console.log( fnDef );
+
 		return fnDef;
 
 	}
 
+	/**
+	 * Creates and registers a reusable GLSL function that emulates the behavior of countLeadingZeros.
+	 *
+	 * @private
+	 * @param {string} method - The name of the function to create.
+	 * @param {string} elementType - The type of the input value.
+	 * @returns {Function} - The generated function
+	 */
 	_createLeadingZerosBaseLayout( method, elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
@@ -227,12 +227,19 @@ class BitcountNode extends MathNode {
 
 	}
 
+	/**
+	 * Creates and registers a reusable GLSL function that emulates the behavior of countOneBits.
+	 *
+	 * @private
+	 * @param {string} method - The name of the function to create.
+	 * @param {string} elementType - The type of the input value.
+	 * @returns {Function} - The generated function
+	 */
 	_createOneBitsBaseLayout( method, elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
 
 		const fnDef = Fn( ( [ value ] ) => {
-
 
 			const v = uint( 0.0 );
 
@@ -253,10 +260,23 @@ class BitcountNode extends MathNode {
 			]
 		} );
 
+		console.log( fnDef );
+
 		return fnDef;
 
 	}
 
+	/**
+	 * Creates and registers a reusable GLSL function that emulates the behavior of the specified bitcount function.
+	 * including considerations for component-wise bitcounts on vector type inputs.
+	 *
+	 * @private
+	 * @param {string} method - The name of the function to create.
+	 * @param {string} inputType - The type of the input value.
+	 * @param {number} typeLength - The vec length of the input value.
+	 * @param {Function} baseFn - The base function that operates on an individual component of the vector.
+	 * @returns {Function} - The alias function for the specified bitcount method.
+	 */
 	_createMainLayout( method, inputType, typeLength, baseFn ) {
 
 		const outputConvertNode = this._returnDataNode( inputType );
@@ -296,13 +316,6 @@ class BitcountNode extends MathNode {
 
 	}
 
-
-	/**
-	 * Constructs a new math node.
-	 *
-	 * @param {NodeBuilder} builder - The method name.
-	 * @return {?Node} The output node.
-	 */
 	setup( builder ) {
 
 		const { method, aNode } = this;
@@ -310,6 +323,8 @@ class BitcountNode extends MathNode {
 		const { renderer } = builder;
 
 		if ( renderer.backend.isWebGPUBackend ) {
+
+			// use built-in WGSL functions for WebGPU
 
 			return super.setup( builder );
 
