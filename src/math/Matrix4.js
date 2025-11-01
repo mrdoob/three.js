@@ -614,9 +614,6 @@ class Matrix4 {
 		const n31 = te[ 2 ], n32 = te[ 6 ], n33 = te[ 10 ], n34 = te[ 14 ];
 		const n41 = te[ 3 ], n42 = te[ 7 ], n43 = te[ 11 ], n44 = te[ 15 ];
 
-		// Optimized calculation using pre-computed sub-expressions
-		// Based on cofactor expansion, but with common sub-expressions factored out
-
 		const t11 = n23 * n34 - n24 * n33;
 		const t12 = n22 * n34 - n24 * n32;
 		const t13 = n22 * n33 - n23 * n32;
