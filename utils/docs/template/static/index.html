@@ -327,7 +327,14 @@
 					for ( const item of items ) {
 
 						// Match against combined category and title for multi-word searches
-						const searchText = category + ' ' + item.title;
+						// For TSL items, also include the sub-category in the search
+						let searchText = category + ' ' + item.title;
+						if ( item.subCategory ) {
+
+							searchText = category + ' ' + item.subCategory + ' ' + item.title;
+
+						}
+
 						if ( searchText.match( regExp ) ) {
 
 							results.push( { ...item, category } );
@@ -354,7 +361,8 @@
 							grouped[ className ] = {
 								class: null,
 								members: [],
-								category: item.category
+								category: item.category,
+								subCategory: item.subCategory
 							};
 
 						}
@@ -421,42 +429,119 @@
 						const highlightedCategory = highlightMatch( category, highlightRegExp );
 						html += `<h2>${highlightedCategory}</h2>`;
 
-						for ( const className in byCategory[ category ] ) {
+						// For TSL category, group by sub-category
+						if ( category === 'TSL' ) {
 
-							const group = byCategory[ category ][ className ];
+							const bySubCategory = {};
 
-							if ( group.class ) {
+							for ( const className in byCategory[ category ] ) {
 
-								html += '<div class="search-result-group">';
-								const selectedClass = group.class.hash === currentHash ? ' selected' : '';
-								const highlightedName = highlightMatch( group.class.name, highlightRegExp );
-								html += `<a href="#${group.class.hash}" class="search-result-class${selectedClass}">${highlightedName}</a>`;
+								const group = byCategory[ category ][ className ];
+								const subCat = group.subCategory || 'Other';
 
-							}
+								if ( ! bySubCategory[ subCat ] ) {
 
-							if ( group.members.length > 0 ) {
-
-								if ( ! group.class ) {
-
-									html += '<div class="search-result-group">';
-									html += `<a href="#${className}" class="search-result-class">${className}</a>`;
+									bySubCategory[ subCat ] = {};
 
 								}
 
-								group.members.forEach( member => {
-
-									const selectedClass = member.hash === currentHash ? ' selected' : '';
-									const highlightedName = highlightMatch( member.name, highlightRegExp );
-									const suffix = member.kind === 'function' ? '()' : '';
-									html += `<a href="#${member.hash}" class="search-result-member${selectedClass}">.${highlightedName}${suffix}</a>`;
-
-								} );
+								bySubCategory[ subCat ][ className ] = group;
 
 							}
 
-							if ( group.class || group.members.length > 0 ) {
+							// Sort sub-categories and render them
+							const sortedSubCategories = Object.keys( bySubCategory ).sort();
 
-								html += '</div>';
+							for ( const subCat of sortedSubCategories ) {
+
+								const highlightedSubCat = highlightMatch( subCat, highlightRegExp );
+								html += `<h3>${highlightedSubCat}</h3>`;
+
+								for ( const className in bySubCategory[ subCat ] ) {
+
+									const group = bySubCategory[ subCat ][ className ];
+
+									if ( group.class ) {
+
+										html += '<div class="search-result-group">';
+										const selectedClass = group.class.hash === currentHash ? ' selected' : '';
+										const highlightedName = highlightMatch( group.class.name, highlightRegExp );
+										html += `<a href="#${group.class.hash}" class="search-result-class${selectedClass}">${highlightedName}</a>`;
+
+									}
+
+									if ( group.members.length > 0 ) {
+
+										if ( ! group.class ) {
+
+											html += '<div class="search-result-group">';
+											html += `<a href="#${className}" class="search-result-class">${className}</a>`;
+
+										}
+
+										group.members.forEach( member => {
+
+											const selectedClass = member.hash === currentHash ? ' selected' : '';
+											const highlightedName = highlightMatch( member.name, highlightRegExp );
+											const suffix = member.kind === 'function' ? '()' : '';
+											html += `<a href="#${member.hash}" class="search-result-member${selectedClass}">.${highlightedName}${suffix}</a>`;
+
+										} );
+
+									}
+
+									if ( group.class || group.members.length > 0 ) {
+
+										html += '</div>';
+
+									}
+
+								}
+
+							}
+
+						} else {
+
+							// Regular category rendering (Core, Addons, Global)
+
+							for ( const className in byCategory[ category ] ) {
+
+								const group = byCategory[ category ][ className ];
+
+								if ( group.class ) {
+
+									html += '<div class="search-result-group">';
+									const selectedClass = group.class.hash === currentHash ? ' selected' : '';
+									const highlightedName = highlightMatch( group.class.name, highlightRegExp );
+									html += `<a href="#${group.class.hash}" class="search-result-class${selectedClass}">${highlightedName}</a>`;
+
+								}
+
+								if ( group.members.length > 0 ) {
+
+									if ( ! group.class ) {
+
+										html += '<div class="search-result-group">';
+										html += `<a href="#${className}" class="search-result-class">${className}</a>`;
+
+									}
+
+									group.members.forEach( member => {
+
+										const selectedClass = member.hash === currentHash ? ' selected' : '';
+										const highlightedName = highlightMatch( member.name, highlightRegExp );
+										const suffix = member.kind === 'function' ? '()' : '';
+										html += `<a href="#${member.hash}" class="search-result-member${selectedClass}">.${highlightedName}${suffix}</a>`;
+
+									} );
+
+								}
+
+								if ( group.class || group.members.length > 0 ) {
+
+									html += '</div>';
+
+								}
 
 							}
 
