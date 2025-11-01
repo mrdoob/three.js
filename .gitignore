@@ -1,3 +1,4 @@
 .DS_Store
+.puppeteer_profile/
 node_modules
 test/e2e/chromium
