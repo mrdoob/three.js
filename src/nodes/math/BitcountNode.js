@@ -431,7 +431,3 @@ export const countLeadingZeros = /*@__PURE__*/ nodeProxyIntent( BitcountNode, Bi
  * @returns {Node}
  */
 export const countOneBits = /*@__PURE__*/ nodeProxyIntent( BitcountNode, BitcountNode.COUNT_ONE_BITS ).setParameterLength( 1 );
-
-addMethodChaining( 'countTrailingZeros', countTrailingZeros );
-addMethodChaining( 'countLeadingZeros', countLeadingZeros );
-addMethodChaining( 'countOneBits', countOneBits );
