@@ -26,11 +26,11 @@ animation loop when animations are on.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">ArcballControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">ArcballControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { ArcballControls } from 'three/addons/controls/ArcballControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ArcballControls" translate="no">new <a href="#ArcballControls">ArcballControls</a><span class="signature">( camera : <span class="param-type">Camera</span>, domElement : <span class="param-type">HTMLElement</span>, scene : <span class="param-type">Scene</span> )</span> </h3>
+					<h3 class="name name-method" id="ArcballControls" translate="no">new <a href="#ArcballControls">ArcballControls</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, domElement : <span class="param-type">HTMLElement</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new controls instance.</p>
@@ -38,16 +38,30 @@ animation loop when animations are on.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>domElement</code></td>
-									<td class="description last"><p>The HTML element used for event listeners.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene rendered by the camera. If not given, gizmos cannot be shown.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene rendered by the camera. If not given, gizmos cannot be shown.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -59,104 +73,121 @@ animation loop when animations are on.</p></div>
 					<div class="description">
 						<p>If set to <code>true</code>, the camera's near and far values will be adjusted every time zoom is
 performed trying to maintain the same visible portion given by initial near and far
-values. Only works with perspective cameras.<br/>Default is <code>false</code>.</p>
+values. Only works with perspective cameras.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="cursorZoom" translate="no">.<a href="#cursorZoom">cursorZoom</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Set to <code>true</code> to make zoom become cursor centered.<br/>Default is <code>false</code>.</p>
+						<p>Set to <code>true</code> to make zoom become cursor centered.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="dampingFactor" translate="no">.<a href="#dampingFactor">dampingFactor</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The damping inertia used if 'enableAnimations<code>is set to</code>true`.<br/>Default is <code>25</code>.</p>
+						<p>The damping inertia used if 'enableAnimations<code>is set to</code>true`.</p>
+						<p>Default is <code>25</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="enableAnimations" translate="no">.<a href="#enableAnimations">enableAnimations</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Set to <code>true</code> to enable animations for rotation (damping) and focus operation.<br/>Default is <code>true</code>.</p>
+						<p>Set to <code>true</code> to enable animations for rotation (damping) and focus operation.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="enableFocus" translate="no">.<a href="#enableFocus">enableFocus</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Enable or disable camera focusing on double-tap (or click) operations.<br/>Default is <code>true</code>.</p>
+						<p>Enable or disable camera focusing on double-tap (or click) operations.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="enableGizmos" translate="no">.<a href="#enableGizmos">enableGizmos</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Enable or disable gizmos.<br/>Default is <code>true</code>.</p>
+						<p>Enable or disable gizmos.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="enableGrid" translate="no">.<a href="#enableGrid">enableGrid</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>If set to <code>true</code>, a grid will appear when panning operation is being performed
-(desktop interaction only).<br/>Default is <code>false</code>.</p>
+(desktop interaction only).</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="enablePan" translate="no">.<a href="#enablePan">enablePan</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Enable or disable camera panning.<br/>Default is <code>true</code>.</p>
+						<p>Enable or disable camera panning.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="enableRotate" translate="no">.<a href="#enableRotate">enableRotate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Enable or disable camera rotation.<br/>Default is <code>true</code>.</p>
+						<p>Enable or disable camera rotation.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="enableZoom" translate="no">.<a href="#enableZoom">enableZoom</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Enable or disable camera zoom.<br/>Default is <code>true</code>.</p>
+						<p>Enable or disable camera zoom.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="focusAnimationTime" translate="no">.<a href="#focusAnimationTime">focusAnimationTime</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Duration of focus animations in ms.<br/>Default is <code>500</code>.</p>
+						<p>Duration of focus animations in ms.</p>
+						<p>Default is <code>500</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="maxDistance" translate="no">.<a href="#maxDistance">maxDistance</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>How far you can dolly out. For perspective cameras only.<br/>Default is <code>Infinity</code>.</p>
+						<p>How far you can dolly out. For perspective cameras only.</p>
+						<p>Default is <code>Infinity</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="maxFov" translate="no">.<a href="#maxFov">maxFov</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The maximum FOV in degrees.<br/>Default is <code>90</code>.</p>
+						<p>The maximum FOV in degrees.</p>
+						<p>Default is <code>90</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="maxZoom" translate="no">.<a href="#maxZoom">maxZoom</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>How far you can zoom out. For orthographic cameras only.<br/>Default is <code>Infinity</code>.</p>
+						<p>How far you can zoom out. For orthographic cameras only.</p>
+						<p>Default is <code>Infinity</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="minDistance" translate="no">.<a href="#minDistance">minDistance</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>How far you can dolly in. For perspective cameras only.<br/>Default is <code>0</code>.</p>
+						<p>How far you can dolly in. For perspective cameras only.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="minFov" translate="no">.<a href="#minFov">minFov</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The minimum FOV in degrees.<br/>Default is <code>5</code>.</p>
+						<p>The minimum FOV in degrees.</p>
+						<p>Default is <code>5</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="minZoom" translate="no">.<a href="#minZoom">minZoom</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>How far you can zoom in. For orthographic cameras only.<br/>Default is <code>0</code>.</p>
+						<p>How far you can zoom in. For orthographic cameras only.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -169,25 +200,29 @@ values. Only works with perspective cameras.<br/>Default is <code>false</code>.<
 				<div class="member">
 					<h3 class="name" id="radiusFactor" translate="no">.<a href="#radiusFactor">radiusFactor</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The size of the gizmo relative to the screen width and height.<br/>Default is <code>0.67</code>.</p>
+						<p>The size of the gizmo relative to the screen width and height.</p>
+						<p>Default is <code>0.67</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="rotateSpeed" translate="no">.<a href="#rotateSpeed">rotateSpeed</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Speed of rotation.<br/>Default is <code>1</code>.</p>
+						<p>Speed of rotation.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="scaleFactor" translate="no">.<a href="#scaleFactor">scaleFactor</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The scaling factor used when performing zoom operation.<br/>Default is <code>1.1</code>.</p>
+						<p>The scaling factor used when performing zoom operation.</p>
+						<p>Default is <code>1.1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="scene" translate="no">.<a href="#scene">scene</a><span class="type-signature"> : <a href="Scene.html">Scene</a></span> </h3>
 					<div class="description">
-						<p>The scene rendered by the camera. If not given, gizmos cannot be shown.<br/>Default is <code>null</code>.</p>
+						<p>The scene rendered by the camera. If not given, gizmos cannot be shown.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -199,7 +234,8 @@ values. Only works with perspective cameras.<br/>Default is <code>false</code>.<
 				<div class="member">
 					<h3 class="name" id="wMax" translate="no">.<a href="#wMax">wMax</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Maximum angular velocity allowed on rotation animation start.<br/>Default is <code>20</code>.</p>
+						<p>Maximum angular velocity allowed on rotation animation start.</p>
+						<p>Default is <code>20</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -211,8 +247,12 @@ values. Only works with perspective cameras.<br/>Default is <code>false</code>.<
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>isActive</code></td>
-									<td class="description last"><p>If set to <code>true</code>, gizmos are more visible.</p></td>
+									<td class="name">
+										<strong>isActive</strong>
+									</td>
+									<td class="description last">
+										<p>If set to <code>true</code>, gizmos are more visible.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -258,7 +298,7 @@ text as saved from <code>copyState()</code>.</p>
 							<p>Saves the current state of the control. This can later be recover with <code>reset()</code>.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="setCamera" translate="no">.<a href="#setCamera">setCamera</a><span class="signature">( camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="setCamera" translate="no">.<a href="#setCamera">setCamera</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the camera to be controlled.  Must be called in order to set a new camera to be controlled.</p>
@@ -266,8 +306,12 @@ text as saved from <code>copyState()</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera to be controlled.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to be controlled.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -280,8 +324,12 @@ text as saved from <code>copyState()</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>Value of gizmos visibility.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Value of gizmos visibility.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -294,16 +342,29 @@ text as saved from <code>copyState()</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>operation</code></td>
-									<td class="description last"><p>The operation to be performed ('PAN', 'ROTATE', 'ZOOM', 'FOV').</p></td>
+									<td class="name">
+										<strong>operation</strong>
+									</td>
+									<td class="description last">
+										<p>The operation to be performed ('PAN', 'ROTATE', 'ZOOM', 'FOV').</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>mouse</code></td>
-									<td class="description last"><p>A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.</p></td>
+									<td class="name">
+										<strong>mouse</strong>
+									</td>
+									<td class="description last">
+										<p>A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>key</code></td>
-									<td class="description last"><p>The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>key</strong>
+									</td>
+									<td class="description last">
+										<p>The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -319,8 +380,12 @@ text as saved from <code>copyState()</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>Value of radius factor.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Value of radius factor.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -333,12 +398,21 @@ text as saved from <code>copyState()</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mouse</code></td>
-									<td class="description last"><p>A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.</p></td>
+									<td class="name">
+										<strong>mouse</strong>
+									</td>
+									<td class="description last">
+										<p>A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>key</code></td>
-									<td class="description last"><p>The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>key</strong>
+									</td>
+									<td class="description last">
+										<p>The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -385,7 +459,7 @@ text as saved from <code>copyState()</code>.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/ArcballControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/ArcballControls.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/ArcballControls.js" translate="no" target="_blank" rel="noopener">examples/jsm/controls/ArcballControls.js</a>
 				</p>
 			</article>
 		</section>

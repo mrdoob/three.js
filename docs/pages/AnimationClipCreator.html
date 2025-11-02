@@ -16,14 +16,14 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">AnimationClipCreator</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">AnimationClipCreator</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { AnimationClipCreator } from 'three/addons/animation/AnimationClipCreator.js';</code></pre>
 				<div class="container-overview">
 					<div class="method">
 					</div>
 				</div>
 				<h2 class="subsection-title">Static Methods</h2>
-					<h3 class="name name-method" id=".CreateMaterialColorAnimation" translate="no">.<a href="#.CreateMaterialColorAnimation">CreateMaterialColorAnimation</a><span class="signature">( duration : <span class="param-type">number</span>, colors : <span class="param-type">Array.&lt;Color></span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<h3 class="name name-method" id=".CreateMaterialColorAnimation" translate="no">.<a href="#.CreateMaterialColorAnimation">CreateMaterialColorAnimation</a><span class="signature">( duration : <span class="param-type">number</span>, colors : <span class="param-type">Array.&lt;<a href="Color.html">Color</a>></span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates an animation clip that animates the <code>color</code> property of a 3D object's
@@ -32,12 +32,20 @@ material.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration of the animation.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the animation.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>colors</code></td>
-									<td class="description last"><p>An array of colors that should be sequentially animated.</p></td>
+									<td class="name">
+										<strong>colors</strong>
+									</td>
+									<td class="description last">
+										<p>An array of colors that should be sequentially animated.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -54,12 +62,20 @@ in the given period.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration of the animation.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the animation.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>pulseScale</code></td>
-									<td class="description last"><p>The scale of the pulse.</p></td>
+									<td class="name">
+										<strong>pulseScale</strong>
+									</td>
+									<td class="description last">
+										<p>The scale of the pulse.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -76,12 +92,21 @@ in the given period of time around the given axis.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>period</code></td>
-									<td class="description last"><p>The duration of the animation.</p></td>
+									<td class="name">
+										<strong>period</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the animation.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>axis</code></td>
-									<td class="description last"><p>The axis of rotation.<br/>Default is <code>'x'</code>.</p></td>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The axis of rotation.</p>
+										<p>Default is <code>'x'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -98,12 +123,21 @@ in the given period of time along the given axis.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>period</code></td>
-									<td class="description last"><p>The duration of the animation.</p></td>
+									<td class="name">
+										<strong>period</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the animation.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>axis</code></td>
-									<td class="description last"><p>The axis to scale the 3D object along.<br/>Default is <code>'x'</code>.</p></td>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The axis to scale the 3D object along.</p>
+										<p>Default is <code>'x'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -111,7 +145,7 @@ in the given period of time along the given axis.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The created animation clip.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id=".CreateShakeAnimation" translate="no">.<a href="#.CreateShakeAnimation">CreateShakeAnimation</a><span class="signature">( duration : <span class="param-type">number</span>, shakeScale : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
+					<h3 class="name name-method" id=".CreateShakeAnimation" translate="no">.<a href="#.CreateShakeAnimation">CreateShakeAnimation</a><span class="signature">( duration : <span class="param-type">number</span>, shakeScale : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="AnimationClip.html">AnimationClip</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates an animation clip that translates a 3D object in a shake pattern
@@ -120,12 +154,20 @@ in the given period.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration of the animation.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the animation.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>shakeScale</code></td>
-									<td class="description last"><p>The scale of the shake.</p></td>
+									<td class="name">
+										<strong>shakeScale</strong>
+									</td>
+									<td class="description last">
+										<p>The scale of the shake.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -141,8 +183,12 @@ in the given period.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration of the animation.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the animation.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -152,7 +198,7 @@ in the given period.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/AnimationClipCreator.js" target="_blank" rel="noopener" translate="no">examples/jsm/animation/AnimationClipCreator.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/AnimationClipCreator.js" translate="no" target="_blank" rel="noopener">examples/jsm/animation/AnimationClipCreator.js</a>
 				</p>
 			</article>
 		</section>

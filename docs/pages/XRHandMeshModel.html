@@ -18,11 +18,11 @@ custom asset.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">XRHandMeshModel</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">XRHandMeshModel</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { XRHandMeshModel } from 'three/addons/webxr/XRHandMeshModel.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="XRHandMeshModel" translate="no">new <a href="#XRHandMeshModel">XRHandMeshModel</a><span class="signature">( handModel : <span class="param-type">XRHandModel</span>, controller : <span class="param-type">Group</span>, path : <span class="param-type">string</span>, handedness : <span class="param-type">XRHandedness</span>, loader : <span class="param-type">Loader</span>, onLoad : <span class="param-type">function</span> )</span> </h3>
+					<h3 class="name name-method" id="XRHandMeshModel" translate="no">new <a href="#XRHandMeshModel">XRHandMeshModel</a><span class="signature">( handModel : <span class="param-type"><a href="XRHandModel.html">XRHandModel</a></span>, controller : <span class="param-type"><a href="Group.html">Group</a></span>, path : <span class="param-type">string</span>, handedness : <span class="param-type">XRHandedness</span>, loader : <span class="param-type"><a href="Loader.html">Loader</a></span>, onLoad : <span class="param-type">function</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new XR hand mesh model.</p>
@@ -30,28 +30,54 @@ custom asset.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>handModel</code></td>
-									<td class="description last"><p>The hand model.</p></td>
+									<td class="name">
+										<strong>handModel</strong>
+									</td>
+									<td class="description last">
+										<p>The hand model.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>controller</code></td>
-									<td class="description last"><p>The WebXR controller.</p></td>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The WebXR controller.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>path</code></td>
-									<td class="description last"><p>The model path.</p></td>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The model path.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>handedness</code></td>
-									<td class="description last"><p>The handedness of the XR input source.</p></td>
+									<td class="name">
+										<strong>handedness</strong>
+									</td>
+									<td class="description last">
+										<p>The handedness of the XR input source.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>loader</code></td>
-									<td class="description last"><p>The loader. If not provided, an instance of <code>GLTFLoader</code> will be used to load models.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>loader</strong>
+									</td>
+									<td class="description last">
+										<p>The loader. If not provided, an instance of <code>GLTFLoader</code> will be used to load models.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>A callback that is executed when a controller model has been loaded.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>A callback that is executed when a controller model has been loaded.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -86,7 +112,7 @@ of the hand skeleton.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XRHandMeshModel.js" target="_blank" rel="noopener" translate="no">examples/jsm/webxr/XRHandMeshModel.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XRHandMeshModel.js" translate="no" target="_blank" rel="noopener">examples/jsm/webxr/XRHandMeshModel.js</a>
 				</p>
 			</article>
 		</section>

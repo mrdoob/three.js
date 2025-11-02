@@ -24,11 +24,11 @@ spotLight.iesMap = texture;
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">IESLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">IESLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { IESLoader } from 'three/addons/loaders/IESLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="IESLoader" translate="no">new <a href="#IESLoader">IESLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="IESLoader" translate="no">new <a href="#IESLoader">IESLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new IES loader.</p>
@@ -36,8 +36,12 @@ spotLight.iesMap = texture;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -47,11 +51,12 @@ spotLight.iesMap = texture;
 				<div class="member">
 					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : <a href="global.html#HalfFloatType">HalfFloatType</a> | <a href="global.html#FloatType">FloatType</a></span> </h3>
 					<div class="description">
-						<p>The texture type.<br/>Default is <code>HalfFloatType</code>.</p>
+						<p>The texture type.</p>
+						<p>Default is <code>HalfFloatType</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded IES texture
@@ -60,20 +65,36 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -89,8 +110,12 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>text</code></td>
-									<td class="description last"><p>The raw IES data.</p></td>
+									<td class="name">
+										<strong>text</strong>
+									</td>
+									<td class="description last">
+										<p>The raw IES data.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -103,7 +128,7 @@ to the <code>onLoad()</code> callback.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/IESLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/IESLoader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/IESLoader.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/IESLoader.js</a>
 				</p>
 			</article>
 		</section>

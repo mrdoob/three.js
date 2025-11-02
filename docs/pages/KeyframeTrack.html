@@ -19,7 +19,7 @@ of an object.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="KeyframeTrack" translate="no">new <a href="#KeyframeTrack">KeyframeTrack</a><span class="signature">( name : <span class="param-type">string</span>, times : <span class="param-type">Array.&lt;number></span>, values : <span class="param-type">Array.&lt;(number|string|boolean)></span>, interpolation : <span class="param-type">InterpolateLinear | InterpolateDiscrete | InterpolateSmooth</span> )</span> </h3>
+					<h3 class="name name-method" id="KeyframeTrack" translate="no">new <a href="#KeyframeTrack">KeyframeTrack</a><span class="signature">( name : <span class="param-type">string</span>, times : <span class="param-type">Array.&lt;number></span>, values : <span class="param-type">Array.&lt;(number|string|boolean)></span>, interpolation : <span class="param-type"><a href="global.html#InterpolateLinear">InterpolateLinear</a> | <a href="global.html#InterpolateDiscrete">InterpolateDiscrete</a> | <a href="global.html#InterpolateSmooth">InterpolateSmooth</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new keyframe track.</p>
@@ -27,20 +27,36 @@ of an object.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The keyframe track's name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The keyframe track's name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>times</code></td>
-									<td class="description last"><p>A list of keyframe times.</p></td>
+									<td class="name">
+										<strong>times</strong>
+									</td>
+									<td class="description last">
+										<p>A list of keyframe times.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>values</code></td>
-									<td class="description last"><p>A list of keyframe values.</p></td>
+									<td class="name">
+										<strong>values</strong>
+									</td>
+									<td class="description last">
+										<p>A list of keyframe values.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>interpolation</code></td>
-									<td class="description last"><p>The interpolation type.</p></td>
+									<td class="name">
+										<strong>interpolation</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation type.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -50,25 +66,29 @@ of an object.</p></div>
 				<div class="member">
 					<h3 class="name" id="DefaultInterpolation" translate="no">.<a href="#DefaultInterpolation">DefaultInterpolation</a><span class="type-signature"> : <a href="global.html#InterpolateLinear">InterpolateLinear</a> | <a href="global.html#InterpolateDiscrete">InterpolateDiscrete</a> | <a href="global.html#InterpolateSmooth">InterpolateSmooth</a></span> </h3>
 					<div class="description">
-						<p>The default interpolation type of this keyframe track.<br/>Default is <code>InterpolateLinear</code>.</p>
+						<p>The default interpolation type of this keyframe track.</p>
+						<p>Default is <code>InterpolateLinear</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="TimeBufferType" translate="no">.<a href="#TimeBufferType">TimeBufferType</a><span class="type-signature"> : TypedArray | Array</span> </h3>
 					<div class="description">
-						<p>The time buffer type of this keyframe track.<br/>Default is <code>Float32Array.constructor</code>.</p>
+						<p>The time buffer type of this keyframe track.</p>
+						<p>Default is <code>Float32Array.constructor</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="ValueBufferType" translate="no">.<a href="#ValueBufferType">ValueBufferType</a><span class="type-signature"> : TypedArray | Array</span> </h3>
 					<div class="description">
-						<p>The value buffer type of this keyframe track.<br/>Default is <code>Float32Array.constructor</code>.</p>
+						<p>The value buffer type of this keyframe track.</p>
+						<p>Default is <code>Float32Array.constructor</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="ValueTypeName" translate="no">.<a href="#ValueTypeName">ValueTypeName</a><span class="type-signature"> : String</span> </h3>
 					<div class="description">
-						<p>The value type name.<br/>Default is <code>''</code>.</p>
+						<p>The value type name.</p>
+						<p>Default is <code>''</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -100,8 +120,12 @@ for the forms of strings that can be parsed for property binding.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>result</code></td>
-									<td class="description last"><p>The result buffer.</p></td>
+									<td class="name">
+										<strong>result</strong>
+									</td>
+									<td class="description last">
+										<p>The result buffer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -117,8 +141,12 @@ for the forms of strings that can be parsed for property binding.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>result</code></td>
-									<td class="description last"><p>The result buffer.</p></td>
+									<td class="name">
+										<strong>result</strong>
+									</td>
+									<td class="description last">
+										<p>The result buffer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -134,8 +162,12 @@ for the forms of strings that can be parsed for property binding.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>result</code></td>
-									<td class="description last"><p>The result buffer.</p></td>
+									<td class="name">
+										<strong>result</strong>
+									</td>
+									<td class="description last">
+										<p>The result buffer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -188,8 +220,12 @@ common in morph target sequences).</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>timeScale</code></td>
-									<td class="description last"><p>The time scale.</p></td>
+									<td class="name">
+										<strong>timeScale</strong>
+									</td>
+									<td class="description last">
+										<p>The time scale.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -197,7 +233,7 @@ common in morph target sequences).</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this keyframe track.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setInterpolation" translate="no">.<a href="#setInterpolation">setInterpolation</a><span class="signature">( interpolation : <span class="param-type">InterpolateLinear | InterpolateDiscrete | InterpolateSmooth</span> )</span><span class="type-signature"> : <a href="KeyframeTrack.html">KeyframeTrack</a></span> </h3>
+					<h3 class="name name-method" id="setInterpolation" translate="no">.<a href="#setInterpolation">setInterpolation</a><span class="signature">( interpolation : <span class="param-type"><a href="global.html#InterpolateLinear">InterpolateLinear</a> | <a href="global.html#InterpolateDiscrete">InterpolateDiscrete</a> | <a href="global.html#InterpolateSmooth">InterpolateSmooth</a></span> )</span><span class="type-signature"> : <a href="KeyframeTrack.html">KeyframeTrack</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Defines the interpolation factor method for this keyframe track.</p>
@@ -205,8 +241,12 @@ common in morph target sequences).</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>interpolation</code></td>
-									<td class="description last"><p>The interpolation type.</p></td>
+									<td class="name">
+										<strong>interpolation</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation type.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -222,8 +262,12 @@ common in morph target sequences).</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>timeOffset</code></td>
-									<td class="description last"><p>The offset to move the time values.</p></td>
+									<td class="name">
+										<strong>timeOffset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset to move the time values.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -241,12 +285,20 @@ keys this will change their values</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>startTime</code></td>
-									<td class="description last"><p>The start time.</p></td>
+									<td class="name">
+										<strong>startTime</strong>
+									</td>
+									<td class="description last">
+										<p>The start time.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>endTime</code></td>
-									<td class="description last"><p>The end time.</p></td>
+									<td class="name">
+										<strong>endTime</strong>
+									</td>
+									<td class="description last">
+										<p>The end time.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -265,7 +317,7 @@ are valid.</p>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Static Methods</h2>
-					<h3 class="name name-method" id=".toJSON" translate="no">.<a href="#.toJSON">toJSON</a><span class="signature">( track : <span class="param-type">KeyframeTrack</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id=".toJSON" translate="no">.<a href="#.toJSON">toJSON</a><span class="signature">( track : <span class="param-type"><a href="KeyframeTrack.html">KeyframeTrack</a></span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Converts the keyframe track to JSON.</p>
@@ -273,8 +325,12 @@ are valid.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>track</code></td>
-									<td class="description last"><p>The keyframe track to serialize.</p></td>
+									<td class="name">
+										<strong>track</strong>
+									</td>
+									<td class="description last">
+										<p>The keyframe track to serialize.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -284,7 +340,7 @@ are valid.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/KeyframeTrack.js" target="_blank" rel="noopener" translate="no">src/animation/KeyframeTrack.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/KeyframeTrack.js" translate="no" target="_blank" rel="noopener">src/animation/KeyframeTrack.js</a>
 				</p>
 			</article>
 		</section>

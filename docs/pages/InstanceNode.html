@@ -21,7 +21,7 @@ data.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="InstanceNode" translate="no">new <a href="#InstanceNode">InstanceNode</a><span class="signature">( count : <span class="param-type">number</span>, instanceMatrix : <span class="param-type">InstancedBufferAttribute</span>, instanceColor : <span class="param-type">InstancedBufferAttribute</span> )</span> </h3>
+					<h3 class="name name-method" id="InstanceNode" translate="no">new <a href="#InstanceNode">InstanceNode</a><span class="signature">( count : <span class="param-type">number</span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span>, instanceColor : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new instance node.</p>
@@ -29,16 +29,29 @@ data.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>count</code></td>
-									<td class="description last"><p>The number of instances.</p></td>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The number of instances.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>instanceMatrix</code></td>
-									<td class="description last"><p>Instanced buffer attribute representing the instance transformations.</p></td>
+									<td class="name">
+										<strong>instanceMatrix</strong>
+									</td>
+									<td class="description last">
+										<p>Instanced buffer attribute representing the instance transformations.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>instanceColor</code></td>
-									<td class="description last"><p>Instanced buffer attribute representing the instance colors.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>instanceColor</strong>
+									</td>
+									<td class="description last">
+										<p>Instanced buffer attribute representing the instance colors.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -72,7 +85,8 @@ data.</p></div>
 				<div class="member">
 					<h3 class="name" id="instanceColorNode" translate="no">.<a href="#instanceColorNode">instanceColorNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="description">
-						<p>The node that represents the instance color data.<br/>Default is <code>null</code>.</p>
+						<p>The node that represents the instance color data.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -91,14 +105,15 @@ data.</p></div>
 					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The update type is set to <code>frame</code> since an update
-of instanced buffer data must be checked per frame.<br/>Default is <code>'frame'</code>.</p>
+of instanced buffer data must be checked per frame.</p>
+						<p>Default is <code>'frame'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateType">Node#updateType</a></dt>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the internal buffers and nodes and assigns the transformed vertex data
@@ -108,8 +123,12 @@ like with morph and skinning nodes.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -117,7 +136,7 @@ like with morph and skinning nodes.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Checks if the internal buffers required an update.</p>
@@ -125,8 +144,12 @@ like with morph and skinning nodes.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>The current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -136,7 +159,7 @@ like with morph and skinning nodes.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/InstanceNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/InstanceNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/InstanceNode.js" translate="no" target="_blank" rel="noopener">src/nodes/accessors/InstanceNode.js</a>
 				</p>
 			</article>
 		</section>

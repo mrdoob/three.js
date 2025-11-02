@@ -16,14 +16,14 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">LightProbeGenerator</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">LightProbeGenerator</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { LightProbeGenerator } from 'three/addons/lights/LightProbeGenerator.js';</code></pre>
 				<div class="container-overview">
 					<div class="method">
 					</div>
 				</div>
 				<h2 class="subsection-title">Static Methods</h2>
-					<h3 class="name name-method" id=".fromCubeRenderTarget" translate="no">.<a href="#.fromCubeRenderTarget">fromCubeRenderTarget</a><span class="signature">( renderer : <span class="param-type">WebGPURenderer | WebGLRenderer</span>, cubeRenderTarget : <span class="param-type">CubeRenderTarget | WebGLCubeRenderTarget</span> )</span><span class="type-signature"> : Promise.&lt;<a href="LightProbe.html">LightProbe</a>></span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id=".fromCubeRenderTarget" translate="no">.<a href="#.fromCubeRenderTarget">fromCubeRenderTarget</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, cubeRenderTarget : <span class="param-type"><a href="CubeRenderTarget.html">CubeRenderTarget</a> | <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> )</span><span class="type-signature"> : Promise.&lt;<a href="LightProbe.html">LightProbe</a>></span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates a light probe from the given (radiance) environment map.
@@ -34,12 +34,20 @@ set to <a href="global.html#RGBAFormat">RGBAFormat</a>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>cubeRenderTarget</code></td>
-									<td class="description last"><p>The environment map.</p></td>
+									<td class="name">
+										<strong>cubeRenderTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The environment map.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -47,7 +55,7 @@ set to <a href="global.html#RGBAFormat">RGBAFormat</a>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with the created light probe.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id=".fromCubeTexture" translate="no">.<a href="#.fromCubeTexture">fromCubeTexture</a><span class="signature">( cubeTexture : <span class="param-type">CubeTexture</span> )</span><span class="type-signature"> : <a href="LightProbe.html">LightProbe</a></span> </h3>
+					<h3 class="name name-method" id=".fromCubeTexture" translate="no">.<a href="#.fromCubeTexture">fromCubeTexture</a><span class="signature">( cubeTexture : <span class="param-type"><a href="CubeTexture.html">CubeTexture</a></span> )</span><span class="type-signature"> : <a href="LightProbe.html">LightProbe</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates a light probe from the given (radiance) environment map.
@@ -56,8 +64,12 @@ The method expects that the environment map is represented as a cube texture.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>cubeTexture</code></td>
-									<td class="description last"><p>The environment map.</p></td>
+									<td class="name">
+										<strong>cubeTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The environment map.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -67,7 +79,7 @@ The method expects that the environment map is represented as a cube texture.</p
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/LightProbeGenerator.js" target="_blank" rel="noopener" translate="no">examples/jsm/lights/LightProbeGenerator.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/LightProbeGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/lights/LightProbeGenerator.js</a>
 				</p>
 			</article>
 		</section>

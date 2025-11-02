@@ -22,7 +22,7 @@ import { LuminosityHighPassShader } from '../shaders/LuminosityHighPassShader.js
  * When using this pass, tone mapping must be enabled in the renderer settings.
  *
  * Reference:
- * - [Bloom in Unreal Engine]{@link https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/}
+ * - [Bloom in Unreal Engine](https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/)
  *
  * ```js
  * const resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );

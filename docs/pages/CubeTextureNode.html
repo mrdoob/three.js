@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CubeTextureNode" translate="no">new <a href="#CubeTextureNode">CubeTextureNode</a><span class="signature">( value : <span class="param-type">CubeTexture</span>, uvNode : <span class="param-type">Node.&lt;vec3></span>, levelNode : <span class="param-type">Node.&lt;int></span>, biasNode : <span class="param-type">Node.&lt;float></span> )</span> </h3>
+					<h3 class="name name-method" id="CubeTextureNode" translate="no">new <a href="#CubeTextureNode">CubeTextureNode</a><span class="signature">( value : <span class="param-type"><a href="CubeTexture.html">CubeTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>, biasNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new cube texture node.</p>
@@ -26,20 +26,39 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The cube texture.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The cube texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvNode</code></td>
-									<td class="description last"><p>The uv node.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>levelNode</code></td>
-									<td class="description last"><p>The level node.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>levelNode</strong>
+									</td>
+									<td class="description last">
+										<p>The level node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>biasNode</code></td>
-									<td class="description last"><p>The bias node.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>biasNode</strong>
+									</td>
+									<td class="description last">
+										<p>The bias node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -49,11 +68,12 @@
 				<div class="member">
 					<h3 class="name" id="isCubeTextureNode" translate="no">.<a href="#isCubeTextureNode">isCubeTextureNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="generateUV" translate="no">.<a href="#generateUV">generateUV</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, cubeUV : <span class="param-type">Node</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateUV" translate="no">.<a href="#generateUV">generateUV</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, cubeUV : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the uv code snippet.</p>
@@ -61,12 +81,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>cubeUV</code></td>
-									<td class="description last"><p>The uv node to generate code for.</p></td>
+									<td class="name">
+										<strong>cubeUV</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node to generate code for.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -89,7 +117,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> The default uv attribute.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Overwrites the default implementation to return a fixed value <code>'cubeTexture'</code>.</p>
@@ -97,8 +125,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -118,8 +150,12 @@ for cube textures. The uv transformation matrix is not applied to cube textures.
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The update toggle.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The update toggle.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -127,7 +163,7 @@ for cube textures. The uv transformation matrix is not applied to cube textures.
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TextureNode.html#setUpdateMatrix">TextureNode#setUpdateMatrix</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setupUV" translate="no">.<a href="#setupUV">setupUV</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, uvNode : <span class="param-type">Node</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="setupUV" translate="no">.<a href="#setupUV">setupUV</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the uv node. Depending on the backend as well as the texture type, it might be necessary
@@ -136,12 +172,20 @@ to modify the uv node for correct sampling.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvNode</code></td>
-									<td class="description last"><p>The uv node to setup.</p></td>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node to setup.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -154,7 +198,7 @@ to modify the uv node for correct sampling.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/CubeTextureNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/CubeTextureNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/CubeTextureNode.js" translate="no" target="_blank" rel="noopener">src/nodes/accessors/CubeTextureNode.js</a>
 				</p>
 			</article>
 		</section>

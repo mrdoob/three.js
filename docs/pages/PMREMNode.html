@@ -23,7 +23,7 @@ material.envNode = pmremTexture( envMap );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PMREMNode" translate="no">new <a href="#PMREMNode">PMREMNode</a><span class="signature">( value : <span class="param-type">Texture</span>, uvNode : <span class="param-type">Node.&lt;vec2></span>, levelNode : <span class="param-type">Node.&lt;float></span> )</span> </h3>
+					<h3 class="name name-method" id="PMREMNode" translate="no">new <a href="#PMREMNode">PMREMNode</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new function overloading node.</p>
@@ -31,16 +31,30 @@ material.envNode = pmremTexture( envMap );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The input texture.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The input texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvNode</code></td>
-									<td class="description last"><p>The uv node.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>levelNode</code></td>
-									<td class="description last"><p>The level node.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>levelNode</strong>
+									</td>
+									<td class="description last">
+										<p>The level node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -56,7 +70,8 @@ material.envNode = pmremTexture( envMap );
 				<div class="member">
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.RENDER</code>.<br/>Default is <code>'render'</code>.</p>
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.RENDER</code>.</p>
+						<p>Default is <code>'render'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
@@ -75,7 +90,7 @@ material.envNode = pmremTexture( envMap );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="updateFromTexture" translate="no">.<a href="#updateFromTexture">updateFromTexture</a><span class="signature">( texture : <span class="param-type">Texture</span> )</span> </h3>
+					<h3 class="name name-method" id="updateFromTexture" translate="no">.<a href="#updateFromTexture">updateFromTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Uses the given PMREM texture to update internal values.</p>
@@ -83,15 +98,19 @@ material.envNode = pmremTexture( envMap );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The PMREM texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The PMREM texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/pmrem/PMREMNode.js" target="_blank" rel="noopener" translate="no">src/nodes/pmrem/PMREMNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/pmrem/PMREMNode.js" translate="no" target="_blank" rel="noopener">src/nodes/pmrem/PMREMNode.js</a>
 				</p>
 			</article>
 		</section>

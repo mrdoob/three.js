@@ -29,11 +29,11 @@ scene.add( refractor );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">Refractor</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">Refractor</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { Refractor } from 'three/addons/objects/Refractor.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Refractor" translate="no">new <a href="#Refractor">Refractor</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, options : <span class="param-type">Refractor~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="Refractor" translate="no">new <a href="#Refractor">Refractor</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, options : <span class="param-type"><a href="Refractor.html#~Options">Refractor~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new refractor.</p>
@@ -41,12 +41,20 @@ scene.add( refractor );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>geometry</code></td>
-									<td class="description last"><p>The refractor's geometry.</p></td>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The refractor's geometry.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The configuration options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,7 +70,8 @@ scene.add( refractor );
 				<div class="member">
 					<h3 class="name" id="isRefractor" translate="no">.<a href="#isRefractor">isRefractor</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -88,105 +97,83 @@ method whenever this instance is no longer used in your app.</p>
 					<div class="description">
 						<p>Constructor options of <code>Refractor</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>color</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>color</strong>
+						<br>
 <span class="param-type">number</span>
 |
 <span class="param-type"><a href="Color.html">Color</a></span>
 |
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The refractor's color.</p>
+						<p>Default is <code>0x7F7F7F</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0x7F7F7F
-				</td>
-			<td class="description last"><p>The refractor's color.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>textureWidth</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>textureWidth</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture width. A higher value results in more clear refractions but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					512
-				</td>
-			<td class="description last"><p>The texture width. A higher value results in more clear refractions but is also more expensive.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>textureHeight</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>textureHeight</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture height. A higher value results in more clear refractions but is also more expensive.</p>
+						<p>Default is <code>512</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					512
-				</td>
-			<td class="description last"><p>The texture height. A higher value results in more clear refractions but is also more expensive.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>clipBias</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>clipBias</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The clip bias.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0
-				</td>
-			<td class="description last"><p>The clip bias.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>shader</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>shader</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>Can be used to pass in a custom shader that defines how the refractive view is projected onto the reflector's geometry.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Can be used to pass in a custom shader that defines how the refractive view is projected onto the reflector's geometry.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>multisample</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>multisample</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>How many samples to use for MSAA. <code>0</code> disables MSAA.</p>
+						<p>Default is <code>4</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					4
-				</td>
-			<td class="description last"><p>How many samples to use for MSAA. <code>0</code> disables MSAA.</p></td>
 		</tr>
 	</tbody>
 </table>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/Refractor.js" target="_blank" rel="noopener" translate="no">examples/jsm/objects/Refractor.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/Refractor.js" translate="no" target="_blank" rel="noopener">examples/jsm/objects/Refractor.js</a>
 				</p>
 			</article>
 		</section>

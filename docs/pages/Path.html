@@ -30,7 +30,7 @@ scene.add( line );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Path" translate="no">new <a href="#Path">Path</a><span class="signature">( points : <span class="param-type">Array.&lt;Vector2></span> )</span> </h3>
+					<h3 class="name name-method" id="Path" translate="no">new <a href="#Path">Path</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new path.</p>
@@ -38,8 +38,12 @@ scene.add( line );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>points</code></td>
-									<td class="description last"><p>An array of 2D points defining the path.</p></td>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points defining the path.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -61,28 +65,58 @@ scene.add( line );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>aX</code></td>
-									<td class="description last"><p>The x coordinate of the center of the arc.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the center of the arc.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aY</code></td>
-									<td class="description last"><p>The y coordinate of the center of the arc.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the center of the arc.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aRadius</code></td>
-									<td class="description last"><p>The radius of the arc.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>aRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the arc.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aStartAngle</code></td>
-									<td class="description last"><p>The start angle in radians.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aStartAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The start angle in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aEndAngle</code></td>
-									<td class="description last"><p>The end angle in radians.<br/>Default is <code>Math.PI*2</code>.</p></td>
+									<td class="name">
+										<strong>aEndAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The end angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aClockwise</code></td>
-									<td class="description last"><p>Whether to sweep the arc clockwise or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>aClockwise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sweep the arc clockwise or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -98,36 +132,76 @@ scene.add( line );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>aX</code></td>
-									<td class="description last"><p>The x coordinate of the absolute center of the ellipse.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the absolute center of the ellipse.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aY</code></td>
-									<td class="description last"><p>The y coordinate of the absolute center of the ellipse.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the absolute center of the ellipse.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>xRadius</code></td>
-									<td class="description last"><p>The radius of the ellipse in the x axis.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>xRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the ellipse in the x axis.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>yRadius</code></td>
-									<td class="description last"><p>The radius of the ellipse in the y axis.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>yRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the ellipse in the y axis.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aStartAngle</code></td>
-									<td class="description last"><p>The start angle in radians.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aStartAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The start angle in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aEndAngle</code></td>
-									<td class="description last"><p>The end angle in radians.<br/>Default is <code>Math.PI*2</code>.</p></td>
+									<td class="name">
+										<strong>aEndAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The end angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aClockwise</code></td>
-									<td class="description last"><p>Whether to sweep the ellipse clockwise or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>aClockwise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sweep the ellipse clockwise or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aRotation</code></td>
-									<td class="description last"><p>The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aRotation</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -144,28 +218,58 @@ to the current point.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>aX</code></td>
-									<td class="description last"><p>The x coordinate of the center of the arc offsetted from the previous curve.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the center of the arc offsetted from the previous curve.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aY</code></td>
-									<td class="description last"><p>The y coordinate of the center of the arc offsetted from the previous curve.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the center of the arc offsetted from the previous curve.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aRadius</code></td>
-									<td class="description last"><p>The radius of the arc.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>aRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the arc.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aStartAngle</code></td>
-									<td class="description last"><p>The start angle in radians.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aStartAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The start angle in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aEndAngle</code></td>
-									<td class="description last"><p>The end angle in radians.<br/>Default is <code>Math.PI*2</code>.</p></td>
+									<td class="name">
+										<strong>aEndAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The end angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aClockwise</code></td>
-									<td class="description last"><p>Whether to sweep the arc clockwise or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>aClockwise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sweep the arc clockwise or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -182,28 +286,52 @@ the current point with the given one.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>aCP1x</code></td>
-									<td class="description last"><p>The x coordinate of the first control point.</p></td>
+									<td class="name">
+										<strong>aCP1x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the first control point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aCP1y</code></td>
-									<td class="description last"><p>The y coordinate of the first control point.</p></td>
+									<td class="name">
+										<strong>aCP1y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the first control point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aCP2x</code></td>
-									<td class="description last"><p>The x coordinate of the second control point.</p></td>
+									<td class="name">
+										<strong>aCP2x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the second control point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aCP2y</code></td>
-									<td class="description last"><p>The y coordinate of the second control point.</p></td>
+									<td class="name">
+										<strong>aCP2y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the second control point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aX</code></td>
-									<td class="description last"><p>The x coordinate of the end point.</p></td>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aY</code></td>
-									<td class="description last"><p>The y coordinate of the end point.</p></td>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -220,36 +348,76 @@ to the current point</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>aX</code></td>
-									<td class="description last"><p>The x coordinate of the center of the ellipse offsetted from the previous curve.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the center of the ellipse offsetted from the previous curve.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aY</code></td>
-									<td class="description last"><p>The y coordinate of the center of the ellipse offsetted from the previous curve.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the center of the ellipse offsetted from the previous curve.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>xRadius</code></td>
-									<td class="description last"><p>The radius of the ellipse in the x axis.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>xRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the ellipse in the x axis.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>yRadius</code></td>
-									<td class="description last"><p>The radius of the ellipse in the y axis.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>yRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the ellipse in the y axis.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aStartAngle</code></td>
-									<td class="description last"><p>The start angle in radians.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aStartAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The start angle in radians.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aEndAngle</code></td>
-									<td class="description last"><p>The end angle in radians.<br/>Default is <code>Math.PI*2</code>.</p></td>
+									<td class="name">
+										<strong>aEndAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The end angle in radians.</p>
+										<p>Default is <code>Math.PI*2</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aClockwise</code></td>
-									<td class="description last"><p>Whether to sweep the ellipse clockwise or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>aClockwise</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sweep the ellipse clockwise or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aRotation</code></td>
-									<td class="description last"><p>The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>aRotation</strong>
+									</td>
+									<td class="description last">
+										<p>The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -266,12 +434,20 @@ the current point with the given one.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The x coordinate of the end point.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The y coordinate of the end point.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -287,12 +463,20 @@ the current point with the given one.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The x coordinate.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The y coordinate.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -309,20 +493,36 @@ the current point with the given one.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>aCPx</code></td>
-									<td class="description last"><p>The x coordinate of the control point.</p></td>
+									<td class="name">
+										<strong>aCPx</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the control point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aCPy</code></td>
-									<td class="description last"><p>The y coordinate of the control point.</p></td>
+									<td class="name">
+										<strong>aCPy</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the control point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aX</code></td>
-									<td class="description last"><p>The x coordinate of the end point.</p></td>
+									<td class="name">
+										<strong>aX</strong>
+									</td>
+									<td class="description last">
+										<p>The x coordinate of the end point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aY</code></td>
-									<td class="description last"><p>The y coordinate of the end point.</p></td>
+									<td class="name">
+										<strong>aY</strong>
+									</td>
+									<td class="description last">
+										<p>The y coordinate of the end point.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -330,7 +530,7 @@ the current point with the given one.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;Vector2></span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<h3 class="name name-method" id="setFromPoints" translate="no">.<a href="#setFromPoints">setFromPoints</a><span class="signature">( points : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates a path from the given list of points. The points are added
@@ -339,8 +539,12 @@ to the path as instances of <a href="LineCurve.html">LineCurve</a>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>points</code></td>
-									<td class="description last"><p>An array of 2D points.</p></td>
+									<td class="name">
+										<strong>points</strong>
+									</td>
+									<td class="description last">
+										<p>An array of 2D points.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -348,7 +552,7 @@ to the path as instances of <a href="LineCurve.html">LineCurve</a>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this path.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="splineThru" translate="no">.<a href="#splineThru">splineThru</a><span class="signature">( pts : <span class="param-type">Array.&lt;Vector2></span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
+					<h3 class="name name-method" id="splineThru" translate="no">.<a href="#splineThru">splineThru</a><span class="signature">( pts : <span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span> )</span><span class="type-signature"> : <a href="Path.html">Path</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds an instance of <a href="SplineCurve.html">SplineCurve</a> to the path by connecting
@@ -357,8 +561,12 @@ the current point with the given list of points.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pts</code></td>
-									<td class="description last"><p>An array of points in 2D space.</p></td>
+									<td class="name">
+										<strong>pts</strong>
+									</td>
+									<td class="description last">
+										<p>An array of points in 2D space.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -368,7 +576,7 @@ the current point with the given list of points.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/core/Path.js" target="_blank" rel="noopener" translate="no">src/extras/core/Path.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/core/Path.js" translate="no" target="_blank" rel="noopener">src/extras/core/Path.js</a>
 				</p>
 			</article>
 		</section>

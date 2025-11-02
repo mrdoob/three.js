@@ -24,7 +24,7 @@ automatically be updated.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="RendererReferenceNode" translate="no">new <a href="#RendererReferenceNode">RendererReferenceNode</a><span class="signature">( property : <span class="param-type">string</span>, inputType : <span class="param-type">string</span>, renderer : <span class="param-type">Renderer</span> )</span> </h3>
+					<h3 class="name name-method" id="RendererReferenceNode" translate="no">new <a href="#RendererReferenceNode">RendererReferenceNode</a><span class="signature">( property : <span class="param-type">string</span>, inputType : <span class="param-type">string</span>, renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new renderer reference node.</p>
@@ -32,17 +32,30 @@ automatically be updated.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>property</code></td>
-									<td class="description last"><p>The name of the property the node refers to.</p></td>
+									<td class="name">
+										<strong>property</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the property the node refers to.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>inputType</code></td>
-									<td class="description last"><p>The uniform type that should be used to represent the property value.</p></td>
+									<td class="name">
+										<strong>inputType</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform type that should be used to represent the property value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer the property belongs to. When no renderer is set,
-the node refers to the renderer of the current state.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer the property belongs to. When no renderer is set,
+the node refers to the renderer of the current state.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -53,11 +66,12 @@ the node refers to the renderer of the current state.<br/>Default is <code>null<
 					<h3 class="name" id="renderer" translate="no">.<a href="#renderer">renderer</a><span class="type-signature"> : <a href="Renderer.html">Renderer</a></span> </h3>
 					<div class="description">
 						<p>The renderer the property belongs to. When no renderer is set,
-the node refers to the renderer of the current state.<br/>Default is <code>null</code>.</p>
+the node refers to the renderer of the current state.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type">NodeFrame | NodeBuilder</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id="updateReference" translate="no">.<a href="#updateReference">updateReference</a><span class="signature">( state : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a> | <a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the reference based on the given state. The state is only evaluated
@@ -66,8 +80,12 @@ the node refers to the renderer of the current state.<br/>Default is <code>null<
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>state</code></td>
-									<td class="description last"><p>The current state.</p></td>
+									<td class="name">
+										<strong>state</strong>
+									</td>
+									<td class="description last">
+										<p>The current state.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -80,7 +98,7 @@ the node refers to the renderer of the current state.<br/>Default is <code>null<
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/RendererReferenceNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/RendererReferenceNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/RendererReferenceNode.js" translate="no" target="_blank" rel="noopener">src/nodes/accessors/RendererReferenceNode.js</a>
 				</p>
 			</article>
 		</section>

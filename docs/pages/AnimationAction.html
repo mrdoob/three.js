@@ -18,7 +18,7 @@ stored in <a href="AnimationClip.html">AnimationClip</a>.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="AnimationAction" translate="no">new <a href="#AnimationAction">AnimationAction</a><span class="signature">( mixer : <span class="param-type">AnimationMixer</span>, clip : <span class="param-type">AnimationClip</span>, localRoot : <span class="param-type">Object3D</span>, blendMode : <span class="param-type">NormalAnimationBlendMode | AdditiveAnimationBlendMode</span> )</span> </h3>
+					<h3 class="name name-method" id="AnimationAction" translate="no">new <a href="#AnimationAction">AnimationAction</a><span class="signature">( mixer : <span class="param-type"><a href="AnimationMixer.html">AnimationMixer</a></span>, clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span>, localRoot : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, blendMode : <span class="param-type"><a href="global.html#NormalAnimationBlendMode">NormalAnimationBlendMode</a> | <a href="global.html#AdditiveAnimationBlendMode">AdditiveAnimationBlendMode</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new animation action.</p>
@@ -26,20 +26,37 @@ stored in <a href="AnimationClip.html">AnimationClip</a>.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mixer</code></td>
-									<td class="description last"><p>The mixer that is controlled by this action.</p></td>
+									<td class="name">
+										<strong>mixer</strong>
+									</td>
+									<td class="description last">
+										<p>The mixer that is controlled by this action.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>clip</code></td>
-									<td class="description last"><p>The animation clip that holds the actual keyframes.</p></td>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>The animation clip that holds the actual keyframes.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>localRoot</code></td>
-									<td class="description last"><p>The root object on which this action is performed.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>localRoot</strong>
+									</td>
+									<td class="description last">
+										<p>The root object on which this action is performed.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>blendMode</code></td>
-									<td class="description last"><p>The blend mode.</p></td>
+									<td class="name">
+										<strong>blendMode</strong>
+									</td>
+									<td class="description last">
+										<p>The blend mode.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -61,7 +78,8 @@ are simultaneously played.</p>
 to <code>false</code> when the last loop of the action has finished, so that this action has
 no further impact.</p>
 <p>Note: This member has no impact if the action is interrupted (it
-has only an effect if its last loop has really finished).<br/>Default is <code>false</code>.</p>
+has only an effect if its last loop has really finished).</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -69,19 +87,22 @@ has only an effect if its last loop has really finished).<br/>Default is <code>f
 					<div class="description">
 						<p>If set to <code>false</code>, the action is disabled so it has no impact.</p>
 <p>When the action is re-enabled, the animation continues from its current
-time (setting <code>enabled</code> to <code>false</code> doesn't reset the action).<br/>Default is <code>true</code>.</p>
+time (setting <code>enabled</code> to <code>false</code> doesn't reset the action).</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="loop" translate="no">.<a href="#loop">loop</a><span class="type-signature"> : <a href="global.html#LoopRepeat">LoopRepeat</a> | <a href="global.html#LoopOnce">LoopOnce</a> | <a href="global.html#LoopPingPong">LoopPingPong</a></span> </h3>
 					<div class="description">
-						<p>The loop mode, set via <a href="AnimationAction.html#setLoop">AnimationAction#setLoop</a>.<br/>Default is <code>LoopRepeat</code>.</p>
+						<p>The loop mode, set via <a href="AnimationAction.html#setLoop">AnimationAction#setLoop</a>.</p>
+						<p>Default is <code>LoopRepeat</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="paused" translate="no">.<a href="#paused">paused</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>If set to <code>true</code>, the playback of the action is paused.<br/>Default is <code>false</code>.</p>
+						<p>If set to <code>true</code>, the playback of the action is paused.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -90,7 +111,8 @@ time (setting <code>enabled</code> to <code>false</code> doesn't reset the actio
 						<p>The number of repetitions of the performed clip over the course of this action.
 Can be set via <a href="AnimationAction.html#setLoop">AnimationAction#setLoop</a>.</p>
 <p>Setting this number has no effect if <a href="AnimationAction.html#loop">AnimationAction#loop</a> is set to
-<code>THREE:LoopOnce</code>.<br/>Default is <code>Infinity</code>.</p>
+<code>THREE:LoopOnce</code>.</p>
+						<p>Default is <code>Infinity</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -98,14 +120,16 @@ Can be set via <a href="AnimationAction.html#setLoop">AnimationAction#setLoop</a
 					<div class="description">
 						<p>The local time of this action (in seconds, starting with <code>0</code>).</p>
 <p>The value gets clamped or wrapped to <code>[0,clip.duration]</code> (according to the
-loop state).<br/>Default is <code>Infinity</code>.</p>
+loop state).</p>
+						<p>Default is <code>Infinity</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="timeScale" translate="no">.<a href="#timeScale">timeScale</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Scaling factor for the <a href="AnimationAction.html#time">AnimationAction#time</a>. A value of <code>0</code> causes the
-animation to pause. Negative values cause the animation to play backwards.<br/>Default is <code>1</code>.</p>
+animation to pause. Negative values cause the animation to play backwards.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -113,23 +137,26 @@ animation to pause. Negative values cause the animation to play backwards.<br/>D
 					<div class="description">
 						<p>The degree of influence of this action (in the interval <code>[0, 1]</code>). Values
 between <code>0</code> (no impact) and <code>1</code> (full impact) can be used to blend between
-several actions.<br/>Default is <code>1</code>.</p>
+several actions.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="zeroSlopeAtEnd" translate="no">.<a href="#zeroSlopeAtEnd">zeroSlopeAtEnd</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Enables smooth interpolation without separate clips for start, loop and end.<br/>Default is <code>true</code>.</p>
+						<p>Enables smooth interpolation without separate clips for start, loop and end.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="zeroSlopeAtStart" translate="no">.<a href="#zeroSlopeAtStart">zeroSlopeAtStart</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Enables smooth interpolation without separate clips for start, loop and end.<br/>Default is <code>true</code>.</p>
+						<p>Enables smooth interpolation without separate clips for start, loop and end.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="crossFadeFrom" translate="no">.<a href="#crossFadeFrom">crossFadeFrom</a><span class="signature">( fadeOutAction : <span class="param-type">AnimationAction</span>, duration : <span class="param-type">number</span>, warp : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<h3 class="name name-method" id="crossFadeFrom" translate="no">.<a href="#crossFadeFrom">crossFadeFrom</a><span class="signature">( fadeOutAction : <span class="param-type"><a href="AnimationAction.html">AnimationAction</a></span>, duration : <span class="param-type">number</span>, warp : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Causes this action to fade in and the given action to fade out,
@@ -138,16 +165,29 @@ within the passed time interval.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>fadeOutAction</code></td>
-									<td class="description last"><p>The animation action to fade out.</p></td>
+									<td class="name">
+										<strong>fadeOutAction</strong>
+									</td>
+									<td class="description last">
+										<p>The animation action to fade out.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration of the fade.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the fade.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>warp</code></td>
-									<td class="description last"><p>Whether warping should be used or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>warp</strong>
+									</td>
+									<td class="description last">
+										<p>Whether warping should be used or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -155,7 +195,7 @@ within the passed time interval.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="crossFadeTo" translate="no">.<a href="#crossFadeTo">crossFadeTo</a><span class="signature">( fadeInAction : <span class="param-type">AnimationAction</span>, duration : <span class="param-type">number</span>, warp : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<h3 class="name name-method" id="crossFadeTo" translate="no">.<a href="#crossFadeTo">crossFadeTo</a><span class="signature">( fadeInAction : <span class="param-type"><a href="AnimationAction.html">AnimationAction</a></span>, duration : <span class="param-type">number</span>, warp : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Causes this action to fade out and the given action to fade in,
@@ -164,16 +204,29 @@ within the passed time interval.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>fadeInAction</code></td>
-									<td class="description last"><p>The animation action to fade in.</p></td>
+									<td class="name">
+										<strong>fadeInAction</strong>
+									</td>
+									<td class="description last">
+										<p>The animation action to fade in.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration of the fade.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the fade.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>warp</code></td>
-									<td class="description last"><p>Whether warping should be used or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>warp</strong>
+									</td>
+									<td class="description last">
+										<p>Whether warping should be used or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -190,8 +243,12 @@ within the passed time interval.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration of the fade.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the fade.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -208,8 +265,12 @@ within the passed time interval.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration of the fade.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration of the fade.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -270,8 +331,12 @@ within the passed time interval.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -323,8 +388,12 @@ within the passed time interval.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration to set.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -342,8 +411,12 @@ action is paused.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>timeScale</code></td>
-									<td class="description last"><p>The time scale to set.</p></td>
+									<td class="name">
+										<strong>timeScale</strong>
+									</td>
+									<td class="description last">
+										<p>The time scale to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -361,8 +434,12 @@ action is disabled.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>weight</code></td>
-									<td class="description last"><p>The weight to set.</p></td>
+									<td class="name">
+										<strong>weight</strong>
+									</td>
+									<td class="description last">
+										<p>The weight to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -370,7 +447,7 @@ action is disabled.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setLoop" translate="no">.<a href="#setLoop">setLoop</a><span class="signature">( mode : <span class="param-type">LoopRepeat | LoopOnce | LoopPingPong</span>, repetitions : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<h3 class="name name-method" id="setLoop" translate="no">.<a href="#setLoop">setLoop</a><span class="signature">( mode : <span class="param-type"><a href="global.html#LoopRepeat">LoopRepeat</a> | <a href="global.html#LoopOnce">LoopOnce</a> | <a href="global.html#LoopPingPong">LoopPingPong</a></span>, repetitions : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Configures the loop settings for this action.</p>
@@ -378,12 +455,20 @@ action is disabled.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mode</code></td>
-									<td class="description last"><p>The loop mode.</p></td>
+									<td class="name">
+										<strong>mode</strong>
+									</td>
+									<td class="description last">
+										<p>The loop mode.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>repetitions</code></td>
-									<td class="description last"><p>The number of repetitions.</p></td>
+									<td class="name">
+										<strong>repetitions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of repetitions.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -399,8 +484,12 @@ action is disabled.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>time</code></td>
-									<td class="description last"><p>The start time in seconds.</p></td>
+									<td class="name">
+										<strong>time</strong>
+									</td>
+									<td class="description last">
+										<p>The start time in seconds.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -435,7 +524,7 @@ action is disabled.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation action.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="syncWith" translate="no">.<a href="#syncWith">syncWith</a><span class="signature">( action : <span class="param-type">AnimationAction</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<h3 class="name name-method" id="syncWith" translate="no">.<a href="#syncWith">syncWith</a><span class="signature">( action : <span class="param-type"><a href="AnimationAction.html">AnimationAction</a></span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Synchronizes this action with the passed other action.</p>
@@ -443,8 +532,12 @@ action is disabled.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>action</code></td>
-									<td class="description last"><p>The action to sync with.</p></td>
+									<td class="name">
+										<strong>action</strong>
+									</td>
+									<td class="description last">
+										<p>The action to sync with.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -462,16 +555,28 @@ action is disabled.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>startTimeScale</code></td>
-									<td class="description last"><p>The start time scale.</p></td>
+									<td class="name">
+										<strong>startTimeScale</strong>
+									</td>
+									<td class="description last">
+										<p>The start time scale.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>endTimeScale</code></td>
-									<td class="description last"><p>The end time scale.</p></td>
+									<td class="name">
+										<strong>endTimeScale</strong>
+									</td>
+									<td class="description last">
+										<p>The end time scale.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>duration</code></td>
-									<td class="description last"><p>The duration.</p></td>
+									<td class="name">
+										<strong>duration</strong>
+									</td>
+									<td class="description last">
+										<p>The duration.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -481,7 +586,7 @@ action is disabled.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/AnimationAction.js" target="_blank" rel="noopener" translate="no">src/animation/AnimationAction.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/AnimationAction.js" translate="no" target="_blank" rel="noopener">src/animation/AnimationAction.js</a>
 				</p>
 			</article>
 		</section>

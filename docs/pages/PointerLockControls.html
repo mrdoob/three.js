@@ -13,7 +13,7 @@
 	<h1 translate="no">PointerLockControls</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>The implementation of this class is based on the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API">Pointer Lock API</a>.
+				<div class="class-description"><p>The implementation of this class is based on the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API" target="_blank" rel="noopener">Pointer Lock API</a>.
 <code>PointerLockControls</code> is a perfect choice for first person 3D games.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const controls = new PointerLockControls( camera, document.body );
@@ -28,11 +28,11 @@ controls.addEventListener( 'unlock', function () {
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">PointerLockControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">PointerLockControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PointerLockControls" translate="no">new <a href="#PointerLockControls">PointerLockControls</a><span class="signature">( camera : <span class="param-type">Camera</span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<h3 class="name name-method" id="PointerLockControls" translate="no">new <a href="#PointerLockControls">PointerLockControls</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, domElement : <span class="param-type">HTMLElement</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new controls instance.</p>
@@ -40,12 +40,21 @@ controls.addEventListener( 'unlock', function () {
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera that is managed by the controls.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera that is managed by the controls.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>domElement</code></td>
-									<td class="description last"><p>The HTML element used for event listeners.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>domElement</strong>
+									</td>
+									<td class="description last">
+										<p>The HTML element used for event listeners.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -55,29 +64,33 @@ controls.addEventListener( 'unlock', function () {
 				<div class="member">
 					<h3 class="name" id="isLocked" translate="no">.<a href="#isLocked">isLocked</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>Whether the controls are locked or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether the controls are locked or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="maxPolarAngle" translate="no">.<a href="#maxPolarAngle">maxPolarAngle</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Camera pitch, upper limit. Range is '[0, Math.PI]' in radians.<br/>Default is <code>Math.PI</code>.</p>
+						<p>Camera pitch, upper limit. Range is '[0, Math.PI]' in radians.</p>
+						<p>Default is <code>Math.PI</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="minPolarAngle" translate="no">.<a href="#minPolarAngle">minPolarAngle</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Camera pitch, lower limit. Range is '[0, Math.PI]' in radians.<br/>Default is <code>0</code>.</p>
+						<p>Camera pitch, lower limit. Range is '[0, Math.PI]' in radians.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="pointerSpeed" translate="no">.<a href="#pointerSpeed">pointerSpeed</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Multiplier for how much the pointer movement influences the camera rotation.<br/>Default is <code>1</code>.</p>
+						<p>Multiplier for how much the pointer movement influences the camera rotation.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getDirection" translate="no">.<a href="#getDirection">getDirection</a><span class="signature">( v : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getDirection" translate="no">.<a href="#getDirection">getDirection</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the look direction of the camera.</p>
@@ -85,8 +98,12 @@ controls.addEventListener( 'unlock', function () {
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>v</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -102,9 +119,14 @@ controls.addEventListener( 'unlock', function () {
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>unadjustedMovement</code></td>
-									<td class="description last"><p>Disables OS-level adjustment for mouse acceleration, and accesses raw mouse input instead.
-Setting it to true will disable mouse acceleration.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>unadjustedMovement</strong>
+									</td>
+									<td class="description last">
+										<p>Disables OS-level adjustment for mouse acceleration, and accesses raw mouse input instead.
+Setting it to true will disable mouse acceleration.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -117,8 +139,12 @@ Setting it to true will disable mouse acceleration.<br/>Default is <code>false</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>The signed distance.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The signed distance.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -131,8 +157,12 @@ Setting it to true will disable mouse acceleration.<br/>Default is <code>false</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>The signed distance.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The signed distance.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -182,7 +212,7 @@ Setting it to true will disable mouse acceleration.<br/>Default is <code>false</
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js" target="_blank" rel="noopener" translate="no">examples/jsm/controls/PointerLockControls.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js" translate="no" target="_blank" rel="noopener">examples/jsm/controls/PointerLockControls.js</a>
 				</p>
 			</article>
 		</section>

@@ -23,11 +23,11 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">EXRLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">EXRLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="EXRLoader" translate="no">new <a href="#EXRLoader">EXRLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="EXRLoader" translate="no">new <a href="#EXRLoader">EXRLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new EXR loader.</p>
@@ -35,8 +35,12 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -46,13 +50,15 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 				<div class="member">
 					<h3 class="name" id="outputFormat" translate="no">.<a href="#outputFormat">outputFormat</a><span class="type-signature"> : <a href="global.html#RGBAFormat">RGBAFormat</a> | <a href="global.html#RGFormat">RGFormat</a> | <a href="global.html#RedFormat">RedFormat</a></span> </h3>
 					<div class="description">
-						<p>Texture output format.<br/>Default is <code>RGBAFormat</code>.</p>
+						<p>Texture output format.</p>
+						<p>Default is <code>RGBAFormat</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="type" translate="no">.<a href="#type">type</a><span class="type-signature"> : <a href="global.html#HalfFloatType">HalfFloatType</a> | <a href="global.html#FloatType">FloatType</a></span> </h3>
 					<div class="description">
-						<p>The texture type.<br/>Default is <code>HalfFloatType</code>.</p>
+						<p>The texture type.</p>
+						<p>Default is <code>HalfFloatType</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -64,8 +70,12 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>buffer</code></td>
-									<td class="description last"><p>The raw texture data.</p></td>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw texture data.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -76,7 +86,7 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 							<dt class="tag-returns"><strong>Returns:</strong> An object representing the parsed texture data.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setDataType" translate="no">.<a href="#setDataType">setDataType</a><span class="signature">( value : <span class="param-type">HalfFloatType | FloatType</span> )</span><span class="type-signature"> : <a href="EXRLoader.html">EXRLoader</a></span> </h3>
+					<h3 class="name name-method" id="setDataType" translate="no">.<a href="#setDataType">setDataType</a><span class="signature">( value : <span class="param-type"><a href="global.html#HalfFloatType">HalfFloatType</a> | <a href="global.html#FloatType">FloatType</a></span> )</span><span class="type-signature"> : <a href="EXRLoader.html">EXRLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the texture type.</p>
@@ -84,8 +94,12 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The texture type to set.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The texture type to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -93,7 +107,7 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setOutputFormat" translate="no">.<a href="#setOutputFormat">setOutputFormat</a><span class="signature">( value : <span class="param-type">RGBAFormat | RGFormat | RedFormat</span> )</span><span class="type-signature"> : <a href="EXRLoader.html">EXRLoader</a></span> </h3>
+					<h3 class="name name-method" id="setOutputFormat" translate="no">.<a href="#setOutputFormat">setOutputFormat</a><span class="signature">( value : <span class="param-type"><a href="global.html#RGBAFormat">RGBAFormat</a> | <a href="global.html#RGFormat">RGFormat</a> | <a href="global.html#RedFormat">RedFormat</a></span> )</span><span class="type-signature"> : <a href="EXRLoader.html">EXRLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets texture output format. Defaults to <code>RGBAFormat</code>.</p>
@@ -101,8 +115,12 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>Texture output format.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>Texture output format.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -112,7 +130,7 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/EXRLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/EXRLoader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/EXRLoader.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/EXRLoader.js</a>
 				</p>
 			</article>
 		</section>

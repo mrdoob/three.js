@@ -22,7 +22,7 @@ for render objects.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="GLSLNodeBuilder" translate="no">new <a href="#GLSLNodeBuilder">GLSLNodeBuilder</a><span class="signature">( object : <span class="param-type">Object3D</span>, renderer : <span class="param-type">Renderer</span> )</span> </h3>
+					<h3 class="name name-method" id="GLSLNodeBuilder" translate="no">new <a href="#GLSLNodeBuilder">GLSLNodeBuilder</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new GLSL node builder renderer.</p>
@@ -30,12 +30,20 @@ for render objects.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -86,8 +94,12 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shaderNode</code></td>
-									<td class="description last"><p>The shader node.</p></td>
+									<td class="name">
+										<strong>shaderNode</strong>
+									</td>
+									<td class="description last">
+										<p>The shader node.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -106,16 +118,29 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The extension name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The extension name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>behavior</code></td>
-									<td class="description last"><p>The extension behavior.</p></td>
+									<td class="name">
+										<strong>behavior</strong>
+									</td>
+									<td class="description last">
+										<p>The extension behavior.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.<br/>Default is <code>this.shaderStage</code>.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -128,8 +153,12 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>planeCount</code></td>
-									<td class="description last"><p>The clipping plane count.</p></td>
+									<td class="name">
+										<strong>planeCount</strong>
+									</td>
+									<td class="description last">
+										<p>The clipping plane count.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -140,7 +169,7 @@ another dictionary which manages UBOs per group ('render','frame','object').</p>
 							<p>Enables multiview.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="generatePBO" translate="no">.<a href="#generatePBO">generatePBO</a><span class="signature">( storageArrayElementNode : <span class="param-type">StorageArrayElementNode</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generatePBO" translate="no">.<a href="#generatePBO">generatePBO</a><span class="signature">( storageArrayElementNode : <span class="param-type"><a href="StorageArrayElementNode.html">StorageArrayElementNode</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the Pixel Buffer Object (PBO) for the given storage
@@ -149,8 +178,12 @@ buffer node.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>storageArrayElementNode</code></td>
-									<td class="description last"><p>The storage array element node.</p></td>
+									<td class="name">
+										<strong>storageArrayElementNode</strong>
+									</td>
+									<td class="description last">
+										<p>The storage array element node.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -158,7 +191,7 @@ buffer node.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The property name.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTexture" translate="no">.<a href="#generateTexture">generateTexture</a><span class="signature">( texture : <span class="param-type">Texture</span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTexture" translate="no">.<a href="#generateTexture">generateTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet for sampling/loading the given texture.</p>
@@ -166,24 +199,44 @@ buffer node.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textureProperty</code></td>
-									<td class="description last"><p>The name of the texture uniform in the shader.</p></td>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents texture coordinates used for sampling.</p></td>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>depthSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the 0-based texture array index to sample.</p></td>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the 0-based texture array index to sample.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offsetSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p></td>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -194,7 +247,7 @@ buffer node.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureBias" translate="no">.<a href="#generateTextureBias">generateTextureBias</a><span class="signature">( texture : <span class="param-type">Texture</span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, biasSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureBias" translate="no">.<a href="#generateTextureBias">generateTextureBias</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, biasSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet when sampling textures with a bias to the mip level.</p>
@@ -202,24 +255,44 @@ buffer node.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textureProperty</code></td>
-									<td class="description last"><p>The name of the texture uniform in the shader.</p></td>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents texture coordinates used for sampling.</p></td>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>biasSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the bias to apply to the mip level before sampling.</p></td>
+									<td class="name">
+										<strong>biasSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the bias to apply to the mip level before sampling.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offsetSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p></td>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -227,7 +300,7 @@ buffer node.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureCompare" translate="no">.<a href="#generateTextureCompare">generateTextureCompare</a><span class="signature">( texture : <span class="param-type">Texture</span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, compareSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureCompare" translate="no">.<a href="#generateTextureCompare">generateTextureCompare</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, compareSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet for sampling a depth texture and comparing the sampled depth values
@@ -236,32 +309,61 @@ against a reference value.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textureProperty</code></td>
-									<td class="description last"><p>The name of the texture uniform in the shader.</p></td>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents texture coordinates used for sampling.</p></td>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>compareSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the reference value.</p></td>
+									<td class="name">
+										<strong>compareSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the reference value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>depthSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents 0-based texture array index to sample.</p></td>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents 0-based texture array index to sample.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offsetSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p></td>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage this code snippet is generated for.<br/>Default is <code>this.shaderStage</code>.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -269,7 +371,7 @@ against a reference value.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureGrad" translate="no">.<a href="#generateTextureGrad">generateTextureGrad</a><span class="signature">( texture : <span class="param-type">Texture</span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, gradSnippet : <span class="param-type">Array.&lt;string></span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureGrad" translate="no">.<a href="#generateTextureGrad">generateTextureGrad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, gradSnippet : <span class="param-type">Array.&lt;string></span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet for sampling/loading the given texture using explicit gradients.</p>
@@ -277,24 +379,44 @@ against a reference value.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textureProperty</code></td>
-									<td class="description last"><p>The name of the texture uniform in the shader.</p></td>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents texture coordinates used for sampling.</p></td>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>gradSnippet</code></td>
-									<td class="description last"><p>An array holding both gradient GLSL snippets.</p></td>
+									<td class="name">
+										<strong>gradSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>An array holding both gradient GLSL snippets.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offsetSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p></td>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -302,7 +424,7 @@ against a reference value.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureLevel" translate="no">.<a href="#generateTextureLevel">generateTextureLevel</a><span class="signature">( texture : <span class="param-type">Texture</span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureLevel" translate="no">.<a href="#generateTextureLevel">generateTextureLevel</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet when sampling textures with explicit mip level.</p>
@@ -310,24 +432,44 @@ against a reference value.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textureProperty</code></td>
-									<td class="description last"><p>The name of the texture uniform in the shader.</p></td>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents texture coordinates used for sampling.</p></td>
+									<td class="name">
+										<strong>uvSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>levelSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p></td>
+									<td class="name">
+										<strong>levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offsetSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p></td>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -335,7 +477,7 @@ against a reference value.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateTextureLoad" translate="no">.<a href="#generateTextureLoad">generateTextureLoad</a><span class="signature">( texture : <span class="param-type">Texture</span>, textureProperty : <span class="param-type">string</span>, uvIndexSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generateTextureLoad" translate="no">.<a href="#generateTextureLoad">generateTextureLoad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvIndexSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the GLSL snippet that reads a single texel from a texture without sampling or filtering.</p>
@@ -343,28 +485,52 @@ against a reference value.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The texture.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textureProperty</code></td>
-									<td class="description last"><p>The name of the texture uniform in the shader.</p></td>
+									<td class="name">
+										<strong>textureProperty</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform in the shader.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvIndexSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents texture coordinates used for sampling.</p></td>
+									<td class="name">
+										<strong>uvIndexSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents texture coordinates used for sampling.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>levelSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p></td>
+									<td class="name">
+										<strong>levelSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the mip level, with level 0 containing a full size version of the texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>depthSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the 0-based texture array index to sample.</p></td>
+									<td class="name">
+										<strong>depthSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the 0-based texture array index to sample.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offsetSnippet</code></td>
-									<td class="description last"><p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p></td>
+									<td class="name">
+										<strong>offsetSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -380,8 +546,12 @@ against a reference value.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -400,12 +570,20 @@ against a reference value.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The output type to bitcast to.</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The output type to bitcast to.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>inputType</code></td>
-									<td class="description last"><p>The input type of the.</p></td>
+									<td class="name">
+										<strong>inputType</strong>
+									</td>
+									<td class="description last">
+										<p>The input type of the.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -442,8 +620,12 @@ against a reference value.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -520,8 +702,12 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>method</code></td>
-									<td class="description last"><p>The method name to resolve.</p></td>
+									<td class="name">
+										<strong>method</strong>
+									</td>
+									<td class="description last">
+										<p>The method name to resolve.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -540,11 +726,8 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getOutputStructName">NodeBuilder#getOutputStructName</a></dt>
 						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
-						</dl>
 					</div>
-					<h3 class="name name-method" id="getPropertyName" translate="no">.<a href="#getPropertyName">getPropertyName</a><span class="signature">( node : <span class="param-type">Node</span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getPropertyName" translate="no">.<a href="#getPropertyName">getPropertyName</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a GLSL snippet that represents the property name of the given node.</p>
@@ -552,12 +735,21 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>node</code></td>
-									<td class="description last"><p>The node.</p></td>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage this code snippet is generated for.<br/>Default is <code>this.shaderStage</code>.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage this code snippet is generated for.</p>
+										<p>Default is <code>this.shaderStage</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -568,7 +760,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 							<dt class="tag-returns"><strong>Returns:</strong> The property name.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getStructMembers" translate="no">.<a href="#getStructMembers">getStructMembers</a><span class="signature">( struct : <span class="param-type">StructTypeNode</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getStructMembers" translate="no">.<a href="#getStructMembers">getStructMembers</a><span class="signature">( struct : <span class="param-type"><a href="StructTypeNode.html">StructTypeNode</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the members of the given struct type node as a GLSL string.</p>
@@ -576,8 +768,12 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>struct</code></td>
-									<td class="description last"><p>The struct type node.</p></td>
+									<td class="name">
+										<strong>struct</strong>
+									</td>
+									<td class="description last">
+										<p>The struct type node.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -593,8 +789,12 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -622,16 +822,28 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>condSnippet</code></td>
-									<td class="description last"><p>The condition determining which expression gets resolved.</p></td>
+									<td class="name">
+										<strong>condSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The condition determining which expression gets resolved.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>ifSnippet</code></td>
-									<td class="description last"><p>The expression to resolve to if the condition is true.</p></td>
+									<td class="name">
+										<strong>ifSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The expression to resolve to if the condition is true.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>elseSnippet</code></td>
-									<td class="description last"><p>The expression to resolve to if the condition is false.</p></td>
+									<td class="name">
+										<strong>elseSnippet</strong>
+									</td>
+									<td class="description last">
+										<p>The expression to resolve to if the condition is false.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -650,8 +862,12 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -659,7 +875,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 							<dt class="tag-returns"><strong>Returns:</strong> The GLSL snippet that defines the transforms.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getTypeFromAttribute" translate="no">.<a href="#getTypeFromAttribute">getTypeFromAttribute</a><span class="signature">( attribute : <span class="param-type">BufferAttribute</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getTypeFromAttribute" translate="no">.<a href="#getTypeFromAttribute">getTypeFromAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the type for a given buffer attribute.</p>
@@ -667,8 +883,12 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>attribute</code></td>
-									<td class="description last"><p>The buffer attribute.</p></td>
+									<td class="name">
+										<strong>attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -679,7 +899,7 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 							<dt class="tag-returns"><strong>Returns:</strong> The type.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getUniformFromNode" translate="no">.<a href="#getUniformFromNode">getUniformFromNode</a><span class="signature">( node : <span class="param-type">UniformNode</span>, type : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="NodeUniform.html">NodeUniform</a></span> </h3>
+					<h3 class="name name-method" id="getUniformFromNode" translate="no">.<a href="#getUniformFromNode">getUniformFromNode</a><span class="signature">( node : <span class="param-type"><a href="UniformNode.html">UniformNode</a></span>, type : <span class="param-type">string</span>, shaderStage : <span class="param-type">string</span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="NodeUniform.html">NodeUniform</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is one of the more important ones since it's responsible
@@ -690,20 +910,37 @@ and layouts.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>node</code></td>
-									<td class="description last"><p>The uniform node.</p></td>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform node.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The node data type.</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The node data type.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>An optional uniform name.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>An optional uniform name.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -722,8 +959,12 @@ and layouts.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -742,8 +983,12 @@ and layouts.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -762,8 +1007,12 @@ and layouts.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shaderStage</code></td>
-									<td class="description last"><p>The shader stage.</p></td>
+									<td class="name">
+										<strong>shaderStage</strong>
+									</td>
+									<td class="description last">
+										<p>The shader stage.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -794,8 +1043,12 @@ and layouts.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The requested feature.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The requested feature.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -818,7 +1071,7 @@ and layouts.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Returns always <code>true</code> in context of GLSL.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="needsToWorkingColorSpace" translate="no">.<a href="#needsToWorkingColorSpace">needsToWorkingColorSpace</a><span class="signature">( texture : <span class="param-type">Texture</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="needsToWorkingColorSpace" translate="no">.<a href="#needsToWorkingColorSpace">needsToWorkingColorSpace</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Checks if the given texture requires a manual conversion to the working color space.</p>
@@ -826,8 +1079,12 @@ and layouts.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>texture</code></td>
-									<td class="description last"><p>The texture to check.</p></td>
+									<td class="name">
+										<strong>texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture to check.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -838,7 +1095,7 @@ and layouts.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the given texture requires a conversion to working color space or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="registerTransform" translate="no">.<a href="#registerTransform">registerTransform</a><span class="signature">( varyingName : <span class="param-type">string</span>, attributeNode : <span class="param-type">AttributeNode</span> )</span> </h3>
+					<h3 class="name name-method" id="registerTransform" translate="no">.<a href="#registerTransform">registerTransform</a><span class="signature">( varyingName : <span class="param-type">string</span>, attributeNode : <span class="param-type"><a href="AttributeNode.html">AttributeNode</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Registers a transform in context of Transform Feedback.</p>
@@ -846,17 +1103,25 @@ and layouts.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>varyingName</code></td>
-									<td class="description last"><p>The varying name.</p></td>
+									<td class="name">
+										<strong>varyingName</strong>
+									</td>
+									<td class="description last">
+										<p>The varying name.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>attributeNode</code></td>
-									<td class="description last"><p>The attribute node.</p></td>
+									<td class="name">
+										<strong>attributeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute node.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setupPBO" translate="no">.<a href="#setupPBO">setupPBO</a><span class="signature">( storageBufferNode : <span class="param-type">StorageBufferNode</span> )</span> </h3>
+					<h3 class="name name-method" id="setupPBO" translate="no">.<a href="#setupPBO">setupPBO</a><span class="signature">( storageBufferNode : <span class="param-type"><a href="StorageBufferNode.html">StorageBufferNode</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the Pixel Buffer Object (PBO) for the given storage
@@ -865,15 +1130,19 @@ buffer node.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>storageBufferNode</code></td>
-									<td class="description last"><p>The storage buffer node.</p></td>
+									<td class="name">
+										<strong>storageBufferNode</strong>
+									</td>
+									<td class="description last">
+										<p>The storage buffer node.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/webgl-fallback/nodes/GLSLNodeBuilder.js" target="_blank" rel="noopener" translate="no">src/renderers/webgl-fallback/nodes/GLSLNodeBuilder.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/webgl-fallback/nodes/GLSLNodeBuilder.js" translate="no" target="_blank" rel="noopener">src/renderers/webgl-fallback/nodes/GLSLNodeBuilder.js</a>
 				</p>
 			</article>
 		</section>

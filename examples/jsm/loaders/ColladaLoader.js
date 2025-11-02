@@ -45,7 +45,7 @@ import { TGALoader } from '../loaders/TGALoader.js';
  * A loader for the Collada format.
  *
  * The Collada format is very complex so this loader only supports a subset of what
- * is defined in the [official specification]{@link https://www.khronos.org/files/collada_spec_1_5.pdf}.
+ * is defined in the [official specification](https://www.khronos.org/files/collada_spec_1_5.pdf).
  *
  * Assets with a Z-UP coordinate system are transformed it into Y-UP by a simple rotation.
  * The vertex data are not converted.

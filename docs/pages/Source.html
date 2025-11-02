@@ -19,7 +19,7 @@ definition so the same data can be used with multiple texture instances.</p></di
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Source" translate="no">new <a href="#Source">Source</a><span class="signature">( data : <span class="param-type">any</span> )</span> </h3>
+					<h3 class="name name-method" id="Source" translate="no">new <a href="#Source">Source</a><span class="signature">( data : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new video texture.</p>
@@ -27,8 +27,13 @@ definition so the same data can be used with multiple texture instances.</p></di
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>The data definition of a texture.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The data definition of a texture.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -47,7 +52,8 @@ definition so the same data can be used with multiple texture instances.</p></di
 						<p>This property is only relevant when <a href="Source.html#needsUpdate">Source#needsUpdate</a> is set to <code>true</code> and
 provides more control on how texture data should be processed. When <code>dataReady</code> is set
 to <code>false</code>, the engine performs the memory allocation (if necessary) but does not transfer
-the data into the GPU memory.<br/>Default is <code>true</code>.</p>
+the data into the GPU memory.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -59,7 +65,8 @@ the data into the GPU memory.<br/>Default is <code>true</code>.</p>
 				<div class="member">
 					<h3 class="name" id="isSource" translate="no">.<a href="#isSource">isSource</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -67,7 +74,8 @@ the data into the GPU memory.<br/>Default is <code>true</code>.</p>
 					<div class="description">
 						<p>When the property is set to <code>true</code>, the engine allocates the memory
 for the texture (if necessary) and triggers the actual texture upload
-to the GPU next time the source is used.<br/>Default is <code>false</code>.</p>
+to the GPU next time the source is used.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -79,11 +87,12 @@ to the GPU next time the source is used.<br/>Default is <code>false</code>.</p>
 				<div class="member">
 					<h3 class="name" id="version" translate="no">.<a href="#version">version</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This starts at <code>0</code> and counts how many times <a href="Source.html#needsUpdate">Source#needsUpdate</a> is set to <code>true</code>.<br/>Default is <code>0</code>.</p>
+						<p>This starts at <code>0</code> and counts how many times <a href="Source.html#needsUpdate">Source#needsUpdate</a> is set to <code>true</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getSize" translate="no">.<a href="#getSize">getSize</a><span class="signature">( target : <span class="param-type">Vector2 | Vector3</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getSize" translate="no">.<a href="#getSize">getSize</a><span class="signature">( target : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the dimensions of the source into the given target vector.</p>
@@ -91,8 +100,12 @@ to the GPU next time the source is used.<br/>Default is <code>false</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target object the result is written into.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target object the result is written into.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -108,8 +121,12 @@ to the GPU next time the source is used.<br/>Default is <code>false</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>meta</code></td>
-									<td class="description last"><p>An optional value holding meta information about the serialization.</p></td>
+									<td class="name">
+										<strong>meta</strong>
+									</td>
+									<td class="description last">
+										<p>An optional value holding meta information about the serialization.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -127,7 +144,7 @@ to the GPU next time the source is used.<br/>Default is <code>false</code>.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/textures/Source.js" target="_blank" rel="noopener" translate="no">src/textures/Source.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/textures/Source.js" translate="no" target="_blank" rel="noopener">src/textures/Source.js</a>
 				</p>
 			</article>
 		</section>

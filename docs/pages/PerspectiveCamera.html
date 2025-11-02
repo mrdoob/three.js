@@ -13,7 +13,7 @@
 	<h1 translate="no">PerspectiveCamera</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>Camera that uses <a href="https://en.wikipedia.org/wiki/Perspective_(graphical)">perspective projection</a>.</p>
+				<div class="class-description"><p>Camera that uses <a href="https://en.wikipedia.org/wiki/Perspective_(graphical)" target="_blank" rel="noopener">perspective projection</a>.</p>
 <p>This projection mode is designed to mimic the way the human eye sees. It
 is the most common projection mode used for rendering a 3D scene.</p></div>
 				<h2>Code Example</h2>
@@ -32,20 +32,40 @@ scene.add( camera );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>fov</code></td>
-									<td class="description last"><p>The vertical field of view.<br/>Default is <code>50</code>.</p></td>
+									<td class="name">
+										<strong>fov</strong>
+									</td>
+									<td class="description last">
+										<p>The vertical field of view.</p>
+										<p>Default is <code>50</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aspect</code></td>
-									<td class="description last"><p>The aspect ratio.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>aspect</strong>
+									</td>
+									<td class="description last">
+										<p>The aspect ratio.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>near</code></td>
-									<td class="description last"><p>The camera's near plane.<br/>Default is <code>0.1</code>.</p></td>
+									<td class="name">
+										<strong>near</strong>
+									</td>
+									<td class="description last">
+										<p>The camera's near plane.</p>
+										<p>Default is <code>0.1</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>far</code></td>
-									<td class="description last"><p>The camera's far plane.<br/>Default is <code>2000</code>.</p></td>
+									<td class="name">
+										<strong>far</strong>
+									</td>
+									<td class="description last">
+										<p>The camera's far plane.</p>
+										<p>Default is <code>2000</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -55,14 +75,16 @@ scene.add( camera );
 				<div class="member">
 					<h3 class="name" id="aspect" translate="no">.<a href="#aspect">aspect</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The aspect ratio, usually the canvas width / canvas height.<br/>Default is <code>1</code>.</p>
+						<p>The aspect ratio, usually the canvas width / canvas height.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="far" translate="no">.<a href="#far">far</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The camera's far plane. Must be greater than the
-current value of <a href="PerspectiveCamera.html#near">PerspectiveCamera#near</a>.<br/>Default is <code>2000</code>.</p>
+current value of <a href="PerspectiveCamera.html#near">PerspectiveCamera#near</a>.</p>
+						<p>Default is <code>2000</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -70,13 +92,15 @@ current value of <a href="PerspectiveCamera.html#near">PerspectiveCamera#near</a
 					<div class="description">
 						<p>Film size used for the larger axis. Default is <code>35</code> (millimeters). This
 parameter does not influence the projection matrix unless <a href="PerspectiveCamera.html#filmOffset">PerspectiveCamera#filmOffset</a>
-is set to a nonzero value.<br/>Default is <code>35</code>.</p>
+is set to a nonzero value.</p>
+						<p>Default is <code>35</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="filmOffset" translate="no">.<a href="#filmOffset">filmOffset</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Horizontal off-center offset in the same unit as <a href="PerspectiveCamera.html#filmGauge">PerspectiveCamera#filmGauge</a>.<br/>Default is <code>0</code>.</p>
+						<p>Horizontal off-center offset in the same unit as <a href="PerspectiveCamera.html#filmGauge">PerspectiveCamera#filmGauge</a>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -84,20 +108,23 @@ is set to a nonzero value.<br/>Default is <code>35</code>.</p>
 					<div class="description">
 						<p>Object distance used for stereoscopy and depth-of-field effects. This
 parameter does not influence the projection matrix unless a
-<a href="StereoCamera.html">StereoCamera</a> is being used.<br/>Default is <code>10</code>.</p>
+<a href="StereoCamera.html">StereoCamera</a> is being used.</p>
+						<p>Default is <code>10</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="fov" translate="no">.<a href="#fov">fov</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The vertical field of view, from bottom to top of view,
-in degrees.<br/>Default is <code>50</code>.</p>
+in degrees.</p>
+						<p>Default is <code>50</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isPerspectiveCamera" translate="no">.<a href="#isPerspectiveCamera">isPerspectiveCamera</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -106,20 +133,23 @@ in degrees.<br/>Default is <code>50</code>.</p>
 						<p>The camera's near plane. The valid range is greater than <code>0</code>
 and less than the current value of <a href="PerspectiveCamera.html#far">PerspectiveCamera#far</a>.</p>
 <p>Note that, unlike for the <a href="OrthographicCamera.html">OrthographicCamera</a>, <code>0</code> is <em>not</em> a
-valid value for a perspective camera's near plane.<br/>Default is <code>0.1</code>.</p>
+valid value for a perspective camera's near plane.</p>
+						<p>Default is <code>0.1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="view" translate="no">.<a href="#view">view</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>Represents the frustum window specification. This property should not be edited
-directly but via <a href="PerspectiveCamera.html#setViewOffset">PerspectiveCamera#setViewOffset</a> and <a href="PerspectiveCamera.html#clearViewOffset">PerspectiveCamera#clearViewOffset</a>.<br/>Default is <code>null</code>.</p>
+directly but via <a href="PerspectiveCamera.html#setViewOffset">PerspectiveCamera#setViewOffset</a> and <a href="PerspectiveCamera.html#clearViewOffset">PerspectiveCamera#clearViewOffset</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="zoom" translate="no">.<a href="#zoom">zoom</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The zoom factor of the camera.<br/>Default is <code>1</code>.</p>
+						<p>The zoom factor of the camera.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -168,7 +198,7 @@ equal to one (landscape format), the result equals <a href="PerspectiveCamera.ht
 							<dt class="tag-returns"><strong>Returns:</strong> The computed focal length.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getViewBounds" translate="no">.<a href="#getViewBounds">getViewBounds</a><span class="signature">( distance : <span class="param-type">number</span>, minTarget : <span class="param-type">Vector2</span>, maxTarget : <span class="param-type">Vector2</span> )</span> </h3>
+					<h3 class="name name-method" id="getViewBounds" translate="no">.<a href="#getViewBounds">getViewBounds</a><span class="signature">( distance : <span class="param-type">number</span>, minTarget : <span class="param-type"><a href="Vector2.html">Vector2</a></span>, maxTarget : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
@@ -177,21 +207,33 @@ Sets <code>minTarget</code> and <code>maxTarget</code> to the coordinates of the
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>The viewing distance.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The viewing distance.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>minTarget</code></td>
-									<td class="description last"><p>The lower-left corner of the view rectangle is written into this vector.</p></td>
+									<td class="name">
+										<strong>minTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The lower-left corner of the view rectangle is written into this vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maxTarget</code></td>
-									<td class="description last"><p>The upper-right corner of the view rectangle is written into this vector.</p></td>
+									<td class="name">
+										<strong>maxTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The upper-right corner of the view rectangle is written into this vector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="getViewSize" translate="no">.<a href="#getViewSize">getViewSize</a><span class="signature">( distance : <span class="param-type">number</span>, target : <span class="param-type">Vector2</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
+					<h3 class="name name-method" id="getViewSize" translate="no">.<a href="#getViewSize">getViewSize</a><span class="signature">( distance : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector2.html">Vector2</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.</p>
@@ -199,12 +241,20 @@ Sets <code>minTarget</code> and <code>maxTarget</code> to the coordinates of the
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>The viewing distance.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The viewing distance.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store result where x is width and y is height.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store result where x is width and y is height.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -222,8 +272,12 @@ a 35mm (full frame) camera.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>focalLength</code></td>
-									<td class="description last"><p>Values for focal length and film gauge must have the same unit.</p></td>
+									<td class="name">
+										<strong>focalLength</strong>
+									</td>
+									<td class="description last">
+										<p>Values for focal length and film gauge must have the same unit.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -264,28 +318,52 @@ camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>fullWidth</code></td>
-									<td class="description last"><p>The full width of multiview setup.</p></td>
+									<td class="name">
+										<strong>fullWidth</strong>
+									</td>
+									<td class="description last">
+										<p>The full width of multiview setup.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>fullHeight</code></td>
-									<td class="description last"><p>The full height of multiview setup.</p></td>
+									<td class="name">
+										<strong>fullHeight</strong>
+									</td>
+									<td class="description last">
+										<p>The full height of multiview setup.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The horizontal offset of the subcamera.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The horizontal offset of the subcamera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The vertical offset of the subcamera.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The vertical offset of the subcamera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of subcamera.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of subcamera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of subcamera.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of subcamera.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -299,7 +377,7 @@ camera properties.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/cameras/PerspectiveCamera.js" target="_blank" rel="noopener" translate="no">src/cameras/PerspectiveCamera.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/cameras/PerspectiveCamera.js" translate="no" target="_blank" rel="noopener">src/cameras/PerspectiveCamera.js</a>
 				</p>
 			</article>
 		</section>

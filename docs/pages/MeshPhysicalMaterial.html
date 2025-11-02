@@ -47,12 +47,16 @@ best results, always specify an environment map when using this material.</p></d
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>An object with one or more properties
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object with one or more properties
 defining the material's appearance. Any property of the material
 (including any property from inherited materials) can be passed
 in here. Color values can be passed any type of value accepted
-by <a href="Color.html#set">Color#set</a>.</p></td>
+by <a href="Color.html#set">Color#set</a>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,7 +66,8 @@ by <a href="Color.html#set">Color#set</a>.</p></td>
 				<div class="member">
 					<h3 class="name" id="anisotropy" translate="no">.<a href="#anisotropy">anisotropy</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The anisotropy strength, from <code>0.0</code> to <code>1.0</code>.<br/>Default is <code>0</code>.</p>
+						<p>The anisotropy strength, from <code>0.0</code> to <code>1.0</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -70,7 +75,8 @@ by <a href="Color.html#set">Color#set</a>.</p></td>
 					<div class="description">
 						<p>Red and green channels represent the anisotropy direction in <code>[-1, 1]</code> tangent,
 bitangent space, to be rotated by <code>anisotropyRotation</code>. The blue channel
-contains strength as <code>[0, 1]</code> to be multiplied by <code>anisotropy</code>.<br/>Default is <code>null</code>.</p>
+contains strength as <code>[0, 1]</code> to be multiplied by <code>anisotropy</code>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -78,14 +84,16 @@ contains strength as <code>[0, 1]</code> to be multiplied by <code>anisotropy</c
 					<div class="description">
 						<p>The rotation of the anisotropy in tangent, bitangent space, measured in radians
 counter-clockwise from the tangent. When <code>anisotropyMap</code> is present, this
-property provides additional rotation to the vectors in the texture.<br/>Default is <code>1</code>.</p>
+property provides additional rotation to the vectors in the texture.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="attenuationColor" translate="no">.<a href="#attenuationColor">attenuationColor</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="description">
 						<p>The color that white light turns into due to absorption when reaching the
-attenuation distance.<br/>Default is <code>(1,1,1)</code>.</p>
+attenuation distance.</p>
+						<p>Default is <code>(1,1,1)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -93,7 +101,8 @@ attenuation distance.<br/>Default is <code>(1,1,1)</code>.</p>
 					<div class="description">
 						<p>Density of the medium given as the average distance that light travels in
 the medium before interacting with a particle. The value is given in world
-space units, and must be greater than zero.<br/>Default is <code>Infinity</code>.</p>
+space units, and must be greater than zero.</p>
+						<p>Default is <code>Infinity</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -101,40 +110,46 @@ space units, and must be greater than zero.<br/>Default is <code>Infinity</code>
 					<div class="description">
 						<p>Represents the intensity of the clear coat layer, from <code>0.0</code> to <code>1.0</code>. Use
 clear coat related properties to enable multilayer materials that have a
-thin translucent layer over the base layer.<br/>Default is <code>0</code>.</p>
+thin translucent layer over the base layer.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="clearcoatMap" translate="no">.<a href="#clearcoatMap">clearcoatMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The red channel of this texture is multiplied against <code>clearcoat</code>,
-for per-pixel control over a coating's intensity.<br/>Default is <code>null</code>.</p>
+for per-pixel control over a coating's intensity.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="clearcoatNormalMap" translate="no">.<a href="#clearcoatNormalMap">clearcoatNormalMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
-						<p>Can be used to enable independent normals for the clear coat layer.<br/>Default is <code>null</code>.</p>
+						<p>Can be used to enable independent normals for the clear coat layer.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="clearcoatNormalScale" translate="no">.<a href="#clearcoatNormalScale">clearcoatNormalScale</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="description">
 						<p>How much <code>clearcoatNormalMap</code> affects the clear coat layer, from
-<code>(0,0)</code> to <code>(1,1)</code>.<br/>Default is <code>(1,1)</code>.</p>
+<code>(0,0)</code> to <code>(1,1)</code>.</p>
+						<p>Default is <code>(1,1)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="clearcoatRoughness" translate="no">.<a href="#clearcoatRoughness">clearcoatRoughness</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Roughness of the clear coat layer, from <code>0.0</code> to <code>1.0</code>.<br/>Default is <code>0</code>.</p>
+						<p>Roughness of the clear coat layer, from <code>0.0</code> to <code>1.0</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="clearcoatRoughnessMap" translate="no">.<a href="#clearcoatRoughnessMap">clearcoatRoughnessMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The green channel of this texture is multiplied against
-<code>clearcoatRoughness</code>, for per-pixel control over a coating's roughness.<br/>Default is <code>null</code>.</p>
+<code>clearcoatRoughness</code>, for per-pixel control over a coating's roughness.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -142,34 +157,39 @@ for per-pixel control over a coating's intensity.<br/>Default is <code>null</cod
 					<div class="description">
 						<p>Defines the strength of the angular separation of colors (chromatic aberration) transmitting
 through a relatively clear volume. Any value zero or larger is valid, the typical range of
-realistic values is <code>[0, 1]</code>. This property can be only be used with transmissive objects.<br/>Default is <code>0</code>.</p>
+realistic values is <code>[0, 1]</code>. This property can be only be used with transmissive objects.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="ior" translate="no">.<a href="#ior">ior</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Index-of-refraction for non-metallic materials, from <code>1.0</code> to <code>2.333</code>.<br/>Default is <code>1.5</code>.</p>
+						<p>Index-of-refraction for non-metallic materials, from <code>1.0</code> to <code>2.333</code>.</p>
+						<p>Default is <code>1.5</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="iridescence" translate="no">.<a href="#iridescence">iridescence</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The intensity of the iridescence layer, simulating RGB color shift based on the angle between
-the surface and the viewer, from <code>0.0</code> to <code>1.0</code>.<br/>Default is <code>0</code>.</p>
+the surface and the viewer, from <code>0.0</code> to <code>1.0</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="iridescenceIOR" translate="no">.<a href="#iridescenceIOR">iridescenceIOR</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Strength of the iridescence RGB color shift effect, represented by an index-of-refraction.
-Between <code>1.0</code> to <code>2.333</code>.<br/>Default is <code>1.3</code>.</p>
+Between <code>1.0</code> to <code>2.333</code>.</p>
+						<p>Default is <code>1.3</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="iridescenceMap" translate="no">.<a href="#iridescenceMap">iridescenceMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The red channel of this texture is multiplied against <code>iridescence</code>, for per-pixel
-control over iridescence.<br/>Default is <code>null</code>.</p>
+control over iridescence.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -181,20 +201,23 @@ Minimum and maximum values of thickness are defined by <code>iridescenceThicknes
 <li><code>0.0</code> in the green channel will result in thickness equal to first element of the array.</li>
 <li><code>1.0</code> in the green channel will result in thickness equal to second element of the array.</li>
 <li>Values in-between will linearly interpolate between the elements of the array.</li>
-</ul><br/>Default is <code>null</code>.
+</ul>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="iridescenceThicknessRange" translate="no">.<a href="#iridescenceThicknessRange">iridescenceThicknessRange</a><span class="type-signature"> : Array.&lt;number, number></span> </h3>
 					<div class="description">
 						<p>Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer.
-Thickness of iridescence layer has an equivalent effect of the one <code>thickness</code> has on <code>ior</code>.<br/>Default is <code>[100,400]</code>.</p>
+Thickness of iridescence layer has an equivalent effect of the one <code>thickness</code> has on <code>ior</code>.</p>
+						<p>Default is <code>[100,400]</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isMeshPhysicalMaterial" translate="no">.<a href="#isMeshPhysicalMaterial">isMeshPhysicalMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -203,66 +226,76 @@ Thickness of iridescence layer has an equivalent effect of the one <code>thickne
 						<p>Degree of reflectivity, from <code>0.0</code> to <code>1.0</code>. Default is <code>0.5</code>, which
 corresponds to an index-of-refraction of <code>1.5</code>.</p>
 <p>This models the reflectivity of non-metallic materials. It has no effect
-when <code>metalness</code> is <code>1.0</code><br/>Default is <code>0.5</code>.</p>
+when <code>metalness</code> is <code>1.0</code></p>
+						<p>Default is <code>0.5</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sheen" translate="no">.<a href="#sheen">sheen</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The intensity of the sheen layer, from <code>0.0</code> to <code>1.0</code>.<br/>Default is <code>0</code>.</p>
+						<p>The intensity of the sheen layer, from <code>0.0</code> to <code>1.0</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sheenColor" translate="no">.<a href="#sheenColor">sheenColor</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="description">
-						<p>The sheen tint.<br/>Default is <code>(0,0,0)</code>.</p>
+						<p>The sheen tint.</p>
+						<p>Default is <code>(0,0,0)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sheenColorMap" translate="no">.<a href="#sheenColorMap">sheenColorMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The RGB channels of this texture are multiplied against  <code>sheenColor</code>, for per-pixel control
-over sheen tint.<br/>Default is <code>null</code>.</p>
+over sheen tint.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sheenRoughness" translate="no">.<a href="#sheenRoughness">sheenRoughness</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Roughness of the sheen layer, from <code>0.0</code> to <code>1.0</code>.<br/>Default is <code>1</code>.</p>
+						<p>Roughness of the sheen layer, from <code>0.0</code> to <code>1.0</code>.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sheenRoughnessMap" translate="no">.<a href="#sheenRoughnessMap">sheenRoughnessMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The alpha channel of this texture is multiplied against <code>sheenRoughness</code>, for per-pixel control
-over sheen roughness.<br/>Default is <code>null</code>.</p>
+over sheen roughness.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="specularColor" translate="no">.<a href="#specularColor">specularColor</a><span class="type-signature"> : <a href="Color.html">Color</a></span> </h3>
 					<div class="description">
-						<p>Tints the specular reflection at normal incidence for non-metals only.<br/>Default is <code>(1,1,1)</code>.</p>
+						<p>Tints the specular reflection at normal incidence for non-metals only.</p>
+						<p>Default is <code>(1,1,1)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="specularColorMap" translate="no">.<a href="#specularColorMap">specularColorMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The RGB channels of this texture are multiplied against <code>specularColor</code>,
-for per-pixel control over specular color.<br/>Default is <code>null</code>.</p>
+for per-pixel control over specular color.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="specularIntensity" translate="no">.<a href="#specularIntensity">specularIntensity</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>A float that scales the amount of specular reflection for non-metals only.
-When set to zero, the model is effectively Lambertian. From <code>0.0</code> to <code>1.0</code>.<br/>Default is <code>1</code>.</p>
+When set to zero, the model is effectively Lambertian. From <code>0.0</code> to <code>1.0</code>.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="specularIntensityMap" translate="no">.<a href="#specularIntensityMap">specularIntensityMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The alpha channel of this texture is multiplied against <code>specularIntensity</code>,
-for per-pixel control over specular intensity.<br/>Default is <code>null</code>.</p>
+for per-pixel control over specular intensity.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -270,14 +303,16 @@ for per-pixel control over specular intensity.<br/>Default is <code>null</code>.
 					<div class="description">
 						<p>The thickness of the volume beneath the surface. The value is given in the
 coordinate space of the mesh. If the value is <code>0</code> the material is
-thin-walled. Otherwise the material is a volume boundary.<br/>Default is <code>0</code>.</p>
+thin-walled. Otherwise the material is a volume boundary.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="thicknessMap" translate="no">.<a href="#thicknessMap">thicknessMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>A texture that defines the thickness, stored in the green channel. This will
-be multiplied by <code>thickness</code>.<br/>Default is <code>null</code>.</p>
+be multiplied by <code>thickness</code>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -287,19 +322,21 @@ be multiplied by <code>thickness</code>.<br/>Default is <code>null</code>.</p>
 <p>Thin, transparent or semitransparent, plastic or glass materials remain
 largely reflective even if they are fully transmissive. The transmission
 property can be used to model these materials.</p>
-<p>When transmission is non-zero, <code>opacity</code> should be  set to <code>1</code>.<br/>Default is <code>0</code>.</p>
+<p>When transmission is non-zero, <code>opacity</code> should be  set to <code>1</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="transmissionMap" translate="no">.<a href="#transmissionMap">transmissionMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The red channel of this texture is multiplied against <code>transmission</code>, for per-pixel control over
-optical transparency.<br/>Default is <code>null</code>.</p>
+optical transparency.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/MeshPhysicalMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/MeshPhysicalMaterial.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/MeshPhysicalMaterial.js" translate="no" target="_blank" rel="noopener">src/materials/MeshPhysicalMaterial.js</a>
 				</p>
 			</article>
 		</section>

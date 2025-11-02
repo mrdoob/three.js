@@ -32,7 +32,7 @@ scene.add( mesh );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ExtrudeGeometry" translate="no">new <a href="#ExtrudeGeometry">ExtrudeGeometry</a><span class="signature">( shapes : <span class="param-type">Shape | Array.&lt;Shape></span>, options : <span class="param-type">ExtrudeGeometry~Options</span> )</span> </h3>
+					<h3 class="name name-method" id="ExtrudeGeometry" translate="no">new <a href="#ExtrudeGeometry">ExtrudeGeometry</a><span class="signature">( shapes : <span class="param-type"><a href="Shape.html">Shape</a> | Array.&lt;<a href="Shape.html">Shape</a>></span>, options : <span class="param-type"><a href="ExtrudeGeometry.html#~Options">ExtrudeGeometry~Options</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new extrude geometry.</p>
@@ -40,12 +40,20 @@ scene.add( mesh );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shapes</code></td>
-									<td class="description last"><p>A shape or an array of shapes.</p></td>
+									<td class="name">
+										<strong>shapes</strong>
+									</td>
+									<td class="description last">
+										<p>A shape or an array of shapes.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The extrude settings.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The extrude settings.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -61,7 +69,7 @@ after instantiation does not change the geometry.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Static Methods</h2>
-					<h3 class="name name-method" id=".fromJSON" translate="no">.<a href="#.fromJSON">fromJSON</a><span class="signature">( data : <span class="param-type">Object</span>, shapes : <span class="param-type">Array.&lt;Shape></span> )</span><span class="type-signature"> : <a href="ExtrudeGeometry.html">ExtrudeGeometry</a></span> </h3>
+					<h3 class="name name-method" id=".fromJSON" translate="no">.<a href="#.fromJSON">fromJSON</a><span class="signature">( data : <span class="param-type">Object</span>, shapes : <span class="param-type">Array.&lt;<a href="Shape.html">Shape</a>></span> )</span><span class="type-signature"> : <a href="ExtrudeGeometry.html">ExtrudeGeometry</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Factory method for creating an instance of this class from the given
@@ -70,12 +78,20 @@ JSON object.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>A JSON object representing the serialized geometry.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>A JSON object representing the serialized geometry.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>shapes</code></td>
-									<td class="description last"><p>An array of shapes.</p></td>
+									<td class="name">
+										<strong>shapes</strong>
+									</td>
+									<td class="description last">
+										<p>An array of shapes.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -89,154 +105,123 @@ JSON object.</p>
 					<div class="description">
 						<p>Represents the <code>options</code> type of the geometry's constructor.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>curveSegments</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>curveSegments</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Number of points on the curves.</p>
+						<p>Default is <code>12</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					12
-				</td>
-			<td class="description last"><p>Number of points on the curves.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>steps</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>steps</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Number of points used for subdividing segments along the depth of the extruded spline.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>Number of points used for subdividing segments along the depth of the extruded spline.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>depth</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>depth</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Depth to extrude the shape.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>Depth to extrude the shape.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelEnabled</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelEnabled</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to beveling to the shape or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					true
-				</td>
-			<td class="description last"><p>Whether to beveling to the shape or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelThickness</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelThickness</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>How deep into the original shape the bevel goes.</p>
+						<p>Default is <code>0.2</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0.2
-				</td>
-			<td class="description last"><p>How deep into the original shape the bevel goes.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelSize</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelSize</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Distance from the shape outline that the bevel extends.</p>
+						<p>Default is <code>bevelThickness-0.1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					bevelThickness-0.1
-				</td>
-			<td class="description last"><p>Distance from the shape outline that the bevel extends.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelOffset</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelOffset</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Distance from the shape outline that the bevel starts.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					0
-				</td>
-			<td class="description last"><p>Distance from the shape outline that the bevel starts.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>bevelSegments</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>bevelSegments</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Number of bevel layers.</p>
+						<p>Default is <code>3</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					3
-				</td>
-			<td class="description last"><p>Number of bevel layers.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>extrudePath</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>extrudePath</strong>
+						<br>
 <span class="param-type"><a href="Curve.html">Curve</a></span>
+				</td>
+			<td class="description last">
+				<p>A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.</p>
+						<p>Default is <code>null</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-					&lt;nullable><br>
-				</td>
-				<td class="default">
-					null
-				</td>
-			<td class="description last"><p>A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>UVGenerator</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>UVGenerator</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>An object that provides UV generator functions for custom UV generation.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>An object that provides UV generator functions for custom UV generation.</p></td>
 		</tr>
 	</tbody>
 </table>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/geometries/ExtrudeGeometry.js" target="_blank" rel="noopener" translate="no">src/geometries/ExtrudeGeometry.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/geometries/ExtrudeGeometry.js" translate="no" target="_blank" rel="noopener">src/geometries/ExtrudeGeometry.js</a>
 				</p>
 			</article>
 		</section>

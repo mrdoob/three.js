@@ -432,6 +432,7 @@ class UniformsGroup extends UniformBuffer {
 	/**
 	 * Returns a typed array that matches the given data type.
 	 *
+	 * @private
 	 * @param {string} type - The data type.
 	 * @return {TypedArray} The typed array.
 	 */

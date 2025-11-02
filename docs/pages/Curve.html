@@ -32,13 +32,15 @@ for interpolation.</p></div>
 						<p>This value determines the amount of divisions when calculating the
 cumulative segment lengths of a curve via <a href="Curve.html#getLengths">Curve#getLengths</a>. To ensure
 precision when using methods like <a href="Curve.html#getSpacedPoints">Curve#getSpacedPoints</a>, it is
-recommended to increase the value of this property if the curve is very large.<br/>Default is <code>200</code>.</p>
+recommended to increase the value of this property if the curve is very large.</p>
+						<p>Default is <code>200</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Must be set to <code>true</code> if the curve parameters have changed.<br/>Default is <code>false</code>.</p>
+						<p>Must be set to <code>true</code> if the curve parameters have changed.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -67,12 +69,21 @@ in geometries like <a href="TubeGeometry.html">TubeGeometry</a> or <a href="Extr
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>segments</code></td>
-									<td class="description last"><p>The number of segments.</p></td>
+									<td class="name">
+										<strong>segments</strong>
+									</td>
+									<td class="description last">
+										<p>The number of segments.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>closed</code></td>
-									<td class="description last"><p>Whether the curve is closed or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>closed</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the curve is closed or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -80,7 +91,7 @@ in geometries like <a href="TubeGeometry.html">TubeGeometry</a> or <a href="Extr
 							<dt class="tag-returns"><strong>Returns:</strong> The Frenet Frames.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type">Curve</span> )</span><span class="type-signature"> : <a href="Curve.html">Curve</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="Curve.html">Curve</a></span> )</span><span class="type-signature"> : <a href="Curve.html">Curve</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given curve to this instance.</p>
@@ -88,8 +99,12 @@ in geometries like <a href="TubeGeometry.html">TubeGeometry</a> or <a href="Extr
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>source</code></td>
-									<td class="description last"><p>The curve to copy.</p></td>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The curve to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -105,8 +120,12 @@ in geometries like <a href="TubeGeometry.html">TubeGeometry</a> or <a href="Extr
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>json</code></td>
-									<td class="description last"><p>The JSON holding the serialized curve.</p></td>
+									<td class="name">
+										<strong>json</strong>
+									</td>
+									<td class="description last">
+										<p>The JSON holding the serialized curve.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -131,8 +150,13 @@ in geometries like <a href="TubeGeometry.html">TubeGeometry</a> or <a href="Extr
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>divisions</code></td>
-									<td class="description last"><p>The number of divisions.<br/>Default is <code>this.arcLengthDivisions</code>.</p></td>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions.</p>
+										<p>Default is <code>this.arcLengthDivisions</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -140,7 +164,7 @@ in geometries like <a href="TubeGeometry.html">TubeGeometry</a> or <a href="Extr
 							<dt class="tag-returns"><strong>Returns:</strong> An array holding the cumulative segment lengths.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type">Vector2 | Vector3</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method returns a vector in 2D or 3D space (depending on the curve definition)
@@ -149,12 +173,20 @@ for the given interpolation factor.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalTarget</code></td>
-									<td class="description last"><p>The optional target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -162,7 +194,7 @@ for the given interpolation factor.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The position on the curve. It can be a 2D or 3D vector depending on the curve definition.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getPointAt" translate="no">.<a href="#getPointAt">getPointAt</a><span class="signature">( u : <span class="param-type">number</span>, optionalTarget : <span class="param-type">Vector2 | Vector3</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getPointAt" translate="no">.<a href="#getPointAt">getPointAt</a><span class="signature">( u : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method returns a vector in 2D or 3D space (depending on the curve definition)
@@ -172,12 +204,20 @@ of the curve which equidistant samples.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalTarget</code></td>
-									<td class="description last"><p>The optional target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -194,8 +234,13 @@ the curve shape.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>divisions</code></td>
-									<td class="description last"><p>The number of divisions.<br/>Default is <code>5</code>.</p></td>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions.</p>
+										<p>Default is <code>5</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -213,8 +258,13 @@ curve.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>divisions</code></td>
-									<td class="description last"><p>The number of divisions.<br/>Default is <code>5</code>.</p></td>
+									<td class="name">
+										<strong>divisions</strong>
+									</td>
+									<td class="description last">
+										<p>The number of divisions.</p>
+										<p>Default is <code>5</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -222,7 +272,7 @@ curve.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> An array holding the sampled curve values. The number of points is <code>divisions + 1</code>.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getTangent" translate="no">.<a href="#getTangent">getTangent</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type">Vector2 | Vector3</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getTangent" translate="no">.<a href="#getTangent">getTangent</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a unit vector tangent for the given interpolation factor.
@@ -233,12 +283,20 @@ which seems to give a reasonable approximation.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>The interpolation factor.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalTarget</code></td>
-									<td class="description last"><p>The optional target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -246,7 +304,7 @@ which seems to give a reasonable approximation.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The tangent vector.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getTangentAt" translate="no">.<a href="#getTangentAt">getTangentAt</a><span class="signature">( u : <span class="param-type">number</span>, optionalTarget : <span class="param-type">Vector2 | Vector3</span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getTangentAt" translate="no">.<a href="#getTangentAt">getTangentAt</a><span class="signature">( u : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector2.html">Vector2</a> | <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Same as <a href="Curve.html#getTangent">Curve#getTangent</a> but with equidistant samples.</p>
@@ -254,12 +312,20 @@ which seems to give a reasonable approximation.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The interpolation factor.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalTarget</code></td>
-									<td class="description last"><p>The optional target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -285,12 +351,21 @@ from a curve.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The interpolation factor.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The interpolation factor.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>An optional distance on the curve.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>An optional distance on the curve.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -326,7 +401,7 @@ composed curve, too.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/core/Curve.js" target="_blank" rel="noopener" translate="no">src/extras/core/Curve.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/extras/core/Curve.js" translate="no" target="_blank" rel="noopener">src/extras/core/Curve.js</a>
 				</p>
 			</article>
 		</section>

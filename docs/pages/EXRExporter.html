@@ -13,7 +13,7 @@
 		<section>
 			<header>
 				<div class="class-description"><p>An exporter for EXR.</p>
-<p>EXR ( Extended Dynamic Range) is an <a href="https://github.com/AcademySoftwareFoundation/openexr">open format specification</a>
+<p>EXR ( Extended Dynamic Range) is an <a href="https://github.com/AcademySoftwareFoundation/openexr" target="_blank" rel="noopener">open format specification</a>
 for professional-grade image storage format of the motion picture industry. The purpose of
 format is to accurately and efficiently represent high-dynamic-range scene-linear image data
 and associated metadata. The library is widely used in host application software where accuracy
@@ -26,7 +26,7 @@ const result = await exporter.parse( renderer, options );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">EXRExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">EXRExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { EXRExporter } from 'three/addons/exporters/EXRExporter.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -35,7 +35,7 @@ const result = await exporter.parse( renderer, options );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( arg1 : <span class="param-type">DataTexture | WebGPURenderer | WebGLRenderer</span>, arg2 : <span class="param-type">EXRExporter~Options | RenderTarget</span>, arg3 : <span class="param-type">EXRExporter~Options</span> )</span><span class="type-signature"> : Promise.&lt;Uint8Array></span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( arg1 : <span class="param-type"><a href="DataTexture.html">DataTexture</a> | <a href="WebGPURenderer.html">WebGPURenderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, arg2 : <span class="param-type"><a href="EXRExporter.html#~Options">EXRExporter~Options</a> | <a href="RenderTarget.html">RenderTarget</a></span>, arg3 : <span class="param-type"><a href="EXRExporter.html#~Options">EXRExporter~Options</a></span> )</span><span class="type-signature"> : Promise.&lt;Uint8Array></span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method has two variants.</p>
@@ -48,16 +48,28 @@ render target and the exporter options.</li>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>arg1</code></td>
-									<td class="description last"><p>The data texture to export or a renderer.</p></td>
+									<td class="name">
+										<strong>arg1</strong>
+									</td>
+									<td class="description last">
+										<p>The data texture to export or a renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>arg2</code></td>
-									<td class="description last"><p>The exporter options or a render target.</p></td>
+									<td class="name">
+										<strong>arg2</strong>
+									</td>
+									<td class="description last">
+										<p>The exporter options or a render target.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>arg3</code></td>
-									<td class="description last"><p>The exporter options.</p></td>
+									<td class="name">
+										<strong>arg3</strong>
+									</td>
+									<td class="description last">
+										<p>The exporter options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -71,56 +83,42 @@ render target and the exporter options.</li>
 					<div class="description">
 						<p>Export options of <code>EXRExporter</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>type</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>type</strong>
+						<br>
 <span class="param-type"><a href="global.html#HalfFloatType">HalfFloatType</a></span>
 |
 <span class="param-type"><a href="global.html#FloatType">FloatType</a></span>
+				</td>
+			<td class="description last">
+				<p>Output data type.</p>
+						<p>Default is <code>HalfFloatType</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					HalfFloatType
-				</td>
-			<td class="description last"><p>Output data type.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>type</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>type</strong>
+						<br>
 <span class="param-type">NO_COMPRESSION</span>
 |
 <span class="param-type">ZIP_COMPRESSION</span>
 |
 <span class="param-type">ZIPS_COMPRESSION</span>
+				</td>
+			<td class="description last">
+				<p>The compression algorithm.</p>
+						<p>Default is <code>ZIP_COMPRESSION</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					ZIP_COMPRESSION
-				</td>
-			<td class="description last"><p>The compression algorithm.</p></td>
 		</tr>
 	</tbody>
 </table>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/EXRExporter.js" target="_blank" rel="noopener" translate="no">examples/jsm/exporters/EXRExporter.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/EXRExporter.js" translate="no" target="_blank" rel="noopener">examples/jsm/exporters/EXRExporter.js</a>
 				</p>
 			</article>
 		</section>

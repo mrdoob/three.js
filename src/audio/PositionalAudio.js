@@ -154,7 +154,7 @@ class PositionalAudio extends Audio {
 	 * Defines which algorithm to use to reduce the volume of the audio source
 	 * as it moves away from the listener.
 	 *
-	 * Read [the spec]{@link https://www.w3.org/TR/webaudio-1.1/#enumdef-distancemodeltype}
+	 * Read [the spec](https://www.w3.org/TR/webaudio-1.1/#enumdef-distancemodeltype)
 	 * for more details.
 	 *
 	 * @param {('linear'|'inverse'|'exponential')} value - The distance model to set.

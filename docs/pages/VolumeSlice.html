@@ -16,11 +16,11 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">VolumeSlice</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">VolumeSlice</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { VolumeSlice } from 'three/addons/misc/VolumeSlice.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="VolumeSlice" translate="no">new <a href="#VolumeSlice">VolumeSlice</a><span class="signature">( volume : <span class="param-type">Volume</span>, index : <span class="param-type">number</span>, axis : <span class="param-type">'x' | 'y' | 'z'</span> )</span> </h3>
+					<h3 class="name name-method" id="VolumeSlice" translate="no">new <a href="#VolumeSlice">VolumeSlice</a><span class="signature">( volume : <span class="param-type"><a href="Volume.html">Volume</a></span>, index : <span class="param-type">number</span>, axis : <span class="param-type">'x' | 'y' | 'z'</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new volume slice.</p>
@@ -28,16 +28,30 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>volume</code></td>
-									<td class="description last"><p>The associated volume.</p></td>
+									<td class="name">
+										<strong>volume</strong>
+									</td>
+									<td class="description last">
+										<p>The associated volume.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index of the slice.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the slice.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>axis</code></td>
-									<td class="description last"><p>For now only 'x', 'y' or 'z' but later it will change to a normal vector.<br/>Default is <code>'z'</code>.</p></td>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>For now only 'x', 'y' or 'z' but later it will change to a normal vector.</p>
+										<p>Default is <code>'z'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -85,25 +99,29 @@
 				<div class="member">
 					<h3 class="name" id="geometryNeedsUpdate" translate="no">.<a href="#geometryNeedsUpdate">geometryNeedsUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>If set to <code>true</code>, <code>updateGeometry()</code> will be triggered at the next repaint.<br/>Default is <code>true</code>.</p>
+						<p>If set to <code>true</code>, <code>updateGeometry()</code> will be triggered at the next repaint.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="iLength" translate="no">.<a href="#iLength">iLength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Width of slice in the original coordinate system, corresponds to the width of the buffer canvas.<br/>Default is <code>0</code>.</p>
+						<p>Width of slice in the original coordinate system, corresponds to the width of the buffer canvas.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="index" translate="no">.<a href="#index">index</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The index of the slice, if changed, will automatically call updateGeometry at the next repaint.<br/>Default is <code>0</code>.</p>
+						<p>The index of the slice, if changed, will automatically call updateGeometry at the next repaint.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="jLength" translate="no">.<a href="#jLength">jLength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Height of slice in the original coordinate system, corresponds to the height of the buffer canvas.<br/>Default is <code>0</code>.</p>
+						<p>Height of slice in the original coordinate system, corresponds to the height of the buffer canvas.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -155,7 +173,7 @@
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/VolumeSlice.js" target="_blank" rel="noopener" translate="no">examples/jsm/misc/VolumeSlice.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/VolumeSlice.js" translate="no" target="_blank" rel="noopener">examples/jsm/misc/VolumeSlice.js</a>
 				</p>
 			</article>
 		</section>

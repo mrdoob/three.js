@@ -33,6 +33,8 @@ import { Vector4 } from '../../math/Vector4.js';
 import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
 import { warn, error } from '../../utils.js';
 
+let _id = 0;
+
 const rendererCache = new WeakMap();
 
 const typeFromArray = new Map( [
@@ -435,13 +437,13 @@ class NodeBuilder {
 		 */
 		this.subBuildLayers = [];
 
+
 		/**
-		 * The current stack of nodes.
+		 * The active stack nodes.
 		 *
-		 * @type {?StackNode}
-		 * @default null
+		 * @type {Array<StackNode>}
 		 */
-		this.currentStack = null;
+		this.activeStacks = [];
 
 		/**
 		 * The current sub-build TSL function(Fn).
@@ -458,6 +460,8 @@ class NodeBuilder {
 		 * @default null
 		 */
 		this.fnCall = null;
+
+		Object.defineProperty( this, 'id', { value: _id ++ } );
 
 	}
 
@@ -1220,9 +1224,9 @@ class NodeBuilder {
 			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
 			else if ( type === 'bool' ) value = false;
 			else if ( type === 'color' ) value = new Color();
-			else if ( type === 'vec2' ) value = new Vector2();
-			else if ( type === 'vec3' ) value = new Vector3();
-			else if ( type === 'vec4' ) value = new Vector4();
+			else if ( type === 'vec2' || type === 'uvec2' || type === 'ivec2' ) value = new Vector2();
+			else if ( type === 'vec3' || type === 'uvec3' || type === 'ivec3' ) value = new Vector3();
+			else if ( type === 'vec4' || type === 'uvec4' || type === 'ivec4' ) value = new Vector4();
 
 		}
 
@@ -1606,6 +1610,58 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Adds an active stack to the internal stack.
+	 *
+	 * @param {StackNode} stack - The stack node to add.
+	 */
+	setActiveStack( stack ) {
+
+		this.activeStacks.push( stack );
+
+	}
+
+	/**
+	 * Removes the active stack from the internal stack.
+	 *
+	 * @param {StackNode} stack - The stack node to remove.
+	 */
+	removeActiveStack( stack ) {
+
+		if ( this.activeStacks[ this.activeStacks.length - 1 ] === stack ) {
+
+			this.activeStacks.pop();
+
+		} else {
+
+			throw new Error( 'NodeBuilder: Invalid active stack removal.' );
+
+		}
+
+	}
+
+	/**
+	 * Returns the active stack.
+	 *
+	 * @return {StackNode} The active stack.
+	 */
+	getActiveStack() {
+
+		return this.activeStacks[ this.activeStacks.length - 1 ];
+
+	}
+
+	/**
+	 * Returns the base stack.
+	 *
+	 * @return {StackNode} The base stack.
+	 */
+	getBaseStack() {
+
+		return this.activeStacks[ 0 ];
+
+	}
+
+	/**
 	 * Adds a stack node to the internal stack.
 	 *
 	 * @return {StackNode} The added stack node.
@@ -1631,6 +1687,14 @@ class NodeBuilder {
 	removeStack() {
 
 		const lastStack = this.stack;
+
+		for ( const node of lastStack.nodes ) {
+
+			const nodeData = this.getDataFromNode( node );
+			nodeData.stack = lastStack;
+
+		}
+
 		this.stack = lastStack.parent;
 
 		setCurrentStack( this.stacks.pop() );

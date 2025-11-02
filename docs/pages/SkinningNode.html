@@ -19,7 +19,7 @@ for skinning/skeletal animation.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="SkinningNode" translate="no">new <a href="#SkinningNode">SkinningNode</a><span class="signature">( skinnedMesh : <span class="param-type">SkinnedMesh</span> )</span> </h3>
+					<h3 class="name name-method" id="SkinningNode" translate="no">new <a href="#SkinningNode">SkinningNode</a><span class="signature">( skinnedMesh : <span class="param-type"><a href="SkinnedMesh.html">SkinnedMesh</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new skinning node.</p>
@@ -27,8 +27,12 @@ for skinning/skeletal animation.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>skinnedMesh</code></td>
-									<td class="description last"><p>The skinned mesh.</p></td>
+									<td class="name">
+										<strong>skinnedMesh</strong>
+									</td>
+									<td class="description last">
+										<p>The skinned mesh.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -63,7 +67,8 @@ for skinning/skeletal animation.</p></div>
 					<h3 class="name" id="previousBoneMatricesNode" translate="no">.<a href="#previousBoneMatricesNode">previousBoneMatricesNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="description">
 						<p>The previous bind matrices as a uniform buffer node.
-Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
+Required for computing motion vectors.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -100,7 +105,7 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the code snippet of the skinning node.</p>
@@ -108,12 +113,20 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>output</code></td>
-									<td class="description last"><p>The current output.</p></td>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The current output.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -124,7 +137,7 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getPreviousSkinnedPosition" translate="no">.<a href="#getPreviousSkinnedPosition">getPreviousSkinnedPosition</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="getPreviousSkinnedPosition" translate="no">.<a href="#getPreviousSkinnedPosition">getPreviousSkinnedPosition</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the transformed/skinned vertex position of the previous frame.</p>
@@ -132,8 +145,12 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -141,7 +158,7 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The skinned position from the previous frame.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getSkinnedNormal" translate="no">.<a href="#getSkinnedNormal">getSkinnedNormal</a><span class="signature">( boneMatrices : <span class="param-type">Node</span>, normal : <span class="param-type">Node.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="getSkinnedNormal" translate="no">.<a href="#getSkinnedNormal">getSkinnedNormal</a><span class="signature">( boneMatrices : <span class="param-type"><a href="Node.html">Node</a></span>, normal : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Transforms the given vertex normal via skinning.</p>
@@ -149,12 +166,22 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>boneMatrices</code></td>
-									<td class="description last"><p>The bone matrices<br/>Default is <code>this.boneMatricesNode</code>.</p></td>
+									<td class="name">
+										<strong>boneMatrices</strong>
+									</td>
+									<td class="description last">
+										<p>The bone matrices</p>
+										<p>Default is <code>this.boneMatricesNode</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>normal</code></td>
-									<td class="description last"><p>The vertex normal in local space.<br/>Default is <code>normalLocal</code>.</p></td>
+									<td class="name">
+										<strong>normal</strong>
+									</td>
+									<td class="description last">
+										<p>The vertex normal in local space.</p>
+										<p>Default is <code>normalLocal</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -162,7 +189,7 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The transformed vertex normal.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getSkinnedPosition" translate="no">.<a href="#getSkinnedPosition">getSkinnedPosition</a><span class="signature">( boneMatrices : <span class="param-type">Node</span>, position : <span class="param-type">Node.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="getSkinnedPosition" translate="no">.<a href="#getSkinnedPosition">getSkinnedPosition</a><span class="signature">( boneMatrices : <span class="param-type"><a href="Node.html">Node</a></span>, position : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Transforms the given vertex position via skinning.</p>
@@ -170,12 +197,22 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>boneMatrices</code></td>
-									<td class="description last"><p>The bone matrices<br/>Default is <code>this.boneMatricesNode</code>.</p></td>
+									<td class="name">
+										<strong>boneMatrices</strong>
+									</td>
+									<td class="description last">
+										<p>The bone matrices</p>
+										<p>Default is <code>this.boneMatricesNode</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>position</code></td>
-									<td class="description last"><p>The vertex position in local space.<br/>Default is <code>this.positionNode</code>.</p></td>
+									<td class="name">
+										<strong>position</strong>
+									</td>
+									<td class="description last">
+										<p>The vertex position in local space.</p>
+										<p>Default is <code>this.positionNode</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -183,7 +220,7 @@ Required for computing motion vectors.<br/>Default is <code>null</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The transformed vertex position.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="needsPreviousBoneMatrices" translate="no">.<a href="#needsPreviousBoneMatrices">needsPreviousBoneMatrices</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="needsPreviousBoneMatrices" translate="no">.<a href="#needsPreviousBoneMatrices">needsPreviousBoneMatrices</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if bone matrices from the previous frame are required. Relevant
@@ -192,8 +229,12 @@ when computing motion vectors with <a href="VelocityNode.html">VelocityNode</a>.
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -201,7 +242,7 @@ when computing motion vectors with <a href="VelocityNode.html">VelocityNode</a>.
 							<dt class="tag-returns"><strong>Returns:</strong> Whether bone matrices from the previous frame are required or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the skinning node by assigning the transformed vertex data to predefined node variables.</p>
@@ -209,8 +250,12 @@ when computing motion vectors with <a href="VelocityNode.html">VelocityNode</a>.
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -221,7 +266,7 @@ when computing motion vectors with <a href="VelocityNode.html">VelocityNode</a>.
 							<dt class="tag-returns"><strong>Returns:</strong> The transformed vertex position.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates the state of the skinned mesh by updating the skeleton once per frame.</p>
@@ -229,8 +274,12 @@ when computing motion vectors with <a href="VelocityNode.html">VelocityNode</a>.
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>The current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -240,7 +289,7 @@ when computing motion vectors with <a href="VelocityNode.html">VelocityNode</a>.
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/SkinningNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/SkinningNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/SkinningNode.js" translate="no" target="_blank" rel="noopener">src/nodes/accessors/SkinningNode.js</a>
 				</p>
 			</article>
 		</section>

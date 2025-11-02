@@ -25,7 +25,7 @@ postProcessing.outputNode = scenePass;
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PassNode" translate="no">new <a href="#PassNode">PassNode</a><span class="signature">( scope : <span class="param-type">'color' | 'depth'</span>, scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="PassNode" translate="no">new <a href="#PassNode">PassNode</a><span class="signature">( scope : <span class="param-type">'color' | 'depth'</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new pass node.</p>
@@ -33,20 +33,36 @@ postProcessing.outputNode = scenePass;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scope</code></td>
-									<td class="description last"><p>The scope of the pass. The scope determines whether the node outputs color or depth.</p></td>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The scope of the pass. The scope determines whether the node outputs color or depth.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>A reference to the scene.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>A reference to the camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the camera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>Options for the internal render target.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>Options for the internal render target.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,7 +78,8 @@ postProcessing.outputNode = scenePass;
 				<div class="member">
 					<h3 class="name" id="global" translate="no">.<a href="#global">global</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>This flag is used for global cache.<br/>Default is <code>true</code>.</p>
+						<p>This flag is used for global cache.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#global">TempNode#global</a></dt>
@@ -71,7 +88,8 @@ postProcessing.outputNode = scenePass;
 				<div class="member">
 					<h3 class="name" id="isPassNode" translate="no">.<a href="#isPassNode">isPassNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -102,7 +120,8 @@ postProcessing.outputNode = scenePass;
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders the
-scene once per frame in its <a href="PassNode.html#updateBefore">PassNode#updateBefore</a> method.<br/>Default is <code>'frame'</code>.</p>
+scene once per frame in its <a href="PassNode.html#updateBefore">PassNode#updateBefore</a> method.</p>
+						<p>Default is <code>'frame'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
@@ -115,7 +134,7 @@ scene once per frame in its <a href="PassNode.html#updateBefore">PassNode#update
 					<h3 class="name" id=".DEPTH" translate="no">.<a href="#.DEPTH">DEPTH</a><span class="type-signature"> : 'depth'</span> </h3>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="compileAsync" translate="no">.<a href="#compileAsync">compileAsync</a><span class="signature">( renderer : <span class="param-type">Renderer</span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id="compileAsync" translate="no">.<a href="#compileAsync">compileAsync</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Precompiles the pass.</p>
@@ -125,8 +144,12 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -168,8 +191,13 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The output name to get the linear depth node for. In most cases the default <code>'depth'</code> can be used however the parameter exists for custom depth outputs.<br/>Default is <code>'depth'</code>.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The output name to get the linear depth node for. In most cases the default <code>'depth'</code> can be used however the parameter exists for custom depth outputs.</p>
+										<p>Default is <code>'depth'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -194,8 +222,12 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The output name to get the texture for.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The output name to get the texture for.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -211,8 +243,13 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The output name to get the previous texture node for.<br/>Default is <code>'output'</code>.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The output name to get the previous texture node for.</p>
+										<p>Default is <code>'output'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -249,8 +286,12 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The output name to get the texture for.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The output name to get the texture for.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -266,8 +307,13 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The output name to get the texture node for.<br/>Default is <code>'output'</code>.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The output name to get the texture node for.</p>
+										<p>Default is <code>'output'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -283,8 +329,13 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The output name to get the viewZ node for. In most cases the default <code>'depth'</code> can be used however the parameter exists for custom depth outputs.<br/>Default is <code>'depth'</code>.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The output name to get the viewZ node for. In most cases the default <code>'depth'</code> can be used however the parameter exists for custom depth outputs.</p>
+										<p>Default is <code>'depth'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -292,7 +343,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<dt class="tag-returns"><strong>Returns:</strong> The viewZ node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setLayers" translate="no">.<a href="#setLayers">setLayers</a><span class="signature">( layers : <span class="param-type">Layers</span> )</span><span class="type-signature"> : <a href="PassNode.html">PassNode</a></span> </h3>
+					<h3 class="name name-method" id="setLayers" translate="no">.<a href="#setLayers">setLayers</a><span class="signature">( layers : <span class="param-type"><a href="Layers.html">Layers</a></span> )</span><span class="type-signature"> : <a href="PassNode.html">PassNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the layer configuration that should be used when rendering the pass.</p>
@@ -300,8 +351,12 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>layers</code></td>
-									<td class="description last"><p>The layers object to set.</p></td>
+									<td class="name">
+										<strong>layers</strong>
+									</td>
+									<td class="description last">
+										<p>The layers object to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -309,7 +364,7 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this pass.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setMRT" translate="no">.<a href="#setMRT">setMRT</a><span class="signature">( mrt : <span class="param-type">MRTNode</span> )</span><span class="type-signature"> : <a href="PassNode.html">PassNode</a></span> </h3>
+					<h3 class="name name-method" id="setMRT" translate="no">.<a href="#setMRT">setMRT</a><span class="signature">( mrt : <span class="param-type"><a href="MRTNode.html">MRTNode</a></span> )</span><span class="type-signature"> : <a href="PassNode.html">PassNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given MRT node to setup MRT for this pass.</p>
@@ -317,8 +372,12 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mrt</code></td>
-									<td class="description last"><p>The MRT object.</p></td>
+									<td class="name">
+										<strong>mrt</strong>
+									</td>
+									<td class="description last">
+										<p>The MRT object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -334,8 +393,12 @@ So calls like <code>setMRT()</code> and <code>getTextureNode()</code> must proce
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pixelRatio</code></td>
-									<td class="description last"><p>The pixel ratio to set.</p></td>
+									<td class="name">
+										<strong>pixelRatio</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel ratio to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -349,8 +412,12 @@ The resolution is a factor that is multiplied with the renderer's width and heig
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>resolution</code></td>
-									<td class="description last"><p>The resolution to set. A value of <code>1</code> means full resolution.</p></td>
+									<td class="name">
+										<strong>resolution</strong>
+									</td>
+									<td class="description last">
+										<p>The resolution to set. A value of <code>1</code> means full resolution.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -370,8 +437,12 @@ The resolution scale is a factor that is multiplied with the renderer's width an
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>resolutionScale</code></td>
-									<td class="description last"><p>The resolution scale to set. A value of <code>1</code> means full resolution.</p></td>
+									<td class="name">
+										<strong>resolutionScale</strong>
+									</td>
+									<td class="description last">
+										<p>The resolution scale to set. A value of <code>1</code> means full resolution.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -379,7 +450,7 @@ The resolution scale is a factor that is multiplied with the renderer's width an
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this pass.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setScissor" translate="no">.<a href="#setScissor">setScissor</a><span class="signature">( x : <span class="param-type">number | Vector4</span>, y : <span class="param-type">number</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="setScissor" translate="no">.<a href="#setScissor">setScissor</a><span class="signature">( x : <span class="param-type">number | <a href="Vector4.html">Vector4</a></span>, y : <span class="param-type">number</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method allows to define the pass's scissor rectangle. By default, the scissor rectangle is kept
@@ -389,21 +460,37 @@ with <code>null</code> as the single argument.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The horizontal coordinate for the lower left corner of the box in logical pixel unit.
-Instead of passing four arguments, the method also works with a single four-dimensional vector.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+Instead of passing four arguments, the method also works with a single four-dimensional vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The vertical coordinate for the lower left corner of the box in logical pixel unit.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The vertical coordinate for the lower left corner of the box in logical pixel unit.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the scissor box in logical pixel unit.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the scissor box in logical pixel unit.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the scissor box in logical pixel unit.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the scissor box in logical pixel unit.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -416,17 +503,25 @@ Instead of passing four arguments, the method also works with a single four-dime
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width to set.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height to set.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setViewport" translate="no">.<a href="#setViewport">setViewport</a><span class="signature">( x : <span class="param-type">number | Vector4</span>, y : <span class="param-type">number</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="setViewport" translate="no">.<a href="#setViewport">setViewport</a><span class="signature">( x : <span class="param-type">number | <a href="Vector4.html">Vector4</a></span>, y : <span class="param-type">number</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method allows to define the pass's viewport. By default, the viewport is kept in sync
@@ -436,20 +531,36 @@ with <code>null</code> as the single argument.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the viewport in logical pixel unit.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the viewport in logical pixel unit.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the viewport in logical pixel unit.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the viewport in logical pixel unit.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -462,15 +573,19 @@ with <code>null</code> as the single argument.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The output name.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The output name.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/display/PassNode.js" target="_blank" rel="noopener" translate="no">src/nodes/display/PassNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/display/PassNode.js" translate="no" target="_blank" rel="noopener">src/nodes/display/PassNode.js</a>
 				</p>
 			</article>
 		</section>

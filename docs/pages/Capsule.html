@@ -18,11 +18,11 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">Capsule</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">Capsule</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { Capsule } from 'three/addons/math/Capsule.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Capsule" translate="no">new <a href="#Capsule">Capsule</a><span class="signature">( start : <span class="param-type">Vector3</span>, end : <span class="param-type">Vector3</span>, radius : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="Capsule" translate="no">new <a href="#Capsule">Capsule</a><span class="signature">( start : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, end : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, radius : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new capsule.</p>
@@ -30,16 +30,29 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>start</code></td>
-									<td class="description last"><p>The start vector.</p></td>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>The start vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>end</code></td>
-									<td class="description last"><p>The end vector.</p></td>
+									<td class="name">
+										<strong>end</strong>
+									</td>
+									<td class="description last">
+										<p>The end vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>radius</code></td>
-									<td class="description last"><p>The capsule's radius.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The capsule's radius.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -55,7 +68,8 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 				<div class="member">
 					<h3 class="name" id="radius" translate="no">.<a href="#radius">radius</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The capsule's radius.<br/>Default is <code>1</code>.</p>
+						<p>The capsule's radius.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -74,7 +88,7 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( capsule : <span class="param-type">Capsule</span> )</span><span class="type-signature"> : <a href="Capsule.html">Capsule</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( capsule : <span class="param-type"><a href="Capsule.html">Capsule</a></span> )</span><span class="type-signature"> : <a href="Capsule.html">Capsule</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given capsule to this instance.</p>
@@ -82,8 +96,12 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>capsule</code></td>
-									<td class="description last"><p>The capsule to copy.</p></td>
+									<td class="name">
+										<strong>capsule</strong>
+									</td>
+									<td class="description last">
+										<p>The capsule to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -91,7 +109,7 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this capsule.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getCenter" translate="no">.<a href="#getCenter">getCenter</a><span class="signature">( target : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getCenter" translate="no">.<a href="#getCenter">getCenter</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the center point of this capsule.</p>
@@ -99,8 +117,12 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -108,7 +130,7 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 							<dt class="tag-returns"><strong>Returns:</strong> The center point.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type">Box3</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="intersectsBox" translate="no">.<a href="#intersectsBox">intersectsBox</a><span class="signature">( box : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given bounding box intersects with this capsule.</p>
@@ -116,8 +138,12 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>box</code></td>
-									<td class="description last"><p>The bounding box to test.</p></td>
+									<td class="name">
+										<strong>box</strong>
+									</td>
+									<td class="description last">
+										<p>The bounding box to test.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -125,7 +151,7 @@ It can be thought of as a swept sphere, where a sphere is moved along a line seg
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the given bounding box intersects with this capsule.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( start : <span class="param-type">Vector3</span>, end : <span class="param-type">Vector3</span>, radius : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Capsule.html">Capsule</a></span> </h3>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( start : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, end : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, radius : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Capsule.html">Capsule</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the capsule components to the given values.
@@ -134,16 +160,28 @@ Please note that this method only copies the values from the given objects.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>start</code></td>
-									<td class="description last"><p>The start vector.</p></td>
+									<td class="name">
+										<strong>start</strong>
+									</td>
+									<td class="description last">
+										<p>The start vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>end</code></td>
-									<td class="description last"><p>The end vector</p></td>
+									<td class="name">
+										<strong>end</strong>
+									</td>
+									<td class="description last">
+										<p>The end vector</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>radius</code></td>
-									<td class="description last"><p>The capsule's radius.</p></td>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The capsule's radius.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -151,7 +189,7 @@ Please note that this method only copies the values from the given objects.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this capsule.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( v : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Capsule.html">Capsule</a></span> </h3>
+					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( v : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Capsule.html">Capsule</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the given offset to this capsule, effectively moving it in 3D space.</p>
@@ -159,8 +197,12 @@ Please note that this method only copies the values from the given objects.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>v</code></td>
-									<td class="description last"><p>The offset that should be used to translate the capsule.</p></td>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The offset that should be used to translate the capsule.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -170,7 +212,7 @@ Please note that this method only copies the values from the given objects.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/Capsule.js" target="_blank" rel="noopener" translate="no">examples/jsm/math/Capsule.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/Capsule.js" translate="no" target="_blank" rel="noopener">examples/jsm/math/Capsule.js</a>
 				</p>
 			</article>
 		</section>

@@ -55,23 +55,19 @@
 								?>
 								<tr>
 									<?js if (params.hasName) {?>
-									<td class="name"><code><?js= param.name ?></code></td>
+									<td class="name">
+										<strong><?js= param.name ?></strong>
+									</td>
 									<?js } ?>
-									<td class="description last"><?js
-										var desc = param.description;
-										if (typeof param.defaultvalue !== 'undefined') {
-											var defaultText = '<br/>Default is <code>' + self.htmlsafe(param.defaultvalue) + '</code>.';
-											// If description ends with </p>, insert default before closing tag
-											if (desc.trim().endsWith('</p>')) {
-												desc = desc.trim().slice(0, -4) + defaultText + '</p>';
-											} else {
-												desc = desc + defaultText;
-											}
-										}
-									?><?js= desc ?><?js if (param.subparams) { ?>
-										<h6>Properties</h6>
+									<td class="description last">
+										<?js= param.description ?>
+										<?js if (typeof param.defaultvalue !== 'undefined') { ?>
+										<p>Default is <code><?js= self.htmlsafe(param.defaultvalue) ?></code>.</p>
+										<?js } ?>
+										<?js if (param.subparams) { ?>
 										<?js= self.partial('params.tmpl', param.subparams) ?>
-									<?js } ?></td>
+										<?js } ?>
+									</td>
 								</tr>
 								<?js }); ?>
 							</tbody>

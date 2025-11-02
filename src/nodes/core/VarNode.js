@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { addMethodChaining, getCurrentStack, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { error } from '../../utils.js';
 
 /**
@@ -179,9 +179,19 @@ class VarNode extends Node {
 
 	build( ...params ) {
 
-		if ( this.intent === true ) {
+		const builder = params[ 0 ];
 
-			const builder = params[ 0 ];
+		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
+
+			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+
+				builder.getBaseStack().addToStack( this );
+
+			}
+
+		}
+
+		if ( this.intent === true ) {
 
 			if ( this.isAssign( builder ) !== true ) {
 
@@ -262,6 +272,14 @@ class VarNode extends Node {
 
 	}
 
+	_hasStack( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		return nodeData.stack !== undefined;
+
+	}
+
 }
 
 export default VarNode;
@@ -312,12 +330,6 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
  * @returns {VarNode}
  */
 export const VarIntent = ( node ) => {
-
-	if ( getCurrentStack() === null ) {
-
-		return node;
-
-	}
 
 	return createVar( node ).setIntent( true ).toStack();
 

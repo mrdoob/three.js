@@ -19,7 +19,7 @@ one <code>AnimationMixer</code> may be used for each object.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="AnimationMixer" translate="no">new <a href="#AnimationMixer">AnimationMixer</a><span class="signature">( root : <span class="param-type">Object3D</span> )</span> </h3>
+					<h3 class="name name-method" id="AnimationMixer" translate="no">new <a href="#AnimationMixer">AnimationMixer</a><span class="signature">( root : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new animation mixer.</p>
@@ -27,8 +27,12 @@ one <code>AnimationMixer</code> may be used for each object.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>root</code></td>
-									<td class="description last"><p>The object whose animations shall be played by this mixer.</p></td>
+									<td class="name">
+										<strong>root</strong>
+									</td>
+									<td class="description last">
+										<p>The object whose animations shall be played by this mixer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -38,7 +42,8 @@ one <code>AnimationMixer</code> may be used for each object.</p></div>
 				<div class="member">
 					<h3 class="name" id="time" translate="no">.<a href="#time">time</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The global mixer time (in seconds; starting with <code>0</code> on the mixer's creation).<br/>Default is <code>0</code>.</p>
+						<p>The global mixer time (in seconds; starting with <code>0</code> on the mixer's creation).</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -47,11 +52,12 @@ one <code>AnimationMixer</code> may be used for each object.</p></div>
 						<p>A scaling factor for the global time.</p>
 <p>Note: Setting this member to <code>0</code> and later back to <code>1</code> is a
 possibility to pause/unpause all actions that are controlled by this
-mixer.<br/>Default is <code>1</code>.</p>
+mixer.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="clipAction" translate="no">.<a href="#clipAction">clipAction</a><span class="signature">( clip : <span class="param-type">AnimationClip | string</span>, optionalRoot : <span class="param-type">Object3D</span>, blendMode : <span class="param-type">NormalAnimationBlendMode | AdditiveAnimationBlendMode</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<h3 class="name name-method" id="clipAction" translate="no">.<a href="#clipAction">clipAction</a><span class="signature">( clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a> | string</span>, optionalRoot : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, blendMode : <span class="param-type"><a href="global.html#NormalAnimationBlendMode">NormalAnimationBlendMode</a> | <a href="global.html#AdditiveAnimationBlendMode">AdditiveAnimationBlendMode</a></span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns an instance of <a href="AnimationAction.html">AnimationAction</a> for the passed clip.</p>
@@ -62,16 +68,28 @@ same clip and root parameters always returns the same action.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>clip</code></td>
-									<td class="description last"><p>An animation clip or alternatively the name of the animation clip.</p></td>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>An animation clip or alternatively the name of the animation clip.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalRoot</code></td>
-									<td class="description last"><p>An alternative root object.</p></td>
+									<td class="name">
+										<strong>optionalRoot</strong>
+									</td>
+									<td class="description last">
+										<p>An alternative root object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>blendMode</code></td>
-									<td class="description last"><p>The blend mode.</p></td>
+									<td class="name">
+										<strong>blendMode</strong>
+									</td>
+									<td class="description last">
+										<p>The blend mode.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -79,7 +97,7 @@ same clip and root parameters always returns the same action.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The animation action.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="existingAction" translate="no">.<a href="#existingAction">existingAction</a><span class="signature">( clip : <span class="param-type">AnimationClip | string</span>, optionalRoot : <span class="param-type">Object3D</span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
+					<h3 class="name name-method" id="existingAction" translate="no">.<a href="#existingAction">existingAction</a><span class="signature">( clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a> | string</span>, optionalRoot : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="AnimationAction.html">AnimationAction</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns an existing animation action for the passed clip.</p>
@@ -87,12 +105,20 @@ same clip and root parameters always returns the same action.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>clip</code></td>
-									<td class="description last"><p>An animation clip or alternatively the name of the animation clip.</p></td>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>An animation clip or alternatively the name of the animation clip.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalRoot</code></td>
-									<td class="description last"><p>An alternative root object.</p></td>
+									<td class="name">
+										<strong>optionalRoot</strong>
+									</td>
+									<td class="description last">
+										<p>An alternative root object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -119,8 +145,12 @@ input parameter will be scaled by <a href="AnimationMixer.html#timeScale">Animat
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>time</code></td>
-									<td class="description last"><p>The time to set in seconds.</p></td>
+									<td class="name">
+										<strong>time</strong>
+									</td>
+									<td class="description last">
+										<p>The time to set in seconds.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -137,7 +167,7 @@ input parameter will be scaled by <a href="AnimationMixer.html#timeScale">Animat
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this animation mixer.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="uncacheAction" translate="no">.<a href="#uncacheAction">uncacheAction</a><span class="signature">( clip : <span class="param-type">AnimationClip | string</span>, optionalRoot : <span class="param-type">Object3D</span> )</span> </h3>
+					<h3 class="name name-method" id="uncacheAction" translate="no">.<a href="#uncacheAction">uncacheAction</a><span class="signature">( clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a> | string</span>, optionalRoot : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Deallocates all memory resources for an action. The action is identified by the
@@ -147,17 +177,25 @@ sure to call <a href="AnimationAction.html#stop">AnimationAction#stop</a> to dea
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>clip</code></td>
-									<td class="description last"><p>An animation clip or alternatively the name of the animation clip.</p></td>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>An animation clip or alternatively the name of the animation clip.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalRoot</code></td>
-									<td class="description last"><p>An alternative root object.</p></td>
+									<td class="name">
+										<strong>optionalRoot</strong>
+									</td>
+									<td class="description last">
+										<p>An alternative root object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="uncacheClip" translate="no">.<a href="#uncacheClip">uncacheClip</a><span class="signature">( clip : <span class="param-type">AnimationClip</span> )</span> </h3>
+					<h3 class="name name-method" id="uncacheClip" translate="no">.<a href="#uncacheClip">uncacheClip</a><span class="signature">( clip : <span class="param-type"><a href="AnimationClip.html">AnimationClip</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Deallocates all memory resources for a clip. Before using this method make
@@ -166,13 +204,17 @@ sure to call <a href="AnimationAction.html#stop">AnimationAction#stop</a> for al
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>clip</code></td>
-									<td class="description last"><p>The clip to uncache.</p></td>
+									<td class="name">
+										<strong>clip</strong>
+									</td>
+									<td class="description last">
+										<p>The clip to uncache.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="uncacheRoot" translate="no">.<a href="#uncacheRoot">uncacheRoot</a><span class="signature">( root : <span class="param-type">Object3D</span> )</span> </h3>
+					<h3 class="name name-method" id="uncacheRoot" translate="no">.<a href="#uncacheRoot">uncacheRoot</a><span class="signature">( root : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Deallocates all memory resources for a root object. Before using this
@@ -183,8 +225,12 @@ mixer operates on a single root.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>root</code></td>
-									<td class="description last"><p>The root object to uncache.</p></td>
+									<td class="name">
+										<strong>root</strong>
+									</td>
+									<td class="description last">
+										<p>The root object to uncache.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -199,8 +245,12 @@ time from <a href="Clock.html">Clock</a> or <a href="Timer.html">Timer</a>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>deltaTime</code></td>
-									<td class="description last"><p>The delta time in seconds.</p></td>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -210,7 +260,7 @@ time from <a href="Clock.html">Clock</a> or <a href="Timer.html">Timer</a>.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/AnimationMixer.js" target="_blank" rel="noopener" translate="no">src/animation/AnimationMixer.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/animation/AnimationMixer.js" translate="no" target="_blank" rel="noopener">src/animation/AnimationMixer.js</a>
 				</p>
 			</article>
 		</section>
