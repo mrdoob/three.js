@@ -308,7 +308,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -387,7 +387,7 @@
 
 
 				renderer.compute( computeWorkgroupsDispatched );
-				renderer.compute( computeParticles, workgroupGridIndirectBuffer );
+				renderer.compute( computeParticles, renderer.backend.isWebGLBackend !== undefined ? null : workgroupGridIndirectBuffer );
 
 				// result
 
