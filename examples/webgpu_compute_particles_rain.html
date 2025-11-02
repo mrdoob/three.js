@@ -204,8 +204,12 @@
 
 				} );
 
-				// Count doesn't matter when indirect
-				computeParticles = computeUpdate().compute( null, [ 64, 1, 1 ] ).setName( 'Particles' );
+				// When computing indirectly on the Renderer's WebGPUBackend, the count is ignored and only the dispatch size
+				// is equal to the product of the workgroup size by the dispatch grid. However, the WebGLBackend does not
+				// have any conception of indirect compute, workgroup sizes, or dispatch grids. Accordingly, in order for the example
+				// to function on both the WebGPUBackend and the WebGLBackend, the total number of computed particles still needs to be provided
+				// as the ComputeNode's count argument.
+				computeParticles = computeUpdate().compute( maxParticleCount, [ 64, 1, 1 ] ).setName( 'Particles' );
 
 				// rain
 
@@ -304,7 +308,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
