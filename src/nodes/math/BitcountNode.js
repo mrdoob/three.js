@@ -1,4 +1,4 @@
-import { addMethodChaining, float, Fn, If, nodeProxyIntent, uint, int, uvec2, uvec3, uvec4, ivec2, ivec3, ivec4 } from '../tsl/TSLCore.js';
+import { float, Fn, If, nodeProxyIntent, uint, int, uvec2, uvec3, uvec4, ivec2, ivec3, ivec4 } from '../tsl/TSLCore.js';
 import { bitcast, floatBitsToUint } from './BitcastNode.js';
 import MathNode, { negate } from './MathNode.js';
 
