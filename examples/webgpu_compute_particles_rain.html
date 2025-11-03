@@ -387,7 +387,7 @@
 
 
 				renderer.compute( computeWorkgroupsDispatched );
-				renderer.compute( computeParticles, renderer.backend.isWebGLBackend !== undefined ? null : workgroupGridIndirectBuffer );
+				renderer.compute( computeParticles, workgroupGridIndirectBuffer );
 
 				// result
 
