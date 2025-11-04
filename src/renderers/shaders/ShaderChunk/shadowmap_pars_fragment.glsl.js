@@ -89,30 +89,37 @@ export default /* glsl */`
 
 	float VSMShadow( sampler2D shadow, vec2 uv, float compare ) {
 
-		float occlusion = 1.0;
-
 		vec2 distribution = texture2DDistribution( shadow, uv );
+
+		float mean = distribution.x;
+		float variance = distribution.y * distribution.y;
 
 		#ifdef USE_REVERSED_DEPTH_BUFFER
 
-			float hard_shadow = step( distribution.x, compare );
+			float hard_shadow = step( mean, compare );
 
 		#else
 
-			float hard_shadow = step( compare, distribution.x );
+			float hard_shadow = step( compare, mean );
 
 		#endif
 
-		if ( hard_shadow != 1.0 ) {
+		// Early return if fully lit
+		if ( hard_shadow == 1.0 ) return 1.0;
 
-			float distance = compare - distribution.x;
-			float variance = max( 0.00000, distribution.y * distribution.y );
-			float softness_probability = variance / (variance + distance * distance ); // Chebeyshevs inequality
-			softness_probability = clamp( ( softness_probability - 0.3 ) / ( 0.95 - 0.3 ), 0.0, 1.0 ); // 0.3 reduces light bleed
-			occlusion = clamp( max( hard_shadow, softness_probability ), 0.0, 1.0 );
+		// Variance must be non-zero to avoid division by zero
+		variance = max( variance, 0.0000001 );
 
-		}
-		return occlusion;
+		// Distance from mean
+		float d = compare - mean;
+
+		// Chebyshev's inequality for upper bound on probability
+		float p_max = variance / ( variance + d * d );
+
+		// Reduce light bleeding by remapping [amount, 1] to [0, 1]
+		p_max = clamp( ( p_max - 0.3 ) / 0.65, 0.0, 1.0 );
+
+		return max( hard_shadow, p_max );
 
 	}
 
