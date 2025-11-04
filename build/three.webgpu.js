@@ -12732,6 +12732,7 @@ class ScreenNode extends Node {
 		/**
 		 * This output node.
 		 *
+		 * @private
 		 * @type {?Node}
 		 * @default null
 		 */
@@ -16927,6 +16928,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * A reference to the internal buffer attribute node.
 		 *
+		 * @private
 		 * @type {?BufferAttributeNode}
 		 * @default null
 		 */
@@ -16935,6 +16937,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * A reference to the internal varying node.
 		 *
+		 * @private
 		 * @type {?VaryingNode}
 		 * @default null
 		 */
@@ -36374,11 +36377,36 @@ class Texture3DNode extends TextureNode {
  * @tsl
  * @function
  * @param {Data3DTexture} value - The 3D texture.
- * @param {?Node<vec2|vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
  * @param {?Node<int>} [levelNode=null] - The level node.
  * @returns {Texture3DNode}
  */
 const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode ).setParameterLength( 1, 3 );
+
+/**
+ * TSL function for creating a texture node that fetches/loads texels without interpolation.
+ *
+ * @tsl
+ * @function
+ * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @param {?Node<float>} [biasNode=null] - The bias node.
+ * @returns {TextureNode}
+ */
+const texture3DLoad = ( ...params ) => texture3D( ...params ).setSampler( false );
+
+/**
+ * TSL function for creating a texture node that fetches/loads texels without interpolation.
+ *
+ * @tsl
+ * @function
+ * @param {?(Texture|TextureNode)} [value=EmptyTexture] - The texture.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
+ * @param {?Node<int>} [levelNode=null] - The level node.
+ * @returns {TextureNode}
+ */
+const texture3DLevel = ( value, uvNode, levelNode ) => texture3D( value, uvNode ).level( levelNode );
 
 /**
  * A special type of reference node that allows to link values in
@@ -42238,16 +42266,7 @@ const _shadowRenderObjectKeys = [];
  * @param {LightShadow} shadow - The light shadow object containing shadow properties.
  * @param {number} shadowType - The type of shadow map (e.g., BasicShadowMap).
  * @param {boolean} useVelocity - Whether to use velocity data for rendering.
- * @return {Function} A function that renders shadow objects.
- *
- * The returned function has the following parameters:
- * @param {Object3D} object - The 3D object to render.
- * @param {Scene} scene - The scene containing the object.
- * @param {Camera} _camera - The camera used for rendering.
- * @param {BufferGeometry} geometry - The geometry of the object.
- * @param {Material} material - The material of the object.
- * @param {Group} group - The group the object belongs to.
- * @param {...any} params - Additional parameters for rendering.
+ * @return {shadowRenderObjectFunction} A function that renders shadow objects.
  */
 const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
@@ -42295,6 +42314,7 @@ const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocit
 /**
  * Represents the shader code for the first VSM render pass.
  *
+ * @private
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
@@ -42341,6 +42361,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 /**
  * Represents the shader code for the second VSM render pass.
  *
+ * @private
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
@@ -42998,6 +43019,19 @@ class ShadowNode extends ShadowBaseNode {
 	}
 
 }
+
+/**
+ * Shadow Render Object Function.
+ *
+ * @function shadowRenderObjectFunction
+ * @param {Object3D} object - The 3D object to render.
+ * @param {Scene} scene - The scene containing the object.
+ * @param {Camera} _camera - The camera used for rendering.
+ * @param {BufferGeometry} geometry - The geometry of the object.
+ * @param {Material} material - The material of the object.
+ * @param {Group} group - The group the object belongs to.
+ * @param {...any} params - Additional parameters for rendering.
+ */
 
 /**
  * TSL function for creating an instance of `ShadowNode`.
@@ -46149,6 +46183,8 @@ var TSL = /*#__PURE__*/Object.freeze({
 	tangentWorld: tangentWorld,
 	texture: texture,
 	texture3D: texture3D,
+	texture3DLevel: texture3DLevel,
+	texture3DLoad: texture3DLoad,
 	textureBarrier: textureBarrier,
 	textureBicubic: textureBicubic,
 	textureBicubicLevel: textureBicubicLevel,
@@ -48976,9 +49012,9 @@ class NodeBuilder {
 			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
 			else if ( type === 'bool' ) value = false;
 			else if ( type === 'color' ) value = new Color();
-			else if ( type === 'vec2' ) value = new Vector2();
-			else if ( type === 'vec3' ) value = new Vector3();
-			else if ( type === 'vec4' ) value = new Vector4();
+			else if ( type === 'vec2' || type === 'uvec2' || type === 'ivec2' ) value = new Vector2();
+			else if ( type === 'vec3' || type === 'uvec3' || type === 'ivec3' ) value = new Vector3();
+			else if ( type === 'vec4' || type === 'uvec4' || type === 'ivec4' ) value = new Vector4();
 
 		}
 
@@ -53751,6 +53787,7 @@ class XRManager extends EventDispatcher {
 		/**
 		 * Whether the XR session uses layers.
 		 *
+		 * @private
 		 * @type {boolean}
 		 * @default false
 		 */
@@ -57915,6 +57952,7 @@ class Renderer {
 	/**
 	 * Resets the renderer to the initial state before WebXR started.
 	 *
+	 * @private
 	 */
 	_resetXRState() {
 
@@ -58305,6 +58343,7 @@ class Renderer {
 	 * Analyzes the given 3D object's hierarchy and builds render lists from the
 	 * processed hierarchy.
 	 *
+	 * @private
 	 * @param {Object3D} object - The 3D object to process (usually a scene).
 	 * @param {Camera} camera - The camera the object is rendered with.
 	 * @param {number} groupOrder - The group order is derived from the `renderOrder` of groups and is used to group 3D objects within groups.
@@ -58530,6 +58569,7 @@ class Renderer {
 	 * Retrieves shadow nodes for the given material. This is used to setup shadow passes.
 	 * The result is cached per material and updated when the material's version changes.
 	 *
+	 * @private
 	 * @param {Material} material
 	 * @returns {Object} - The shadow nodes for the material.
 	 */
@@ -59503,6 +59543,7 @@ class UniformsGroup extends UniformBuffer {
 	/**
 	 * Returns a typed array that matches the given data type.
 	 *
+	 * @private
 	 * @param {string} type - The data type.
 	 * @return {TypedArray} The typed array.
 	 */
@@ -71677,7 +71718,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.isData3DTexture ? '3d' : '2d' }T`;
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }T`;
 
 		let nodeCode = wgslCodeCache[ functionName ];
 
@@ -71686,7 +71727,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const includes = [];
 
 			// For 3D textures, use vec3f; for texture arrays, keep vec2f since array index is separate
-			const coordType = texture.isData3DTexture ? 'vec3f' : 'vec2f';
+			const coordType = texture.is3DTexture || texture.isData3DTexture ? 'vec3f' : 'vec2f';
 			let code = `fn ${ functionName }( coord : ${ coordType } ) -> ${ coordType } {\n\n\treturn ${ coordType }(\n`;
 
 			const addWrapSnippet = ( wrap, axis ) => {
@@ -71725,7 +71766,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			addWrapSnippet( texture.wrapT, 'y' );
 
-			if ( texture.isData3DTexture ) {
+			if ( texture.is3DTexture || texture.isData3DTexture ) {
 
 				code += ',\n';
 				addWrapSnippet( texture.wrapR, 'z' );
@@ -71783,7 +71824,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
 			const isMultisampled = primarySamples > 1;
 
-			if ( texture.isData3DTexture ) {
+			if ( texture.is3DTexture || texture.isData3DTexture ) {
 
 				dimensionType = 'vec3<u32>';
 
@@ -71809,7 +71850,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
 
-			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
+			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.is3DTexture || texture.isData3DTexture ) {
 
 				textureData.arrayLayerCount = new VarNode(
 					new ExpressionNode(
@@ -71879,7 +71920,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		const wrapFunction = this.generateWrapFunction( texture );
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
 
-		const vecType = texture.isData3DTexture ? 'vec3' : 'vec2';
+		const vecType = texture.is3DTexture || texture.isData3DTexture ? 'vec3' : 'vec2';
 
 		if ( offsetSnippet ) {
 
