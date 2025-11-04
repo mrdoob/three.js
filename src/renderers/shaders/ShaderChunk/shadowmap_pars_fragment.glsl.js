@@ -154,19 +154,23 @@ export default /* glsl */`
 
 			float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;
 
+			vec2 offset = texelSize * shadowRadius;
+			vec2 uv = shadowCoord.xy;
+			float compare = shadowCoord.z;
+
 			shadow = (
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 0, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 1, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 2, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 3, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 4, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 5, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 6, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 7, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 8, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 9, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 10, 12, phi ) * texelSize * shadowRadius, shadowCoord.z ) +
-				texture2DCompare( shadowMap, shadowCoord.xy + vogelDiskSample( 11, 12, phi ) * texelSize * shadowRadius, shadowCoord.z )
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 0, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 1, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 2, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 3, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 4, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 5, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 6, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 7, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 8, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 9, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 10, 12, phi ) * offset, compare ) +
+				texture2DCompare( shadowMap, uv + vogelDiskSample( 11, 12, phi ) * offset, compare )
 			) * ( 1.0 / 12.0 );
 
 		#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
@@ -317,24 +321,27 @@ export default /* glsl */`
 
 				float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;
 
-				vec2 d0 = vogelDiskSample( 0, 8, phi ) * shadowRadius * texelSize.y;
-				vec2 d1 = vogelDiskSample( 1, 8, phi ) * shadowRadius * texelSize.y;
-				vec2 d2 = vogelDiskSample( 2, 8, phi ) * shadowRadius * texelSize.y;
-				vec2 d3 = vogelDiskSample( 3, 8, phi ) * shadowRadius * texelSize.y;
-				vec2 d4 = vogelDiskSample( 4, 8, phi ) * shadowRadius * texelSize.y;
-				vec2 d5 = vogelDiskSample( 5, 8, phi ) * shadowRadius * texelSize.y;
-				vec2 d6 = vogelDiskSample( 6, 8, phi ) * shadowRadius * texelSize.y;
-				vec2 d7 = vogelDiskSample( 7, 8, phi ) * shadowRadius * texelSize.y;
+				float offset = shadowRadius * texelSize.y;
+				float texelSizeY = texelSize.y;
+
+				vec2 d0 = vogelDiskSample( 0, 8, phi ) * offset;
+				vec2 d1 = vogelDiskSample( 1, 8, phi ) * offset;
+				vec2 d2 = vogelDiskSample( 2, 8, phi ) * offset;
+				vec2 d3 = vogelDiskSample( 3, 8, phi ) * offset;
+				vec2 d4 = vogelDiskSample( 4, 8, phi ) * offset;
+				vec2 d5 = vogelDiskSample( 5, 8, phi ) * offset;
+				vec2 d6 = vogelDiskSample( 6, 8, phi ) * offset;
+				vec2 d7 = vogelDiskSample( 7, 8, phi ) * offset;
 
 				shadow = (
-					texture2DCompare( shadowMap, cubeToUV( bd3D + vec3( d0.x, d0.y, d0.x ), texelSize.y ), dp ) +
-					texture2DCompare( shadowMap, cubeToUV( bd3D + vec3( d1.x, d1.y, d1.x ), texelSize.y ), dp ) +
-					texture2DCompare( shadowMap, cubeToUV( bd3D + vec3( d2.x, d2.y, d2.x ), texelSize.y ), dp ) +
-					texture2DCompare( shadowMap, cubeToUV( bd3D + vec3( d3.x, d3.y, d3.x ), texelSize.y ), dp ) +
-					texture2DCompare( shadowMap, cubeToUV( bd3D + vec3( d4.x, d4.y, d4.x ), texelSize.y ), dp ) +
-					texture2DCompare( shadowMap, cubeToUV( bd3D + vec3( d5.x, d5.y, d5.x ), texelSize.y ), dp ) +
-					texture2DCompare( shadowMap, cubeToUV( bd3D + vec3( d6.x, d6.y, d6.x ), texelSize.y ), dp ) +
-					texture2DCompare( shadowMap, cubeToUV( bd3D + vec3( d7.x, d7.y, d7.x ), texelSize.y ), dp )
+					texture2DCompare( shadowMap, cubeToUV( bd3D + d0.xyx, texelSizeY ), dp ) +
+					texture2DCompare( shadowMap, cubeToUV( bd3D + d1.xyx, texelSizeY ), dp ) +
+					texture2DCompare( shadowMap, cubeToUV( bd3D + d2.xyx, texelSizeY ), dp ) +
+					texture2DCompare( shadowMap, cubeToUV( bd3D + d3.xyx, texelSizeY ), dp ) +
+					texture2DCompare( shadowMap, cubeToUV( bd3D + d4.xyx, texelSizeY ), dp ) +
+					texture2DCompare( shadowMap, cubeToUV( bd3D + d5.xyx, texelSizeY ), dp ) +
+					texture2DCompare( shadowMap, cubeToUV( bd3D + d6.xyx, texelSizeY ), dp ) +
+					texture2DCompare( shadowMap, cubeToUV( bd3D + d7.xyx, texelSizeY ), dp )
 				) * ( 1.0 / 8.0 );
 
 			#else // no percentage-closer filtering
