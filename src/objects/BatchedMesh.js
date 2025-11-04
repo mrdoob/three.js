@@ -874,7 +874,6 @@ class BatchedMesh extends Mesh {
 	 * Repacks the sub geometries in [name] to remove any unused space remaining from
 	 * previously deleted geometry, freeing up space to add new geometry.
 	 *
-	 * @param {number} instanceId - The ID of the instance to remove from the batch.
 	 * @return {BatchedMesh} A reference to this batched mesh.
 	 */
 	optimize() {
