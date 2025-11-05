@@ -497,7 +497,7 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
-		if ( material.transmission > 0 ) {
+		if ( material.transmission > 0 || material.diffuseTransmission > 0 ) {
 
 			uniforms.transmission.value = material.transmission;
 			uniforms.transmissionSamplerMap.value = transmissionRenderTarget.texture;

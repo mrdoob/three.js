@@ -16,5 +16,9 @@ export default /* glsl */`
 
 	#endif
 
+	// Reuse transmission render target uniforms
+	uniform vec2 transmissionSamplerSize;
+	uniform sampler2D transmissionSamplerMap;
+
 #endif
 `;

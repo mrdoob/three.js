@@ -108,7 +108,7 @@ function WebGLRenderList() {
 
 		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		if ( material.transmission > 0.0 ) {
+		if ( material.transmission > 0.0 || material.diffuseTransmission > 0.0 ) {
 
 			transmissive.push( renderItem );
 
@@ -128,7 +128,7 @@ function WebGLRenderList() {
 
 		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		if ( material.transmission > 0.0 ) {
+		if ( material.transmission > 0.0 || material.diffuseTransmission > 0.0 ) {
 
 			transmissive.unshift( renderItem );
 

@@ -17,9 +17,18 @@ export default /* glsl */`
 
 	#endif
 
-	// Apply diffuse transmission to the diffuse component
-	// The diffuse component is mixed between reflected and transmitted light
-	totalDiffuse = mix( totalDiffuse, totalDiffuse * diffuseTransmissionTint, diffuseTransmissionFactor );
+	// Sample light from behind the surface (without refraction, unlike specular transmission)
+	// Map fragment coord to normalized device coordinates for sampling the transmission render target
+	vec2 fragCoord = gl_FragCoord.xy / transmissionSamplerSize;
+
+	// Sample the transmission render target to get light from behind the surface
+	vec4 transmittedLight = texture2D( transmissionSamplerMap, fragCoord );
+
+	// Apply diffuse transmission color tint to the transmitted light
+	vec3 diffuseTransmittedLight = transmittedLight.rgb * diffuseTransmissionTint;
+
+	// Mix between reflected diffuse and transmitted diffuse light
+	totalDiffuse = mix( totalDiffuse, diffuseTransmittedLight, diffuseTransmissionFactor );
 
 #endif
 `;
