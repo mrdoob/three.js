@@ -2,6 +2,7 @@ import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
 
 import { DynamicDrawUsage } from '../../constants.js';
+import { error } from '../../utils.js';
 
 /**
  * This renderer module manages geometry attributes.
@@ -63,6 +64,12 @@ class Attributes extends DataMap {
 		if ( data.version === undefined ) {
 
 			if ( type === AttributeType.VERTEX ) {
+
+				if ( attribute.itemSize > 4 ) {
+
+					error( `WebGPURenderer: Unable to use buffer attribute with item size ${attribute.itemSize}. Item size must be 1, 2, 3, or 4.` );
+
+				}
 
 				this.backend.createAttribute( attribute );
 
