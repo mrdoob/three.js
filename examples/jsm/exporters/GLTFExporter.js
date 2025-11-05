@@ -137,6 +137,12 @@ class GLTFExporter {
 
 		this.register( function ( writer ) {
 
+			return new GLTFMaterialsDiffuseTransmissionExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
 			return new GLTFMaterialsVolumeExtension( writer );
 
 		} );
@@ -2925,6 +2931,71 @@ class GLTFMaterialsTransmissionExtension {
 			};
 			writer.applyTextureTransform( transmissionMapDef, material.transmissionMap );
 			extensionDef.transmissionTexture = transmissionMapDef;
+
+		}
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
+		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+/**
+ * Materials Diffuse Transmission Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_diffuse_transmission
+ *
+ * @private
+ */
+class GLTFMaterialsDiffuseTransmissionExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'KHR_materials_diffuse_transmission';
+
+	}
+
+	async writeMaterialAsync( material, materialDef ) {
+
+		if ( ! material.isMeshPhysicalMaterial || material.diffuseTransmission === 0 ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		extensionDef.diffuseTransmissionFactor = material.diffuseTransmission;
+
+		if ( material.diffuseTransmissionMap ) {
+
+			const diffuseTransmissionMapDef = {
+				index: await writer.processTextureAsync( material.diffuseTransmissionMap ),
+				texCoord: material.diffuseTransmissionMap.channel
+			};
+			writer.applyTextureTransform( diffuseTransmissionMapDef, material.diffuseTransmissionMap );
+			extensionDef.diffuseTransmissionTexture = diffuseTransmissionMapDef;
+
+		}
+
+		if ( material.diffuseTransmissionColor &&
+			 ( material.diffuseTransmissionColor.r !== 1 || material.diffuseTransmissionColor.g !== 1 || material.diffuseTransmissionColor.b !== 1 ) ) {
+
+			extensionDef.diffuseTransmissionColorFactor = material.diffuseTransmissionColor.toArray();
+
+		}
+
+		if ( material.diffuseTransmissionColorMap ) {
+
+			const diffuseTransmissionColorMapDef = {
+				index: await writer.processTextureAsync( material.diffuseTransmissionColorMap ),
+				texCoord: material.diffuseTransmissionColorMap.channel
+			};
+			writer.applyTextureTransform( diffuseTransmissionColorMapDef, material.diffuseTransmissionColorMap );
+			extensionDef.diffuseTransmissionColorTexture = diffuseTransmissionColorMapDef;
 
 		}
 

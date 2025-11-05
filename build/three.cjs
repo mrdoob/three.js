@@ -27808,7 +27808,6 @@ class BatchedMesh extends Mesh {
 	 * Repacks the sub geometries in [name] to remove any unused space remaining from
 	 * previously deleted geometry, freeing up space to add new geometry.
 	 *
-	 * @param {number} instanceId - The ID of the instance to remove from the batch.
 	 * @return {BatchedMesh} A reference to this batched mesh.
 	 */
 	optimize() {
@@ -38792,6 +38791,32 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.attenuationColor = new Color( 1, 1, 1 );
 
 		/**
+		 * The alpha channel of this texture is multiplied against `diffuseTransmission`, for per-pixel
+		 * control over diffuse transmission.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.diffuseTransmissionMap = null;
+
+		/**
+		 * The color that tints the transmitted light using diffuse transmission.
+		 *
+		 * @type {Color}
+		 * @default (1,1,1)
+		 */
+		this.diffuseTransmissionColor = new Color( 1, 1, 1 );
+
+		/**
+		 * The RGB channels of this texture are multiplied against `diffuseTransmissionColor`,
+		 * for per-pixel control over diffuse transmission color.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.diffuseTransmissionColorMap = null;
+
+		/**
 		 * A float that scales the amount of specular reflection for non-metals only.
 		 * When set to zero, the model is effectively Lambertian. From `0.0` to `1.0`.
 		 *
@@ -38832,6 +38857,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this._iridescence = 0;
 		this._sheen = 0.0;
 		this._transmission = 0;
+		this._diffuseTransmission = 0;
 
 		this.setValues( parameters );
 
@@ -38991,6 +39017,34 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	}
 
+	/**
+	 * Degree of diffuse transmission (or optical translucency), from `0.0` to `1.0`.
+	 *
+	 * This property models light diffusely transmitted through thin material surfaces,
+	 * like leaves or paper. It replaces the standard diffuse reflection with a mix of
+	 * diffuse reflection and diffuse transmission.
+	 *
+	 * @type {number}
+	 * @default 0
+	 */
+	get diffuseTransmission() {
+
+		return this._diffuseTransmission;
+
+	}
+
+	set diffuseTransmission( value ) {
+
+		if ( this._diffuseTransmission > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._diffuseTransmission = value;
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -39035,6 +39089,11 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.thicknessMap = source.thicknessMap;
 		this.attenuationDistance = source.attenuationDistance;
 		this.attenuationColor.copy( source.attenuationColor );
+
+		this.diffuseTransmission = source.diffuseTransmission;
+		this.diffuseTransmissionMap = source.diffuseTransmissionMap;
+		this.diffuseTransmissionColor.copy( source.diffuseTransmissionColor );
+		this.diffuseTransmissionColorMap = source.diffuseTransmissionColorMap;
 
 		this.specularIntensity = source.specularIntensity;
 		this.specularIntensityMap = source.specularIntensityMap;

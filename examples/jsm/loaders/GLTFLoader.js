@@ -180,6 +180,12 @@ class GLTFLoader extends Loader {
 
 		this.register( function ( parser ) {
 
+			return new GLTFMaterialsDiffuseTransmissionExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
 			return new GLTFMaterialsVolumeExtension( parser );
 
 		} );
@@ -604,6 +610,7 @@ const EXTENSIONS = {
 	KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
 	KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
 	KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
+	KHR_MATERIALS_DIFFUSE_TRANSMISSION: 'KHR_materials_diffuse_transmission',
 	KHR_MATERIALS_DISPERSION: 'KHR_materials_dispersion',
 	KHR_MATERIALS_IOR: 'KHR_materials_ior',
 	KHR_MATERIALS_SHEEN: 'KHR_materials_sheen',
@@ -1211,6 +1218,79 @@ class GLTFMaterialsTransmissionExtension {
 		if ( extension.transmissionTexture !== undefined ) {
 
 			pending.push( parser.assignTexture( materialParams, 'transmissionMap', extension.transmissionTexture ) );
+
+		}
+
+		return Promise.all( pending );
+
+	}
+
+}
+
+/**
+ * Materials Diffuse Transmission Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_diffuse_transmission
+ *
+ * @private
+ */
+class GLTFMaterialsDiffuseTransmissionExtension {
+
+	constructor( parser ) {
+
+		this.parser = parser;
+		this.name = EXTENSIONS.KHR_MATERIALS_DIFFUSE_TRANSMISSION;
+
+	}
+
+	getMaterialType( materialIndex ) {
+
+		const parser = this.parser;
+		const materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
+
+		return MeshPhysicalMaterial;
+
+	}
+
+	extendMaterialParams( materialIndex, materialParams ) {
+
+		const parser = this.parser;
+		const materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
+
+			return Promise.resolve();
+
+		}
+
+		const pending = [];
+
+		const extension = materialDef.extensions[ this.name ];
+
+		if ( extension.diffuseTransmissionFactor !== undefined ) {
+
+			materialParams.diffuseTransmission = extension.diffuseTransmissionFactor;
+
+		}
+
+		if ( extension.diffuseTransmissionTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'diffuseTransmissionMap', extension.diffuseTransmissionTexture ) );
+
+		}
+
+		if ( extension.diffuseTransmissionColorFactor !== undefined ) {
+
+			const colorFactor = extension.diffuseTransmissionColorFactor;
+			materialParams.diffuseTransmissionColor = new Color().setRGB( colorFactor[ 0 ], colorFactor[ 1 ], colorFactor[ 2 ], LinearSRGBColorSpace );
+
+		}
+
+		if ( extension.diffuseTransmissionColorTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'diffuseTransmissionColorMap', extension.diffuseTransmissionColorTexture, SRGBColorSpace ) );
 
 		}
 
