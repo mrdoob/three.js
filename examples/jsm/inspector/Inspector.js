@@ -31,7 +31,7 @@ class Inspector extends RendererInspector {
 		const performance = new Performance();
 		profiler.addTab( performance );
 
-		const consoleTab = new Console();
+		const consoleTab = new Console( { allowDetach: false } );
 		profiler.addTab( consoleTab );
 
 		profiler.loadLayout();

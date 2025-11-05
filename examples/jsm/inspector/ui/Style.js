@@ -390,6 +390,10 @@ export class Style {
 	opacity: 0.6;
 }
 
+.tab-btn.no-detach.active::before {
+	display: none;
+}
+
 #floating-btn,
 #maximize-btn,
 #hide-panel-btn {

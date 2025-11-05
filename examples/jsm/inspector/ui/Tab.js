@@ -1,6 +1,19 @@
+/**
+ * Tab class
+ * @param {string} title - The title of the tab
+ * @param {Object} options - Options for the tab
+ * @param {boolean} [options.allowDetach=true] - Whether the tab can be detached into a separate window
+ *
+ * @example
+ * // Create a tab that can be detached (default behavior)
+ * const tab1 = new Tab('My Tab');
+ *
+ * // Create a tab that cannot be detached
+ * const tab2 = new Tab('Fixed Tab', { allowDetach: false });
+ */
 export class Tab {
 
-	constructor( title ) {
+	constructor( title, options = {} ) {
 
 		this.id = title.toLowerCase();
 		this.button = document.createElement( 'button' );
@@ -15,6 +28,7 @@ export class Tab {
 		this.isVisible = true;
 		this.isDetached = false;
 		this.detachedWindow = null;
+		this.allowDetach = options.allowDetach !== undefined ? options.allowDetach : true;
 
 	}
 

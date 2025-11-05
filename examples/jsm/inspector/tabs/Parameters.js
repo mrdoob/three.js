@@ -299,9 +299,9 @@ class ParametersGroup {
 
 class Parameters extends Tab {
 
-	constructor() {
+	constructor( options = {} ) {
 
-		super( 'Parameters' );
+		super( 'Parameters', options );
 
 		const paramList = new List( 'Property', 'Value' );
 		paramList.domElement.classList.add( 'parameters' );

@@ -282,6 +282,13 @@ export class Profiler {
 
 		this.tabs[ tab.id ] = tab;
 
+		// Add visual indicator for tabs that cannot be detached
+		if ( tab.allowDetach === false ) {
+
+			tab.button.classList.add( 'no-detach' );
+
+		}
+
 		this.setupTabDragAndDrop( tab );
 
 		this.tabsContainer.appendChild( tab.button );
@@ -299,6 +306,21 @@ export class Profiler {
 				this.setActiveTab( tab.id );
 
 			} );
+
+			return;
+
+		}
+
+		// Disable drag and drop if tab doesn't allow detach
+		if ( tab.allowDetach === false ) {
+
+			tab.button.addEventListener( 'click', () => {
+
+				this.setActiveTab( tab.id );
+
+			} );
+
+			tab.button.style.cursor = 'default';
 
 			return;
 
@@ -416,6 +438,9 @@ export class Profiler {
 
 		} );
 
+		// Set cursor to grab for tabs that can be detached
+		tab.button.style.cursor = 'grab';
+
 	}
 
 	createPreviewWindow( tab, x, y ) {
@@ -465,6 +490,9 @@ export class Profiler {
 	detachTab( tab, x, y ) {
 
 		if ( tab.isDetached ) return;
+
+		// Check if tab allows detachment
+		if ( tab.allowDetach === false ) return;
 
 		const allButtons = Array.from( this.tabsContainer.children );
 		tab.originalIndex = allButtons.indexOf( tab.button );

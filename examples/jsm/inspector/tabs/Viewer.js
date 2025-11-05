@@ -6,9 +6,9 @@ import { RendererUtils, NoToneMapping, LinearSRGBColorSpace } from 'three/webgpu
 
 class Viewer extends Tab {
 
-	constructor() {
+	constructor( options = {} ) {
 
-		super( 'Viewer' );
+		super( 'Viewer', options );
 
 		const nodeList = new List( 'Viewer', 'Name' );
 		nodeList.setGridStyle( '150px minmax(200px, 2fr)' );
