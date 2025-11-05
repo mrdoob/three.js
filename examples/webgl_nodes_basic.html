@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - legacy renderer with NodeMaterial</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>WebGL Legacy - NodeMaterial Support</span>
+			</div>
+
+			<small>Demonstrating NodeMaterial with legacy WebGLRenderer using non-invasive adapter</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { MeshBasicNodeMaterial } from 'three/tsl';
+			import { color, oscSine, time } from 'three/tsl';
+			import { WebGLRendererWithNodes } from 'three/addons/renderers/WebGLRendererWithNodes.js';
+
+			let camera, scene, renderer;
+			let mesh;
+
+			init();
+
+			async function init() {
+
+				// Camera
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.z = 2;
+
+				// Scene
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// Geometry
+				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+
+				// NodeMaterial with animated color using TSL
+				const material = new MeshBasicNodeMaterial();
+
+				// Create an animated color that oscillates over time
+				const r = oscSine( time ).mul( 0.5 ).add( 0.5 );
+				const g = oscSine( time.mul( 0.7 ).add( 1.0 ) ).mul( 0.5 ).add( 0.5 );
+				const b = oscSine( time.mul( 1.3 ).add( 2.0 ) ).mul( 0.5 ).add( 0.5 );
+
+				material.colorNode = color( r, g, b );
+
+				// Mesh
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				// Renderer - WebGLRendererWithNodes (extends legacy WebGLRenderer)
+				// Automatically compiles NodeMaterials to ShaderMaterials
+				renderer = new WebGLRendererWithNodes( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// Handle window resize
+				window.addEventListener( 'resize', onWindowResize );
+
+				// Log renderer info
+				console.log( 'Renderer type:', renderer.constructor.name );
+				console.log( 'Using legacy WebGLRenderer:', renderer.isWebGLRenderer );
+				console.log( 'NodeMaterial support:', renderer.isWebGLRendererWithNodes );
+
+				animate();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				mesh.rotation.x += 0.01;
+				mesh.rotation.y += 0.02;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
