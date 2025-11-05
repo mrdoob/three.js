@@ -906,6 +906,9 @@ export class Profiler {
 				e.stopPropagation();
 				isResizing = true;
 
+				// Bring window to front when resizing
+				this.bringWindowToFront( windowPanel );
+
 				startX = e.clientX || e.touches[ 0 ].clientX;
 				startY = e.clientY || e.touches[ 0 ].clientY;
 				startWidth = windowPanel.offsetWidth;
