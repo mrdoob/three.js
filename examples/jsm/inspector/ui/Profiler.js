@@ -289,10 +289,79 @@ export class Profiler {
 
 		}
 
+		// Set visibility change callback
+		tab.onVisibilityChange = () => this.updatePanelSize();
+
 		this.setupTabDragAndDrop( tab );
 
 		this.tabsContainer.appendChild( tab.button );
 		this.contentWrapper.appendChild( tab.content );
+
+		// Update panel size when tabs change
+		this.updatePanelSize();
+
+	}
+
+	updatePanelSize() {
+
+		// Check if there are any visible tabs in the panel
+		const hasVisibleTabs = Object.values( this.tabs ).some( tab => ! tab.isDetached && tab.isVisible );
+
+		// Add or remove CSS class to indicate no tabs state
+		if ( ! hasVisibleTabs ) {
+
+			this.panel.classList.add( 'no-tabs' );
+
+			// If maximized and no tabs, restore to normal size
+			if ( this.panel.classList.contains( 'maximized' ) ) {
+
+				this.panel.classList.remove( 'maximized' );
+				this.maximizeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+
+			}
+
+			// No tabs visible - set to minimum size
+			if ( this.position === 'bottom' ) {
+
+				this.panel.style.height = '38px';
+
+			} else if ( this.position === 'right' ) {
+
+				// 45px = width of one button column
+				this.panel.style.width = '45px';
+
+			}
+
+		} else {
+
+			this.panel.classList.remove( 'no-tabs' );
+
+			if ( this.tabs && Object.keys( this.tabs ).length > 0 ) {
+
+				// Has tabs - restore to saved size only if we had set it to minimum before
+				if ( this.position === 'bottom' ) {
+
+					const currentHeight = parseInt( this.panel.style.height );
+					if ( currentHeight === 38 ) {
+
+						this.panel.style.height = `${ this.lastHeightBottom }px`;
+
+					}
+
+				} else if ( this.position === 'right' ) {
+
+					const currentWidth = parseInt( this.panel.style.width );
+					if ( currentWidth === 45 ) {
+
+						this.panel.style.width = `${ this.lastWidthRight }px`;
+
+					}
+
+				}
+
+			}
+
+		}
 
 	}
 
@@ -582,6 +651,9 @@ export class Profiler {
 			this.activeTabId = null;
 
 		}
+
+		// Update panel size after detaching
+		this.updatePanelSize();
 
 		this.saveLayout();
 
@@ -996,6 +1068,9 @@ export class Profiler {
 
 		this.setActiveTab( tab.id );
 
+		// Update panel size after reattaching
+		this.updatePanelSize();
+
 		this.saveLayout();
 
 	}
@@ -1126,6 +1201,9 @@ export class Profiler {
 
 		}, 50 );
 
+		// Update panel size based on visible tabs
+		this.updatePanelSize();
+
 		// Save layout after position change
 		this.saveLayout();
 
@@ -1247,6 +1325,9 @@ export class Profiler {
 
 			}
 
+			// Update panel size after loading layout
+			this.updatePanelSize();
+
 		} catch ( e ) {
 
 			console.warn( 'Failed to load profiler layout:', e );
@@ -1346,6 +1427,9 @@ export class Profiler {
 			}
 
 		}
+
+		// Update panel size after restoring detached tabs
+		this.updatePanelSize();
 
 	}
 

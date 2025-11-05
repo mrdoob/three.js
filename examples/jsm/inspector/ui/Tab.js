@@ -29,6 +29,7 @@ export class Tab {
 		this.isDetached = false;
 		this.detachedWindow = null;
 		this.allowDetach = options.allowDetach !== undefined ? options.allowDetach : true;
+		this.onVisibilityChange = null; // Callback for visibility changes
 
 	}
 
@@ -55,6 +56,13 @@ export class Tab {
 
 		}
 
+		// Notify profiler of visibility change
+		if ( this.onVisibilityChange ) {
+
+			this.onVisibilityChange();
+
+		}
+
 	}
 
 	hide() {
@@ -68,6 +76,13 @@ export class Tab {
 		if ( this.isDetached && this.detachedWindow ) {
 
 			this.detachedWindow.panel.style.display = 'none';
+
+		}
+
+		// Notify profiler of visibility change
+		if ( this.onVisibilityChange ) {
+
+			this.onVisibilityChange();
 
 		}
 

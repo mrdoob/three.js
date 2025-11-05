@@ -277,6 +277,99 @@ export class Style {
 	width: calc(100% - 90px);
 }
 
+/* ===== RULES FOR WHEN THERE ARE NO TABS ===== */
+
+/* Horizontal mode (bottom/top) without tabs */
+#profiler-panel.position-bottom.no-tabs:not(.maximized),
+#profiler-panel.position-top.no-tabs:not(.maximized) {
+	height: 38px !important;
+	min-height: 38px !important;
+}
+
+#profiler-panel.position-bottom.no-tabs .profiler-header,
+#profiler-panel.position-top.no-tabs .profiler-header {
+	width: 100%;
+	height: 38px;
+	border-bottom: none;
+}
+
+#profiler-panel.position-bottom.no-tabs .profiler-content-wrapper,
+#profiler-panel.position-top.no-tabs .profiler-content-wrapper {
+	display: none;
+}
+
+#profiler-panel.position-bottom.no-tabs .panel-resizer,
+#profiler-panel.position-top.no-tabs .panel-resizer {
+	display: none;
+}
+
+/* Vertical mode (right/left) without tabs */
+#profiler-panel.position-right.no-tabs:not(.maximized),
+#profiler-panel.position-left.no-tabs:not(.maximized) {
+	width: 45px !important;
+	min-width: 45px !important;
+}
+
+/* Vertical layout for header when no tabs */
+#profiler-panel.position-right.no-tabs .profiler-header,
+#profiler-panel.position-left.no-tabs .profiler-header {
+	width: 100%;
+	flex-direction: column;
+	height: 100%;
+	border-bottom: none;
+}
+
+/* Vertical layout for controls when no tabs */
+#profiler-panel.position-right.no-tabs .profiler-controls,
+#profiler-panel.position-left.no-tabs .profiler-controls {
+	position: static;
+	flex-direction: column-reverse;
+	justify-content: flex-end;
+	width: 100%;
+	height: 100%;
+	border-bottom: none;
+	border-left: none;
+	background: transparent;
+}
+
+#profiler-panel.position-right.no-tabs .profiler-controls button,
+#profiler-panel.position-left.no-tabs .profiler-controls button {
+	width: 100%;
+	height: 45px;
+	border-left: none;
+	border-top: none;
+	border-bottom: 1px solid var(--profiler-border);
+}
+
+#profiler-panel.position-right.no-tabs #maximize-btn,
+#profiler-panel.position-left.no-tabs #maximize-btn,
+#profiler-panel.position-bottom.no-tabs #maximize-btn,
+#profiler-panel.position-top.no-tabs #maximize-btn {
+	display: none;
+}
+
+#profiler-panel.position-right.no-tabs .profiler-content-wrapper,
+#profiler-panel.position-left.no-tabs .profiler-content-wrapper {
+	display: none;
+}
+
+#profiler-panel.position-right.no-tabs .profiler-tabs,
+#profiler-panel.position-left.no-tabs .profiler-tabs {
+	display: none;
+}
+
+#profiler-panel.position-right.no-tabs .panel-resizer,
+#profiler-panel.position-left.no-tabs .panel-resizer {
+	display: none;
+}
+
+/* Hide position toggle on mobile without tabs */
+#profiler-panel.hide-position-toggle.position-right.no-tabs:not(.maximized),
+#profiler-panel.hide-position-toggle.position-left.no-tabs:not(.maximized) {
+	width: 45px !important;
+	min-width: 45px !important;
+}
+
 /* Hide drag indicator on mobile devices */
 #profiler-panel.hide-position-toggle .tab-btn.active::before {
 	display: none;
@@ -402,11 +495,23 @@ export class Style {
 	border-left: 1px solid var(--profiler-border);
 	color: var(--text-secondary);
 	width: 45px;
+	height: 100%;
 	cursor: pointer;
 	transition: all 0.2s;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-shrink: 0;
+}
+
+/* Disable transitions in vertical mode to avoid broken animations */
+#profiler-panel.position-right #floating-btn,
+#profiler-panel.position-right #maximize-btn,
+#profiler-panel.position-right #hide-panel-btn,
+#profiler-panel.position-left #floating-btn,
+#profiler-panel.position-left #maximize-btn,
+#profiler-panel.position-left #hide-panel-btn {
+	transition: background-color 0.2s, color 0.2s;
 }
 
 #floating-btn:hover,
