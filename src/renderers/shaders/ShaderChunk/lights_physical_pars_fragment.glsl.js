@@ -9,6 +9,9 @@ struct PhysicalMaterial {
 	vec3 specularColor;
 	float specularF90;
 	float dispersion;
+	vec3 specularColorDielectric; // F0 for dielectric, used for energy conservation
+	vec3 baseColor; // Base color before metalness, for metallic multiscattering
+	float metalness; // Metalness factor
 
 	#ifdef USE_CLEARCOAT
 		float clearcoat;
@@ -558,23 +561,45 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	#endif
 
 	// Both indirect specular and indirect diffuse light accumulate here
+	// Compute multiscattering separately for dielectric and metallic, then mix
 
-	vec3 singleScattering = vec3( 0.0 );
-	vec3 multiScattering = vec3( 0.0 );
 	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
+
+	// Dielectric path: F0 from IOR or 0.04
+	vec3 singleScatteringDielectric = vec3( 0.0 );
+	vec3 multiScatteringDielectric = vec3( 0.0 );
 
 	#ifdef USE_IRIDESCENCE
 
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScattering, multiScattering );
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
 
 	#else
 
-		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );
+		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
 
 	#endif
 
-	vec3 totalScattering = singleScattering + multiScattering;
-	vec3 diffuse = material.diffuseColor * ( 1.0 - max( max( totalScattering.r, totalScattering.g ), totalScattering.b ) );
+	// Metallic path: F0 from base color
+	vec3 singleScatteringMetallic = vec3( 0.0 );
+	vec3 multiScatteringMetallic = vec3( 0.0 );
+
+	#ifdef USE_IRIDESCENCE
+
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.baseColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+
+	#else
+
+		computeMultiscattering( geometryNormal, geometryViewDir, material.baseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+
+	#endif
+
+	// Mix based on metalness
+	vec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );
+	vec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );
+
+	// Diffuse energy conservation uses dielectric path
+	vec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;
+	vec3 diffuse = material.diffuseColor * ( 1.0 - max( max( totalScatteringDielectric.r, totalScatteringDielectric.g ), totalScatteringDielectric.b ) );
 
 	reflectedLight.indirectSpecular += radiance * singleScattering;
 	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;

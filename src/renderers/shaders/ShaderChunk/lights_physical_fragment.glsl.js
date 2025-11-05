@@ -1,5 +1,7 @@
 export default /* glsl */`
 PhysicalMaterial material;
+material.baseColor = diffuseColor.rgb;
+material.metalness = metalnessFactor;
 material.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );
 
 vec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );
@@ -40,11 +42,13 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#endif
 
-	material.specularColor = mix( min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
+	material.specularColorDielectric = min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor;
+	material.specularColor = mix( material.specularColorDielectric, diffuseColor.rgb, metalnessFactor );
 
 #else
 
-	material.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );
+	material.specularColorDielectric = vec3( 0.04 );
+	material.specularColor = mix( material.specularColorDielectric, diffuseColor.rgb, metalnessFactor );
 	material.specularF90 = 1.0;
 
 #endif
