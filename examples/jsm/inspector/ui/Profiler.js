@@ -336,7 +336,7 @@ export class Profiler {
 
 			this.panel.classList.remove( 'no-tabs' );
 
-			if ( this.tabs && Object.keys( this.tabs ).length > 0 ) {
+			if ( Object.keys( this.tabs ).length > 0 ) {
 
 				// Has tabs - restore to saved size only if we had set it to minimum before
 				if ( this.position === 'bottom' ) {
