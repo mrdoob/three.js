@@ -683,6 +683,51 @@ class Matrix4 {
 	}
 
 	/**
+	 * Set the scale (length) of the three basis vectors of this matrix.
+	 * @param {number|Vector3} x The x component of the scale vector or alternatively the vector object.
+	 * @param {number} y - The y component of the vector.
+	 * @param {number} z - The z component of the vector.
+	 * @returns {Matrix4} - A reference to this matrix.
+	 */
+	setScale( x, y, z ) {
+
+		const scale = x.isVector3 ? x : _v1.set( x, y, z );
+		this.extractBasis( _x, _y, _z );
+		_x.setLength( scale.x );
+		_y.setLength( scale.y );
+		_z.setLength( scale.z );
+
+		this.setColumn( 0, _x );
+		this.setColumn( 1, _y );
+		this.setColumn( 2, _z );
+
+		return this;
+
+	}
+
+	/**
+	 * Set the matrix column at `index` to the given vector
+	 * @param {number} index column index
+	 * @param {number|Vector3} x The x component of the vector or alternatively the vector object.
+	 * @param {number} y - The y component of the vector.
+	 * @param {number} z - The z component of the vector.
+	 * @returns {Matrix4} - A reference to this matrix.
+	 */
+	setColumn( index, x, y, z ) {
+
+		const column = x.isVector3 ? x.toArray() : [ x, y, z ];
+		const te = this.elements;
+		for ( let i = 0; i < 3; i ++ ) {
+
+			te[ ( index * 4 ) + i ] = column[ i ];
+
+		}
+
+		return this;
+
+	}
+
+	/**
 	 * Inverts this matrix, using the [analytic method](https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution).
 	 * You can not invert with a determinant of zero. If you attempt this, the method produces
 	 * a zero matrix instead.
@@ -846,10 +891,10 @@ class Matrix4 {
 
 		this.set(
 
-			 c, 0, s, 0,
-			 0, 1, 0, 0,
+			c, 0, s, 0,
+			0, 1, 0, 0,
 			- s, 0, c, 0,
-			 0, 0, 0, 1
+			0, 0, 0, 1
 
 		);
 

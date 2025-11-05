@@ -8,6 +8,26 @@ import { Quaternion } from '../../../../src/math/Quaternion.js';
 import * as MathUtils from '../../../../src/math/MathUtils.js';
 import { eps } from '../../utils/math-constants.js';
 
+function vectorEquals( a, b, tolerance ) {
+
+	tolerance = tolerance || 0.0001;
+	const _a = a.toArray();
+	const _b = b.toArray();
+	if ( _a.length != _b.length ) {
+
+		return false;
+
+	}
+
+	for ( let i = 0; i < _a.length; i ++ ) {
+
+		if ( Math.abs( _a[ i ] - _b[ i ] ) > tolerance ) return false;
+
+	}
+
+	return true;
+
+}
 
 function matrixEquals4( a, b, tolerance ) {
 
@@ -506,6 +526,41 @@ export default QUnit.module( 'Maths', () => {
 
 			d.setPosition( - 1, - 2, - 3 );
 			assert.ok( matrixEquals4( d, e ), 'Passed!' );
+
+		} );
+
+		QUnit.test( 'setScale', ( assert ) => {
+
+			const a = new Matrix4().identity();
+			const scale = new Vector3( 2, 4, 8 );
+
+			a.setScale( scale );
+
+			const v = new Vector3().setFromMatrixScale( a );
+
+			assert.ok( vectorEquals( v, scale ), 'setScale(Vector3) Passed!' );
+
+			const b = new Matrix4().identity();
+
+			a.setScale( 2, 4, 8 );
+
+			const v2 = new Vector3().setFromMatrixScale( a );
+			assert.ok( vectorEquals( v2, scale ), 'setScale(number, number, number) Passed!' );
+		} );
+
+		QUnit.test( 'setColumn', ( assert ) => {
+
+			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			const b = new Vector3( - 1, - 2, - 3 );
+			const c = new Matrix4().set( - 1, 1, 2, 3, - 2, 5, 6, 7, - 3, 9, 10, 11, 12, 13, 14, 15 );
+
+			a.setColumn( 0, b );
+			assert.ok( matrixEquals4( a, c ), 'setColumn(Vector3) Passed' );
+
+			const d = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );			a.setColumn( 0, b );
+
+			d.setColumn( 0, - 1, - 2, - 3 );
+			assert.ok( matrixEquals4( d, c ), 'setColumn(number, number, number) Passed!' );
 
 		} );
 
