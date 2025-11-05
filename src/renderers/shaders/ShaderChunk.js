@@ -101,6 +101,8 @@ import tonemapping_fragment from './ShaderChunk/tonemapping_fragment.glsl.js';
 import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.glsl.js';
 import transmission_fragment from './ShaderChunk/transmission_fragment.glsl.js';
 import transmission_pars_fragment from './ShaderChunk/transmission_pars_fragment.glsl.js';
+import diffuse_transmission_fragment from './ShaderChunk/diffuse_transmission_fragment.glsl.js';
+import diffuse_transmission_pars_fragment from './ShaderChunk/diffuse_transmission_pars_fragment.glsl.js';
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl.js';
 import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl.js';
 import uv_vertex from './ShaderChunk/uv_vertex.glsl.js';
@@ -228,6 +230,8 @@ export const ShaderChunk = {
 	tonemapping_pars_fragment: tonemapping_pars_fragment,
 	transmission_fragment: transmission_fragment,
 	transmission_pars_fragment: transmission_pars_fragment,
+	diffuse_transmission_fragment: diffuse_transmission_fragment,
+	diffuse_transmission_pars_fragment: diffuse_transmission_pars_fragment,
 	uv_pars_fragment: uv_pars_fragment,
 	uv_pars_vertex: uv_pars_vertex,
 	uv_vertex: uv_vertex,

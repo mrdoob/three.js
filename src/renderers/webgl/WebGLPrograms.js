@@ -133,6 +133,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_IRIDESCENCE = material.iridescence > 0;
 		const HAS_SHEEN = material.sheen > 0;
 		const HAS_TRANSMISSION = material.transmission > 0;
+		const HAS_DIFFUSE_TRANSMISSION = material.diffuseTransmission > 0;
 
 		const HAS_ANISOTROPYMAP = HAS_ANISOTROPY && !! material.anisotropyMap;
 
@@ -152,6 +153,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_TRANSMISSIONMAP = HAS_TRANSMISSION && !! material.transmissionMap;
 		const HAS_THICKNESSMAP = HAS_TRANSMISSION && !! material.thicknessMap;
+
+		const HAS_DIFFUSE_TRANSMISSIONMAP = HAS_DIFFUSE_TRANSMISSION && !! material.diffuseTransmissionMap;
+		const HAS_DIFFUSE_TRANSMISSION_COLORMAP = HAS_DIFFUSE_TRANSMISSION && !! material.diffuseTransmissionColorMap;
 
 		const HAS_GRADIENTMAP = !! material.gradientMap;
 
@@ -247,6 +251,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			transmissionMap: HAS_TRANSMISSIONMAP,
 			thicknessMap: HAS_THICKNESSMAP,
 
+			diffuseTransmission: HAS_DIFFUSE_TRANSMISSION,
+			diffuseTransmissionMap: HAS_DIFFUSE_TRANSMISSIONMAP,
+			diffuseTransmissionColorMap: HAS_DIFFUSE_TRANSMISSION_COLORMAP,
+
 			gradientMap: HAS_GRADIENTMAP,
 
 			opaque: material.transparent === false && material.blending === NormalBlending && material.alphaToCoverage === false,
@@ -288,6 +296,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			transmissionMapUv: HAS_TRANSMISSIONMAP && getChannel( material.transmissionMap.channel ),
 			thicknessMapUv: HAS_THICKNESSMAP && getChannel( material.thicknessMap.channel ),
+
+			diffuseTransmissionMapUv: HAS_DIFFUSE_TRANSMISSIONMAP && getChannel( material.diffuseTransmissionMap.channel ),
+			diffuseTransmissionColorMapUv: HAS_DIFFUSE_TRANSMISSION_COLORMAP && getChannel( material.diffuseTransmissionColorMap.channel ),
 
 			alphaMapUv: HAS_ALPHAMAP && getChannel( material.alphaMap.channel ),
 

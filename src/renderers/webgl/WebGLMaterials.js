@@ -526,6 +526,30 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
+		if ( material.diffuseTransmission > 0 ) {
+
+			uniforms.diffuseTransmission.value = material.diffuseTransmission;
+
+			if ( material.diffuseTransmissionMap ) {
+
+				uniforms.diffuseTransmissionMap.value = material.diffuseTransmissionMap;
+
+				refreshTransformUniform( material.diffuseTransmissionMap, uniforms.diffuseTransmissionMapTransform );
+
+			}
+
+			uniforms.diffuseTransmissionColor.value.copy( material.diffuseTransmissionColor );
+
+			if ( material.diffuseTransmissionColorMap ) {
+
+				uniforms.diffuseTransmissionColorMap.value = material.diffuseTransmissionColorMap;
+
+				refreshTransformUniform( material.diffuseTransmissionColorMap, uniforms.diffuseTransmissionColorMapTransform );
+
+			}
+
+		}
+
 		if ( material.anisotropy > 0 ) {
 
 			uniforms.anisotropyVector.value.set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ) );

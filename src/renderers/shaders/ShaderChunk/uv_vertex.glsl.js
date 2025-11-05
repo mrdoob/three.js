@@ -119,4 +119,14 @@ export default /* glsl */`
 	vThicknessMapUv = ( thicknessMapTransform * vec3( THICKNESSMAP_UV, 1 ) ).xy;
 
 #endif
+#ifdef USE_DIFFUSE_TRANSMISSIONMAP
+
+	vDiffuseTransmissionMapUv = ( diffuseTransmissionMapTransform * vec3( DIFFUSE_TRANSMISSIONMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_DIFFUSE_TRANSMISSION_COLORMAP
+
+	vDiffuseTransmissionColorMapUv = ( diffuseTransmissionColorMapTransform * vec3( DIFFUSE_TRANSMISSION_COLORMAP_UV, 1 ) ).xy;
+
+#endif
 `;

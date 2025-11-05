@@ -150,6 +150,7 @@ varying vec3 vViewPosition;
 #include <normal_pars_fragment>
 #include <lights_physical_pars_fragment>
 #include <transmission_pars_fragment>
+#include <diffuse_transmission_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
@@ -195,6 +196,8 @@ void main() {
 	vec3 totalSpecular = reflectedLight.directSpecular + reflectedLight.indirectSpecular;
 
 	#include <transmission_fragment>
+
+	#include <diffuse_transmission_fragment>
 
 	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
 

@@ -588,6 +588,10 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
 
+			parameters.diffuseTransmission ? '#define USE_DIFFUSE_TRANSMISSION' : '',
+			parameters.diffuseTransmissionMap ? '#define USE_DIFFUSE_TRANSMISSIONMAP' : '',
+			parameters.diffuseTransmissionColorMap ? '#define USE_DIFFUSE_TRANSMISSION_COLORMAP' : '',
+
 			parameters.sheenColorMap ? '#define USE_SHEEN_COLORMAP' : '',
 			parameters.sheenRoughnessMap ? '#define USE_SHEEN_ROUGHNESSMAP' : '',
 
@@ -794,6 +798,10 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.transmission ? '#define USE_TRANSMISSION' : '',
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
+
+			parameters.diffuseTransmission ? '#define USE_DIFFUSE_TRANSMISSION' : '',
+			parameters.diffuseTransmissionMap ? '#define USE_DIFFUSE_TRANSMISSIONMAP' : '',
+			parameters.diffuseTransmissionColorMap ? '#define USE_DIFFUSE_TRANSMISSION_COLORMAP' : '',
 
 			parameters.vertexTangents && parameters.flatShading === false ? '#define USE_TANGENT' : '',
 			parameters.vertexColors || parameters.instancingColor || parameters.batchingColor ? '#define USE_COLOR' : '',

@@ -142,4 +142,16 @@ export default /* glsl */`
 	varying vec2 vThicknessMapUv;
 
 #endif
+#ifdef USE_DIFFUSE_TRANSMISSIONMAP
+
+	uniform mat3 diffuseTransmissionMapTransform;
+	varying vec2 vDiffuseTransmissionMapUv;
+
+#endif
+#ifdef USE_DIFFUSE_TRANSMISSION_COLORMAP
+
+	uniform mat3 diffuseTransmissionColorMapTransform;
+	varying vec2 vDiffuseTransmissionColorMapUv;
+
+#endif
 `;
