@@ -8,7 +8,29 @@ import { Viewer } from './tabs/Viewer.js';
 import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
 import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
-import { renderOutput, vec3, vec4 } from 'three/tsl';
+import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform } from 'three/tsl';
+
+const aspectRatioUV = /*@__PURE__*/ Fn( ( [ uv, textureNode ] ) => {
+
+	const aspect = uniform( 0 );
+
+	OnMaterialUpdate( () => {
+
+		const { width, height } = textureNode.value;
+
+		aspect.value = width / height;
+
+	} );
+
+	const centered = uv.sub( 0.5 );
+	const corrected = vec2( centered.x.div( aspect ), centered.y );
+	const finalUV = corrected.add( 0.5 );
+
+	const inBounds = step( 0.0, finalUV.x ).mul( step( finalUV.x, 1.0 ) ).mul( step( 0.0, finalUV.y ) ).mul( step( finalUV.y, 1.0 ) );
+
+	return vec3( finalUV, inBounds );
+
+} );
 
 class Inspector extends RendererInspector {
 
@@ -275,7 +297,17 @@ class Inspector extends RendererInspector {
 
 			const { path, name } = splitPath( splitCamelCase( node.getName() || '(unnamed)' ) );
 
-			let output = vec4( vec3( node ), 1 );
+			const target = node.context( { getUV: ( textureNode ) => {
+
+				const uvData = aspectRatioUV( screenUV, textureNode );
+				const correctedUV = uvData.xy;
+				const mask = uvData.z;
+
+				return correctedUV.mul( mask );
+
+			} } );
+
+			let output = vec4( vec3( target ), 1 );
 			output = renderOutput( output, NoToneMapping, renderer.outputColorSpace );
 			output = output.context( { inspector: true } );
 
