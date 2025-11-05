@@ -12,7 +12,7 @@ class Viewer extends Tab {
 
 		const nodeList = new List( 'Viewer', 'Name' );
 		nodeList.setGridStyle( '150px minmax(200px, 2fr)' );
-		nodeList.domElement.style.minWidth = '600px';
+		nodeList.domElement.style.minWidth = '400px';
 
 		const scrollWrapper = document.createElement( 'div' );
 		scrollWrapper.className = 'list-scroll-wrapper';
@@ -70,7 +70,7 @@ class Viewer extends Tab {
 
 	update( renderer, canvasDataList ) {
 
-		if ( ! this.isActive ) return;
+		if ( ! this.isActive && ! this.isDetached ) return;
 
 		//
 

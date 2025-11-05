@@ -13,6 +13,8 @@ export class Tab {
 
 		this.isActive = false;
 		this.isVisible = true;
+		this.isDetached = false;
+		this.detachedWindow = null;
 
 	}
 
@@ -32,6 +34,13 @@ export class Tab {
 
 		this.isVisible = true;
 
+		// Show detached window if tab is detached
+		if ( this.isDetached && this.detachedWindow ) {
+
+			this.detachedWindow.panel.style.display = '';
+
+		}
+
 	}
 
 	hide() {
@@ -40,6 +49,13 @@ export class Tab {
 		this.button.style.display = 'none';
 
 		this.isVisible = false;
+
+		// Hide detached window if tab is detached
+		if ( this.isDetached && this.detachedWindow ) {
+
+			this.detachedWindow.panel.style.display = 'none';
+
+		}
 
 	}
 

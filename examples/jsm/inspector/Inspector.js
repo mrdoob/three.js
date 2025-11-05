@@ -31,18 +31,22 @@ class Inspector extends RendererInspector {
 		const performance = new Performance();
 		profiler.addTab( performance );
 
-		const console = new Console();
-		profiler.addTab( console );
+		const consoleTab = new Console();
+		profiler.addTab( consoleTab );
 
-		profiler.setActiveTab( performance.id );
+		profiler.loadLayout();
 
-		//
+		if ( ! profiler.activeTabId ) {
+
+			profiler.setActiveTab( performance.id );
+
+		}
 
 		this.statsData = new Map();
 		this.canvasNodes = new Map();
 		this.profiler = profiler;
 		this.performance = performance;
-		this.console = console;
+		this.console = consoleTab;
 		this.parameters = parameters;
 		this.viewer = viewer;
 		this.once = {};
@@ -178,7 +182,12 @@ class Inspector extends RendererInspector {
 		if ( this.parameters.isVisible === false ) {
 
 			this.parameters.show();
-			this.profiler.setActiveTab( this.parameters.id );
+
+			if ( this.parameters.isDetached === false ) {
+
+				this.profiler.setActiveTab( this.parameters.id );
+
+			}
 
 		}
 
