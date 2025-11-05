@@ -569,26 +569,18 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	vec3 singleScatteringDielectric = vec3( 0.0 );
 	vec3 multiScatteringDielectric = vec3( 0.0 );
 
-	#ifdef USE_IRIDESCENCE
-
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-
-	#else
-
-		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-
-	#endif
-
 	// Metallic path: F0 from base color
 	vec3 singleScatteringMetallic = vec3( 0.0 );
 	vec3 multiScatteringMetallic = vec3( 0.0 );
 
 	#ifdef USE_IRIDESCENCE
 
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
 		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.baseColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#else
 
+		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
 		computeMultiscattering( geometryNormal, geometryViewDir, material.baseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#endif
