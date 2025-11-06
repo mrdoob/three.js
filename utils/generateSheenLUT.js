@@ -69,25 +69,6 @@ function importanceSampleCosine(u, v) {
 }
 
 // Transform sample from tangent space to world space
-function tangentToWorld(sample, N) {
-    const up = Math.abs(N[2]) < 0.999 ? [0, 0, 1] : [1, 0, 0];
-    const tangent = normalize([
-        up[1] * N[2] - up[2] * N[1],
-        up[2] * N[0] - up[0] * N[2],
-        up[0] * N[1] - up[1] * N[0]
-    ]);
-    const bitangent = [
-        N[1] * tangent[2] - N[2] * tangent[1],
-        N[2] * tangent[0] - N[0] * tangent[2],
-        N[0] * tangent[1] - N[1] * tangent[0]
-    ];
-    
-    return normalize([
-        tangent[0] * sample[0] + bitangent[0] * sample[1] + N[0] * sample[2],
-        tangent[1] * sample[0] + bitangent[1] * sample[1] + N[1] * sample[2],
-        tangent[2] * sample[0] + bitangent[2] * sample[1] + N[2] * sample[2]
-    ]);
-}
 
 // ============================================================================
 // Charlie Sheen BRDF
