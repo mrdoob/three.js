@@ -5,7 +5,7 @@ import { materialRoughness, materialMetalness } from '../../nodes/accessors/Mate
 import getRoughness from '../../nodes/functions/material/getRoughness.js';
 import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
 import EnvironmentNode from '../../nodes/lighting/EnvironmentNode.js';
-import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
 
 import { MeshStandardMaterial } from '../MeshStandardMaterial.js';
 
