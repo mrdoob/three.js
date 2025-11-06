@@ -8,6 +8,11 @@
   "engines": {
     "node": ">=20"
   },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm"
+    }
+  },
   "exports": {
     ".": {
       "import": "./build/three.module.js",
