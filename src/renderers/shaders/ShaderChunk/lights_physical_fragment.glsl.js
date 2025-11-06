@@ -1,8 +1,8 @@
 export default /* glsl */`
 PhysicalMaterial material;
-material.baseColor = diffuseColor.rgb;
+material.diffuseColor = diffuseColor.rgb;
+material.diffuseContribution = diffuseColor.rgb * ( 1.0 - metalnessFactor );
 material.metalness = metalnessFactor;
-material.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );
 
 vec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );
 float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );

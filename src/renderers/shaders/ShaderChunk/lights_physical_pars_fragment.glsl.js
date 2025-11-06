@@ -5,13 +5,14 @@ uniform sampler2D dfgLUT;
 struct PhysicalMaterial {
 
 	vec3 diffuseColor;
-	float roughness;
+	vec3 diffuseContribution;
 	vec3 specularColor;
-	float specularF90;
+	vec3 specularColorDielectric;
+
 	float dispersion;
-	vec3 specularColorDielectric; // F0 for dielectric, used for energy conservation
-	vec3 baseColor; // Base color before metalness, for metallic multiscattering
-	float metalness; // Metalness factor
+	float roughness;
+	float metalness;
+	float specularF90;
 
 	#ifdef USE_CLEARCOAT
 		float clearcoat;
@@ -507,7 +508,7 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 
 		reflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );
 
-		reflectedLight.directDiffuse += lightColor * material.diffuseColor * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );
+		reflectedLight.directDiffuse += lightColor * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );
 
 	}
 
@@ -537,12 +538,12 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
 
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
 
 }
 
@@ -576,12 +577,12 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	#ifdef USE_IRIDESCENCE
 
 		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.baseColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#else
 
 		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscattering( geometryNormal, geometryViewDir, material.baseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
+		computeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#endif
 
@@ -591,7 +592,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	// Diffuse energy conservation uses dielectric path
 	vec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;
-	vec3 diffuse = material.diffuseColor * ( 1.0 - max( max( totalScatteringDielectric.r, totalScatteringDielectric.g ), totalScatteringDielectric.b ) );
+	vec3 diffuse = material.diffuseContribution * ( 1.0 - max( max( totalScatteringDielectric.r, totalScatteringDielectric.g ), totalScatteringDielectric.b ) );
 
 	reflectedLight.indirectSpecular += radiance * singleScattering;
 	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
