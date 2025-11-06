@@ -7,7 +7,7 @@ struct PhysicalMaterial {
 	vec3 diffuseColor;
 	vec3 diffuseContribution;
 	vec3 specularColor;
-	vec3 specularColorDielectric;
+	vec3 specularColorBlended;
 
 	float dispersion;
 	float roughness;
@@ -153,7 +153,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 
 vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {
 
-	vec3 f0 = material.specularColor;
+	vec3 f0 = material.specularColorBlended;
 	float f90 = material.specularF90;
 	float roughness = material.roughness;
 
@@ -447,8 +447,8 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 	vec2 dfgL = DFGApprox( vec3(0.0, 0.0, 1.0), vec3(sqrt(1.0 - dotNL * dotNL), 0.0, dotNL), material.roughness );
 
 	// Single-scattering energy for view and light
-	vec3 FssEss_V = material.specularColor * dfgV.x + material.specularF90 * dfgV.y;
-	vec3 FssEss_L = material.specularColor * dfgL.x + material.specularF90 * dfgL.y;
+	vec3 FssEss_V = material.specularColorBlended * dfgV.x + material.specularF90 * dfgV.y;
+	vec3 FssEss_L = material.specularColorBlended * dfgL.x + material.specularF90 * dfgL.y;
 
 	float Ess_V = dfgV.x + dfgV.y;
 	float Ess_L = dfgL.x + dfgL.y;
@@ -458,7 +458,7 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 	float Ems_L = 1.0 - Ess_L;
 
 	// Average Fresnel reflectance
-	vec3 Favg = material.specularColor + ( 1.0 - material.specularColor ) * 0.047619; // 1/21
+	vec3 Favg = material.specularColorBlended + ( 1.0 - material.specularColorBlended ) * 0.047619; // 1/21
 
 	// Multiple scattering contribution
 	vec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg * Favg + EPSILON );
@@ -504,7 +504,7 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 
 		// LTC Fresnel Approximation by Stephen Hill
 		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
-		vec3 fresnel = ( material.specularColor * t2.x + ( vec3( 1.0 ) - material.specularColor ) * t2.y );
+		vec3 fresnel = ( material.specularColorBlended * t2.x + ( vec3( 1.0 ) - material.specularColorBlended ) * t2.y );
 
 		reflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );
 
@@ -576,12 +576,12 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#ifdef USE_IRIDESCENCE
 
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
 		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#else
 
-		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColorDielectric, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
 		computeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#endif

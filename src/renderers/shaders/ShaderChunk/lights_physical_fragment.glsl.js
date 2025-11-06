@@ -42,13 +42,13 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#endif
 
-	material.specularColorDielectric = min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor;
-	material.specularColor = mix( material.specularColorDielectric, diffuseColor.rgb, metalnessFactor );
+	material.specularColor = min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor;
+	material.specularColorBlended = mix( material.specularColor, diffuseColor.rgb, metalnessFactor );
 
 #else
 
-	material.specularColorDielectric = vec3( 0.04 );
-	material.specularColor = mix( material.specularColorDielectric, diffuseColor.rgb, metalnessFactor );
+	material.specularColor = vec3( 0.04 );
+	material.specularColorBlended = mix( material.specularColor, diffuseColor.rgb, metalnessFactor );
 	material.specularF90 = 1.0;
 
 #endif
