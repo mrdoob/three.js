@@ -200,9 +200,14 @@ void main() {
 
 	#ifdef USE_SHEEN
 
-		// Sheen energy compensation approximation calculation can be found at the end of
-		// https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
-		float sheenEnergyComp = 1.0 - 0.157 * max3( material.sheenColor );
+		// Albedo-scaling energy conservation using directional albedo
+		// Compute the sheen layer's directional albedo (integrated reflectance)
+		float sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
+
+		// Scale base layer by amount of light not reflected by sheen
+		// sheenScaling = 1.0 - sheenIntensity * sheenAlbedo
+		float sheenIntensity = max3( material.sheenColor );
+		float sheenEnergyComp = 1.0 - sheenIntensity * sheenAlbedo;
 
 		outgoingLight = outgoingLight * sheenEnergyComp + sheenSpecularDirect + sheenSpecularIndirect;
 

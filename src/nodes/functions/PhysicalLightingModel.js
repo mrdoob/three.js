@@ -783,8 +783,20 @@ class PhysicalLightingModel extends LightingModel {
 
 		if ( this.sheen === true ) {
 
-			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
-			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
+			// Albedo-scaling energy conservation
+			// Compute the directional albedo (integrated reflectance) of the sheen layer
+			const sheenAlbedo = IBLSheenBRDF( {
+				normal: normalView,
+				viewDir: positionViewDirection,
+				roughness: sheenRoughness
+			} );
+
+			// Scale base layer by the amount of light not reflected by sheen
+			// sheenScaling = 1.0 - sheenIntensity * sheenAlbedo
+			const sheenIntensity = sheen.r.max( sheen.g ).max( sheen.b );
+			const sheenScaling = sheenIntensity.mul( sheenAlbedo ).oneMinus();
+
+			const sheenLight = outgoingLight.mul( sheenScaling ).add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
 
 			outgoingLight.assign( sheenLight );
 
