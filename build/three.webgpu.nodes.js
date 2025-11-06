@@ -5159,8 +5159,23 @@ const uniform = ( value, type ) => {
 
 	}
 
-	// @TODO: get ConstNode from .traverse() in the future
-	value = ( value && value.isNode === true ) ? ( value.node && value.node.value ) || value.value : value;
+	if ( value && value.isNode === true ) {
+
+		let v = value.value;
+
+		value.traverse( n => {
+
+			if ( n.isConstNode === true ) {
+
+				v = n.value;
+
+			}
+
+		} );
+
+		value = v;
+
+	}
 
 	return nodeObject( new UniformNode( value, nodeType ) );
 
@@ -49565,7 +49580,7 @@ class NodeBuilder {
 	 */
 	getBufferAttributeFromNode( node, type ) {
 
-		const nodeData = this.getDataFromNode( node );
+		const nodeData = this.getDataFromNode( node, 'vertex' );
 
 		let bufferAttribute = nodeData.bufferAttribute;
 
@@ -56588,11 +56603,6 @@ class Renderer {
 
 	//
 
-	/**
-	 * Sets the inspector instance. The inspector can be any class that extends from `InspectorBase`.
-	 *
-	 * @param {InspectorBase} value - The new inspector.
-	 */
 	set inspector( value ) {
 
 		if ( this._inspector !== null ) {
@@ -56606,6 +56616,11 @@ class Renderer {
 
 	}
 
+	/**
+	 * The inspector instance. The inspector can be any class that extends from `InspectorBase`.
+	 *
+	 * @type {InspectorBase}
+	 */
 	get inspector() {
 
 		return this._inspector;
