@@ -564,13 +564,8 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	// Both indirect specular and indirect diffuse light accumulate here
 	// Compute multiscattering separately for dielectric and metallic, then mix
 
-	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
-
-	// Dielectric path: F0 from IOR or 0.04
 	vec3 singleScatteringDielectric = vec3( 0.0 );
 	vec3 multiScatteringDielectric = vec3( 0.0 );
-
-	// Metallic path: F0 from base color
 	vec3 singleScatteringMetallic = vec3( 0.0 );
 	vec3 multiScatteringMetallic = vec3( 0.0 );
 
@@ -593,6 +588,8 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	// Diffuse energy conservation uses dielectric path
 	vec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;
 	vec3 diffuse = material.diffuseContribution * ( 1.0 - max( max( totalScatteringDielectric.r, totalScatteringDielectric.g ), totalScatteringDielectric.b ) );
+
+	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
 	reflectedLight.indirectSpecular += radiance * singleScattering;
 	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
