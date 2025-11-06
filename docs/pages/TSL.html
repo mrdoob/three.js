@@ -4733,7 +4733,7 @@ using the linear shadow distance.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The shadow material associated with the given light.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getShadowRenderObjectFunction" translate="no">.<a href="#getShadowRenderObjectFunction">getShadowRenderObjectFunction</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, shadow : <span class="param-type"><a href="LightShadow.html">LightShadow</a></span>, shadowType : <span class="param-type">number</span>, useVelocity : <span class="param-type">boolean</span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, _camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type"><a href="Group.html">Group</a></span>, &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : function</span> </h3>
+					<h3 class="name name-method" id="getShadowRenderObjectFunction" translate="no">.<a href="#getShadowRenderObjectFunction">getShadowRenderObjectFunction</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, shadow : <span class="param-type"><a href="LightShadow.html">LightShadow</a></span>, shadowType : <span class="param-type">number</span>, useVelocity : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="global.html#shadowRenderObjectFunction">shadowRenderObjectFunction</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates a function to render shadow objects in a scene.</p>
@@ -4772,67 +4772,10 @@ using the linear shadow distance.</p>
 										<p>Whether to use velocity data for rendering.</p>
 									</td>
 								</tr>
-								<tr>
-									<td class="name">
-										<strong>object</strong>
-									</td>
-									<td class="description last">
-										<p>The 3D object to render.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>scene</strong>
-									</td>
-									<td class="description last">
-										<p>The scene containing the object.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>_camera</strong>
-									</td>
-									<td class="description last">
-										<p>The camera used for rendering.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>geometry</strong>
-									</td>
-									<td class="description last">
-										<p>The geometry of the object.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>material</strong>
-									</td>
-									<td class="description last">
-										<p>The material of the object.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>group</strong>
-									</td>
-									<td class="description last">
-										<p>The group the object belongs to.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>params</strong>
-									</td>
-									<td class="description last">
-										<p>Additional parameters for rendering.</p>
-									</td>
-								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> A function that renders shadow objects.</p>
-<p>The returned function has the following parameters:</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> A function that renders shadow objects.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getViewPosition" translate="no">.<a href="#getViewPosition">getViewPosition</a><span class="signature">( screenPosition : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, depth : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, projectionMatrixInverse : <span class="param-type"><a href="Node.html">Node</a>.&lt;mat4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
@@ -10025,7 +9968,7 @@ among active invocations in the subgroup.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="texture3D" translate="no">.<a href="#texture3D">texture3D</a><span class="signature">( value : <span class="param-type"><a href="Data3DTexture.html">Data3DTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span><span class="type-signature"> : <a href="Texture3DNode.html">Texture3DNode</a></span> </h3>
+					<h3 class="name name-method" id="texture3D" translate="no">.<a href="#texture3D">texture3D</a><span class="signature">( value : <span class="param-type"><a href="Data3DTexture.html">Data3DTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span><span class="type-signature"> : <a href="Texture3DNode.html">Texture3DNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a 3D texture node.</p>
@@ -10055,6 +9998,89 @@ among active invocations in the subgroup.</p>
 									</td>
 									<td class="description last">
 										<p>The level node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="texture3DLevel" translate="no">.<a href="#texture3DLevel">texture3DLevel</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a> | <a href="TextureNode.html">TextureNode</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a texture node that fetches/loads texels without interpolation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+										<p>Default is <code>EmptyTexture</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelNode</strong>
+									</td>
+									<td class="description last">
+										<p>The level node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="texture3DLoad" translate="no">.<a href="#texture3DLoad">texture3DLoad</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a> | <a href="TextureNode.html">TextureNode</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>, biasNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for creating a texture node that fetches/loads texels without interpolation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+										<p>Default is <code>EmptyTexture</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>levelNode</strong>
+									</td>
+									<td class="description last">
+										<p>The level node.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>biasNode</strong>
+									</td>
+									<td class="description last">
+										<p>The bias node.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>

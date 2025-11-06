@@ -171,9 +171,9 @@ and the rendering process. Useful for debugging and monitoring.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="inspector" translate="no">.<a href="#inspector">inspector</a> </h3>
+					<h3 class="name" id="inspector" translate="no">.<a href="#inspector">inspector</a><span class="type-signature"> : <a href="InspectorBase.html">InspectorBase</a></span> </h3>
 					<div class="description">
-						<p>Sets the inspector instance. The inspector can be any class that extends from <code>InspectorBase</code>.</p>
+						<p>The inspector instance. The inspector can be any class that extends from <code>InspectorBase</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -329,86 +329,6 @@ e.g. manually determining each object's rendering order.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="_getShadowNodes" translate="no">.<a href="#_getShadowNodes">_getShadowNodes</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : Object</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Retrieves shadow nodes for the given material. This is used to setup shadow passes.
-The result is cached per material and updated when the material's version changes.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>material</strong>
-									</td>
-									<td class="description last">
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> <ul>
-<li>The shadow nodes for the material.</li>
-</ul></dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="_projectObject" translate="no">.<a href="#_projectObject">_projectObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, groupOrder : <span class="param-type">number</span>, renderList : <span class="param-type"><a href="RenderList.html">RenderList</a></span>, clippingContext : <span class="param-type"><a href="ClippingContext.html">ClippingContext</a></span> )</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Analyzes the given 3D object's hierarchy and builds render lists from the
-processed hierarchy.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>object</strong>
-									</td>
-									<td class="description last">
-										<p>The 3D object to process (usually a scene).</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>camera</strong>
-									</td>
-									<td class="description last">
-										<p>The camera the object is rendered with.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>groupOrder</strong>
-									</td>
-									<td class="description last">
-										<p>The group order is derived from the <code>renderOrder</code> of groups and is used to group 3D objects within groups.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>renderList</strong>
-									</td>
-									<td class="description last">
-										<p>The current render list.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>clippingContext</strong>
-									</td>
-									<td class="description last">
-										<p>The current clipping context.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<h3 class="name name-method" id="_resetXRState" translate="no">.<a href="#_resetXRState">_resetXRState</a><span class="signature">()</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Resets the renderer to the initial state before WebXR started.</p>
-						</div>
-					</div>
 					<h3 class="name name-method" id="clear" translate="no">.<a href="#clear">clear</a><span class="signature">( color : <span class="param-type">boolean</span>, depth : <span class="param-type">boolean</span>, stencil : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">

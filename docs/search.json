@@ -11285,18 +11285,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "Renderer#_getShadowNodes",
-			"kind": "function"
-		},
-		{
-			"title": "Renderer#_projectObject",
-			"kind": "function"
-		},
-		{
-			"title": "Renderer#_resetXRState",
-			"kind": "function"
-		},
-		{
 			"title": "Renderer#alpha",
 			"kind": "member"
 		},
@@ -11843,10 +11831,6 @@
 		{
 			"title": "ScreenNode",
 			"kind": "class"
-		},
-		{
-			"title": "ScreenNode#_output",
-			"kind": "member"
 		},
 		{
 			"title": "ScreenNode#getNodeType",
@@ -13217,14 +13201,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "StorageBufferNode#_attribute",
-			"kind": "member"
-		},
-		{
-			"title": "StorageBufferNode#_varying",
-			"kind": "member"
-		},
-		{
 			"title": "StorageBufferNode#access",
 			"kind": "member"
 		},
@@ -14359,10 +14335,6 @@
 		{
 			"title": "UniformsGroup",
 			"kind": "class"
-		},
-		{
-			"title": "UniformsGroup#_getBufferForType",
-			"kind": "function"
 		},
 		{
 			"title": "UniformsGroup#add",
@@ -16369,10 +16341,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "XRManager#_sessionUsesLayers",
-			"kind": "member"
-		},
-		{
 			"title": "XRManager#cameraAutoUpdate",
 			"kind": "member"
 		},
@@ -16613,14 +16581,6 @@
 		{
 			"title": "AnaglyphPassNode",
 			"kind": "class"
-		},
-		{
-			"title": "AnaglyphPassNode#_colorMatrixLeft",
-			"kind": "member"
-		},
-		{
-			"title": "AnaglyphPassNode#_colorMatrixRight",
-			"kind": "member"
 		},
 		{
 			"title": "AnaglyphPassNode#isAnaglyphPassNode",
@@ -16889,10 +16849,6 @@
 		{
 			"title": "BloomNode",
 			"kind": "class"
-		},
-		{
-			"title": "BloomNode#_getSeparableBlurMaterial",
-			"kind": "function"
 		},
 		{
 			"title": "BloomNode#dispose",
@@ -20595,10 +20551,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "PCDLoader#_getDataView",
-			"kind": "function"
-		},
-		{
 			"title": "PCDLoader#littleEndian",
 			"kind": "member"
 		},
@@ -20733,10 +20685,6 @@
 		{
 			"title": "PixelationNode",
 			"kind": "class"
-		},
-		{
-			"title": "PixelationNode#_resolution",
-			"kind": "member"
 		},
 		{
 			"title": "PixelationNode#depthEdgeStrength",
@@ -21491,22 +21439,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "SSGINode#_halfProjScale",
-			"kind": "member"
-		},
-		{
-			"title": "SSGINode#_resolution",
-			"kind": "member"
-		},
-		{
-			"title": "SSGINode#_temporalDirection",
-			"kind": "member"
-		},
-		{
-			"title": "SSGINode#_temporalOffset",
-			"kind": "member"
-		},
-		{
 			"title": "SSGINode#aoIntensity",
 			"kind": "member"
 		},
@@ -21753,14 +21685,6 @@
 		{
 			"title": "SSSNode",
 			"kind": "class"
-		},
-		{
-			"title": "SSSNode#_frameId",
-			"kind": "member"
-		},
-		{
-			"title": "SSSNode#_temporalOffset",
-			"kind": "member"
 		},
 		{
 			"title": "SSSNode#depthNode",
@@ -22209,26 +22133,6 @@
 		{
 			"title": "StereoCompositePassNode",
 			"kind": "class"
-		},
-		{
-			"title": "StereoCompositePassNode#_mapLeft",
-			"kind": "member"
-		},
-		{
-			"title": "StereoCompositePassNode#_mapRight",
-			"kind": "member"
-		},
-		{
-			"title": "StereoCompositePassNode#_material",
-			"kind": "member"
-		},
-		{
-			"title": "StereoCompositePassNode#_renderTargetL",
-			"kind": "member"
-		},
-		{
-			"title": "StereoCompositePassNode#_renderTargetR",
-			"kind": "member"
 		},
 		{
 			"title": "StereoCompositePassNode#dispose",
@@ -25721,14 +25625,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "VSMPassHorizontal",
-			"kind": "function"
-		},
-		{
-			"title": "VSMPassVertical",
-			"kind": "function"
-		},
-		{
 			"title": "VSMShadowFilter",
 			"kind": "function"
 		},
@@ -26018,6 +25914,10 @@
 		},
 		{
 			"title": "setQuaternionFromProperEuler",
+			"kind": "function"
+		},
+		{
+			"title": "shadowRenderObjectFunction",
 			"kind": "function"
 		},
 		{
@@ -27984,6 +27884,14 @@
 		},
 		{
 			"title": "texture3D",
+			"kind": "function"
+		},
+		{
+			"title": "texture3DLevel",
+			"kind": "function"
+		},
+		{
+			"title": "texture3DLoad",
 			"kind": "function"
 		},
 		{
