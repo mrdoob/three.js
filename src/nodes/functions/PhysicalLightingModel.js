@@ -8,7 +8,7 @@ import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import { LTC_Evaluate, LTC_Uv } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
+import { diffuseColor, diffuseContribution, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
@@ -521,8 +521,8 @@ class PhysicalLightingModel extends LightingModel {
 				n,
 				v,
 				roughness,
-				diffuseColor,
-				specularColor,
+				diffuseContribution,
+				specularColorBlended,
 				specularF90, // specularF90
 				position, // positionWorld
 				modelWorldMatrix, // modelMatrix
@@ -549,13 +549,13 @@ class PhysicalLightingModel extends LightingModel {
 	// Approximates multi-scattering in order to preserve energy.
 	// http://www.jcgt.org/published/0008/01/03/
 
-	computeMultiscattering( singleScatter, multiScatter, specularF90 ) {
+	computeMultiscattering( singleScatter, multiScatter, specularF90, f0 ) {
 
 		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
 		const fab = DFGApprox( { roughness, dotNV } );
 
-		const Fr = this.iridescenceF0 ? iridescence.mix( specularColor, this.iridescenceF0 ) : specularColor;
+		const Fr = this.iridescenceF0 ? iridescence.mix( f0, this.iridescenceF0 ) : f0;
 
 		const FssEss = Fr.mul( fab.x ).add( specularF90.mul( fab.y ) );
 
@@ -596,9 +596,9 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ) );
 
-		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX_Multiscatter( { lightDirection, f0: specularColor, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } ) ) );
+		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX_Multiscatter( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } ) ) );
 
 	}
 
@@ -633,11 +633,11 @@ class PhysicalLightingModel extends LightingModel {
 
 		// LTC Fresnel Approximation by Stephen Hill
 		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
-		const fresnel = specularColor.mul( t2.x ).add( specularColor.oneMinus().mul( t2.y ) ).toVar();
+		const fresnel = specularColorBlended.mul( t2.x ).add( specularColorBlended.oneMinus().mul( t2.y ) ).toVar();
 
 		reflectedLight.directSpecular.addAssign( lightColor.mul( fresnel ).mul( LTC_Evaluate( { N, V, P, mInv, p0, p1, p2, p3 } ) ) );
 
-		reflectedLight.directDiffuse.addAssign( lightColor.mul( diffuseColor ).mul( LTC_Evaluate( { N, V, P, mInv: mat3( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), p0, p1, p2, p3 } ) ) );
+		reflectedLight.directDiffuse.addAssign( lightColor.mul( diffuseContribution ).mul( LTC_Evaluate( { N, V, P, mInv: mat3( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), p0, p1, p2, p3 } ) ) );
 
 	}
 
@@ -663,7 +663,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { irradiance, reflectedLight } = builder.context;
 
-		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
+		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ) );
 
 	}
 
@@ -705,16 +705,26 @@ class PhysicalLightingModel extends LightingModel {
 		}
 
 		// Both indirect specular and indirect diffuse light accumulate here
+		// Compute multiscattering separately for dielectric and metallic, then mix
 
-		const singleScattering = vec3().toVar( 'singleScattering' );
-		const multiScattering = vec3().toVar( 'multiScattering' );
+		const singleScatteringDielectric = vec3().toVar( 'singleScatteringDielectric' );
+		const multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
+		const singleScatteringMetallic = vec3().toVar( 'singleScatteringMetallic' );
+		const multiScatteringMetallic = vec3().toVar( 'multiScatteringMetallic' );
+
+		this.computeMultiscattering( singleScatteringDielectric, multiScatteringDielectric, specularF90, specularColor );
+		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb );
+
+		// Mix based on metalness
+		const singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, metalness );
+		const multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, metalness );
+
+		// Diffuse energy conservation uses dielectric path
+		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
+
+		const diffuse = diffuseContribution.mul( totalScatteringDielectric.r.max( totalScatteringDielectric.g ).max( totalScatteringDielectric.b ).oneMinus() );
+
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
-
-		this.computeMultiscattering( singleScattering, multiScattering, specularF90 );
-
-		const totalScattering = singleScattering.add( multiScattering );
-
-		const diffuse = diffuseColor.mul( totalScattering.r.max( totalScattering.g ).max( totalScattering.b ).oneMinus() );
 
 		reflectedLight.indirectSpecular.addAssign( radiance.mul( singleScattering ) );
 		reflectedLight.indirectSpecular.addAssign( multiScattering.mul( cosineWeightedIrradiance ) );
