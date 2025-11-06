@@ -368,7 +368,6 @@ function createBufferAttribute( array, type = null, stride = 0, offset = 0, usag
 
 	return new BufferAttributeNode( array, type, stride, offset );
 
-
 }
 
 /**
