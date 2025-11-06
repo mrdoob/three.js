@@ -9,10 +9,10 @@ struct PhysicalMaterial {
 	vec3 specularColor;
 	vec3 specularColorBlended;
 
-	float dispersion;
 	float roughness;
 	float metalness;
 	float specularF90;
+	float dispersion;
 
 	#ifdef USE_CLEARCOAT
 		float clearcoat;
@@ -566,6 +566,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	vec3 singleScatteringDielectric = vec3( 0.0 );
 	vec3 multiScatteringDielectric = vec3( 0.0 );
+
 	vec3 singleScatteringMetallic = vec3( 0.0 );
 	vec3 multiScatteringMetallic = vec3( 0.0 );
 
