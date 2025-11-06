@@ -13,6 +13,7 @@ export class Profiler {
 		this.detachedWindows = []; // Array to store detached tab windows
 		this.isMobile = this.detectMobile();
 		this.maxZIndex = 1002; // Track the highest z-index for detached windows (starts at base z-index from CSS)
+		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
 		Style.init();
 
@@ -281,6 +282,9 @@ export class Profiler {
 	addTab( tab ) {
 
 		this.tabs[ tab.id ] = tab;
+
+		// Assign a permanent original index to this tab
+		tab.originalIndex = this.nextTabOriginalIndex ++;
 
 		// Add visual indicator for tabs that cannot be detached
 		if ( tab.allowDetach === false ) {
@@ -564,7 +568,6 @@ export class Profiler {
 		if ( tab.allowDetach === false ) return;
 
 		const allButtons = Array.from( this.tabsContainer.children );
-		tab.originalIndex = allButtons.indexOf( tab.button );
 
 		const tabIdsInOrder = allButtons.map( btn => {
 
@@ -1045,29 +1048,48 @@ export class Profiler {
 
 		tab.isDetached = false;
 
-		// Get all tab buttons currently in the container (only visible, non-detached tabs)
-		const buttons = Array.from( this.tabsContainer.children );
+		// Get all tabs and sort by their original index to determine the correct order
+		const allTabs = Object.values( this.tabs );
+		const allTabsSorted = allTabs
+			.filter( t => t.originalIndex !== undefined && t.isVisible )
+			.sort( ( a, b ) => a.originalIndex - b.originalIndex );
 
-		// Use the original index stored when the tab was detached
-		const targetIndex = tab.originalIndex !== undefined ? tab.originalIndex : 0;
+		// Get currently attached tab buttons
+		const currentButtons = Array.from( this.tabsContainer.children );
+
+		// Find the correct position for this tab
+		let insertIndex = 0;
+		for ( const t of allTabsSorted ) {
+
+			if ( t.id === tab.id ) {
+
+				break;
+
+			}
+
+			// Count only non-detached tabs that come before this one
+			if ( ! t.isDetached ) {
+
+				insertIndex ++;
+
+			}
+
+		}
 
 		// Insert the button at the correct position
-		if ( targetIndex >= buttons.length || buttons.length === 0 ) {
+		if ( insertIndex >= currentButtons.length || currentButtons.length === 0 ) {
 
-			// If target index is beyond current buttons, or no buttons exist, append at the end
+			// If insert index is beyond current buttons, or no buttons exist, append at the end
 			this.tabsContainer.appendChild( tab.button );
 
 		} else {
 
-			// Insert before the button at the target index
-			this.tabsContainer.insertBefore( tab.button, buttons[ targetIndex ] );
+			// Insert before the button at the insert index
+			this.tabsContainer.insertBefore( tab.button, currentButtons[ insertIndex ] );
 
 		}
 
 		this.contentWrapper.appendChild( tab.content );
-
-		// Don't delete originalIndex - keep it for future reference
-		// delete tab.originalIndex;
 
 		this.setActiveTab( tab.id );
 
@@ -1349,6 +1371,7 @@ export class Profiler {
 
 			if ( ! tab || tab.isDetached ) return;
 
+			// Restore originalIndex if saved
 			if ( detachedTabData.originalIndex !== undefined ) {
 
 				tab.originalIndex = detachedTabData.originalIndex;
