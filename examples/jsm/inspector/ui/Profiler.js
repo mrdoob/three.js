@@ -218,8 +218,9 @@ export class Profiler {
 
 			this.isResizing = true;
 			this.panel.classList.add( 'resizing' );
-			const startX = e.clientX || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientX : 0 );
-			const startY = e.clientY || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientY : 0 );
+			resizer.setPointerCapture( e.pointerId );
+			const startX = e.clientX;
+			const startY = e.clientY;
 			const startHeight = this.panel.offsetHeight;
 			const startWidth = this.panel.offsetWidth;
 
@@ -227,8 +228,8 @@ export class Profiler {
 
 				if ( ! this.isResizing ) return;
 				moveEvent.preventDefault();
-				const currentX = moveEvent.clientX || ( moveEvent.touches && moveEvent.touches[ 0 ] ? moveEvent.touches[ 0 ].clientX : 0 );
-				const currentY = moveEvent.clientY || ( moveEvent.touches && moveEvent.touches[ 0 ] ? moveEvent.touches[ 0 ].clientY : 0 );
+				const currentX = moveEvent.clientX;
+				const currentY = moveEvent.clientY;
 
 				if ( this.position === 'bottom' ) {
 
@@ -260,10 +261,9 @@ export class Profiler {
 
 				this.isResizing = false;
 				this.panel.classList.remove( 'resizing' );
-				document.removeEventListener( 'mousemove', onMove );
-				document.removeEventListener( 'mouseup', onEnd );
-				document.removeEventListener( 'touchmove', onMove );
-				document.removeEventListener( 'touchend', onEnd );
+				resizer.removeEventListener( 'pointermove', onMove );
+				resizer.removeEventListener( 'pointerup', onEnd );
+				resizer.removeEventListener( 'pointercancel', onEnd );
 				if ( ! this.panel.classList.contains( 'maximized' ) ) {
 
 					// Save dimensions based on current position
@@ -284,15 +284,13 @@ export class Profiler {
 
 			};
 
-			document.addEventListener( 'mousemove', onMove );
-			document.addEventListener( 'mouseup', onEnd );
-			document.addEventListener( 'touchmove', onMove, { passive: false } );
-			document.addEventListener( 'touchend', onEnd );
+			resizer.addEventListener( 'pointermove', onMove );
+			resizer.addEventListener( 'pointerup', onEnd );
+			resizer.addEventListener( 'pointercancel', onEnd );
 
 		};
 
-		resizer.addEventListener( 'mousedown', onStart );
-		resizer.addEventListener( 'touchstart', onStart );
+		resizer.addEventListener( 'pointerdown', onStart );
 
 	}
 
@@ -479,17 +477,18 @@ export class Profiler {
 
 		const onDragStart = ( e ) => {
 
-			startX = e.clientX || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientX : 0 );
-			startY = e.clientY || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientY : 0 );
+			startX = e.clientX;
+			startY = e.clientY;
 			isDragging = false;
 			hasMoved = false;
+			tab.button.setPointerCapture( e.pointerId );
 
 		};
 
 		const onDragMove = ( e ) => {
 
-			const currentX = e.clientX || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientX : 0 );
-			const currentY = e.clientY || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientY : 0 );
+			const currentX = e.clientX;
+			const currentY = e.clientY;
 
 			const deltaX = Math.abs( currentX - startX );
 			const deltaY = Math.abs( currentY - startY );
@@ -560,26 +559,18 @@ export class Profiler {
 			hasMoved = false;
 			previewWindow = null;
 
-			document.removeEventListener( 'mousemove', onDragMove );
-			document.removeEventListener( 'mouseup', onDragEnd );
-			document.removeEventListener( 'touchmove', onDragMove );
-			document.removeEventListener( 'touchend', onDragEnd );
+			tab.button.removeEventListener( 'pointermove', onDragMove );
+			tab.button.removeEventListener( 'pointerup', onDragEnd );
+			tab.button.removeEventListener( 'pointercancel', onDragEnd );
 
 		};
 
-		tab.button.addEventListener( 'mousedown', ( e ) => {
+		tab.button.addEventListener( 'pointerdown', ( e ) => {
 
 			onDragStart( e );
-			document.addEventListener( 'mousemove', onDragMove );
-			document.addEventListener( 'mouseup', onDragEnd );
-
-		} );
-
-		tab.button.addEventListener( 'touchstart', ( e ) => {
-
-			onDragStart( e );
-			document.addEventListener( 'touchmove', onDragMove, { passive: false } );
-			document.addEventListener( 'touchend', onDragEnd );
+			tab.button.addEventListener( 'pointermove', onDragMove );
+			tab.button.addEventListener( 'pointerup', onDragEnd );
+			tab.button.addEventListener( 'pointercancel', onDragEnd );
 
 		} );
 
@@ -869,13 +860,7 @@ export class Profiler {
 		let startX, startY, startLeft, startTop;
 
 		// Bring window to front when clicking anywhere on it
-		windowPanel.addEventListener( 'mousedown', () => {
-
-			this.bringWindowToFront( windowPanel );
-
-		} );
-
-		windowPanel.addEventListener( 'touchstart', () => {
+		windowPanel.addEventListener( 'pointerdown', () => {
 
 			this.bringWindowToFront( windowPanel );
 
@@ -894,9 +879,10 @@ export class Profiler {
 
 			isDragging = true;
 			header.style.cursor = 'grabbing';
+			header.setPointerCapture( e.pointerId );
 
-			startX = e.clientX || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientX : 0 );
-			startY = e.clientY || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientY : 0 );
+			startX = e.clientX;
+			startY = e.clientY;
 
 			const rect = windowPanel.getBoundingClientRect();
 			startLeft = rect.left;
@@ -910,8 +896,8 @@ export class Profiler {
 
 			e.preventDefault();
 
-			const currentX = e.clientX || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientX : 0 );
-			const currentY = e.clientY || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientY : 0 );
+			const currentX = e.clientX;
+			const currentY = e.clientY;
 
 			const deltaX = currentX - startX;
 			const deltaY = currentY - startY;
@@ -987,8 +973,8 @@ export class Profiler {
 			this.panel.style.outline = '';
 
 			// Check if dropped over the inspector panel
-			const currentX = e.clientX || ( e.changedTouches && e.changedTouches[ 0 ].clientX );
-			const currentY = e.clientY || ( e.changedTouches && e.changedTouches[ 0 ].clientY );
+			const currentX = e.clientX;
+			const currentY = e.clientY;
 
 			if ( currentX !== undefined && currentY !== undefined ) {
 
@@ -1010,26 +996,18 @@ export class Profiler {
 
 			}
 
-			document.removeEventListener( 'mousemove', onDragMove );
-			document.removeEventListener( 'mouseup', onDragEnd );
-			document.removeEventListener( 'touchmove', onDragMove );
-			document.removeEventListener( 'touchend', onDragEnd );
+			header.removeEventListener( 'pointermove', onDragMove );
+			header.removeEventListener( 'pointerup', onDragEnd );
+			header.removeEventListener( 'pointercancel', onDragEnd );
 
 		};
 
-		header.addEventListener( 'mousedown', ( e ) => {
+		header.addEventListener( 'pointerdown', ( e ) => {
 
 			onDragStart( e );
-			document.addEventListener( 'mousemove', onDragMove );
-			document.addEventListener( 'mouseup', onDragEnd );
-
-		} );
-
-		header.addEventListener( 'touchstart', ( e ) => {
-
-			onDragStart( e );
-			document.addEventListener( 'touchmove', onDragMove, { passive: false } );
-			document.addEventListener( 'touchend', onDragEnd );
+			header.addEventListener( 'pointermove', onDragMove );
+			header.addEventListener( 'pointerup', onDragEnd );
+			header.addEventListener( 'pointercancel', onDragEnd );
 
 		} );
 
@@ -1056,8 +1034,10 @@ export class Profiler {
 				// Bring window to front when resizing
 				this.bringWindowToFront( windowPanel );
 
-				startX = e.clientX || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientX : 0 );
-				startY = e.clientY || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientY : 0 );
+				resizer.setPointerCapture( e.pointerId );
+
+				startX = e.clientX;
+				startY = e.clientY;
 				startWidth = windowPanel.offsetWidth;
 				startHeight = windowPanel.offsetHeight;
 				startLeft = windowPanel.offsetLeft;
@@ -1071,8 +1051,8 @@ export class Profiler {
 
 				e.preventDefault();
 
-				const currentX = e.clientX || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientX : 0 );
-				const currentY = e.clientY || ( e.touches && e.touches[ 0 ] ? e.touches[ 0 ].clientY : 0 );
+				const currentX = e.clientX;
+				const currentY = e.clientY;
 
 				const deltaX = currentX - startX;
 				const deltaY = currentY - startY;
@@ -1152,29 +1132,21 @@ export class Profiler {
 
 				isResizing = false;
 
-				document.removeEventListener( 'mousemove', onResizeMove );
-				document.removeEventListener( 'mouseup', onResizeEnd );
-				document.removeEventListener( 'touchmove', onResizeMove );
-				document.removeEventListener( 'touchend', onResizeEnd );
+				resizer.removeEventListener( 'pointermove', onResizeMove );
+				resizer.removeEventListener( 'pointerup', onResizeEnd );
+				resizer.removeEventListener( 'pointercancel', onResizeEnd );
 
 				// Save layout after resizing detached window
 				this.saveLayout();
 
 			};
 
-			resizer.addEventListener( 'mousedown', ( e ) => {
+			resizer.addEventListener( 'pointerdown', ( e ) => {
 
 				onResizeStart( e );
-				document.addEventListener( 'mousemove', onResizeMove );
-				document.addEventListener( 'mouseup', onResizeEnd );
-
-			} );
-
-			resizer.addEventListener( 'touchstart', ( e ) => {
-
-				onResizeStart( e );
-				document.addEventListener( 'touchmove', onResizeMove, { passive: false } );
-				document.addEventListener( 'touchend', onResizeEnd );
+				resizer.addEventListener( 'pointermove', onResizeMove );
+				resizer.addEventListener( 'pointerup', onResizeEnd );
+				resizer.addEventListener( 'pointercancel', onResizeEnd );
 
 			} );
 

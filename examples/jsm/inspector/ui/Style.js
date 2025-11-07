@@ -220,6 +220,7 @@ export class Style {
 	height: 5px;
 	cursor: ns-resize;
 	z-index: 1001;
+	touch-action: none;
 }
 
 #profiler-panel.position-top .panel-resizer {
@@ -457,6 +458,7 @@ export class Style {
 	font-size: 14px;
 	user-select: none;
 	transition: opacity 0.2s, transform 0.2s;
+	touch-action: none;
 }
 
 .tab-btn.active {
@@ -1016,6 +1018,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	flex-shrink: 0;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	touch-action: none;
 }
 
 .detached-tab-header:active {
@@ -1101,6 +1104,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	height: 20px;
 	cursor: nwse-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 .detached-tab-resizer::after {
@@ -1130,6 +1134,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	height: 5px;
 	cursor: ns-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 .detached-tab-resizer-right {
@@ -1140,6 +1145,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	width: 5px;
 	cursor: ew-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 .detached-tab-resizer-bottom {
@@ -1150,6 +1156,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	height: 5px;
 	cursor: ns-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 .detached-tab-resizer-left {
@@ -1160,6 +1167,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	width: 5px;
 	cursor: ew-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 /* Input number spin buttons - hide arrows */
