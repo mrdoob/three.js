@@ -577,7 +577,7 @@ class Projector {
 
 			if ( sortObjects === true ) {
 
-				_renderData.objects.sort( painterSort );
+				painterSortStable( _renderData.objects, 0, _renderData.objects.length );
 
 			}
 
@@ -843,7 +843,7 @@ class Projector {
 
 			if ( sortElements === true ) {
 
-				_renderData.elements.sort( painterSort );
+				painterSortStable( _renderData.elements, 0, _renderData.elements.length );
 
 			}
 
@@ -982,6 +982,29 @@ class Projector {
 			} else {
 
 				return 0;
+
+			}
+
+		}
+
+		function painterSortStable( array, start, length ) {
+
+			// A stable insertion sort for sorting render items
+			// This avoids the GC overhead of Array.prototype.sort()
+
+			for ( let i = start + 1; i < start + length; i ++ ) {
+
+				const item = array[ i ];
+				let j = i - 1;
+
+				while ( j >= start && painterSort( array[ j ], item ) > 0 ) {
+
+					array[ j + 1 ] = array[ j ];
+					j --;
+
+				}
+
+				array[ j + 1 ] = item;
 
 			}
 
