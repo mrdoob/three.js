@@ -206,7 +206,7 @@ class SSRNode extends TempNode {
 		 * @private
 		 * @type {UniformNode<bool>}
 		 */
-		this._isPerspectiveCamera = uniform( camera.isPerspectiveCamera );
+		this._isPerspectiveCamera = uniform( !!camera.isPerspectiveCamera );
 
 		/**
 		 * The resolution of the pass.
