@@ -51,7 +51,7 @@
 	const parts = window.location.href.split( '/' );
 	const filename = parts[ parts.length - 1 ];
 
-	if ( filename !== 'primitives.html' ) {
+	if ( filename !== 'primitives.html' && filename !== 'prerequisites.html' ) {
 
 		let text = document.body.innerHTML;
 
