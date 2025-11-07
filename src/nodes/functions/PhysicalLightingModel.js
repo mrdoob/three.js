@@ -502,7 +502,7 @@ class PhysicalLightingModel extends LightingModel {
 				eta2: iridescenceIOR,
 				cosTheta1: dotNVi,
 				thinFilmThickness: iridescenceThickness,
-				baseF0: specularColor
+				baseF0: specularColorBlended
 			} );
 
 			this.iridescenceF0 = Schlick_to_F0( { f: this.iridescenceFresnel, f90: 1.0, dotVH: dotNVi } );
