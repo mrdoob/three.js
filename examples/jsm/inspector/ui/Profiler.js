@@ -84,8 +84,49 @@ export class Profiler {
 
 		};
 
+		const constrainMainPanel = () => {
+
+			// Skip if panel is maximized (it should always fill the screen)
+			if ( this.panel.classList.contains( 'maximized' ) ) return;
+
+			const windowWidth = window.innerWidth;
+			const windowHeight = window.innerHeight;
+
+			if ( this.position === 'bottom' ) {
+
+				const currentHeight = this.panel.offsetHeight;
+				const maxHeight = windowHeight - 50; // Leave 50px margin
+
+				if ( currentHeight > maxHeight ) {
+
+					this.panel.style.height = `${ maxHeight }px`;
+					this.lastHeightBottom = maxHeight;
+
+				}
+
+			} else if ( this.position === 'right' ) {
+
+				const currentWidth = this.panel.offsetWidth;
+				const maxWidth = windowWidth - 50; // Leave 50px margin
+
+				if ( currentWidth > maxWidth ) {
+
+					this.panel.style.width = `${ maxWidth }px`;
+					this.lastWidthRight = maxWidth;
+
+				}
+
+			}
+
+		};
+
 		// Listen for window resize events
-		window.addEventListener( 'resize', constrainDetachedWindows );
+		window.addEventListener( 'resize', () => {
+
+			constrainDetachedWindows();
+			constrainMainPanel();
+
+		} );
 
 	}
 
@@ -1511,6 +1552,22 @@ export class Profiler {
 			if ( layout.lastWidthRight ) {
 
 				this.lastWidthRight = layout.lastWidthRight;
+
+			}
+
+			// Constrain saved dimensions to current screen bounds
+			const windowWidth = window.innerWidth;
+			const windowHeight = window.innerHeight;
+
+			if ( this.lastHeightBottom > windowHeight - 50 ) {
+
+				this.lastHeightBottom = windowHeight - 50;
+
+			}
+
+			if ( this.lastWidthRight > windowWidth - 50 ) {
+
+				this.lastWidthRight = windowWidth - 50;
 
 			}
 
