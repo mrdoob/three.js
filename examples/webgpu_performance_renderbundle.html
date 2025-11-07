@@ -55,12 +55,10 @@
 
 			//
 
-			const MAX_GEOMETRY_COUNT = 4000;
-
 			const api = {
 				webgpu: true,
 				renderBundle: true,
-				count: MAX_GEOMETRY_COUNT,
+				count: 4000,
 				opacity: 1,
 				dynamic: false
 			};
@@ -155,6 +153,7 @@
 				const searchParams = new URLSearchParams( window.location.search );
 				api.webgpu = searchParams.get( 'backend' ) !== 'webgl';
 				api.renderBundle = searchParams.get( 'renderBundle' ) !== 'false';
+				api.count = parseFloat( searchParams.get( 'count' ) || 4000 );
 
 				const count = api.count;
 
@@ -225,8 +224,9 @@
 
 					const backendParam = 'backend=' + ( api.webgpu ? 'webgpu' : 'webgl' );
 					const renderBundleParam = '&renderBundle=' + ( api.renderBundle ? 'true' : 'false' );
+					const countParam = '&count=' + api.count;
 
-					location.href = location.pathname + '?' + backendParam + renderBundleParam; // relative redirect with parameters
+					location.href = location.pathname + '?' + backendParam + renderBundleParam + countParam; // relative redirect with parameters
 
 				}
 
