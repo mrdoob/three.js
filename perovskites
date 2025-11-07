@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Photocatalyse Pérovskite</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        #info { position: absolute; top: 10px; left: 10px; color: white; }
+    </style>
+</head>
+<body>
+    <div id="info">Photocatalyse - Réactions Radicaux</div>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Couleurs des atomes
+        const colors = {
+            O: 0xFF4444,    // Rouge pour Oxygène
+            H: 0xFFFFFF,    // Blanc pour Hydrogène  
+            C: 0x333333,    // Noir pour Carbone
+            Pb: 0x888888,   // Gris pour Plomb
+            I: 0x9932CC     // Violet pour Iode
+        };
+
+        // Créer une molécule
+        function createMolecule(atoms, positions, name) {
+            const group = new THREE.Group();
+            group.name = name;
+            
+            atoms.forEach((atom, index) => {
+                const geometry = new THREE.SphereGeometry(0.3);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: colors[atom] 
+                });
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.set(...positions[index]);
+                group.add(sphere);
+            });
+            
+            return group;
+        }
+
+        // Molécules initiales
+        const O2 = createMolecule(['O', 'O'], [[0,0,0], [1.2,0,0]], 'O2');
+        const H2O = createMolecule(['O', 'H', 'H'], [[0,0,0], [0.9,0.5,0], [0.9,-0.5,0]], 'H2O');
+        const pollutant = createMolecule(['C', 'C', 'C', 'H', 'H', 'H'], 
+            [[0,0,0], [1.4,0,0], [2.8,0,0], [-0.5,0.5,0], [3.3,0.5,0], [3.3,-0.5,0]], 'pollutant');
+
+        // Positionnement
+        O2.position.set(-5, 2, 0);
+        H2O.position.set(-5, -2, 0);
+        pollutant.position.set(0, 0, 0);
+
+        scene.add(O2);
+        scene.add(H2O);
+        scene.add(pollutant);
+
+        // Animation
+        let step = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (step < 100) {
+                // Étape 1: Mouvement vers la réaction
+                O2.position.x += 0.05;
+                H2O.position.x += 0.05;
+            } else if (step < 200) {
+                // Étape 2: Formation radicaux
+                if (step === 150) {
+                    const OH = createMolecule(['O', 'H'], [[0,0,0], [0.9,0,0]], 'OH');
+                    OH.position.copy(H2O.position);
+                    scene.add(OH);
+                }
+            }
+            
+            step++;
+            renderer.render(scene, camera);
+        }
+
+        camera.position.z = 10;
+        animate();
+    </script>
+</body>
+</html>
