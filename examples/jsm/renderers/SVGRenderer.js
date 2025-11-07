@@ -8,12 +8,13 @@ import {
 	SRGBColorSpace,
 	Vector3
 } from 'three';
+
 import {
 	Projector,
 	RenderableFace,
 	RenderableLine,
 	RenderableSprite
-} from '../renderers/Projector.js';
+} from './Projector.js';
 
 /**
  * Can be used to wrap SVG elements into a 3D object.
@@ -366,10 +367,6 @@ class SVGRenderer {
 				} else if ( element instanceof RenderableFace ) {
 
 					_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
-
-					if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
-					if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
-					if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
 
 					_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
 					_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
