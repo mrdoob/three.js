@@ -357,5 +357,34 @@ ShaderLib.physical = {
 
 };
 
+ShaderLib.spectral = {
+
+	uniforms: /*@__PURE__*/ mergeUniforms( [
+		UniformsLib.common,
+		UniformsLib.envmap,
+		UniformsLib.aomap,
+		UniformsLib.lightmap,
+		UniformsLib.emissivemap,
+		UniformsLib.bumpmap,
+		UniformsLib.normalmap,
+		UniformsLib.displacementmap,
+		UniformsLib.roughnessmap,
+		UniformsLib.metalnessmap,
+		UniformsLib.fog,
+		UniformsLib.lights,
+		{
+			emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
+			roughness: { value: 1.0 },
+			metalness: { value: 0.0 },
+			envMapIntensity: { value: 1 },
+			dispersion: { value: 0.0 }
+		}
+	] ),
+
+	vertexShader: ShaderChunk.meshspectral_vert,
+	fragmentShader: ShaderChunk.meshspectral_frag
+
+};
+
 
 export { ShaderLib };

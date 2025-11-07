@@ -4,6 +4,7 @@ import { RawShaderMaterial } from './RawShaderMaterial.js';
 import { ShaderMaterial } from './ShaderMaterial.js';
 import { PointsMaterial } from './PointsMaterial.js';
 import { MeshPhysicalMaterial } from './MeshPhysicalMaterial.js';
+import { MeshSpectralMaterial } from './MeshSpectralMaterial.js';
 import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 import { MeshPhongMaterial } from './MeshPhongMaterial.js';
 import { MeshToonMaterial } from './MeshToonMaterial.js';
@@ -24,6 +25,7 @@ export {
 	ShaderMaterial,
 	PointsMaterial,
 	MeshPhysicalMaterial,
+	MeshSpectralMaterial,
 	MeshStandardMaterial,
 	MeshPhongMaterial,
 	MeshToonMaterial,

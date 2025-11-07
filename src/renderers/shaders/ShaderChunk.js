@@ -97,6 +97,7 @@ import skinning_vertex from './ShaderChunk/skinning_vertex.glsl.js';
 import skinnormal_vertex from './ShaderChunk/skinnormal_vertex.glsl.js';
 import specularmap_fragment from './ShaderChunk/specularmap_fragment.glsl.js';
 import specularmap_pars_fragment from './ShaderChunk/specularmap_pars_fragment.glsl.js';
+import spectral_pars_fragment from './ShaderChunk/spectral_pars_fragment.glsl.js';
 import tonemapping_fragment from './ShaderChunk/tonemapping_fragment.glsl.js';
 import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.glsl.js';
 import transmission_fragment from './ShaderChunk/transmission_fragment.glsl.js';
@@ -119,6 +120,7 @@ import * as meshmatcap from './ShaderLib/meshmatcap.glsl.js';
 import * as meshnormal from './ShaderLib/meshnormal.glsl.js';
 import * as meshphong from './ShaderLib/meshphong.glsl.js';
 import * as meshphysical from './ShaderLib/meshphysical.glsl.js';
+import * as meshspectral from './ShaderLib/meshspectral.glsl.js';
 import * as meshtoon from './ShaderLib/meshtoon.glsl.js';
 import * as points from './ShaderLib/points.glsl.js';
 import * as shadow from './ShaderLib/shadow.glsl.js';
@@ -224,6 +226,7 @@ export const ShaderChunk = {
 	skinnormal_vertex: skinnormal_vertex,
 	specularmap_fragment: specularmap_fragment,
 	specularmap_pars_fragment: specularmap_pars_fragment,
+	spectral_pars_fragment: spectral_pars_fragment,
 	tonemapping_fragment: tonemapping_fragment,
 	tonemapping_pars_fragment: tonemapping_pars_fragment,
 	transmission_fragment: transmission_fragment,
@@ -259,6 +262,8 @@ export const ShaderChunk = {
 	meshphong_frag: meshphong.fragment,
 	meshphysical_vert: meshphysical.vertex,
 	meshphysical_frag: meshphysical.fragment,
+	meshspectral_vert: meshspectral.vertex,
+	meshspectral_frag: meshspectral.fragment,
 	meshtoon_vert: meshtoon.vertex,
 	meshtoon_frag: meshtoon.fragment,
 	points_vert: points.vertex,
