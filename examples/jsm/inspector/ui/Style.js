@@ -341,13 +341,6 @@ export class Style {
 	border-bottom: 1px solid var(--profiler-border);
 }
 
-#profiler-panel.position-right.no-tabs #maximize-btn,
-#profiler-panel.position-left.no-tabs #maximize-btn,
-#profiler-panel.position-bottom.no-tabs #maximize-btn,
-#profiler-panel.position-top.no-tabs #maximize-btn {
-	display: none;
-}
-
 #profiler-panel.position-right.no-tabs .profiler-content-wrapper,
 #profiler-panel.position-left.no-tabs .profiler-content-wrapper {
 	display: none;
@@ -519,6 +512,14 @@ export class Style {
 #hide-panel-btn:hover {
 	background-color: rgba(255, 255, 255, 0.1);
 	color: var(--text-primary);
+}
+
+/* Hide maximize button when there are no tabs */
+#profiler-panel.position-right.no-tabs #maximize-btn,
+#profiler-panel.position-left.no-tabs #maximize-btn,
+#profiler-panel.position-bottom.no-tabs #maximize-btn,
+#profiler-panel.position-top.no-tabs #maximize-btn {
+	display: none !important;
 }
 
 .profiler-content-wrapper {

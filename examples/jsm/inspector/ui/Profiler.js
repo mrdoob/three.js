@@ -205,6 +205,9 @@ export class Profiler {
 
 		this.domElement.append( this.toggleButton, this.panel );
 
+		// Set initial position class
+		this.panel.classList.add( `position-${this.position}` );
+
 	}
 
 	setupResizing() {
