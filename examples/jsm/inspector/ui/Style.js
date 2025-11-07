@@ -966,6 +966,44 @@ export class Style {
 
 }
 
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+
+	.panel-resizer {
+		top: -10px !important;
+		height: 20px !important;
+	}
+
+	#profiler-panel.position-top .panel-resizer {
+		top: auto !important;
+		bottom: -10px !important;
+		height: 20px !important;
+	}
+
+	#profiler-panel.position-left .panel-resizer {
+		right: -10px !important;
+		width: 20px !important;
+		height: 100% !important;
+	}
+
+	#profiler-panel.position-right .panel-resizer {
+		left: -10px !important;
+		width: 20px !important;
+		height: 100% !important;
+	}
+
+	.detached-tab-resizer-top,
+	.detached-tab-resizer-bottom {
+		height: 10px !important;
+	}
+
+	.detached-tab-resizer-left,
+	.detached-tab-resizer-right {
+		width: 10px !important;
+	}
+
+}
+
 .drag-preview-indicator {
 	position: fixed;
 	background-color: rgba(0, 170, 255, 0.2);
