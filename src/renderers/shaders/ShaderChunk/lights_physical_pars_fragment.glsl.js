@@ -399,23 +399,11 @@ vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3
 // Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
 // Approximates multiscattering in order to preserve energy.
 // http://www.jcgt.org/published/0008/01/03/
-#ifdef USE_IRIDESCENCE
-void computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
-#else
 void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
-#endif
 
 	vec2 fab = DFGApprox( normal, viewDir, roughness );
 
-	#ifdef USE_IRIDESCENCE
-
-		vec3 Fr = mix( specularColor, iridescenceF0, iridescence );
-
-	#else
-
-		vec3 Fr = specularColor;
-
-	#endif
+	vec3 Fr = specularColor;
 
 	vec3 FssEss = Fr * fab.x + specularF90 * fab.y;
 
@@ -429,6 +417,27 @@ void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const 
 	multiScatter += Fms * Ems;
 
 }
+
+#ifdef USE_IRIDESCENCE
+void computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceFresnel, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
+
+	vec2 fab = DFGApprox( normal, viewDir, roughness );
+
+	vec3 Fr = mix( specularColor, iridescenceFresnel, iridescence );
+
+	vec3 FssEss = Fr * fab.x + specularF90 * fab.y;
+
+	float Ess = fab.x + fab.y;
+	float Ems = 1.0 - Ess;
+
+	vec3 Favg = Fr + ( 1.0 - Fr ) * 0.047619; // 1/21
+	vec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );
+
+	singleScatter += FssEss;
+	multiScatter += Fms * Ems;
+
+}
+#endif
 
 // GGX BRDF with multi-scattering energy compensation for direct lighting
 // Based on "Practical Multiple Scattering Compensation for Microfacet Models"
@@ -573,14 +582,14 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	#ifdef USE_IRIDESCENCE
 
 		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#else
 
 		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
-		computeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#endif
+
+	computeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	// Mix based on metalness
 	vec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );

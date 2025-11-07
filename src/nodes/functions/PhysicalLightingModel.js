@@ -549,13 +549,13 @@ class PhysicalLightingModel extends LightingModel {
 	// Approximates multi-scattering in order to preserve energy.
 	// http://www.jcgt.org/published/0008/01/03/
 
-	computeMultiscattering( singleScatter, multiScatter, specularF90, f0 ) {
+	computeMultiscattering( singleScatter, multiScatter, specularF90, f0, useIridescence = true ) {
 
 		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
 		const fab = DFGApprox( { roughness, dotNV } );
 
-		const Fr = this.iridescenceF0 ? iridescence.mix( f0, this.iridescenceF0 ) : f0;
+		const Fr = ( this.iridescenceF0 && useIridescence ) ? iridescence.mix( f0, this.iridescenceF0 ) : f0;
 
 		const FssEss = Fr.mul( fab.x ).add( specularF90.mul( fab.y ) );
 
@@ -713,7 +713,7 @@ class PhysicalLightingModel extends LightingModel {
 		const multiScatteringMetallic = vec3().toVar( 'multiScatteringMetallic' );
 
 		this.computeMultiscattering( singleScatteringDielectric, multiScatteringDielectric, specularF90, specularColor );
-		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb );
+		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb, false );
 
 		// Mix based on metalness
 		const singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, metalness );
