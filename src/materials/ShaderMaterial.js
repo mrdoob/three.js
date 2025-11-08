@@ -279,6 +279,12 @@ class ShaderMaterial extends Material {
 
 		this.glslVersion = source.glslVersion;
 
+		this.defaultAttributeValues = Object.assign( {}, source.defaultAttributeValues );
+
+		this.index0AttributeName = source.index0AttributeName;
+
+		this.uniformsNeedUpdate = source.uniformsNeedUpdate;
+
 		return this;
 
 	}
