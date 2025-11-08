@@ -2,6 +2,7 @@
 
 // Constants
 const MESSAGE_ID = 'three-devtools';
+const CONNECTION_NAME = 'three-devtools';
 const MESSAGE_INIT = 'init';
 const MESSAGE_REQUEST_STATE = 'request-state';
 const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
@@ -11,57 +12,64 @@ const EVENT_RENDERER = 'renderer';
 const EVENT_OBJECT_DETAILS = 'object-details';
 const EVENT_SCENE = 'scene';
 const EVENT_COMMITTED = 'committed';
+const STATE_POLLING_INTERVAL = 1000;
 
 // --- Utility Functions ---
-function getObjectIcon(obj) {
-	if (obj.isScene) return '🌍';
-	if (obj.isCamera) return '📷';
-	if (obj.isLight) return '💡';
-	if (obj.isInstancedMesh) return '🔸';
-	if (obj.isMesh) return '🔷';
-	if (obj.type === 'Group') return '📁';
+function getObjectIcon( obj ) {
+
+	if ( obj.isScene ) return '🌍';
+	if ( obj.isCamera ) return '📷';
+	if ( obj.isLight ) return '💡';
+	if ( obj.isInstancedMesh ) return '🔸';
+	if ( obj.isMesh ) return '🔷';
+	if ( obj.type === 'Group' ) return '📁';
 	return '📦';
+
 }
 
-function createPropertyRow(label, value) {
-	const row = document.createElement('div');
+function createPropertyRow( label, value ) {
+
+	const row = document.createElement( 'div' );
 	row.className = 'property-row';
 	row.style.display = 'flex';
 	row.style.justifyContent = 'space-between';
 	row.style.marginBottom = '2px';
 
-	const labelSpan = document.createElement('span');
+	const labelSpan = document.createElement( 'span' );
 	labelSpan.className = 'property-label';
 	labelSpan.textContent = `${label}`;
 	labelSpan.style.marginRight = '10px';
 	labelSpan.style.whiteSpace = 'nowrap';
 
-	const valueSpan = document.createElement('span');
+	const valueSpan = document.createElement( 'span' );
 	valueSpan.className = 'property-value';
-	const displayValue = (value === undefined || value === null)
+	const displayValue = ( value === undefined || value === null )
 		? '–'
-		: (typeof value === 'number' ? value.toLocaleString() : value);
+		: ( typeof value === 'number' ? value.toLocaleString() : value );
 	valueSpan.textContent = displayValue;
 	valueSpan.style.textAlign = 'right';
 
-	row.appendChild(labelSpan);
-	row.appendChild(valueSpan);
+	row.appendChild( labelSpan );
+	row.appendChild( valueSpan );
 	return row;
+
 }
 
-function createVectorRow(label, vector) {
-	const row = document.createElement('div');
+function createVectorRow( label, vector ) {
+
+	const row = document.createElement( 'div' );
 	row.className = 'property-row';
 	row.style.marginBottom = '2px';
-	
+
 	// Pad label to ensure consistent alignment
-	const paddedLabel = label.padEnd(16, ' '); // Pad to 16 characters
-	const content = `${paddedLabel} ${vector.x.toFixed(3)}\t${vector.y.toFixed(3)}\t${vector.z.toFixed(3)}`;
+	const paddedLabel = label.padEnd( 16, ' ' ); // Pad to 16 characters
+	const content = `${paddedLabel} ${vector.x.toFixed( 3 )}\t${vector.y.toFixed( 3 )}\t${vector.z.toFixed( 3 )}`;
 	row.textContent = content;
 	row.style.fontFamily = 'monospace';
 	row.style.whiteSpace = 'pre';
-	
+
 	return row;
+
 }
 
 // --- State ---
@@ -80,7 +88,7 @@ let mousePosition = { x: 0, y: 0 };
 
 // Create a connection to the background page
 const backgroundPageConnection = chrome.runtime.connect( {
-	name: 'three-devtools'
+	name: CONNECTION_NAME
 } );
 
 // Initialize the connection with the inspected tab ID
@@ -111,7 +119,7 @@ const intervalId = setInterval( () => {
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
 
-}, 1000 );
+}, STATE_POLLING_INTERVAL );
 
 backgroundPageConnection.onDisconnect.addListener( () => {
 

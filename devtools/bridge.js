@@ -16,6 +16,7 @@
 	const MESSAGE_REQUEST_STATE = 'request-state';
 	const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
 	const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
+	const HIGHLIGHT_OVERLAY_DURATION = 1000;
 
 	// Only initialize if not already initialized
 	if ( ! window.__THREE_DEVTOOLS__ ) {
@@ -474,7 +475,7 @@
 
 			parent.appendChild( overlay );
 
-			// Auto-remove after 1 second
+			// Auto-remove after duration
 			setTimeout( () => {
 
 				if ( overlay.parentElement ) {
@@ -483,7 +484,7 @@
 
 				}
 
-			}, 1000 );
+			}, HIGHLIGHT_OVERLAY_DURATION );
 
 		}
 
