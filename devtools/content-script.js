@@ -2,6 +2,12 @@
 
 // This script runs in the context of the web page
 
+// Constants
+const MESSAGE_ID = 'three-devtools';
+const MESSAGE_REQUEST_STATE = 'request-state';
+const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
+const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
+
 // Inject the bridge script into the main document or a target (e.g., iframe)
 function injectBridge( target = document ) {
 
@@ -27,7 +33,11 @@ function injectIntoIframes() {
 
 			if ( iframe.contentDocument ) injectBridge( iframe.contentDocument );
 
-		} catch ( e ) { /* Ignore cross-origin errors */ }
+		} catch ( e ) {
+
+			// Ignore cross-origin errors when accessing iframe content
+
+		}
 
 	} );
 
@@ -52,7 +62,11 @@ new MutationObserver( mutations => {
 
 						if ( node.contentDocument ) injectBridge( node.contentDocument );
 
-					} catch ( e ) { /* Ignore cross-origin errors */ }
+					} catch ( e ) {
+
+						// Ignore cross-origin errors when accessing iframe content
+
+					}
 
 				} );
 
@@ -84,7 +98,7 @@ function isExtensionContextValid() {
 function handleWindowMessage( event ) {
 
 	// Only accept messages with the correct id
-	if ( ! event.data || event.data.id !== 'three-devtools' ) return;
+	if ( ! event.data || event.data.id !== MESSAGE_ID ) return;
 
 	// Determine source: 'main' for window, 'iframe' otherwise
 	const source = event.source === window ? 'main' : 'iframe';
@@ -104,19 +118,11 @@ function handleWindowMessage( event ) {
 // Listener for messages from the background script (originating from panel)
 function handleBackgroundMessage( message ) {
 
-	if ( message.name === 'request-state' ) {
+	const forwardableMessages = new Set( [ MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS ] );
 
-		message.id = 'three-devtools';
-		window.postMessage( message, '*' );
+	if ( forwardableMessages.has( message.name ) ) {
 
-	} else if ( message.name === 'request-object-details' ) {
-
-		message.id = 'three-devtools';
-		window.postMessage( message, '*' );
-
-	} else if ( message.name === 'scroll-to-canvas' ) {
-
-		message.id = 'three-devtools';
+		message.id = MESSAGE_ID;
 		window.postMessage( message, '*' );
 
 	}

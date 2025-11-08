@@ -1,5 +1,17 @@
 /* global chrome */
 
+// Constants
+const MESSAGE_ID = 'three-devtools';
+const MESSAGE_INIT = 'init';
+const MESSAGE_REQUEST_STATE = 'request-state';
+const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
+const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
+const EVENT_REGISTER = 'register';
+const EVENT_RENDERER = 'renderer';
+const EVENT_OBJECT_DETAILS = 'object-details';
+const EVENT_SCENE = 'scene';
+const EVENT_COMMITTED = 'committed';
+
 // --- Utility Functions ---
 function getObjectIcon(obj) {
 	if (obj.isScene) return '🌍';
@@ -73,20 +85,20 @@ const backgroundPageConnection = chrome.runtime.connect( {
 
 // Initialize the connection with the inspected tab ID
 backgroundPageConnection.postMessage( {
-	name: 'init',
+	name: MESSAGE_INIT,
 	tabId: chrome.devtools.inspectedWindow.tabId
 } );
 
 // Request the initial state from the bridge script
 backgroundPageConnection.postMessage( {
-	name: 'request-state',
+	name: MESSAGE_REQUEST_STATE,
 	tabId: chrome.devtools.inspectedWindow.tabId
 } );
 
 // Function to scroll to canvas element
 function scrollToCanvas( rendererUuid ) {
 	backgroundPageConnection.postMessage( {
-		name: 'scroll-to-canvas',
+		name: MESSAGE_SCROLL_TO_CANVAS,
 		uuid: rendererUuid,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
@@ -95,7 +107,7 @@ function scrollToCanvas( rendererUuid ) {
 const intervalId = setInterval( () => {
 
 	backgroundPageConnection.postMessage( {
-		name: 'request-state',
+		name: MESSAGE_REQUEST_STATE,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
 
@@ -112,7 +124,7 @@ backgroundPageConnection.onDisconnect.addListener( () => {
 // Function to request object details from the bridge
 function requestObjectDetails( uuid ) {
 	backgroundPageConnection.postMessage( {
-		name: 'request-object-details',
+		name: MESSAGE_REQUEST_OBJECT_DETAILS,
 		uuid: uuid,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
@@ -121,6 +133,124 @@ function requestObjectDetails( uuid ) {
 
 // Store renderer collapse states
 const rendererCollapsedState = new Map();
+
+// Helper function to create properties column for renderer
+function createRendererPropertiesColumn( props ) {
+
+	const propsCol = document.createElement( 'div' );
+	propsCol.className = 'properties-column';
+	const propsTitle = document.createElement( 'h4' );
+	propsTitle.textContent = 'Properties';
+	propsCol.appendChild( propsTitle );
+	propsCol.appendChild( createPropertyRow( 'Size', `${props.width}x${props.height}` ) );
+	propsCol.appendChild( createPropertyRow( 'Alpha', props.alpha ) );
+	propsCol.appendChild( createPropertyRow( 'Antialias', props.antialias ) );
+	propsCol.appendChild( createPropertyRow( 'Output Color Space', props.outputColorSpace ) );
+	propsCol.appendChild( createPropertyRow( 'Tone Mapping', props.toneMapping ) );
+	propsCol.appendChild( createPropertyRow( 'Tone Mapping Exposure', props.toneMappingExposure ) );
+	propsCol.appendChild( createPropertyRow( 'Shadows', props.shadows ? 'enabled' : 'disabled' ) );
+	propsCol.appendChild( createPropertyRow( 'Auto Clear', props.autoClear ) );
+	propsCol.appendChild( createPropertyRow( 'Auto Clear Color', props.autoClearColor ) );
+	propsCol.appendChild( createPropertyRow( 'Auto Clear Depth', props.autoClearDepth ) );
+	propsCol.appendChild( createPropertyRow( 'Auto Clear Stencil', props.autoClearStencil ) );
+	propsCol.appendChild( createPropertyRow( 'Local Clipping', props.localClipping ) );
+	propsCol.appendChild( createPropertyRow( 'Physically Correct Lights', props.physicallyCorrectLights ) );
+
+	return propsCol;
+
+}
+
+// Helper function to create stats column for renderer
+function createRendererStatsColumn( info ) {
+
+	const statsCol = document.createElement( 'div' );
+	statsCol.className = 'stats-column';
+
+	// Render Stats
+	const renderTitle = document.createElement( 'h4' );
+	renderTitle.textContent = 'Render Stats';
+	statsCol.appendChild( renderTitle );
+	statsCol.appendChild( createPropertyRow( 'Frame', info.render.frame ) );
+	statsCol.appendChild( createPropertyRow( 'Draw Calls', info.render.calls ) );
+	statsCol.appendChild( createPropertyRow( 'Triangles', info.render.triangles ) );
+	statsCol.appendChild( createPropertyRow( 'Points', info.render.points ) );
+	statsCol.appendChild( createPropertyRow( 'Lines', info.render.lines ) );
+
+	// Memory
+	const memoryTitle = document.createElement( 'h4' );
+	memoryTitle.textContent = 'Memory';
+	memoryTitle.style.marginTop = '10px';
+	statsCol.appendChild( memoryTitle );
+	statsCol.appendChild( createPropertyRow( 'Geometries', info.memory.geometries ) );
+	statsCol.appendChild( createPropertyRow( 'Textures', info.memory.textures ) );
+	statsCol.appendChild( createPropertyRow( 'Shader Programs', info.memory.programs ) );
+
+	return statsCol;
+
+}
+
+// Helper function to process scene batch updates
+function processSceneBatch( sceneUuid, batchObjects ) {
+
+	// 1. Identify UUIDs in the new batch
+	const newObjectUuids = new Set( batchObjects.map( obj => obj.uuid ) );
+
+	// 2. Identify current object UUIDs associated with this scene that are NOT renderers
+	const currentSceneObjectUuids = new Set();
+	state.objects.forEach( ( obj, uuid ) => {
+
+		// Use the _sceneUuid property we'll add below, or check if it's the scene root itself
+		if ( obj._sceneUuid === sceneUuid || uuid === sceneUuid ) {
+
+			currentSceneObjectUuids.add( uuid );
+
+		}
+
+	} );
+
+	// 3. Find UUIDs to remove (in current state for this scene, but not in the new batch)
+	const uuidsToRemove = new Set();
+	currentSceneObjectUuids.forEach( uuid => {
+
+		if ( ! newObjectUuids.has( uuid ) ) {
+
+			uuidsToRemove.add( uuid );
+
+		}
+
+	} );
+
+	// 4. Remove stale objects from state
+	uuidsToRemove.forEach( uuid => {
+
+		state.objects.delete( uuid );
+		// If a scene object itself was somehow removed (unlikely for root), clean up scenes map too
+		if ( state.scenes.has( uuid ) ) {
+
+			state.scenes.delete( uuid );
+
+		}
+
+	} );
+
+	// 5. Process the new batch: Add/Update objects and mark their scene association
+	batchObjects.forEach( objData => {
+
+		// Add a private property to track which scene this object belongs to
+		objData._sceneUuid = sceneUuid;
+		state.objects.set( objData.uuid, objData );
+
+		// Ensure the scene root is in the scenes map
+		if ( objData.isScene && objData.uuid === sceneUuid ) {
+
+			state.scenes.set( objData.uuid, objData );
+
+		}
+		// Note: Renderers are handled separately by 'renderer' events and shouldn't appear in scene batches.
+
+	} );
+
+}
 
 // Clear state when panel is reloaded
 function clearState() {
@@ -148,7 +278,7 @@ function clearState() {
 // Listen for messages from the background page
 backgroundPageConnection.onMessage.addListener( function ( message ) {
 
-	if ( message.id === 'three-devtools' ) {
+	if ( message.id === MESSAGE_ID ) {
 
 		handleThreeEvent( message );
 
@@ -160,103 +290,35 @@ function handleThreeEvent( message ) {
 
 	switch ( message.name ) {
 
-		case 'register':
+		case EVENT_REGISTER:
 			state.revision = message.detail.revision;
 			break;
 
 		// Handle individual renderer observation
-		case 'renderer':
+		case EVENT_RENDERER:
 			const detail = message.detail;
 
-			// Only store each unique object once
-			if ( ! state.objects.has( detail.uuid ) ) {
-
-				state.objects.set( detail.uuid, detail );
-				state.renderers.set( detail.uuid, detail );
-
-			}
-
-			// Update or add the renderer in the state map
-			state.renderers.set( detail.uuid, detail ); // Ensure the latest detail is always stored
-			// Also update the generic objects map if renderers are stored there too
+			// Update or add the renderer in the state maps (always use latest data)
+			state.renderers.set( detail.uuid, detail );
 			state.objects.set( detail.uuid, detail );
-
 
 			break;
 
 		// Handle object details response
-		case 'object-details':
+		case EVENT_OBJECT_DETAILS:
 			state.selectedObject = message.detail;
 			console.log( 'Panel: Received object details:', message.detail );
 			showFloatingDetails( message.detail );
 			break;
 
 		// Handle a batch of objects for a specific scene
-		case 'scene':
+		case EVENT_SCENE:
 			const { sceneUuid, objects: batchObjects } = message.detail;
 			console.log( 'Panel: Received scene batch for', sceneUuid, 'with', batchObjects.length, 'objects' );
-
-			// 1. Identify UUIDs in the new batch
-			const newObjectUuids = new Set( batchObjects.map( obj => obj.uuid ) );
-
-			// 2. Identify current object UUIDs associated with this scene that are NOT renderers
-			const currentSceneObjectUuids = new Set();
-			state.objects.forEach( ( obj, uuid ) => {
-
-				// Use the _sceneUuid property we'll add below, or check if it's the scene root itself
-				if ( obj._sceneUuid === sceneUuid || uuid === sceneUuid ) {
-
-					currentSceneObjectUuids.add( uuid );
-
-				}
-
-			} );
-
-			// 3. Find UUIDs to remove (in current state for this scene, but not in the new batch)
-			const uuidsToRemove = new Set();
-			currentSceneObjectUuids.forEach( uuid => {
-
-				if ( ! newObjectUuids.has( uuid ) ) {
-
-					uuidsToRemove.add( uuid );
-
-				}
-
-			} );
-
-			// 4. Remove stale objects from state
-			uuidsToRemove.forEach( uuid => {
-
-				state.objects.delete( uuid );
-				// If a scene object itself was somehow removed (unlikely for root), clean up scenes map too
-				if ( state.scenes.has( uuid ) ) {
-
-					state.scenes.delete( uuid );
-
-				}
-
-			} );
-
-			// 5. Process the new batch: Add/Update objects and mark their scene association
-			batchObjects.forEach( objData => {
-
-				// Add a private property to track which scene this object belongs to
-				objData._sceneUuid = sceneUuid;
-				state.objects.set( objData.uuid, objData );
-
-				// Ensure the scene root is in the scenes map
-				if ( objData.isScene && objData.uuid === sceneUuid ) {
-
-					state.scenes.set( objData.uuid, objData );
-
-				}
-				// Note: Renderers are handled separately by 'renderer' events and shouldn't appear in scene batches.
-
-			} );
-
+			processSceneBatch( sceneUuid, batchObjects );
 			break;
 
-		case 'committed':
+		case EVENT_COMMITTED:
 			// Page was reloaded, clear state
 			clearState();
 			break;
@@ -328,51 +390,8 @@ function renderRenderer( obj, container ) {
 		gridContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(200px, 1fr))'; // Responsive columns
 		gridContainer.style.gap = '10px 20px'; // Row and column gap
 
-		// --- Column 1: Properties ---
-		const propsCol = document.createElement( 'div' );
-		propsCol.className = 'properties-column';
-		const propsTitle = document.createElement( 'h4' );
-		propsTitle.textContent = 'Properties';
-		propsCol.appendChild( propsTitle );
-		propsCol.appendChild( createPropertyRow( 'Size', `${props.width}x${props.height}` ) );
-		propsCol.appendChild( createPropertyRow( 'Alpha', props.alpha ) );
-		propsCol.appendChild( createPropertyRow( 'Antialias', props.antialias ) );
-		propsCol.appendChild( createPropertyRow( 'Output Color Space', props.outputColorSpace ) );
-		propsCol.appendChild( createPropertyRow( 'Tone Mapping', props.toneMapping ) );
-		propsCol.appendChild( createPropertyRow( 'Tone Mapping Exposure', props.toneMappingExposure ) );
-		propsCol.appendChild( createPropertyRow( 'Shadows', props.shadows ? 'enabled' : 'disabled' ) ); // Display string
-		propsCol.appendChild( createPropertyRow( 'Auto Clear', props.autoClear ) );
-		propsCol.appendChild( createPropertyRow( 'Auto Clear Color', props.autoClearColor ) );
-		propsCol.appendChild( createPropertyRow( 'Auto Clear Depth', props.autoClearDepth ) );
-		propsCol.appendChild( createPropertyRow( 'Auto Clear Stencil', props.autoClearStencil ) );
-		propsCol.appendChild( createPropertyRow( 'Local Clipping', props.localClipping ) );
-		propsCol.appendChild( createPropertyRow( 'Physically Correct Lights', props.physicallyCorrectLights ) );
-		gridContainer.appendChild( propsCol );
-
-		// --- Column 2: Render Stats & Memory ---
-		const statsCol = document.createElement( 'div' );
-		statsCol.className = 'stats-column';
-
-		// Render Stats
-		const renderTitle = document.createElement( 'h4' );
-		renderTitle.textContent = 'Render Stats';
-		statsCol.appendChild( renderTitle );
-		statsCol.appendChild( createPropertyRow( 'Frame', info.render.frame ) );
-		statsCol.appendChild( createPropertyRow( 'Draw Calls', info.render.calls ) );
-		statsCol.appendChild( createPropertyRow( 'Triangles', info.render.triangles ) );
-		statsCol.appendChild( createPropertyRow( 'Points', info.render.points ) );
-		statsCol.appendChild( createPropertyRow( 'Lines', info.render.lines ) );
-
-		// Memory
-		const memoryTitle = document.createElement( 'h4' );
-		memoryTitle.textContent = 'Memory';
-		memoryTitle.style.marginTop = '10px'; // Add space before Memory section
-		statsCol.appendChild( memoryTitle );
-		statsCol.appendChild( createPropertyRow( 'Geometries', info.memory.geometries ) ); // Memory Geometries
-		statsCol.appendChild( createPropertyRow( 'Textures', info.memory.textures ) );
-		statsCol.appendChild( createPropertyRow( 'Shader Programs', info.memory.programs ) );
-
-		gridContainer.appendChild( statsCol );
+		gridContainer.appendChild( createRendererPropertiesColumn( props ) );
+		gridContainer.appendChild( createRendererStatsColumn( info ) );
 		propsContainer.appendChild( gridContainer );
 
 	} else {

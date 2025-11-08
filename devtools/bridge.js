@@ -5,6 +5,18 @@
 
 ( function () {
 
+	// Constants
+	const MESSAGE_ID = 'three-devtools';
+	const EVENT_REGISTER = 'register';
+	const EVENT_OBSERVE = 'observe';
+	const EVENT_RENDERER = 'renderer';
+	const EVENT_SCENE = 'scene';
+	const EVENT_OBJECT_DETAILS = 'object-details';
+	const EVENT_DEVTOOLS_READY = 'devtools-ready';
+	const MESSAGE_REQUEST_STATE = 'request-state';
+	const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
+	const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
+
 	// Only initialize if not already initialized
 	if ( ! window.__THREE_DEVTOOLS__ ) {
 
@@ -26,9 +38,9 @@
 
 				// If this is the first listener for a type, and we have backlogged events,
 				// check if we should process them
-				if ( type !== 'devtools-ready' && this._backlog.length > 0 ) {
+				if ( type !== EVENT_DEVTOOLS_READY && this._backlog.length > 0 ) {
 
-					this.dispatchEvent( new CustomEvent( 'devtools-ready' ) );
+					this.dispatchEvent( new CustomEvent( EVENT_DEVTOOLS_READY ) );
 
 				}
 
@@ -36,9 +48,9 @@
 
 			dispatchEvent( event ) {
 
-				if ( this._ready || event.type === 'devtools-ready' ) {
+				if ( this._ready || event.type === EVENT_DEVTOOLS_READY ) {
 
-					if ( event.type === 'devtools-ready' ) {
+					if ( event.type === EVENT_DEVTOOLS_READY ) {
 
 						this._ready = true;
 						const backlog = this._backlog;
@@ -91,6 +103,35 @@
 		const observedScenes = [];
 		const observedRenderers = [];
 		const sceneObjectCountCache = new Map(); // Cache for object counts per scene
+
+		// Shared tree traversal function
+		function traverseObjectTree( rootObject, callback, skipDuplicates = false ) {
+
+			const processedUUIDs = skipDuplicates ? new Set() : null;
+
+			function traverse( object ) {
+
+				if ( ! object || ! object.uuid ) return;
+
+				// Skip if already processed (when duplicate prevention is enabled)
+				if ( processedUUIDs && processedUUIDs.has( object.uuid ) ) return;
+				if ( processedUUIDs ) processedUUIDs.add( object.uuid );
+
+				// Execute callback for this object
+				callback( object );
+
+				// Process children recursively
+				if ( object.children && Array.isArray( object.children ) ) {
+
+					object.children.forEach( child => traverse( child ) );
+
+				}
+
+			}
+
+			traverse( rootObject );
+
+		}
 
 		// Function to get renderer data
 		function getRendererData( renderer ) {
@@ -188,14 +229,14 @@
 		}
 
 		// Listen for Three.js registration
-		devTools.addEventListener( 'register', ( event ) => {
+		devTools.addEventListener( EVENT_REGISTER, ( event ) => {
 
-			dispatchEvent( 'register', event.detail );
+			dispatchEvent( EVENT_REGISTER, event.detail );
 
 		} );
 
 		// Listen for object observations
-		devTools.addEventListener( 'observe', ( event ) => {
+		devTools.addEventListener( EVENT_OBSERVE, ( event ) => {
 
 			const obj = event.detail;
 			if ( ! obj ) {
@@ -229,7 +270,7 @@
 					observedRenderers.push( obj );
 					devTools.objects.set( obj.uuid, data );
 
-					dispatchEvent( 'renderer', data );
+					dispatchEvent( EVENT_RENDERER, data );
 
 				}
 
@@ -238,12 +279,8 @@
 				observedScenes.push( obj );
 
 				const batchObjects = [];
-				const processedUUIDs = new Set();
 
-				function traverseForBatch( currentObj ) {
-
-					if ( ! currentObj || ! currentObj.uuid || processedUUIDs.has( currentObj.uuid ) ) return;
-					processedUUIDs.add( currentObj.uuid );
+				traverseObjectTree( obj, ( currentObj ) => {
 
 					const objectData = getObjectData( currentObj );
 					if ( objectData ) {
@@ -253,18 +290,9 @@
 
 					}
 
-					// Process children
-					if ( currentObj.children && Array.isArray( currentObj.children ) ) {
+				}, true );
 
-						currentObj.children.forEach( child => traverseForBatch( child ) );
-
-					}
-
-				}
-
-				traverseForBatch( obj ); // Start traversal from the scene
-
-				dispatchEvent( 'scene', { sceneUuid: obj.uuid, objects: batchObjects } );
+				dispatchEvent( EVENT_SCENE, { sceneUuid: obj.uuid, objects: batchObjects } );
 
 			}
 
@@ -316,13 +344,12 @@
 		// Function to check if bridge is available
 		function checkBridgeAvailability() {
 
-			const hasDevTools = window.hasOwnProperty( '__THREE_DEVTOOLS__' );
 			const devToolsValue = window.__THREE_DEVTOOLS__;
 
 			// If we have devtools and we're interactive or complete, trigger ready
-			if ( hasDevTools && devToolsValue && ( document.readyState === 'interactive' || document.readyState === 'complete' ) ) {
+			if ( devToolsValue && ( document.readyState === 'interactive' || document.readyState === 'complete' ) ) {
 
-				devTools.dispatchEvent( new CustomEvent( 'devtools-ready' ) );
+				devTools.dispatchEvent( new CustomEvent( EVENT_DEVTOOLS_READY ) );
 
 			}
 
@@ -346,7 +373,7 @@
 
 			if ( window.THREE && window.THREE.REVISION ) {
 
-				dispatchEvent( 'register', { revision: THREE.REVISION } );
+				dispatchEvent( EVENT_REGISTER, { revision: THREE.REVISION } );
 
 			}
 
@@ -366,18 +393,18 @@
 			if ( event.source !== window ) return;
 
 			const message = event.data;
-			if ( ! message || message.id !== 'three-devtools' ) return;
+			if ( ! message || message.id !== MESSAGE_ID ) return;
 
 			// Handle request for initial state from panel
-			if ( message.name === 'request-state' ) {
+			if ( message.name === MESSAGE_REQUEST_STATE ) {
 
 				sendState();
 
-			} else if ( message.name === 'request-object-details' ) {
+			} else if ( message.name === MESSAGE_REQUEST_OBJECT_DETAILS ) {
 
 				sendObjectDetails( message.uuid );
 
-			} else if ( message.name === 'scroll-to-canvas' ) {
+			} else if ( message.name === MESSAGE_SCROLL_TO_CANVAS ) {
 
 				scrollToCanvas( message.uuid );
 
@@ -394,7 +421,7 @@
 				if ( data ) {
 
 					data.properties = getRendererProperties( observedRenderer );
-					dispatchEvent( 'renderer', data );
+					dispatchEvent( EVENT_RENDERER, data );
 
 				}
 
@@ -419,6 +446,44 @@
 			}
 
 			return null;
+
+		}
+
+		function createHighlightOverlay( targetElement ) {
+
+			const overlay = document.createElement( 'div' );
+			overlay.style.cssText = `
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 122, 204, 0.3);
+				pointer-events: none;
+				z-index: 999999;
+			`;
+
+			// Position the overlay relative to the target
+			const parent = targetElement.parentElement || document.body;
+
+			if ( getComputedStyle( parent ).position === 'static' ) {
+
+				parent.style.position = 'relative';
+
+			}
+
+			parent.appendChild( overlay );
+
+			// Auto-remove after 1 second
+			setTimeout( () => {
+
+				if ( overlay.parentElement ) {
+
+					overlay.parentElement.removeChild( overlay );
+
+				}
+
+			}, 1000 );
 
 		}
 
@@ -449,7 +514,7 @@
 					}
 				};
 
-				dispatchEvent( 'object-details', details );
+				dispatchEvent( EVENT_OBJECT_DETAILS, details );
 
 			}
 
@@ -458,15 +523,19 @@
 		function scrollToCanvas( uuid ) {
 
 			let renderer = null;
-			
+
 			if ( uuid ) {
+
 				// Find the renderer with the given UUID
 				renderer = observedRenderers.find( r => r.uuid === uuid );
+
 			} else {
+
 				// If no UUID provided, find the first available renderer whose canvas is in the DOM
 				renderer = observedRenderers.find( r => r.domElement && document.body.contains( r.domElement ) );
+
 			}
-			
+
 			if ( renderer ) {
 
 				// Scroll the canvas element into view
@@ -477,32 +546,7 @@
 				} );
 
 				// Add a brief blue overlay flash effect
-				const overlay = document.createElement('div');
-				overlay.style.cssText = `
-					position: absolute;
-					top: 0;
-					left: 0;
-					width: 100%;
-					height: 100%;
-					background-color: rgba(0, 122, 204, 0.3);
-					pointer-events: none;
-					z-index: 999999;
-				`;
-				
-				// Position the overlay relative to the canvas
-				const canvasParent = renderer.domElement.parentElement || document.body;
-				
-				if (getComputedStyle(canvasParent).position === 'static') {
-					canvasParent.style.position = 'relative';
-				}
-				
-				canvasParent.appendChild(overlay);
-				
-				setTimeout(() => {
-					if (overlay.parentElement) {
-						overlay.parentElement.removeChild(overlay);
-					}
-				}, 1000);
+				createHighlightOverlay( renderer.domElement );
 
 			}
 
@@ -513,7 +557,7 @@
 			try {
 
 				window.postMessage( {
-					id: 'three-devtools',
+					id: MESSAGE_ID,
 					name: name,
 					detail: detail
 				}, '*' );
@@ -540,13 +584,8 @@
 
 			const batchObjects = [];
 
-			// Recursively observe all objects, collect data, update local cache
-			function observeAndBatchObject( object ) {
+			traverseObjectTree( scene, ( object ) => {
 
-				if ( ! object || ! object.uuid ) return; // Simplified check
-
-
-				// Get object data
 				const objectData = getObjectData( object );
 				if ( objectData ) {
 
@@ -556,17 +595,7 @@
 
 				}
 
-				// Process children recursively
-				if ( object.children && Array.isArray( object.children ) ) {
-
-					object.children.forEach( child => observeAndBatchObject( child ) );
-
-				}
-
-			}
-
-			// Start traversal from the scene itself
-			observeAndBatchObject( scene );
+			} );
 
 			// --- Caching Logic ---
 			const currentObjectCount = batchObjects.length;
@@ -575,8 +604,8 @@
 			if ( currentObjectCount !== previousObjectCount ) {
 
 				console.log( `DevTools: Scene ${scene.uuid} count changed (${previousObjectCount} -> ${currentObjectCount}), dispatching update.` );
-				// Dispatch the batch update for the panel as 'scene'
-				dispatchEvent( 'scene', { sceneUuid: scene.uuid, objects: batchObjects } );
+				// Dispatch the batch update for the panel
+				dispatchEvent( EVENT_SCENE, { sceneUuid: scene.uuid, objects: batchObjects } );
 				// Update the cache
 				sceneObjectCountCache.set( scene.uuid, currentObjectCount );
 
