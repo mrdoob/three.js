@@ -1,6 +1,7 @@
 import { positionView } from '../accessors/Position.js';
 import { smoothstep } from '../math/MathNode.js';
 import { Fn, output, vec4 } from '../tsl/TSLBase.js';
+import { warn } from '../../utils.js';
 
 /**
  * Returns a node that represents the `z` coordinate in view space
@@ -91,7 +92,7 @@ export const fog = Fn( ( [ color, factor ] ) => {
  */
 export function rangeFog( color, near, far ) { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
+	warn( 'TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
 	return fog( color, rangeFogFactor( near, far ) );
 
 }
@@ -107,7 +108,7 @@ export function rangeFog( color, near, far ) { // @deprecated, r171
  */
 export function densityFog( color, density ) { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "densityFog( color, density )" is deprecated. Use "fog( color, densityFogFactor( density ) )" instead.' );
+	warn( 'TSL: "densityFog( color, density )" is deprecated. Use "fog( color, densityFogFactor( density ) )" instead.' );
 	return fog( color, densityFogFactor( density ) );
 
 }

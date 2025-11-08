@@ -2,6 +2,8 @@ import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 import { createElementNS } from '../utils.js';
 
+const _loading = new WeakMap();
+
 /**
  * A loader for loading images. The class loads images with the HTML `Image` API.
  *
@@ -11,7 +13,7 @@ import { createElementNS } from '../utils.js';
  * ```
  * Please note that `ImageLoader` has dropped support for progress
  * events in `r84`. For an `ImageLoader` that supports progress events, see
- * [this thread]{@link https://github.com/mrdoob/three.js/issues/10439#issuecomment-275785639}.
+ * [this thread](https://github.com/mrdoob/three.js/issues/10439#issuecomment-275785639).
  *
  * @augments Loader
  */
@@ -48,19 +50,36 @@ class ImageLoader extends Loader {
 
 		const scope = this;
 
-		const cached = Cache.get( url );
+		const cached = Cache.get( `image:${url}` );
 
 		if ( cached !== undefined ) {
 
-			scope.manager.itemStart( url );
+			if ( cached.complete === true ) {
 
-			setTimeout( function () {
+				scope.manager.itemStart( url );
 
-				if ( onLoad ) onLoad( cached );
+				setTimeout( function () {
 
-				scope.manager.itemEnd( url );
+					if ( onLoad ) onLoad( cached );
 
-			}, 0 );
+					scope.manager.itemEnd( url );
+
+				}, 0 );
+
+			} else {
+
+				let arr = _loading.get( cached );
+
+				if ( arr === undefined ) {
+
+					arr = [];
+					_loading.set( cached, arr );
+
+				}
+
+				arr.push( { onLoad, onError } );
+
+			}
 
 			return cached;
 
@@ -72,9 +91,20 @@ class ImageLoader extends Loader {
 
 			removeEventListeners();
 
-			Cache.add( url, this );
-
 			if ( onLoad ) onLoad( this );
+
+			//
+
+			const callbacks = _loading.get( this ) || [];
+
+			for ( let i = 0; i < callbacks.length; i ++ ) {
+
+				const callback = callbacks[ i ];
+				if ( callback.onLoad ) callback.onLoad( this );
+
+			}
+
+			_loading.delete( this );
 
 			scope.manager.itemEnd( url );
 
@@ -85,6 +115,22 @@ class ImageLoader extends Loader {
 			removeEventListeners();
 
 			if ( onError ) onError( event );
+
+			Cache.remove( `image:${url}` );
+
+			//
+
+			const callbacks = _loading.get( this ) || [];
+
+			for ( let i = 0; i < callbacks.length; i ++ ) {
+
+				const callback = callbacks[ i ];
+				if ( callback.onError ) callback.onError( event );
+
+			}
+
+			_loading.delete( this );
+
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
@@ -107,6 +153,7 @@ class ImageLoader extends Loader {
 
 		}
 
+		Cache.add( `image:${url}`, image );
 		scope.manager.itemStart( url );
 
 		image.src = url;

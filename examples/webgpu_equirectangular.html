@@ -4,12 +4,20 @@
 		<title>three.js webgpu - equirectangular</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Equirectangular Panorama</span>
+			</div>
+
+			<small>
+				Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -25,12 +33,11 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { texture, equirectUV } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			let controls;
@@ -54,13 +61,20 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.autoRotate = true;
 				controls.rotateSpeed = - 0.125; // negative, to track mouse pointer
 				controls.autoRotateSpeed = 1.0;
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( scene, 'backgroundIntensity', 0, 1 ).name( 'background intensity' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -75,26 +89,13 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				controls.update();
 
 				renderer.render( scene, camera );
 
 			}
-
-			const gui = new GUI();
-
-			const params = {
-				intensity: 1.0,
-			};
-			gui.add( params, 'intensity', 0, 1 ).onChange( function ( value ) {
-
-				scene.backgroundIntensity = value;
-				render();
-
-			} );
-
 
 		</script>
 

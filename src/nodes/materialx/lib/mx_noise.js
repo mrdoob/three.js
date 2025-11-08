@@ -4,7 +4,7 @@
 import { int, uint, float, vec3, bool, uvec3, vec2, vec4, If, Fn } from '../../tsl/TSLBase.js';
 import { select } from '../../math/ConditionalNode.js';
 import { sub, mul } from '../../math/OperatorNode.js';
-import { floor, abs, max, dot, min, sqrt } from '../../math/MathNode.js';
+import { floor, abs, max, dot, min, sqrt, clamp } from '../../math/MathNode.js';
 import { overloadingFn } from '../../utils/FunctionOverloadingNode.js';
 import { Loop } from '../../utils/LoopNode.js';
 
@@ -1004,7 +1004,7 @@ export const mx_worley_distance_1 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutab
 
 	If( metric.equal( int( 3 ) ), () => {
 
-		return max( max( abs( diff.x ), abs( diff.y ) ), abs( diff.z ) );
+		return max( abs( diff.x ), abs( diff.y ), abs( diff.z ) );
 
 	} );
 
@@ -1325,3 +1325,167 @@ export const mx_worley_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 } );
 
 export const mx_worley_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_0, mx_worley_noise_vec3_1 ] );
+
+// Unified Noise 2D
+export const mx_unifiednoise2d = /*@__PURE__*/ Fn( ( [
+	noiseType_immutable, texcoord_immutable, freq_immutable, offset_immutable,
+	jitter_immutable, outmin_immutable, outmax_immutable, clampoutput_immutable,
+	octaves_immutable, lacunarity_immutable, diminish_immutable
+] ) => {
+
+	const noiseType = int( noiseType_immutable ).toVar();
+	const texcoord = vec2( texcoord_immutable ).toVar();
+	const freq = vec2( freq_immutable ).toVar();
+	const offset = vec2( offset_immutable ).toVar();
+	const jitter = float( jitter_immutable ).toVar();
+	const outmin = float( outmin_immutable ).toVar();
+	const outmax = float( outmax_immutable ).toVar();
+	const clampoutput = bool( clampoutput_immutable ).toVar();
+	const octaves = int( octaves_immutable ).toVar();
+	const lacunarity = float( lacunarity_immutable ).toVar();
+	const diminish = float( diminish_immutable ).toVar();
+
+	// Compute input position
+	const p = texcoord.mul( freq ).add( offset );
+
+	const result = float( 0.0 ).toVar();
+
+	// Perlin
+	If( noiseType.equal( int( 0 ) ), () => {
+
+		result.assign( mx_perlin_noise_vec3( p ) );
+
+	} );
+
+	// Cell
+	If( noiseType.equal( int( 1 ) ), () => {
+
+		result.assign( mx_cell_noise_vec3( p ) );
+
+	} );
+
+	// Worley (metric=0 = euclidean)
+	If( noiseType.equal( int( 2 ) ), () => {
+
+		result.assign( mx_worley_noise_vec3( p, jitter, int( 0 ) ) );
+
+	} );
+
+	// Fractal (use vec3(p, 0.0) for 2D input)
+	If( noiseType.equal( int( 3 ) ), () => {
+
+		result.assign( mx_fractal_noise_vec3( vec3( p, 0.0 ), octaves, lacunarity, diminish ) );
+
+	} );
+
+	// Remap output to [outmin, outmax]
+	result.assign( result.mul( outmax.sub( outmin ) ).add( outmin ) );
+
+	// Clamp if requested
+	If( clampoutput, () => {
+
+		result.assign( clamp( result, outmin, outmax ) );
+
+	} );
+
+	return result;
+
+} ).setLayout( {
+	name: 'mx_unifiednoise2d',
+	type: 'float',
+	inputs: [
+		{ name: 'noiseType', type: 'int' },
+		{ name: 'texcoord', type: 'vec2' },
+		{ name: 'freq', type: 'vec2' },
+		{ name: 'offset', type: 'vec2' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'outmin', type: 'float' },
+		{ name: 'outmax', type: 'float' },
+		{ name: 'clampoutput', type: 'bool' },
+		{ name: 'octaves', type: 'int' },
+		{ name: 'lacunarity', type: 'float' },
+		{ name: 'diminish', type: 'float' }
+	]
+} );
+
+// Unified Noise 3D
+export const mx_unifiednoise3d = /*@__PURE__*/ Fn( ( [
+	noiseType_immutable, position_immutable, freq_immutable, offset_immutable,
+	jitter_immutable, outmin_immutable, outmax_immutable, clampoutput_immutable,
+	octaves_immutable, lacunarity_immutable, diminish_immutable
+] ) => {
+
+	const noiseType = int( noiseType_immutable ).toVar();
+	const position = vec3( position_immutable ).toVar();
+	const freq = vec3( freq_immutable ).toVar();
+	const offset = vec3( offset_immutable ).toVar();
+	const jitter = float( jitter_immutable ).toVar();
+	const outmin = float( outmin_immutable ).toVar();
+	const outmax = float( outmax_immutable ).toVar();
+	const clampoutput = bool( clampoutput_immutable ).toVar();
+	const octaves = int( octaves_immutable ).toVar();
+	const lacunarity = float( lacunarity_immutable ).toVar();
+	const diminish = float( diminish_immutable ).toVar();
+
+	// Compute input position
+	const p = position.mul( freq ).add( offset );
+
+	const result = float( 0.0 ).toVar();
+
+	// Perlin
+	If( noiseType.equal( int( 0 ) ), () => {
+
+		result.assign( mx_perlin_noise_vec3( p ) );
+
+	} );
+
+	// Cell
+	If( noiseType.equal( int( 1 ) ), () => {
+
+		result.assign( mx_cell_noise_vec3( p ) );
+
+	} );
+
+	// Worley (metric=0 = euclidean)
+	If( noiseType.equal( int( 2 ) ), () => {
+
+		result.assign( mx_worley_noise_vec3( p, jitter, int( 0 ) ) );
+
+	} );
+
+	// Fractal
+	If( noiseType.equal( int( 3 ) ), () => {
+
+		result.assign( mx_fractal_noise_vec3( p, octaves, lacunarity, diminish ) );
+
+	} );
+
+	// Remap output to [outmin, outmax]
+	result.assign( result.mul( outmax.sub( outmin ) ).add( outmin ) );
+
+	// Clamp if requested
+	If( clampoutput, () => {
+
+		result.assign( clamp( result, outmin, outmax ) );
+
+	} );
+
+	return result;
+
+} ).setLayout( {
+	name: 'mx_unifiednoise3d',
+	type: 'float',
+	inputs: [
+		{ name: 'noiseType', type: 'int' },
+		{ name: 'position', type: 'vec3' },
+		{ name: 'freq', type: 'vec3' },
+		{ name: 'offset', type: 'vec3' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'outmin', type: 'float' },
+		{ name: 'outmax', type: 'float' },
+		{ name: 'clampoutput', type: 'bool' },
+		{ name: 'octaves', type: 'int' },
+		{ name: 'lacunarity', type: 'float' },
+		{ name: 'diminish', type: 'float' }
+	]
+} );

@@ -1,4 +1,4 @@
-import Binding from './Binding.js';
+import Sampler from './Sampler.js';
 
 let _id = 0;
 
@@ -6,9 +6,9 @@ let _id = 0;
  * Represents a sampled texture binding type.
  *
  * @private
- * @augments Binding
+ * @augments Sampler
  */
-class SampledTexture extends Binding {
+class SampledTexture extends Sampler {
 
 	/**
 	 * Constructs a new sampled texture.
@@ -18,7 +18,7 @@ class SampledTexture extends Binding {
 	 */
 	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
 
 		/**
 		 * This identifier.
@@ -26,20 +26,6 @@ class SampledTexture extends Binding {
 		 * @type {number}
 		 */
 		this.id = _id ++;
-
-		/**
-		 * The texture this binding is referring to.
-		 *
-		 * @type {?Texture}
-		 */
-		this.texture = texture;
-
-		/**
-		 * The binding's version.
-		 *
-		 * @type {number}
-		 */
-		this.version = texture ? texture.version : 0;
 
 		/**
 		 * Whether the texture is a storage texture or not.
@@ -50,13 +36,12 @@ class SampledTexture extends Binding {
 		this.store = false;
 
 		/**
-		 * The binding's generation which is an additional version
-		 * qualifier.
+		 * The mip level to bind for storage textures.
 		 *
-		 * @type {?number}
-		 * @default null
+		 * @type {number}
+		 * @default 0
 		 */
-		this.generation = null;
+		this.mipLevel = 0;
 
 		/**
 		 * This flag can be used for type testing.
@@ -66,51 +51,6 @@ class SampledTexture extends Binding {
 		 * @default true
 		 */
 		this.isSampledTexture = true;
-
-	}
-
-	/**
-	 * Returns `true` whether this binding requires an update for the
-	 * given generation.
-	 *
-	 * @param {number} generation - The generation.
-	 * @return {boolean} Whether an update is required or not.
-	 */
-	needsBindingsUpdate( generation ) {
-
-		const { texture } = this;
-
-		if ( generation !== this.generation ) {
-
-			this.generation = generation;
-
-			return true;
-
-		}
-
-		return texture.isVideoTexture;
-
-	}
-
-	/**
-	 * Updates the binding.
-	 *
-	 * @return {boolean} Whether the texture has been updated and must be
-	 * uploaded to the GPU.
-	 */
-	update() {
-
-		const { texture, version } = this;
-
-		if ( version !== texture.version ) {
-
-			this.version = texture.version;
-
-			return true;
-
-		}
-
-		return false;
 
 	}
 

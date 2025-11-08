@@ -1,6 +1,6 @@
 
 import Node from './Node.js';
-import { getLengthFromType } from './NodeUtils.js';
+import { getByteBoundaryFromType, getMemoryLengthFromType } from './NodeUtils.js';
 
 /**
  * Generates a layout for struct members.
@@ -86,15 +86,37 @@ class StructTypeNode extends Node {
 	 */
 	getLength() {
 
-		let length = 0;
+		const GPU_CHUNK_BYTES = 8;
+		const BYTES_PER_ELEMENT = Float32Array.BYTES_PER_ELEMENT;
+
+		let offset = 0; // global buffer offset in bytes
 
 		for ( const member of this.membersLayout ) {
 
-			length += getLengthFromType( member.type );
+			const type = member.type;
+
+			const itemSize = getMemoryLengthFromType( type ) * BYTES_PER_ELEMENT;
+			const boundary = getByteBoundaryFromType( type );
+
+			const chunkOffset = offset % GPU_CHUNK_BYTES; // offset in the current chunk
+			const chunkPadding = chunkOffset % boundary; // required padding to match boundary
+			const chunkStart = chunkOffset + chunkPadding; // start position in the current chunk for the data
+
+			offset += chunkPadding;
+
+			// Check for chunk overflow
+			if ( chunkStart !== 0 && ( GPU_CHUNK_BYTES - chunkStart ) < itemSize ) {
+
+				// Add padding to the end of the chunk
+				offset += ( GPU_CHUNK_BYTES - chunkStart );
+
+			}
+
+			offset += itemSize;
 
 		}
 
-		return length;
+		return ( Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES ) / BYTES_PER_ELEMENT;
 
 	}
 
@@ -116,6 +138,7 @@ class StructTypeNode extends Node {
 
 	setup( builder ) {
 
+		builder.getStructTypeFromNode( this, this.membersLayout, this.name );
 		builder.addInclude( this );
 
 	}

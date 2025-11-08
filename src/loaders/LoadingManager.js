@@ -70,6 +70,14 @@ class LoadingManager {
 		this.onError = onError;
 
 		/**
+		 * Used for aborting ongoing requests in loaders using this manager.
+		 *
+		 * @private
+		 * @type {AbortController | null}
+		 */
+		this._abortController = null;
+
+		/**
 		 * This should be called by any loader using the manager when the loader
 		 * starts loading an item.
 		 *
@@ -268,6 +276,43 @@ class LoadingManager {
 			return null;
 
 		};
+
+		/**
+		 * Can be used to abort ongoing loading requests in loaders using this manager.
+		 * The abort only works if the loaders implement {@link Loader#abort} and `AbortSignal.any()`
+		 * is supported in the browser.
+		 *
+		 * @return {LoadingManager} A reference to this loading manager.
+		 */
+		this.abort = function () {
+
+
+			this.abortController.abort();
+			this._abortController = null;
+
+			return this;
+
+		};
+
+	}
+
+	// TODO: Revert this back to a single member variable once this issue has been fixed
+	// https://github.com/cloudflare/workerd/issues/3657
+
+	/**
+	 * Used for aborting ongoing requests in loaders using this manager.
+	 *
+	 * @type {AbortController}
+	 */
+	get abortController() {
+
+		if ( ! this._abortController ) {
+
+			this._abortController = new AbortController();
+
+		}
+
+		return this._abortController;
 
 	}
 

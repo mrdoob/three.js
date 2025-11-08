@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - ambient occlusion (GTAO)</title>
+		<title>three.js webgpu - ambient occlusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing - ambient occlusion<br />
-			<a href="https://skfb.ly/oCnNx" target="_blank" rel="noopener">Minimalistic Modern Bedroom</a> by 
-			<a href="https://sketchfab.com/dylanheyes" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>AO</span>
+			</div>
+
+			<small>
+				Ambient Occlusion based on GTAO.<br />
+				<a href="https://skfb.ly/oCnNx" target="_blank" rel="noopener">Minimalistic Modern Bedroom</a> by 
+				<a href="https://sketchfab.com/dylanheyes" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.	
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,35 +35,30 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { pass, mrt, output, normalView } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, output, normalView, velocity, vec3, vec4, directionToColor, colorSpaceToWorking } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
-			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			let camera, scene, renderer, postProcessing, controls, stats;
+			let camera, scene, renderer, postProcessing, controls;
 
-			let aoPass, denoisePass, blendPassAO, blendPassDenoise, scenePassColor;
+			let aoPass, traaPass, blendPassAO, scenePassColor;
 
 			const params = {
+				samples: 16,
 				distanceExponent: 1,
 				distanceFallOff: 1,
 				radius: 0.25,
 				scale: 1,
 				thickness: 1,
-				denoised: false,
-				enabled: true,
-				denoiseRadius: 5,
-				lumaPhi: 5,
-				depthPhi: 5,
-				normalPhi: 5
+				aoOnly: false
 			};
 
 			init();
@@ -71,6 +74,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
@@ -93,9 +97,6 @@
 				controls.minDistance = 2;
 				controls.maxDistance = 8;
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				//
 
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -103,25 +104,34 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: normalView
+					normal: normalView,
+					velocity: velocity
 				} ) );
 
-				scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+
+					return scenePass.getLinearDepthNode();
+
+				} );
+				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', () => {
+
+					return colorSpaceToWorking( directionToColor( scenePassNormal ), THREE.SRGBColorSpace );
+
+				} );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 
 				// ao
 
 				aoPass = ao( scenePassDepth, scenePassNormal, camera );
-				aoPass.resolutionScale = 0.5;
-				blendPassAO = aoPass.getTextureNode().mul( scenePassColor );
+				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
+				aoPass.useTemporalFiltering = true;
+				blendPassAO = vec4( scenePassColor.rgb.mul( aoPass.r.toInspector( 'AO' ) ), scenePassColor.a ); // the AO is stored only in the red channel
 
-				// denoise (optional)
+				// traa
 
-				denoisePass = denoise( aoPass.getTextureNode(), scenePassDepth, scenePassNormal, camera );
-				blendPassDenoise = denoisePass.mul( scenePassColor );
-
-				postProcessing.outputNode = blendPassAO;
+				traaPass = traa( blendPassAO, scenePassDepth, scenePassVelocity, camera );
+				postProcessing.outputNode = traaPass;
 
 				//
 
@@ -155,60 +165,41 @@
 
 				//
 
-				const gui = new GUI();
-				gui.title( 'AO settings' );
-				gui.add( params, 'distanceExponent' ).min( 1 ).max( 4 ).onChange( updateParameters );
-				gui.add( params, 'distanceFallOff' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
-				gui.add( params, 'radius' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
-				gui.add( params, 'scale' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
-				gui.add( params, 'thickness' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
-				gui.add( params, 'enabled' ).onChange( updatePassChain );
-				const folder = gui.addFolder( 'Denoise settings' );
-				folder.add( params, 'denoiseRadius' ).min( 0.01 ).max( 10 ).name( 'radius' ).onChange( updateParameters );
-				folder.add( params, 'lumaPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
-				folder.add( params, 'depthPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
-				folder.add( params, 'normalPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
-				folder.add( params, 'denoised' ).name( 'enabled' ).onChange( updatePassChain );
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'samples', 4, 32, 1 ).onChange( updateParameters );
+				gui.add( params, 'distanceExponent', 1, 2 ).onChange( updateParameters );
+				gui.add( params, 'distanceFallOff', 0.01, 1 ).onChange( updateParameters );
+				gui.add( params, 'radius', 0.1, 1 ).onChange( updateParameters );
+				gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters );
+				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
+				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
+				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
 
-			}
+					if ( value === true ) {
 
-			function updatePassChain() {
-
-				if ( params.enabled === true ) {
-
-					if ( params.denoised === true ) {
-
-						postProcessing.outputNode = blendPassDenoise;
+						postProcessing.outputNode = vec4( vec3( aoPass.r ), 1 );
 
 					} else {
 
-						postProcessing.outputNode = blendPassAO;
+
+						postProcessing.outputNode = traaPass;
 
 					}
 
-				} else {
+					postProcessing.needsUpdate = true;
 
-					postProcessing.outputNode = scenePassColor;
-
-				}
-
-				postProcessing.needsUpdate = true;
-
+				} );
 
 			}
 
 			function updateParameters() {
 
+				aoPass.samples.value = params.samples;
 				aoPass.distanceExponent.value = params.distanceExponent;
 				aoPass.distanceFallOff.value = params.distanceFallOff;
 				aoPass.radius.value = params.radius;
 				aoPass.scale.value = params.scale;
 				aoPass.thickness.value = params.thickness;
-
-				denoisePass.radius.value = params.denoiseRadius;
-				denoisePass.lumaPhi.value = params.lumaPhi;
-				denoisePass.depthPhi.value = params.depthPhi;
-				denoisePass.normalPhi.value = params.normalPhi;
 
 			}
 
@@ -229,7 +220,6 @@
 				controls.update();
 
 				postProcessing.render();
-				stats.update();
 
 			}
 

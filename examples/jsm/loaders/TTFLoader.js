@@ -152,7 +152,19 @@ class TTFLoader extends Loader {
 
 					} );
 
-					glyphs[ String.fromCodePoint( glyph.unicode ) ] = token;
+					if ( Array.isArray( glyph.unicodes ) && glyph.unicodes.length > 0 ) {
+
+						glyph.unicodes.forEach( function ( unicode ) {
+
+							glyphs[ String.fromCodePoint( unicode ) ] = token;
+
+						} );
+
+					} else {
+
+						glyphs[ String.fromCodePoint( glyph.unicode ) ] = token;
+
+					}
 
 				}
 

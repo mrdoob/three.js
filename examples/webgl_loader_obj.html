@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - loaders - OBJ loader</title>
+		<title>three.js webgl - loaders - OBJ/MTL loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJ/MTL loader
 		</div>
 
 		<script type="importmap">
@@ -25,16 +25,15 @@
 
 			import * as THREE from 'three';
 
+			import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let camera, scene, renderer;
-
-			let object;
+			let camera, scene, renderer, controls;
 
 			init();
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20 );
 				camera.position.z = 2.5;
@@ -50,67 +49,35 @@
 				camera.add( pointLight );
 				scene.add( camera );
 
-				// manager
-
-				function loadModel() {
-
-					object.traverse( function ( child ) {
-
-						if ( child.isMesh ) child.material.map = texture;
-
-					} );
-
-					object.position.y = - 0.95;
-					object.scale.setScalar( 0.01 );
-					scene.add( object );
-
-					render();
-
-				}
-
-				const manager = new THREE.LoadingManager( loadModel );
-
-				// texture
-
-				const textureLoader = new THREE.TextureLoader( manager );
-				const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg', render );
-				texture.colorSpace = THREE.SRGBColorSpace;
-
 				// model
 
-				function onProgress( xhr ) {
+				const mtlLoader = new MTLLoader().setPath( 'models/obj/male02/' );
+				const materials = await mtlLoader.loadAsync( 'male02.mtl' );
+				materials.preload();
 
-					if ( xhr.lengthComputable ) {
+				const objLoader = new OBJLoader().setPath( 'models/obj/male02/' );
+				objLoader.setMaterials( materials ); // optional since OBJ assets can be loaded without an accompanying MTL file
 
-						const percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( 'model ' + percentComplete.toFixed( 2 ) + '% downloaded' );
+				const object = await objLoader.loadAsync( 'male02.obj' );
 
-					}
-
-				}
-
-				function onError() {}
-
-				const loader = new OBJLoader( manager );
-				loader.load( 'models/obj/male02/male02.obj', function ( obj ) {
-
-					object = obj;
-
-				}, onProgress, onError );
+				object.position.y = - 0.95;
+				object.scale.setScalar( 0.01 );
+				scene.add( object );
 
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
 				controls.minDistance = 2;
 				controls.maxDistance = 5;
-				controls.addEventListener( 'change', render );
 
 				//
 
@@ -127,7 +94,9 @@
 
 			}
 
-			function render() {
+			function animate() {
+
+				controls.update();
 
 				renderer.render( scene, camera );
 

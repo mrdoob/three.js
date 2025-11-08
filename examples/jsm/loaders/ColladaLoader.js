@@ -45,7 +45,7 @@ import { TGALoader } from '../loaders/TGALoader.js';
  * A loader for the Collada format.
  *
  * The Collada format is very complex so this loader only supports a subset of what
- * is defined in the [official specification]{@link https://www.khronos.org/files/collada_spec_1_5.pdf}.
+ * is defined in the [official specification](https://www.khronos.org/files/collada_spec_1_5.pdf).
  *
  * Assets with a Z-UP coordinate system are transformed it into Y-UP by a simple rotation.
  * The vertex data are not converted.
@@ -108,12 +108,12 @@ class ColladaLoader extends Loader {
 	}
 
 	/**
-	 * Parses the given Collada data and returns a result oject holding the parsed scene,
+	 * Parses the given Collada data and returns a result object holding the parsed scene,
 	 * an array of animation clips and kinematics.
 	 *
 	 * @param {string} text - The raw Collada data as a string.
-	 * @param {string} path - The asset path.
-	 * @return {{scene:Group,animations:Array<AnimationClip>,kinematics:Object}} An object representing the parsed asset.
+	 * @param {string} [path] - The asset path.
+	 * @return {?{scene:Group,animations:Array<AnimationClip>,kinematics:Object}} An object representing the parsed asset.
 	 */
 	parse( text, path ) {
 
@@ -1718,9 +1718,9 @@ class ColladaLoader extends Loader {
 
 			}
 
-			ColorManagement.toWorkingColorSpace( material.color, SRGBColorSpace );
-			if ( material.specular ) ColorManagement.toWorkingColorSpace( material.specular, SRGBColorSpace );
-			if ( material.emissive ) ColorManagement.toWorkingColorSpace( material.emissive, SRGBColorSpace );
+			ColorManagement.colorSpaceToWorking( material.color, SRGBColorSpace );
+			if ( material.specular ) ColorManagement.colorSpaceToWorking( material.specular, SRGBColorSpace );
+			if ( material.emissive ) ColorManagement.colorSpaceToWorking( material.emissive, SRGBColorSpace );
 
 			//
 
@@ -2057,7 +2057,7 @@ class ColladaLoader extends Loader {
 					case 'color':
 						const array = parseFloats( child.textContent );
 						data.color = new Color().fromArray( array );
-						ColorManagement.toWorkingColorSpace( data.color, SRGBColorSpace );
+						ColorManagement.colorSpaceToWorking( data.color, SRGBColorSpace );
 						break;
 
 					case 'falloff_angle':

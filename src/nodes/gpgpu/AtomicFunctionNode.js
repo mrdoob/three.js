@@ -1,4 +1,5 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
+import { expression } from '../code/ExpressionNode.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
 /**
@@ -10,9 +11,9 @@ import { nodeProxy } from '../tsl/TSLCore.js';
  *
  * This node can only be used with a WebGPU backend.
  *
- * @augments TempNode
+ * @augments Node
  */
-class AtomicFunctionNode extends TempNode {
+class AtomicFunctionNode extends Node {
 
 	static get type() {
 
@@ -52,6 +53,14 @@ class AtomicFunctionNode extends TempNode {
 		 */
 		this.valueNode = valueNode;
 
+		/**
+		 * Creates a list of the parents for this node for detecting if the node needs to return a value.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.parents = true;
+
 	}
 
 	/**
@@ -81,6 +90,9 @@ class AtomicFunctionNode extends TempNode {
 
 	generate( builder ) {
 
+		const properties = builder.getNodeProperties( this );
+		const parents = properties.parents;
+
 		const method = this.method;
 
 		const type = this.getNodeType( builder );
@@ -101,14 +113,23 @@ class AtomicFunctionNode extends TempNode {
 		}
 
 		const methodSnippet = `${ builder.getMethod( method, type ) }( ${ params.join( ', ' ) } )`;
+		const isVoid = parents ? ( parents.length === 1 && parents[ 0 ].isStackNode === true ) : false;
 
-		if ( b !== null ) {
+		if ( isVoid ) {
 
 			builder.addLineFlowCode( methodSnippet, this );
 
-		}
+		} else {
 
-		return methodSnippet;
+			if ( properties.constNode === undefined ) {
+
+				properties.constNode = expression( methodSnippet, type ).toConst();
+
+			}
+
+			return properties.constNode.build( builder );
+
+		}
 
 	}
 
@@ -150,10 +171,7 @@ const atomicNode = nodeProxy( AtomicFunctionNode );
  */
 export const atomicFunc = ( method, pointerNode, valueNode ) => {
 
-	const node = atomicNode( method, pointerNode, valueNode );
-	node.append();
-
-	return node;
+	return atomicNode( method, pointerNode, valueNode ).toStack();
 
 };
 

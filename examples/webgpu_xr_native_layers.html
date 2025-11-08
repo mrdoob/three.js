@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
@@ -180,7 +180,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType, multiview: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
@@ -305,7 +305,7 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				// set up rollercoaster
-				rollercoasterLayer = renderer.xr.createCylinderLayer( 1, Math.PI / 2, 2, new THREE.Vector3( 0, 1.5, - 0.5 ), new THREE.Quaternion(), 1024, 1024, renderRollercoaster );
+				rollercoasterLayer = renderer.xr.createCylinderLayer( 1, Math.PI / 2, 2, new THREE.Vector3( 0, 1.5, - 0.5 ), new THREE.Quaternion(), 1500, 1000, renderRollercoaster );
 				scene.add( rollercoasterLayer );
 
 				rcscene = new THREE.Scene();
@@ -410,7 +410,7 @@
 				funfairs.push( rcmesh );
 
 				// set up horse animation
-				horseLayer = renderer.xr.createQuadLayer( 1, 1, new THREE.Vector3( - 1.5, 1.5, - 1.5 ), new THREE.Quaternion(), 1024, 1024, renderQuad );
+				horseLayer = renderer.xr.createQuadLayer( 1, 1, new THREE.Vector3( - 1.5, 1.5, - 1.5 ), new THREE.Quaternion(), 800, 800, renderQuad );
 				scene.add( horseLayer );
 
 				horseLayer.geometry = new THREE.CircleGeometry( .5, 64 );
@@ -465,7 +465,7 @@
 				gui.add( parameters, 'thickness', 0, 1 ).onChange( onThicknessChange );
 				gui.domElement.style.visibility = 'hidden';
 
-				guiGroup = new InteractiveGroup( renderer, guiCamera );
+				guiGroup = new InteractiveGroup();
 				guiScene.add( guiGroup );
 
 				const mesh = new HTMLMesh( gui.domElement );
@@ -473,7 +473,7 @@
 
 				const bbox = new THREE.Box3().setFromObject( guiScene );
 
-				guiLayer = renderer.xr.createQuadLayer( 1.2, .8, new THREE.Vector3( 1.5, 1.5, - 1.5 ), new THREE.Quaternion(), 1024, 1024, renderGui );
+				guiLayer = renderer.xr.createQuadLayer( 1.2, .8, new THREE.Vector3( 1.5, 1.5, - 1.5 ), new THREE.Quaternion(), 1280, 800, renderGui );
 				scene.add( guiLayer );
 
 				guiCamera.left = bbox.min.x;
@@ -481,6 +481,7 @@
 				guiCamera.top = bbox.max.y;
 				guiCamera.bottom = bbox.min.y;
 				guiCamera.updateProjectionMatrix();
+
 			}
 
 			function renderGui() {

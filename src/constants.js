@@ -1,4 +1,4 @@
-export const REVISION = '176dev';
+export const REVISION = '182dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -722,6 +722,14 @@ export const UnsignedInt248Type = 1020;
 export const UnsignedInt5999Type = 35902;
 
 /**
+ * An unsigned int 10_11_11 (packed) data type for textures.
+ *
+ * @type {number}
+ * @constant
+ */
+export const UnsignedInt101111Type = 35899;
+
+/**
  * Discards the red, green and blue components and reads just the alpha component.
  *
  * @type {number}
@@ -744,25 +752,6 @@ export const RGBFormat = 1022;
  * @constant
  */
 export const RGBAFormat = 1023;
-
-/**
- * reads each element as a single luminance component. This is then converted to a floating point,
- * clamped to the range `[0,1]`, and then assembled into an RGBA element by placing the luminance value
- * in the red, green and blue channels, and attaching 1.0 to the alpha channel.
- *
- * @type {number}
- * @constant
- */
-export const LuminanceFormat = 1024;
-
-/**
- * Reads each element as a luminance/alpha double. The same process occurs as for the `LuminanceFormat`,
- * except that the alpha channel may have values other than `1.0`.
- *
- * @type {number}
- * @constant
- */
-export const LuminanceAlphaFormat = 1025;
 
 /**
  * Reads each element as a single depth value, converts it to floating point, and clamps to the range `[0,1]`.
@@ -1631,8 +1620,8 @@ export const InterpolationSamplingMode = {
 	NORMAL: 'normal',
 	CENTROID: 'centroid',
 	SAMPLE: 'sample',
-	FLAT_FIRST: 'flat first',
-	FLAT_EITHER: 'flat either'
+	FIRST: 'first',
+	EITHER: 'either'
 };
 
 /**
@@ -1681,6 +1670,6 @@ export const InterpolationSamplingMode = {
  * @property {string} NORMAL - Normal sampling mode.
  * @property {string} CENTROID - Centroid sampling mode.
  * @property {string} SAMPLE - Sample-specific sampling mode.
- * @property {string} FLAT_FIRST - Flat interpolation using the first vertex.
- * @property {string} FLAT_EITHER - Flat interpolation using either vertex.
+ * @property {string} FIRST - Flat interpolation using the first vertex.
+ * @property {string} EITHER - Flat interpolation using either vertex.
  */

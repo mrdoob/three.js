@@ -392,21 +392,21 @@ class MaterialCreator {
 
 					// Diffuse color (color under white light) using RGB values
 
-					params.color = ColorManagement.toWorkingColorSpace( new Color().fromArray( value ), SRGBColorSpace );
+					params.color = ColorManagement.colorSpaceToWorking( new Color().fromArray( value ), SRGBColorSpace );
 
 					break;
 
 				case 'ks':
 
 					// Specular color (color when light is reflected from shiny surface) using RGB values
-					params.specular = ColorManagement.toWorkingColorSpace( new Color().fromArray( value ), SRGBColorSpace );
+					params.specular = ColorManagement.colorSpaceToWorking( new Color().fromArray( value ), SRGBColorSpace );
 
 					break;
 
 				case 'ke':
 
 					// Emissive using RGB values
-					params.emissive = ColorManagement.toWorkingColorSpace( new Color().fromArray( value ), SRGBColorSpace );
+					params.emissive = ColorManagement.colorSpaceToWorking( new Color().fromArray( value ), SRGBColorSpace );
 
 					break;
 

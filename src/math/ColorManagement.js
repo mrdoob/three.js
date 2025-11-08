@@ -1,5 +1,6 @@
 import { SRGBColorSpace, LinearSRGBColorSpace, SRGBTransfer, LinearTransfer, NoColorSpace } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
+import { warnOnce } from '../utils.js';
 
 const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
 	0.4123908, 0.3575843, 0.1804808,
@@ -33,7 +34,7 @@ function createColorManagement() {
 		 *	- luminanceCoefficients: RGB luminance coefficients
 		 *
 		 * Optional:
-		 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace }
+		 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace, toneMappingMode: 'extended' | 'standard' }
 		 *  - workingColorSpaceConfig: { unpackColorSpace: ColorSpace }
 		 *
 		 * Reference:
@@ -76,13 +77,13 @@ function createColorManagement() {
 
 		},
 
-		fromWorkingColorSpace: function ( color, targetColorSpace ) {
+		workingToColorSpace: function ( color, targetColorSpace ) {
 
 			return this.convert( color, this.workingColorSpace, targetColorSpace );
 
 		},
 
-		toWorkingColorSpace: function ( color, sourceColorSpace ) {
+		colorSpaceToWorking: function ( color, sourceColorSpace ) {
 
 			return this.convert( color, sourceColorSpace, this.workingColorSpace );
 
@@ -99,6 +100,12 @@ function createColorManagement() {
 			if ( colorSpace === NoColorSpace ) return LinearTransfer;
 
 			return this.spaces[ colorSpace ].transfer;
+
+		},
+
+		getToneMappingMode: function ( colorSpace ) {
+
+			return this.spaces[ colorSpace ].outputColorSpaceConfig.toneMappingMode || 'standard';
 
 		},
 
@@ -134,7 +141,25 @@ function createColorManagement() {
 
 			return this.spaces[ colorSpace ].workingColorSpaceConfig.unpackColorSpace;
 
-		}
+		},
+
+		// Deprecated
+
+		fromWorkingColorSpace: function ( color, targetColorSpace ) {
+
+			warnOnce( 'ColorManagement: .fromWorkingColorSpace() has been renamed to .workingToColorSpace().' ); // @deprecated, r177
+
+			return ColorManagement.workingToColorSpace( color, targetColorSpace );
+
+		},
+
+		toWorkingColorSpace: function ( color, sourceColorSpace ) {
+
+			warnOnce( 'ColorManagement: .toWorkingColorSpace() has been renamed to .colorSpaceToWorking().' ); // @deprecated, r177
+
+			return ColorManagement.colorSpaceToWorking( color, sourceColorSpace );
+
+		},
 
 	};
 

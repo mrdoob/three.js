@@ -139,7 +139,7 @@ class SSAOPass extends Pass {
 		 */
 		this.maxDistance = 0.1;
 
-		this._visibilityCache = new Map();
+		this._visibilityCache = [];
 
 		//
 
@@ -351,7 +351,7 @@ class SSAOPass extends Pass {
 	 * Sets the size of the pass.
 	 *
 	 * @param {number} width - The width to set.
-	 * @param {number} height - The width to set.
+	 * @param {number} height - The height to set.
 	 */
 	setSize( width, height ) {
 
@@ -489,9 +489,12 @@ class SSAOPass extends Pass {
 
 		scene.traverse( function ( object ) {
 
-			cache.set( object, object.visible );
+			if ( ( object.isPoints || object.isLine || object.isLine2 ) && object.visible ) {
 
-			if ( object.isPoints || object.isLine ) object.visible = false;
+				object.visible = false;
+				cache.push( object );
+
+			}
 
 		} );
 
@@ -499,17 +502,15 @@ class SSAOPass extends Pass {
 
 	_restoreVisibility() {
 
-		const scene = this.scene;
 		const cache = this._visibilityCache;
 
-		scene.traverse( function ( object ) {
+		for ( let i = 0; i < cache.length; i ++ ) {
 
-			const visible = cache.get( object );
-			object.visible = visible;
+			cache[ i ].visible = true;
 
-		} );
+		}
 
-		cache.clear();
+		cache.length = 0;
 
 	}
 

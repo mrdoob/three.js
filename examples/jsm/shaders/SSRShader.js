@@ -8,7 +8,7 @@ import {
  * A collection of shaders used for SSR.
  *
  * References:
- * - [3D Game Shaders For Beginners, Screen Space Reflection (SSR)]{@link https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html}.
+ * - [3D Game Shaders For Beginners, Screen Space Reflection (SSR)](https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html).
  *
  * @module SSRShader
  * @three_import import * as SSRShader from 'three/addons/shaders/SSRShader.js';

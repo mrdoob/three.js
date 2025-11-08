@@ -1,7 +1,7 @@
-import { bitangentView } from './Bitangent.js';
-import { normalView, transformedNormalView } from './Normal.js';
+import { normalView } from './Normal.js';
 import { tangentView } from './Tangent.js';
-import { mat3 } from '../tsl/TSLBase.js';
+import { bitangentView } from './Bitangent.js';
+import { Fn, mat3 } from '../tsl/TSLBase.js';
 import { mix } from '../math/MathNode.js';
 import { anisotropy, anisotropyB, roughness } from '../core/PropertyNode.js';
 import { positionViewDirection } from './Position.js';
@@ -12,7 +12,7 @@ import { positionViewDirection } from './Position.js';
  * @tsl
  * @type {Node<mat3>}
  */
-export const TBNViewMatrix = /*@__PURE__*/ mat3( tangentView, bitangentView, normalView );
+export const TBNViewMatrix = /*@__PURE__*/ mat3( tangentView, bitangentView, normalView ).toVar( 'TBNViewMatrix' );
 
 /**
  * TSL object that represents the parallax direction.
@@ -40,15 +40,14 @@ export const parallaxUV = ( uv, scale ) => uv.sub( parallaxDirection.mul( scale 
  * @function
  * @returns {Node<vec3>} Bent normals.
  */
-export const transformedBentNormalView = /*@__PURE__*/ ( () => {
+export const bentNormalView = /*@__PURE__*/ ( Fn( () => {
 
 	// https://google.github.io/filament/Filament.md.html#lighting/imagebasedlights/anisotropy
 
 	let bentNormal = anisotropyB.cross( positionViewDirection );
 	bentNormal = bentNormal.cross( anisotropyB ).normalize();
-	bentNormal = mix( bentNormal, transformedNormalView, anisotropy.mul( roughness.oneMinus() ).oneMinus().pow2().pow2() ).normalize();
+	bentNormal = mix( bentNormal, normalView, anisotropy.mul( roughness.oneMinus() ).oneMinus().pow2().pow2() ).normalize();
 
 	return bentNormal;
 
-
-} )();
+} ).once() )();

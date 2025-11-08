@@ -35,6 +35,7 @@ const UniformsLib = {
 		reflectivity: { value: 1.0 }, // basic, lambert, phong
 		ior: { value: 1.5 }, // physical
 		refractionRatio: { value: 0.98 }, // basic, lambert, phong
+		dfgLUT: { value: null } // DFG LUT for physically-based rendering
 
 	},
 

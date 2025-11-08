@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
-import { nodeObject, vec3 } from '../tsl/TSLBase.js';
+import { nodeObject, property, vec3 } from '../tsl/TSLBase.js';
 import { hashArray } from '../core/NodeUtils.js';
+import { warn } from '../../utils.js';
 
 const sortLights = ( lights ) => {
 
@@ -25,6 +26,7 @@ const getLightNodeById = ( id, lightNodes ) => {
 };
 
 const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
+const _hashData = [];
 
 /**
  * This node represents the scene's lighting and manages the lighting model's life cycle
@@ -53,21 +55,21 @@ class LightsNode extends Node {
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.totalDiffuseNode = vec3().toVar();
+		this.totalDiffuseNode = property( 'vec3', 'totalDiffuse' );
 
 		/**
 		 * A node representing the total specular light.
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.totalSpecularNode = vec3().toVar();
+		this.totalSpecularNode = property( 'vec3', 'totalSpecular' );
 
 		/**
 		 * A node representing the outgoing light.
 		 *
 		 * @type {Node<vec3>}
 		 */
-		this.outgoingLightNode = vec3().toVar();
+		this.outgoingLightNode = property( 'vec3', 'outgoingLight' );
 
 		/**
 		 * An array representing the lights in the scene.
@@ -107,23 +109,38 @@ class LightsNode extends Node {
 	}
 
 	/**
-	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
-	 * light IDs into the cache key.
+	 * Overwrites the default {@link Node#customCacheKey} implementation by including
+	 * light data into the cache key.
 	 *
 	 * @return {number} The custom cache key.
 	 */
 	customCacheKey() {
 
-		const lightIDs = [];
 		const lights = this._lights;
 
 		for ( let i = 0; i < lights.length; i ++ ) {
 
-			lightIDs.push( lights[ i ].id );
+			const light = lights[ i ];
+
+			_hashData.push( light.id );
+			_hashData.push( light.castShadow ? 1 : 0 );
+
+			if ( light.isSpotLight === true ) {
+
+				const hashMap = ( light.map !== null ) ? light.map.id : - 1;
+				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : - 1;
+
+				_hashData.push( hashMap, hashColorNode );
+
+			}
 
 		}
 
-		return hashArray( lightIDs );
+		const cacheKey = hashArray( _hashData );
+
+		_hashData.length = 0;
+
+		return cacheKey;
 
 	}
 
@@ -143,7 +160,7 @@ class LightsNode extends Node {
 
 			for ( const lightNode of this._lightNodes ) {
 
-				hash.push( lightNode.getSelf().getHash() );
+				hash.push( lightNode.getHash() );
 
 			}
 
@@ -157,13 +174,15 @@ class LightsNode extends Node {
 
 	analyze( builder ) {
 
-		const properties = builder.getDataFromNode( this );
+		const properties = builder.getNodeProperties( this );
 
 		for ( const node of properties.nodes ) {
 
 			node.build( builder );
 
 		}
+
+		properties.outputNode.build( builder );
 
 	}
 
@@ -206,7 +225,7 @@ class LightsNode extends Node {
 
 					if ( lightNodeClass === null ) {
 
-						console.warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
+						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
 						continue;
 
 					}
@@ -313,7 +332,7 @@ class LightsNode extends Node {
 		const context = builder.context;
 		const lightingModel = context.lightingModel;
 
-		const properties = builder.getDataFromNode( this );
+		const properties = builder.getNodeProperties( this );
 
 		if ( lightingModel ) {
 
@@ -349,8 +368,6 @@ class LightsNode extends Node {
 					totalDiffuse = vec3( backdrop );
 
 				}
-
-				context.material.transparent = true;
 
 			}
 

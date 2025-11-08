@@ -137,6 +137,8 @@ class SSRPass extends Pass {
 
 		this._selects = selects;
 
+		this._resolutionScale = 1;
+
 		/**
 		 * Whether the pass is selective or not.
 		 *
@@ -457,6 +459,29 @@ class SSRPass extends Pass {
 
 	}
 
+
+	/**
+	 * The resolution scale. Valid values are in the range
+	 * `[0,1]`. `1` means best quality but also results in
+	 * more computational overhead. Setting to `0.5` means
+	 * the effect is computed in half-resolution.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
+	get resolutionScale() {
+
+		return this._resolutionScale;
+
+	}
+
+	set resolutionScale( value ) {
+
+		this._resolutionScale = value;
+		this.setSize( this.width, this.height ); // force a resize when resolution scaling changes
+
+	}
+
 	/**
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever the pass is no longer used in your app.
@@ -654,30 +679,34 @@ class SSRPass extends Pass {
 	 * Sets the size of the pass.
 	 *
 	 * @param {number} width - The width to set.
-	 * @param {number} height - The width to set.
+	 * @param {number} height - The height to set.
 	 */
 	setSize( width, height ) {
 
 		this.width = width;
 		this.height = height;
 
-		this.ssrMaterial.defines.MAX_STEP = Math.sqrt( width * width + height * height );
+		const effectiveWidth = Math.round( this.resolutionScale * width );
+		const effectiveHeight = Math.round( this.resolutionScale * height );
+
+		this.ssrMaterial.defines.MAX_STEP = Math.sqrt( effectiveWidth * effectiveWidth + effectiveHeight * effectiveHeight );
 		this.ssrMaterial.needsUpdate = true;
+
 		this.beautyRenderTarget.setSize( width, height );
-		this.prevRenderTarget.setSize( width, height );
-		this.ssrRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
 		this.metalnessRenderTarget.setSize( width, height );
-		this.blurRenderTarget.setSize( width, height );
-		this.blurRenderTarget2.setSize( width, height );
+		this.ssrRenderTarget.setSize( effectiveWidth, effectiveHeight );
+		this.prevRenderTarget.setSize( effectiveWidth, effectiveHeight );
+		this.blurRenderTarget.setSize( effectiveWidth, effectiveHeight );
+		this.blurRenderTarget2.setSize( effectiveWidth, effectiveHeight );
 		// this.blurRenderTarget3.setSize(width, height);
 
-		this.ssrMaterial.uniforms[ 'resolution' ].value.set( width, height );
+		this.ssrMaterial.uniforms[ 'resolution' ].value.set( effectiveWidth, effectiveHeight );
 		this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 		this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 
-		this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
-		this.blurMaterial2.uniforms[ 'resolution' ].value.set( width, height );
+		this.blurMaterial.uniforms[ 'resolution' ].value.set( effectiveWidth, effectiveHeight );
+		this.blurMaterial2.uniforms[ 'resolution' ].value.set( effectiveWidth, effectiveHeight );
 
 	}
 

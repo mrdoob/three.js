@@ -1,35 +1,9 @@
 import { RenderTarget, Vector2, NodeMaterial, RendererUtils, QuadMesh, TempNode, NodeUpdateType } from 'three/webgpu';
-import { nodeObject, Fn, If, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, mul } from 'three/tsl';
+import { nodeObject, Fn, float, uv, uniform, convertToTexture, vec2, vec4, passTexture, premultiplyAlpha, unpremultiplyAlpha } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
-
-const premult = /*@__PURE__*/ Fn( ( [ color ] ) => {
-
-	return vec4( color.rgb.mul( color.a ), color.a );
-
-} ).setLayout( {
-	name: 'premult',
-	type: 'vec4',
-	inputs: [
-		{ name: 'color', type: 'vec4' }
-	]
-} );
-
-const unpremult = /*@__PURE__*/ Fn( ( [ color ] ) => {
-
-	If( color.a.equal( 0.0 ), () => vec4( 0.0 ) );
-
-	return vec4( color.rgb.div( color.a ), color.a );
-
-} ).setLayout( {
-	name: 'unpremult',
-	type: 'vec4',
-	inputs: [
-		{ name: 'color', type: 'vec4' }
-	]
-} );
 
 /**
  * Post processing node for creating a gaussian blur effect.
@@ -51,8 +25,11 @@ class GaussianBlurNode extends TempNode {
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
 	 * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
 	 * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
+	 * @param {Object} [options={}] - Additional options for the gaussian blur effect.
+	 * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
+	 * @param {number} [options.resolutionScale=1] - The resolution of the effect. 0.5 means half the resolution of the texture node.
 	 */
-	constructor( textureNode, directionNode = null, sigma = 2 ) {
+	constructor( textureNode, directionNode = null, sigma = 4, options = {} ) {
 
 		super( 'vec4' );
 
@@ -131,12 +108,12 @@ class GaussianBlurNode extends TempNode {
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		/**
-		 * Controls the resolution of the effect.
+		 * The resolution scale.
 		 *
-		 * @type {Vector2}
-		 * @default (1,1)
+		 * @type {number}
+		 * @default (1)
 		 */
-		this.resolution = new Vector2( 1, 1 );
+		this.resolutionScale = options.resolutionScale || 1;
 
 		/**
 		 * Whether the effect should use premultiplied alpha or not. Set this to `true`
@@ -145,32 +122,7 @@ class GaussianBlurNode extends TempNode {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.premultipliedAlpha = false;
-
-	}
-
-	/**
-	 * Sets the given premultiplied alpha value.
-	 *
-	 * @param {boolean} value - Whether the effect should use premultiplied alpha or not.
-	 * @return {GaussianBlurNode} height - A reference to this node.
-	 */
-	setPremultipliedAlpha( value ) {
-
-		this.premultipliedAlpha = value;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns the premultiplied alpha value.
-	 *
-	 * @return {boolean} Whether the effect should use premultiplied alpha or not.
-	 */
-	getPremultipliedAlpha() {
-
-		return this.premultipliedAlpha;
+		this.premultipliedAlpha = options.premultipliedAlpha || false;
 
 	}
 
@@ -182,8 +134,8 @@ class GaussianBlurNode extends TempNode {
 	 */
 	setSize( width, height ) {
 
-		width = Math.max( Math.round( width * this.resolution.x ), 1 );
-		height = Math.max( Math.round( height * this.resolution.y ), 1 );
+		width = Math.max( Math.round( width * this.resolutionScale ), 1 );
+		height = Math.max( Math.round( height * this.resolutionScale ), 1 );
 
 		this._invSize.value.set( 1 / width, 1 / height );
 		this._horizontalRT.setSize( width, height );
@@ -224,6 +176,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 1, 0 );
 
+		_quadMesh.name = 'Gaussian Blur [ Horizontal Pass ]';
 		_quadMesh.render( renderer );
 
 		// vertical
@@ -233,6 +186,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 0, 1 );
 
+		_quadMesh.name = 'Gaussian Blur [ Vertical Pass ]';
 		_quadMesh.render( renderer );
 
 		// restore
@@ -275,8 +229,8 @@ class GaussianBlurNode extends TempNode {
 
 			// https://lisyarus.github.io/blog/posts/blur-coefficients-generator.html
 
-			sampleTexture = ( uv ) => premult( textureNode.sample( uv ) );
-			output = ( color ) => unpremult( color );
+			sampleTexture = ( uv ) => premultiplyAlpha( textureNode.sample( uv ) );
+			output = ( color ) => unpremultiplyAlpha( color );
 
 		} else {
 
@@ -293,8 +247,7 @@ class GaussianBlurNode extends TempNode {
 			const invSize = this._invSize;
 			const direction = directionNode.mul( this._passDirection );
 
-			const weightSum = float( gaussianCoefficients[ 0 ] ).toVar();
-			const diffuseSum = vec4( sampleTexture( uvNode ).mul( weightSum ) ).toVar();
+			const diffuseSum = vec4( sampleTexture( uvNode ).mul( gaussianCoefficients[ 0 ] ) ).toVar();
 
 			for ( let i = 1; i < kernelSize; i ++ ) {
 
@@ -307,11 +260,10 @@ class GaussianBlurNode extends TempNode {
 				const sample2 = sampleTexture( uvNode.sub( uvOffset ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
-				weightSum.addAssign( mul( 2.0, w ) );
 
 			}
 
-			return output( diffuseSum.div( weightSum ) );
+			return output( diffuseSum );
 
 		} );
 
@@ -354,14 +306,38 @@ class GaussianBlurNode extends TempNode {
 	_getCoefficients( kernelRadius ) {
 
 		const coefficients = [];
+		const sigma = kernelRadius / 3;
 
 		for ( let i = 0; i < kernelRadius; i ++ ) {
 
-			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( kernelRadius * kernelRadius ) ) / kernelRadius );
+			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
 
 		}
 
 		return coefficients;
+
+	}
+
+	/**
+	 * The resolution scale.
+	 *
+	 * @deprecated
+	 * @type {Vector2}
+	 * @default {(1,1)}
+	 */
+	get resolution() {
+
+		console.warn( 'THREE.GaussianBlurNode: The "resolution" property has been renamed to "resolutionScale" and is now of type `number`.' ); // @deprecated r180
+
+		return new Vector2( this.resolutionScale, this.resolutionScale );
+
+	}
+
+	set resolution( value ) {
+
+		console.warn( 'THREE.GaussianBlurNode: The "resolution" property has been renamed to "resolutionScale" and is now of type `number`.' ); // @deprecated r180
+
+		this.resolutionScale = value.x;
 
 	}
 
@@ -377,18 +353,28 @@ export default GaussianBlurNode;
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
  * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
+ * @param {Object} [options={}] - Additional options for the gaussian blur effect.
+ * @param {boolean} [options.premultipliedAlpha=false] - Whether to use premultiplied alpha for the blur effect.
+ * @param {number} [options.resolutionScale=1] - The resolution of the effect. 0.5 means half the resolution of the texture node.
  * @returns {GaussianBlurNode}
  */
-export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );
+export const gaussianBlur = ( node, directionNode, sigma, options = {} ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma, options ) );
 
 /**
  * TSL function for creating a gaussian blur node for post processing with enabled premultiplied alpha.
  *
  * @tsl
  * @function
+ * @deprecated  since r180. Use `gaussianBlur()` with `premultipliedAlpha: true` option instead.
  * @param {Node<vec4>} node - The node that represents the input of the effect.
  * @param {Node<vec2|float>} directionNode - Defines the direction and radius of the blur.
  * @param {number} sigma - Controls the kernel of the blur filter. Higher values mean a wider blur radius.
  * @returns {GaussianBlurNode}
  */
-export const premultipliedGaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ).setPremultipliedAlpha( true ) );
+export function premultipliedGaussianBlur( node, directionNode, sigma ) {
+
+	console.warn( 'THREE.TSL: "premultipliedGaussianBlur()" is deprecated. Use "gaussianBlur()" with "premultipliedAlpha: true" option instead.' ); // deprecated, r180
+
+	return gaussianBlur( node, directionNode, sigma, { premultipliedAlpha: true } );
+
+}

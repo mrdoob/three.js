@@ -6,6 +6,7 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<style>
+
 		body {
 			margin: 0;
 			overflow: hidden;
@@ -25,7 +26,7 @@
 			align-items: center;
 		}
 
-		#antialising-disabled {
+		#antialiasing-disabled {
 			border-right: 1px solid black;
 		}
 
@@ -33,14 +34,16 @@
 			width: 100%;
 			height: 100%;
 		}
+
 	</style>
 	<body>
+
 		<div id="demo">
-			<div id="antialising-disabled" class="renderer-wrapper">
-				<div>antialising disabled</div>
+			<div id="antialiasing-disabled" class="renderer-wrapper">
+				<div>antialiasing disabled</div>
 			</div>
-			<div id="antialising-enabled" class="renderer-wrapper">
-				<div>antialising enabled</div>
+			<div id="antialiasing-enabled" class="renderer-wrapper">
+				<div>antialiasing enabled</div>
 			</div>
 		</div>
 
@@ -57,10 +60,10 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { varying, uv, texture, Fn } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let rendererAntialiasingEnabled;
 			let rendererAntialiasingDisabled;
@@ -140,7 +143,7 @@
 					);
 
 					return geometry;
-			
+
 				};
 
 				const material = new THREE.MeshBasicNodeMaterial();
@@ -158,8 +161,8 @@
 
 				};
 
-				const withFlatFirstShader = createShader( 'flat', 'first' );
-				const withFlatEitherShader = createShader( 'flat', 'either' );
+				const withFlatFirstShader = createShader( THREE.InterpolationSamplingType.FLAT, THREE.InterpolationSamplingMode.FIRST );
+				const withFlatEitherShader = createShader( THREE.InterpolationSamplingType.FLAT, THREE.InterpolationSamplingMode.EITHER );
 
 				const withSampleShader = Fn( () => {
 
@@ -197,9 +200,9 @@
 						mesh.position.set( x * 2, y * 2, 0 );
 						faceMeshes.push( mesh );
 						scene.add( mesh );
-			
+
 					}
-			
+
 				}
 
 				// Create Standard Renderer
@@ -218,33 +221,34 @@
 					forceWebGL: forceWebGL
 				} );
 
-				document.body.querySelector( '#antialising-enabled' ).appendChild( rendererAntialiasingEnabled.domElement );
+				document.body.querySelector( '#antialiasing-enabled' ).appendChild( rendererAntialiasingEnabled.domElement );
 				rendererAntialiasingEnabled.setPixelRatio( window.devicePixelRatio );
 				rendererAntialiasingEnabled.setSize( window.innerWidth / 2, window.innerHeight );
 				rendererAntialiasingEnabled.setAnimationLoop( animateAliased );
-			
-				document.body.querySelector( '#antialising-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
-				document.body.querySelector( '#antialising-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
+				rendererAntialiasingEnabled.inspector = new Inspector();
+
+				document.body.querySelector( '#antialiasing-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
+				document.body.querySelector( '#antialiasing-disabled' ).appendChild( rendererAntialiasingDisabled.domElement );
 
 				onWindowResize();
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				gui = new GUI();
+				gui = rendererAntialiasingEnabled.inspector.createParameters( 'Settings' );
 				gui.add( effectController, 'sampling', [
 					THREE.InterpolationSamplingMode.NORMAL,
 					THREE.InterpolationSamplingMode.CENTROID,
 					THREE.InterpolationSamplingMode.SAMPLE,
-					THREE.InterpolationSamplingMode.FLAT_FIRST,
-					THREE.InterpolationSamplingMode.FLAT_EITHER
+					'flat first',
+					'flat either'
 				] ).onChange( () => {
 
 					const interpolationShaderLib = {
 						[ THREE.InterpolationSamplingMode.NORMAL ]: withoutInterpolationShader,
 						[ THREE.InterpolationSamplingMode.CENTROID ]: withInterpolationShader,
 						[ THREE.InterpolationSamplingMode.SAMPLE ]: withSampleShader,
-						[ THREE.InterpolationSamplingMode.FLAT_FIRST ]: withFlatFirstShader,
-						[ THREE.InterpolationSamplingMode.FLAT_EITHER ]: withFlatEitherShader
+						[ 'flat first' ]: withFlatFirstShader,
+						[ 'flat either' ]: withFlatEitherShader
 					};
 
 					const shader = interpolationShaderLib[ effectController.sampling ];
@@ -256,7 +260,7 @@
 
 					}
 
-			
+
 				} );
 
 			}
@@ -267,7 +271,7 @@
 				rendererAntialiasingDisabled.setSize( halfWidth, window.innerHeight );
 				rendererAntialiasingEnabled.setSize( halfWidth, window.innerHeight );
 				const aspect = ( halfWidth ) / window.innerHeight;
-			
+
 				camera.aspect = aspect;
 				camera.updateProjectionMatrix();
 
@@ -276,13 +280,13 @@
 			function animateStandard() {
 
 				rendererAntialiasingDisabled.render( scene, camera );
-			
+
 			}
 
 			function animateAliased() {
 
 				rendererAntialiasingEnabled.render( scene, camera );
-			
+
 			}
 
 		</script>

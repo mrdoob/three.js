@@ -1,5 +1,5 @@
 import { cameraViewMatrix } from './Camera.js';
-import { transformedNormalView } from './Normal.js';
+import { normalView } from './Normal.js';
 import { positionViewDirection } from './Position.js';
 import { materialRefractionRatio } from './MaterialProperties.js';
 
@@ -9,7 +9,7 @@ import { materialRefractionRatio } from './MaterialProperties.js';
  * @tsl
  * @type {Node<vec3>}
  */
-export const reflectView = /*@__PURE__*/ positionViewDirection.negate().reflect( transformedNormalView );
+export const reflectView = /*@__PURE__*/ positionViewDirection.negate().reflect( normalView );
 
 /**
  * The refract vector in view space.
@@ -17,7 +17,7 @@ export const reflectView = /*@__PURE__*/ positionViewDirection.negate().reflect(
  * @tsl
  * @type {Node<vec3>}
  */
-export const refractView = /*@__PURE__*/ positionViewDirection.negate().refract( transformedNormalView, materialRefractionRatio );
+export const refractView = /*@__PURE__*/ positionViewDirection.negate().refract( normalView, materialRefractionRatio );
 
 /**
  * Used for sampling cube maps when using cube reflection mapping.

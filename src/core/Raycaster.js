@@ -1,6 +1,7 @@
 import { Matrix4 } from '../math/Matrix4.js';
 import { Ray } from '../math/Ray.js';
 import { Layers } from './Layers.js';
+import { error } from '../utils.js';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
 
@@ -131,7 +132,7 @@ class Raycaster {
 
 		} else {
 
-			console.error( 'THREE.Raycaster: Unsupported camera type: ' + camera.type );
+			error( 'Raycaster: Unsupported camera type: ' + camera.type );
 
 		}
 

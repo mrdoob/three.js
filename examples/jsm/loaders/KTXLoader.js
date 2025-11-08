@@ -6,8 +6,8 @@ import {
  * A loader for the KTX texture compression format.
  *
  * References:
- * - [The KTX File Format and Tools]{@link https://www.khronos.org/opengles/sdk/tools/KTX/}
- * - [Babylon.JS khronosTextureContainer.ts]{@link https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts}
+ * - [The KTX File Format and Tools](https://www.khronos.org/opengles/sdk/tools/KTX/)
+ * - [Babylon.JS khronosTextureContainer.ts](https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts)
  *
  * ```js
  * const loader = new KTXLoader();

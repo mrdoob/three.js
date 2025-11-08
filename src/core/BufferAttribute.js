@@ -88,7 +88,7 @@ class BufferAttribute {
 		/**
 		 * Applies to integer data only. Indicates how the underlying data in the buffer maps to
 		 * the values in the GLSL code. For instance, if `array` is an instance of `UInt16Array`,
-		 * and `normalized` is `true`, the values `0 -+65535` in the array data will be mapped to
+		 * and `normalized` is `true`, the values `0 - +65535` in the array data will be mapped to
 		 * `0.0f - +1.0f` in the GLSL attribute. If `normalized` is `false`, the values will be converted
 		 * to floats unmodified, i.e. `65535` becomes `65535.0f`.
 		 *
@@ -841,8 +841,8 @@ class Uint32BufferAttribute extends BufferAttribute {
  * Convenient class that can be used when creating a `Float16` buffer attribute with
  * a plain `Array` instance.
  *
- * This class automatically converts to and from FP16 since `Float16Array` is not
- * natively supported in JavaScript.
+ * This class automatically converts to and from FP16 via `Uint16Array` since `Float16Array`
+ * browser support is still problematic.
  *
  * @augments BufferAttribute
  */

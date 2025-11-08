@@ -4,11 +4,18 @@
 		<title>three.js webgpu - materialx noise</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - materialx noise
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>MaterialX Noise</span>
+			</div>
+
+			<small>MaterialX noise functions.</small>
 		</div>
 
 		<script type="importmap">
@@ -24,15 +31,15 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { normalWorld, time, mx_noise_vec3, mx_worley_noise_vec3, mx_cell_noise_float, mx_fractal_noise_vec3 } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 
-			let container, stats;
+			let container;
 
 			let camera, scene, renderer;
 
@@ -123,23 +130,16 @@
 				particleLight.add( new THREE.PointLight( 0xffffff, 1000 ) );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				//
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.25;
-
-				//
-
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				// EVENTS
 
@@ -164,14 +164,6 @@
 			}
 
 			//
-
-			function animate() {
-
-				render();
-
-				stats.update();
-
-			}
 
 			function render() {
 

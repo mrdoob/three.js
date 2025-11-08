@@ -7,6 +7,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 import { SpriteMaterial } from '../materials/SpriteMaterial.js';
+import { error } from '../utils.js';
 
 let _geometry;
 
@@ -48,7 +49,7 @@ class Sprite extends Object3D {
 	/**
 	 * Constructs a new sprite.
 	 *
-	 * @param {SpriteMaterial} [material] - The sprite material.
+	 * @param {(SpriteMaterial|SpriteNodeMaterial)} [material] - The sprite material.
 	 */
 	constructor( material = new SpriteMaterial() ) {
 
@@ -94,7 +95,7 @@ class Sprite extends Object3D {
 		/**
 		 * The sprite material.
 		 *
-		 * @type {SpriteMaterial}
+		 * @type {(SpriteMaterial|SpriteNodeMaterial)}
 		 */
 		this.material = material;
 
@@ -108,6 +109,15 @@ class Sprite extends Object3D {
 		 */
 		this.center = new Vector2( 0.5, 0.5 );
 
+		/**
+		 * The number of instances of this sprite.
+		 * Can only be used with {@link WebGPURenderer}.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.count = 1;
+
 	}
 
 	/**
@@ -120,7 +130,7 @@ class Sprite extends Object3D {
 
 		if ( raycaster.camera === null ) {
 
-			console.error( 'THREE.Sprite: "Raycaster.camera" needs to be set in order to raycast against sprites.' );
+			error( 'Sprite: "Raycaster.camera" needs to be set in order to raycast against sprites.' );
 
 		}
 

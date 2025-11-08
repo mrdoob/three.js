@@ -4,13 +4,20 @@
 		<title>three.js webgpu - skinning points</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - skinning points</br>
-			colors and scale of the points are based on the speed of the animation
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Skinning Points</span>
+			</div>
+
+			<small>
+				Colors and scale of the points are based on the speed of the animation.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -26,7 +33,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { color, computeSkinning, objectWorldMatrix, instancedArray, instanceIndex, Fn, shapeCircle } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -78,7 +85,7 @@
 							materialPoints.sizeNode = pointSpeedAttribute.length().exp().min( 5 ).mul( 5 ).add( 1 );
 							materialPoints.sizeAttenuation = false;
 
-							materialPoints.positionNode = Fn( () => {
+							const updateSkinningPoints = Fn( () => {
 
 								const pointPosition = pointPositionArray.element( instanceIndex );
 								const pointSpeed = pointSpeedArray.element( instanceIndex );
@@ -90,9 +97,21 @@
 								pointSpeed.assign( skinningSpeed );
 								pointPosition.assign( skinningWorldPosition );
 
+							}, 'void' );
+
+							materialPoints.positionNode = Fn( () => {
+
+								updateSkinningPoints();
+
 								return pointPositionArray.toAttribute();
 
-							} )().compute( countOfPoints );
+							} )().compute( countOfPoints ).onInit( () => {
+
+								// initialize point positions and speeds
+
+								renderer.compute( updateSkinningPoints().compute( countOfPoints ) );
+
+							} );
 
 							const pointCloud = new THREE.Sprite( materialPoints );
 							pointCloud.count = countOfPoints;

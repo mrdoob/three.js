@@ -22,9 +22,9 @@ const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
  */
 export const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
 
-	let basic = texture( depthTexture, shadowCoord.xy ).label( 't_basic' );
+	let basic = texture( depthTexture, shadowCoord.xy ).setName( 't_basic' );
 
-	if ( depthTexture.isDepthArrayTexture ) {
+	if ( depthTexture.isArrayTexture ) {
 
 		basic = basic.depth( depthLayer );
 
@@ -50,7 +50,7 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 
 		let depth = texture( depthTexture, uv );
 
-		if ( depthTexture.isDepthArrayTexture ) {
+		if ( depthTexture.isArrayTexture ) {
 
 			depth = depth.depth( depthLayer );
 
@@ -111,7 +111,7 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
 
 		let depth = texture( depthTexture, uv );
 
-		if ( depthTexture.isDepthArrayTexture ) {
+		if ( depthTexture.isArrayTexture ) {
 
 			depth = depth.depth( depthLayer );
 
@@ -185,11 +185,9 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
  */
 export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
 
-	const occlusion = float( 1 ).toVar();
-
 	let distribution = texture( depthTexture ).sample( shadowCoord.xy );
 
-	if ( depthTexture.isDepthArrayTexture || depthTexture.isDataArrayTexture ) {
+	if ( depthTexture.isArrayTexture ) {
 
 		distribution = distribution.depth( depthLayer );
 
@@ -197,19 +195,28 @@ export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 
 	distribution = distribution.rg;
 
-	const hardShadow = step( shadowCoord.z, distribution.x );
+	const mean = distribution.x;
+	const variance = max( 0.0000001, distribution.y.mul( distribution.y ) );
 
-	If( hardShadow.notEqual( float( 1.0 ) ), () => {
+	const hardShadow = step( shadowCoord.z, mean );
 
-		const distance = shadowCoord.z.sub( distribution.x );
-		const variance = max( 0, distribution.y.mul( distribution.y ) );
-		let softnessProbability = variance.div( variance.add( distance.mul( distance ) ) ); // Chebeyshevs inequality
-		softnessProbability = clamp( sub( softnessProbability, 0.3 ).div( 0.95 - 0.3 ) );
-		occlusion.assign( clamp( max( hardShadow, softnessProbability ) ) );
+	// Early return if fully lit
+	If( hardShadow.equal( 1.0 ), () => {
+
+		return float( 1.0 );
 
 	} );
 
-	return occlusion;
+	// Distance from mean
+	const d = shadowCoord.z.sub( mean );
+
+	// Chebyshev's inequality for upper bound on probability
+	let p_max = variance.div( variance.add( d.mul( d ) ) );
+
+	// Reduce light bleeding by remapping [amount, 1] to [0, 1]
+	p_max = clamp( sub( p_max, 0.3 ).div( 0.65 ) );
+
+	return max( hardShadow, p_max );
 
 } );
 
@@ -245,6 +252,8 @@ const linearShadowDistance = ( light ) => {
  * If not, it creates a new `NodeMaterial` configured for shadow rendering and stores it
  * in the `shadowMaterialLib` for future use.
  *
+ * @tsl
+ * @function
  * @param {Light} light - The light source for which the shadow material is needed.
  *                         If the light is a point light, a depth node is calculated
  *                         using the linear shadow distance.

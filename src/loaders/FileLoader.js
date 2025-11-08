@@ -1,5 +1,6 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
+import { warn } from '../utils.js';
 
 const loading = {};
 
@@ -41,7 +42,8 @@ class FileLoader extends Loader {
 		super( manager );
 
 		/**
-		 * The expected mime type.
+		 * The expected mime type. Valid values can be found
+		 * [here](hhttps://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype)
 		 *
 		 * @type {string}
 		 */
@@ -54,6 +56,14 @@ class FileLoader extends Loader {
 		 * @default ''
 		 */
 		this.responseType = '';
+
+		/**
+		 * Used for aborting requests.
+		 *
+		 * @private
+		 * @type {AbortController}
+		 */
+		this._abortController = new AbortController();
 
 	}
 
@@ -74,7 +84,7 @@ class FileLoader extends Loader {
 
 		url = this.manager.resolveURL( url );
 
-		const cached = Cache.get( url );
+		const cached = Cache.get( `file:${url}` );
 
 		if ( cached !== undefined ) {
 
@@ -121,7 +131,7 @@ class FileLoader extends Loader {
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
-			// An abort controller could be added within a future PR
+			signal: ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal
 		} );
 
 		// record states ( avoid data race )
@@ -139,7 +149,7 @@ class FileLoader extends Loader {
 
 					if ( response.status === 0 ) {
 
-						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+						warn( 'FileLoader: HTTP Status 0 received.' );
 
 					}
 
@@ -263,7 +273,7 @@ class FileLoader extends Loader {
 
 				// Add to cache only on HTTP success, so that we do not cache
 				// error response bodies as proper responses to requests.
-				Cache.add( url, data );
+				Cache.add( `file:${url}`, data );
 
 				const callbacks = loading[ url ];
 				delete loading[ url ];
@@ -334,6 +344,20 @@ class FileLoader extends Loader {
 	setMimeType( value ) {
 
 		this.mimeType = value;
+		return this;
+
+	}
+
+	/**
+	 * Aborts ongoing fetch requests.
+	 *
+	 * @return {FileLoader} A reference to this instance.
+	 */
+	abort() {
+
+		this._abortController.abort();
+		this._abortController = new AbortController();
+
 		return this;
 
 	}

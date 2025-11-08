@@ -1,6 +1,7 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
+import { error } from '../../../utils.js';
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],
@@ -11,6 +12,12 @@ const typedArraysToVertexFormatPrefix = new Map( [
 	[ Uint32Array, [ 'uint32', 'unorm32' ]],
 	[ Float32Array, [ 'float32', ]],
 ] );
+
+if ( typeof Float16Array !== 'undefined' ) {
+
+	typedArraysToVertexFormatPrefix.set( Float16Array, [ 'float16' ] );
+
+}
 
 const typedAttributeToVertexFormatPrefix = new Map( [
 	[ Float16BufferAttribute, [ 'float16', ]],
@@ -113,7 +120,9 @@ class WebGPUAttributeUtils {
 
 			}
 
-			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
+			// ensure 4 byte alignment
+			const byteLength = array.byteLength;
+			const size = byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
 
 			buffer = device.createBuffer( {
 				label: bufferAttribute.name,
@@ -398,7 +407,7 @@ class WebGPUAttributeUtils {
 
 		if ( ! format ) {
 
-			console.error( 'THREE.WebGPUAttributeUtils: Vertex format not supported yet.' );
+			error( 'WebGPUAttributeUtils: Vertex format not supported yet.' );
 
 		}
 

@@ -1,5 +1,4 @@
 import { Sphere } from '../math/Sphere.js';
-import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { FileLoader } from './FileLoader.js';
@@ -8,7 +7,7 @@ import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
-import { getTypedArray } from '../utils.js';
+import { getTypedArray, error } from '../utils.js';
 
 /**
  * Class for loading geometries. The files are internally
@@ -68,7 +67,7 @@ class BufferGeometryLoader extends Loader {
 
 				} else {
 
-					console.error( e );
+					error( e );
 
 				}
 
@@ -227,15 +226,7 @@ class BufferGeometryLoader extends Loader {
 
 		if ( boundingSphere !== undefined ) {
 
-			const center = new Vector3();
-
-			if ( boundingSphere.center !== undefined ) {
-
-				center.fromArray( boundingSphere.center );
-
-			}
-
-			geometry.boundingSphere = new Sphere( center, boundingSphere.radius );
+			geometry.boundingSphere = new Sphere().fromJSON( boundingSphere );
 
 		}
 

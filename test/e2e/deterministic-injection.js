@@ -17,43 +17,34 @@
 	window.performance._now = performance.now;
 
 	let frameId = 0;
-	const now = () => frameId * 16;
+	const now = () => 0; // frameId * 16;
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
 	window.performance.now = now;
 
 	/* Deterministic RAF */
 
-	const RAF = window.requestAnimationFrame;
 	window._renderStarted = false;
 	window._renderFinished = false;
 
-	const maxFrameId = 2;
 	window.requestAnimationFrame = function ( cb ) {
 
-		if ( ! window._renderStarted ) {
+		if ( window._renderFinished === true ) return
 
-			setTimeout( function () {
+		if ( window._renderStarted === false ) {
 
-				requestAnimationFrame( cb );
+			const intervalId = setInterval( function () {
 
-			}, 50 );
-
-		} else {
-
-			RAF( function () {
-
-				if ( frameId ++ < maxFrameId ) {
+				if ( window._renderStarted === true ) {
 
 					cb( now() );
 
-				} else {
-
+					clearInterval( intervalId );
 					window._renderFinished = true;
 
 				}
 
-			} );
+			}, 100 );
 
 		}
 

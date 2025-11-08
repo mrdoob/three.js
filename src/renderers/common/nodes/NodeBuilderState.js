@@ -126,7 +126,7 @@ class NodeBuilderState {
 
 			if ( shared !== true ) {
 
-				const bindingsGroup = new BindGroup( instanceGroup.name, [], instanceGroup.index, instanceGroup );
+				const bindingsGroup = new BindGroup( instanceGroup.name, [], instanceGroup.index, instanceGroup.bindingsReference );
 				bindings.push( bindingsGroup );
 
 				for ( const instanceBinding of instanceGroup.bindings ) {

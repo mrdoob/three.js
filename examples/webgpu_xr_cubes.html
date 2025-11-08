@@ -25,7 +25,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
@@ -96,7 +96,7 @@
 
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType, multiview: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

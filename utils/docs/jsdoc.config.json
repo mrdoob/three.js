@@ -1,6 +1,6 @@
 {
     "opts": {
-            "destination": "docs_new",
+            "destination": "docs",
             "encoding": "utf8",
             "package": "package.json",
             "recurse": true,
@@ -8,6 +8,11 @@
             "themeOpts": {
                 "ignoreInheritedSymbols": true
             }
+    },
+    "templates": {
+        "default": {
+            "outputSourceFiles": false
+        }
     },
     "plugins": [ "plugins/markdown" ],
     "source": {
@@ -18,6 +23,7 @@
         "exclude": [
             "src/extras/lib",
             "src/renderers/common/extras/PMREMGenerator.js",
+            "src/renderers/webgpu/WebGPURenderer.Nodes.js",
             "examples/jsm/helpers/LightProbeHelperGPU.js",
             "examples/jsm/helpers/TextureHelperGPU.js",
             "examples/jsm/libs",

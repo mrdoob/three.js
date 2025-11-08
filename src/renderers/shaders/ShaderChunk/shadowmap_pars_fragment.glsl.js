@@ -65,17 +65,19 @@ export default /* glsl */`
 
 	#endif
 
-	/*
-	#if NUM_RECT_AREA_LIGHTS > 0
-
-		// TODO (abelnation): create uniforms for area light shadows
-
-	#endif
-	*/
-
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 
-		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
+		float depth = unpackRGBAToDepth( texture2D( depths, uv ) );
+
+		#ifdef USE_REVERSED_DEPTH_BUFFER
+
+			return step( depth, compare );
+
+		#else
+
+			return step( compare, depth );
+
+		#endif
 
 	}
 
@@ -85,24 +87,39 @@ export default /* glsl */`
 
 	}
 
-	float VSMShadow (sampler2D shadow, vec2 uv, float compare ){
-
-		float occlusion = 1.0;
+	float VSMShadow( sampler2D shadow, vec2 uv, float compare ) {
 
 		vec2 distribution = texture2DDistribution( shadow, uv );
 
-		float hard_shadow = step( compare , distribution.x ); // Hard Shadow
+		float mean = distribution.x;
+		float variance = distribution.y * distribution.y;
 
-		if (hard_shadow != 1.0 ) {
+		#ifdef USE_REVERSED_DEPTH_BUFFER
 
-			float distance = compare - distribution.x ;
-			float variance = max( 0.00000, distribution.y * distribution.y );
-			float softness_probability = variance / (variance + distance * distance ); // Chebeyshevs inequality
-			softness_probability = clamp( ( softness_probability - 0.3 ) / ( 0.95 - 0.3 ), 0.0, 1.0 ); // 0.3 reduces light bleed
-			occlusion = clamp( max( hard_shadow, softness_probability ), 0.0, 1.0 );
+			float hard_shadow = step( mean, compare );
 
-		}
-		return occlusion;
+		#else
+
+			float hard_shadow = step( compare, mean );
+
+		#endif
+
+		// Early return if fully lit
+		if ( hard_shadow == 1.0 ) return 1.0;
+
+		// Variance must be non-zero to avoid division by zero
+		variance = max( variance, 0.0000001 );
+
+		// Distance from mean
+		float d = compare - mean;
+
+		// Chebyshev's inequality for upper bound on probability
+		float p_max = variance / ( variance + d * d );
+
+		// Reduce light bleeding by remapping [amount, 1] to [0, 1]
+		p_max = clamp( ( p_max - 0.3 ) / 0.65, 0.0, 1.0 );
+
+		return max( hard_shadow, p_max );
 
 	}
 

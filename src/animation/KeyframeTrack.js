@@ -7,6 +7,7 @@ import { CubicInterpolant } from '../math/interpolants/CubicInterpolant.js';
 import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant.js';
 import * as AnimationUtils from './AnimationUtils.js';
+import { warn, error } from '../utils.js';
 
 /**
  * Represents s a timed sequence of keyframes, which are composed of lists of
@@ -20,7 +21,7 @@ class KeyframeTrack {
 	 *
 	 * @param {string} name - The keyframe track's name.
 	 * @param {Array<number>} times - A list of keyframe times.
-	 * @param {Array<number>} values - A list of keyframe values.
+	 * @param {Array<number|string|boolean>} values - A list of keyframe values.
 	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
 	 */
 	constructor( name, times, values, interpolation ) {
@@ -191,7 +192,7 @@ class KeyframeTrack {
 
 			}
 
-			console.warn( 'THREE.KeyframeTrack:', message );
+			warn( 'KeyframeTrack:', message );
 			return this;
 
 		}
@@ -351,7 +352,7 @@ class KeyframeTrack {
 		const valueSize = this.getValueSize();
 		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
-			console.error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
+			error( 'KeyframeTrack: Invalid value size in track.', this );
 			valid = false;
 
 		}
@@ -363,7 +364,7 @@ class KeyframeTrack {
 
 		if ( nKeys === 0 ) {
 
-			console.error( 'THREE.KeyframeTrack: Track is empty.', this );
+			error( 'KeyframeTrack: Track is empty.', this );
 			valid = false;
 
 		}
@@ -376,7 +377,7 @@ class KeyframeTrack {
 
 			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
-				console.error( 'THREE.KeyframeTrack: Time is not a valid number.', this, i, currTime );
+				error( 'KeyframeTrack: Time is not a valid number.', this, i, currTime );
 				valid = false;
 				break;
 
@@ -384,7 +385,7 @@ class KeyframeTrack {
 
 			if ( prevTime !== null && prevTime > currTime ) {
 
-				console.error( 'THREE.KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
+				error( 'KeyframeTrack: Out of order keys.', this, i, currTime, prevTime );
 				valid = false;
 				break;
 
@@ -404,7 +405,7 @@ class KeyframeTrack {
 
 					if ( isNaN( value ) ) {
 
-						console.error( 'THREE.KeyframeTrack: Value is not a valid number.', this, i, value );
+						error( 'KeyframeTrack: Value is not a valid number.', this, i, value );
 						valid = false;
 						break;
 

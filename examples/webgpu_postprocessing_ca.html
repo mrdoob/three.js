@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - chromatic aberration</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>CA</span>
+			</div>
+
+			<small>Chromatic Aberration effect.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, renderOutput, uniform } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const params = {
+				enabled: true,
+				animated: true,
+				strength: 1.5,
+				center: new THREE.Vector2( 0.5, 0.5 ),
+				scale: 1.2,
+				autoRotate: true,
+				cameraDistance: 40
+			};
+
+			let camera, scene, renderer, clock, mainGroup;
+			let controls, postProcessing;
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
+				camera.position.set( 0, 15, params.cameraDistance );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.1;
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 0.1;
+				controls.target.set( 0, 0.5, 0 );
+				controls.update();
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x0a0a0a );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+				clock = new THREE.Clock();
+
+				// Create main group
+				mainGroup = new THREE.Group();
+				scene.add( mainGroup );
+
+				// Create shapes
+				createShapes();
+
+				// Add a grid for reference
+				const gridHelper = new THREE.GridHelper( 40, 20, 0x444444, 0x222222 );
+				gridHelper.position.y = - 10;
+				scene.add( gridHelper );
+
+				// post processing
+				postProcessing = new THREE.PostProcessing( renderer );
+				postProcessing.outputColorTransform = false;
+
+				// scene pass
+				const scenePass = pass( scene, camera );
+				const outputPass = renderOutput( scenePass );
+
+				// Create uniform nodes for the static version that can be updated
+				const staticStrength = uniform( params.strength );
+				const staticCenter = uniform( new THREE.Vector2( params.center.x, params.center.y ) );
+				const staticScale = uniform( params.scale );
+
+				// With static values (using uniform nodes)
+				const caPass = chromaticAberration( outputPass, staticStrength, staticCenter, staticScale );
+
+				// Set initial output based on params
+				postProcessing.outputNode = params.enabled ? caPass : outputPass;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( params, 'enabled' ).onChange( ( value ) => {
+
+					postProcessing.outputNode = value ? caPass : outputPass;
+					postProcessing.needsUpdate = true;
+
+				} );
+
+				const staticFolder = gui.addFolder( 'Static Parameters' );
+
+				staticFolder.add( staticStrength, 'value', 0, 3 ).name( 'Strength' );
+				staticFolder.add( staticCenter.value, 'x', - 1, 1 ).name( 'Center X' );
+				staticFolder.add( staticCenter.value, 'y', - 1, 1 ).name( 'Center Y' );
+				staticFolder.add( staticScale, 'value', 0.5, 2 ).name( 'Scale' );
+
+				const animationFolder = gui.addFolder( 'Animation' );
+				animationFolder.add( params, 'animated' );
+				animationFolder.add( params, 'autoRotate' ).onChange( ( value ) => {
+
+					controls.autoRotate = value;
+
+				} );
+
+			}
+
+			function createShapes() {
+
+				const shapes = [];
+				const materials = [];
+
+				// Define colors for different materials
+				const colors = [
+					0xff0000, // Red
+					0x00ff00, // Green
+					0x0000ff, // Blue
+					0xffff00, // Yellow
+					0xff00ff, // Magenta
+					0x00ffff, // Cyan
+					0xffffff, // White
+					0xff8800 // Orange
+				];
+
+				// Create materials
+				colors.forEach( color => {
+
+					materials.push( new THREE.MeshStandardMaterial( {
+						color: color,
+						roughness: 0.2,
+						metalness: 0.8
+					} ) );
+
+				} );
+
+				// Create geometries
+				const geometries = [
+					new THREE.BoxGeometry( 3, 3, 3 ),
+					new THREE.SphereGeometry( 2, 32, 16 ),
+					new THREE.ConeGeometry( 2, 4, 8 ),
+					new THREE.CylinderGeometry( 1.5, 1.5, 4, 8 ),
+					new THREE.TorusGeometry( 2, 0.8, 8, 16 ),
+					new THREE.OctahedronGeometry( 2.5 ),
+					new THREE.IcosahedronGeometry( 2.5 ),
+					new THREE.TorusKnotGeometry( 1.5, 0.5, 64, 8 )
+				];
+
+				// Create central showcase
+				const centralGroup = new THREE.Group();
+
+				// Large central torus
+				const centralTorus = new THREE.Mesh(
+					new THREE.TorusGeometry( 5, 1.5, 16, 32 ),
+					new THREE.MeshStandardMaterial( {
+						color: 0xffffff,
+						roughness: 0.1,
+						metalness: 1,
+						emissive: 0x222222
+					} )
+				);
+				centralGroup.add( centralTorus );
+
+				// Inner rotating shapes
+				for ( let i = 0; i < 6; i ++ ) {
+
+					const angle = ( i / 6 ) * Math.PI * 2;
+					const radius = 3;
+
+					const mesh = new THREE.Mesh(
+						geometries[ i % geometries.length ],
+						materials[ i % materials.length ]
+					);
+
+					mesh.position.set(
+						Math.cos( angle ) * radius,
+						0,
+						Math.sin( angle ) * radius
+					);
+
+					mesh.scale.setScalar( 0.5 );
+					centralGroup.add( mesh );
+					shapes.push( mesh );
+
+				}
+
+				mainGroup.add( centralGroup );
+				shapes.push( centralGroup );
+
+				// Create outer ring of shapes
+				const numShapes = 12;
+				const outerRadius = 15;
+
+				for ( let i = 0; i < numShapes; i ++ ) {
+
+					const angle = ( i / numShapes ) * Math.PI * 2;
+					const shapesGroup = new THREE.Group();
+
+					const geometry = geometries[ i % geometries.length ];
+					const material = materials[ i % materials.length ];
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					shapesGroup.add( mesh );
+					shapesGroup.position.set(
+						Math.cos( angle ) * outerRadius,
+						Math.sin( i * 0.5 ) * 2,
+						Math.sin( angle ) * outerRadius
+					);
+
+					mainGroup.add( shapesGroup );
+					shapes.push( shapesGroup );
+
+				}
+
+				// Add floating particles
+				const particlesGeometry = new THREE.BufferGeometry();
+				const particlesCount = 200;
+				const positions = new Float32Array( particlesCount * 3 );
+
+				for ( let i = 0; i < particlesCount * 3; i += 3 ) {
+
+					const radius = 25 + Math.random() * 10;
+					const theta = Math.random() * Math.PI * 2;
+					const phi = Math.random() * Math.PI;
+
+					positions[ i ] = radius * Math.sin( phi ) * Math.cos( theta );
+					positions[ i + 1 ] = radius * Math.cos( phi );
+					positions[ i + 2 ] = radius * Math.sin( phi ) * Math.sin( theta );
+
+				}
+
+				particlesGeometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+				const particlesMaterial = new THREE.PointsMaterial( {
+					color: 0xffffff,
+					size: 0.5,
+					sizeAttenuation: true
+				} );
+
+				const particles = new THREE.Points( particlesGeometry, particlesMaterial );
+				mainGroup.add( particles );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const time = clock.getElapsedTime();
+
+				controls.update();
+
+				if ( params.animated ) {
+
+					// Animate individual shapes
+					mainGroup.children.forEach( ( child, index ) => {
+
+						if ( child.children.length > 0 ) {
+
+							// Central group
+							child.rotation.y = time * 0.5;
+							child.children.forEach( ( subChild, subIndex ) => {
+
+								if ( subChild.geometry ) {
+
+									subChild.rotation.x = time * ( 1 + subIndex * 0.1 );
+									subChild.rotation.z = time * ( 1 - subIndex * 0.1 );
+
+								}
+
+							} );
+
+						} else if ( child.type === 'Group' ) {
+
+							// Outer shapes
+							child.rotation.x = time * 0.5 + index;
+							child.rotation.y = time * 0.3 + index;
+							child.position.y = Math.sin( time + index ) * 2;
+
+						}
+
+					} );
+
+				}
+
+				postProcessing.render();
+			
+			}
+
+		</script>
+
+	</body>
+</html>

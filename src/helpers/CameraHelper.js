@@ -5,7 +5,7 @@ import { Color } from '../math/Color.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { WebGLCoordinateSystem } from '../constants.js';
+import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 const _camera = /*@__PURE__*/ new Camera();
@@ -14,7 +14,7 @@ const _camera = /*@__PURE__*/ new Camera();
  * This helps with visualizing what a camera contains in its frustum. It
  * visualizes the frustum of a camera using a line segments.
  *
- * Based on frustum visualization in [lightgl.js shadowmap example]{@link https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html}.
+ * Based on frustum visualization in [lightgl.js shadowmap example](https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html).
  *
  * `CameraHelper` must be a child of the scene.
  *
@@ -159,6 +159,7 @@ class CameraHelper extends LineSegments {
 	 * @param {Color} up - The up line color.
 	 * @param {Color} target - The target line color.
 	 * @param {Color} cross - The cross line color.
+	 * @return {CameraHelper} A reference to this helper.
 	 */
 	setColors( frustum, cone, up, target, cross ) {
 
@@ -215,6 +216,8 @@ class CameraHelper extends LineSegments {
 
 		colorAttribute.needsUpdate = true;
 
+		return this;
+
 	}
 
 	/**
@@ -227,17 +230,44 @@ class CameraHelper extends LineSegments {
 
 		const w = 1, h = 1;
 
+		let nearZ, farZ;
+
 		// we need just camera projection matrix inverse
 		// world matrix must be identity
 
 		_camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
 
 		// Adjust z values based on coordinate system
-		const nearZ = this.camera.coordinateSystem === WebGLCoordinateSystem ? - 1 : 0;
+
+		if ( this.camera.reversedDepth === true ) {
+
+			nearZ = 1;
+			farZ = 0;
+
+		} else {
+
+			if ( this.camera.coordinateSystem === WebGLCoordinateSystem ) {
+
+				nearZ = - 1;
+				farZ = 1;
+
+			} else if ( this.camera.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				nearZ = 0;
+				farZ = 1;
+
+			} else {
+
+				throw new Error( 'THREE.CameraHelper.update(): Invalid coordinate system: ' + this.camera.coordinateSystem );
+
+			}
+
+		}
+
 
 		// center / target
 		setPoint( 'c', pointMap, geometry, _camera, 0, 0, nearZ );
-		setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
+		setPoint( 't', pointMap, geometry, _camera, 0, 0, farZ );
 
 		// near
 
@@ -248,10 +278,10 @@ class CameraHelper extends LineSegments {
 
 		// far
 
-		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
-		setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
-		setPoint( 'f3', pointMap, geometry, _camera, - w, h, 1 );
-		setPoint( 'f4', pointMap, geometry, _camera, w, h, 1 );
+		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, farZ );
+		setPoint( 'f2', pointMap, geometry, _camera, w, - h, farZ );
+		setPoint( 'f3', pointMap, geometry, _camera, - w, h, farZ );
+		setPoint( 'f4', pointMap, geometry, _camera, w, h, farZ );
 
 		// up
 
@@ -261,10 +291,10 @@ class CameraHelper extends LineSegments {
 
 		// cross
 
-		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, 1 );
-		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, 1 );
-		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
-		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
+		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, farZ );
+		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, farZ );
+		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, farZ );
+		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, farZ );
 
 		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, nearZ );
 		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, nearZ );

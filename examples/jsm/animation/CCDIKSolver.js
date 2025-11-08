@@ -13,7 +13,7 @@ import {
 	Vector3
 } from 'three';
 
-const _q = new Quaternion();
+const _quaternion = new Quaternion();
 const _targetPos = new Vector3();
 const _targetVec = new Vector3();
 const _effectorPos = new Vector3();
@@ -26,7 +26,7 @@ const _vector = new Vector3();
 const _matrix = new Matrix4();
 
 /**
- * This class solves the Inverse Kinematics Problem with a [CCD Algorithm]{@link https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm}.
+ * This class solves the Inverse Kinematics Problem with a [CCD Algorithm](https://web.archive.org/web/20221206080850/https://sites.google.com/site/auraliusproject/ccd-algorithm).
  *
  * `CCDIKSolver` is designed to work with instances of {@link SkinnedMesh}.
  *
@@ -194,8 +194,8 @@ class CCDIKSolver {
 				_axis.crossVectors( _effectorVec, _targetVec );
 				_axis.normalize();
 
-				_q.setFromAxisAngle( _axis, angle );
-				link.quaternion.multiply( _q );
+				_quaternion.setFromAxisAngle( _axis, angle );
+				link.quaternion.multiply( _quaternion );
 
 				// TODO: re-consider the limitation specification
 				if ( limitation !== undefined ) {

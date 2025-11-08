@@ -146,7 +146,7 @@
 			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 			// Texture width for simulation
@@ -236,11 +236,11 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 
-				const rgbeLoader = new RGBELoader().setPath( './textures/equirectangular/' );
+				const hdrLoader = new HDRLoader().setPath( './textures/equirectangular/' );
 				const glbloader = new GLTFLoader().setPath( 'models/gltf/' );
 				glbloader.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) );
 
-				const [ env, model ] = await Promise.all( [ rgbeLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
+				const [ env, model ] = await Promise.all( [ hdrLoader.loadAsync( 'blouberg_sunrise_2_1k.hdr' ), glbloader.loadAsync( 'duck.glb' ) ] );
 				env.mapping = THREE.EquirectangularReflectionMapping;
 				scene.environment = env;
 				scene.background = env;
@@ -328,8 +328,8 @@
 				borderGeom.rotateY( Math.PI * 0.25 );
 				poolBorder = new THREE.Mesh( borderGeom, new THREE.MeshStandardMaterial( { color: 0x908877, roughness: 0.2 } ) );
 				scene.add( poolBorder );
-				borderGeom.receiveShadow = true;
-				borderGeom.castShadow = true;
+				poolBorder.receiveShadow = true;
+				poolBorder.castShadow = true;
 
 				// THREE.Mesh just for mouse raycasting
 				const geometryRay = new THREE.PlaneGeometry( BOUNDS, BOUNDS, 1, 1 );

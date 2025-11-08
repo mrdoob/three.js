@@ -4,12 +4,20 @@
 		<title>three.js webgpu - halftone</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Halftone
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Halftone</span>
+			</div>
+
+			<small>
+				Halftone effect.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -25,10 +33,11 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { color, mix, normalWorld, output, Fn, uniform, vec4, rotate, screenCoordinate, screenSize } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -45,7 +54,20 @@
 
 				clock = new THREE.Clock();
 
-				const gui = new GUI();
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.setClearColor( '#000000' );
+				document.body.appendChild( renderer.domElement );
+
+				// inspector/gui
+
+				renderer.inspector = new Inspector();
+
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				// lights
 
@@ -57,8 +79,8 @@
 				scene.add( directionalLight );
 
 				const lightsFolder = gui.addFolder( '💡 lights' );
-				lightsFolder.add( ambientLight, 'intensity', 0, 10, 0.001 ).name( 'ambientIntensity' );
-				lightsFolder.add( directionalLight, 'intensity', 0, 20, 0.001 ).name( 'directionalIntensity' );
+				lightsFolder.add( ambientLight, 'intensity', 0, 10, 0.001 ).name( 'ambient intensity' );
+				lightsFolder.add( directionalLight, 'intensity', 0, 20, 0.001 ).name( 'directional intensity' );
 
 				// halftone settings
 
@@ -114,16 +136,15 @@
 
 					const folder = gui.addFolder( `⚪️ halftone ${index}` );
 
-					folder.addColor( { color: uniforms.color.value.getHexString( THREE.SRGBColorSpace ) }, 'color' )
-						.onChange( value => uniforms.color.value.set( value ) );
+					folder.addColor( { color: uniforms.color.value }, 'color' );
 					folder.add( uniforms.count, 'value', 1, 200, 1 ).name( 'count' );
 					folder.add( uniforms.direction.value, 'x', - 1, 1, 0.01 ).listen();
 					folder.add( uniforms.direction.value, 'y', - 1, 1, 0.01 ).listen();
 					folder.add( uniforms.direction.value, 'z', - 1, 1, 0.01 ).listen();
 					folder.add( uniforms.start, 'value', - 1, 1, 0.01 ).name( 'start' );
 					folder.add( uniforms.end, 'value', - 1, 1, 0.01 ).name( 'end' );
-					folder.add( uniforms.mixLow, 'value', 0, 1, 0.01 ).name( 'mixLow' );
-					folder.add( uniforms.mixHigh, 'value', 0, 1, 0.01 ).name( 'mixHigh' );
+					folder.add( uniforms.mixLow, 'value', 0, 1, 0.01 ).name( 'mix low' );
+					folder.add( uniforms.mixHigh, 'value', 0, 1, 0.01 ).name( 'mix high' );
 					folder.add( uniforms.radius, 'value', 0, 1, 0.01 ).name( 'radius' );
 
 				}
@@ -145,10 +166,8 @@
 
 					// mask
 
-					const mask = gridUv
-						.sub( 0.5 )
-						.length()
-						.step( orientationStrength.mul( radius ).mul( 0.5 ) )
+					const mask = orientationStrength.mul( radius ).mul( 0.5 )
+						.step( gridUv.sub( 0.5 ).length() )
 						.mul( mix( mixLow, mixHigh, orientationStrength ) );
 
 					return vec4( color, mask );
@@ -176,8 +195,7 @@
 				defaultMaterial.outputNode = halftones( output );
 
 				const folder = gui.addFolder( '🎨 default material' );
-				folder.addColor( { color: defaultMaterial.color.getHexString( THREE.SRGBColorSpace ) }, 'color' )
-					.onChange( value => defaultMaterial.color.set( value ) );
+				folder.addColor( { color: defaultMaterial.color }, 'color' );
 
 				// objects
 
@@ -215,14 +233,7 @@
 					}
 				);
 
-				// renderer
-
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				renderer.setClearColor( '#000000' );
-				document.body.appendChild( renderer.domElement );
+				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;

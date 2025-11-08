@@ -6,6 +6,7 @@ import { Bone } from './Bone.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { generateUUID } from '../math/MathUtils.js';
+import { warn } from '../utils.js';
 
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
@@ -106,7 +107,7 @@ class Skeleton {
 
 			if ( bones.length !== boneInverses.length ) {
 
-				console.warn( 'THREE.Skeleton: Number of inverse bone matrices does not match amount of bones.' );
+				warn( 'Skeleton: Number of inverse bone matrices does not match amount of bones.' );
 
 				this.boneInverses = [];
 
@@ -324,7 +325,7 @@ class Skeleton {
 
 			if ( bone === undefined ) {
 
-				console.warn( 'THREE.Skeleton: No bone found with UUID:', uuid );
+				warn( 'Skeleton: No bone found with UUID:', uuid );
 				bone = new Bone();
 
 			}
@@ -350,7 +351,7 @@ class Skeleton {
 
 		const data = {
 			metadata: {
-				version: 4.6,
+				version: 4.7,
 				type: 'Skeleton',
 				generator: 'Skeleton.toJSON'
 			},

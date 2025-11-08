@@ -72,7 +72,7 @@ function reversePainterSortStable( a, b ) {
  */
 function needsDoublePass( material ) {
 
-	const hasTransmission = material.transmission > 0 || material.transmissionNode;
+	const hasTransmission = material.transmission > 0 || ( material.transmissionNode && material.transmissionNode.isNode );
 
 	return hasTransmission && material.side === DoubleSide && material.forceSinglePass === false;
 
@@ -283,7 +283,9 @@ class RenderList {
 
 		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
 
-		if ( material.transparent === true || material.transmission > 0 ) {
+		if ( material.transparent === true || material.transmission > 0 ||
+			( material.transmissionNode && material.transmissionNode.isNode ) ||
+			( material.backdropNode && material.backdropNode.isNode ) ) {
 
 			if ( needsDoublePass( material ) ) this.transparentDoublePass.push( renderItem );
 
@@ -313,7 +315,9 @@ class RenderList {
 
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
-		if ( material.transparent === true || material.transmission > 0 ) {
+		if ( material.transparent === true || material.transmission > 0 ||
+			( material.transmissionNode && material.transmissionNode.isNode ) ||
+			( material.backdropNode && material.backdropNode.isNode ) ) {
 
 			if ( needsDoublePass( material ) ) this.transparentDoublePass.unshift( renderItem );
 

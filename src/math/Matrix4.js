@@ -5,7 +5,7 @@ import { Vector3 } from './Vector3.js';
  * Represents a 4x4 matrix.
  *
  * The most common use of a 4x4 matrix in 3D computer graphics is as a transformation matrix.
- * For an introduction to transformation matrices as used in WebGL, check out [this tutorial]{@link https://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices}
+ * For an introduction to transformation matrices as used in WebGL, check out [this tutorial](https://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices)
  *
  * This allows a 3D vector representing a point in 3D space to undergo
  * transformations such as translation, rotation, shear, scale, reflection,
@@ -15,7 +15,7 @@ import { Vector3 } from './Vector3.js';
  * A Note on Row-Major and Column-Major Ordering:
  *
  * The constructor and {@link Matrix3#set} method take arguments in
- * [row-major]{@link https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order}
+ * [row-major](https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order)
  * order, while internally they are stored in the {@link Matrix3#elements} array in column-major order.
  * This means that calling:
  * ```js
@@ -309,7 +309,7 @@ class Matrix4 {
 	 * Sets the rotation component (the upper left 3x3 matrix) of this matrix to
 	 * the rotation specified by the given Euler angles. The rest of
 	 * the matrix is set to the identity. Depending on the {@link Euler#order},
-	 * there are six possible outcomes. See [this page]{@link https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix}
+	 * there are six possible outcomes. See [this page](https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix)
 	 * for a complete list.
 	 *
 	 * @param {Euler} euler - The Euler angles.
@@ -439,7 +439,7 @@ class Matrix4 {
 
 	/**
 	 * Sets the rotation component of this matrix to the rotation specified by
-	 * the given Quaternion as outlined [here]{@link https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion}
+	 * the given Quaternion as outlined [here](https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion)
 	 * The rest of the matrix is set to the identity.
 	 *
 	 * @param {Quaternion} q - The Quaternion.
@@ -601,7 +601,7 @@ class Matrix4 {
 	/**
 	 * Computes and returns the determinant of this matrix.
 	 *
-	 * Based on the method outlined [here]{@link http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.html}.
+	 * Based on the method outlined [here](http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.html).
 	 *
 	 * @return {number} The determinant.
 	 */
@@ -614,43 +614,18 @@ class Matrix4 {
 		const n31 = te[ 2 ], n32 = te[ 6 ], n33 = te[ 10 ], n34 = te[ 14 ];
 		const n41 = te[ 3 ], n42 = te[ 7 ], n43 = te[ 11 ], n44 = te[ 15 ];
 
-		//TODO: make this more efficient
+		const t11 = n23 * n34 - n24 * n33;
+		const t12 = n22 * n34 - n24 * n32;
+		const t13 = n22 * n33 - n23 * n32;
 
-		return (
-			n41 * (
-				+ n14 * n23 * n32
-				 - n13 * n24 * n32
-				 - n14 * n22 * n33
-				 + n12 * n24 * n33
-				 + n13 * n22 * n34
-				 - n12 * n23 * n34
-			) +
-			n42 * (
-				+ n11 * n23 * n34
-				 - n11 * n24 * n33
-				 + n14 * n21 * n33
-				 - n13 * n21 * n34
-				 + n13 * n24 * n31
-				 - n14 * n23 * n31
-			) +
-			n43 * (
-				+ n11 * n24 * n32
-				 - n11 * n22 * n34
-				 - n14 * n21 * n32
-				 + n12 * n21 * n34
-				 + n14 * n22 * n31
-				 - n12 * n24 * n31
-			) +
-			n44 * (
-				- n13 * n22 * n31
-				 - n11 * n23 * n32
-				 + n11 * n22 * n33
-				 + n13 * n21 * n32
-				 - n12 * n21 * n33
-				 + n12 * n23 * n31
-			)
+		const t21 = n21 * n34 - n24 * n31;
+		const t22 = n21 * n33 - n23 * n31;
+		const t23 = n21 * n32 - n22 * n31;
 
-		);
+		return n11 * ( n42 * t11 - n43 * t12 + n44 * t13 ) -
+			n12 * ( n41 * t11 - n43 * t21 + n44 * t22 ) +
+			n13 * ( n41 * t12 - n42 * t21 + n44 * t23 ) -
+			n14 * ( n41 * t13 - n42 * t22 + n43 * t23 );
 
 	}
 
@@ -708,7 +683,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Inverts this matrix, using the [analytic method]{@link https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution}.
+	 * Inverts this matrix, using the [analytic method](https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution).
 	 * You can not invert with a determinant of zero. If you attempt this, the method produces
 	 * a zero matrix instead.
 	 *
@@ -911,7 +886,7 @@ class Matrix4 {
 	 * the given angle.
 	 *
 	 * This is a somewhat controversial but mathematically sound alternative to
-	 * rotating via Quaternions. See the discussion [here]{@link https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199}.
+	 * rotating via Quaternions. See the discussion [here](https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199).
 	 *
 	 * @param {Vector3} axis - The normalized rotation axis.
 	 * @param {number} angle - The rotation in radians.
@@ -1103,11 +1078,13 @@ class Matrix4 {
 	 * @param {number} near - The distance from the camera to the near plane.
 	 * @param {number} far - The distance from the camera to the far plane.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
-	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
+	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
+
 		const x = 2 * near / ( right - left );
 		const y = 2 * near / ( top - bottom );
 
@@ -1116,19 +1093,28 @@ class Matrix4 {
 
 		let c, d;
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		if ( reversedDepth ) {
 
-			c = - ( far + near ) / ( far - near );
-			d = ( - 2 * far * near ) / ( far - near );
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			c = - far / ( far - near );
-			d = ( - far * near ) / ( far - near );
+			c = near / ( far - near );
+			d = ( far * near ) / ( far - near );
 
 		} else {
 
-			throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				c = - ( far + near ) / ( far - near );
+				d = ( - 2 * far * near ) / ( far - near );
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				c = - far / ( far - near );
+				d = ( - far * near ) / ( far - near );
+
+			} else {
+
+				throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
@@ -1152,39 +1138,49 @@ class Matrix4 {
 	 * @param {number} near - The distance from the camera to the near plane.
 	 * @param {number} far - The distance from the camera to the far plane.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Matrix4} A reference to this matrix.
 	 */
-	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
+	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const te = this.elements;
-		const w = 1.0 / ( right - left );
-		const h = 1.0 / ( top - bottom );
-		const p = 1.0 / ( far - near );
 
-		const x = ( right + left ) * w;
-		const y = ( top + bottom ) * h;
+		const x = 2 / ( right - left );
+		const y = 2 / ( top - bottom );
 
-		let z, zInv;
+		const a = - ( right + left ) / ( right - left );
+		const b = - ( top + bottom ) / ( top - bottom );
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		let c, d;
 
-			z = ( far + near ) * p;
-			zInv = - 2 * p;
+		if ( reversedDepth ) {
 
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			z = near * p;
-			zInv = - 1 * p;
+			c = 1 / ( far - near );
+			d = far / ( far - near );
 
 		} else {
 
-			throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				c = - 2 / ( far - near );
+				d = - ( far + near ) / ( far - near );
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				c = - 1 / ( far - near );
+				d = - near / ( far - near );
+
+			} else {
+
+				throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
-		te[ 0 ] = 2 * w;	te[ 4 ] = 0;		te[ 8 ] = 0; 		te[ 12 ] = - x;
-		te[ 1 ] = 0; 		te[ 5 ] = 2 * h;	te[ 9 ] = 0; 		te[ 13 ] = - y;
-		te[ 2 ] = 0; 		te[ 6 ] = 0;		te[ 10 ] = zInv;	te[ 14 ] = - z;
+		te[ 0 ] = x;		te[ 4 ] = 0;		te[ 8 ] = 0; 		te[ 12 ] = a;
+		te[ 1 ] = 0; 		te[ 5 ] = y;		te[ 9 ] = 0; 		te[ 13 ] = b;
+		te[ 2 ] = 0; 		te[ 6 ] = 0;		te[ 10 ] = c;		te[ 14 ] = d;
 		te[ 3 ] = 0; 		te[ 7 ] = 0;		te[ 11 ] = 0;		te[ 15 ] = 1;
 
 		return this;

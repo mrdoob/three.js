@@ -154,6 +154,40 @@ class Bindings extends DataMap {
 	}
 
 	/**
+	 * Deletes the bindings for the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
+	deleteForCompute( computeNode ) {
+
+		const bindings = this.nodes.getForCompute( computeNode ).bindings;
+
+		for ( const bindGroup of bindings ) {
+
+			this.delete( bindGroup );
+
+		}
+
+	}
+
+	/**
+	 * Deletes the bindings for the given renderObject node.
+	 *
+	 * @param {RenderObject} renderObject - The renderObject.
+	 */
+	deleteForRender( renderObject ) {
+
+		const bindings = renderObject.getBindings();
+
+		for ( const bindGroup of bindings ) {
+
+			this.delete( bindGroup );
+
+		}
+
+	}
+
+	/**
 	 * Updates the given array of bindings.
 	 *
 	 * @param {Array<BindGroup>} bindings - The bind groups.
@@ -180,6 +214,10 @@ class Bindings extends DataMap {
 			if ( binding.isSampledTexture ) {
 
 				this.textures.updateTexture( binding.texture );
+
+			} else if ( binding.isSampler ) {
+
+				this.textures.updateSampler( binding.texture );
 
 			} else if ( binding.isStorageBuffer ) {
 
@@ -244,23 +282,32 @@ class Bindings extends DataMap {
 
 				}
 
-			} else if ( binding.isSampler ) {
-
-				binding.update();
-
 			} else if ( binding.isSampledTexture ) {
-
-				const texturesTextureData = this.textures.get( binding.texture );
-
-				if ( binding.needsBindingsUpdate( texturesTextureData.generation ) ) needsBindingsUpdate = true;
 
 				const updated = binding.update();
 
+				// get the texture data after the update, to sync the texture reference from node
+
 				const texture = binding.texture;
+				const texturesTextureData = this.textures.get( texture );
 
 				if ( updated ) {
 
+					// version: update the texture data or create a new one
+
 					this.textures.updateTexture( texture );
+
+					// generation: update the bindings if a new texture has been created
+
+					if ( binding.generation !== texturesTextureData.generation ) {
+
+						binding.generation = texturesTextureData.generation;
+
+						needsBindingsUpdate = true;
+
+						cacheBindings = false;
+
+					}
 
 				}
 
@@ -277,17 +324,7 @@ class Bindings extends DataMap {
 
 				}
 
-				if ( backend.isWebGPUBackend === true && textureData.texture === undefined && textureData.externalTexture === undefined ) {
-
-					// TODO: Remove this once we found why updated === false isn't bound to a texture in the WebGPU backend
-					console.error( 'Bindings._update: binding should be available:', binding, updated, texture, binding.textureNode.value, needsBindingsUpdate );
-
-					this.textures.updateTexture( texture );
-					needsBindingsUpdate = true;
-
-				}
-
-				if ( texture.isStorageTexture === true ) {
+				if ( texture.isStorageTexture === true && texture.mipmapsAutoUpdate === true ) {
 
 					const textureData = this.get( texture );
 
@@ -300,6 +337,26 @@ class Bindings extends DataMap {
 						this.backend.generateMipmaps( texture );
 
 						textureData.needsMipmap = false;
+
+					}
+
+				}
+
+			} else if ( binding.isSampler ) {
+
+				const updated = binding.update();
+
+				if ( updated ) {
+
+					const samplerKey = this.textures.updateSampler( binding.texture );
+
+					if ( binding.samplerKey !== samplerKey ) {
+
+						binding.samplerKey = samplerKey;
+
+						needsBindingsUpdate = true;
+
+						cacheBindings = false;
 
 					}
 

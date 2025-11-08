@@ -52,8 +52,9 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
-import { createCanvasElement, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, warnOnce } from '../utils.js';
+import { createCanvasElement, probeAsync, warnOnce, error, warn, log } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
+import { getDFGLUT } from './shaders/DFGLUTData.js';
 
 /**
  * This renderer uses WebGL 2 to display scenes.
@@ -80,7 +81,7 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
-			reverseDepthBuffer = false,
+			reversedDepthBuffer = false,
 		} = parameters;
 
 		/**
@@ -110,6 +111,21 @@ class WebGLRenderer {
 
 		}
 
+		const INTEGER_FORMATS = new Set( [
+			RGBAIntegerFormat,
+			RGIntegerFormat,
+			RedIntegerFormat
+		] );
+
+		const UNSIGNED_TYPES = new Set( [
+			UnsignedByteType,
+			UnsignedIntType,
+			UnsignedShortType,
+			UnsignedInt248Type,
+			UnsignedShort4444Type,
+			UnsignedShort5551Type
+		] );
+
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
 
@@ -131,7 +147,7 @@ class WebGLRenderer {
 		 * document.body.appendChild( renderer.domElement );
 		 * ```
 		 *
-		 * @type {DOMElement}
+		 * @type {HTMLCanvasElement|OffscreenCanvas}
 		 */
 		this.domElement = canvas;
 
@@ -313,7 +329,6 @@ class WebGLRenderer {
 
 		// camera matrices cache
 
-		const _currentProjectionMatrix = new Matrix4();
 		const _projScreenMatrix = new Matrix4();
 
 		const _vector3 = new Vector3();
@@ -385,7 +400,7 @@ class WebGLRenderer {
 
 		} catch ( error ) {
 
-			console.error( 'THREE.WebGLRenderer: ' + error.message );
+			error( 'WebGLRenderer: ' + error.message );
 			throw error;
 
 		}
@@ -409,7 +424,7 @@ class WebGLRenderer {
 
 			state = new WebGLState( _gl, extensions );
 
-			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) {
+			if ( capabilities.reversedDepthBuffer && reversedDepthBuffer ) {
 
 				state.buffers.depth.setReversed( true );
 
@@ -622,7 +637,7 @@ class WebGLRenderer {
 
 			if ( xr.isPresenting ) {
 
-				console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
+				warn( 'WebGLRenderer: Can\'t change size while VR device is presenting.' );
 				return;
 
 			}
@@ -884,9 +899,7 @@ class WebGLRenderer {
 				if ( _currentRenderTarget !== null ) {
 
 					const targetFormat = _currentRenderTarget.texture.format;
-					isIntegerFormat = targetFormat === RGBAIntegerFormat ||
-						targetFormat === RGIntegerFormat ||
-						targetFormat === RedIntegerFormat;
+					isIntegerFormat = INTEGER_FORMATS.has( targetFormat );
 
 				}
 
@@ -895,12 +908,7 @@ class WebGLRenderer {
 				if ( isIntegerFormat ) {
 
 					const targetType = _currentRenderTarget.texture.type;
-					const isUnsignedType = targetType === UnsignedByteType ||
-						targetType === UnsignedIntType ||
-						targetType === UnsignedShortType ||
-						targetType === UnsignedInt248Type ||
-						targetType === UnsignedShort4444Type ||
-						targetType === UnsignedShort5551Type;
+					const isUnsignedType = UNSIGNED_TYPES.has( targetType );
 
 					const clearColor = background.getClearColor();
 					const a = background.getClearAlpha();
@@ -1014,7 +1022,7 @@ class WebGLRenderer {
 
 			event.preventDefault();
 
-			console.log( 'THREE.WebGLRenderer: Context Lost.' );
+			log( 'WebGLRenderer: Context Lost.' );
 
 			_isContextLost = true;
 
@@ -1022,7 +1030,7 @@ class WebGLRenderer {
 
 		function onContextRestore( /* event */ ) {
 
-			console.log( 'THREE.WebGLRenderer: Context Restored.' );
+			log( 'WebGLRenderer: Context Restored.' );
 
 			_isContextLost = false;
 
@@ -1044,7 +1052,7 @@ class WebGLRenderer {
 
 		function onContextCreationError( event ) {
 
-			console.error( 'THREE.WebGLRenderer: A WebGL context could not be created. Reason: ', event.statusMessage );
+			error( 'WebGLRenderer: A WebGL context could not be created. Reason: ', event.statusMessage );
 
 		}
 
@@ -1217,7 +1225,7 @@ class WebGLRenderer {
 				if ( object._multiDrawInstances !== null ) {
 
 					// @deprecated, r174
-					warnOnce( 'THREE.WebGLRenderer: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
+					warnOnce( 'WebGLRenderer: renderMultiDrawInstances has been deprecated and will be removed in r184. Append to renderMultiDraw arguments and use indirection.' );
 					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
 				} else {
@@ -1493,6 +1501,13 @@ class WebGLRenderer {
 
 		if ( typeof self !== 'undefined' ) animation.setContext( self );
 
+		/**
+		 * Applications are advised to always define the animation loop
+		 * with this method and not manually with `requestAnimationFrame()`
+		 * for best compatibility.
+		 *
+		 * @param {?onAnimationCallback} callback - The application's animation loop.
+		 */
 		this.setAnimationLoop = function ( callback ) {
 
 			onAnimationFrameCallback = callback;
@@ -1525,7 +1540,7 @@ class WebGLRenderer {
 
 			if ( camera !== undefined && camera.isCamera !== true ) {
 
-				console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
+				error( 'WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 				return;
 
 			}
@@ -1557,7 +1572,7 @@ class WebGLRenderer {
 			renderStateStack.push( currentRenderState );
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			_frustum.setFromProjectionMatrix( _projScreenMatrix );
+			_frustum.setFromProjectionMatrix( _projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth );
 
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
@@ -1823,9 +1838,7 @@ class WebGLRenderer {
 
 		function renderScene( currentRenderList, scene, camera, viewport ) {
 
-			const opaqueObjects = currentRenderList.opaque;
-			const transmissiveObjects = currentRenderList.transmissive;
-			const transparentObjects = currentRenderList.transparent;
+			const { opaque: opaqueObjects, transmissive: transmissiveObjects, transparent: transparentObjects } = currentRenderList;
 
 			currentRenderState.setupLightsView( camera );
 
@@ -1890,6 +1903,9 @@ class WebGLRenderer {
 			//
 
 			const currentRenderTarget = _this.getRenderTarget();
+			const currentActiveCubeFace = _this.getActiveCubeFace();
+			const currentActiveMipmapLevel = _this.getActiveMipmapLevel();
+
 			_this.setRenderTarget( transmissionRenderTarget );
 
 			_this.getClearColor( _currentClearColor );
@@ -1927,10 +1943,7 @@ class WebGLRenderer {
 
 					const renderItem = transmissiveObjects[ i ];
 
-					const object = renderItem.object;
-					const geometry = renderItem.geometry;
-					const material = renderItem.material;
-					const group = renderItem.group;
+					const { object, geometry, material, group } = renderItem;
 
 					if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
 
@@ -1959,7 +1972,7 @@ class WebGLRenderer {
 
 			}
 
-			_this.setRenderTarget( currentRenderTarget );
+			_this.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 
 			_this.setClearColor( _currentClearColor, _currentClearAlpha );
 
@@ -1977,9 +1990,7 @@ class WebGLRenderer {
 
 				const renderItem = renderList[ i ];
 
-				const object = renderItem.object;
-				const geometry = renderItem.geometry;
-				const group = renderItem.group;
+				const { object, geometry, group } = renderItem;
 				let material = renderItem.material;
 
 				if ( material.allowOverride === true && overrideMaterial !== null ) {
@@ -2377,22 +2388,16 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				const reverseDepthBuffer = state.buffers.depth.getReversed();
+				const reversedDepthBuffer = state.buffers.depth.getReversed();
 
-				if ( reverseDepthBuffer ) {
+				if ( reversedDepthBuffer && camera.reversedDepth !== true ) {
 
-					_currentProjectionMatrix.copy( camera.projectionMatrix );
-
-					toNormalizedProjectionMatrix( _currentProjectionMatrix );
-					toReversedProjectionMatrix( _currentProjectionMatrix );
-
-					p_uniforms.setValue( _gl, 'projectionMatrix', _currentProjectionMatrix );
-
-				} else {
-
-					p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+					camera._reversedDepth = true;
+					camera.updateProjectionMatrix();
 
 				}
+
+				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -2505,6 +2510,13 @@ class WebGLRenderer {
 			if ( material.isMeshStandardMaterial && material.envMap === null && scene.environment !== null ) {
 
 				m_uniforms.envMapIntensity.value = scene.environmentIntensity;
+
+			}
+
+			// Set DFG LUT for physically-based materials
+			if ( m_uniforms.dfgLUT !== undefined ) {
+
+				m_uniforms.dfgLUT.value = getDFGLUT();
 
 			}
 
@@ -2815,9 +2827,15 @@ class WebGLRenderer {
 
 			} else if ( isRenderTarget3D ) {
 
-				const textureProperties = properties.get( renderTarget.texture );
 				const layer = activeCubeFace;
-				_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureProperties.__webglTexture, activeMipmapLevel, layer );
+
+				for ( let i = 0; i < renderTarget.textures.length; i ++ ) {
+
+					const textureProperties = properties.get( renderTarget.textures[ i ] );
+
+					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, textureProperties.__webglTexture, activeMipmapLevel, layer );
+
+				}
 
 			} else if ( renderTarget !== null && activeMipmapLevel !== 0 ) {
 
@@ -2842,12 +2860,13 @@ class WebGLRenderer {
 		 * @param {number} height - The height of the copy region.
 		 * @param {TypedArray} buffer - The result buffer.
 		 * @param {number} [activeCubeFaceIndex] - The active cube face index.
+		 * @param {number} [textureIndex=0] - The texture index of an MRT render target.
 		 */
-		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
+		this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
 
 			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
-				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+				error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 				return;
 
 			}
@@ -2866,20 +2885,20 @@ class WebGLRenderer {
 
 				try {
 
-					const texture = renderTarget.texture;
+					const texture = renderTarget.textures[ textureIndex ];
 					const textureFormat = texture.format;
 					const textureType = texture.type;
 
 					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
-						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
+						error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 						return;
 
 					}
 
 					if ( ! capabilities.textureTypeReadable( textureType ) ) {
 
-						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
+						error( 'WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 						return;
 
 					}
@@ -2887,6 +2906,10 @@ class WebGLRenderer {
 					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 
 					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
+
+						// when using MRT, select the correct color buffer for the subsequent read command
+
+						if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
 
 						_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), buffer );
 
@@ -2918,9 +2941,10 @@ class WebGLRenderer {
 		 * @param {number} height - The height of the copy region.
 		 * @param {TypedArray} buffer - The result buffer.
 		 * @param {number} [activeCubeFaceIndex] - The active cube face index.
+		 * @param {number} [textureIndex=0] - The texture index of an MRT render target.
 		 * @return {Promise<TypedArray>} A Promise that resolves when the read has been finished. The resolve provides the read data as a typed array.
 		 */
-		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
+		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, textureIndex = 0 ) {
 
 			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
@@ -2943,7 +2967,7 @@ class WebGLRenderer {
 					// set the active frame buffer to the one we want to read
 					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
-					const texture = renderTarget.texture;
+					const texture = renderTarget.textures[ textureIndex ];
 					const textureFormat = texture.format;
 					const textureType = texture.type;
 
@@ -2962,6 +2986,11 @@ class WebGLRenderer {
 					const glBuffer = _gl.createBuffer();
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
 					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
+
+					// when using MRT, select the correct color buffer for the subsequent read command
+
+					if ( renderTarget.textures.length > 1 ) _gl.readBuffer( _gl.COLOR_ATTACHMENT0 + textureIndex );
+
 					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
 
 					// reset the frame buffer to the currently set buffer before waiting
@@ -3285,15 +3314,6 @@ class WebGLRenderer {
 
 		};
 
-		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
-
-			// @deprecated, r170
-			warnOnce( 'WebGLRenderer: copyTextureToTexture3D function has been deprecated. Use "copyTextureToTexture" instead.' );
-
-			return this.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
-
-		};
-
 		/**
 		 * Initializes the given WebGLRenderTarget memory. Useful for initializing a render target so data
 		 * can be copied into it using {@link WebGLRenderer#copyTextureToTexture} before it has been
@@ -3410,7 +3430,7 @@ class WebGLRenderer {
  * WebGLRenderer options.
  *
  * @typedef {Object} WebGLRenderer~Options
- * @property {DOMElement} [canvas=null] - A canvas element where the renderer draws its output. If not passed in here, a new canvas element will be created by the renderer.
+ * @property {HTMLCanvasElement|OffscreenCanvas} [canvas=null] - A canvas element where the renderer draws its output. If not passed in here, a new canvas element will be created by the renderer.
  * @property {WebGL2RenderingContext} [context=null] - Can be used to attach an existing rendering context to this renderer.
  * @property {('highp'|'mediump'|'lowp')} [precision='highp'] - The default shader precision. Uses `highp` if supported by the device.
  * @property {boolean} [alpha=false] - Controls the default clear alpha value. When set to`true`, the value is `0`. Otherwise it's `1`.
@@ -3423,7 +3443,7 @@ class WebGLRenderer {
  * @property {boolean} [depth=true] Whether the drawing buffer has a depth buffer of at least 16 bits.
  * @property {boolean} [logarithmicDepthBuffer=false] Whether to use a logarithmic depth buffer. It may be necessary to use this if dealing with huge differences in scale in a single scene.
  * Note that this setting uses `gl_FragDepth` if available which disables the Early Fragment Test optimization and can cause a decrease in performance.
- * @property {boolean} [reverseDepthBuffer=false] Whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
+ * @property {boolean} [reversedDepthBuffer=false] Whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
  * This is a more faster and accurate version than logarithmic depth buffer.
  **/
 
@@ -3444,7 +3464,7 @@ class WebGLRenderer {
  * @property {number} maxVertexTextures - The number of textures that can be used in a vertex shader.
  * @property {number} maxVertexUniforms - The maximum number of uniforms that can be used in a vertex shader.
  * @property {string} precision - The shader precision currently being used by the renderer.
- * @property {boolean} reverseDepthBuffer - `true` if `reverseDepthBuffer` was set to `true` in the constructor
+ * @property {boolean} reversedDepthBuffer - `true` if `reversedDepthBuffer` was set to `true` in the constructor
  * and the rendering context supports `EXT_clip_control`.
  * @property {boolean} vertexTextures - `true` if vertex textures can be used.
  **/

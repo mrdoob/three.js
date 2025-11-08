@@ -183,7 +183,7 @@ class LOD extends Object3D {
 	 * the given distance.
 	 *
 	 * @param {number} distance - The LOD distance.
-	 * @return {Object3D|null} The found 3D object. `null` if no 3D object has been found.
+	 * @return {?Object3D} The found 3D object. `null` if no 3D object has been found.
 	 */
 	getObjectForDistance( distance ) {
 

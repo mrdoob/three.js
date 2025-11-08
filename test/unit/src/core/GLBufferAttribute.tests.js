@@ -51,6 +51,12 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.todo( 'normalized', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.todo( 'version', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );

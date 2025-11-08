@@ -4,7 +4,7 @@
 		<title>three.js webgpu - video panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 			body {
 				touch-action: none;
@@ -12,8 +12,15 @@
 		</style>
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - video panorama
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Video Panorama</span>
+			</div>
+
+			<small>Video panorama using equirectangular projection.</small>
 		</div>
 
 		<div id="container"></div>
@@ -36,7 +43,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			let camera, scene, renderer;
 

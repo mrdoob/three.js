@@ -161,8 +161,10 @@ export class PreviewEditor extends BaseNodeEditor {
 
 		}
 
-		await renderer.clearAsync();
-		await renderer.renderAsync( scene, camera );
+		if ( renderer.hasInitialized() === false ) await renderer.init();
+
+		renderer.clear();
+		renderer.render( scene, camera );
 
 		viewHelper.render( renderer );
 

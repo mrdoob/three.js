@@ -4,11 +4,18 @@
 		<title>three.js webgpu - post processing - Outline Pass</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Outline Pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Outline</span>
+			</div>
+
+			<small>Outline Pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>.</small>
 		</div>
 
 		<script type="importmap">
@@ -24,17 +31,15 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { pass, uniform, time, oscSine } from 'three/tsl';
 			import { outline } from 'three/addons/tsl/display/OutlineNode.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
-			let container, stats;
 			let camera, scene, renderer, controls;
 			let postProcessing, outlinePass;
 
@@ -50,17 +55,15 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
 				renderer = new THREE.WebGPURenderer();
-				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -167,11 +170,6 @@
 				torus.receiveShadow = true;
 				torus.castShadow = true;
 
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				// outline pass
 
 				const edgeStrength = uniform( 3.0 );
@@ -197,14 +195,14 @@
 
 				// postprocessing
 
-				const scenePass = pass( scene, camera );
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = outlinePulse.add( scenePass );
 
 				// gui
 
-				const gui = new GUI( { width: 280 } );
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( edgeStrength, 'value', 0.01, 10 ).name( 'edgeStrength' );
 				gui.add( edgeGlow, 'value', 0.0, 1 ).name( 'edgeGlow' );
 				gui.add( edgeThickness, 'value', 1, 4 ).name( 'edgeThickness' );
@@ -281,13 +279,9 @@
 
 			function animate() {
 
-				stats.begin();
-
 				controls.update();
 
 				postProcessing.render();
-
-				stats.end();
 
 			}
 

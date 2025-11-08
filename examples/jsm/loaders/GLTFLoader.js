@@ -70,7 +70,7 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
 /**
  * A loader for the glTF 2.0 format.
  *
- * [glTF]{@link https://www.khronos.org/gltf/} (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/main/specification/2.0}
+ * [glTF](https://www.khronos.org/gltf/} (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/main/specification/2.0)
  * for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf) or binary (.glb)
  * format. External files store textures (.jpg, .png) and additional binary data (.bin). A glTF asset may deliver
  * one or more scenes, including meshes, materials, textures, skins, skeletons, morph targets, animations, lights,
@@ -99,8 +99,10 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
  * - EXT_mesh_gpu_instancing
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
- * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
- * - [MSFT_texture_dds]{@link https://github.com/takahirox/three-gltf-extensions}
+ * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
+ * - [MSFT_texture_dds](https://github.com/takahirox/three-gltf-extensions)
+ * - [KHR_animation_pointer](https://github.com/needle-tools/three-animation-pointer)
+ * - [NEEDLE_progressive](https://github.com/needle-tools/gltf-progressive)
  *
  * ```js
  * const loader = new GLTFLoader();
@@ -2217,7 +2219,7 @@ class GLTFCubicSplineInterpolant extends Interpolant {
 
 }
 
-const _q = new Quaternion();
+const _quaternion = new Quaternion();
 
 class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
@@ -2225,7 +2227,7 @@ class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
 		const result = super.interpolate_( i1, t0, t, t1 );
 
-		_q.fromArray( result ).normalize().toArray( result );
+		_quaternion.fromArray( result ).normalize().toArray( result );
 
 		return result;
 
@@ -2376,7 +2378,7 @@ function addUnknownExtensionsToUserData( knownExtensions, object, objectDef ) {
 /**
  *
  * @private
- * @param {Object3D|Material|BufferGeometry|Object} object
+ * @param {Object3D|Material|BufferGeometry|Object|AnimationClip} object
  * @param {GLTF.definition} gltfDef
  */
 function assignExtrasToUserData( object, gltfDef ) {
@@ -2943,7 +2945,7 @@ class GLTFParser {
 	 * @private
 	 * @param {string} type
 	 * @param {number} index
-	 * @return {Promise<Object3D|Material|THREE.Texture|AnimationClip|ArrayBuffer|Object>}
+	 * @return {Promise<Object3D|Material|Texture|AnimationClip|ArrayBuffer|Object>}
 	 */
 	getDependency( type, index ) {
 
@@ -3283,7 +3285,7 @@ class GLTFParser {
 	 *
 	 * @private
 	 * @param {number} textureIndex
-	 * @return {Promise<THREE.Texture|null>}
+	 * @return {Promise<?Texture>}
 	 */
 	loadTexture( textureIndex ) {
 
@@ -4020,7 +4022,7 @@ class GLTFParser {
 	 *
 	 * @private
 	 * @param {number} cameraIndex
-	 * @return {Promise<THREE.Camera>}
+	 * @return {Promise<Camera>|undefined}
 	 */
 	loadCamera( cameraIndex ) {
 
@@ -4213,7 +4215,11 @@ class GLTFParser {
 
 			}
 
-			return new AnimationClip( animationName, undefined, tracks );
+			const animation = new AnimationClip( animationName, undefined, tracks );
+
+			assignExtrasToUserData( animation, animationDef );
+
+			return animation;
 
 		} );
 
@@ -4450,6 +4456,11 @@ class GLTFParser {
 			if ( ! parser.associations.has( node ) ) {
 
 				parser.associations.set( node, {} );
+
+			} else if ( nodeDef.mesh !== undefined && parser.meshCache.refs[ nodeDef.mesh ] > 1 ) {
+
+				const mapping = parser.associations.get( node );
+				parser.associations.set( node, { ...mapping } );
 
 			}
 

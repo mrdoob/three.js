@@ -4,14 +4,20 @@
 		<title>three.js webgpu - angular slicing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - angular slicing
-			<br>
-			Based on <a href="https://threejs-journey.com/lessons/sliced-model-shader" target="_blank" rel="noopener">Three.js Journey</a> lesson
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Angular Slicing</span>
+			</div>
+
+			<small>
+				Based on <a href="https://threejs-journey.com/lessons/sliced-model-shader" target="_blank" rel="noopener">Three.js Journey</a> lesson.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,14 +33,15 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { If, PI2, atan, color, frontFacing, output, positionLocal, Fn, uniform, vec4 } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { If, TWO_PI, atan, color, frontFacing, output, positionLocal, Fn, uniform, vec4 } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, controls;
 
@@ -47,12 +54,10 @@
 
 				scene = new THREE.Scene();
 
-				const gui = new GUI();
-
 				// environment
 
-				const rgbeLoader = new RGBELoader();
-				rgbeLoader.load( './textures/equirectangular/royal_esplanade_1k.hdr', ( environmentMap ) => {
+				const hdrLoader = new HDRLoader();
+				hdrLoader.load( './textures/equirectangular/royal_esplanade_1k.hdr', ( environmentMap ) => {
 
 					environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -80,7 +85,7 @@
 			
 				const inAngle = Fn( ( [ position, angleStart, angleArc ] ) => {
 
-					const angle = atan( position.y, position.x ).sub( angleStart ).mod( PI2 ).toVar();
+					const angle = atan( position.y, position.x ).sub( angleStart ).mod( TWO_PI ).toVar();
 					return angle.greaterThan( 0 ).and( angle.lessThan( angleArc ) );
 
 				} );
@@ -107,12 +112,6 @@
 				const sliceStart = uniform( 1.75 );
 				const sliceArc = uniform( 1.25 );
 				const sliceColor = uniform( color( '#b62f58' ) );
-
-				// debug
-
-				gui.add( sliceStart, 'value', - Math.PI, Math.PI, 0.001 ).name( 'sliceStart' );
-				gui.add( sliceArc, 'value', 0, Math.PI * 2, 0.001 ).name( 'sliceArc' );
-				gui.addColor( { color: sliceColor.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).onChange( value => sliceColor.value.set( value ) );
 
 				// output
 
@@ -196,6 +195,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -208,7 +208,16 @@
 				controls.minDistance = 0.1;
 				controls.maxDistance = 50;
 
+				// events
+
 				window.addEventListener( 'resize', onWindowResize );
+
+				// debug
+
+				const gui = renderer.inspector.createParameters( 'Parameters' );
+				gui.add( sliceStart, 'value', - Math.PI, Math.PI, 0.001 ).name( 'sliceStart' );
+				gui.add( sliceArc, 'value', 0, Math.PI * 2, 0.001 ).name( 'sliceArc' );
+				gui.addColor( { color: sliceColor.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).onChange( value => sliceColor.value.set( value ) );
 
 			}
 

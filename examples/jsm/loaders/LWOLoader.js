@@ -36,8 +36,8 @@ let _lwoTree;
  * LWO3 and LWO2 formats are supported.
  *
  * References:
- * - [LWO3 format specification]{@link https://static.lightwave3d.com/sdk/2019/html/filefmts/lwo3.html}
- * - [LWO2 format specification]{@link https://static.lightwave3d.com/sdk/2019/html/filefmts/lwo2.html}
+ * - [LWO3 format specification](https://static.lightwave3d.com/sdk/2019/html/filefmts/lwo3.html)
+ * - [LWO2 format specification](https://static.lightwave3d.com/sdk/2019/html/filefmts/lwo2.html)
  *
  * ```js
  * const loader = new LWOLoader();

@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - cubemap adjustments</title>
+		<title>three.js webgpu - envmap adjustments</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Env. Adjustments<br />
-			Battle Damaged Sci-fi Helmet by
-			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>EnvMap Adjustments</span>
+			</div>
+
+			<small>
+				Adjust/modify the scene's background and environment.<br/>
+				Battle Damaged Sci-fi Helmet by <a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a>
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,15 +34,15 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { uniform, mix, pmremTexture, reference, positionLocal, hue, saturation, positionWorld, normalWorld, positionWorldDirection, reflectVector } from 'three/tsl';
 
-			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
+			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 
@@ -55,11 +62,10 @@
 
 				// cube textures
 
-				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				const cube1Texture = await new RGBMLoader()
-					.setMaxRange( 16 )
-					.setPath( './textures/cube/pisaRGBM16/' )
-					.loadCubemapAsync( rgbmUrls );
+				const hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				const cube1Texture = await new HDRCubeTextureLoader()
+					.setPath( './textures/cube/pisaHDR/' )
+					.loadAsync( hdrUrls );
 
 				cube1Texture.generateMipmaps = true;
 				cube1Texture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -137,6 +143,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.inspector = new Inspector();
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
@@ -148,7 +155,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				gui.add( { blurBackground: blurNode.value }, 'blurBackground', 0, 1, 0.01 ).onChange( value => {
 

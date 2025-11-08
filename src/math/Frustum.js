@@ -1,9 +1,11 @@
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
+import { Vector2 } from './Vector2.js';
 import { Vector3 } from './Vector3.js';
 import { Sphere } from './Sphere.js';
 import { Plane } from './Plane.js';
 
 const _sphere = /*@__PURE__*/ new Sphere();
+const _defaultSpriteCenter = /*@__PURE__*/ new Vector2( 0.5, 0.5 );
 const _vector = /*@__PURE__*/ new Vector3();
 
 /**
@@ -87,9 +89,10 @@ class Frustum {
 	 *
 	 * @param {Matrix4} m - The projection matrix.
 	 * @param {(WebGLCoordinateSystem|WebGPUCoordinateSystem)} coordinateSystem - The coordinate system.
+	 * @param {boolean} [reversedDepth=false] - Whether to use a reversed depth.
 	 * @return {Frustum} A reference to this frustum.
 	 */
-	setFromProjectionMatrix( m, coordinateSystem = WebGLCoordinateSystem ) {
+	setFromProjectionMatrix( m, coordinateSystem = WebGLCoordinateSystem, reversedDepth = false ) {
 
 		const planes = this.planes;
 		const me = m.elements;
@@ -102,19 +105,29 @@ class Frustum {
 		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
 		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
 		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
-		planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
 
-		if ( coordinateSystem === WebGLCoordinateSystem ) {
+		if ( reversedDepth ) {
 
-			planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
-
-		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
-
-			planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize();
+			planes[ 4 ].setComponents( me2, me6, me10, me14 ).normalize(); // far
+			planes[ 5 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize(); // near
 
 		} else {
 
-			throw new Error( 'THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: ' + coordinateSystem );
+			planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize(); // far
+
+			if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+				planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize(); // near
+
+			} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+				planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize(); // near
+
+			} else {
+
+				throw new Error( 'THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: ' + coordinateSystem );
+
+			}
 
 		}
 
@@ -161,7 +174,10 @@ class Frustum {
 	intersectsSprite( sprite ) {
 
 		_sphere.center.set( 0, 0, 0 );
-		_sphere.radius = 0.7071067811865476;
+
+		const offset = _defaultSpriteCenter.distanceTo( sprite.center );
+
+		_sphere.radius = 0.7071067811865476 + offset;
 		_sphere.applyMatrix4( sprite.matrixWorld );
 
 		return this.intersectsSphere( _sphere );

@@ -3,7 +3,7 @@ import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.j
 import { diffuseColor } from '../../nodes/core/PropertyNode.js';
 import { vec3 } from '../../nodes/tsl/TSLBase.js';
 import { mix } from '../../nodes/math/MathNode.js';
-import { matcapUV } from '../../nodes/utils/MatcapUVNode.js';
+import { matcapUV } from '../../nodes/utils/MatcapUV.js';
 
 import { MeshMatcapMaterial } from '../MeshMatcapMaterial.js';
 

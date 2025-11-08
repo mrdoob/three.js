@@ -309,12 +309,6 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.todo( 'onBuild', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.todo( 'onBeforeRender', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );

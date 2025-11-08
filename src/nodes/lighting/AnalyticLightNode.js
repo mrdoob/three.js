@@ -3,7 +3,6 @@ import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { Color } from '../../math/Color.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { hash } from '../core/NodeUtils.js';
 import { shadow } from './ShadowNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import { lightViewPosition } from '../accessors/Lights.js';
@@ -99,24 +98,19 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
-	/**
-	 * Overwrites the default {@link Node#customCacheKey} implementation by including the
-	 * `light.id` and `light.castShadow` into the cache key.
-	 *
-	 * @return {number} The custom cache key.
-	 */
-	customCacheKey() {
-
-		return hash( this.light.id, this.light.castShadow ? 1 : 0 );
-
-	}
-
 	getHash() {
 
 		return this.light.uuid;
 
 	}
 
+	/**
+	 * Returns a node representing a direction vector which points from the current
+	 * position in view space to the light's position in view space.
+	 *
+	 * @param {NodeBuilder} builder - The builder object used for setting up the light.
+	 * @return {Node<vec3>} The light vector node.
+	 */
 	getLightVector( builder ) {
 
 		return lightViewPosition( this.light ).sub( builder.context.positionView || positionView );

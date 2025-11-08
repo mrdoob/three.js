@@ -1,8 +1,14 @@
 import { NodeUpdateType } from './constants.js';
-import { getNodeChildren, getCacheKey, hash } from './NodeUtils.js';
+import { hash, hashArray, hashString } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
+import { warn, error } from '../../utils.js';
+
+const _parentBuildStage = {
+	analyze: 'setup',
+	generate: 'analyze'
+};
 
 let _nodeId = 0;
 
@@ -78,6 +84,14 @@ class Node extends EventDispatcher {
 		this.version = 0;
 
 		/**
+		 * The name of the node.
+		 *
+		 * @type {string}
+		 * @default ''
+		 */
+		this.name = '';
+
+		/**
 		 * Whether this node is global or not. This property is relevant for the internal
 		 * node caching system. All nodes which should be declared just once should
 		 * set this flag to `true` (a typical example is {@link AttributeNode}).
@@ -86,6 +100,14 @@ class Node extends EventDispatcher {
 		 * @default false
 		 */
 		this.global = false;
+
+		/**
+		 * Create a list of parents for this node during the build process.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.parents = false;
 
 		/**
 		 * This flag can be used for type testing.
@@ -97,6 +119,8 @@ class Node extends EventDispatcher {
 		this.isNode = true;
 
 		// private
+
+		this._beforeNodes = null;
 
 		/**
 		 * The cache key of this node.
@@ -159,7 +183,7 @@ class Node extends EventDispatcher {
 	onUpdate( callback, updateType ) {
 
 		this.updateType = updateType;
-		this.update = callback.bind( this.getSelf() );
+		this.update = callback.bind( this );
 
 		return this;
 
@@ -212,23 +236,9 @@ class Node extends EventDispatcher {
 	 */
 	onReference( callback ) {
 
-		this.updateReference = callback.bind( this.getSelf() );
+		this.updateReference = callback.bind( this );
 
 		return this;
-
-	}
-
-	/**
-	 * The `this` reference might point to a Proxy so this method can be used
-	 * to get the reference to the actual node instance.
-	 *
-	 * @return {Node} A reference to the node.
-	 */
-	getSelf() {
-
-		// Returns non-node object.
-
-		return this.self || this;
 
 	}
 
@@ -248,7 +258,7 @@ class Node extends EventDispatcher {
 	/**
 	 * By default this method returns the value of the {@link Node#global} flag. This method
 	 * can be overwritten in derived classes if an analytical way is required to determine the
-	 * global status.
+	 * global cache referring to the current shader-stage.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether this node is global or not.
@@ -267,7 +277,7 @@ class Node extends EventDispatcher {
 	 */
 	* getChildren() {
 
-		for ( const { childNode } of getNodeChildren( this ) ) {
+		for ( const { childNode } of this._getChildren() ) {
 
 			yield childNode;
 
@@ -310,18 +320,99 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Returns the child nodes of this node.
+	 *
+	 * @private
+	 * @param {Set<Node>} [ignores=new Set()] - A set of nodes to ignore during the search to avoid circular references.
+	 * @returns {Array<Object>} An array of objects describing the child nodes.
+	 */
+	_getChildren( ignores = new Set() ) {
+
+		const children = [];
+
+		// avoid circular references
+		ignores.add( this );
+
+		for ( const property of Object.getOwnPropertyNames( this ) ) {
+
+			const object = this[ property ];
+
+			// Ignore private properties and ignored nodes.
+			if ( property.startsWith( '_' ) === true || ignores.has( object ) ) continue;
+
+			if ( Array.isArray( object ) === true ) {
+
+				for ( let i = 0; i < object.length; i ++ ) {
+
+					const child = object[ i ];
+
+					if ( child && child.isNode === true ) {
+
+						children.push( { property, index: i, childNode: child } );
+
+					}
+
+				}
+
+			} else if ( object && object.isNode === true ) {
+
+				children.push( { property, childNode: object } );
+
+			} else if ( object && Object.getPrototypeOf( object ) === Object.prototype ) {
+
+				for ( const subProperty in object ) {
+
+					// Ignore private sub-properties.
+					if ( subProperty.startsWith( '_' ) === true ) continue;
+
+					const child = object[ subProperty ];
+
+					if ( child && child.isNode === true ) {
+
+						children.push( { property, index: subProperty, childNode: child } );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		//
+
+		return children;
+
+	}
+
+	/**
 	 * Returns the cache key for this node.
 	 *
 	 * @param {boolean} [force=false] - When set to `true`, a recomputation of the cache key is forced.
+	 * @param {Set<Node>} [ignores=null] - A set of nodes to ignore during the computation of the cache key.
 	 * @return {number} The cache key of the node.
 	 */
-	getCacheKey( force = false ) {
+	getCacheKey( force = false, ignores = null ) {
 
 		force = force || this.version !== this._cacheKeyVersion;
 
 		if ( force === true || this._cacheKey === null ) {
 
-			this._cacheKey = hash( getCacheKey( this, force ), this.customCacheKey() );
+			if ( ignores === null ) ignores = new Set();
+
+			//
+
+			const values = [];
+
+			for ( const { property, childNode } of this._getChildren( ignores ) ) {
+
+				values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey( force, ignores ) );
+
+			}
+
+			//
+
+			this._cacheKey = hash( hashArray( values ), this.customCacheKey() );
 			this._cacheKeyVersion = this.version;
 
 		}
@@ -337,7 +428,7 @@ class Node extends EventDispatcher {
 	 */
 	customCacheKey() {
 
-		return 0;
+		return this.id;
 
 	}
 
@@ -468,9 +559,21 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Returns the number of elements in the node array.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {?number} The number of elements in the node array.
+	 */
+	getArrayCount( /*builder*/ ) {
+
+		return null;
+
+	}
+
+	/**
 	 * Represents the setup stage which is the first step of the build process, see {@link Node#build} method.
-	 * This method is often overwritten in derived modules to prepare the node which is used as the output/result.
-	 * The output node must be returned in the `return` statement.
+	 * This method is often overwritten in derived modules to prepare the node which is used as a node's output/result.
+	 * If an output node is prepared, then it must be returned in the `return` statement of the derived module's setup function.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {?Node} The output node.
@@ -498,10 +601,20 @@ class Node extends EventDispatcher {
 	 * This stage analyzes the node hierarchy and ensures descendent nodes are built.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {?Node} output - The target output node.
 	 */
-	analyze( builder ) {
+	analyze( builder, output = null ) {
 
 		const usageCount = builder.increaseUsage( this );
+
+		if ( this.parents === true ) {
+
+			const nodeData = builder.getDataFromNode( this, 'any' );
+			nodeData.stages = nodeData.stages || {};
+			nodeData.stages[ builder.shaderStage ] = nodeData.stages[ builder.shaderStage ] || [];
+			nodeData.stages[ builder.shaderStage ].push( output );
+
+		}
 
 		if ( usageCount === 1 ) {
 
@@ -513,7 +626,7 @@ class Node extends EventDispatcher {
 
 				if ( childNode && childNode.isNode === true ) {
 
-					childNode.build( builder );
+					childNode.build( builder, this );
 
 				}
 
@@ -528,7 +641,7 @@ class Node extends EventDispatcher {
 	 * This state builds the output node and returns the resulting shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {?string} output - Can be used to define the output type.
+	 * @param {?string} [output] - Can be used to define the output type.
 	 * @return {?string} The generated shader string.
 	 */
 	generate( builder, output ) {
@@ -553,7 +666,7 @@ class Node extends EventDispatcher {
 	 */
 	updateBefore( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -567,7 +680,7 @@ class Node extends EventDispatcher {
 	 */
 	updateAfter( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -581,17 +694,29 @@ class Node extends EventDispatcher {
 	 */
 	update( /*frame*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
+
+	}
+
+	before( node ) {
+
+		if ( this._beforeNodes === null ) this._beforeNodes = [];
+
+		this._beforeNodes.push( node );
+
+		return this;
 
 	}
 
 	/**
-	 * This method performs the build of a node. The behavior of this method as well as its return value depend
-	 * on the current build stage (setup, analyze or generate).
+	 * This method performs the build of a node. The behavior and return value depend on the current build stage:
+	 * - **setup**: Prepares the node and its children for the build process. This process can also create new nodes. Returns the node itself or a variant.
+	 * - **analyze**: Analyzes the node hierarchy for optimizations in the code generation stage. Returns `null`.
+	 * - **generate**: Generates the shader code for the node. Returns the generated shader string.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {?string} output - Can be used to define the output type.
-	 * @return {?string} When this method is executed in the setup or analyze stage, `null` is returned. In the generate stage, the generated shader string.
+	 * @param {?(string|Node)} [output=null] - Can be used to define the output type.
+	 * @return {?(Node|string)} The result of the build process, depending on the build stage.
 	 */
 	build( builder, output = null ) {
 
@@ -602,6 +727,48 @@ class Node extends EventDispatcher {
 			return refNode.build( builder, output );
 
 		}
+
+		//
+
+		if ( this._beforeNodes !== null ) {
+
+			const currentBeforeNodes = this._beforeNodes;
+
+			this._beforeNodes = null;
+
+			for ( const beforeNode of currentBeforeNodes ) {
+
+				beforeNode.build( builder, output );
+
+			}
+
+			this._beforeNodes = currentBeforeNodes;
+
+		}
+
+		//
+
+		const nodeData = builder.getDataFromNode( this );
+		nodeData.buildStages = nodeData.buildStages || {};
+		nodeData.buildStages[ builder.buildStage ] = true;
+
+		const parentBuildStage = _parentBuildStage[ builder.buildStage ];
+
+		if ( parentBuildStage && nodeData.buildStages[ parentBuildStage ] !== true ) {
+
+			// force parent build stage (setup or analyze)
+
+			const previousBuildStage = builder.getBuildStage();
+
+			builder.setBuildStage( parentBuildStage );
+
+			this.build( builder );
+
+			builder.setBuildStage( previousBuildStage );
+
+		}
+
+		//
 
 		builder.addNode( this );
 		builder.addChain( this );
@@ -626,9 +793,7 @@ class Node extends EventDispatcher {
 				//const stackNodesBeforeSetup = builder.stack.nodes.length;
 
 				properties.initialized = true;
-
-				const outputNode = this.setup( builder ); // return a node or null
-				const isNodeOutput = outputNode && outputNode.isNode === true;
+				properties.outputNode = this.setup( builder ) || properties.outputNode || null;
 
 				/*if ( isNodeOutput && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
@@ -641,29 +806,36 @@ class Node extends EventDispatcher {
 
 					if ( childNode && childNode.isNode === true ) {
 
+						if ( childNode.parents === true ) {
+
+							const childProperties = builder.getNodeProperties( childNode );
+							childProperties.parents = childProperties.parents || [];
+							childProperties.parents.push( this );
+
+						}
+
 						childNode.build( builder );
 
 					}
 
 				}
 
-				if ( isNodeOutput ) {
-
-					outputNode.build( builder );
-
-				}
-
-				properties.outputNode = outputNode;
-
 			}
+
+			result = properties.outputNode;
 
 		} else if ( buildStage === 'analyze' ) {
 
-			this.analyze( builder );
+			this.analyze( builder, output );
 
 		} else if ( buildStage === 'generate' ) {
 
-			const isGenerateOnce = this.generate.length === 1;
+			// If generate has just one argument, it means the output type is not required.
+			// This means that the node does not handle output conversions internally,
+			// so the value is stored in a cache and the builder handles the conversion
+			// for all requested output types.
+
+			const isGenerateOnce = this.generate.length < 2;
 
 			if ( isGenerateOnce ) {
 
@@ -684,9 +856,9 @@ class Node extends EventDispatcher {
 
 					} else {
 
-						console.warn( 'THREE.Node: Recursion detected.', this );
+						warn( 'Node: Recursion detected.', this );
 
-						result = '';
+						result = '/* Recursion detected. */';
 
 					}
 
@@ -704,6 +876,16 @@ class Node extends EventDispatcher {
 
 			}
 
+			if ( result === '' && output !== null && output !== 'void' && output !== 'OutputType' ) {
+
+				// if no snippet is generated, return a default value
+
+				error( `TSL: Invalid generated code, expected a "${ output }".` );
+
+				result = builder.generateConst( output );
+
+			}
+
 		}
 
 		builder.removeChain( this );
@@ -716,11 +898,11 @@ class Node extends EventDispatcher {
 	/**
 	 * Returns the child nodes as a JSON object.
 	 *
-	 * @return {Array<Object>} An iterable list of serialized child objects as JSON.
+	 * @return {Generator<Object>} An iterable list of serialized child objects as JSON.
 	 */
 	getSerializeChildren() {
 
-		return getNodeChildren( this );
+		return this._getChildren();
 
 	}
 
@@ -848,7 +1030,7 @@ class Node extends EventDispatcher {
 				type,
 				meta,
 				metadata: {
-					version: 4.6,
+					version: 4.7,
 					type: 'Node',
 					generator: 'Node.toJSON'
 				}

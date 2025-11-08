@@ -43,7 +43,7 @@ class AfterimagePass extends Pass {
 		 */
 		this.uniforms = UniformsUtils.clone( AfterimageShader.uniforms );
 
-		this.uniforms[ 'damp' ].value = damp;
+		this.damp = damp;
 
 		/**
 		 * The composition material.
@@ -86,6 +86,23 @@ class AfterimagePass extends Pass {
 
 		this._compFsQuad = new FullScreenQuad( this.compFsMaterial );
 		this._copyFsQuad = new FullScreenQuad( this.copyFsMaterial );
+
+	}
+
+	/**
+	 * The damping intensity, from 0.0 to 1.0. A higher value means a stronger after image effect.
+	 *
+	 * @type {number}
+	 */
+	get damp() {
+
+		return this.uniforms[ 'damp' ].value;
+
+	}
+
+	set damp( value ) {
+
+		this.uniforms[ 'damp' ].value = value;
 
 	}
 
@@ -137,7 +154,7 @@ class AfterimagePass extends Pass {
 	 * Sets the size of the pass.
 	 *
 	 * @param {number} width - The width to set.
-	 * @param {number} height - The width to set.
+	 * @param {number} height - The height to set.
 	 */
 	setSize( width, height ) {
 

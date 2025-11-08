@@ -10,6 +10,9 @@ import { Texture } from './Texture.js';
  * const texture = new THREE.VideoTexture( video );
  * ```
  *
+ * Note: When using video textures with {@link WebGPURenderer}, {@link Texture#colorSpace} must be
+ * set to THREE.SRGBColorSpace.
+ *
  * Note: After the initial use of a texture, its dimensions, format, and type
  * cannot be changed. Instead, call {@link Texture#dispose} on the texture and instantiate a new one.
  *
@@ -53,18 +56,28 @@ class VideoTexture extends Texture {
 		 */
 		this.generateMipmaps = false;
 
+		/**
+		 * The video frame request callback identifier, which is a positive integer.
+		 *
+		 * Value of 0 represents no scheduled rVFC.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._requestVideoFrameCallbackId = 0;
+
 		const scope = this;
 
 		function updateVideo() {
 
 			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
+			scope._requestVideoFrameCallbackId = video.requestVideoFrameCallback( updateVideo );
 
 		}
 
 		if ( 'requestVideoFrameCallback' in video ) {
 
-			video.requestVideoFrameCallback( updateVideo );
+			this._requestVideoFrameCallbackId = video.requestVideoFrameCallback( updateVideo );
 
 		}
 
@@ -92,6 +105,20 @@ class VideoTexture extends Texture {
 			this.needsUpdate = true;
 
 		}
+
+	}
+
+	dispose() {
+
+		if ( this._requestVideoFrameCallbackId !== 0 ) {
+
+			this.source.data.cancelVideoFrameCallback( this._requestVideoFrameCallbackId );
+
+			this._requestVideoFrameCallbackId = 0;
+
+		}
+
+		super.dispose();
 
 	}
 

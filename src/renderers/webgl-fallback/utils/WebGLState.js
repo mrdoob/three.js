@@ -7,6 +7,7 @@ import {
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth
 } from '../../../constants.js';
 import { Vector4 } from '../../../math/Vector4.js';
+import { error } from '../../../utils.js';
 
 let equationToGL, factorToGL;
 
@@ -339,11 +340,11 @@ class WebGLState {
 							break;
 
 						case MultiplyBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
+							gl.blendFuncSeparate( gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
 							break;
 
 						default:
-							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -357,19 +358,19 @@ class WebGLState {
 							break;
 
 						case AdditiveBlending:
-							gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE );
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
+							error( 'WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						case MultiplyBlending:
-							gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+							error( 'WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						default:
-							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -754,7 +755,7 @@ class WebGLState {
 
 		this.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-		material.alphaToCoverage === true && this.backend.renderer.samples > 1
+		material.alphaToCoverage === true && this.backend.renderer.currentSamples > 0
 			? this.enable( gl.SAMPLE_ALPHA_TO_COVERAGE )
 			: this.disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
 
@@ -848,7 +849,7 @@ class WebGLState {
 	 * Sets the vertex state by binding the given VAO and element buffer.
 	 *
 	 * @param {WebGLVertexArrayObject} vao - The VAO.
-	 * @param {WebGLBuffer} indexBuffer - The index buffer.
+	 * @param {?WebGLBuffer} indexBuffer - The index buffer.
 	 * @return {boolean} Whether a vertex state has been changed or not.
 	 */
 	setVertexState( vao, indexBuffer = null ) {

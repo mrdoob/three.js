@@ -4,13 +4,20 @@
 		<title>three.js webgpu - mrt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - mrt<br />
-			Final / Beauty / Normal / Emissive / Diffuse
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Multiple Render Targets (MRT)</span>
+			</div>
+
+			<small>
+				Final / Beauty / Normal / Emissive / Diffuse
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -26,10 +33,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { output, transformedNormalView, pass, step, diffuseColor, emissive, directionToColor, screenUV, mix, mrt, Fn } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { output, normalView, pass, step, diffuseColor, emissive, directionToColor, screenUV, mix, mrt, Fn } from 'three/tsl';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -51,7 +60,7 @@
 
 				scene = new THREE.Scene();
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
@@ -78,6 +87,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				// post processing
@@ -85,7 +95,7 @@
 				const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: directionToColor( transformedNormalView ),
+					normal: directionToColor( normalView ),
 					diffuse: diffuseColor,
 					emissive: emissive
 				} ) );

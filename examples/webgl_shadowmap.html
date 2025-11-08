@@ -11,7 +11,6 @@
 
 		<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">rome</a><br />
-		move camera with WASD / RF + mouse<br />
 		t: toggle HUD
 		</div>
 
@@ -30,7 +29,7 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
@@ -38,8 +37,8 @@
 
 			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
-			let SCREEN_WIDTH = window.innerWidth;
-			let SCREEN_HEIGHT = window.innerHeight;
+			const SCREEN_WIDTH = window.innerWidth;
+			const SCREEN_HEIGHT = window.innerHeight;
 			const FLOOR = - 250;
 
 			let camera, controls, scene, renderer;
@@ -102,7 +101,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, reversedDepthBuffer: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.setAnimationLoop( animate );
@@ -117,13 +116,14 @@
 
 				// CONTROLS
 
-				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enablePan = false;
+				controls.maxPolarAngle = Math.PI / 2;
+				controls.minDistance = 200;
+				controls.maxDistance = 2200;
 
-				controls.lookSpeed = 0.0125;
-				controls.movementSpeed = 500;
-				controls.lookVertical = true;
-
-				controls.lookAt( scene.position );
+				controls.target.set( 0, - 75, 25 );
+				controls.update();
 
 				// STATS
 
@@ -139,15 +139,10 @@
 
 			function onWindowResize() {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight;
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				controls.handleResize();
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

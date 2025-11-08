@@ -29,7 +29,7 @@ jobs:
       # Using actions/download-artifact doesn't work here
       # https://github.com/actions/download-artifact/issues/60
       - name: Download artifact
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         id: download-artifact
         with:
           result-encoding: string
@@ -56,11 +56,11 @@ jobs:
 
       # This runs on the base branch of the PR, meaning "dev"
       - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - name: Install Node
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
@@ -238,14 +238,14 @@ jobs:
           echo "WEBGPU_NODES_TREESHAKEN_DIFF_GZIP=$WEBGPU_NODES_TREESHAKEN_DIFF_GZIP" >> $GITHUB_OUTPUT
 
       - name: Find existing comment
-        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
         id: find-comment
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-author: 'github-actions[bot]'
           body-includes: Bundle size
       - name: Comment on PR
-        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}

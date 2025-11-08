@@ -11,16 +11,16 @@ permissions:
   contents: read
 
 jobs:
-  lint:
-    name: Lint testing
+  test:
+    name: Lint, Unit, Unit addons, Circular dependencies & Examples testing
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - name: Install Node
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
@@ -28,58 +28,33 @@ jobs:
       - name: === Lint testing ===
         run: npm run lint
 
-  unit:
-    name: Unit testing
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Install Node
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-
       - name: === Unit testing ===
         run: npm run test-unit
 
-  circular:
-    name: Circular dependencies testing
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Install Node
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
+      - name: === Unit addons testing ===
+        run: npm run test-unit-addons
 
-      - name: === Circular dependencies testing ===
-        run: npm run test-circular-deps
+      - name: === Examples ready for release ===
+        run: npm run test-e2e-cov
 
   e2e:
     name: E2E testing
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest ]
-        CI: [ 0, 1, 2, 3 ]
+        os: [ ubuntu-latest ]
+        CI: [ 0, 1, 2, 3, 4 ]
     env:
       CI: ${{ matrix.CI }}
     steps:
       - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - name: Install Node
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
@@ -89,26 +64,9 @@ jobs:
       - name: === E2E testing ===
         run: npm run test-e2e
       - name: Upload output screenshots
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         if: always()
         with:
           name: Output screenshots-${{ matrix.os }}-${{ matrix.CI }}
           path: test/e2e/output-screenshots
           if-no-files-found: ignore
-
-  e2e-cov:
-    name: Examples ready for release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - name: Install Node
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-
-      - name: === Examples ready for release ===
-        run: npm run test-e2e-cov

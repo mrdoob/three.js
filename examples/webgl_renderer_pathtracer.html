@@ -57,7 +57,7 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
 			import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';
 			import { LDrawConditionalLineMaterial } from 'three/addons/materials/LDrawConditionalLineMaterial.js';
@@ -94,7 +94,7 @@
 				camera.position.set( 150, 200, 250 );
 
 				// initialize the renderer
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true, preserveDrawingBuffer: true, premultipliedAlpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true, preserveDrawingBuffer: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -210,7 +210,7 @@
 						.catch( onError );
 
 				const envMapPromise =
-					new RGBELoader()
+					new HDRLoader()
 						.setPath( 'textures/equirectangular/' )
 						.loadAsync( 'royal_esplanade_1k.hdr' )
 						.then( tex => {
@@ -392,7 +392,7 @@
 
 			function updateProgressBar( fraction ) {
 
-				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
+				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100 ) + '%';
 
 			}
 

@@ -11,6 +11,7 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  * ] );
  *
  * const redColor = tintColors.element( 0 );
+ * ```
  *
  * @augments TempNode
  */
@@ -55,6 +56,18 @@ class ArrayNode extends TempNode {
 		 * @default true
 		 */
 		this.isArrayNode = true;
+
+	}
+
+	/**
+	 * Returns the number of elements in the node array.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {number} The number of elements in the node array.
+	 */
+	getArrayCount( /*builder*/ ) {
+
+		return this.count;
 
 	}
 

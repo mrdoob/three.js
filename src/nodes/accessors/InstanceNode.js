@@ -3,7 +3,7 @@ import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal } from './Position.js';
-import { nodeProxy, vec3, mat4 } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
@@ -109,7 +109,9 @@ class InstanceNode extends Node {
 	 */
 	setup( builder ) {
 
-		const { count, instanceMatrix, instanceColor } = this;
+		const { instanceMatrix, instanceColor } = this;
+
+		const { count } = instanceMatrix;
 
 		let { instanceMatrixNode, instanceColorNode } = this;
 
@@ -125,19 +127,11 @@ class InstanceNode extends Node {
 
 				const buffer = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
 
+				const instancedBufferAttributeFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+
+				instanceMatrixNode = instancedBufferAttributeFn( buffer, 'mat4' );
+
 				this.buffer = buffer;
-
-				const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-				const instanceBuffers = [
-					// F.Signature -> bufferAttribute( array, type, stride, offset )
-					bufferFn( buffer, 'vec4', 16, 0 ),
-					bufferFn( buffer, 'vec4', 16, 4 ),
-					bufferFn( buffer, 'vec4', 16, 8 ),
-					bufferFn( buffer, 'vec4', 16, 12 )
-				];
-
-				instanceMatrixNode = mat4( ...instanceBuffers );
 
 			}
 
@@ -193,15 +187,33 @@ class InstanceNode extends Node {
 	 */
 	update( /*frame*/ ) {
 
-		if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.buffer !== null && this.instanceMatrix.version !== this.buffer.version ) {
+		if ( this.buffer !== null ) {
 
-			this.buffer.version = this.instanceMatrix.version;
+			// keep update ranges in sync
+
+			this.buffer.clearUpdateRanges();
+			this.buffer.updateRanges.push( ... this.instanceMatrix.updateRanges );
+
+			// update version if necessary
+
+			if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.instanceMatrix.version !== this.buffer.version ) {
+
+				this.buffer.version = this.instanceMatrix.version;
+
+			}
 
 		}
 
-		if ( this.instanceColor && this.instanceColor.usage !== DynamicDrawUsage && this.bufferColor !== null && this.instanceColor.version !== this.bufferColor.version ) {
+		if ( this.instanceColor && this.bufferColor !== null ) {
 
-			this.bufferColor.version = this.instanceColor.version;
+			this.bufferColor.clearUpdateRanges();
+			this.bufferColor.updateRanges.push( ... this.instanceColor.updateRanges );
+
+			if ( this.instanceColor.usage !== DynamicDrawUsage && this.instanceColor.version !== this.bufferColor.version ) {
+
+				this.bufferColor.version = this.instanceColor.version;
+
+			}
 
 		}
 

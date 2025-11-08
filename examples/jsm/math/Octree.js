@@ -130,6 +130,23 @@ class Octree {
 		 */
 		this.layers = new Layers();
 
+		/**
+		 * The number of triangles a leaf can store before it is split.
+		 *
+		 * @type {number}
+		 * @default 8
+		 */
+		this.trianglesPerLeaf = 8;
+
+		/**
+		 * The maximum level of the Octree. It defines the maximum
+		 * hierarchical depth of the data structure.
+		 *
+		 * @type {number}
+		 * @default 16
+		 */
+		this.maxLevel = 16;
+
 		// private
 
 		this.subTrees = [];
@@ -231,7 +248,7 @@ class Octree {
 
 			const len = subTrees[ i ].triangles.length;
 
-			if ( len > 8 && level < 16 ) {
+			if ( len > this.trianglesPerLeaf && level < this.maxLevel ) {
 
 				subTrees[ i ].split( level + 1 );
 

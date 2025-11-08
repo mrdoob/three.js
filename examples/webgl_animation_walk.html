@@ -36,7 +36,7 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let scene, renderer, camera, floor, orbitControls;
 			let group, followGroup, model, skeleton, mixer, clock;
@@ -76,8 +76,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 0, 2, - 5 );
-				//camera.lookAt( 0, 1, 0 );
-
 
 				clock = new THREE.Clock();
 
@@ -99,8 +97,7 @@
 				cam.bottom = cam.left = - 2;
 				cam.near = 3;
 				cam.far = 8;
-				dirLight.shadow.bias = - 0.005;
-				dirLight.shadow.radius = 4;
+				dirLight.shadow.mapSize.set( 1024, 1024 );
 				followGroup.add( dirLight );
 				followGroup.add( dirLight.target );
 
@@ -113,6 +110,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				container.appendChild( renderer.domElement );
 
 				orbitControls = new OrbitControls( camera, renderer.domElement );
@@ -131,7 +129,7 @@
 
 				// DEMO
 
-				new RGBELoader()
+				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'lobe.hdr', function ( texture ) {
 
@@ -205,7 +203,6 @@
 
 								object.castShadow = true;
 								object.receiveShadow = true;
-								object.material.shadowSide = THREE.DoubleSide;
 								//object.material.envMapIntensity = 0.5;
 								object.material.metalness = 1.0;
 								object.material.roughness = 0.2;
@@ -229,6 +226,7 @@
 					//
 
 					skeleton = new THREE.SkeletonHelper( model );
+					skeleton.setColors( new THREE.Color( 0xe000ff ), new THREE.Color( 0x00e0ff ) );
 					skeleton.visible = false;
 					scene.add( skeleton );
 

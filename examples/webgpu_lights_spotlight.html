@@ -4,12 +4,18 @@
 		<title>three.js webgpu - spotlight</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - spotlight<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Spot Light</span>
+			</div>
+
+			<small>Spot light projecting texture map.</small>
 		</div>
 
 		<script type="importmap">
@@ -25,20 +31,22 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let renderer, scene, camera;
 
-			let spotLight, lightHelper;
+			let spotLight;
 
 			init();
 
 			function init() {
+
+				// Renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -46,16 +54,20 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				renderer.inspector = new Inspector();
+
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 1;
+
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1;
 
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 7, 4, 1 );
+
+				// Controls
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
@@ -64,8 +76,7 @@
 				controls.target.set( 0, 1, 0 );
 				controls.update();
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.15 );
-				scene.add( ambient );
+				// Textures
 
 				const loader = new THREE.TextureLoader().setPath( 'textures/' );
 				const filenames = [ 'disturb.jpg', 'colors.png', 'uv_grid_opengl.jpg' ];
@@ -86,29 +97,41 @@
 
 				}
 
+				// Lights
+
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.25 );
+				scene.add( ambient );
+
 				spotLight = new THREE.SpotLight( 0xffffff, 100 );
+				spotLight.name = 'spotLight';
+				spotLight.map = textures[ 'disturb.jpg' ];
 				spotLight.position.set( 2.5, 5, 2.5 );
 				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 1;
 				spotLight.decay = 2;
 				spotLight.distance = 0;
-				spotLight.map = textures[ 'disturb.jpg' ];
 
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
-				spotLight.shadow.camera.near = 1;
+				spotLight.shadow.camera.near = 2;
 				spotLight.shadow.camera.far = 10;
 				spotLight.shadow.focus = 1;
 				spotLight.shadow.bias = - .003;
+				spotLight.shadow.intensity = 1;
 				scene.add( spotLight );
 
-				lightHelper = new THREE.SpotLightHelper( spotLight );
-				scene.add( lightHelper );
+				spotLight.lightHelper = new THREE.SpotLightHelper( spotLight );
+				spotLight.lightHelper.visible = false;
+				scene.add( spotLight.lightHelper );
+
+				spotLight.shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera ); // colored lines
+				spotLight.shadowCameraHelper.visible = false;
+				scene.add( spotLight.shadowCameraHelper );
 
 				//
 
-				const geometry = new THREE.PlaneGeometry( 200, 200 );
+				const geometry = new THREE.PlaneGeometry( 10, 10 );
 				const material = new THREE.MeshLambertMaterial( { color: 0xbcbcbc } );
 
 				const mesh = new THREE.Mesh( geometry, material );
@@ -117,7 +140,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				//
+				// Model
 
 				new PLYLoader().load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
 
@@ -135,11 +158,13 @@
 
 				} );
 
+				//
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				// GUI
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 
 				const params = {
 					map: textures[ 'disturb.jpg' ],
@@ -150,7 +175,8 @@
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
 					focus: spotLight.shadow.focus,
-					shadows: true
+					shadowIntensity: spotLight.shadow.intensity,
+					helpers: false
 				};
 
 				gui.add( params, 'map', textures ).onChange( function ( val ) {
@@ -202,24 +228,18 @@
 
 				} );
 
+				gui.add( params, 'shadowIntensity', 0, 1 ).onChange( function ( val ) {
 
-				gui.add( params, 'shadows' ).onChange( function ( val ) {
-
-					renderer.shadowMap.enabled = val;
-
-					scene.traverse( function ( child ) {
-
-						if ( child.material ) {
-
-							child.material.needsUpdate = true;
-
-						}
-
-					} );
+					spotLight.shadow.intensity = val;
 
 				} );
 
-				gui.open();
+				gui.add( params, 'helpers' ).onChange( function ( val ) {
+
+					spotLight.lightHelper.visible = val;
+					spotLight.shadowCameraHelper.visible = val;
+
+				} );
 
 			}
 
@@ -239,7 +259,7 @@
 				spotLight.position.x = Math.cos( time ) * 2.5;
 				spotLight.position.z = Math.sin( time ) * 2.5;
 
-				lightHelper.update();
+				spotLight.lightHelper.update();
 
 				renderer.render( scene, camera );
 

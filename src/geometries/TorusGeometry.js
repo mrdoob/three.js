@@ -13,6 +13,7 @@ import { Vector3 } from '../math/Vector3.js';
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#TorusGeometry
  */
 class TorusGeometry extends BufferGeometry {
 

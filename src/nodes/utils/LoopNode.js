@@ -1,6 +1,7 @@
 import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
-import { nodeObject, nodeArray } from '../tsl/TSLBase.js';
+import { nodeArray, Fn } from '../tsl/TSLBase.js';
+import { error } from '../../utils.js';
 
 /**
  * This module offers a variety of ways to implement loops in TSL. In it's basic form it's:
@@ -53,7 +54,7 @@ class LoopNode extends Node {
 	 */
 	constructor( params = [] ) {
 
-		super();
+		super( 'void' );
 
 		this.params = params;
 
@@ -99,28 +100,26 @@ class LoopNode extends Node {
 
 		}
 
-		const stack = builder.addStack(); // TODO: cache() it
+		const stack = builder.addStack();
 
-		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, stack, builder );
+		const fnCall = this.params[ this.params.length - 1 ]( inputs );
+
+		properties.returnsNode = fnCall.context( { nodeLoop: fnCall } );
 		properties.stackNode = stack;
+
+		const baseParam = this.params[ 0 ];
+
+		if ( baseParam.isNode !== true && typeof baseParam.update === 'function' ) {
+
+			const fnUpdateCall = Fn( this.params[ 0 ].update )( inputs );
+
+			properties.updateNode = fnUpdateCall.context( { nodeLoop: fnUpdateCall } );
+
+		}
 
 		builder.removeStack();
 
 		return properties;
-
-	}
-
-	/**
-	 * This method is overwritten since the node type is inferred based on the loop configuration.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {string} The node type.
-	 */
-	getNodeType( builder ) {
-
-		const { returnsNode } = this.getProperties( builder );
-
-		return returnsNode ? returnsNode.getNodeType( builder ) : 'void';
 
 	}
 
@@ -129,6 +128,13 @@ class LoopNode extends Node {
 		// setup properties
 
 		this.getProperties( builder );
+
+		if ( builder.fnCall ) {
+
+			const shaderNodeData = builder.getDataFromNode( builder.fnCall.shaderNode );
+			shaderNodeData.hasLoop = true;
+
+		}
 
 	}
 
@@ -222,30 +228,69 @@ class LoopNode extends Node {
 				const startSnippet = internalParam.start;
 				const endSnippet = internalParam.end;
 
-				let declarationSnippet = '';
-				let conditionalSnippet = '';
-				let updateSnippet = '';
+				let updateSnippet;
 
-				if ( ! update ) {
+				const deltaOperator = () => condition.includes( '<' ) ? '+=' : '-=';
 
-					if ( type === 'int' || type === 'uint' ) {
+				if ( update !== undefined && update !== null ) {
 
-						if ( condition.includes( '<' ) ) update = '++';
-						else update = '--';
+					switch ( typeof update ) {
 
-					} else {
+						case 'function':
 
-						if ( condition.includes( '<' ) ) update = '+= 1.';
-						else update = '-= 1.';
+							const flow = builder.flowStagesNode( properties.updateNode, 'void' );
+							const snippet = flow.code.replace( /\t|;/g, '' );
+
+							updateSnippet = snippet;
+
+							break;
+
+						case 'number':
+
+							updateSnippet = name + ' ' + deltaOperator() + ' ' + builder.generateConst( type, update );
+
+							break;
+
+						case 'string':
+
+							updateSnippet = name + ' ' + update;
+
+							break;
+
+						default:
+
+							if ( update.isNode ) {
+
+								updateSnippet = name + ' ' + deltaOperator() + ' ' + update.build( builder );
+
+							} else {
+
+								error( 'TSL: \'Loop( { update: ... } )\' is not a function, string or number.' );
+
+								updateSnippet = 'break /* invalid update */';
+
+							}
 
 					}
 
+				} else {
+
+					if ( type === 'int' || type === 'uint' ) {
+
+						update = condition.includes( '<' ) ? '++' : '--';
+
+					} else {
+
+						update = deltaOperator() + ' 1.';
+
+					}
+
+					updateSnippet = name + ' ' + update;
+
 				}
 
-				declarationSnippet += builder.getVar( type, name ) + ' = ' + startSnippet;
-
-				conditionalSnippet += name + ' ' + condition + ' ' + endSnippet;
-				updateSnippet += name + ' ' + update;
+				const declarationSnippet = builder.getVar( type, name ) + ' = ' + startSnippet;
+				const conditionalSnippet = name + ' ' + condition + ' ' + endSnippet;
 
 				loopSnippet = `for ( ${ declarationSnippet }; ${ conditionalSnippet }; ${ updateSnippet } )`;
 
@@ -257,7 +302,7 @@ class LoopNode extends Node {
 
 		const stackSnippet = stackNode.build( builder, 'void' );
 
-		const returnsSnippet = properties.returnsNode ? properties.returnsNode.build( builder ) : '';
+		properties.returnsNode.build( builder, 'void' );
 
 		builder.removeFlowTab().addFlowCode( '\n' + builder.tab + stackSnippet );
 
@@ -268,8 +313,6 @@ class LoopNode extends Node {
 		}
 
 		builder.addFlowTab();
-
-		return returnsSnippet;
 
 	}
 
@@ -285,7 +328,7 @@ export default LoopNode;
  * @param {...any} params - A list of parameters.
  * @returns {LoopNode}
  */
-export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
+export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
  * TSL function for creating a `Continue()` expression.
@@ -294,7 +337,7 @@ export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params
  * @function
  * @returns {ExpressionNode}
  */
-export const Continue = () => expression( 'continue' ).append();
+export const Continue = () => expression( 'continue' ).toStack();
 
 /**
  * TSL function for creating a `Break()` expression.
@@ -303,21 +346,4 @@ export const Continue = () => expression( 'continue' ).append();
  * @function
  * @returns {ExpressionNode}
  */
-export const Break = () => expression( 'break' ).append();
-
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r168. Use {@link Loop} instead.
- *
- * @param {...any} params
- * @returns {LoopNode}
- */
-export const loop = ( ...params ) => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: loop() has been renamed to Loop().' );
-	return Loop( ...params );
-
-};
+export const Break = () => expression( 'break' ).toStack();

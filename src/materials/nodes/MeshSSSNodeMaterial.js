@@ -1,6 +1,6 @@
 import MeshPhysicalNodeMaterial from './MeshPhysicalNodeMaterial.js';
 import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
-import { transformedNormalView } from '../../nodes/accessors/Normal.js';
+import { normalView } from '../../nodes/accessors/Normal.js';
 import { positionViewDirection } from '../../nodes/accessors/Position.js';
 import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
 
@@ -39,7 +39,7 @@ class SSSLightingModel extends PhysicalLightingModel {
 	/**
 	 * Extends the default implementation with a SSS term.
 	 *
-	 * Reference: [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look]{@link https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/}
+	 * Reference: [Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look](https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/)
 	 *
 	 * @param {Object} input - The input data.
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -52,7 +52,7 @@ class SSSLightingModel extends PhysicalLightingModel {
 
 			const { thicknessColorNode, thicknessDistortionNode, thicknessAmbientNode, thicknessAttenuationNode, thicknessPowerNode, thicknessScaleNode } = material;
 
-			const scatteringHalf = lightDirection.add( transformedNormalView.mul( thicknessDistortionNode ) ).normalize();
+			const scatteringHalf = lightDirection.add( normalView.mul( thicknessDistortionNode ) ).normalize();
 			const scatteringDot = float( positionViewDirection.dot( scatteringHalf.negate() ).saturate().pow( thicknessPowerNode ).mul( thicknessScaleNode ) );
 			const scatteringIllu = vec3( scatteringDot.add( thicknessAmbientNode ).mul( thicknessColorNode ) );
 

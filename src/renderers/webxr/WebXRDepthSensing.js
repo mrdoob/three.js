@@ -1,7 +1,7 @@
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
-import { Texture } from '../../textures/Texture.js';
+import { ExternalTexture } from '../../textures/ExternalTexture.js';
 
 const _occlusion_vertex = `
 void main() {
@@ -42,9 +42,9 @@ class WebXRDepthSensing {
 	constructor() {
 
 		/**
-		 * A texture representing the depth of the user's environment.
+		 * An opaque texture representing the depth of the user's environment.
 		 *
-		 * @type {?Texture}
+		 * @type {?ExternalTexture}
 		 */
 		this.texture = null;
 
@@ -74,18 +74,14 @@ class WebXRDepthSensing {
 	/**
 	 * Inits the depth sensing module
 	 *
-	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {XRWebGLDepthInformation} depthData - The XR depth data.
 	 * @param {XRRenderState} renderState - The XR render state.
 	 */
-	init( renderer, depthData, renderState ) {
+	init( depthData, renderState ) {
 
 		if ( this.texture === null ) {
 
-			const texture = new Texture();
-
-			const texProps = renderer.properties.get( texture );
-			texProps.__webglTexture = depthData.texture;
+			const texture = new ExternalTexture( depthData.texture );
 
 			if ( ( depthData.depthNear !== renderState.depthNear ) || ( depthData.depthFar !== renderState.depthFar ) ) {
 
@@ -146,7 +142,7 @@ class WebXRDepthSensing {
 	/**
 	 * Returns a texture representing the depth of the user's environment.
 	 *
-	 * @return {?Texture} The depth texture.
+	 * @return {?ExternalTexture} The depth texture.
 	 */
 	getDepthTexture() {
 

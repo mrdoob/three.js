@@ -4,11 +4,20 @@
 		<title>three.js webgpu - custom fog</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
-		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - custom fog
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Custom Fog</span>
+			</div>
+
+			<small>
+				Custom Fog via TSL.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -24,10 +33,11 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { color, fog, float, positionWorld, triNoise3D, positionView, normalWorld, uniform } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			let controls;
@@ -124,6 +134,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				// controls

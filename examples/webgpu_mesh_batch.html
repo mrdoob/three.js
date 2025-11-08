@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgpu - mesh - batch</title>
+	<title>three.js webgpu - batch mesh</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css" rel="stylesheet" href="main.css">
-	<style>
-		#info {
-			background-color: rgba(0,0,0,0.75);
-		}
-	</style>
+	<link type="text/css" rel="stylesheet" href="example.css">
 </head>
 <body>
 
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - mesh - batch
+		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+		<div class="title-wrapper">
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Batch Mesh</span>
+		</div>
+
+		<small>Mirror reflections using procedural effects.</small>
 	</div>
 
 	<script type="importmap">
 		{
 			"imports": {
 				"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
+				"three/webgpu": "../build/three.webgpu.js",
 				"three/tsl": "../build/three.tsl.js",
 				"three/addons/": "./jsm/"
 			}
@@ -30,19 +31,17 @@
 
 	<script type="module">
 
-		import * as THREE from 'three';
+		import * as THREE from 'three/webgpu';
 
-		import Stats from 'three/addons/libs/stats.module.js';
-
-		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { radixSort } from 'three/addons/utils/SortUtils.js';
 
-		import { transformedNormalView, directionToColor, diffuseColor } from 'three/tsl';
+		import { normalView, directionToColor, diffuseColor } from 'three/tsl';
 
 		let camera, scene, renderer;
-		let controls, stats;
+		let controls;
 		let gui;
 		let geometries, mesh, material;
 		const ids = [];
@@ -127,7 +126,7 @@
 			if ( ! material ) {
 
 				material = new THREE.MeshBasicNodeMaterial();
-				material.outputNode = diffuseColor.mul( directionToColor( transformedNormalView ).y.add( 0.5 ) );
+				material.outputNode = diffuseColor.mul( directionToColor( normalView ).y.add( 0.5 ) );
 		
 	}
 
@@ -203,7 +202,6 @@
 
 				renderer.dispose();
 				controls.dispose();
-				document.body.removeChild( stats.dom );
 				document.body.removeChild( renderer.domElement );
 
 			}
@@ -220,7 +218,7 @@
 			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
+			renderer.inspector = new Inspector();
 			renderer.setAnimationLoop( animate );
 
 			// scene
@@ -241,21 +239,16 @@
 			controls.autoRotate = true;
 			controls.autoRotateSpeed = 1.0;
 
-			// stats
-
-			stats = new Stats();
-			document.body.appendChild( stats.dom );
-
 			// gui
 
-			gui = new GUI();
+			gui = renderer.inspector.createParameters( 'Settings' );
 			gui.add( api, 'webgpu' ).onChange( () => {
 
 				init( ! api.webgpu );
 
 			} );
-			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
-			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
+			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT, 1 ).onChange( initMesh );
+			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT, 1 );
 
 			gui.add( api, 'opacity', 0, 1 ).onChange( v => {
 
@@ -278,7 +271,7 @@
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
 			gui.add( api, 'useCustomSort' );
-			gui.add( api, 'randomizeGeometry' );
+			gui.add( api, 'randomizeGeometry' ).name( 'randomize geometry' );
 
 
 			// listeners
@@ -304,7 +297,6 @@
 
 				controls.update();
 
-
 				if ( mesh.isBatchedMesh ) {
 
 					mesh.sortObjects = api.sortObjects;
@@ -313,9 +305,7 @@
 
 				}
 
-				await renderer.renderAsync( scene, camera );
-
-				stats.update();
+				renderer.render( scene, camera );
 
 			}
 

@@ -30,9 +30,19 @@ export function lightShadowMatrix( light ) {
 
 	const data = getLightData( light );
 
-	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( () => {
+	return data.shadowMatrix || ( data.shadowMatrix = uniform( 'mat4' ).setGroup( renderGroup ).onRenderUpdate( ( frame ) => {
 
-		if ( light.castShadow !== true ) {
+		// normally, shadow matrices are updated in ShadowNode. However, if the shadow matrix is used outside
+		// of shadow rendering (like in ProjectorLightNode), the shadow matrix still requires an update
+
+		if ( light.castShadow !== true || frame.renderer.shadowMap.enabled === false ) {
+
+			if ( light.shadow.camera.coordinateSystem !== frame.camera.coordinateSystem ) {
+
+				light.shadow.camera.coordinateSystem = frame.camera.coordinateSystem;
+				light.shadow.camera.updateProjectionMatrix();
+
+			}
 
 			light.shadow.updateMatrices( light );
 
