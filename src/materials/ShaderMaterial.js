@@ -270,6 +270,7 @@ class ShaderMaterial extends Material {
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
+		this.linewidth = source.linewidth;
 
 		this.fog = source.fog;
 		this.lights = source.lights;
@@ -278,6 +279,14 @@ class ShaderMaterial extends Material {
 		this.extensions = Object.assign( {}, source.extensions );
 
 		this.glslVersion = source.glslVersion;
+
+		this.forceSinglePass = source.forceSinglePass;
+
+		this.defaultAttributeValues = Object.assign( {}, source.defaultAttributeValues );
+
+		this.index0AttributeName = source.index0AttributeName;
+
+		this.uniformsNeedUpdate = source.uniformsNeedUpdate;
 
 		return this;
 
