@@ -1,327 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgpu - renderbundle</title>
+	<title>three.js webgpu - Render Bundle</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="example.css">
-</head>
+	</head>
+	<body>
 
-<body>
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
-	<style>
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Render Bundle</span>
+			</div>
 
-		#backend {
-			position: absolute;
-			top: 70px;
-			left: 0;
-			color: #fff;
-			background-color: rgba( 0, 0, 0, 0.75 );
-			padding: 5px;
-			width: 100%;
-			font-size: 13px;
-			text-align: center;
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-			z-index: 1;
-		}
-
-	</style>
-
-	<div id="info" class="invert">
-		<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
-
-		<div class="title-wrapper">
-			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
-			<span>Render Bundle</span>
+			<small>
+				Performance Optimization with Render Bundles. Only supported with WebGPU.
+			</small>
 		</div>
 
-		<small>
-			(WebGL uses 10 times fewer meshes to prevent performance issues.)
-		</small>
-	</div>
-
-	<div id="backend">
-		Draw Calls: 0
-	</div>
-
-	<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.webgpu.js",
-				"three/webgpu": "../build/three.webgpu.js",
-				"three/tsl": "../build/three.tsl.js",
-				"three/addons/": "./jsm/",
-				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/",
+					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+				}
 			}
-		}
-	</script>
+		</script>
 
-	<script type="module">
+		<script type="module">
 
-		import * as THREE from 'three/webgpu';
+			import * as THREE from 'three/webgpu';
 
-		import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		let camera, scene, renderer;
-		let controls;
-		let gui;
-		let geometries, group;
+			let camera, scene, renderer;
+			let controls;
+			let gui;
+			let geometries, group;
 
-		let renderTimeAverages = [];
-		//
+			//
 
-		const position = new THREE.Vector3();
-		const rotation = new THREE.Euler();
-		const quaternion = new THREE.Quaternion();
-		const scale = new THREE.Vector3();
+			const position = new THREE.Vector3();
+			const rotation = new THREE.Euler();
+			const quaternion = new THREE.Quaternion();
+			const scale = new THREE.Vector3();
 
-		//
+			//
 
-		const MAX_GEOMETRY_COUNT = 4000;
-
-		const api = {
-			webgpu: true,
-			renderBundle: true,
-			count: MAX_GEOMETRY_COUNT,
-			opacity: 1,
-			dynamic: false
-		};
+			const api = {
+				webgpu: true,
+				renderBundle: true,
+				count: 4000,
+				opacity: 1,
+				dynamic: false
+			};
 
 
-		init( ! api.webgpu );
+			init();
 
-		//
+			//
 
-		function randomizeMatrix( matrix ) {
+			function randomizeMatrix( matrix ) {
 
-			position.x = Math.random() * 80 - 40;
-			position.y = Math.random() * 80 - 40;
-			position.z = Math.random() * 80 - 40;
+				position.x = Math.random() * 80 - 40;
+				position.y = Math.random() * 80 - 40;
+				position.z = Math.random() * 80 - 40;
 
-			rotation.x = Math.random() * 2 * Math.PI;
-			rotation.y = Math.random() * 2 * Math.PI;
-			rotation.z = Math.random() * 2 * Math.PI;
+				rotation.x = Math.random() * 2 * Math.PI;
+				rotation.y = Math.random() * 2 * Math.PI;
+				rotation.z = Math.random() * 2 * Math.PI;
 
-			quaternion.setFromEuler( rotation );
+				quaternion.setFromEuler( rotation );
 
-			const factorScale = api.webgpu ? 1 : 2.0;
-			scale.x = scale.y = scale.z = 0.35 * factorScale + ( Math.random() * 0.5 * factorScale );
+				scale.x = scale.y = scale.z = 0.35 + ( Math.random() * 0.5 );
 
-			return matrix.compose( position, quaternion, scale );
+				return matrix.compose( position, quaternion, scale );
 
-		}
+			}
 
-		function randomizeRotationSpeed( rotation ) {
+			function randomizeRotationSpeed( rotation ) {
 
-			rotation.x = Math.random() * .05;
-			rotation.y = Math.random() * .05;
-			rotation.z = Math.random() * .05;
-			return rotation;
+				rotation.x = Math.random() * .05;
+				rotation.y = Math.random() * .05;
+				rotation.z = Math.random() * .05;
+				return rotation;
 
-		}
+			}
 
-		function initGeometries() {
+			function initGeometries() {
 
-			geometries = [
-				new THREE.ConeGeometry( 1.0, 2.0, 3, 1 ),
-				new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
-				new THREE.PlaneGeometry( 2.0, 2, 1, 1 ),
-				new THREE.CapsuleGeometry( ),
-				new THREE.CircleGeometry( 1.0, 3 ),
-				new THREE.CylinderGeometry( 1.0, 1.0, 2.0, 3, 1 ),
-				new THREE.DodecahedronGeometry( 1.0, 0 ),
-				new THREE.IcosahedronGeometry( 1.0, 0 ),
-				new THREE.OctahedronGeometry( 1.0, 0 ),
-				new THREE.PolyhedronGeometry( [ 0, 0, 0 ], [ 0, 0, 0 ], 1, 0 ),
-				new THREE.RingGeometry( 1.0, 1.5, 3 ),
-				new THREE.SphereGeometry( 1.0, 3, 2 ),
-				new THREE.TetrahedronGeometry( 1.0, 0 ),
-				new THREE.TorusGeometry( 1.0, 0.5, 3, 3 ),
-				new THREE.TorusKnotGeometry( 1.0, 0.5, 20, 3, 1, 1 ),
-			];
+				geometries = [
+					new THREE.ConeGeometry( 1.0, 2.0, 3, 1 ),
+					new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
+					new THREE.PlaneGeometry( 2.0, 2, 1, 1 ),
+					new THREE.CapsuleGeometry( ),
+					new THREE.CircleGeometry( 1.0, 3 ),
+					new THREE.CylinderGeometry( 1.0, 1.0, 2.0, 3, 1 ),
+					new THREE.DodecahedronGeometry( 1.0, 0 ),
+					new THREE.IcosahedronGeometry( 1.0, 0 ),
+					new THREE.OctahedronGeometry( 1.0, 0 ),
+					new THREE.PolyhedronGeometry( [ 0, 0, 0 ], [ 0, 0, 0 ], 1, 0 ),
+					new THREE.RingGeometry( 1.0, 1.5, 3 ),
+					new THREE.SphereGeometry( 1.0, 3, 2 ),
+					new THREE.TetrahedronGeometry( 1.0, 0 ),
+					new THREE.TorusGeometry( 1.0, 0.5, 3, 3 ),
+					new THREE.TorusKnotGeometry( 1.0, 0.5, 20, 3, 1, 1 ),
+				];
 
-		}
+			}
 
-		function cleanup() {
+			function initMesh( count ) {
 
-			if ( group ) {
+				initRegularMesh( count );
 
-				group.parent.remove( group );
+			}
 
-				if ( group.dispose ) {
 
-					group.dispose();
+			function initRegularMesh( count ) {
+
+				group = api.renderBundle ? new THREE.BundleGroup() : new THREE.Group();
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const material = new THREE.MeshToonNodeMaterial( {
+						color: new THREE.Color( Math.random() * 0xffffff ),
+						side: THREE.DoubleSide,
+					} );
+
+					const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
+					randomizeMatrix( child.matrix );
+					child.matrix.decompose( child.position, child.quaternion, child.scale );
+					child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
+					child.frustumCulled = false;
+					group.add( child );
 
 				}
 
+				scene.add( group );
+
 			}
 
-		}
+			function init() {
 
-		function initMesh( count ) {
+				const searchParams = new URLSearchParams( window.location.search );
+				api.webgpu = searchParams.get( 'backend' ) !== 'webgl';
+				api.renderBundle = searchParams.get( 'renderBundle' ) !== 'false';
+				api.count = parseFloat( searchParams.get( 'count' ) || 4000 );
 
-			cleanup();
-			initRegularMesh( count );
+				const count = api.count;
 
-		}
+				// camera
 
+				const aspect = window.innerWidth / window.innerHeight;
 
-		function initRegularMesh( count ) {
+				camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
+				camera.position.z = 50;
 
-			group = api.renderBundle ? new THREE.BundleGroup() : new THREE.Group();
+				// renderer
 
-			for ( let i = 0; i < count; i ++ ) {
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: ! api.webgpu } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.inspector = new Inspector();
+				renderer.setAnimationLoop( animate );
 
-				const material = new THREE.MeshToonNodeMaterial( {
-					color: new THREE.Color( Math.random() * 0xffffff ),
-					side: THREE.DoubleSide,
+				// scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xc1c1c1 );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 3.4 );
+				scene.add( light );
+
+				document.body.appendChild( renderer.domElement );
+
+				initGeometries();
+				initMesh( count );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 1.0;
+
+				// gui
+
+				gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( api, 'renderBundle' ).name( 'render bundle' ).onChange( reload );
+
+				gui.add( api, 'webgpu' ).onChange( reload );
+
+				gui.add( api, 'dynamic' ).onChange( () => {
+
+					group.static = ! group.static;
+
 				} );
 
-				const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
-				randomizeMatrix( child.matrix );
-				child.matrix.decompose( child.position, child.quaternion, child.scale );
-				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
-				child.frustumCulled = false;
-				group.add( child );
 
-			}
+				// listeners
 
-			scene.add( group );
+				window.addEventListener( 'resize', onWindowResize );
 
-		}
+				function onWindowResize() {
 
-		async function init( forceWebGL = false ) {
+					const width = window.innerWidth;
+					const height = window.innerHeight;
 
-			const count = api.count / ( api.webgpu ? 1 : 10 );
+					camera.aspect = width / height;
+					camera.updateProjectionMatrix();
 
-			renderTimeAverages = [];
+					renderer.setSize( width, height );
+					group.needsUpdate = true;
+			
+				}
 
-			if ( renderer ) {
+				function reload() {
 
-				renderer.dispose();
-				controls.dispose();
-				document.body.removeChild( renderer.domElement );
+					const backendParam = 'backend=' + ( api.webgpu ? 'webgpu' : 'webgl' );
+					const renderBundleParam = '&renderBundle=' + ( api.renderBundle ? 'true' : 'false' );
+					const countParam = '&count=' + api.count;
 
-			}
+					location.href = location.pathname + '?' + backendParam + renderBundleParam + countParam; // relative redirect with parameters
 
-			// camera
+				}
 
-			const aspect = window.innerWidth / window.innerHeight;
+				function animate() {
 
-			camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
-			camera.position.z = 50;
+					animateMeshes();
 
-			// renderer
+					controls.update();
 
-			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.inspector = new Inspector();
-			renderer.setAnimationLoop( animate );
+					renderer.render( scene, camera );
 
-			// scene
+				}
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xc1c1c1 );
+				function animateMeshes() {
 
-			const light = new THREE.DirectionalLight( 0xffffff, 3.4 );
-			scene.add( light );
+					const count = api.count;
+					const loopNum = api.dynamic ? count : 0;
 
-			document.body.appendChild( renderer.domElement );
+					for ( let i = 0; i < loopNum; i ++ ) {
 
-			await renderer.init();
+						const child = group.children[ i ];
+						const rotationSpeed = child.userData.rotationSpeed;
 
+						child.rotation.set(
+							child.rotation.x + rotationSpeed.x,
+							child.rotation.y + rotationSpeed.y,
+							child.rotation.z + rotationSpeed.z
+						);
 
-			initGeometries();
-			initMesh( count );
-
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.autoRotate = true;
-			controls.autoRotateSpeed = 1.0;
-
-			// gui
-
-			gui = renderer.inspector.createParameters( 'Settings' );
-			gui.add( api, 'renderBundle' ).name( 'render bundle' ).onChange( () => {
-
-				init( ! api.webgpu );
-
-			} );
-
-			gui.add( api, 'webgpu' ).onChange( () => {
-
-				init( ! api.webgpu );
-
-			} );
-
-			gui.add( api, 'dynamic' ).onChange( () => {
-
-				group.static = ! group.static;
-
-			} );
-
-
-			// listeners
-
-			window.addEventListener( 'resize', onWindowResize );
-
-			function onWindowResize() {
-
-				const width = window.innerWidth;
-				const height = window.innerHeight;
-
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( width, height );
-				group.needsUpdate = true;
-		
-			}
-
-			async function animate() {
-
-				animateMeshes();
-
-				controls.update();
-
-				const renderTimeAverage = performance.now();
-				renderer.render( scene, camera );
-
-				// push only the last 60 render times
-				renderTimeAverages.push( performance.now() - renderTimeAverage );
-				if ( renderTimeAverages.length > 60 ) renderTimeAverages.shift();
-		
-				const average = renderTimeAverages.reduce( ( a, b ) => a + b, 0 ) / renderTimeAverages.length;
-
-				document.getElementById( 'backend' ).innerText = `Average Render Time ${api.renderBundle ? '(Bundle)' : ''}: ` + average.toFixed( 2 ) + 'ms';
-
-			}
-
-			function animateMeshes() {
-
-				const count = api.count / ( api.webgpu ? 1 : 10 );
-				const loopNum = api.dynamic ? count : 0;
-
-				for ( let i = 0; i < loopNum; i ++ ) {
-
-					const child = group.children[ i ];
-					const rotationSpeed = child.userData.rotationSpeed;
-
-					child.rotation.set(
-						child.rotation.x + rotationSpeed.x,
-						child.rotation.y + rotationSpeed.y,
-						child.rotation.z + rotationSpeed.z
-					);
+					}
 
 				}
 
 			}
 
-		}
+		</script>
 
-	</script>
-
-</body>
+	</body>
 </html>
