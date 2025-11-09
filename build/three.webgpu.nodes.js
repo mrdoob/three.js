@@ -42283,8 +42283,6 @@ const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, sha
  */
 const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
 
-	const occlusion = float( 1 ).toVar();
-
 	let distribution = texture( depthTexture ).sample( shadowCoord.xy );
 
 	if ( depthTexture.isArrayTexture ) {
@@ -42295,19 +42293,28 @@ const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLa
 
 	distribution = distribution.rg;
 
-	const hardShadow = step( shadowCoord.z, distribution.x );
+	const mean = distribution.x;
+	const variance = max$1( 0.0000001, distribution.y.mul( distribution.y ) );
 
-	If( hardShadow.notEqual( float( 1.0 ) ), () => {
+	const hardShadow = step( shadowCoord.z, mean );
 
-		const distance = shadowCoord.z.sub( distribution.x );
-		const variance = max$1( 0, distribution.y.mul( distribution.y ) );
-		let softnessProbability = variance.div( variance.add( distance.mul( distance ) ) ); // Chebeyshevs inequality
-		softnessProbability = clamp( sub( softnessProbability, 0.3 ).div( 0.95 - 0.3 ) );
-		occlusion.assign( clamp( max$1( hardShadow, softnessProbability ) ) );
+	// Early return if fully lit
+	If( hardShadow.equal( 1.0 ), () => {
+
+		return float( 1.0 );
 
 	} );
 
-	return occlusion;
+	// Distance from mean
+	const d = shadowCoord.z.sub( mean );
+
+	// Chebyshev's inequality for upper bound on probability
+	let p_max = variance.div( variance.add( d.mul( d ) ) );
+
+	// Reduce light bleeding by remapping [amount, 1] to [0, 1]
+	p_max = clamp( sub( p_max, 0.3 ).div( 0.65 ) );
+
+	return max$1( hardShadow, p_max );
 
 } );
 
@@ -56550,7 +56557,7 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
-	 * @return {Promise<Array|undefined>} A Promise that resolves when the compile has been finished.
+	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
 	async compileAsync( scene, camera, targetScene = null ) {
 
