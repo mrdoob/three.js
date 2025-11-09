@@ -276,21 +276,6 @@
 					observedRenderers.push( obj );
 					devTools.objects.set( obj.uuid, data );
 
-					// Intercept render method to track last camera
-					if ( ! obj.__devtools_render_wrapped ) {
-
-						const originalRender = obj.render;
-						obj.render = function ( scene, camera ) {
-
-							devTools.lastCamera = camera;
-							return originalRender.call( this, scene, camera );
-
-						};
-
-						obj.__devtools_render_wrapped = true;
-
-					}
-
 					dispatchEvent( EVENT_RENDERER, data );
 
 				}

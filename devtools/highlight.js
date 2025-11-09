@@ -10,11 +10,18 @@
 
 	function cloneMaterial( material ) {
 
+		// Skip MeshNormalMaterial
+		if ( material.isMeshNormalMaterial ) {
+
+			return material;
+
+		}
+
 		// Handle ShaderMaterial and RawShaderMaterial
 		if ( material.isShaderMaterial || material.isRawShaderMaterial ) {
 
-			// Clone the material to preserve uniforms and other properties
-			const cloned = material.clone();
+			// Create new material of the same type
+			const cloned = new material.constructor();
 
 			// Override shaders with simple yellow output
 			const vertexShader = `
@@ -49,8 +56,8 @@
 
 		}
 
-		// Clone the material
-		const cloned = material.clone();
+		// Create new material of the same type
+		const cloned = new material.constructor();
 
 		// Set yellow color
 		if ( cloned.color ) {
@@ -74,36 +81,6 @@
 		if ( 'wireframe' in cloned ) {
 
 			cloned.wireframe = true;
-
-		}
-
-		// Disable vertex colors
-		cloned.vertexColors = false;
-
-		// Set to front side only (0 = FrontSide) if material supports it
-		if ( 'side' in cloned ) {
-
-			cloned.side = 0;
-
-		}
-
-		// Clear all texture maps
-		if ( 'map' in cloned ) cloned.map = null;
-		if ( 'lightMap' in cloned ) cloned.lightMap = null;
-		if ( 'aoMap' in cloned ) cloned.aoMap = null;
-		if ( 'emissiveMap' in cloned ) cloned.emissiveMap = null;
-		if ( 'bumpMap' in cloned ) cloned.bumpMap = null;
-		if ( 'normalMap' in cloned ) cloned.normalMap = null;
-		if ( 'displacementMap' in cloned ) cloned.displacementMap = null;
-		if ( 'roughnessMap' in cloned ) cloned.roughnessMap = null;
-		if ( 'metalnessMap' in cloned ) cloned.metalnessMap = null;
-		if ( 'alphaMap' in cloned ) cloned.alphaMap = null;
-		if ( 'envMap' in cloned ) cloned.envMap = null;
-
-		// Disable clipping
-		if ( cloned.clippingPlanes ) {
-
-			cloned.clippingPlanes = [];
 
 		}
 

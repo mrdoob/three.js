@@ -443,7 +443,7 @@ function renderRenderer( obj, container ) {
 }
 
 // Function to render an object and its children
-function renderObject( obj, container, level = 0 ) {
+function renderObject( obj, container, level = 0, parentInvisible = false ) {
 
 	const icon = getObjectIcon( obj );
 	let displayName = obj.name || obj.type;
@@ -453,6 +453,13 @@ function renderObject( obj, container, level = 0 ) {
 	elem.className = 'tree-item';
 	elem.style.paddingLeft = `${level * 20}px`;
 	elem.setAttribute( 'data-uuid', obj.uuid );
+
+	// Apply opacity for invisible objects or if parent is invisible
+	if ( obj.visible === false || parentInvisible ) {
+
+		elem.style.opacity = '0.5';
+
+	}
 
 	let labelContent = `<span class="icon">${icon}</span>
 		<span class="label">${displayName}</span>
@@ -491,7 +498,12 @@ function renderObject( obj, container, level = 0 ) {
 	// Add mouseenter handler to request object details and highlight in 3D
 	elem.addEventListener( 'mouseenter', () => {
 		requestObjectDetails( obj.uuid );
-		requestObjectHighlight( obj.uuid );
+		// Only highlight if object and all parents are visible
+		if ( obj.visible !== false && ! parentInvisible ) {
+
+			requestObjectHighlight( obj.uuid );
+
+		}
 	} );
 
 	// Add mouseleave handler to remove 3D highlight
@@ -533,7 +545,7 @@ function renderObject( obj, container, level = 0 ) {
 		// Render each child
 		children.forEach( child => {
 
-			renderObject( child, childContainer, level + 1 );
+			renderObject( child, childContainer, level + 1, parentInvisible || obj.visible === false );
 
 		} );
 
@@ -636,7 +648,7 @@ function showFloatingDetails( objectData ) {
 	
 	// Clear previous content
 	panel.innerHTML = '';
-	
+
 	if ( objectData.position ) {
 
 		panel.appendChild( createVectorRow( 'Position', objectData.position ) );
