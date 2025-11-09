@@ -502,7 +502,15 @@ class Texture extends EventDispatcher {
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
 		this.isArrayTexture = source.isArrayTexture;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		if ( typeof structuredClone === 'function' ) {
+
+			this.userData = structuredClone( source.userData );
+
+		} else {
+
+			this.userData = JSON.parse( JSON.stringify( source.userData ) );
+
+		}
 
 		this.needsUpdate = true;
 

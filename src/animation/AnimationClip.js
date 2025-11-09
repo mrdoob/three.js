@@ -529,7 +529,15 @@ class AnimationClip {
 
 		const clip = new this.constructor( this.name, this.duration, tracks, this.blendMode );
 
-		clip.userData = JSON.parse( JSON.stringify( this.userData ) );
+		if ( typeof structuredClone === 'function' ) {
+
+			clip.userData = structuredClone( this.userData );
+
+		} else {
+
+			clip.userData = JSON.parse( JSON.stringify( this.userData ) );
+
+		}
 
 		return clip;
 
