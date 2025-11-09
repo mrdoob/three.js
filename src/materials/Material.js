@@ -970,9 +970,47 @@ class Material extends EventDispatcher {
 
 		this.visible = source.visible;
 
-		this.toneMapped = source.toneMapped;
+		if ( source.userData ) {
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+			if ( typeof structuredClone === 'function' ) {
+
+				this.userData = structuredClone( source.userData );
+
+			} else {
+
+				this.userData = JSON.parse( JSON.stringify( source.userData ) );
+
+			}
+
+		} else {
+
+			this.userData = {};
+			
+		}
+
+		this.onBeforeCompile = source.onBeforeCompile;
+
+		if ( Object.prototype.hasOwnProperty.call( source, 'customProgramCacheKey' ) ) {
+
+			if ( typeof source.customProgramCacheKey === 'function' ) {
+
+				this.customProgramCacheKey = source.customProgramCacheKey.bind( this );
+
+			} else {
+
+				this.customProgramCacheKey = source.customProgramCacheKey;
+
+			}
+
+		} else {
+
+			if ( Object.prototype.hasOwnProperty.call( this, 'customProgramCacheKey' ) ) {
+
+				delete this.customProgramCacheKey;
+
+			}
+
+		}
 
 		return this;
 
