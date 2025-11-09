@@ -10,47 +10,40 @@
 
 	function cloneMaterial( material ) {
 
-		// Handle ShaderMaterial and RawShaderMaterial with custom yellow shaders
+		// Handle ShaderMaterial and RawShaderMaterial
 		if ( material.isShaderMaterial || material.isRawShaderMaterial ) {
 
-			const vertexShader = material.isRawShaderMaterial ?
-				`
-				attribute vec3 position;
+			// Clone the material to preserve uniforms and other properties
+			const cloned = material.clone();
+
+			// Override shaders with simple yellow output
+			const vertexShader = `
+				${ material.isRawShaderMaterial ? `attribute vec3 position;
 				uniform mat4 modelViewMatrix;
 				uniform mat4 projectionMatrix;
-				void main() {
+				` : '' }void main() {
 					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 				}
-				` :
-				`
-				void main() {
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				}
-				`;
+			`;
 
-			const fragmentShader = material.isRawShaderMaterial ?
-				`
-				precision highp float;
-				void main() {
+			const fragmentShader = `
+				${ material.isRawShaderMaterial ? `precision highp float;
+				` : '' }void main() {
 					gl_FragColor = vec4( 1.0, 1.0, 0.0, 1.0 );
 				}
-				` :
-				`
-				void main() {
-					gl_FragColor = vec4( 1.0, 1.0, 0.0, 1.0 );
-				}
-				`;
+			`;
 
-			// Create new shader material with solid yellow color
-			const cloned = new material.constructor( {
-				vertexShader: vertexShader,
-				fragmentShader: fragmentShader,
-				wireframe: true,
-				depthTest: false,
-				depthWrite: false,
-				transparent: true,
-				opacity: 1
-			} );
+			cloned.vertexShader = vertexShader;
+			cloned.fragmentShader = fragmentShader;
+
+			// Override with yellow wireframe settings
+			cloned.wireframe = true;
+			cloned.depthTest = false;
+			cloned.depthWrite = false;
+			cloned.transparent = true;
+			cloned.opacity = 1;
+			cloned.toneMapped = false;
+			cloned.fog = false;
 
 			return cloned;
 
