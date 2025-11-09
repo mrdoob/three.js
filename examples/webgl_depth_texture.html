@@ -189,22 +189,28 @@
 				const count = 50;
 				const scale = 5;
 
+				const mesh = new THREE.InstancedMesh( geometry, material, count );
+				const dummy = new THREE.Object3D();
+
 				for ( let i = 0; i < count; i ++ ) {
 
 					const r = Math.random() * 2.0 * Math.PI;
 					const z = ( Math.random() * 2.0 ) - 1.0;
 					const zScale = Math.sqrt( 1.0 - z * z ) * scale;
 
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.set(
+					dummy.position.set(
 						Math.cos( r ) * zScale,
 						Math.sin( r ) * zScale,
 						z * scale
 					);
-					mesh.rotation.set( Math.random(), Math.random(), Math.random() );
-					scene.add( mesh );
+					dummy.rotation.set( Math.random(), Math.random(), Math.random() );
+
+					dummy.updateMatrix();
+					mesh.setMatrixAt( i, dummy.matrix );
 
 				}
+
+				scene.add( mesh );
 
 			}
 
