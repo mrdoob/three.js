@@ -14,6 +14,7 @@
 	"physics_rapier_character_controller": [ "external" ],
 	"physics_rapier_vehicle_controller": [ "external" ],
 	"webgl_batch_lod_bvh": [ "external", "accelerate", "performance", "extension", "plugin", "library", "three.ez" ],
+    "webgl_batch_lod_merged":[ "external", "accelerate", "performance", "extension", "plugin", "library", "three.ez" ],
 	"webgl_clipping": [ "solid" ],
 	"webgl_clipping_advanced": [ "solid" ],
 	"webgl_clipping_intersection": [ "solid" ],
