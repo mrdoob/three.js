@@ -1,4 +1,7 @@
-import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, invocationSubgroupMetaIndex, arrayBuffer } from 'three/tsl';
+import {
+	StorageInstancedBufferAttribute
+} from 'three';
+import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, invocationSubgroupMetaIndex, arrayBuffer, storage } from 'three/tsl';
 
 const divRoundUp = ( size, part_size ) => {
 
@@ -68,6 +71,12 @@ export class PrefixSum {
 		 */
 		this.renderer = renderer;
 
+		if ( this.renderer.backend.device === null ) {
+
+			renderer.backend.init();
+
+		}
+
 		/**
 		 * @type {PrefixSumStorageObjects}
 		 */
@@ -132,7 +141,14 @@ export class PrefixSum {
 		 *
 		 * @type {number}
 		*/
-		this.workgroupSize = options.workgroupSize ? options.workgroupSize : Math.min( this.vecCount, 64 );
+		this.workgroupSize = options.workgroupSize ? options.workgroupSize : Math.min( this.vecCount, this.renderer.backend.device.limits.maxComputeWorkgroupSizeX );
+
+		/**
+		 * The minimumn subgroup size specified by the renderer's graphics device.
+		 *
+		 * @type {number}
+		*/
+		this.minSubgroupSize = ( this.renderer.backend.device.adapterInfo && this.renderer.backend.device.adapterInfo.subgroupMinSize ) ? this.renderer.backend.device.adapterInfo.subgroupMinSize : 4;
 
 		/**
 		 * The maximum number of elements that will be read by an individual workgroup in the reduction step.
@@ -179,10 +195,17 @@ export class PrefixSum {
 	_createStorageBuffers( inputArray ) {
 
 		this.arrayBuffer = this.type === 'uint' ? Uint32Array.from( inputArray ) : Float32Array.from( inputArray );
+		this.outputArrayBuffer = this.type === 'uint' ? Uint32Array.from( inputArray ) : Float32Array.from( inputArray );
 
-		this.storageBuffers.unvectorizedDataBuffer = instancedArray( this.arrayBuffer, this.type ).setPBO( true ).setName( `Prefix_Sum_Input_Unvec_${id}` );
-		this.storageBuffers.dataBuffer = instancedArray( this.arrayBuffer, this.vecType ).setPBO( true ).setName( `Prefix_Sum_Input_Vec_${id}` );
-		this.storageBuffers.outputBuffer = instancedArray( this.arrayBuffer, this.vecType ).setName( `Prefix_Sum_Output_${id}` );
+		const inputAttribute = new StorageInstancedBufferAttribute( this.arrayBuffer, 1 );
+		const outputAttribute = new StorageInstancedBufferAttribute( this.outputArrayBuffer, 1 );
+
+		this.storageBuffers.dataBuffer = storage( inputAttribute, this.vecType, inputAttribute.count / 4 ).setName( `Prefix_Sum_Input_Vec_${id}` );
+		this.storageBuffers.unvectorizedDataBuffer = storage( inputAttribute, this.type, inputAttribute.count ).setName( `Prefix_Sum_Input_Unvec_${id}` );
+
+		this.storageBuffers.outputBuffer = storage( outputAttribute, this.vecType, outputAttribute.count / 4 ).setName( `Prefix_Sum_Output_Vec_${id}` );
+		this.storageBuffers.unvectorizedOutputBuffer = storage( outputAttribute, this.type, outputAttribute.count ).setName( `Prefix_Sum_Output_Unvec_${id}` );
+
 		this.storageBuffers.reductionBuffer = instancedArray( this.numWorkgroups, this.type ).setPBO( true ).setName( `Prefix_Sum_Reduction_${id}` );
 
 	}
@@ -472,6 +495,19 @@ export class PrefixSum {
 	_getSpineScanFn() {
 
 		const { reductionBuffer } = this.storageBuffers;
+
+		if ( this.numWorkgroups <= this.minSubgroupSize ) {
+
+			const fnDef = Fn( () => {
+
+				reductionBuffer.element( invocationSubgroupIndex ).assign( subgroupInclusiveAdd( reductionBuffer.element( invocationSubgroupIndex ) ) );
+
+			} )().compute( this.numWorkgroups, [ this.workgroupSize ] );
+
+			return fnDef;
+
+		}
+
 		const { subgroupReductionArray, unvectorizedSubgroupOffset, spineSize, subgroupSizeLog } = this.utilityNodes;
 		const { unvectorizedWorkPerInvocation } = this;
 
@@ -630,8 +666,6 @@ export class PrefixSum {
 
 		} )().compute( this.numWorkgroups, [ this.workgroupSize ] );
 
-		console.log( fnDef );
-
 		return fnDef;
 
 	}
@@ -639,7 +673,6 @@ export class PrefixSum {
 	_getDownsweepFn() {
 
 		const { dataBuffer, reductionBuffer, outputBuffer } = this.storageBuffers;
-		const { vecType } = this;
 		const { subgroupOffset, workgroupOffset, subgroupReductionArray, subgroupSizeLog, spineSize } = this.utilityNodes;
 
 		const { workPerInvocation, vecCount } = this;
@@ -958,9 +991,9 @@ export class PrefixSum {
 	 */
 	async compute() {
 
-		await this.computeStep( this.currentStep );
-		await this.computeStep( this.currentStep );
-		await this.computeStep( this.currentStep );
+		await this.computeReduce();
+		await this.computeSpineScan();
+		await this.computeDownsweep();
 
 	}
 

@@ -119,7 +119,7 @@ export class BitonicSort {
 		 *
 		 * @type {StorageBufferNode}
 		*/
-		this.workgroupSize = options.workgroupSize ? Math.min( this.dispatchSize, options.workgroupSize ) : Math.min( this.dispatchSize, 64 );
+		this.workgroupSize = options.workgroupSize ? Math.min( this.dispatchSize, options.workgroupSize ) : Math.min( this.dispatchSize, this.renderer.backend.device.limits.maxComputeWorkgroupSizeX );
 
 		/**
 		 * A node representing a workgroup scoped buffer that holds locally sorted elements.
