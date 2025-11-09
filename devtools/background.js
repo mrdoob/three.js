@@ -6,6 +6,8 @@ const MESSAGE_INIT = 'init';
 const MESSAGE_REQUEST_STATE = 'request-state';
 const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
 const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
+const MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
+const MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
 const MESSAGE_REGISTER = 'register';
 const MESSAGE_COMMITTED = 'committed';
 
@@ -34,7 +36,13 @@ chrome.runtime.onConnect.addListener( port => {
 	let tabId;
 
 	// Messages that should be forwarded to content script
-	const forwardableMessages = new Set( [ MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS ] );
+	const forwardableMessages = new Set( [
+		MESSAGE_REQUEST_STATE,
+		MESSAGE_REQUEST_OBJECT_DETAILS,
+		MESSAGE_SCROLL_TO_CANVAS,
+		MESSAGE_HIGHLIGHT_OBJECT,
+		MESSAGE_UNHIGHLIGHT_OBJECT
+	] );
 
 	// Listen for messages from the devtools panel
 	port.onMessage.addListener( message => {

@@ -3,12 +3,7 @@ try {
 	chrome.devtools.panels.create(
 		'Three.js',
 		null,
-		'panel/panel.html',
-		function () {
-
-			console.log( 'Three.js DevTools panel created' );
-
-		}
+		'panel/panel.html'
 	);
 
 } catch ( error ) {

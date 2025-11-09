@@ -7,20 +7,33 @@ const MESSAGE_ID = 'three-devtools';
 const MESSAGE_REQUEST_STATE = 'request-state';
 const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
 const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
+const MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
+const MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
 
 // Inject the bridge script into the main document or a target (e.g., iframe)
 function injectBridge( target = document ) {
 
-	const script = document.createElement( 'script' );
-	script.src = chrome.runtime.getURL( 'bridge.js' );
-	script.onload = function () {
+	const bridgeScript = document.createElement( 'script' );
+	bridgeScript.src = chrome.runtime.getURL( 'bridge.js' );
+	bridgeScript.onload = function () {
 
 		this.remove();
 
+		// Inject highlight.js after bridge.js loads
+		const highlightScript = document.createElement( 'script' );
+		highlightScript.src = chrome.runtime.getURL( 'highlight.js' );
+		highlightScript.onload = function () {
+
+			this.remove();
+
+		};
+
+		( target.head || target.documentElement ).appendChild( highlightScript );
+
 	};
 
-	( target.head || target.documentElement ).appendChild( script );
-	return script;
+	( target.head || target.documentElement ).appendChild( bridgeScript );
+	return bridgeScript;
 
 }
 
@@ -118,7 +131,13 @@ function handleWindowMessage( event ) {
 // Listener for messages from the background script (originating from panel)
 function handleBackgroundMessage( message ) {
 
-	const forwardableMessages = new Set( [ MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS ] );
+	const forwardableMessages = new Set( [
+		MESSAGE_REQUEST_STATE,
+		MESSAGE_REQUEST_OBJECT_DETAILS,
+		MESSAGE_SCROLL_TO_CANVAS,
+		MESSAGE_HIGHLIGHT_OBJECT,
+		MESSAGE_UNHIGHLIGHT_OBJECT
+	] );
 
 	if ( forwardableMessages.has( message.name ) ) {
 

@@ -16,6 +16,8 @@
 	const MESSAGE_REQUEST_STATE = 'request-state';
 	const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
 	const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
+	const MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
+	const MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
 	const HIGHLIGHT_OVERLAY_DURATION = 1000;
 
 	// Only initialize if not already initialized
@@ -113,6 +115,9 @@
 			function traverse( object ) {
 
 				if ( ! object || ! object.uuid ) return;
+
+				// Skip DevTools highlight objects
+				if ( object.name === '__THREE_DEVTOOLS_HIGHLIGHT__' ) return;
 
 				// Skip if already processed (when duplicate prevention is enabled)
 				if ( processedUUIDs && processedUUIDs.has( object.uuid ) ) return;
@@ -271,6 +276,21 @@
 					observedRenderers.push( obj );
 					devTools.objects.set( obj.uuid, data );
 
+					// Intercept render method to track last camera
+					if ( ! obj.__devtools_render_wrapped ) {
+
+						const originalRender = obj.render;
+						obj.render = function ( scene, camera ) {
+
+							devTools.lastCamera = camera;
+							return originalRender.call( this, scene, camera );
+
+						};
+
+						obj.__devtools_render_wrapped = true;
+
+					}
+
 					dispatchEvent( EVENT_RENDERER, data );
 
 				}
@@ -374,7 +394,7 @@
 
 			if ( window.THREE && window.THREE.REVISION ) {
 
-				dispatchEvent( EVENT_REGISTER, { revision: THREE.REVISION } );
+				dispatchEvent( EVENT_REGISTER, { revision: window.THREE.REVISION } );
 
 			}
 
@@ -409,6 +429,14 @@
 
 				scrollToCanvas( message.uuid );
 
+			} else if ( message.name === MESSAGE_HIGHLIGHT_OBJECT ) {
+
+				devTools.dispatchEvent( new CustomEvent( 'highlight-object', { detail: { uuid: message.uuid } } ) );
+
+			} else if ( message.name === MESSAGE_UNHIGHLIGHT_OBJECT ) {
+
+				devTools.dispatchEvent( new CustomEvent( 'unhighlight-object' ) );
+
 			}
 
 		} );
@@ -441,6 +469,9 @@
 
 			for ( const scene of observedScenes ) {
 
+				// Check if we're looking for the scene itself
+				if ( scene.uuid === uuid ) return scene;
+
 				const found = scene.getObjectByProperty( 'uuid', uuid );
 				if ( found ) return found;
 
@@ -449,6 +480,15 @@
 			return null;
 
 		}
+
+		// Expose utilities for highlight.js in a clean namespace
+		devTools.utils = {
+			findObjectInScenes,
+			generateUUID
+		};
+
+		// Expose renderers array for highlight.js
+		devTools.renderers = observedRenderers;
 
 		function createHighlightOverlay( targetElement ) {
 
@@ -604,7 +644,6 @@
 
 			if ( currentObjectCount !== previousObjectCount ) {
 
-				console.log( `DevTools: Scene ${scene.uuid} count changed (${previousObjectCount} -> ${currentObjectCount}), dispatching update.` );
 				// Dispatch the batch update for the panel
 				dispatchEvent( EVENT_SCENE, { sceneUuid: scene.uuid, objects: batchObjects } );
 				// Update the cache

@@ -7,6 +7,8 @@ const MESSAGE_INIT = 'init';
 const MESSAGE_REQUEST_STATE = 'request-state';
 const MESSAGE_REQUEST_OBJECT_DETAILS = 'request-object-details';
 const MESSAGE_SCROLL_TO_CANVAS = 'scroll-to-canvas';
+const MESSAGE_HIGHLIGHT_OBJECT = 'highlight-object';
+const MESSAGE_UNHIGHLIGHT_OBJECT = 'unhighlight-object';
 const EVENT_REGISTER = 'register';
 const EVENT_RENDERER = 'renderer';
 const EVENT_OBJECT_DETAILS = 'object-details';
@@ -123,7 +125,6 @@ const intervalId = setInterval( () => {
 
 backgroundPageConnection.onDisconnect.addListener( () => {
 
-	console.log( 'Panel: Connection to background page lost' );
 	clearInterval( intervalId );
 	clearState();
 
@@ -134,6 +135,23 @@ function requestObjectDetails( uuid ) {
 	backgroundPageConnection.postMessage( {
 		name: MESSAGE_REQUEST_OBJECT_DETAILS,
 		uuid: uuid,
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+}
+
+// Function to highlight object in 3D scene
+function requestObjectHighlight( uuid ) {
+	backgroundPageConnection.postMessage( {
+		name: MESSAGE_HIGHLIGHT_OBJECT,
+		uuid: uuid,
+		tabId: chrome.devtools.inspectedWindow.tabId
+	} );
+}
+
+// Function to remove highlight from 3D scene
+function requestObjectUnhighlight() {
+	backgroundPageConnection.postMessage( {
+		name: MESSAGE_UNHIGHLIGHT_OBJECT,
 		tabId: chrome.devtools.inspectedWindow.tabId
 	} );
 }
@@ -300,6 +318,7 @@ function handleThreeEvent( message ) {
 
 		case EVENT_REGISTER:
 			state.revision = message.detail.revision;
+			updateUI();
 			break;
 
 		// Handle individual renderer observation
@@ -309,31 +328,30 @@ function handleThreeEvent( message ) {
 			// Update or add the renderer in the state maps (always use latest data)
 			state.renderers.set( detail.uuid, detail );
 			state.objects.set( detail.uuid, detail );
-
+			updateUI();
 			break;
 
 		// Handle object details response
 		case EVENT_OBJECT_DETAILS:
 			state.selectedObject = message.detail;
-			console.log( 'Panel: Received object details:', message.detail );
 			showFloatingDetails( message.detail );
+			// Don't call updateUI() - this doesn't change the tree structure
 			break;
 
 		// Handle a batch of objects for a specific scene
 		case EVENT_SCENE:
 			const { sceneUuid, objects: batchObjects } = message.detail;
-			console.log( 'Panel: Received scene batch for', sceneUuid, 'with', batchObjects.length, 'objects' );
 			processSceneBatch( sceneUuid, batchObjects );
+			updateUI();
 			break;
 
 		case EVENT_COMMITTED:
 			// Page was reloaded, clear state
 			clearState();
+			updateUI();
 			break;
 
 	}
-
-	updateUI();
 
 }
 
@@ -447,7 +465,7 @@ function renderObject( obj, container, level = 0 ) {
 		function countObjects( uuid ) {
 
 			const object = state.objects.get( uuid );
-			if ( object ) {
+			if ( object && object.name !== '__THREE_DEVTOOLS_HIGHLIGHT__' ) {
 
 				objectCount ++; // Increment count for the object itself
 				if ( object.children ) {
@@ -469,13 +487,18 @@ function renderObject( obj, container, level = 0 ) {
 	}
 
 	elem.innerHTML = labelContent;
-	
-	// Add mouseover handler to request object details
-	elem.addEventListener( 'mouseover', ( event ) => {
-		event.stopPropagation(); // Prevent bubbling to parent elements
+
+	// Add mouseenter handler to request object details and highlight in 3D
+	elem.addEventListener( 'mouseenter', () => {
 		requestObjectDetails( obj.uuid );
+		requestObjectHighlight( obj.uuid );
 	} );
-	
+
+	// Add mouseleave handler to remove 3D highlight
+	elem.addEventListener( 'mouseleave', () => {
+		requestObjectUnhighlight();
+	} );
+
 	container.appendChild( elem );
 
 	// Handle children (excluding children of renderers, as properties are shown in details)
@@ -489,7 +512,7 @@ function renderObject( obj, container, level = 0 ) {
 		// Get all children and sort them by type for better organization
 		const children = obj.children
 			.map( childId => state.objects.get( childId ) )
-			.filter( child => child !== undefined )
+			.filter( child => child !== undefined && child.name !== '__THREE_DEVTOOLS_HIGHLIGHT__' )
 			.sort( ( a, b ) => {
 
 				const getTypeOrder = ( obj ) => {
