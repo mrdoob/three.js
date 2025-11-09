@@ -776,6 +776,74 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Generates the WGSL snippet for gathering four texels from a texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} componentSnippet - A WGSL snippet that represents the component to gather (0-3).
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGather( texture, textureProperty, uvSnippet, componentSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureGather( ${ componentSnippet }, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGather( ${ componentSnippet }, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet } )`;
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for gathering four texels from a texture and comparing them against a reference value.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet } )`;
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for sampling a depth texture and comparing the sampled depth values
+	 * against a reference value at a specific level.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureSampleCompareLevel( texture, textureProperty, uvSnippet, compareSnippet, levelSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureSampleCompareLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureSampleCompareLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ levelSnippet } )`;
+
+	}
+
+	/**
 	 * Returns a WGSL snippet that represents the property name of the given node.
 	 *
 	 * @param {Node} node - The node.
