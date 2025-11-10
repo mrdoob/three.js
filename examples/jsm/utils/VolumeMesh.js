@@ -72,7 +72,6 @@ export class VolumeMesh extends Mesh {
 		this.sdfTexture.magFilter = LinearFilter;
 
 		const point = new Vector3();
-		const ray = new Ray();
 		const target = {
 			point: new Vector3(),
 			distance: 0,
