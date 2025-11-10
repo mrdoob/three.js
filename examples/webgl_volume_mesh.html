@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - VolumeMesh</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - VolumeMesh<br/>
+			Generation time: <span id="output">-</span>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
+			import { VolumeMesh } from 'three/addons/utils/VolumeMesh.js';
+			import { RenderSDFLayerMaterial } from 'three/addons/utils/RenderSDFLayerMaterial.js';
+
+
+			// Add BVH extension to THREE.BufferGeometry
+			THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+			THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
+			THREE.Mesh.prototype.raycast = acceleratedRaycast;
+
+			const params = {
+				resolution: 100,
+				margin: 0.05,
+				surface: 0.0,
+				regenerate: () => regenerateVolume(),
+				showMultiple: false,
+				showLayers: true,
+				layer: 0
+			};
+
+			let renderer, camera, scene, gui;
+			let outputContainer;
+			let sourceMesh, sourceMaterial;
+			let volumeMeshes = [];
+			let layerPass;
+
+			init();
+
+			async function init() {
+
+				outputContainer = document.getElementById( 'output' );
+
+				// renderer setup
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				// scene setup
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				// Setup environment map
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const environment = new RoomEnvironment();
+				const envMapRT = pmremGenerator.fromScene( environment );
+				scene.environment = envMapRT.texture;
+				environment.dispose();
+				pmremGenerator.dispose();
+
+				// camera setup
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 50 );
+				camera.position.set( 1, 1, 2 );
+				camera.far = 100;
+				camera.updateProjectionMatrix();
+
+				new OrbitControls( camera, renderer.domElement );
+
+				// screen pass to render a single layer of the 3d texture
+				layerPass = new FullScreenQuad( new RenderSDFLayerMaterial() );
+
+				// Load model
+				new GLTFLoader()
+					.load( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', async ( gltf ) => {
+
+						const object = gltf.scene;
+						object.updateMatrixWorld( true );
+
+						// Get material from first mesh
+						object.traverse( c => {
+
+							if ( c.isMesh && c.material && ! sourceMaterial ) {
+
+								sourceMaterial = c.material;
+
+							}
+
+						} );
+
+						// Merge into single geometry
+						const geometries = [];
+						object.traverse( c => {
+
+							if ( c.geometry ) {
+
+								const cloned = c.geometry.clone();
+								cloned.applyMatrix4( c.matrixWorld );
+								geometries.push( cloned );
+
+							}
+
+						} );
+
+						const mergedGeometry = BufferGeometryUtils.mergeGeometries( geometries );
+						mergedGeometry.center();
+
+						// Compute BVH (required for VolumeMesh)
+						mergedGeometry.computeBoundsTree( { maxLeafTris: 1 } );
+
+						sourceMesh = new THREE.Mesh( mergedGeometry, sourceMaterial );
+
+						// Generate the first volume mesh
+						await regenerateVolume();
+
+					} );
+
+				// GUI
+				gui = new GUI();
+				gui.add( params, 'resolution', 32, 200, 1 ).name( 'Resolution' );
+				gui.add( params, 'margin', 0, 0.5 ).name( 'Margin' );
+				gui.add( params, 'surface', - 0.2, 0.5 ).name( 'Surface' ).onChange( () => {
+
+					volumeMeshes.forEach( v => v.surface = params.surface );
+
+				} );
+				gui.add( params, 'regenerate' ).name( 'Regenerate' );
+				gui.add( params, 'showMultiple' ).name( 'Show Multiple' ).onChange( ( value ) => {
+
+					if ( value ) {
+
+						createMultipleVolumes();
+
+					} else {
+
+						removeExtraVolumes();
+
+					}
+
+				} );
+				gui.add( params, 'showLayers' );
+				gui.add( params, 'layer', 0, params.resolution - 1, 1 );				window.addEventListener( 'resize', onResize );
+
+				window.addEventListener( 'resize', onResize );
+
+			}
+
+			async function regenerateVolume() {
+
+				if ( ! sourceMesh ) return;
+
+				const startTime = window.performance.now();
+
+				// Remove existing volume meshes
+				volumeMeshes.forEach( v => {
+
+					scene.remove( v );
+					v.dispose();
+
+				} );
+				volumeMeshes = [];
+
+				// Create new VolumeMesh - this is all you need!
+				const volume = new VolumeMesh( {
+					resolution: params.resolution,
+					margin: params.margin,
+					surface: params.surface,
+					roughness: 1.0,
+					metalness: 1.0
+				} );
+
+				// Generate the SDF from the source mesh
+				await volume.generate( sourceMesh );
+
+				// Add to scene
+				scene.add( volume );
+				volumeMeshes.push( volume );
+
+				const delta = window.performance.now() - startTime;
+				outputContainer.innerText = `${ delta.toFixed( 2 ) }ms`;
+				console.log( `VolumeMesh generated in ${delta.toFixed( 2 )}ms` );
+
+				// If showing multiple, create them
+				if ( params.showMultiple ) {
+
+					createMultipleVolumes();
+
+				}
+
+			}
+
+			async function createMultipleVolumes() {
+
+				if ( volumeMeshes.length === 0 || ! sourceMesh ) return;
+
+				// Position the first one
+				volumeMeshes[ 0 ].position.x = - 1.5;
+
+				// Create 2 more volumes
+				for ( let i = 1; i < 3; i ++ ) {
+
+					const volume = new VolumeMesh( {
+						resolution: params.resolution,
+						margin: params.margin,
+						surface: params.surface,
+						roughness: params.roughness,
+						metalness: params.metalness
+					} );
+
+					// Reuse the SDF texture from the first volume
+					volume.sdfTexture = volumeMeshes[ 0 ].sdfTexture;
+					volume.inverseBoundsMatrix.copy( volumeMeshes[ 0 ].inverseBoundsMatrix );
+
+					// Copy material properties
+					if ( sourceMesh.material ) {
+
+						const mat = sourceMesh.material;
+						if ( mat.map ) volume.material.map = mat.map;
+						if ( mat.normalMap ) volume.material.normalMap = mat.normalMap;
+						if ( mat.metalnessMap ) volume.material.metalnessMap = mat.metalnessMap;
+						if ( mat.roughnessMap ) volume.material.roughnessMap = mat.roughnessMap;
+						if ( mat.aoMap ) volume.material.aoMap = mat.aoMap;
+						volume.material.needsUpdate = true;
+
+					}
+
+					// Set scale and position
+					const sdfBoundsMatrix = volume.inverseBoundsMatrix.clone().invert();
+					const boundsCenter = new THREE.Vector3();
+					const boundsQuat = new THREE.Quaternion();
+					const boundsScale = new THREE.Vector3();
+					sdfBoundsMatrix.decompose( boundsCenter, boundsQuat, boundsScale );
+
+					volume.scale.copy( boundsScale );
+					volume.position.copy( boundsCenter );
+					volume.position.x = i * 1.5;
+					volume.updateMatrixWorld();
+
+					scene.add( volume );
+					volumeMeshes.push( volume );
+
+				}
+
+			}
+
+			function removeExtraVolumes() {
+
+				// Keep only the first volume
+				while ( volumeMeshes.length > 1 ) {
+
+					const v = volumeMeshes.pop();
+					scene.remove( v );
+					// Don't dispose the shared texture, only dispose materials
+					v.geometry.dispose();
+					v.material.dispose();
+
+				}
+
+				// Reset position of the first one
+				if ( volumeMeshes.length > 0 ) {
+
+					const sdfBoundsMatrix = volumeMeshes[ 0 ].inverseBoundsMatrix.clone().invert();
+					const boundsCenter = new THREE.Vector3();
+					const boundsQuat = new THREE.Quaternion();
+					const boundsScale = new THREE.Vector3();
+					sdfBoundsMatrix.decompose( boundsCenter, boundsQuat, boundsScale );
+
+					volumeMeshes[ 0 ].position.copy( boundsCenter );
+					volumeMeshes[ 0 ].updateMatrixWorld();
+
+				}
+
+			}
+
+			function onResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+				if ( params.showLayers && volumeMeshes.length > 0 ) {
+
+					const layerSize = 256;
+					renderer.setScissorTest( true );
+					renderer.setScissor( 0, window.innerHeight - layerSize, layerSize, layerSize );
+					renderer.setViewport( 0, window.innerHeight - layerSize, layerSize, layerSize );
+
+					layerPass.material.uniforms.sdfTex.value = volumeMeshes[ 0 ].sdfTexture;
+					layerPass.material.uniforms.layer.value = params.layer * ( 1 / params.resolution );
+
+					layerPass.render( renderer );
+
+					renderer.setScissorTest( false );
+					renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>
