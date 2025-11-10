@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - EXR with HTJ2K compression</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			EXR loader with HTJ2K compression support
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+			let camera, scene, renderer;
+
+			init();
+
+			async function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
+
+				scene = new THREE.Scene();
+
+				// Add loading information
+				const loadingDiv = document.createElement( 'div' );
+				loadingDiv.style.position = 'absolute';
+				loadingDiv.style.top = '50%';
+				loadingDiv.style.left = '50%';
+				loadingDiv.style.transform = 'translate(-50%, -50%)';
+				loadingDiv.style.color = 'white';
+				loadingDiv.style.fontSize = '20px';
+				loadingDiv.innerHTML = 'Loading...';
+				document.body.appendChild( loadingDiv );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				container.appendChild( renderer.domElement );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 0, - 0.2 );
+				controls.update();
+
+				try {
+
+					// Load HTJ2K-compressed EXR file
+					// HTJ2K support is automatically initialized when needed
+					loadingDiv.innerHTML = 'Loading HTJ2K-compressed EXR...';
+					const loader = new EXRLoader();
+
+					loader.load( 'textures/memorial_htj2k.exr', function ( texture ) {
+
+						loadingDiv.remove();
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						const geometry = new THREE.SphereGeometry( 0.8, 64, 32 );
+
+						const material = new THREE.MeshStandardMaterial( {
+							metalness: 0,
+							roughness: 0,
+							envMap: texture,
+							envMapIntensity: 1
+						} );
+
+						const mesh = new THREE.Mesh( geometry, material );
+						scene.add( mesh );
+
+						render();
+
+					}, undefined, function ( error ) {
+
+						loadingDiv.innerHTML = 'Error loading EXR: ' + error.message;
+						console.error( error );
+
+					} );
+
+				} catch ( error ) {
+
+					loadingDiv.innerHTML = 'Error: ' + error.message;
+					console.error( error );
+
+					// Fall back to loading a regular EXR without HTJ2K
+					loadingDiv.innerHTML += '<br>Loading standard EXR instead...';
+
+					const loader = new EXRLoader();
+					loader.load( 'textures/memorial.exr', function ( texture ) {
+
+						const infoDiv = document.createElement( 'div' );
+						infoDiv.style.position = 'absolute';
+						infoDiv.style.bottom = '20px';
+						infoDiv.style.left = '20px';
+						infoDiv.style.color = 'yellow';
+						infoDiv.innerHTML = 'Using fallback: Standard PIZ-compressed EXR';
+						document.body.appendChild( infoDiv );
+
+						loadingDiv.remove();
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						const geometry = new THREE.SphereGeometry( 0.8, 64, 32 );
+
+						const material = new THREE.MeshStandardMaterial( {
+							metalness: 0,
+							roughness: 0,
+							envMap: texture,
+							envMapIntensity: 1
+						} );
+
+						const mesh = new THREE.Mesh( geometry, material );
+						scene.add( mesh );
+
+						render();
+
+					} );
+
+				}
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			function animate() {
+
+				render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

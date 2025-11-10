@@ -10,6 +10,9 @@ import {
 	RGBAFormat
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
+import OpenJPHModule from '../libs/openjph/openjph.module.js';
+
+let _openjph;
 
 // Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
 // implementation, so I have preserved their copyright notices.
@@ -84,11 +87,15 @@ import * as fflate from '../libs/fflate.module.js';
  * A loader for the OpenEXR texture format.
  *
  * `EXRLoader` currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * HTJ2K (High Throughput JPEG 2000) compression is supported when the OpenJPH WASM module is loaded.
  * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
  *
  * ```js
  * const loader = new EXRLoader();
  * const texture = await loader.loadAsync( 'textures/memorial.exr' );
+ * 
+ * // For HTJ2K support:
+ * EXRLoader.setOpenJPH( openjphModule );
  * ```
  *
  * @augments DataTextureLoader
@@ -129,7 +136,7 @@ class EXRLoader extends DataTextureLoader {
 	 * @param {ArrayBuffer} buffer - The raw texture data.
 	 * @return {DataTextureLoader~TexData} An object representing the parsed texture data.
 	 */
-	parse( buffer ) {
+	async parse( buffer ) {
 
 		const USHORT_RANGE = ( 1 << 16 );
 		const BITMAP_SIZE = ( USHORT_RANGE >> 3 );
@@ -1777,7 +1784,165 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseNullTerminatedString( buffer, offset ) {
+	async function uncompressHTJ2K( info ) {
+
+		// HTJ2K (High Throughput JPEG 2000) decompression
+		// Reference: ISO/IEC 15444-15 / ITU-T T.814
+
+		// Lazy initialization of OpenJPH WASM module
+		let openjph;
+
+		if ( ! _openjph ) {
+
+			_openjph = new Promise( async ( resolve ) => {
+
+				const openjph = await OpenJPHModule();
+				resolve( openjph );
+
+			} );
+
+		}
+
+		openjph = await _openjph;
+
+		const compressedData = info.array;
+		const wasm = openjph;
+		const dv = new DataView( compressedData.buffer, compressedData.byteOffset, compressedData.byteLength );
+
+		// Parse HTJ2K header
+		let offset = 0;
+
+		// Read magic number (0x4854 = 'HT')
+		const magic = dv.getUint16( offset, false ); // big-endian
+		offset += 2;
+
+		if ( magic !== 0x4854 ) {
+
+			throw new Error(
+				`THREE.EXRLoader: Invalid HTJ2K magic number: 0x${magic.toString( 16 )}. Expected 0x4854.`
+			);
+
+		}
+
+		// Read payload length
+		const payloadLength = dv.getUint32( offset, false ); // big-endian
+		offset += 4;
+
+		// Read number of channels
+		const numChannels = dv.getUint16( offset, false ); // big-endian
+		offset += 2;
+
+		// Read channel map
+		const channelMap = new Uint16Array( numChannels );
+		for ( let i = 0; i < numChannels; i ++ ) {
+
+			channelMap[ i ] = dv.getUint16( offset, false ); // big-endian
+			offset += 2;
+
+		}
+
+		const headerSize = offset;
+
+		// Extract JPEG 2000 codestream (data after header)
+		const codestreamSize = compressedData.byteLength - headerSize;
+		const codestreamData = new Uint8Array( compressedData.buffer, compressedData.byteOffset + headerSize, codestreamSize );
+
+		// Create J2K data structure
+		const j2kData = wasm._create_j2c_data();
+
+		if ( ! j2kData ) {
+
+			throw new Error( 'THREE.EXRLoader: Failed to create J2K data structure.' );
+
+		}
+
+		try {
+
+			// Allocate memory for codestream
+			const dataPtr = wasm._malloc( codestreamSize );
+			wasm.HEAPU8.set( codestreamData, dataPtr );
+
+			// Initialize codestream
+			wasm._init_j2c_data( j2kData, dataPtr, codestreamSize );
+
+			// Free input data
+			wasm._free( dataPtr );
+
+			// Parse codestream
+			wasm._parse_j2c_data( j2kData );
+
+			// Get dimensions from codestream
+			const width = wasm._get_width( j2kData );
+			const height = wasm._get_height( j2kData );
+			const numComponents = wasm._get_num_components( j2kData );
+
+			// Determine bytes per element from EXR info
+			const bytesPerElement = info.type === 1 ? 2 : 4; // HALF=1, FLOAT=2
+			const totalBytes = width * height * numChannels * bytesPerElement;
+
+			// Allocate output buffer
+			const outputBuffer = new ArrayBuffer( totalBytes );
+			const outputView = new DataView( outputBuffer );
+
+			// Decode scanlines
+			let outputOffset = 0;
+
+			for ( let y = 0; y < height; y ++ ) {
+
+				for ( let c = 0; c < numComponents; c ++ ) {
+
+					const linePtr = wasm._pull_j2c_line( j2kData );
+
+					if ( ! linePtr ) {
+
+						throw new Error( `THREE.EXRLoader: Failed to decode HTJ2K line ${y}, component ${c}.` );
+
+					}
+
+					// Copy and convert line data
+					for ( let x = 0; x < width; x ++ ) {
+
+						const value = wasm.HEAP32[ ( linePtr >> 2 ) + x ];
+
+						if ( bytesPerElement === 2 ) {
+
+							// HALF float - store as uint16
+							outputView.setUint16( outputOffset, value, true );
+							outputOffset += 2;
+
+						} else {
+
+							// FLOAT - store as int32 (will be reinterpreted as float)
+							outputView.setInt32( outputOffset, value, true );
+							outputOffset += 4;
+
+						}
+
+					}
+
+				}
+
+			}
+
+			// Release J2K data
+			wasm._release_j2c_data( j2kData );
+
+			return outputView;
+
+		} catch ( error ) {
+
+			// Clean up on error
+			if ( j2kData ) {
+
+				wasm._release_j2c_data( j2kData );
+
+			}
+
+			throw error;
+
+		}
+
+	}		function parseNullTerminatedString( buffer, offset ) {
 
 			const uintBuffer = new Uint8Array( buffer );
 			let endOffset = 0;
@@ -1995,7 +2160,9 @@ class EXRLoader extends DataTextureLoader {
 				'B44_COMPRESSION',
 				'B44A_COMPRESSION',
 				'DWAA_COMPRESSION',
-				'DWAB_COMPRESSION'
+				'DWAB_COMPRESSION',
+				'UNKNOWN_COMPRESSION', // 10
+				'HTJ2K_COMPRESSION'     // 11 - High Throughput JPEG 2000 (ISO/IEC 15444-15)
 			];
 
 			const compression = parseUint8( dataView, offset );
@@ -2210,7 +2377,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseTiles() {
+		async function parseTiles() {
 
 			const EXRDecoder = this;
 			const offset = EXRDecoder.offset;
@@ -2230,7 +2397,7 @@ class EXRLoader extends DataTextureLoader {
 
 				const bytesBlockLine = EXRDecoder.columns * EXRDecoder.totalBytes;
 				const isCompressed = EXRDecoder.size < EXRDecoder.lines * bytesBlockLine;
-				const viewer = isCompressed ? EXRDecoder.uncompress( EXRDecoder ) : uncompressRAW( EXRDecoder );
+				const viewer = isCompressed ? await EXRDecoder.uncompress( EXRDecoder ) : uncompressRAW( EXRDecoder );
 
 				offset.value += EXRDecoder.size;
 
@@ -2264,7 +2431,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseScanline() {
+		async function parseScanline() {
 
 			const EXRDecoder = this;
 			const offset = EXRDecoder.offset;
@@ -2278,7 +2445,7 @@ class EXRLoader extends DataTextureLoader {
 
 				const bytesPerLine = EXRDecoder.columns * EXRDecoder.totalBytes;
 				const isCompressed = EXRDecoder.size < EXRDecoder.lines * bytesPerLine;
-				const viewer = isCompressed ? EXRDecoder.uncompress( EXRDecoder ) : uncompressRAW( EXRDecoder );
+				const viewer = isCompressed ? await EXRDecoder.uncompress( EXRDecoder ) : uncompressRAW( EXRDecoder );
 
 				offset.value += EXRDecoder.size;
 
@@ -2445,6 +2612,11 @@ class EXRLoader extends DataTextureLoader {
 				case 'DWAB_COMPRESSION':
 					EXRDecoder.blockHeight = 256;
 					EXRDecoder.uncompress = uncompressDWA;
+					break;
+
+				case 'HTJ2K_COMPRESSION':
+					EXRDecoder.blockHeight = 32; // Typical block height for HTJ2K, may vary
+					EXRDecoder.uncompress = uncompressHTJ2K;
 					break;
 
 				default:
@@ -2702,7 +2874,7 @@ class EXRLoader extends DataTextureLoader {
 		const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type, this.outputFormat );
 
 		// parse input data
-		EXRDecoder.decode();
+		await EXRDecoder.decode();
 
 		// output texture post-processing
 		if ( EXRDecoder.shouldExpand ) {
