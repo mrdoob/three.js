@@ -390,7 +390,7 @@ function SidebarScene( editor ) {
 
 				if ( nodeStates.has( object ) === false ) {
 
-					nodeStates.set( object, false );
+					nodeStates.set( object, true );
 
 				}
 
