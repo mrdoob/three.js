@@ -11492,6 +11492,22 @@ class TextureNode extends UniformNode {
 		this.offsetNode = null;
 
 		/**
+		 * Represents the component for texture gather operations.
+		 *
+		 * @type {?Node<int>}
+		 * @default null
+		 */
+		this.gatherComponentNode = null;
+
+		/**
+		 * Represents the reference value for texture gather compare operations.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.gatherCompareNode = null;
+
+		/**
 		 * Whether texture values should be sampled or fetched.
 		 *
 		 * @type {boolean}
@@ -11784,6 +11800,8 @@ class TextureNode extends UniformNode {
 		properties.gradNode = this.gradNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
+		properties.gatherComponentNode = this.gatherComponentNode;
+		properties.gatherCompareNode = this.gatherCompareNode;
 
 	}
 
@@ -11825,21 +11843,35 @@ class TextureNode extends UniformNode {
 	 * @param {?string} compareSnippet - The compare snippet.
 	 * @param {?Array<string>} gradSnippet - The grad snippet.
 	 * @param {?string} offsetSnippet - The offset snippet.
+	 * @param {?string} gatherComponentSnippet - The gather component snippet.
+	 * @param {?string} gatherCompareSnippet - The gather compare snippet.
 	 * @return {string} The generated code snippet.
 	 */
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet, gatherComponentSnippet, gatherCompareSnippet ) {
 
 		const texture = this.value;
 
 		let snippet;
 
-		if ( biasSnippet ) {
+		if ( gatherCompareSnippet ) {
+
+			snippet = builder.generateTextureGatherCompare( texture, textureProperty, uvSnippet, gatherCompareSnippet, offsetSnippet );
+
+		} else if ( gatherComponentSnippet ) {
+
+			snippet = builder.generateTextureGather( texture, textureProperty, uvSnippet, gatherComponentSnippet, offsetSnippet );
+
+		} else if ( biasSnippet ) {
 
 			snippet = builder.generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, offsetSnippet );
 
 		} else if ( gradSnippet ) {
 
 			snippet = builder.generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, offsetSnippet );
+
+		} else if ( compareSnippet && levelSnippet ) {
+
+			snippet = builder.generateTextureSampleCompareLevel( texture, textureProperty, uvSnippet, compareSnippet, levelSnippet, offsetSnippet );
 
 		} else if ( compareSnippet ) {
 
@@ -11893,7 +11925,7 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, biasNode, compareNode, depthNode, gradNode, offsetNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, depthNode, gradNode, offsetNode, gatherComponentNode, gatherCompareNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
@@ -11902,12 +11934,14 @@ class TextureNode extends UniformNode {
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
+				const gatherComponentSnippet = gatherComponentNode ? gatherComponentNode.build( builder, 'int' ) : null;
+				const gatherCompareSnippet = gatherCompareNode ? gatherCompareNode.build( builder, 'float' ) : null;
 
 				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet );
+				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet, offsetSnippet, gatherComponentSnippet, gatherCompareSnippet );
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
 
@@ -12146,6 +12180,38 @@ class TextureNode extends UniformNode {
 
 	}
 
+	/**
+	 * Gathers four texels from the texture.
+	 *
+	 * @param {Node<int>} [componentNode=0] - The component to gather (0-3).
+	 * @return {TextureNode} A texture node representing the texture gather.
+	 */
+	gather( componentNode = 0 ) {
+
+		const textureNode = this.clone();
+		textureNode.gatherComponentNode = nodeObject( componentNode );
+		textureNode.referenceNode = this.getBase();
+
+		return nodeObject( textureNode );
+
+	}
+
+	/**
+	 * Gathers four texels from the texture and compares them against a reference value.
+	 *
+	 * @param {Node<float>} compareNode - The reference value to compare against.
+	 * @return {TextureNode} A texture node representing the texture gather compare.
+	 */
+	gatherCompare( compareNode ) {
+
+		const textureNode = this.clone();
+		textureNode.gatherCompareNode = nodeObject( compareNode );
+		textureNode.referenceNode = this.getBase();
+
+		return nodeObject( textureNode );
+
+	}
+
 	// --
 
 	serialize( data ) {
@@ -12211,6 +12277,8 @@ class TextureNode extends UniformNode {
 		newNode.compareNode = this.compareNode;
 		newNode.gradNode = this.gradNode;
 		newNode.offsetNode = this.offsetNode;
+		newNode.gatherComponentNode = this.gatherComponentNode;
+		newNode.gatherCompareNode = this.gatherCompareNode;
 
 		return newNode;
 
@@ -12289,6 +12357,58 @@ const uniformTexture = ( value = EmptyTexture$1 ) => texture( value );
 const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
 
 const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
+
+const textureGather = ( value, uv, component = 0 ) => texture( value, uv ).gather( component );
+
+const textureGatherCompare = ( value, uv, compare ) => texture( value, uv ).gatherCompare( compare );
+
+const textureSample = ( value, uv, offset = null ) => {
+
+	const textureNode = texture( value, uv );
+	if ( offset !== null ) textureNode.offsetNode = nodeObject( offset );
+	return textureNode;
+
+};
+
+const textureSampleBias = ( value, uv, bias, offset = null ) => {
+
+	const textureNode = texture( value, uv ).bias( bias );
+	if ( offset !== null ) textureNode.offsetNode = nodeObject( offset );
+	return textureNode;
+
+};
+
+const textureSampleGrad = ( value, uv, ddx, ddy, offset = null ) => {
+
+	const textureNode = texture( value, uv ).grad( ddx, ddy );
+	if ( offset !== null ) textureNode.offsetNode = nodeObject( offset );
+	return textureNode;
+
+};
+
+const textureSampleLevel = ( value, uv, level, offset = null ) => {
+
+	const textureNode = texture( value, uv ).level( level );
+	if ( offset !== null ) textureNode.offsetNode = nodeObject( offset );
+	return textureNode;
+
+};
+
+const textureSampleCompare = ( value, uv, depthRef, offset = null ) => {
+
+	const textureNode = texture( value, uv ).compare( depthRef );
+	if ( offset !== null ) textureNode.offsetNode = nodeObject( offset );
+	return textureNode;
+
+};
+
+const textureSampleCompareLevel = ( value, uv, depthRef, offset = null ) => {
+
+	const textureNode = texture( value, uv ).compare( depthRef );
+	if ( offset !== null ) textureNode.offsetNode = nodeObject( offset );
+	return textureNode;
+
+};
 
 /**
  * Converts a texture or texture node to a sampler.
@@ -46309,8 +46429,16 @@ var TSL = /*#__PURE__*/Object.freeze({
 	textureBicubic: textureBicubic,
 	textureBicubicLevel: textureBicubicLevel,
 	textureCubeUV: textureCubeUV,
+	textureGather: textureGather,
+	textureGatherCompare: textureGatherCompare,
 	textureLevel: textureLevel,
 	textureLoad: textureLoad,
+	textureSample: textureSample,
+	textureSampleBias: textureSampleBias,
+	textureSampleCompare: textureSampleCompare,
+	textureSampleCompareLevel: textureSampleCompareLevel,
+	textureSampleGrad: textureSampleGrad,
+	textureSampleLevel: textureSampleLevel,
 	textureSize: textureSize,
 	textureStore: textureStore,
 	thickness: thickness,
@@ -72324,6 +72452,74 @@ class WGSLNodeBuilder extends NodeBuilder {
 			error( `WebGPURenderer: THREE.TextureNode.biasNode does not support ${ shaderStage } shader.` );
 
 		}
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for gathering four texels from a texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} componentSnippet - A WGSL snippet that represents the component to gather (0-3).
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGather( texture, textureProperty, uvSnippet, componentSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureGather( ${ componentSnippet }, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGather( ${ componentSnippet }, ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet } )`;
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for gathering four texels from a texture and comparing them against a reference value.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureGatherCompare( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet } )`;
+
+	}
+
+	/**
+	 * Generates the WGSL snippet for sampling a depth texture and comparing the sampled depth values
+	 * against a reference value at a specific level.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} uvSnippet - A WGSL snippet that represents texture coordinates used for sampling.
+	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
+	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureSampleCompareLevel( texture, textureProperty, uvSnippet, compareSnippet, levelSnippet, offsetSnippet ) {
+
+		if ( offsetSnippet ) {
+
+			return `textureSampleCompareLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+		}
+
+		return `textureSampleCompareLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ compareSnippet }, ${ levelSnippet } )`;
 
 	}
 
