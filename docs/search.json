@@ -1013,6 +1013,14 @@
 			"kind": "member"
 		},
 		{
+			"title": "BitcountNode",
+			"kind": "class"
+		},
+		{
+			"title": "BitcountNode#isBitcountNode",
+			"kind": "member"
+		},
+		{
 			"title": "Bone",
 			"kind": "class"
 		},
@@ -22319,6 +22327,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "Tab",
+			"kind": "class"
+		},
+		{
 			"title": "TeapotGeometry",
 			"kind": "class"
 		},
@@ -26435,6 +26447,18 @@
 			"kind": "function"
 		},
 		{
+			"title": "countLeadingZeros",
+			"kind": "function"
+		},
+		{
+			"title": "countOneBits",
+			"kind": "function"
+		},
+		{
+			"title": "countTrailingZeros",
+			"kind": "function"
+		},
+		{
 			"title": "createVar",
 			"kind": "function"
 		},
@@ -26520,6 +26544,10 @@
 		},
 		{
 			"title": "diffuseColor",
+			"kind": "member"
+		},
+		{
+			"title": "diffuseContribution",
 			"kind": "member"
 		},
 		{
@@ -27680,6 +27708,10 @@
 		},
 		{
 			"title": "specularColor",
+			"kind": "member"
+		},
+		{
+			"title": "specularColorBlended",
 			"kind": "member"
 		},
 		{
