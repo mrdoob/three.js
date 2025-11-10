@@ -1,4 +1,4 @@
-import { ShaderMaterial, Vector3 } from 'three';
+import { ShaderMaterial } from 'three';
 
 export class GenerateSDFMaterial extends ShaderMaterial {
 
