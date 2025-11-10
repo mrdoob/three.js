@@ -1,14 +1,17 @@
 {
-  "name": "Three.js Editor",
-  "short_name": "Three.js",
-  "start_url": ".",
-  "scope": ".",
-  "display": "standalone",
-  "icons": [
+  "manifest_version": 3,
+  "name": "Three.js DevTools",
+  "version": "1.0.0",
+  "description": "A Chrome DevTools extension for debugging Three.js scenes.",
+  "devtools_page": "panel.html",
+  "content_scripts": [
     {
-      "src": "./images/icon.png",
-      "type": "image/png",
-      "sizes": "144x144"
+      "matches": ["<all_urls>"],
+      "js": ["content/init.js"]
     }
-  ]
+  ],
+  "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js"
+  }
 }
