@@ -10,7 +10,7 @@
     // Check if it matches the old API docs pattern:
     // /docs/api/[lang]/[...any...]/[...path...]/PageName.html
     // The ".*" part will greedily match any category path.
-    var match = path.match(/\/docs\/api\/[^\/]+\/.*\/([^\.]+)\.html/);
+    var match = path.match(/\/docs\/(?:api|examples)\/[^\/]+\/.*\/([^\.]+)\.html/);
 
     if (match && match[1]) {
       // match[1] will be "AnimationMixer" or "ColorKeyframeTrack"
