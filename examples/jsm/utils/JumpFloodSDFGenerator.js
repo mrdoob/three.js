@@ -156,14 +156,14 @@ export class JumpFloodSDFGenerator {
 		matrix.compose( center, quat, scale );
 
 		// Create the render targets
-		const rt1 = new WebGLRenderTarget( dim, dim, {
+		let rt1 = new WebGLRenderTarget( dim, dim, {
 			format: RGBAFormat,
 			type: FloatType,
 			minFilter: LinearFilter,
 			magFilter: LinearFilter
 		} );
 
-		const rt2 = new WebGLRenderTarget( dim, dim, {
+		let rt2 = new WebGLRenderTarget( dim, dim, {
 			format: RGBAFormat,
 			type: FloatType,
 			minFilter: LinearFilter,
