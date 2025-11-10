@@ -15026,17 +15026,7 @@ const bitangentViewFrame = /*@__PURE__*/ B.mul( scale$1 ).toVar( 'bitangentViewF
  * @tsl
  * @type {Node<vec4>}
  */
-const tangentGeometry = /*@__PURE__*/ Fn( ( builder ) => {
-
-	if ( builder.geometry.hasAttribute( 'tangent' ) === false ) {
-
-		builder.geometry.computeTangents();
-
-	}
-
-	return attribute( 'tangent', 'vec4' );
-
-} )();
+const tangentGeometry = /*@__PURE__*/ attribute( 'tangent', 'vec4' );
 
 /**
  * TSL object that represents the vertex tangent in local space of the current rendered object.
