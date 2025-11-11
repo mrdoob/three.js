@@ -100,14 +100,14 @@ class InstanceNode extends Node {
 		this.updateType = NodeUpdateType.FRAME;
 
 		/**
-		 * A reference to a buffer that is used by `instanceMatrixNode`
+		 * A reference to a buffer that is used by `instanceMatrixNode`.
 		 *
 		 * @type {?InstancedInterleavedBuffer}
 		 */
 		this.buffer = null;
 
 		/**
-		 * A reference to a buffer that is used by `instanceColorNode`
+		 * A reference to a buffer that is used by `instanceColorNode`.
 		 *
 		 * @type {?InstancedBufferAttribute}
 		 */
