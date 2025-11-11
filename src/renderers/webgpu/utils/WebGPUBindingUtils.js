@@ -374,27 +374,29 @@ class WebGPUBindingUtils {
 
 					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
-					let bufferVisibility = '';
+					const visibilities = [];
 					if ( binding.visibility & 1 ) {
 
-						bufferVisibility += 'vertex';
+						visibilities.push( 'vertex' );
 
 					}
 
 					if ( binding.visibility & 2 ) {
 
-						bufferVisibility += 'fragment';
+						visibilities.push( 'fragment' );
 
 					}
 
 					if ( binding.visibility & 4 ) {
 
-						bufferVisibility += 'compute';
+						visibilities.push( 'compute' );
 
 					}
 
+					const bufferVisibility = `(${visibilities.join( ',' )})`;
+
 					const bufferGPU = device.createBuffer( {
-						label: `bufferBinding${binding.id}_${binding.name}_${bufferVisibility}`,
+						label: `bindingBuffer${binding.id}_${binding.name}_${bufferVisibility}`,
 						size: byteLength,
 						usage: usage
 					} );
