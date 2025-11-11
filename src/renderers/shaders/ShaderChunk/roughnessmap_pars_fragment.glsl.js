@@ -1,7 +1,7 @@
 export default /* glsl */`
 #ifdef USE_ROUGHNESSMAP
 
-	uniform sampler2D roughnessMap;
+	uniform mediump sampler2D roughnessMap;
 
 #endif
 `;

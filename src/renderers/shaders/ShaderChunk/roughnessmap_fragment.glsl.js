@@ -9,4 +9,8 @@ float roughnessFactor = roughness;
 	roughnessFactor *= texelRoughness.g;
 
 #endif
+
+// Clamp for mobile fp16 safety - prevents division by near-zero in BRDF
+roughnessFactor = clamp( roughnessFactor , 0.089, 1.0 );
+
 `;

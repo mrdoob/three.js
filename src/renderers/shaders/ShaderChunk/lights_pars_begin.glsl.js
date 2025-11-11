@@ -79,8 +79,8 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {
-		vec3 direction;
-		vec3 color;
+		mediump vec3 direction;
+		mediump vec3 color;
 	};
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -99,10 +99,10 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 #if NUM_POINT_LIGHTS > 0
 
 	struct PointLight {
-		vec3 position;
-		vec3 color;
-		float distance;
-		float decay;
+		highp vec3 position;
+		mediump vec3 color;
+		mediump float distance;
+		mediump float decay;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -128,13 +128,13 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 #if NUM_SPOT_LIGHTS > 0
 
 	struct SpotLight {
-		vec3 position;
-		vec3 direction;
-		vec3 color;
-		float distance;
-		float decay;
-		float coneCos;
-		float penumbraCos;
+		highp vec3 position;
+		mediump vec3 direction;
+		mediump vec3 color;
+		mediump float distance;
+		mediump float decay;
+		mediump float coneCos;
+		mediump float penumbraCos;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
@@ -173,10 +173,10 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 #if NUM_RECT_AREA_LIGHTS > 0
 
 	struct RectAreaLight {
-		vec3 color;
-		vec3 position;
-		vec3 halfWidth;
-		vec3 halfHeight;
+		mediump vec3 color;
+		highp vec3 position;
+		highp vec3 halfWidth;
+		highp vec3 halfHeight;
 	};
 
 	// Pre-computed values of LinearTransformedCosine approximation of BRDF
@@ -192,9 +192,9 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 #if NUM_HEMI_LIGHTS > 0
 
 	struct HemisphereLight {
-		vec3 direction;
-		vec3 skyColor;
-		vec3 groundColor;
+		mediump vec3 direction;
+		mediump vec3 skyColor;
+		mediump vec3 groundColor;
 	};
 
 	uniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];

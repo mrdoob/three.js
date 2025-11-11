@@ -67,11 +67,11 @@ export const fragment = /* glsl */`
 	#define USE_SPECULAR
 #endif
 
-uniform vec3 diffuse;
-uniform vec3 emissive;
-uniform float roughness;
-uniform float metalness;
-uniform float opacity;
+uniform mediump vec3 diffuse;
+uniform mediump vec3 emissive;
+uniform mediump float roughness;
+uniform mediump float metalness;
+uniform mediump float opacity;
 
 #ifdef IOR
 	uniform float ior;

@@ -1,7 +1,7 @@
 export default /* glsl */`
 #ifdef USE_METALNESSMAP
 
-	uniform sampler2D metalnessMap;
+	uniform mediump sampler2D metalnessMap;
 
 #endif
 `;

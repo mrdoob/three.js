@@ -1,8 +1,8 @@
 export default /* glsl */`
 #ifdef USE_NORMALMAP
 
-	uniform sampler2D normalMap;
-	uniform vec2 normalScale;
+	uniform mediump sampler2D normalMap;
+	uniform mediump vec2 normalScale;
 
 #endif
 
