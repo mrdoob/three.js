@@ -6086,6 +6086,9 @@ function loopReplacer( match, start, end, snippet ) {
 
 function generatePrecision( parameters ) {
 
+	// TEMP: Force highp to mediump for testing
+	if ( parameters.precision === 'highp' ) parameters.precision = 'mediump';
+
 	let precisionstring = `precision ${parameters.precision} float;
 	precision ${parameters.precision} int;
 	precision ${parameters.precision} sampler2D;
@@ -9990,9 +9993,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.compressedTexImage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10004,9 +10007,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.compressedTexImage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10018,9 +10021,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texSubImage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10032,9 +10035,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texSubImage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10046,9 +10049,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.compressedTexSubImage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10060,9 +10063,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.compressedTexSubImage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10074,9 +10077,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texStorage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10088,9 +10091,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texStorage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10102,9 +10105,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texImage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -10116,9 +10119,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texImage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -15494,10 +15497,10 @@ class WebGLRenderer {
 
 			}
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLRenderer: ' + error.message );
-			throw error;
+			error( 'WebGLRenderer: ' + e.message );
+			throw e;
 
 		}
 
