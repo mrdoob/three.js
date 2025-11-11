@@ -58,7 +58,7 @@ export class PrefixSum {
 	 * Constructs a new light probe helper.
 	 *
 	 * @param {Renderer} renderer - A renderer with the ability to execute compute operations.
-	 * @param {number[]} inputArray - The data buffer to sum.
+	 * @param {number[] | TypedArray | StorageInstancedBufferAttribute } inputArray - The data buffer to sum.
 	 * @param {'uint' | 'float'} inputArrayType - Type of input array
 	 * @param {Object} [options={}] - Options that modify the behavior of the prefix sum.
 	 */
