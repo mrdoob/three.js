@@ -6,6 +6,7 @@ import {
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
 import { error } from '../../../utils.js';
+import { buffer } from '../../../nodes/TSL.js';
 
 /**
  * A WebGPU backend utility module for managing bindings.
@@ -373,8 +374,27 @@ class WebGPUBindingUtils {
 
 					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
+					let bufferVisibility = '';
+					if ( binding.visibility & 1 ) {
+
+						bufferVisibility += 'vertex';
+
+					}
+
+					if ( binding.visibility & 2 ) {
+
+						bufferVisibility += 'fragment';
+
+					}
+
+					if ( binding.visibility & 4 ) {
+
+						bufferVisibility += 'compute';
+
+					}
+
 					const bufferGPU = device.createBuffer( {
-						label: 'bindingBuffer_' + binding.name,
+						label: `bufferBinding${binding.id}_${binding.name}_${bufferVisibility}`,
 						size: byteLength,
 						usage: usage
 					} );
