@@ -1825,8 +1825,7 @@ class EXRLoader extends DataTextureLoader {
 		}
 
 		// Read payload length
-		const payloadLength = dv.getUint32( offset, false ); // big-endian
-		offset += 4;
+		offset += 4; // skip payloadLength field (unused)
 
 		// Read number of channels
 		const numChannels = dv.getUint16( offset, false ); // big-endian
