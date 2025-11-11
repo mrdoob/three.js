@@ -324,6 +324,9 @@ function loopReplacer( match, start, end, snippet ) {
 
 function generatePrecision( parameters ) {
 
+	// TEMP: Force highp to mediump for testing
+	if ( parameters.precision === 'highp' ) parameters.precision = 'mediump';
+
 	let precisionstring = `precision ${parameters.precision} float;
 	precision ${parameters.precision} int;
 	precision ${parameters.precision} sampler2D;
