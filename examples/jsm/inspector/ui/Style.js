@@ -220,6 +220,7 @@ export class Style {
 	height: 5px;
 	cursor: ns-resize;
 	z-index: 1001;
+	touch-action: none;
 }
 
 #profiler-panel.position-top .panel-resizer {
@@ -341,13 +342,6 @@ export class Style {
 	border-bottom: 1px solid var(--profiler-border);
 }
 
-#profiler-panel.position-right.no-tabs #maximize-btn,
-#profiler-panel.position-left.no-tabs #maximize-btn,
-#profiler-panel.position-bottom.no-tabs #maximize-btn,
-#profiler-panel.position-top.no-tabs #maximize-btn {
-	display: none;
-}
-
 #profiler-panel.position-right.no-tabs .profiler-content-wrapper,
 #profiler-panel.position-left.no-tabs .profiler-content-wrapper {
 	display: none;
@@ -464,6 +458,7 @@ export class Style {
 	font-size: 14px;
 	user-select: none;
 	transition: opacity 0.2s, transform 0.2s;
+	touch-action: none;
 }
 
 .tab-btn.active {
@@ -519,6 +514,14 @@ export class Style {
 #hide-panel-btn:hover {
 	background-color: rgba(255, 255, 255, 0.1);
 	color: var(--text-primary);
+}
+
+/* Hide maximize button when there are no tabs */
+#profiler-panel.position-right.no-tabs #maximize-btn,
+#profiler-panel.position-left.no-tabs #maximize-btn,
+#profiler-panel.position-bottom.no-tabs #maximize-btn,
+#profiler-panel.position-top.no-tabs #maximize-btn {
+	display: none !important;
 }
 
 .profiler-content-wrapper {
@@ -963,6 +966,44 @@ export class Style {
 
 }
 
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+
+	.panel-resizer {
+		top: -10px !important;
+		height: 20px !important;
+	}
+
+	#profiler-panel.position-top .panel-resizer {
+		top: auto !important;
+		bottom: -10px !important;
+		height: 20px !important;
+	}
+
+	#profiler-panel.position-left .panel-resizer {
+		right: -10px !important;
+		width: 20px !important;
+		height: 100% !important;
+	}
+
+	#profiler-panel.position-right .panel-resizer {
+		left: -10px !important;
+		width: 20px !important;
+		height: 100% !important;
+	}
+
+	.detached-tab-resizer-top,
+	.detached-tab-resizer-bottom {
+		height: 10px !important;
+	}
+
+	.detached-tab-resizer-left,
+	.detached-tab-resizer-right {
+		width: 10px !important;
+	}
+
+}
+
 .drag-preview-indicator {
 	position: fixed;
 	background-color: rgba(0, 170, 255, 0.2);
@@ -1015,6 +1056,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	flex-shrink: 0;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	touch-action: none;
 }
 
 .detached-tab-header:active {
@@ -1100,6 +1142,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	height: 20px;
 	cursor: nwse-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 .detached-tab-resizer::after {
@@ -1129,6 +1172,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	height: 5px;
 	cursor: ns-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 .detached-tab-resizer-right {
@@ -1139,6 +1183,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	width: 5px;
 	cursor: ew-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 .detached-tab-resizer-bottom {
@@ -1149,6 +1194,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	height: 5px;
 	cursor: ns-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 .detached-tab-resizer-left {
@@ -1159,6 +1205,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	width: 5px;
 	cursor: ew-resize;
 	z-index: 10;
+	touch-action: none;
 }
 
 /* Input number spin buttons - hide arrows */

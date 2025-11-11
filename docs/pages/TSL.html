@@ -251,6 +251,12 @@ Complements the tangentViewFrame for constructing the tangent space basis.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="diffuseContribution" translate="no">.<a href="#diffuseContribution">diffuseContribution</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>TSL object that represents the shader variable <code>DiffuseContribution</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="directionToFaceDirection" translate="no">.<a href="#directionToFaceDirection">directionToFaceDirection</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Converts a direction vector to a face direction vector based on the material's side.</p>
@@ -934,6 +940,12 @@ Used in context of <a href="VelocityNode.html">VelocityNode</a> for rendering mo
 					<h3 class="name" id="specularColor" translate="no">.<a href="#specularColor">specularColor</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;color></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>TSL object that represents the shader variable <code>SpecularColor</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="specularColorBlended" translate="no">.<a href="#specularColorBlended">specularColorBlended</a><span class="type-signature"> : <a href="PropertyNode.html">PropertyNode</a>.&lt;color></span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>TSL object that represents the shader variable <code>SpecularColorBlended</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -2659,7 +2671,7 @@ kernels won't perform well. Use Gaussian instead if you need a more high-quality
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="bufferAttribute" translate="no">.<a href="#bufferAttribute">bufferAttribute</a><span class="signature">( array : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, type : <span class="param-type">string</span>, stride : <span class="param-type">number</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a></span> </h3>
+					<h3 class="name name-method" id="bufferAttribute" translate="no">.<a href="#bufferAttribute">bufferAttribute</a><span class="signature">( array : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, type : <span class="param-type">string</span>, stride : <span class="param-type">number</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a> | <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a buffer attribute node.</p>
@@ -3439,6 +3451,52 @@ or AgX Log), and will return output in the same space. Output may require clampi
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="countLeadingZeros" translate="no">.<a href="#countLeadingZeros">countLeadingZeros</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Finds the number of consecutive 0 bits starting from the most significant bit of the input value.</p>
+<p>Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a> and a WebGPU backend.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The input value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="countOneBits" translate="no">.<a href="#countOneBits">countOneBits</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Finds the number of '1' bits set in the input value</p>
+<p>Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a> and a WebGPU backend.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="countTrailingZeros" translate="no">.<a href="#countTrailingZeros">countTrailingZeros</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a> | number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Finds the number of consecutive 0 bits from the least significant bit of the input value,
+which is also the index of the least significant bit of the input value.</p>
+<p>Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a> and a WebGPU backend.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The input value.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="createVar" translate="no">.<a href="#createVar">createVar</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="VarNode.html">VarNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -4109,7 +4167,7 @@ densening fog farther from the camera.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="dynamicBufferAttribute" translate="no">.<a href="#dynamicBufferAttribute">dynamicBufferAttribute</a><span class="signature">( array : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, type : <span class="param-type">string</span>, stride : <span class="param-type">number</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a></span> </h3>
+					<h3 class="name name-method" id="dynamicBufferAttribute" translate="no">.<a href="#dynamicBufferAttribute">dynamicBufferAttribute</a><span class="signature">( array : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, type : <span class="param-type">string</span>, stride : <span class="param-type">number</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a> | <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a buffer attribute node but with dynamic draw usage.
@@ -5176,7 +5234,7 @@ Compared to Gaussian blur, hash blur requires just a single pass.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="instancedBufferAttribute" translate="no">.<a href="#instancedBufferAttribute">instancedBufferAttribute</a><span class="signature">( array : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, type : <span class="param-type">string</span>, stride : <span class="param-type">number</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a></span> </h3>
+					<h3 class="name name-method" id="instancedBufferAttribute" translate="no">.<a href="#instancedBufferAttribute">instancedBufferAttribute</a><span class="signature">( array : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, type : <span class="param-type">string</span>, stride : <span class="param-type">number</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a> | <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a buffer attribute node but with enabled instancing</p>
@@ -5221,7 +5279,7 @@ Compared to Gaussian blur, hash blur requires just a single pass.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="instancedDynamicBufferAttribute" translate="no">.<a href="#instancedDynamicBufferAttribute">instancedDynamicBufferAttribute</a><span class="signature">( array : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, type : <span class="param-type">string</span>, stride : <span class="param-type">number</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a></span> </h3>
+					<h3 class="name name-method" id="instancedDynamicBufferAttribute" translate="no">.<a href="#instancedDynamicBufferAttribute">instancedDynamicBufferAttribute</a><span class="signature">( array : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, type : <span class="param-type">string</span>, stride : <span class="param-type">number</span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a> | <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a buffer attribute node but with dynamic draw usage and enabled instancing</p>

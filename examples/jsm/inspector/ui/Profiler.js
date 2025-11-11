@@ -27,6 +27,9 @@ export class Profiler {
 
 		}
 
+		// Setup window resize listener to constrain detached windows
+		this.setupWindowResizeListener();
+
 	}
 
 	detectMobile() {
@@ -66,6 +69,113 @@ export class Profiler {
 		// Listen for orientation changes
 		window.addEventListener( 'orientationchange', handleOrientationChange );
 		window.addEventListener( 'resize', handleOrientationChange );
+
+	}
+
+	setupWindowResizeListener() {
+
+		const constrainDetachedWindows = () => {
+
+			this.detachedWindows.forEach( detachedWindow => {
+
+				this.constrainWindowToBounds( detachedWindow.panel );
+
+			} );
+
+		};
+
+		const constrainMainPanel = () => {
+
+			// Skip if panel is maximized (it should always fill the screen)
+			if ( this.panel.classList.contains( 'maximized' ) ) return;
+
+			const windowWidth = window.innerWidth;
+			const windowHeight = window.innerHeight;
+
+			if ( this.position === 'bottom' ) {
+
+				const currentHeight = this.panel.offsetHeight;
+				const maxHeight = windowHeight - 50; // Leave 50px margin
+
+				if ( currentHeight > maxHeight ) {
+
+					this.panel.style.height = `${ maxHeight }px`;
+					this.lastHeightBottom = maxHeight;
+
+				}
+
+			} else if ( this.position === 'right' ) {
+
+				const currentWidth = this.panel.offsetWidth;
+				const maxWidth = windowWidth - 50; // Leave 50px margin
+
+				if ( currentWidth > maxWidth ) {
+
+					this.panel.style.width = `${ maxWidth }px`;
+					this.lastWidthRight = maxWidth;
+
+				}
+
+			}
+
+		};
+
+		// Listen for window resize events
+		window.addEventListener( 'resize', () => {
+
+			constrainDetachedWindows();
+			constrainMainPanel();
+
+		} );
+
+	}
+
+	constrainWindowToBounds( windowPanel ) {
+
+		const windowWidth = window.innerWidth;
+		const windowHeight = window.innerHeight;
+
+		const panelWidth = windowPanel.offsetWidth;
+		const panelHeight = windowPanel.offsetHeight;
+
+		let left = parseFloat( windowPanel.style.left ) || windowPanel.offsetLeft || 0;
+		let top = parseFloat( windowPanel.style.top ) || windowPanel.offsetTop || 0;
+
+		// Allow window to extend half its width/height outside the screen
+		const halfWidth = panelWidth / 2;
+		const halfHeight = panelHeight / 2;
+
+		// Constrain horizontal position (allow half width to extend beyond right edge)
+		if ( left + panelWidth > windowWidth + halfWidth ) {
+
+			left = windowWidth + halfWidth - panelWidth;
+
+		}
+
+		// Constrain horizontal position (allow half width to extend beyond left edge)
+		if ( left < - halfWidth ) {
+
+			left = - halfWidth;
+
+		}
+
+		// Constrain vertical position (allow half height to extend beyond bottom edge)
+		if ( top + panelHeight > windowHeight + halfHeight ) {
+
+			top = windowHeight + halfHeight - panelHeight;
+
+		}
+
+		// Constrain vertical position (allow half height to extend beyond top edge)
+		if ( top < - halfHeight ) {
+
+			top = - halfHeight;
+
+		}
+
+		// Apply constrained position
+		windowPanel.style.left = `${ left }px`;
+		windowPanel.style.top = `${ top }px`;
 
 	}
 
@@ -136,6 +246,9 @@ export class Profiler {
 
 		this.domElement.append( this.toggleButton, this.panel );
 
+		// Set initial position class
+		this.panel.classList.add( `position-${this.position}` );
+
 	}
 
 	setupResizing() {
@@ -146,8 +259,9 @@ export class Profiler {
 
 			this.isResizing = true;
 			this.panel.classList.add( 'resizing' );
-			const startX = e.clientX || e.touches[ 0 ].clientX;
-			const startY = e.clientY || e.touches[ 0 ].clientY;
+			resizer.setPointerCapture( e.pointerId );
+			const startX = e.clientX;
+			const startY = e.clientY;
 			const startHeight = this.panel.offsetHeight;
 			const startWidth = this.panel.offsetWidth;
 
@@ -155,8 +269,8 @@ export class Profiler {
 
 				if ( ! this.isResizing ) return;
 				moveEvent.preventDefault();
-				const currentX = moveEvent.clientX || moveEvent.touches[ 0 ].clientX;
-				const currentY = moveEvent.clientY || moveEvent.touches[ 0 ].clientY;
+				const currentX = moveEvent.clientX;
+				const currentY = moveEvent.clientY;
 
 				if ( this.position === 'bottom' ) {
 
@@ -188,10 +302,9 @@ export class Profiler {
 
 				this.isResizing = false;
 				this.panel.classList.remove( 'resizing' );
-				document.removeEventListener( 'mousemove', onMove );
-				document.removeEventListener( 'mouseup', onEnd );
-				document.removeEventListener( 'touchmove', onMove );
-				document.removeEventListener( 'touchend', onEnd );
+				resizer.removeEventListener( 'pointermove', onMove );
+				resizer.removeEventListener( 'pointerup', onEnd );
+				resizer.removeEventListener( 'pointercancel', onEnd );
 				if ( ! this.panel.classList.contains( 'maximized' ) ) {
 
 					// Save dimensions based on current position
@@ -212,15 +325,13 @@ export class Profiler {
 
 			};
 
-			document.addEventListener( 'mousemove', onMove );
-			document.addEventListener( 'mouseup', onEnd );
-			document.addEventListener( 'touchmove', onMove, { passive: false } );
-			document.addEventListener( 'touchend', onEnd );
+			resizer.addEventListener( 'pointermove', onMove );
+			resizer.addEventListener( 'pointerup', onEnd );
+			resizer.addEventListener( 'pointercancel', onEnd );
 
 		};
 
-		resizer.addEventListener( 'mousedown', onStart );
-		resizer.addEventListener( 'touchstart', onStart );
+		resizer.addEventListener( 'pointerdown', onStart );
 
 	}
 
@@ -407,17 +518,18 @@ export class Profiler {
 
 		const onDragStart = ( e ) => {
 
-			startX = e.clientX || e.touches[ 0 ].clientX;
-			startY = e.clientY || e.touches[ 0 ].clientY;
+			startX = e.clientX;
+			startY = e.clientY;
 			isDragging = false;
 			hasMoved = false;
+			tab.button.setPointerCapture( e.pointerId );
 
 		};
 
 		const onDragMove = ( e ) => {
 
-			const currentX = e.clientX || e.touches[ 0 ].clientX;
-			const currentY = e.clientY || e.touches[ 0 ].clientY;
+			const currentX = e.clientX;
+			const currentY = e.clientY;
 
 			const deltaX = Math.abs( currentX - startX );
 			const deltaY = Math.abs( currentY - startY );
@@ -488,26 +600,18 @@ export class Profiler {
 			hasMoved = false;
 			previewWindow = null;
 
-			document.removeEventListener( 'mousemove', onDragMove );
-			document.removeEventListener( 'mouseup', onDragEnd );
-			document.removeEventListener( 'touchmove', onDragMove );
-			document.removeEventListener( 'touchend', onDragEnd );
+			tab.button.removeEventListener( 'pointermove', onDragMove );
+			tab.button.removeEventListener( 'pointerup', onDragEnd );
+			tab.button.removeEventListener( 'pointercancel', onDragEnd );
 
 		};
 
-		tab.button.addEventListener( 'mousedown', ( e ) => {
+		tab.button.addEventListener( 'pointerdown', ( e ) => {
 
 			onDragStart( e );
-			document.addEventListener( 'mousemove', onDragMove );
-			document.addEventListener( 'mouseup', onDragEnd );
-
-		} );
-
-		tab.button.addEventListener( 'touchstart', ( e ) => {
-
-			onDragStart( e );
-			document.addEventListener( 'touchmove', onDragMove, { passive: false } );
-			document.addEventListener( 'touchend', onDragEnd );
+			tab.button.addEventListener( 'pointermove', onDragMove );
+			tab.button.addEventListener( 'pointerup', onDragEnd );
+			tab.button.addEventListener( 'pointercancel', onDragEnd );
 
 		} );
 
@@ -664,10 +768,43 @@ export class Profiler {
 
 	createDetachedWindow( tab, x, y ) {
 
+		// Constrain initial position to window bounds
+		const windowWidth = window.innerWidth;
+		const windowHeight = window.innerHeight;
+		const estimatedWidth = 400; // Default detached window width
+		const estimatedHeight = 300; // Default detached window height
+
+		let constrainedX = x - 200;
+		let constrainedY = y - 20;
+
+		if ( constrainedX + estimatedWidth > windowWidth ) {
+
+			constrainedX = windowWidth - estimatedWidth;
+
+		}
+
+		if ( constrainedX < 0 ) {
+
+			constrainedX = 0;
+
+		}
+
+		if ( constrainedY + estimatedHeight > windowHeight ) {
+
+			constrainedY = windowHeight - estimatedHeight;
+
+		}
+
+		if ( constrainedY < 0 ) {
+
+			constrainedY = 0;
+
+		}
+
 		const windowPanel = document.createElement( 'div' );
 		windowPanel.className = 'detached-tab-panel';
-		windowPanel.style.left = `${ x - 200 }px`;
-		windowPanel.style.top = `${ y - 20 }px`;
+		windowPanel.style.left = `${ constrainedX }px`;
+		windowPanel.style.top = `${ constrainedY }px`;
 
 		if ( ! this.panel.classList.contains( 'visible' ) ) {
 
@@ -764,13 +901,7 @@ export class Profiler {
 		let startX, startY, startLeft, startTop;
 
 		// Bring window to front when clicking anywhere on it
-		windowPanel.addEventListener( 'mousedown', () => {
-
-			this.bringWindowToFront( windowPanel );
-
-		} );
-
-		windowPanel.addEventListener( 'touchstart', () => {
+		windowPanel.addEventListener( 'pointerdown', () => {
 
 			this.bringWindowToFront( windowPanel );
 
@@ -789,9 +920,10 @@ export class Profiler {
 
 			isDragging = true;
 			header.style.cursor = 'grabbing';
+			header.setPointerCapture( e.pointerId );
 
-			startX = e.clientX || e.touches[ 0 ].clientX;
-			startY = e.clientY || e.touches[ 0 ].clientY;
+			startX = e.clientX;
+			startY = e.clientY;
 
 			const rect = windowPanel.getBoundingClientRect();
 			startLeft = rect.left;
@@ -805,14 +937,53 @@ export class Profiler {
 
 			e.preventDefault();
 
-			const currentX = e.clientX || e.touches[ 0 ].clientX;
-			const currentY = e.clientY || e.touches[ 0 ].clientY;
+			const currentX = e.clientX;
+			const currentY = e.clientY;
 
 			const deltaX = currentX - startX;
 			const deltaY = currentY - startY;
 
-			windowPanel.style.left = `${ startLeft + deltaX }px`;
-			windowPanel.style.top = `${ startTop + deltaY }px`;
+			let newLeft = startLeft + deltaX;
+			let newTop = startTop + deltaY;
+
+			// Constrain to window bounds (allow half width/height to extend outside)
+			const windowWidth = window.innerWidth;
+			const windowHeight = window.innerHeight;
+			const panelWidth = windowPanel.offsetWidth;
+			const panelHeight = windowPanel.offsetHeight;
+			const halfWidth = panelWidth / 2;
+			const halfHeight = panelHeight / 2;
+
+			// Allow window to extend half its width beyond right edge
+			if ( newLeft + panelWidth > windowWidth + halfWidth ) {
+
+				newLeft = windowWidth + halfWidth - panelWidth;
+
+			}
+
+			// Allow window to extend half its width beyond left edge
+			if ( newLeft < - halfWidth ) {
+
+				newLeft = - halfWidth;
+
+			}
+
+			// Allow window to extend half its height beyond bottom edge
+			if ( newTop + panelHeight > windowHeight + halfHeight ) {
+
+				newTop = windowHeight + halfHeight - panelHeight;
+
+			}
+
+			// Allow window to extend half its height beyond top edge
+			if ( newTop < - halfHeight ) {
+
+				newTop = - halfHeight;
+
+			}
+
+			windowPanel.style.left = `${ newLeft }px`;
+			windowPanel.style.top = `${ newTop }px`;
 
 			// Check if cursor is over the inspector panel
 			const panelRect = this.panel.getBoundingClientRect();
@@ -843,8 +1014,8 @@ export class Profiler {
 			this.panel.style.outline = '';
 
 			// Check if dropped over the inspector panel
-			const currentX = e.clientX || ( e.changedTouches && e.changedTouches[ 0 ].clientX );
-			const currentY = e.clientY || ( e.changedTouches && e.changedTouches[ 0 ].clientY );
+			const currentX = e.clientX;
+			const currentY = e.clientY;
 
 			if ( currentX !== undefined && currentY !== undefined ) {
 
@@ -866,26 +1037,18 @@ export class Profiler {
 
 			}
 
-			document.removeEventListener( 'mousemove', onDragMove );
-			document.removeEventListener( 'mouseup', onDragEnd );
-			document.removeEventListener( 'touchmove', onDragMove );
-			document.removeEventListener( 'touchend', onDragEnd );
+			header.removeEventListener( 'pointermove', onDragMove );
+			header.removeEventListener( 'pointerup', onDragEnd );
+			header.removeEventListener( 'pointercancel', onDragEnd );
 
 		};
 
-		header.addEventListener( 'mousedown', ( e ) => {
+		header.addEventListener( 'pointerdown', ( e ) => {
 
 			onDragStart( e );
-			document.addEventListener( 'mousemove', onDragMove );
-			document.addEventListener( 'mouseup', onDragEnd );
-
-		} );
-
-		header.addEventListener( 'touchstart', ( e ) => {
-
-			onDragStart( e );
-			document.addEventListener( 'touchmove', onDragMove, { passive: false } );
-			document.addEventListener( 'touchend', onDragEnd );
+			header.addEventListener( 'pointermove', onDragMove );
+			header.addEventListener( 'pointerup', onDragEnd );
+			header.addEventListener( 'pointercancel', onDragEnd );
 
 		} );
 
@@ -912,8 +1075,10 @@ export class Profiler {
 				// Bring window to front when resizing
 				this.bringWindowToFront( windowPanel );
 
-				startX = e.clientX || e.touches[ 0 ].clientX;
-				startY = e.clientY || e.touches[ 0 ].clientY;
+				resizer.setPointerCapture( e.pointerId );
+
+				startX = e.clientX;
+				startY = e.clientY;
 				startWidth = windowPanel.offsetWidth;
 				startHeight = windowPanel.offsetHeight;
 				startLeft = windowPanel.offsetLeft;
@@ -927,16 +1092,21 @@ export class Profiler {
 
 				e.preventDefault();
 
-				const currentX = e.clientX || e.touches[ 0 ].clientX;
-				const currentY = e.clientY || e.touches[ 0 ].clientY;
+				const currentX = e.clientX;
+				const currentY = e.clientY;
 
 				const deltaX = currentX - startX;
 				const deltaY = currentY - startY;
 
+				const windowWidth = window.innerWidth;
+				const windowHeight = window.innerHeight;
+
 				if ( direction === 'right' || direction === 'corner' ) {
 
 					const newWidth = startWidth + deltaX;
-					if ( newWidth >= minWidth ) {
+					const maxWidth = windowWidth - startLeft;
+
+					if ( newWidth >= minWidth && newWidth <= maxWidth ) {
 
 						windowPanel.style.width = `${ newWidth }px`;
 
@@ -947,7 +1117,9 @@ export class Profiler {
 				if ( direction === 'bottom' || direction === 'corner' ) {
 
 					const newHeight = startHeight + deltaY;
-					if ( newHeight >= minHeight ) {
+					const maxHeight = windowHeight - startTop;
+
+					if ( newHeight >= minHeight && newHeight <= maxHeight ) {
 
 						windowPanel.style.height = `${ newHeight }px`;
 
@@ -958,10 +1130,18 @@ export class Profiler {
 				if ( direction === 'left' ) {
 
 					const newWidth = startWidth - deltaX;
+					const maxLeft = startLeft + startWidth - minWidth;
+
 					if ( newWidth >= minWidth ) {
 
-						windowPanel.style.width = `${ newWidth }px`;
-						windowPanel.style.left = `${ startLeft + deltaX }px`;
+						const newLeft = startLeft + deltaX;
+
+						if ( newLeft >= 0 && newLeft <= maxLeft ) {
+
+							windowPanel.style.width = `${ newWidth }px`;
+							windowPanel.style.left = `${ newLeft }px`;
+
+						}
 
 					}
 
@@ -970,10 +1150,18 @@ export class Profiler {
 				if ( direction === 'top' ) {
 
 					const newHeight = startHeight - deltaY;
+					const maxTop = startTop + startHeight - minHeight;
+
 					if ( newHeight >= minHeight ) {
 
-						windowPanel.style.height = `${ newHeight }px`;
-						windowPanel.style.top = `${ startTop + deltaY }px`;
+						const newTop = startTop + deltaY;
+
+						if ( newTop >= 0 && newTop <= maxTop ) {
+
+							windowPanel.style.height = `${ newHeight }px`;
+							windowPanel.style.top = `${ newTop }px`;
+
+						}
 
 					}
 
@@ -985,29 +1173,21 @@ export class Profiler {
 
 				isResizing = false;
 
-				document.removeEventListener( 'mousemove', onResizeMove );
-				document.removeEventListener( 'mouseup', onResizeEnd );
-				document.removeEventListener( 'touchmove', onResizeMove );
-				document.removeEventListener( 'touchend', onResizeEnd );
+				resizer.removeEventListener( 'pointermove', onResizeMove );
+				resizer.removeEventListener( 'pointerup', onResizeEnd );
+				resizer.removeEventListener( 'pointercancel', onResizeEnd );
 
 				// Save layout after resizing detached window
 				this.saveLayout();
 
 			};
 
-			resizer.addEventListener( 'mousedown', ( e ) => {
+			resizer.addEventListener( 'pointerdown', ( e ) => {
 
 				onResizeStart( e );
-				document.addEventListener( 'mousemove', onResizeMove );
-				document.addEventListener( 'mouseup', onResizeEnd );
-
-			} );
-
-			resizer.addEventListener( 'touchstart', ( e ) => {
-
-				onResizeStart( e );
-				document.addEventListener( 'touchmove', onResizeMove, { passive: false } );
-				document.addEventListener( 'touchend', onResizeEnd );
+				resizer.addEventListener( 'pointermove', onResizeMove );
+				resizer.addEventListener( 'pointerup', onResizeEnd );
+				resizer.addEventListener( 'pointercancel', onResizeEnd );
 
 			} );
 
@@ -1289,6 +1469,73 @@ export class Profiler {
 
 			const layout = JSON.parse( savedLayout );
 
+			// Constrain detached tabs positions to current screen bounds
+			if ( layout.detachedTabs && layout.detachedTabs.length > 0 ) {
+
+				const windowWidth = window.innerWidth;
+				const windowHeight = window.innerHeight;
+
+				layout.detachedTabs = layout.detachedTabs.map( detachedTabData => {
+
+					let { left, top, width, height } = detachedTabData;
+
+					// Ensure width and height are within bounds
+					if ( width > windowWidth ) {
+
+						width = windowWidth - 100; // Leave some margin
+
+					}
+
+					if ( height > windowHeight ) {
+
+						height = windowHeight - 100; // Leave some margin
+
+					}
+
+					// Allow window to extend half its width/height outside the screen
+					const halfWidth = width / 2;
+					const halfHeight = height / 2;
+
+					// Constrain horizontal position (allow half width to extend beyond right edge)
+					if ( left + width > windowWidth + halfWidth ) {
+
+						left = windowWidth + halfWidth - width;
+
+					}
+
+					// Constrain horizontal position (allow half width to extend beyond left edge)
+					if ( left < - halfWidth ) {
+
+						left = - halfWidth;
+
+					}
+
+					// Constrain vertical position (allow half height to extend beyond bottom edge)
+					if ( top + height > windowHeight + halfHeight ) {
+
+						top = windowHeight + halfHeight - height;
+
+					}
+
+					// Constrain vertical position (allow half height to extend beyond top edge)
+					if ( top < - halfHeight ) {
+
+						top = - halfHeight;
+
+					}
+
+					return {
+						...detachedTabData,
+						left,
+						top,
+						width,
+						height
+					};
+
+				} );
+
+			}
+
 			// Restore position and dimensions
 			if ( layout.position ) {
 
@@ -1305,6 +1552,22 @@ export class Profiler {
 			if ( layout.lastWidthRight ) {
 
 				this.lastWidthRight = layout.lastWidthRight;
+
+			}
+
+			// Constrain saved dimensions to current screen bounds
+			const windowWidth = window.innerWidth;
+			const windowHeight = window.innerHeight;
+
+			if ( this.lastHeightBottom > windowHeight - 50 ) {
+
+				this.lastHeightBottom = windowHeight - 50;
+
+			}
+
+			if ( this.lastWidthRight > windowWidth - 50 ) {
+
+				this.lastWidthRight = windowWidth - 50;
 
 			}
 
@@ -1396,6 +1659,9 @@ export class Profiler {
 			detachedWindow.panel.style.top = `${ detachedTabData.top }px`;
 			detachedWindow.panel.style.width = `${ detachedTabData.width }px`;
 			detachedWindow.panel.style.height = `${ detachedTabData.height }px`;
+
+			// Constrain window to bounds after restoring position and size
+			this.constrainWindowToBounds( detachedWindow.panel );
 
 			this.detachedWindows.push( detachedWindow );
 

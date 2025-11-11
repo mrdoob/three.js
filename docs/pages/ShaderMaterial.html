@@ -122,8 +122,18 @@ yields another directive.</p>
 				<div class="member">
 					<h3 class="name" id="fog" translate="no">.<a href="#fog">fog</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Define whether the material color is affected by global fog settings; <code>true</code>
+						<p>Defines whether the material color is affected by global fog settings; <code>true</code>
 to pass fog uniforms to the shader.</p>
+<p>Setting this property to <code>true</code> requires the definition of fog uniforms. It is
+recommended to use <code>UniformsUtils.merge()</code> to combine the custom shader uniforms
+with predefined fog uniforms.</p>
+<pre><code class="language-js">const material = new ShaderMaterial( {
+    uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] );
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    fog: true
+} );
+</code></pre>
 						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
