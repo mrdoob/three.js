@@ -380,6 +380,13 @@ class NodeBuilder {
 		this.tab = '\t';
 
 		/**
+		 * Reference to the current instance data.
+		 *
+		 * @type {?Array}
+		 */
+		this.instances = null;
+
+		/**
 		 * Reference to the current function node.
 		 *
 		 * @type {?FunctionNode}

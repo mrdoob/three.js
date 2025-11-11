@@ -198,6 +198,7 @@ class Nodes extends DataMap {
 				const createNodeBuilder = ( material ) => {
 
 					const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+					nodeBuilder.instances = renderObject.instances;
 					nodeBuilder.scene = renderObject.scene;
 					nodeBuilder.material = material;
 					nodeBuilder.camera = renderObject.camera;
@@ -318,7 +319,8 @@ class Nodes extends DataMap {
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
 			nodeBuilder.observer,
-			nodeBuilder.transforms
+			nodeBuilder.transforms,
+			nodeBuilder.instances
 		);
 
 	}
