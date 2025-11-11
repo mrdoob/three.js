@@ -112,7 +112,7 @@
 	"webgl_materials_modified": [ "onBeforeCompile" ],
 	"webgl_raycaster_bvh": [ "community", "query", "bounds", "tree", "accelerate", "performance", "extension", "plugin", "library", "three-mesh-bvh" ],
 	"webgl_renderer_pathtracer": [ "community", "raytracing", "pathtracing", "library", "plugin", "extension", "three-gpu-pathtracer", "three-mesh-bvh" ],
-	"webgpu_compute_particles_snow": [ "community", "webgpu", "stats-gl" ],
+	"webgpu_compute_particles_snow": [ "community", "webgpu" ],
 	"webgl_shadowmap_csm": [ "cascade" ],
 	"webgl_shadowmap_pcss": [ "soft" ],
 	"webgl_simple_gi": [ "global illumination" ],
