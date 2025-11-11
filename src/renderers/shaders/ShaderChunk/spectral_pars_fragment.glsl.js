@@ -7,7 +7,6 @@ export default /* glsl */`
 // CIE standard visible spectrum range
 #define MIN_WAVELENGTH 360.0
 #define MAX_WAVELENGTH 830.0
-#define PI 3.14159265359
 
 // Convert linear sRGB to Fourier coefficients (trigonometric moments)
 // Returns 3 Fourier coefficients optimized for D65 illumination
@@ -84,7 +83,7 @@ float evalReflectanceRealLagrange3( float phase, vec3 lagranges ) {
 // Convert wavelength to phase for Fourier representation
 float wavelengthToPhase( float wavelength ) {
 	float t = ( wavelength - MIN_WAVELENGTH ) / ( MAX_WAVELENGTH - MIN_WAVELENGTH );
-	return t * 2.0 * PI;
+	return t * PI2;
 }
 
 // Convert wavelength to approximate RGB for visualization
