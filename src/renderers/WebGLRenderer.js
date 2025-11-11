@@ -398,10 +398,10 @@ class WebGLRenderer {
 
 			}
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'WebGLRenderer: ' + error.message );
-			throw error;
+			error( 'WebGLRenderer: ' + e.message );
+			throw e;
 
 		}
 
