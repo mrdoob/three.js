@@ -251,16 +251,14 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindGroup.bindings ) {
 
-			if ( binding.isNodeUniformsGroup ) {
+			const updatedGroup = this.nodes.updateGroup( binding );
 
-				const updated = this.nodes.updateGroup( binding );
+			// every uniforms group is a uniform buffer. So if no update is required,
+			// we move one with the next binding. Otherwise the next if block will update the group.
 
-				// every uniforms group is a uniform buffer. So if no update is required,
-				// we move one with the next binding. Otherwise the next if block will update the group.
+			if ( updatedGroup === false ) continue;
 
-				if ( updated === false ) continue;
-
-			}
+			//
 
 			if ( binding.isStorageBuffer ) {
 
