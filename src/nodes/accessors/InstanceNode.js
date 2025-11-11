@@ -3,9 +3,10 @@ import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal } from './Position.js';
-import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3, mat4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { buffer } from '../accessors/BufferNode.js';
+import { storage } from './StorageBufferNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
 
 import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
@@ -32,8 +33,8 @@ class InstanceNode extends Node {
 	 * Constructs a new instance node.
 	 *
 	 * @param {number} count - The number of instances.
-	 * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
-	 * @param {?InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
+	 * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
+	 * @param {?InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
 	 */
 	constructor( count, instanceMatrix, instanceColor = null ) {
 
@@ -61,6 +62,20 @@ class InstanceNode extends Node {
 		this.instanceColor = instanceColor;
 
 		/**
+		 * Tracks whether the matrix data is provided via a storage buffer.
+		 *
+		 * @type {boolean}
+		 */
+		this.isStorageMatrix = instanceMatrix && instanceMatrix.isStorageInstancedBufferAttribute === true;
+
+		/**
+		 * Tracks whether the color data is provided via a storage buffer.
+		 *
+		 * @type {boolean}
+		 */
+		this.isStorageColor = instanceColor && instanceColor.isStorageInstancedBufferAttribute === true;
+
+		/**
 		 * The node that represents the instance matrix data.
 		 *
 		 * @type {?Node}
@@ -85,14 +100,16 @@ class InstanceNode extends Node {
 		this.updateType = NodeUpdateType.FRAME;
 
 		/**
-		 * A reference to a buffer that is used by `instanceMatrixNode`.
+		 * A reference to a buffer that is used by `instanceMatrixNode`
+		 * when CPU-side interleaved attributes are required.
 		 *
 		 * @type {?InstancedInterleavedBuffer}
 		 */
 		this.buffer = null;
 
 		/**
-		 * A reference to a buffer that is used by `instanceColorNode`.
+		 * A reference to a buffer that is used by `instanceColorNode`
+		 * when CPU-side attributes are required.
 		 *
 		 * @type {?InstancedBufferAttribute}
 		 */
@@ -109,7 +126,7 @@ class InstanceNode extends Node {
 	 */
 	setup( builder ) {
 
-		const { instanceMatrix, instanceColor } = this;
+		const { instanceMatrix, instanceColor, isStorageMatrix, isStorageColor } = this;
 
 		const { count } = instanceMatrix;
 
@@ -117,21 +134,36 @@ class InstanceNode extends Node {
 
 		if ( instanceMatrixNode === null ) {
 
-			// Both WebGPU and WebGL backends have UBO max limited to 64kb. Matrix count number bigger than 1000 ( 16 * 4 * 1000 = 64kb ) will fallback to attribute.
+			if ( isStorageMatrix ) {
 
-			if ( count <= 1000 ) {
-
-				instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
+				instanceMatrixNode = storage( instanceMatrix, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
 
 			} else {
 
-				const buffer = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
+				// Both backends have ~64kb UBO limit; fallback to attributes above 1000 matrices.
 
-				const instancedBufferAttributeFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+				if ( count <= 1000 ) {
 
-				instanceMatrixNode = instancedBufferAttributeFn( buffer, 'mat4' );
+					instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
 
-				this.buffer = buffer;
+				} else {
+
+					const interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
+
+					this.buffer = interleaved;
+
+					const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+
+					const instanceBuffers = [
+						bufferFn( interleaved, 'vec4', 16, 0 ),
+						bufferFn( interleaved, 'vec4', 16, 4 ),
+						bufferFn( interleaved, 'vec4', 16, 8 ),
+						bufferFn( interleaved, 'vec4', 16, 12 )
+					];
+
+					instanceMatrixNode = mat4( ...instanceBuffers );
+
+				}
 
 			}
 
@@ -141,13 +173,21 @@ class InstanceNode extends Node {
 
 		if ( instanceColor && instanceColorNode === null ) {
 
-			const buffer = new InstancedBufferAttribute( instanceColor.array, 3 );
+			if ( isStorageColor ) {
 
-			const bufferFn = instanceColor.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+				instanceColorNode = storage( instanceColor, 'vec3', Math.max( instanceColor.count, 1 ) ).element( instanceIndex );
 
-			this.bufferColor = buffer;
+			} else {
 
-			instanceColorNode = vec3( bufferFn( buffer, 'vec3', 3, 0 ) );
+				const bufferAttribute = new InstancedBufferAttribute( instanceColor.array, 3 );
+
+				const bufferFn = instanceColor.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+
+				this.bufferColor = bufferAttribute;
+
+				instanceColorNode = vec3( bufferFn( bufferAttribute, 'vec3', 3, 0 ) );
+
+			}
 
 			this.instanceColorNode = instanceColorNode;
 
@@ -181,15 +221,13 @@ class InstanceNode extends Node {
 	}
 
 	/**
-	 * Checks if the internal buffers required an update.
+	 * Checks if the internal buffers require an update.
 	 *
 	 * @param {NodeFrame} frame - The current node frame.
 	 */
 	update( /*frame*/ ) {
 
-		if ( this.buffer !== null ) {
-
-			// keep update ranges in sync
+		if ( this.buffer !== null && this.isStorageMatrix !== true ) {
 
 			this.buffer.clearUpdateRanges();
 			this.buffer.updateRanges.push( ... this.instanceMatrix.updateRanges );
@@ -204,7 +242,7 @@ class InstanceNode extends Node {
 
 		}
 
-		if ( this.instanceColor && this.bufferColor !== null ) {
+		if ( this.instanceColor && this.bufferColor !== null && this.isStorageColor !== true ) {
 
 			this.bufferColor.clearUpdateRanges();
 			this.bufferColor.updateRanges.push( ... this.instanceColor.updateRanges );
@@ -229,8 +267,8 @@ export default InstanceNode;
  * @tsl
  * @function
  * @param {number} count - The number of instances.
- * @param {InstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
- * @param {?InstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
+ * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - Instanced buffer attribute representing the instance transformations.
+ * @param {?InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceColor - Instanced buffer attribute representing the instance colors.
  * @returns {InstanceNode}
  */
 export const instance = /*@__PURE__*/ nodeProxy( InstanceNode ).setParameterLength( 2, 3 );
