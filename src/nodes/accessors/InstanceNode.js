@@ -101,7 +101,6 @@ class InstanceNode extends Node {
 
 		/**
 		 * A reference to a buffer that is used by `instanceMatrixNode`
-		 * when CPU-side interleaved attributes are required.
 		 *
 		 * @type {?InstancedInterleavedBuffer}
 		 */
@@ -109,7 +108,6 @@ class InstanceNode extends Node {
 
 		/**
 		 * A reference to a buffer that is used by `instanceColorNode`
-		 * when CPU-side attributes are required.
 		 *
 		 * @type {?InstancedBufferAttribute}
 		 */
