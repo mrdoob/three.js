@@ -187,14 +187,11 @@ void main() {
 	#include <clearcoat_normal_fragment_maps>
 	#include <emissivemap_fragment>
 
-	// Convert diffuse color to spectrum
-	float diffuseSpectrum[SPECTRAL_BINS];
-	rgbToSpectrum( diffuseColor.rgb, diffuseSpectrum );
+	// Convert diffuse color to spectral Lagrange coefficients
+	// This uses the Spectral Primary Decomposition method
+	vec3 diffuseLagranges = rgbToSpectralCoefficients( diffuseColor.rgb );
 
-	// Perform lighting calculations in spectral space
-	// For now, we do standard lighting and convert at the end
-	// A full spectral implementation would do per-wavelength BRDF evaluation
-
+	// Perform lighting calculations in standard RGB
 	// accumulation
 	#include <lights_physical_fragment>
 	#include <lights_fragment_begin>
@@ -209,23 +206,27 @@ void main() {
 
 	#include <transmission_fragment>
 
-	// Apply spectral modulation to the lighting result
-	float lightSpectrum[SPECTRAL_BINS];
-	rgbToSpectrum( totalDiffuse + totalSpecular, lightSpectrum );
+	// Apply spectral processing:
+	// Sample the spectrum at multiple wavelengths and modulate lighting
+	const int NUM_SPECTRAL_SAMPLES = 16;
+	vec3 spectralResult = vec3( 0.0 );
 
-	// Multiply light spectrum by material spectrum (reflectance)
-	float finalSpectrum[SPECTRAL_BINS];
-	multiplySpectra( lightSpectrum, diffuseSpectrum, finalSpectrum );
+	for ( int i = 0; i < NUM_SPECTRAL_SAMPLES; i++ ) {
+		float t = ( float( i ) + 0.5 ) / float( NUM_SPECTRAL_SAMPLES );
+		float wavelength = MIN_WAVELENGTH + t * ( MAX_WAVELENGTH - MIN_WAVELENGTH );
 
-	// Add emissive contribution
-	float emissiveSpectrum[SPECTRAL_BINS];
-	rgbToSpectrum( totalEmissiveRadiance, emissiveSpectrum );
+		// Evaluate reflectance at this wavelength
+		float reflectance = evalReflectanceAtWavelength( wavelength, diffuseLagranges );
 
-	float outputSpectrum[SPECTRAL_BINS];
-	addSpectra( finalSpectrum, emissiveSpectrum, outputSpectrum );
+		// Get wavelength's contribution to RGB
+		vec3 wrgb = wavelengthToRGB( wavelength );
 
-	// Convert back to RGB for display
-	vec3 outgoingLight = spectrumToRGB( outputSpectrum );
+		// Accumulate: lighting modulated by spectral reflectance
+		spectralResult += ( totalDiffuse + totalSpecular ) * reflectance * wrgb;
+	}
+
+	// Normalize and combine with emissive
+	vec3 outgoingLight = spectralResult / float( NUM_SPECTRAL_SAMPLES ) + totalEmissiveRadiance;
 
 	#ifdef USE_SHEEN
 
