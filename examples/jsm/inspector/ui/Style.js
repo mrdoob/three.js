@@ -232,10 +232,11 @@ export class Style {
 }
 
 .mini-panel-content .list-container.parameters {
-	padding: 3px 6px 0px 6px !important;
+	padding: 2px 6px 0px 6px !important;
 }
 
 .mini-panel-content .list-header {
+	display: none;
 	padding: 2px 4px;
 	font-size: 11px;
 	font-weight: 600;
