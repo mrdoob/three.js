@@ -271,7 +271,6 @@ class WebGPUBindingUtils {
 		}
 
 		const bindGroupLayoutKey = layoutKeyComponents.join( '_' );
-		console.log( bindGroupLayoutKey );
 
 		let bindGroupLayout = this.bindGroupLayoutCache.get( bindGroupLayoutKey );
 
