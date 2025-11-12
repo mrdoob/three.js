@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Three.js DevTools Test</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; }
+        #devtools-panel { 
+            position: fixed; top: 20px; right: 20px; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #404040; border-radius: 8px;
+            padding: 16px; min-width: 280px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+        .panel-title { color: #fff; font-size: 14px; font-weight: 600; margin: 0 0 12px 0; }
+        .control-group { display: flex; gap: 8px; margin-bottom: 12px; }
+        .btn { 
+            padding: 8px 16px; border: none; border-radius: 4px;
+            font-size: 12px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s ease; flex: 1;
+        }
+        .btn-toggle { background: #0ea5e9; color: white; }
+        .btn-toggle:hover { background: #0284c7; transform: translateY(-1px); }
+        .btn-enable { background: #10b981; color: white; }
+        .btn-enable:hover { background: #059669; transform: translateY(-1px); }
+        .btn-disable { background: #ef4444; color: white; }
+        .btn-disable:hover { background: #dc2626; transform: translateY(-1px); }
+        .status-row { 
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; background: rgba(255,255,255,0.05);
+            border-radius: 4px; border-left: 3px solid #0ea5e9;
+        }
+        .status-label { color: #a1a1aa; font-size: 12px; }
+        .status-value { font-weight: 600; font-size: 12px; }
+        .status-enabled { color: #10b981; }
+        .status-disabled { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div id="devtools-panel">
+        <div class="panel-title">Three.js DevTools</div>
+        <div class="control-group">
+            <button class="btn btn-toggle" onclick="toggleDevTools()">Toggle</button>
+            <button class="btn btn-enable" onclick="enableDevTools()">Enable</button>
+            <button class="btn btn-disable" onclick="disableDevTools()">Disable</button>
+        </div>
+        <div class="status-row">
+            <span class="status-label">Status</span>
+            <span id="statusText" class="status-value">Loading...</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from './build/three.module.js';
+
+        // Create a simple scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // DevTools control functions
+        window.toggleDevTools = function() {
+            const newState = THREE.DevTools.toggle();
+            updateStatus();
+            console.log('DevTools toggled to:', newState);
+        };
+
+        window.enableDevTools = function() {
+            THREE.DevTools.setEnabled(true);
+            updateStatus();
+            console.log('DevTools enabled');
+        };
+
+        window.disableDevTools = function() {
+            THREE.DevTools.setEnabled(false);
+            updateStatus();
+            console.log('DevTools disabled');
+        };
+
+        function updateStatus() {
+            const statusText = document.getElementById('statusText');
+            const isEnabled = THREE.DevTools.enabled;
+            statusText.textContent = isEnabled ? 'ENABLED' : 'DISABLED';
+            statusText.className = `status-value ${isEnabled ? 'status-enabled' : 'status-disabled'}`;
+        }
+
+        // Initial status update
+        updateStatus();
+    </script>
+</body>
+</html>
