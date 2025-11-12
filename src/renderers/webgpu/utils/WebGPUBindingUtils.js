@@ -1,6 +1,6 @@
 import {
 	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType, GPUBufferBindingType, GPUStorageTextureAccess,
-	GPUSamplerBindingType
+	GPUSamplerBindingType, GPUShaderStage
 } from './WebGPUConstants.js';
 
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
@@ -70,7 +70,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					if ( binding.visibility & 4 ) {
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 
 						// compute
 
@@ -374,19 +374,19 @@ class WebGPUBindingUtils {
 					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
 					const visibilities = [];
-					if ( binding.visibility & 1 ) {
+					if ( binding.visibility & GPUShaderStage.VERTEX ) {
 
 						visibilities.push( 'vertex' );
 
 					}
 
-					if ( binding.visibility & 2 ) {
+					if ( binding.visibility & GPUShaderStage.FRAGMENT ) {
 
 						visibilities.push( 'fragment' );
 
 					}
 
-					if ( binding.visibility & 4 ) {
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 
 						visibilities.push( 'compute' );
 
