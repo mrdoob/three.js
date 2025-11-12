@@ -19,7 +19,6 @@ export class Profiler {
 
 		this.setupShell();
 		this.setupResizing();
-		this.setupMiniPanelClickOutside();
 
 		// Setup orientation change listener for mobile devices
 		if ( this.isMobile ) {
@@ -256,13 +255,6 @@ export class Profiler {
 
 		// Set initial position class
 		this.panel.classList.add( `position-${this.position}` );
-
-	}
-
-	setupMiniPanelClickOutside() {
-
-		// Mini-panel now stays open - only closes when clicking the button again
-		// or when expanding/minimizing the inspector panel
 
 	}
 
