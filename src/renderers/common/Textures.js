@@ -85,6 +85,7 @@ class Textures extends DataMap {
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
+			depthTexture.renderTarget = renderTarget;
 			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
@@ -163,28 +164,13 @@ class Textures extends DataMap {
 
 			// dispose
 
-			const onDispose = () => {
+			renderTargetData.onDispose = () => {
 
-				renderTarget.removeEventListener( 'dispose', onDispose );
-
-				for ( let i = 0; i < textures.length; i ++ ) {
-
-					this._destroyTexture( textures[ i ] );
-
-				}
-
-				if ( depthTexture ) {
-
-					this._destroyTexture( depthTexture );
-
-				}
-
-				this.delete( renderTarget );
-				this.backend.delete( renderTarget );
+				this._destroyRenderTarget( renderTarget );
 
 			};
 
-			renderTarget.addEventListener( 'dispose', onDispose );
+			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
 
 		}
 
@@ -210,7 +196,6 @@ class Textures extends DataMap {
 
 			// it's an update
 
-			backend.destroySampler( texture );
 			backend.destroyTexture( texture );
 
 		}
@@ -253,16 +238,11 @@ class Textures extends DataMap {
 
 		if ( isRenderTarget || texture.isStorageTexture === true || texture.isExternalTexture === true ) {
 
-			backend.createSampler( texture );
 			backend.createTexture( texture, options );
 
 			textureData.generation = texture.version;
 
 		} else {
-
-			const needsCreate = textureData.initialized !== true;
-
-			if ( needsCreate ) backend.createSampler( texture );
 
 			if ( texture.version > 0 ) {
 
@@ -307,7 +287,13 @@ class Textures extends DataMap {
 
 					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
-					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
+					const skipAutoGeneration = texture.isStorageTexture === true && texture.mipmapsAutoUpdate === false;
+
+					if ( options.needsMipmaps && texture.mipmaps.length === 0 && ! skipAutoGeneration ) {
+
+						backend.generateMipmaps( texture );
+
+					}
 
 					if ( texture.onUpdate ) texture.onUpdate( texture );
 
@@ -347,21 +333,37 @@ class Textures extends DataMap {
 
 			// dispose
 
-			const onDispose = () => {
-
-				texture.removeEventListener( 'dispose', onDispose );
+			textureData.onDispose = () => {
 
 				this._destroyTexture( texture );
 
 			};
 
-			texture.addEventListener( 'dispose', onDispose );
+			texture.addEventListener( 'dispose', textureData.onDispose );
 
 		}
 
 		//
 
 		textureData.version = texture.version;
+
+	}
+
+	/**
+	 * Updates the sampler for the given texture. This method has no effect
+	 * for the WebGL backend since it has no concept of samplers. Texture
+	 * parameters are configured with the `texParameter()` command for each
+	 * texture.
+	 *
+	 * In WebGPU, samplers are objects like textures and it's possible to share
+	 * them when the texture parameters match.
+	 *
+	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @return {string} The current sampler key.
+	 */
+	updateSampler( texture ) {
+
+		return this.backend.updateSampler( texture );
 
 	}
 
@@ -466,6 +468,46 @@ class Textures extends DataMap {
 	}
 
 	/**
+	 * Frees internal resources when the given render target isn't
+	 * required anymore.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target to destroy.
+	 */
+	_destroyRenderTarget( renderTarget ) {
+
+		if ( this.has( renderTarget ) === true ) {
+
+			const renderTargetData = this.get( renderTarget );
+
+			const textures = renderTargetData.textures;
+			const depthTexture = renderTargetData.depthTexture;
+
+			//
+
+			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
+
+			//
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				this._destroyTexture( textures[ i ] );
+
+			}
+
+			if ( depthTexture ) {
+
+				this._destroyTexture( depthTexture );
+
+			}
+
+			this.delete( renderTarget );
+			this.backend.delete( renderTarget );
+
+		}
+
+	}
+
+	/**
 	 * Frees internal resource when the given texture isn't
 	 * required anymore.
 	 *
@@ -475,8 +517,19 @@ class Textures extends DataMap {
 
 		if ( this.has( texture ) === true ) {
 
-			this.backend.destroySampler( texture );
-			this.backend.destroyTexture( texture );
+			const textureData = this.get( texture );
+
+			//
+
+			texture.removeEventListener( 'dispose', textureData.onDispose );
+
+			// if a texture is not ready for use, it falls back to a default texture so it's possible
+			// to use it for rendering. If a texture in this state is disposed, it's important to
+			// not destroy/delete the underlying GPU texture object since it is cached and shared with
+			// other textures.
+
+			const isDefaultTexture = textureData.isDefaultTexture;
+			this.backend.destroyTexture( texture, isDefaultTexture );
 
 			this.delete( texture );
 

@@ -59,6 +59,7 @@ class CSS2DObject extends Object3D {
 			this.traverse( function ( object ) {
 
 				if (
+					object.element &&
 					object.element instanceof object.element.ownerDocument.defaultView.Element &&
 					object.element.parentNode !== null
 				) {
@@ -137,6 +138,16 @@ class CSS2DRenderer {
 		this.domElement = domElement;
 
 		/**
+		 * Controls whether the renderer assigns `z-index` values to CSS2DObject DOM elements.
+		 * If set to `true`, z-index values are assigned first based on the `renderOrder`
+		 * and secondly - the distance to the camera. If set to `false`, no z-index values are assigned.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.sortObjects = true;
+
+		/**
 		 * Returns an object containing the width and height of the renderer.
 		 *
 		 * @return {{width:number,height:number}} The size of the renderer.
@@ -165,7 +176,7 @@ class CSS2DRenderer {
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
 			renderObject( scene, scene, camera );
-			zOrder( scene );
+			if ( this.sortObjects ) zOrder( scene );
 
 		};
 

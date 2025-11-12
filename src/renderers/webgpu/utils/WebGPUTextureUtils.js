@@ -17,7 +17,6 @@ import {
 	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
-import { DepthTexture } from '../../../textures/DepthTexture.js';
 import { Texture } from '../../../textures/Texture.js';
 import { warn, error } from '../../../utils.js';
 
@@ -88,20 +87,11 @@ class WebGPUTextureUtils {
 		this.defaultVideoFrame = null;
 
 		/**
-		 * Represents the color attachment of the default framebuffer.
+		 * A cache of shared texture samplers.
 		 *
-		 * @type {?GPUTexture}
-		 * @default null
+		 * @type {Map<string, Object>}
 		 */
-		this.colorBuffer = null;
-
-		/**
-		 * Represents the depth attachment of the default framebuffer.
-		 *
-		 * @type {DepthTexture}
-		 */
-		this.depthTexture = new DepthTexture();
-		this.depthTexture.name = 'depthBuffer';
+		this._samplerCache = new Map();
 
 	}
 
@@ -109,39 +99,81 @@ class WebGPUTextureUtils {
 	 * Creates a GPU sampler for the given texture.
 	 *
 	 * @param {Texture} texture - The texture to create the sampler for.
+	 * @return {string} The current sampler key.
 	 */
-	createSampler( texture ) {
+	updateSampler( texture ) {
 
 		const backend = this.backend;
-		const device = backend.device;
 
-		const textureGPU = backend.get( texture );
+		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
+			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
+			texture.anisotropy + '-' + ( texture.compareFunction || 0 );
 
-		const samplerDescriptorGPU = {
-			addressModeU: this._convertAddressMode( texture.wrapS ),
-			addressModeV: this._convertAddressMode( texture.wrapT ),
-			addressModeW: this._convertAddressMode( texture.wrapR ),
-			magFilter: this._convertFilterMode( texture.magFilter ),
-			minFilter: this._convertFilterMode( texture.minFilter ),
-			mipmapFilter: this._convertFilterMode( texture.minFilter ),
-			maxAnisotropy: 1
-		};
+		let samplerData = this._samplerCache.get( samplerKey );
 
-		// anisotropy can only be used when all filter modes are set to linear.
+		if ( samplerData === undefined ) {
 
-		if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
+			const samplerDescriptorGPU = {
+				addressModeU: this._convertAddressMode( texture.wrapS ),
+				addressModeV: this._convertAddressMode( texture.wrapT ),
+				addressModeW: this._convertAddressMode( texture.wrapR ),
+				magFilter: this._convertFilterMode( texture.magFilter ),
+				minFilter: this._convertFilterMode( texture.minFilter ),
+				mipmapFilter: this._convertFilterMode( texture.minFilter ),
+				maxAnisotropy: 1
+			};
 
-			samplerDescriptorGPU.maxAnisotropy = texture.anisotropy;
+			// anisotropy can only be used when all filter modes are set to linear.
+
+			if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
+
+				samplerDescriptorGPU.maxAnisotropy = texture.anisotropy;
+
+			}
+
+			if ( texture.isDepthTexture && texture.compareFunction !== null ) {
+
+				samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
+
+			}
+
+			const sampler = backend.device.createSampler( samplerDescriptorGPU );
+
+			samplerData = { sampler, usedTimes: 0 };
+
+			this._samplerCache.set( samplerKey, samplerData );
 
 		}
 
-		if ( texture.isDepthTexture && texture.compareFunction !== null ) {
+		const textureData = backend.get( texture );
 
-			samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
+		if ( textureData.sampler !== samplerData.sampler ) {
+
+			// check if previous sampler is unused so it can be deleted
+
+			if ( textureData.sampler !== undefined ) {
+
+				const oldSamplerData = this._samplerCache.get( textureData.samplerKey );
+				oldSamplerData.usedTimes --;
+
+				if ( oldSamplerData.usedTimes === 0 ) {
+
+					this._samplerCache.delete( textureData.samplerKey );
+
+				}
+
+			}
+
+			// update to new sampler data
+
+			textureData.samplerKey = samplerKey;
+			textureData.sampler = samplerData.sampler;
+
+			samplerData.usedTimes ++;
 
 		}
 
-		textureGPU.sampler = device.createSampler( samplerDescriptorGPU );
+		return samplerKey;
 
 	}
 
@@ -293,13 +325,14 @@ class WebGPUTextureUtils {
 	 * Destroys the GPU data for the given texture object.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {boolean} [isDefaultTexture=false] - Whether the texture uses a default GPU texture or not.
 	 */
-	destroyTexture( texture ) {
+	destroyTexture( texture, isDefaultTexture = false ) {
 
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined ) textureData.texture.destroy();
+		if ( textureData.texture !== undefined && isDefaultTexture === false ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
@@ -308,25 +341,12 @@ class WebGPUTextureUtils {
 	}
 
 	/**
-	 * Destroys the GPU sampler for the given texture.
-	 *
-	 * @param {Texture} texture - The texture to destroy the sampler for.
-	 */
-	destroySampler( texture ) {
-
-		const backend = this.backend;
-		const textureData = backend.get( texture );
-
-		delete textureData.sampler;
-
-	}
-
-	/**
 	 * Generates mipmaps for the given texture.
 	 *
 	 * @param {Texture} texture - The texture.
+	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	generateMipmaps( texture ) {
+	generateMipmaps( texture, encoder = null ) {
 
 		const textureData = this.backend.get( texture );
 
@@ -334,7 +354,7 @@ class WebGPUTextureUtils {
 
 			for ( let i = 0; i < 6; i ++ ) {
 
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
 
 			}
 
@@ -344,7 +364,7 @@ class WebGPUTextureUtils {
 
 			for ( let i = 0; i < depth; i ++ ) {
 
-				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i, encoder );
 
 			}
 
@@ -360,24 +380,47 @@ class WebGPUTextureUtils {
 	 */
 	getColorBuffer() {
 
-		if ( this.colorBuffer ) this.colorBuffer.destroy();
-
 		const backend = this.backend;
+		const canvasTarget = backend.renderer.getCanvasTarget();
 		const { width, height } = backend.getDrawingBufferSize();
+		const samples = backend.renderer.currentSamples;
 
-		this.colorBuffer = backend.device.createTexture( {
+		const colorTexture = canvasTarget.colorTexture;
+		const colorTextureData = backend.get( colorTexture );
+
+		if ( colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
+
+			return colorTextureData.texture;
+
+		}
+
+		// recreate
+
+		let colorBuffer = colorTextureData.texture;
+
+		if ( colorBuffer ) colorBuffer.destroy();
+
+		colorBuffer = backend.device.createTexture( {
 			label: 'colorBuffer',
 			size: {
 				width: width,
 				height: height,
 				depthOrArrayLayers: 1
 			},
-			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
+			sampleCount: backend.utils.getSampleCount( backend.renderer.currentSamples ),
 			format: backend.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
 
-		return this.colorBuffer;
+		//
+
+		colorTexture.source.width = width;
+		colorTexture.source.height = height;
+		colorTexture.samples = samples;
+
+		colorTextureData.texture = colorBuffer;
+
+		return colorBuffer;
 
 	}
 
@@ -392,9 +435,24 @@ class WebGPUTextureUtils {
 	getDepthBuffer( depth = true, stencil = false ) {
 
 		const backend = this.backend;
+		const canvasTarget = backend.renderer.getCanvasTarget();
 		const { width, height } = backend.getDrawingBufferSize();
+		const samples = backend.renderer.currentSamples;
 
-		const depthTexture = this.depthTexture;
+		const depthTexture = canvasTarget.depthTexture;
+
+		if ( depthTexture.width === width &&
+			depthTexture.height === height &&
+			depthTexture.samples === samples &&
+			depthTexture.depth === depth &&
+			depthTexture.stencil === stencil ) {
+
+			return backend.get( depthTexture ).texture;
+
+		}
+
+		//
+
 		const depthTextureGPU = backend.get( depthTexture ).texture;
 
 		let format, type;
@@ -413,7 +471,7 @@ class WebGPUTextureUtils {
 
 		if ( depthTextureGPU !== undefined ) {
 
-			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
+			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type && depthTexture.samples === samples ) {
 
 				return depthTextureGPU;
 
@@ -423,11 +481,14 @@ class WebGPUTextureUtils {
 
 		}
 
+		// recreate
+
 		depthTexture.name = 'depthBuffer';
 		depthTexture.format = format;
 		depthTexture.type = type;
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
+		depthTexture.samples = samples;
 
 		this.createTexture( depthTexture, { width, height } );
 
@@ -573,6 +634,15 @@ class WebGPUTextureUtils {
 		const buffer = readBuffer.getMappedRange();
 
 		return new typedArrayType( buffer );
+
+	}
+
+	/**
+	 * Frees all internal resources.
+	 */
+	dispose() {
+
+		this._samplerCache.clear();
 
 	}
 
@@ -745,10 +815,11 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture object.
 	 * @param {Object} textureDescriptorGPU - The texture descriptor.
 	 * @param {number} [baseArrayLayer=0] - The index of the first array layer accessible to the texture view.
+	 * @param {?GPUCommandEncoder} [encoder=null] - An optional command encoder used to generate mipmaps.
 	 */
-	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
+	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0, encoder = null ) {
 
-		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
+		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer, encoder );
 
 	}
 

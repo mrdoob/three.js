@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - compute - flocking</title>
+		<title>three.js webgpu - compute birds</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				background-color: #fff;
-				color: #444;
-			}
-			a {
-				color:#08f;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgpu compute birds<br/>
-			Move mouse to disturb birds.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>
+				<span>Compute Birds</span>
+			</div>
+
+			<small>
+				Move mouse to disturb birds.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -28,8 +27,7 @@
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
-					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -37,15 +35,15 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, property, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
+			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from 'stats-gl';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-			let container, stats;
+			let container;
 			let camera, scene, renderer;
 
 			let last = performance.now();
@@ -112,7 +110,7 @@
 			}
 
 			// TODO: Fix example with WebGL backend
-			
+
 			if ( WebGPU.isAvailable() === false ) {
 
 				document.body.appendChild( WebGPU.getErrorMessage() );
@@ -163,8 +161,9 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera );
@@ -294,7 +293,7 @@
 					// Define consts
 					const PI = float( 3.141592653589793 );
 					const PI_2 = PI.mul( 2.0 );
-					const limit = property( 'float', 'limit' ).assign( SPEED_LIMIT );
+					const limit = float( SPEED_LIMIT ).toVar( 'limit' );
 
 					// Destructure uniforms
 					const { alignment, separation, cohesion, deltaTime, rayOrigin, rayDirection } = effectController;
@@ -338,7 +337,7 @@
 						If( i.equal( birdIndex ), () => {
 
 							Continue();
-			
+
 						} );
 
 						// Cache bird's position and velocity
@@ -411,7 +410,8 @@
 					// Write back the final velocity to storage
 					velocityStorage.element( birdIndex ).assign( velocity );
 
-				} )().compute( BIRDS );
+				} )().compute( BIRDS ).setName( 'Birds Velocity' );
+
 				computePosition = Fn( () => {
 
 					const { deltaTime } = effectController;
@@ -423,30 +423,19 @@
 					const modValue = phase.add( deltaTime ).add( length( velocity.xz ).mul( deltaTime ).mul( 3.0 ) ).add( max( velocity.y, 0.0 ).mul( deltaTime ).mul( 6.0 ) );
 					phaseStorage.element( instanceIndex ).assign( modValue.mod( 62.83 ) );
 
-				} )().compute( BIRDS );
+				} )().compute( BIRDS ).setName( 'Birds Position' );
 
 				scene.add( birdMesh );
-
-				stats = new Stats( {
-					precision: 3,
-					horizontal: false,
-					trackGPU: true,
-					trackCPT: true
-				} );
-				stats.init( renderer );
-				container.appendChild( stats.dom );
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const gui = new GUI();
-
+				const gui = renderer.inspector.createParameters( 'Birds settings' );
 				gui.add( effectController.separation, 'value', 0.0, 100.0, 1.0 ).name( 'Separation' );
 				gui.add( effectController.alignment, 'value', 0.0, 100, 0.001 ).name( 'Alignment ' );
 				gui.add( effectController.cohesion, 'value', 0.0, 100, 0.025 ).name( 'Cohesion' );
-				gui.close();
 
 			}
 
@@ -468,14 +457,6 @@
 
 			}
 
-			function animate() {
-
-				render();
-				renderer.resolveTimestampsAsync();
-				stats.update();
-
-			}
-
 			function render() {
 
 				const now = performance.now();
@@ -493,7 +474,7 @@
 
 				renderer.compute( computeVelocity );
 				renderer.compute( computePosition );
-				renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+
 				renderer.render( scene, camera );
 
 				// Move pointer away so we only affect birds when moving the mouse

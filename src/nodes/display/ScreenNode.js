@@ -49,6 +49,7 @@ class ScreenNode extends Node {
 		/**
 		 * This output node.
 		 *
+		 * @private
 		 * @type {?Node}
 		 * @default null
 		 */

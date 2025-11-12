@@ -15,7 +15,7 @@ const ZIP_COMPRESSION = 3;
 /**
  * An exporter for EXR.
  *
- * EXR ( Extended Dynamic Range) is an [open format specification]{@link https://github.com/AcademySoftwareFoundation/openexr}
+ * EXR ( Extended Dynamic Range) is an [open format specification](https://github.com/AcademySoftwareFoundation/openexr)
  * for professional-grade image storage format of the motion picture industry. The purpose of
  * format is to accurately and efficiently represent high-dynamic-range scene-linear image data
  * and associated metadata. The library is widely used in host application software where accuracy

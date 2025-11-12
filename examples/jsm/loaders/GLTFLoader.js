@@ -70,7 +70,7 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
 /**
  * A loader for the glTF 2.0 format.
  *
- * [glTF]{@link https://www.khronos.org/gltf/} (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/main/specification/2.0}
+ * [glTF](https://www.khronos.org/gltf/} (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/main/specification/2.0)
  * for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf) or binary (.glb)
  * format. External files store textures (.jpg, .png) and additional binary data (.bin). A glTF asset may deliver
  * one or more scenes, including meshes, materials, textures, skins, skeletons, morph targets, animations, lights,
@@ -99,8 +99,10 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
  * - EXT_mesh_gpu_instancing
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
- * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
- * - [MSFT_texture_dds]{@link https://github.com/takahirox/three-gltf-extensions}
+ * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
+ * - [MSFT_texture_dds](https://github.com/takahirox/three-gltf-extensions)
+ * - [KHR_animation_pointer](https://github.com/needle-tools/three-animation-pointer)
+ * - [NEEDLE_progressive](https://github.com/needle-tools/gltf-progressive)
  *
  * ```js
  * const loader = new GLTFLoader();

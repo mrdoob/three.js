@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils } from 'three/webgpu';
-import { clamp, normalize, reference, nodeObject, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, PI2, div, ceil, shiftRight, uvec2, convertToTexture, bool, getNormalFromDepth } from 'three/tsl';
+import { clamp, normalize, reference, nodeObject, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -20,7 +20,7 @@ let _rendererState;
  *
  * The quality and performance of the effect mainly depend on `sliceCount` and `stepCount`.
  * The total number of samples taken per pixel is `sliceCount` * `stepCount` * `2`. Here are some
- * recommened presets depending on whether temporal filtering is used or not.
+ * recommended presets depending on whether temporal filtering is used or not.
  *
  * With temporal filtering (recommended):
  *
@@ -28,7 +28,7 @@ let _rendererState;
  * - Medium: `sliceCount` of `2`, `stepCount` of `8`.
  * - High: `sliceCount` of `3`, `stepCount` of `16`.
  *
- * Use for a higher slice count if you notice temporal instabilties like flickering. Reduce the sample
+ * Use for a higher slice count if you notice temporal instabilities like flickering. Reduce the sample
  * count then to mitigate the performance lost.
  *
  * Without temporal filtering:
@@ -51,7 +51,7 @@ class SSGINode extends TempNode {
 	/**
 	 * Constructs a new SSGI node.
 	 *
-	 * @param {TextureNode} beautyNode - The texture node that represents the input of the effect.
+	 * @param {TextureNode} beautyNode - A texture node that represents the beauty or scene pass.
 	 * @param {TextureNode} depthNode - A texture node that represents the scene's depth.
 	 * @param {TextureNode} normalNode - A texture node that represents the scene's normals.
 	 * @param {PerspectiveCamera} camera - The camera the scene is rendered with.
@@ -61,9 +61,9 @@ class SSGINode extends TempNode {
 		super( 'vec4' );
 
 		/**
-		 * A node that represents the scene's depth.
+		 * A texture node that represents the beauty or scene pass.
 		 *
-		 * @type {Node<float>}
+		 * @type {TextureNode}
 		 */
 		this.beautyNode = beautyNode;
 
@@ -96,7 +96,7 @@ class SSGINode extends TempNode {
 		 * Number of per-pixel hemisphere slices. This has a big performance cost and should be kept as low as possible.
 		 * Should be in the range `[1, 4]`.
 		 *
-		 * @type {UniformNode<int>}
+		 * @type {UniformNode<uint>}
 		 * @default 1
 		 */
 		this.sliceCount = uniform( 1, 'uint' );
@@ -105,7 +105,7 @@ class SSGINode extends TempNode {
 		 * Number of samples taken along one side of a given hemisphere slice. This has a big performance cost and should
 		 * be kept as low as possible.  Should be in the range `[1, 32]`.
 		 *
-		 * @type {UniformNode<int>}
+		 * @type {UniformNode<uint>}
 		 * @default 12
 		 */
 		this.stepCount = uniform( 12, 'uint' );
@@ -180,7 +180,7 @@ class SSGINode extends TempNode {
 
 		/**
 		 * Whether to use temporal filtering or not. Setting this property to
-		 * `true` requires the usage of `TRAANode`. This will help to reduce noice
+		 * `true` requires the usage of `TRAANode`. This will help to reduce noise
 		 * although it introduces typical TAA artifacts like ghosting and temporal
 		 * instabilities.
 		 *
@@ -197,6 +197,7 @@ class SSGINode extends TempNode {
 		/**
 		 * The resolution of the effect.
 		 *
+		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
 		this._resolution = uniform( new Vector2() );
@@ -204,6 +205,7 @@ class SSGINode extends TempNode {
 		/**
 		 * Used to compute the effective step radius when viewSpaceSampling is `false`.
 		 *
+		 * @private
 		 * @type {UniformNode<vec2>}
 		 */
 		this._halfProjScale = uniform( 1 );
@@ -211,6 +213,7 @@ class SSGINode extends TempNode {
 		/**
 		 * Temporal direction that influences the rotation angle for each slice.
 		 *
+		 * @private
 		 * @type {UniformNode<float>}
 		 */
 		this._temporalDirection = uniform( 0 );
@@ -218,7 +221,8 @@ class SSGINode extends TempNode {
 		/**
 		 * Temporal offset added to the initial ray step.
 		 *
-		 * @type {UniformNode<vec2>}
+		 * @private
+		 * @type {UniformNode<float>}
 		 */
 		this._temporalOffset = uniform( 0 );
 
@@ -351,10 +355,11 @@ class SSGINode extends TempNode {
 		//
 
 		_quadMesh.material = this._material;
+		_quadMesh.name = 'SSGI';
 
 		// clear
 
-		renderer.setClearColor( 0xffffff, 1 );
+		renderer.setClearColor( 0x000000, 1 );
 
 		// gi
 
@@ -377,6 +382,7 @@ class SSGINode extends TempNode {
 
 		const uvNode = uv();
 		const MAX_RAY = uint( 32 );
+		const globalOccludedBitfield = uint( 0 );
 
 		const sampleDepth = ( uv ) => {
 
@@ -403,14 +409,12 @@ class SSGINode extends TempNode {
 
 			return float( 0.25 ).mul( sub( position.y, position.x ).bitAnd( 3 ) );
 
-		} );
-
-		// Interleaved gradient function from Jimenez 2014 http://goo.gl/eomGso
-
-		const gradientNoise = Fn( ( [ position ] ) => {
-
-			return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
-
+		} ).setLayout( {
+			name: 'spatialOffsets',
+			type: 'float',
+			inputs: [
+				{ name: 'position', type: 'vec2' }
+			]
 		} );
 
 		const GTAOFastAcos = Fn( ( [ value ] ) => {
@@ -423,35 +427,15 @@ class SSGINode extends TempNode {
 
 			return vec2( x, y );
 
+		} ).setLayout( {
+			name: 'GTAOFastAcos',
+			type: 'vec2',
+			inputs: [
+				{ name: 'value', type: 'vec2' }
+			]
 		} );
 
-		const bitCount = Fn( ( [ value_immutable ] ) => {
-
-			const value = value_immutable;
-			value.assign( value.sub( value.shiftRight( uint( 1 ) ).bitAnd( uint( 0x55555555 ) ) ) );
-			value.assign( value.bitAnd( uint( 0x33333333 ) ).add( value.shiftRight( uint( 2 ) ).bitAnd( uint( 0x33333333 ) ) ) );
-
-			return value.add( value.shiftRight( uint( 4 ) ) ).bitAnd( uint( 0xF0F0F0F ) ).mul( uint( 0x1010101 ) ).shiftRight( uint( 24 ) );
-
-		} );
-
-		const computeOccludedBitfield = Fn( ( [ minHorizon, maxHorizon, globalOccludedBitfield ] ) => {
-
-			const startHorizonInt = uint( minHorizon.mul( float( MAX_RAY ) ) ).toConst();
-			const angleHorizonInt = uint( ceil( maxHorizon.sub( minHorizon ).mul( float( MAX_RAY ) ) ) ).toConst();
-			const angleHorizonBitfield = angleHorizonInt.greaterThan( uint( 0 ) ).select( uint( shiftRight( uint( 0xFFFFFFFF ), uint( 32 ).sub( MAX_RAY ).add( MAX_RAY.sub( angleHorizonInt ) ) ) ), uint( 0 ) ).toConst();
-			let currentOccludedBitfield = angleHorizonBitfield.shiftLeft( startHorizonInt );
-			currentOccludedBitfield = currentOccludedBitfield.bitAnd( globalOccludedBitfield.bitNot() );
-
-			const result = uvec2();
-			result.x = globalOccludedBitfield.bitOr( currentOccludedBitfield );
-			result.y = bitCount( currentOccludedBitfield );
-
-			return result;
-
-		} );
-
-		const horizonSampling = Fn( ( [ directionIsRight, RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n, globalOccludedBitfield ] ) => {
+		const horizonSampling = Fn( ( [ directionIsRight, RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
 
 			const STEP_COUNT = this.stepCount.toConst();
 			const EXP_FACTOR = this.expFactor.toConst();
@@ -462,11 +446,11 @@ class SSGINode extends TempNode {
 
 			If( this.useScreenSpaceSampling.equal( true ), () => {
 
-				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( STEP_COUNT ) ) );
+				stepRadius.assign( RADIUS.mul( this._resolution.x.div( 2 ) ).div( float( 16 ) ) ); // SSRT3 has a bug where stepRadius is divided by STEP_COUNT twice; fix here
 
 			} ).Else( () => {
 
-				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is requried
+				stepRadius.assign( max( RADIUS.mul( this._halfProjScale ).div( viewPosition.z.negate() ), float( STEP_COUNT ) ) ); // Port note: viewZ is negative so a negate is required
 
 			} );
 
@@ -476,7 +460,6 @@ class SSGINode extends TempNode {
 			const samplingDirection = directionIsRight.equal( true ).select( 1, - 1 );
 
 			const color = vec3( 0 );
-			const occludedBitfield = uint( globalOccludedBitfield ).toVar();
 
 			const lastSampleViewPosition = vec3( viewPosition ).toVar();
 
@@ -502,9 +485,21 @@ class SSGINode extends TempNode {
 				frontBackHorizon = clamp( div( mul( samplingDirection, frontBackHorizon.negate() ).sub( n.sub( HALF_PI ) ), PI ) ); // Port note: subtract half pi instead of adding it
 				frontBackHorizon = directionIsRight.equal( true ).select( frontBackHorizon.yx, frontBackHorizon.xy ); // Front/Back get inverted depending on angle
 
-				const result = computeOccludedBitfield( frontBackHorizon.x, frontBackHorizon.y, occludedBitfield );
-				occludedBitfield.assign( result.x );
-				const numOccludedZones = result.y;
+				// inline ComputeOccludedBitfield() for easier debugging
+
+				const minHorizon = frontBackHorizon.x.toConst();
+				const maxHorizon = frontBackHorizon.y.toConst();
+
+				const startHorizonInt = uint( frontBackHorizon.mul( float( MAX_RAY ) ) ).toConst();
+				const angleHorizonInt = uint( ceil( maxHorizon.sub( minHorizon ).mul( float( MAX_RAY ) ) ) ).toConst();
+				const angleHorizonBitfield = angleHorizonInt.greaterThan( uint( 0 ) ).select( uint( shiftRight( uint( 0xFFFFFFFF ), uint( 32 ).sub( MAX_RAY ).add( MAX_RAY.sub( angleHorizonInt ) ) ) ), uint( 0 ) ).toConst();
+				let currentOccludedBitfield = angleHorizonBitfield.shiftLeft( startHorizonInt );
+				currentOccludedBitfield = currentOccludedBitfield.bitAnd( globalOccludedBitfield.bitNot() );
+
+				globalOccludedBitfield.assign( globalOccludedBitfield.bitOr( currentOccludedBitfield ) );
+				const numOccludedZones = countOneBits( currentOccludedBitfield );
+
+				//
 
 				If( numOccludedZones.greaterThan( 0 ), () => { // If a ray hit the sample, that sample is visible from shading point
 
@@ -538,7 +533,7 @@ class SSGINode extends TempNode {
 
 			} );
 
-			return vec4( color, occludedBitfield );
+			return vec3( color );
 
 		} );
 
@@ -555,8 +550,9 @@ class SSGINode extends TempNode {
 			//
 
 			const noiseOffset = spatialOffsets( screenCoordinate );
-			const noiseDirection = gradientNoise( screenCoordinate );
-			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode ).mul( 2 ).sub( 1 ) );
+			const noiseDirection = interleavedGradientNoise( screenCoordinate );
+			const noiseJitterIdx = this._temporalDirection.mul( 0.02 ); // Port: Add noiseJitterIdx here for slightly better noise convergence with TRAA (see #31890 for more details)
+			const initialRayStep = fract( noiseOffset.add( this._temporalOffset ) ).add( rand( uvNode.add( noiseJitterIdx ).mul( 2 ).sub( 1 ) ) );
 
 			const ao = float( 0 );
 			const color = vec3( 0 );
@@ -568,7 +564,7 @@ class SSGINode extends TempNode {
 
 			Loop( { start: uint( 0 ), end: ROTATION_COUNT, type: 'uint', condition: '<' }, ( { i } ) => {
 
-				const rotationAngle = mul( float( i ).add( noiseDirection ).add( this._temporalDirection ), PI2.div( float( ROTATION_COUNT ) ) ).toConst(); // Port note: PI was changed to PI2 to fix a sampling asymmetry issue
+				const rotationAngle = mul( float( i ).add( noiseDirection ).add( this._temporalDirection ), PI.div( float( ROTATION_COUNT ) ) ).toConst();
 				const sliceDir = vec3( vec2( cos( rotationAngle ), sin( rotationAngle ) ), 0 ).toConst();
 				const slideDirTexelSize = sliceDir.xy.mul( float( 1 ).div( this._resolution ) ).toConst();
 
@@ -580,17 +576,12 @@ class SSGINode extends TempNode {
 				const cos_n = clamp( dot( projectedNormalNormalized, viewDir ), - 1, 1 ).toConst();
 				const n = sign( dot( projectedNormal, tangent ) ).negate().mul( acos( cos_n ) ).toConst();
 
-				const globalOccludedBitfield = uint( 0 );
+				globalOccludedBitfield.assign( 0 );
 
-				const resultRight = horizonSampling( bool( true ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n, globalOccludedBitfield );
-				color.addAssign( resultRight.xyz );
-				globalOccludedBitfield.assign( resultRight.a );
+				color.addAssign( horizonSampling( bool( true ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
+				color.addAssign( horizonSampling( bool( false ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ) );
 
-				const resultLeft = horizonSampling( bool( false ), RADIUS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n, globalOccludedBitfield );
-				color.addAssign( resultLeft.xyz );
-				globalOccludedBitfield.assign( resultLeft.a );
-
-				ao.addAssign( float( bitCount( globalOccludedBitfield ) ).div( float( MAX_RAY ) ) );
+				ao.addAssign( float( countOneBits( globalOccludedBitfield ) ).div( float( MAX_RAY ) ) );
 
 			} );
 

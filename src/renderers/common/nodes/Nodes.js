@@ -1,6 +1,7 @@
 import DataMap from '../DataMap.js';
 import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
+import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame } from '../../../nodes/Nodes.js';
 import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, texture3D, vec3, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV } from '../../../nodes/TSL.js';
@@ -194,22 +195,41 @@ class Nodes extends DataMap {
 
 			if ( nodeBuilderState === undefined ) {
 
-				const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
-				nodeBuilder.scene = renderObject.scene;
-				nodeBuilder.material = renderObject.material;
-				nodeBuilder.camera = renderObject.camera;
-				nodeBuilder.context.material = renderObject.material;
-				nodeBuilder.lightsNode = renderObject.lightsNode;
-				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
-				nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
-				nodeBuilder.clippingContext = renderObject.clippingContext;
-				if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
+				const createNodeBuilder = ( material ) => {
 
-					nodeBuilder.enableMultiview();
+					const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+					nodeBuilder.scene = renderObject.scene;
+					nodeBuilder.material = material;
+					nodeBuilder.camera = renderObject.camera;
+					nodeBuilder.context.material = material;
+					nodeBuilder.lightsNode = renderObject.lightsNode;
+					nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
+					nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
+					nodeBuilder.clippingContext = renderObject.clippingContext;
+					if ( this.renderer.getOutputRenderTarget() ? this.renderer.getOutputRenderTarget().multiview : false ) {
+
+						nodeBuilder.enableMultiview();
+
+					}
+
+					return nodeBuilder;
+
+				};
+
+				let nodeBuilder = createNodeBuilder( renderObject.material );
+
+				try {
+
+					nodeBuilder.build();
+
+				} catch ( e ) {
+
+					nodeBuilder = createNodeBuilder( new NodeMaterial() );
+					nodeBuilder.build();
+
+					error( 'TSL: ' + e );
 
 				}
-
-				nodeBuilder.build();
 
 				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
 
@@ -413,6 +433,7 @@ class Nodes extends DataMap {
 
 			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
 			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
+			_cacheKeyValues.push( this.renderer.shadowMap.type );
 
 			cacheKeyData.callId = callId;
 			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );

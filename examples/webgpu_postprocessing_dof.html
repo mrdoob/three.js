@@ -4,9 +4,20 @@
 		<title>three.js webgpu - postprocessing dof</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>DoF</span>
+			</div>
+
+			<small>High-Quality Depth-of-Field effect.</small>
+		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -25,13 +36,11 @@
 			import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			//
 
-			let camera, scene, renderer, mesh, controls, stats;
+			let camera, scene, renderer, mesh, controls;
 
 			let width = window.innerWidth;
 			let height = window.innerHeight;
@@ -98,6 +107,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				const effectController = {
@@ -112,7 +122,7 @@
 
 				const scenePass = pass( scene, camera );
 
-				const scenePassColor = scenePass.getTextureNode();
+				const scenePassColor = scenePass.getTextureNode().toInspector( 'Color' );
 				const scenePassViewZ = scenePass.getViewZNode();
 
 				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focusDistance, effectController.focalLength, effectController.bokehScale );
@@ -126,14 +136,9 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				// stats
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( effectController.focusDistance, 'value', 10.0, 3000.0 ).name( 'focus distance' );
 				gui.add( effectController.focalLength, 'value', 50, 750 ).name( 'focal length' );
 				gui.add( effectController.bokehScale, 'value', 1, 20 ).name( 'bokeh scale' );
@@ -157,8 +162,6 @@
 				controls.update();
 
 				postProcessing.render();
-
-				stats.update();
 
 			}
 

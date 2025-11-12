@@ -33,9 +33,10 @@ class ToneMappingNode extends TempNode {
 		/**
 		 * The tone mapping type.
 		 *
+		 * @private
 		 * @type {number}
 		 */
-		this.toneMapping = toneMapping;
+		this._toneMapping = toneMapping;
 
 		/**
 		 * The tone mapping exposure.
@@ -63,14 +64,39 @@ class ToneMappingNode extends TempNode {
 	 */
 	customCacheKey() {
 
-		return hash( this.toneMapping );
+		return hash( this._toneMapping );
+
+	}
+
+	/**
+	 * Sets the tone mapping type.
+	 *
+	 * @param {number} value - The tone mapping type.
+	 * @return {ToneMappingNode} A reference to this node.
+	 */
+	setToneMapping( value ) {
+
+		this._toneMapping = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the tone mapping type.
+	 *
+	 * @returns {number} The tone mapping type.
+	 */
+	getToneMapping() {
+
+		return this._toneMapping;
 
 	}
 
 	setup( builder ) {
 
 		const colorNode = this.colorNode || builder.context.color;
-		const toneMapping = this.toneMapping;
+		const toneMapping = this._toneMapping;
 
 		if ( toneMapping === NoToneMapping ) return colorNode;
 

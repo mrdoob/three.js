@@ -1,7 +1,7 @@
 /**
  * A class that creates an ASCII effect.
  *
- * The ASCII generation is based on [jsascii]{@link https://github.com/hassadee/jsascii/blob/master/jsascii.js}.
+ * The ASCII generation is based on [jsascii](https://github.com/hassadee/jsascii/blob/master/jsascii.js).
  *
  * @three_import import { AsciiEffect } from 'three/addons/effects/AsciiEffect.js';
  */
@@ -18,7 +18,7 @@ class AsciiEffect {
 
 		// ' .,:;=|iI+hHOE#`$';
 		// darker bolder character set from https://github.com/saw/Canvas-ASCII-Art/
-		// ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'.split('');
+		// ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 
 		// Some ASCII settings
 
@@ -218,6 +218,8 @@ class AsciiEffect {
 			// Coloring loop starts now
 			let strChars = '';
 
+			const maxIdx = aCharList.length - 1;
+
 			// console.time('rendering');
 
 			for ( let y = 0; y < iHeight; y += 2 ) {
@@ -230,12 +232,10 @@ class AsciiEffect {
 					const iGreen = oImgData[ iOffset + 1 ];
 					const iBlue = oImgData[ iOffset + 2 ];
 					const iAlpha = oImgData[ iOffset + 3 ];
-					let iCharIdx;
 
-					let fBrightness;
-
-					fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
+					let fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
 					// fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
+
 
 					if ( iAlpha == 0 ) {
 
@@ -245,11 +245,11 @@ class AsciiEffect {
 
 					}
 
-					iCharIdx = Math.floor( ( 1 - fBrightness ) * ( aCharList.length - 1 ) );
+					let iCharIdx = Math.round( ( 1 - fBrightness ) * maxIdx );
 
 					if ( bInvert ) {
 
-						iCharIdx = aCharList.length - iCharIdx - 1;
+						iCharIdx = maxIdx - iCharIdx;
 
 					}
 

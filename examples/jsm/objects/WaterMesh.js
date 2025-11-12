@@ -15,9 +15,9 @@ import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, text
  *
  * References:
  *
- * - [Flat mirror for three.js]{@link https://github.com/Slayvin}
- * - [An implementation of water shader based on the flat mirror]{@link https://home.adelphi.edu/~stemkoski/}
- * - [Water shader explanations in WebGL]{@link http://29a.ch/slides/2012/webglwater/ }
+ * - [Flat mirror for three.js](https://github.com/Slayvin)
+ * - [An implementation of water shader based on the flat mirror](https://home.adelphi.edu/~stemkoski/)
+ * - [Water shader explanations in WebGL](http://29a.ch/slides/2012/webglwater/ )
  *
  * @augments Mesh
  * @three_import import { WaterMesh } from 'three/addons/objects/WaterMesh.js';
@@ -51,7 +51,7 @@ class WaterMesh extends Mesh {
 		 * @type {number}
 		 * @default 0.5
 		 */
-		this.resolution = options.resolution !== undefined ? options.resolution : 0.5;
+		this.resolutionScale = options.resolutionScale !== undefined ? options.resolutionScale : 0.5;
 
 		// Uniforms
 
@@ -161,7 +161,7 @@ class WaterMesh extends Mesh {
 
 			const mirrorSampler = reflector();
 			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
-			mirrorSampler.resolution = this.resolution;
+			mirrorSampler.reflector.resolutionScale = this.resolutionScale;
 
 			this.add( mirrorSampler.target );
 
@@ -183,7 +183,7 @@ class WaterMesh extends Mesh {
  * Constructor options of `WaterMesh`.
  *
  * @typedef {Object} WaterMesh~Options
- * @property {number} [resolution=0.5] - The resolution scale.
+ * @property {number} [resolutionScale=0.5] - The resolution scale.
  * @property {?Texture} [waterNormals=null] - The water's normal map.
  * @property {number} [alpha=1] - The alpha value.
  * @property {number} [size=1] - The size value.

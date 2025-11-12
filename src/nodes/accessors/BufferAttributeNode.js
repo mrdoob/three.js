@@ -1,10 +1,42 @@
 import InputNode from '../core/InputNode.js';
-import { nodeObject, addMethodChaining } from '../tsl/TSLCore.js';
+import { addMethodChaining, mat3, mat4 } from '../tsl/TSLCore.js';
 import { varying } from '../core/VaryingNode.js';
 
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
 import { InterleavedBuffer } from '../../core/InterleavedBuffer.js';
 import { StaticDrawUsage, DynamicDrawUsage } from '../../constants.js';
+
+/**
+ * Internal buffer attribute library.
+ *
+ * @private
+ * @type {WeakMap<TypedArray, InterleavedBuffer>}
+ */
+const _bufferLib = new WeakMap();
+
+/**
+ * Internal method for retrieving or creating interleaved buffers.
+ *
+ * @private
+ * @param {TypedArray} value - The attribute data.
+ * @param {number} itemSize - The attribute item size.
+ * @returns {InterleavedBuffer} The interleaved buffer.
+ */
+function _getBufferAttribute( value, itemSize ) {
+
+	let buffer = _bufferLib.get( value );
+
+	if ( buffer === undefined ) {
+
+		buffer = new InterleavedBuffer( value, itemSize );
+
+		_bufferLib.set( value, buffer );
+
+	}
+
+	return buffer;
+
+}
 
 /**
  * In earlier `three.js` versions it was only possible to define attribute data
@@ -114,7 +146,7 @@ class BufferAttributeNode extends InputNode {
 		 */
 		this.global = true;
 
-		if ( value && value.isBufferAttribute === true ) {
+		if ( value && value.isBufferAttribute === true && value.itemSize <= 4 ) {
 
 			this.attribute = value;
 			this.usage = value.usage;
@@ -185,13 +217,30 @@ class BufferAttributeNode extends InputNode {
 
 		if ( this.attribute !== null ) return;
 
+		//
+
 		const type = this.getNodeType( builder );
-		const array = this.value;
 		const itemSize = builder.getTypeLength( type );
+		const value = this.value;
 		const stride = this.bufferStride || itemSize;
 		const offset = this.bufferOffset;
 
-		const buffer = array.isInterleavedBuffer === true ? array : new InterleavedBuffer( array, stride );
+		let buffer;
+
+		if ( value.isInterleavedBuffer === true ) {
+
+			buffer = value;
+
+		} else if ( value.isBufferAttribute === true ) {
+
+			buffer = _getBufferAttribute( value.array, stride );
+
+		} else {
+
+			buffer = _getBufferAttribute( value, stride );
+
+		}
+
 		const bufferAttribute = new InterleavedBufferAttribute( buffer, itemSize, offset );
 
 		buffer.setUsage( this.usage );
@@ -285,6 +334,43 @@ class BufferAttributeNode extends InputNode {
 export default BufferAttributeNode;
 
 /**
+ * Internal method for creating buffer attribute nodes.
+ *
+ * @private
+ * @param {BufferAttribute|InterleavedBuffer|TypedArray} array - The attribute data.
+ * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
+ * @param {number} [stride=0] - The buffer stride.
+ * @param {number} [offset=0] - The buffer offset.
+ * @param {number} [usage=StaticDrawUsage] - The buffer usage.
+ * @param {boolean} [instanced=false] - Whether the buffer is instanced.
+ * @returns {BufferAttributeNode|Node} The buffer attribute node.
+ */
+function createBufferAttribute( array, type = null, stride = 0, offset = 0, usage = StaticDrawUsage, instanced = false ) {
+
+	if ( type === 'mat3' || ( type === null && array.itemSize === 9 ) ) {
+
+		return mat3(
+			new BufferAttributeNode( array, 'vec3', 9, 0 ).setUsage( usage ).setInstanced( instanced ),
+			new BufferAttributeNode( array, 'vec3', 9, 3 ).setUsage( usage ).setInstanced( instanced ),
+			new BufferAttributeNode( array, 'vec3', 9, 6 ).setUsage( usage ).setInstanced( instanced )
+		);
+
+	} else if ( type === 'mat4' || ( type === null && array.itemSize === 16 ) ) {
+
+		return mat4(
+			new BufferAttributeNode( array, 'vec4', 16, 0 ).setUsage( usage ).setInstanced( instanced ),
+			new BufferAttributeNode( array, 'vec4', 16, 4 ).setUsage( usage ).setInstanced( instanced ),
+			new BufferAttributeNode( array, 'vec4', 16, 8 ).setUsage( usage ).setInstanced( instanced ),
+			new BufferAttributeNode( array, 'vec4', 16, 12 ).setUsage( usage ).setInstanced( instanced )
+		);
+
+	}
+
+	return new BufferAttributeNode( array, type, stride, offset );
+
+}
+
+/**
  * TSL function for creating a buffer attribute node.
  *
  * @tsl
@@ -293,9 +379,9 @@ export default BufferAttributeNode;
  * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [stride=0] - The buffer stride.
  * @param {number} [offset=0] - The buffer offset.
- * @returns {BufferAttributeNode}
+ * @returns {BufferAttributeNode|Node}
  */
-export const bufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
+export const bufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => createBufferAttribute( array, type, stride, offset );
 
 /**
  * TSL function for creating a buffer attribute node but with dynamic draw usage.
@@ -307,9 +393,9 @@ export const bufferAttribute = ( array, type = null, stride = 0, offset = 0 ) =>
  * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [stride=0] - The buffer stride.
  * @param {number} [offset=0] - The buffer offset.
- * @returns {BufferAttributeNode}
+ * @returns {BufferAttributeNode|Node}
  */
-export const dynamicBufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => bufferAttribute( array, type, stride, offset ).setUsage( DynamicDrawUsage );
+export const dynamicBufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => createBufferAttribute( array, type, stride, offset, DynamicDrawUsage );
 
 /**
  * TSL function for creating a buffer attribute node but with enabled instancing
@@ -320,9 +406,9 @@ export const dynamicBufferAttribute = ( array, type = null, stride = 0, offset =
  * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [stride=0] - The buffer stride.
  * @param {number} [offset=0] - The buffer offset.
- * @returns {BufferAttributeNode}
+ * @returns {BufferAttributeNode|Node}
  */
-export const instancedBufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => bufferAttribute( array, type, stride, offset ).setInstanced( true );
+export const instancedBufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => createBufferAttribute( array, type, stride, offset, StaticDrawUsage, true );
 
 /**
  * TSL function for creating a buffer attribute node but with dynamic draw usage and enabled instancing
@@ -333,8 +419,8 @@ export const instancedBufferAttribute = ( array, type = null, stride = 0, offset
  * @param {?string} [type=null] - The buffer type (e.g. `'vec3'`).
  * @param {number} [stride=0] - The buffer stride.
  * @param {number} [offset=0] - The buffer offset.
- * @returns {BufferAttributeNode}
+ * @returns {BufferAttributeNode|Node}
  */
-export const instancedDynamicBufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => dynamicBufferAttribute( array, type, stride, offset ).setInstanced( true );
+export const instancedDynamicBufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => createBufferAttribute( array, type, stride, offset, DynamicDrawUsage, true );
 
 addMethodChaining( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );

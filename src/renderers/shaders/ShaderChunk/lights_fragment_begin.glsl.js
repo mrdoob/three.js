@@ -41,7 +41,7 @@ vec3 geometryClearcoatNormal = vec3( 0.0 );
 
 	if ( material.iridescence > 0.0 ) {
 
-		material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );
+		material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColorBlended );
 
 		// Iridescence F0 approximation
 		material.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNVi );

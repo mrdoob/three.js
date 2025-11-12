@@ -3,12 +3,18 @@
 		<title>three.js webgpu - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - sandbox
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>WebGPU sandbox</span>
+			</div>
+
+			<small>A sandbox for testing basic scene setups.</small>
 		</div>
 
 		<script type="importmap">
@@ -28,6 +34,8 @@
 			import { time, vec2, uv, texture, mix, checker, normalLocal, positionLocal, color, oscSine, attribute } from 'three/tsl';
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 
@@ -49,7 +57,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				// textures
 
@@ -65,7 +76,7 @@
 
 				const ktxLoader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
-					.detectSupportAsync( renderer );
+					.detectSupport( renderer );
 
 				const ktxTexture = await ktxLoader.loadAsync( './textures/ktx2/2d_uastc.ktx2' );
 

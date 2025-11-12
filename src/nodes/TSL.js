@@ -5,7 +5,7 @@ export * from './core/constants.js';
 export * from './core/AssignNode.js';
 export * from './core/AttributeNode.js';
 export * from './core/BypassNode.js';
-export * from './core/CacheNode.js';
+export * from './core/IsolateNode.js';
 export * from './core/ContextNode.js';
 export * from './core/IndexNode.js';
 export * from './core/ParameterNode.js';
@@ -20,6 +20,7 @@ export * from './core/MRTNode.js';
 
 // math
 export * from './math/BitcastNode.js';
+export * from './math/BitcountNode.js';
 export * from './math/Hash.js';
 export * from './math/MathUtils.js';
 export * from './math/TriNoise3D.js';

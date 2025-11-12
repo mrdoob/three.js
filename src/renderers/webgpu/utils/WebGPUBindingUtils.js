@@ -415,6 +415,7 @@ class WebGPUBindingUtils {
 				} else {
 
 					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
+					const baseMipLevel = binding.store ? binding.mipLevel : 0;
 					let propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }`;
 
 					if ( textureData.texture.depthOrArrayLayers > 1 ) {
@@ -423,7 +424,7 @@ class WebGPUBindingUtils {
 
 					}
 
-					propertyName += `-${ mipLevelCount }`;
+					propertyName += `-${ mipLevelCount }-${ baseMipLevel }`;
 
 					resourceGPU = textureData[ propertyName ];
 
@@ -451,7 +452,7 @@ class WebGPUBindingUtils {
 
 						}
 
-						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount } );
+						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount, baseMipLevel } );
 
 					}
 

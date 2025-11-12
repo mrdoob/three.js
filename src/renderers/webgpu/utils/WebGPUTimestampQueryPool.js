@@ -1,4 +1,4 @@
-import { warnOnce } from '../../../utils.js';
+import { error, warnOnce } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 /**
@@ -64,6 +64,7 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 		this.currentQueryIndex += 2;
 
 		this.queryOffsets.set( uid, baseOffset );
+
 		return baseOffset;
 
 	}
@@ -177,26 +178,48 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 			}
 
-			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
-			let totalDuration = 0;
+			//
 
-			for ( const [ , baseOffset ] of currentOffsets ) {
+			const times = new BigUint64Array( this.resultBuffer.getMappedRange( 0, bytesUsed ) );
+			const framesDuration = {};
+
+			const frames = [];
+
+			for ( const [ uid, baseOffset ] of currentOffsets ) {
+
+				const match = uid.match( /^(.*):f(\d+)$/ );
+				const frame = parseInt( match[ 2 ] );
+
+				if ( frames.includes( frame ) === false ) {
+
+					frames.push( frame );
+
+				}
+
+				if ( framesDuration[ frame ] === undefined ) framesDuration[ frame ] = 0;
 
 				const startTime = times[ baseOffset ];
 				const endTime = times[ baseOffset + 1 ];
 				const duration = Number( endTime - startTime ) / 1e6;
-				totalDuration += duration;
+
+				this.timestamps.set( uid, duration );
+
+				framesDuration[ frame ] += duration;
 
 			}
 
+			// Return the total duration of the last frame
+			const totalDuration = framesDuration[ frames[ frames.length - 1 ] ];
+
 			this.resultBuffer.unmap();
 			this.lastValue = totalDuration;
+			this.frames = frames;
 
 			return totalDuration;
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'Error resolving queries:', error );
+			error( 'Error resolving queries:', e );
 			if ( this.resultBuffer.mapState === 'mapped' ) {
 
 				this.resultBuffer.unmap();
@@ -232,9 +255,9 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 				await this.pendingResolve;
 
-			} catch ( error ) {
+			} catch ( e ) {
 
-				error( 'Error waiting for pending resolve:', error );
+				error( 'Error waiting for pending resolve:', e );
 
 			}
 
@@ -247,9 +270,9 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 				this.resultBuffer.unmap();
 
-			} catch ( error ) {
+			} catch ( e ) {
 
-				error( 'Error unmapping buffer:', error );
+				error( 'Error unmapping buffer:', e );
 
 			}
 

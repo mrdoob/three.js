@@ -4,12 +4,18 @@
 		<title>three.js webgpu - caustics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - realtime caustics
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Caustics</span>
+			</div>
+
+			<small>Realtime caustics effect.</small>
 		</div>
 
 		<script type="importmap">
@@ -33,12 +39,9 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, controls;
-			let stats;
 			let gltf;
 
 			init();
@@ -119,9 +122,9 @@
 					const chromaticAberrationOffset = normalView.z.pow( - .9 ).mul( .004 );
 
 					const causticProjection = vec3(
-						texture( causticMap, textureUV.add( vec2( chromaticAberrationOffset.x.negate(), 0 ) ) ).r,
-						texture( causticMap, textureUV.add( vec2( 0, chromaticAberrationOffset.y.negate() ) ) ).g,
-						texture( causticMap, textureUV.add( vec2( chromaticAberrationOffset.x, chromaticAberrationOffset.y ) ) ).b
+						texture( causticMap, textureUV.add( vec2( chromaticAberrationOffset.negate(), 0 ) ) ).r,
+						texture( causticMap, textureUV.add( vec2( 0, chromaticAberrationOffset.negate() ) ) ).g,
+						texture( causticMap, textureUV.add( vec2( chromaticAberrationOffset, chromaticAberrationOffset ) ) ).b
 					);
 
 					return causticProjection.mul( viewZ.mul( 25 ) ).add( viewZ ).mul( causticColor );
@@ -155,9 +158,33 @@
 				glass.visible = false;
 				scene.add( glass );
 
+				// ground
+
+				const map = textureLoader.load( 'textures/hardwood2_diffuse.jpg' );
+				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				map.repeat.set( 10, 10 );
+
+				const geometry = new THREE.PlaneGeometry( 2, 2 );
+				const material = new THREE.MeshStandardMaterial( { color: 0x999999, map } );
+
+				const ground = new THREE.Mesh( geometry, material );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( causticOcclusion, 'value', 0, 20 ).name( 'caustic occlusion' );
 				gui.addColor( duck.material, 'color' ).name( 'material color' );
 				gui.add( { model: 'duck' }, 'model', [
@@ -179,33 +206,6 @@
 
 				} );
 
-				// ground
-
-				const map = textureLoader.load( 'textures/hardwood2_diffuse.jpg' );
-				map.wrapS = map.wrapT = THREE.RepeatWrapping;
-				map.repeat.set( 10, 10 );
-
-				const geometry = new THREE.PlaneGeometry( 2, 2 );
-				const material = new THREE.MeshStandardMaterial( { color: 0x999999, map } );
-
-				const ground = new THREE.Mesh( geometry, material );
-				ground.rotation.x = - Math.PI / 2;
-				ground.receiveShadow = true;
-				scene.add( ground );
-
-				// renderer
-
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.shadowMap.enabled = true;
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				document.body.appendChild( renderer.domElement );
-
-				// stats
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				// controls
 
@@ -227,8 +227,6 @@
 			}
 
 			function animate() {
-
-				stats.update();
 
 				for ( const mesh of gltf.children ) {
 

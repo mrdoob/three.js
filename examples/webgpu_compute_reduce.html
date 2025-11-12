@@ -190,7 +190,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instancedArray, Loop, If, vec3, dot, clamp, storage, uvec4, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize, select, log2 } from 'three/tsl';
+			import { instancedArray, Loop, If, vec3, dot, clamp, storage, uvec4, subgroupAdd, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, invocationSubgroupIndex, uvec2, floor, instanceIndex, workgroupId, workgroupBarrier, workgroupArray, subgroupSize, select, countTrailingZeros } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -831,12 +831,12 @@
 
 					// Multiple approaches here
 					// log2(subgroupSize) -> TSL log2 function
-					// countTrailingZeros/findLSB(subgroupSize) -> Currently unsupported function in TSL that counts trailing zeros in number bit representation
+					// countTrailingZeros/findLSB(subgroupSize) -> TSL function that counts trailing zeros in number bit representation
 					// Can technically petition GPU for subgroupSize in shader and calculate logs on CPU at cost of shader being generalizable across devices
 					// May also break if subgroupSize changes when device is lost or if program is rerun on lower power device
-					const subgroupSizeLog = uint( log2( float( subgroupSize ) ) ).toVar( 'subgroupSizeLog' );
+					const subgroupSizeLog = countTrailingZeros( subgroupSize ).toVar( 'subgroupSizeLog' );
 					const spineSize = uint( workgroupSize ).shiftRight( subgroupSizeLog );
-					const spineSizeLog = uint( log2( float( spineSize ) ) ).toVar( 'spineSizeLog' );
+					const spineSizeLog = countTrailingZeros( spineSize ).toVar( 'spineSizeLog' );
 
 
 					// Align size to powers of subgroupSize
@@ -990,8 +990,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
+				await renderer.init();
+
 				// Unfortunately, need to arbitrarily run compute shader to get access to device limits
-				await renderer.computeAsync( computeResetBuffer );
+				renderer.compute( computeResetBuffer );
 
 
 				if ( renderer.backend.device !== null ) {
@@ -1254,8 +1256,8 @@
 
 					if ( state === 'Reset' ) {
 
-						renderer.computeAsync( computeResetBuffer );
-						renderer.computeAsync( computeResetWorkgroupSums );
+						renderer.compute( computeResetBuffer );
+						renderer.compute( computeResetWorkgroupSums );
 
 					} else if ( state === 'Run Algo' ) {
 
@@ -1275,7 +1277,7 @@
 
 									const reduce0 = reduce0Calls[ i ];
 									// Do a reduction step
-									renderer.computeAsync( reduce0 );
+									renderer.compute( reduce0 );
 									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 									m /= 2;
@@ -1293,7 +1295,7 @@
 
 								for ( let i = 0; i < currentAlgoCalls.length; i ++ ) {
 
-									renderer.computeAsync( currentAlgoCalls[ i ] );
+									renderer.compute( currentAlgoCalls[ i ] );
 									renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
 
 								}

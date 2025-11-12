@@ -170,6 +170,22 @@ class Bindings extends DataMap {
 
 	}
 
+	/**
+	 * Deletes the bindings for the given renderObject node.
+	 *
+	 * @param {RenderObject} renderObject - The renderObject.
+	 */
+	deleteForRender( renderObject ) {
+
+		const bindings = renderObject.getBindings();
+
+		for ( const bindGroup of bindings ) {
+
+			this.delete( bindGroup );
+
+		}
+
+	}
 
 	/**
 	 * Updates the given array of bindings.
@@ -198,6 +214,10 @@ class Bindings extends DataMap {
 			if ( binding.isSampledTexture ) {
 
 				this.textures.updateTexture( binding.texture );
+
+			} else if ( binding.isSampler ) {
+
+				this.textures.updateSampler( binding.texture );
 
 			} else if ( binding.isStorageBuffer ) {
 
@@ -231,16 +251,14 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindGroup.bindings ) {
 
-			if ( binding.isNodeUniformsGroup ) {
+			const updatedGroup = this.nodes.updateGroup( binding );
 
-				const updated = this.nodes.updateGroup( binding );
+			// every uniforms group is a uniform buffer. So if no update is required,
+			// we move one with the next binding. Otherwise the next if block will update the group.
 
-				// every uniforms group is a uniform buffer. So if no update is required,
-				// we move one with the next binding. Otherwise the next if block will update the group.
+			if ( updatedGroup === false ) continue;
 
-				if ( updated === false ) continue;
-
-			}
+			//
 
 			if ( binding.isStorageBuffer ) {
 
@@ -304,7 +322,7 @@ class Bindings extends DataMap {
 
 				}
 
-				if ( texture.isStorageTexture === true ) {
+				if ( texture.isStorageTexture === true && texture.mipmapsAutoUpdate === true ) {
 
 					const textureData = this.get( texture );
 
@@ -324,7 +342,23 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampler ) {
 
-				binding.update();
+				const updated = binding.update();
+
+				if ( updated ) {
+
+					const samplerKey = this.textures.updateSampler( binding.texture );
+
+					if ( binding.samplerKey !== samplerKey ) {
+
+						binding.samplerKey = samplerKey;
+
+						needsBindingsUpdate = true;
+
+						cacheBindings = false;
+
+					}
+
+				}
 
 			}
 

@@ -552,6 +552,10 @@ class ReflectorBaseNode extends Node {
 		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = true;
 
+		const previousName = scene.name;
+
+		scene.name = ( scene.name || 'Scene' ) + ' [ Reflector ]'; // TODO: Add bounce index
+
 		if ( needsClear ) {
 
 			renderer.clear();
@@ -565,6 +569,8 @@ class ReflectorBaseNode extends Node {
 			this.hasOutput = true;
 
 		}
+
+		scene.name = previousName;
 
 		renderer.setMRT( currentMRT );
 		renderer.setRenderTarget( currentRenderTarget );

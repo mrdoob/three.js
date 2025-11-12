@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - materials - bpcem</title>
+		<title>three.js webgpu - bpcem</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgpu - box projected cube environment mapping (BPCEM)<br/>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>BPCEM</span>
+			</div>
+
+			<small>
+				Box projected cube environment mapping (BPCEM).
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -23,13 +31,13 @@
 			}
 		</script>
 
-
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
 			import { bumpMap, float, getParallaxCorrectNormal, pmremTexture, reflectVector, texture, uniform, vec3 } from 'three/tsl';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 			import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';
@@ -42,7 +50,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				THREE.RectAreaLightNode.setLTC( RectAreaLightTexturesLib.init() );
 
@@ -94,9 +102,11 @@
 
 				// walls
 			
-				const diffuseTex = loader.load( 'textures/brick_diffuse.jpg' );
+				const [ diffuseTex, bumpTex ] = await Promise.all( [
+					loader.loadAsync( 'textures/brick_diffuse.jpg' ),
+					loader.loadAsync( 'textures/brick_bump.jpg' )
+				] );
 				diffuseTex.colorSpace = THREE.SRGBColorSpace;
-				const bumpTex = loader.load( 'textures/brick_bump.jpg' );
 
 				wallMat = new THREE.MeshStandardNodeMaterial();
 
@@ -165,7 +175,12 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				updateCubeMap();
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -179,7 +194,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 				const params = {
 					'box projected': true
 				};
@@ -214,8 +229,6 @@
 			}
 
 			function animate() {
-
-				updateCubeMap();
 
 				renderer.render( scene, camera );
 

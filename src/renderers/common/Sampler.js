@@ -34,7 +34,8 @@ class Sampler extends Binding {
 		 */
 		this._onTextureDispose = () => {
 
-			this.texture = null;
+			this.generation = null;
+			this.version = 0;
 
 		};
 
@@ -58,6 +59,14 @@ class Sampler extends Binding {
 		this.generation = null;
 
 		/**
+		 * The binding's sampler key.
+		 *
+		 * @type {string}
+		 * @default ''
+		 */
+		this.samplerKey = '';
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -70,7 +79,8 @@ class Sampler extends Binding {
 
 	/**
 	 * Sets the texture of this sampler.
-	 * @param {?Texture} value - The texture to set.
+	 *
+	 * @param {Texture} value - The texture to set.
 	 */
 	set texture( value ) {
 
@@ -139,7 +149,8 @@ class Sampler extends Binding {
 
 		clonedSampler._onTextureDispose = () => {
 
-			clonedSampler.texture = null;
+			clonedSampler.generation = null;
+			clonedSampler.version = 0;
 
 		};
 

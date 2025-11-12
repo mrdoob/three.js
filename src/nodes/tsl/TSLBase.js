@@ -19,7 +19,7 @@ export * from '../display/ColorSpaceNode.js'; // .toColorSpace()
 export * from '../display/ToneMappingNode.js'; // .toToneMapping()
 export * from '../accessors/BufferAttributeNode.js'; // .toAttribute()
 export * from '../gpgpu/ComputeNode.js'; // .compute()
-export * from '../core/CacheNode.js'; // .cache()
+export * from '../core/IsolateNode.js'; // .isolate()
 export * from '../core/BypassNode.js'; // .bypass()
 export * from '../utils/RemapNode.js'; // .remap(), .remapClamp()
 export * from '../code/ExpressionNode.js'; // expression()
@@ -27,6 +27,7 @@ export * from '../utils/Discard.js'; // Discard(), Return()
 export * from '../display/RenderOutputNode.js'; // .renderOutput()
 export * from '../utils/DebugNode.js'; // debug()
 export * from '../core/SubBuildNode.js'; // subBuild()
+export * from '../core/InspectorNode.js'; // inspector(), .toInspector()
 
 export function addNodeElement( name/*, nodeElement*/ ) {
 
