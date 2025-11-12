@@ -72,6 +72,9 @@
 			"Making Voxel Geometry (Minecraft)": "en/voxel-geometry",
 			"Start making a Game": "en/game"
 		},
+		"WebGPU": {
+			"WebGPURenderer": "en/webgpurenderer"
+		},
 		"WebXR": {
 			"VR - Basics": "en/webxr-basics",
 			"VR - Look To Select": "en/webxr-look-to-select",
