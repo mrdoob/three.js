@@ -1267,6 +1267,7 @@ export class Style {
 
 .mini-panel-content .param-control select {
 	padding: 2px 2px;
+	padding-top: 3px;
 }
 
 .mini-panel-content .param-control input[type="number"]::-webkit-outer-spin-button,
@@ -1562,11 +1563,7 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 	-moz-appearance: textfield;
 }
 
-/* Allow text selection in input fields */
-input, textarea, select {
-	user-select: text !important;
-	-webkit-user-select: text !important;
-}
+
 `;
 		const styleElement = document.createElement( 'style' );
 		styleElement.id = 'profiler-styles';
