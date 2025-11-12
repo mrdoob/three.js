@@ -75,7 +75,7 @@ export class VolumeMesh extends Mesh {
 		const target = {
 			point: new Vector3(),
 			distance: 0,
-			faceIndex: -1
+			faceIndex: - 1
 		};
 		const uvAttr = geometry.attributes.uv;
 
@@ -125,23 +125,30 @@ export class VolumeMesh extends Mesh {
 					const dist = target.distance;
 
 					// Check if the point is inside or outside by raycasting
-					// If we hit a back face then we're inside
-					let insideCount = 0;
-					ray.origin.copy( point );
+					// Skip expensive raycasts for points far from surface (definitely outside)
+					let isInside = false;
 
-					for ( let i = 0; i < 6; i ++ ) {
+					if ( dist < this.margin ) {
 
-						ray.direction.copy( directions[ i ] );
-						const hit = bvh.raycastFirst( ray, DoubleSide );
-						if ( hit && hit.face.normal.dot( ray.direction ) > 0.0 ) {
+						// If we hit a back face then we're inside
+						let insideCount = 0;
+						ray.origin.copy( point );
 
-							insideCount ++;
+						for ( let i = 0; i < 6; i ++ ) {
+
+							ray.direction.copy( directions[ i ] );
+							const hit = bvh.raycastFirst( ray, DoubleSide );
+							if ( hit && hit.face.normal.dot( ray.direction ) > 0.0 ) {
+
+								insideCount ++;
+
+							}
 
 						}
 
-					}
+						isInside = insideCount > 3;
 
-					const isInside = insideCount > 3;
+					}
 
 					// Set the distance in the texture data
 					this.sdfTexture.image.data[ index + 0 ] = isInside ? - dist : dist;
