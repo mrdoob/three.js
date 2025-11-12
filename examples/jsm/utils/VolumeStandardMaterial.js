@@ -35,14 +35,21 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				'#include <common>',
 				`#include <common>
 				varying vec3 vLocalPosition;
-				varying vec3 vLocalRayOrigin;`
+				varying vec3 vLocalRayOrigin;
+				varying mat4 vInstanceMatrix;`
 			);
 
 			shader.vertexShader = shader.vertexShader.replace(
 				'#include <worldpos_vertex>',
 				`#include <worldpos_vertex>
-				// Transform camera position to local space
-				vLocalRayOrigin = ( inverse( modelMatrix ) * vec4( cameraPosition, 1.0 ) ).xyz;
+				// Get the instance matrix (identity for non-instanced meshes)
+				#ifdef USE_INSTANCING
+					vInstanceMatrix = instanceMatrix;
+				#else
+					vInstanceMatrix = mat4( 1.0 );
+				#endif
+				// Transform camera position to local space (accounting for instance transform)
+				vLocalRayOrigin = ( inverse( modelMatrix * vInstanceMatrix ) * vec4( cameraPosition, 1.0 ) ).xyz;
 				// Vertex position is already in local space
 				vLocalPosition = position;`
 			);
@@ -61,6 +68,7 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 
 				varying vec3 vLocalPosition;
 				varying vec3 vLocalRayOrigin;
+				varying mat4 vInstanceMatrix;
 
 				vec2 rayBoxDist( vec3 boundsMin, vec3 boundsMax, vec3 rayOrigin, vec3 rayDir ) {
 					vec3 t0 = ( boundsMin - rayOrigin ) / rayDir;
@@ -126,8 +134,8 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 					discard;
 				}
 
-				// Write correct depth for the raymarched surface
-				vec4 viewPos = modelViewMatrix * vec4( localPoint, 1.0 );
+				// Write correct depth for the raymarched surface (accounting for instance transform)
+				vec4 viewPos = modelViewMatrix * vInstanceMatrix * vec4( localPoint, 1.0 );
 				vec4 clipPos = projectionMatrix * viewPos;
 				float ndcDepth = clipPos.z / clipPos.w;
 				gl_FragDepth = ndcDepth * 0.5 + 0.5;
@@ -143,8 +151,9 @@ export class VolumeStandardMaterial extends MeshStandardMaterial {
 				float dz = texture( sdfTex, sdfUV + vec3( 0.0, 0.0, normalStep.z ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, 0.0, normalStep.z ) ).r;
 				vec3 sdfNormalLocal = normalize( vec3( dx, dy, dz ) );
 
-				// Transform normal from SDF local space to view space
-				vec3 sdfNormal = normalize( normalMatrix * sdfNormalLocal );
+				// Transform normal from SDF local space to view space (accounting for instance transform)
+				mat3 instanceNormalMatrix = mat3( transpose( inverse( vInstanceMatrix ) ) );
+				vec3 sdfNormal = normalize( normalMatrix * instanceNormalMatrix * sdfNormalLocal );
 				`
 			);
 

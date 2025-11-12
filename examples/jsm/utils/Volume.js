@@ -1,7 +1,7 @@
 import { Mesh, BoxGeometry, Data3DTexture, RGBAFormat, FloatType, LinearFilter, Matrix4, Vector3, Vector2, Quaternion, Ray, DoubleSide, Triangle } from 'three';
 import { VolumeStandardMaterial } from './VolumeStandardMaterial.js';
 
-export class VolumeMesh extends Mesh {
+export class Volume extends Mesh {
 
 	constructor( params = {} ) {
 
