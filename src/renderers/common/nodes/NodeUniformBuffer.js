@@ -76,7 +76,7 @@ class NodeUniformBuffer extends UniformBuffer {
 	 */
 	addUpdateRange( start, count ) {
 
-		this.nodeUniform.updateRanges.push( { start, count } );
+		this.nodeUniform.addUpdateRange( start, count );
 
 	}
 
