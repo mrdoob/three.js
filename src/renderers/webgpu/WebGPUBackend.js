@@ -2474,6 +2474,7 @@ class WebGPUBackend extends Backend {
 	dispose() {
 
 		this.textureUtils.dispose();
+		this.bindingUtils.dispose();
 
 	}
 
