@@ -164,7 +164,7 @@
 
 				} );
 				gui.add( params, 'showLayers' );
-				gui.add( params, 'layer', 0, params.resolution - 1, 1 );				window.addEventListener( 'resize', onResize );
+				gui.add( params, 'layer', 0, params.resolution - 1, 1 );
 
 				window.addEventListener( 'resize', onResize );
 
@@ -228,8 +228,8 @@
 						resolution: params.resolution,
 						margin: params.margin,
 						surface: params.surface,
-						roughness: params.roughness,
-						metalness: params.metalness
+						roughness: 1.0,
+						metalness: 1.0
 					} );
 
 					// Reuse the SDF texture from the first volume

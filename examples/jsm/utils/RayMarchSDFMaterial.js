@@ -20,54 +20,60 @@ export class RayMarchSDFMaterial extends MeshStandardMaterial {
 
 		this.onBeforeCompile = ( shader ) => {
 
-		// Add our custom uniforms
-		shader.uniforms.sdfTex = this.uniforms.sdfTex;
-		shader.uniforms.normalStep = this.uniforms.normalStep;
-		shader.uniforms.sdfNormalMatrix = this.uniforms.sdfNormalMatrix;
-		shader.uniforms.surface = this.uniforms.surface;			// Add our defines
+			// Add our custom uniforms
+			shader.uniforms.sdfTex = this.uniforms.sdfTex;
+			shader.uniforms.normalStep = this.uniforms.normalStep;
+			shader.uniforms.sdfNormalMatrix = this.uniforms.sdfNormalMatrix;
+			shader.uniforms.surface = this.uniforms.surface;
+
+			// Add our defines
 			shader.defines = shader.defines || {};
 			Object.assign( shader.defines, this.defines );
 
-		// Modify vertex shader to compute ray in local space
-		shader.vertexShader = shader.vertexShader.replace(
-			'#include <common>',
-			`#include <common>
-			varying vec3 vLocalPosition;
-			varying vec3 vLocalRayOrigin;`
-		);
+			// Modify vertex shader to compute ray in local space
+			shader.vertexShader = shader.vertexShader.replace(
+				'#include <common>',
+				`#include <common>
+				varying vec3 vLocalPosition;
+				varying vec3 vLocalRayOrigin;`
+			);
 
-		shader.vertexShader = shader.vertexShader.replace(
-			'#include <worldpos_vertex>',
-			`#include <worldpos_vertex>
-			// Transform camera position to local space
-			vLocalRayOrigin = ( inverse( modelMatrix ) * vec4( cameraPosition, 1.0 ) ).xyz;
-			// Vertex position is already in local space
-			vLocalPosition = position;`
-		);			// Add custom uniforms and functions to fragment shader
-		shader.fragmentShader = shader.fragmentShader.replace(
-			'#include <common>',
-			`#include <common>
-			
-			uniform sampler3D sdfTex;
-			uniform vec3 normalStep;
-			uniform mat4 sdfNormalMatrix;
-			uniform float surface;
-			
-			varying vec3 vLocalPosition;
-			varying vec3 vLocalRayOrigin;
+			shader.vertexShader = shader.vertexShader.replace(
+				'#include <worldpos_vertex>',
+				`#include <worldpos_vertex>
+				// Transform camera position to local space
+				vLocalRayOrigin = ( inverse( modelMatrix ) * vec4( cameraPosition, 1.0 ) ).xyz;
+				// Vertex position is already in local space
+				vLocalPosition = position;`
+			);
 
-			vec2 rayBoxDist( vec3 boundsMin, vec3 boundsMax, vec3 rayOrigin, vec3 rayDir ) {
-				vec3 t0 = ( boundsMin - rayOrigin ) / rayDir;
-				vec3 t1 = ( boundsMax - rayOrigin ) / rayDir;
-				vec3 tmin = min( t0, t1 );
-				vec3 tmax = max( t0, t1 );
-				float distA = max( max( tmin.x, tmin.y ), tmin.z );
-				float distB = min( tmax.x, min( tmax.y, tmax.z ) );
-				float distToBox = max( 0.0, distA );
-				float distInsideBox = max( 0.0, distB - distToBox );
-				return vec2( distToBox, distInsideBox );
-			}`
-		);			// Inject raymarching at the very start of main
+			// Add custom uniforms and functions to fragment shader
+			shader.fragmentShader = shader.fragmentShader.replace(
+				'#include <common>',
+				`#include <common>
+
+				uniform sampler3D sdfTex;
+				uniform vec3 normalStep;
+				uniform mat4 sdfNormalMatrix;
+				uniform float surface;
+
+				varying vec3 vLocalPosition;
+				varying vec3 vLocalRayOrigin;
+
+				vec2 rayBoxDist( vec3 boundsMin, vec3 boundsMax, vec3 rayOrigin, vec3 rayDir ) {
+					vec3 t0 = ( boundsMin - rayOrigin ) / rayDir;
+					vec3 t1 = ( boundsMax - rayOrigin ) / rayDir;
+					vec3 tmin = min( t0, t1 );
+					vec3 tmax = max( t0, t1 );
+					float distA = max( max( tmin.x, tmin.y ), tmin.z );
+					float distB = min( tmax.x, min( tmax.y, tmax.z ) );
+					float distToBox = max( 0.0, distA );
+					float distInsideBox = max( 0.0, distB - distToBox );
+					return vec2( distToBox, distInsideBox );
+				}`
+			);
+
+			// Inject raymarching at the very start of main
 			shader.fragmentShader = shader.fragmentShader.replace(
 				'void main() {',
 				`void main() {
@@ -100,23 +106,25 @@ export class RayMarchSDFMaterial extends MeshStandardMaterial {
 						break;
 					}
 					localPoint += rayDirection * distanceToSurface * 0.5;
-				}					if ( !intersectsSurface ) {
-						discard;
-					}
-					
-					// Compute UV and normal from SDF
-					vec3 sdfUV = localPoint + vec3( 0.5 );
-					vec4 sdfData = texture( sdfTex, sdfUV );
-					vec2 sdfTexUv = sdfData.gb;
-					
-					// Compute gradient in SDF local space
-					float dx = texture( sdfTex, sdfUV + vec3( normalStep.x, 0.0, 0.0 ) ).r - texture( sdfTex, sdfUV - vec3( normalStep.x, 0.0, 0.0 ) ).r;
-					float dy = texture( sdfTex, sdfUV + vec3( 0.0, normalStep.y, 0.0 ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, normalStep.y, 0.0 ) ).r;
-					float dz = texture( sdfTex, sdfUV + vec3( 0.0, 0.0, normalStep.z ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, 0.0, normalStep.z ) ).r;
-					vec3 sdfNormalLocal = normalize( vec3( dx, dy, dz ) );
-					
-					// Transform normal from SDF local space to view space
-					vec3 sdfNormal = normalize( ( sdfNormalMatrix * vec4( sdfNormalLocal, 0.0 ) ).xyz );
+				}
+
+				if ( !intersectsSurface ) {
+					discard;
+				}
+
+				// Compute UV and normal from SDF
+				vec3 sdfUV = localPoint + vec3( 0.5 );
+				vec4 sdfData = texture( sdfTex, sdfUV );
+				vec2 sdfTexUv = sdfData.gb;
+
+				// Compute gradient in SDF local space
+				float dx = texture( sdfTex, sdfUV + vec3( normalStep.x, 0.0, 0.0 ) ).r - texture( sdfTex, sdfUV - vec3( normalStep.x, 0.0, 0.0 ) ).r;
+				float dy = texture( sdfTex, sdfUV + vec3( 0.0, normalStep.y, 0.0 ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, normalStep.y, 0.0 ) ).r;
+				float dz = texture( sdfTex, sdfUV + vec3( 0.0, 0.0, normalStep.z ) ).r - texture( sdfTex, sdfUV - vec3( 0.0, 0.0, normalStep.z ) ).r;
+				vec3 sdfNormalLocal = normalize( vec3( dx, dy, dz ) );
+
+				// Transform normal from SDF local space to view space
+				vec3 sdfNormal = normalize( ( sdfNormalMatrix * vec4( sdfNormalLocal, 0.0 ) ).xyz );
 				`
 			);
 
@@ -184,9 +192,6 @@ export class RayMarchSDFMaterial extends MeshStandardMaterial {
 				#endif`
 			);
 
-			// Debug output
-			console.log( 'Shader compiled with defines:', shader.defines );
-
 			// Replace AO sampling
 			shader.fragmentShader = shader.fragmentShader.replace(
 				'#include <aomap_fragment>',
@@ -205,5 +210,3 @@ export class RayMarchSDFMaterial extends MeshStandardMaterial {
 	}
 
 }
-
-
