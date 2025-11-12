@@ -138,6 +138,10 @@ export class Style {
 	color: var(--accent-color);
 }
 
+.builtin-tab-btn.active:hover {
+	background-color: rgba(0, 170, 255, 0.3);
+}
+
 #profiler-mini-panel {
 	position: fixed;
 	top: 60px;
@@ -1562,8 +1566,6 @@ body:has(#profiler-panel:not(.visible)) .detached-tab-panel {
 .detached-tab-content input[type="number"] {
 	-moz-appearance: textfield;
 }
-
-
 `;
 		const styleElement = document.createElement( 'style' );
 		styleElement.id = 'profiler-styles';
