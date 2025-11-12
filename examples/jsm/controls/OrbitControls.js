@@ -596,6 +596,8 @@ class OrbitControls extends Controls {
 
 	update( deltaTime = null ) {
 
+		if ( ! this.enabled ) return;
+
 		const position = this.object.position;
 
 		_v.copy( position ).sub( this.target );
