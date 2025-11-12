@@ -1,21 +1,22 @@
-import { MeshStandardMaterial, Matrix4, Vector3 } from 'three';
+import { MeshStandardMaterial, Vector3, BackSide } from 'three';
 
-export class RayMarchSDFMaterial extends MeshStandardMaterial {
+export class VolumeStandardMaterial extends MeshStandardMaterial {
 
 	constructor( params ) {
 
 		super( params );
 
+		this.side = BackSide;
+
 		this.uniforms = {
 			sdfTex: { value: null },
 			normalStep: { value: new Vector3() },
-			sdfNormalMatrix: { value: new Matrix4() },
 			surface: { value: 0 }
 		};
 
 		this.defines = {
-			MAX_STEPS: 500,
-			SURFACE_EPSILON: 0.001
+			MAX_STEPS: 50,
+			SURFACE_EPSILON: 0.0001
 		};
 
 		this.onBeforeCompile = ( shader ) => {
@@ -23,7 +24,6 @@ export class RayMarchSDFMaterial extends MeshStandardMaterial {
 			// Add our custom uniforms
 			shader.uniforms.sdfTex = this.uniforms.sdfTex;
 			shader.uniforms.normalStep = this.uniforms.normalStep;
-			shader.uniforms.sdfNormalMatrix = this.uniforms.sdfNormalMatrix;
 			shader.uniforms.surface = this.uniforms.surface;
 
 			// Add our defines
@@ -54,7 +54,9 @@ export class RayMarchSDFMaterial extends MeshStandardMaterial {
 
 				uniform sampler3D sdfTex;
 				uniform vec3 normalStep;
-				uniform mat4 sdfNormalMatrix;
+				uniform mat3 normalMatrix;
+				uniform mat4 modelViewMatrix;
+				uniform mat4 projectionMatrix;
 				uniform float surface;
 
 				varying vec3 vLocalPosition;
@@ -77,40 +79,58 @@ export class RayMarchSDFMaterial extends MeshStandardMaterial {
 			shader.fragmentShader = shader.fragmentShader.replace(
 				'void main() {',
 				`void main() {
-				// Raymarch from camera through the box in local space
+				// Raymarch from entry point to back face (current fragment) in local space
 				vec3 rayOrigin = vLocalRayOrigin;
 				vec3 rayDirection = normalize( vLocalPosition - vLocalRayOrigin );
-				
+
 				// Find intersection with SDF bounds [-0.5, 0.5]
 				vec2 boxIntersectionInfo = rayBoxDist( vec3( - 0.5 ), vec3( 0.5 ), rayOrigin, rayDirection );
 				float distToBox = boxIntersectionInfo.x;
 				float distInsideBox = boxIntersectionInfo.y;
-				bool intersectsBox = distInsideBox > 0.0;
-				
-				if ( !intersectsBox ) {
-					discard;
-				}
-				
-				// Raymarch to find surface in SDF local space
+
+				// Start from the entry point (or camera if inside)
+				distToBox = max( distToBox, 0.0 );
+
+				// Compute distance to back face (current fragment position)
+				float distToBackFace = length( vLocalPosition - rayOrigin );
+
+				// Raymarch from entry to back face to find surface in SDF
 				bool intersectsSurface = false;
-				vec3 localPoint = rayOrigin + rayDirection * ( distToBox + 1e-5 );
-				
+				vec3 localPoint = rayOrigin + rayDirection * distToBox;
+				float marchDist = distToBox;
+
 				for ( int i = 0; i < MAX_STEPS; i ++ ) {
+
+					// Stop if we've reached the back face
+					if ( marchDist >= distToBackFace ) {
+						break;
+					}
+
 					vec3 sdfUV = localPoint + vec3( 0.5 );
 					if ( sdfUV.x < 0.0 || sdfUV.x > 1.0 || sdfUV.y < 0.0 || sdfUV.y > 1.0 || sdfUV.z < 0.0 || sdfUV.z > 1.0 ) {
 						break;
 					}
+
 					float distanceToSurface = texture( sdfTex, sdfUV ).r - surface;
 					if ( abs( distanceToSurface ) < SURFACE_EPSILON ) {
 						intersectsSurface = true;
 						break;
 					}
-					localPoint += rayDirection * distanceToSurface * 0.5;
+
+					float stepSize = distanceToSurface * 0.5;
+					localPoint += rayDirection * stepSize;
+					marchDist += stepSize;
 				}
 
 				if ( !intersectsSurface ) {
 					discard;
 				}
+
+				// Write correct depth for the raymarched surface
+				vec4 viewPos = modelViewMatrix * vec4( localPoint, 1.0 );
+				vec4 clipPos = projectionMatrix * viewPos;
+				float ndcDepth = clipPos.z / clipPos.w;
+				gl_FragDepth = ndcDepth * 0.5 + 0.5;
 
 				// Compute UV and normal from SDF
 				vec3 sdfUV = localPoint + vec3( 0.5 );
@@ -124,7 +144,7 @@ export class RayMarchSDFMaterial extends MeshStandardMaterial {
 				vec3 sdfNormalLocal = normalize( vec3( dx, dy, dz ) );
 
 				// Transform normal from SDF local space to view space
-				vec3 sdfNormal = normalize( ( sdfNormalMatrix * vec4( sdfNormalLocal, 0.0 ) ).xyz );
+				vec3 sdfNormal = normalize( normalMatrix * sdfNormalLocal );
 				`
 			);
 

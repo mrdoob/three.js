@@ -219,10 +219,10 @@
 				if ( volumeMeshes.length === 0 || ! sourceMesh ) return;
 
 				// Position the first one
-				volumeMeshes[ 0 ].position.x = - 1.5;
+				volumeMeshes[ 0 ].position.x = 0;
 
 				// Create 2 more volumes
-				for ( let i = 1; i < 3; i ++ ) {
+				for ( let i = 1; i < 100; i ++ ) {
 
 					const volume = new VolumeMesh( {
 						resolution: params.resolution,
@@ -249,17 +249,12 @@
 
 					}
 
-					// Set scale and position
-					const sdfBoundsMatrix = volume.inverseBoundsMatrix.clone().invert();
-					const boundsCenter = new THREE.Vector3();
-					const boundsQuat = new THREE.Quaternion();
-					const boundsScale = new THREE.Vector3();
-					sdfBoundsMatrix.decompose( boundsCenter, boundsQuat, boundsScale );
-
-					volume.scale.copy( boundsScale );
-					volume.position.copy( boundsCenter );
-					volume.position.x = i * 1.5;
-					volume.updateMatrixWorld();
+					volume.position.set(
+						( Math.random() - 0.5 ) * 8,
+						( Math.random() - 0.5 ) * 8,
+						( Math.random() - 0.5 ) * 8
+					);
+					volume.rotation.set( Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI );
 
 					scene.add( volume );
 					volumeMeshes.push( volume );
