@@ -1,12 +1,12 @@
 import { Mesh, BoxGeometry, Data3DTexture, RGBAFormat, FloatType, LinearFilter, Matrix4, Vector3, Vector2, Quaternion, Ray, DoubleSide, Triangle } from 'three';
-import { RayMarchSDFMaterial } from './RayMarchSDFMaterial.js';
+import { VolumeStandardMaterial } from './VolumeStandardMaterial.js';
 
 export class VolumeMesh extends Mesh {
 
 	constructor( params = {} ) {
 
 		const geometry = new BoxGeometry( 1, 1, 1 );
-		const material = new RayMarchSDFMaterial( {
+		const material = new VolumeStandardMaterial( {
 			roughness: params.roughness !== undefined ? params.roughness : 1.0,
 			metalness: params.metalness !== undefined ? params.metalness : 1.0
 		} );
@@ -79,6 +79,24 @@ export class VolumeMesh extends Mesh {
 		};
 		const uvAttr = geometry.attributes.uv;
 
+		// Reusable objects to avoid allocations in the loop
+		const ray = new Ray();
+		const directions = [
+			new Vector3( 1, 0, 0 ),
+			new Vector3( - 1, 0, 0 ),
+			new Vector3( 0, 1, 0 ),
+			new Vector3( 0, - 1, 0 ),
+			new Vector3( 0, 0, 1 ),
+			new Vector3( 0, 0, - 1 )
+		];
+		const v0 = new Vector3();
+		const v1 = new Vector3();
+		const v2 = new Vector3();
+		const barycoord = new Vector3();
+		const uv0 = new Vector2();
+		const uv1 = new Vector2();
+		const uv2 = new Vector2();
+
 		// Iterate over all pixels and check distance
 		for ( let x = 0; x < dim; x ++ ) {
 
@@ -109,22 +127,18 @@ export class VolumeMesh extends Mesh {
 					// Check if the point is inside or outside by raycasting
 					// If we hit a back face then we're inside
 					let insideCount = 0;
-					const ray = new Ray( point );
-					const directions = [
-						new Vector3( 1, 0, 0 ),
-						new Vector3( -1, 0, 0 ),
-						new Vector3( 0, 1, 0 ),
-						new Vector3( 0, -1, 0 ),
-						new Vector3( 0, 0, 1 ),
-						new Vector3( 0, 0, -1 )
-					];
+					ray.origin.copy( point );
 
-					for( let i = 0; i < 6; i ++ ) {
+					for ( let i = 0; i < 6; i ++ ) {
+
 						ray.direction.copy( directions[ i ] );
 						const hit = bvh.raycastFirst( ray, DoubleSide );
 						if ( hit && hit.face.normal.dot( ray.direction ) > 0.0 ) {
+
 							insideCount ++;
+
 						}
+
 					}
 
 					const isInside = insideCount > 3;
@@ -143,16 +157,15 @@ export class VolumeMesh extends Mesh {
 						const i1 = indexAttr.getX( faceIndex * 3 + 1 );
 						const i2 = indexAttr.getX( faceIndex * 3 + 2 );
 
-						const v0 = new Vector3().fromBufferAttribute( geometry.attributes.position, i0 );
-						const v1 = new Vector3().fromBufferAttribute( geometry.attributes.position, i1 );
-						const v2 = new Vector3().fromBufferAttribute( geometry.attributes.position, i2 );
+						v0.fromBufferAttribute( geometry.attributes.position, i0 );
+						v1.fromBufferAttribute( geometry.attributes.position, i1 );
+						v2.fromBufferAttribute( geometry.attributes.position, i2 );
 
-						const barycoord = new Vector3();
 						Triangle.getBarycoord( target.point, v0, v1, v2, barycoord );
 
-						const uv0 = new Vector2().fromBufferAttribute( uvAttr, i0 );
-						const uv1 = new Vector2().fromBufferAttribute( uvAttr, i1 );
-						const uv2 = new Vector2().fromBufferAttribute( uvAttr, i2 );
+						uv0.fromBufferAttribute( uvAttr, i0 );
+						uv1.fromBufferAttribute( uvAttr, i1 );
+						uv2.fromBufferAttribute( uvAttr, i2 );
 
 						u = uv0.x * barycoord.x + uv1.x * barycoord.y + uv2.x * barycoord.z;
 						v = uv0.y * barycoord.x + uv1.y * barycoord.y + uv2.y * barycoord.z;
@@ -224,12 +237,6 @@ export class VolumeMesh extends Mesh {
 			this.material.needsUpdate = true;
 
 		}
-
-		// Compute normal matrix: normalMatrix = transpose(inverse(modelViewMatrix))
-		// For transforming normals from local space to view space
-		const normalMatrix = new Matrix4();
-		normalMatrix.copy( this.modelViewMatrix ).invert().transpose();
-		this.material.uniforms.sdfNormalMatrix.value.copy( normalMatrix );
 
 	}
 
