@@ -242,18 +242,6 @@ class WebGPUUtils {
 
 	}
 
-	/**
-	 * Returns `true` if the given array is a typed array.
-	 *
-	 * @param {any} array - The array.
-	 * @return {boolean} Whether the given array is a typed array or not.
-	 */
-	isTypedArray( array ) {
-
-		return ArrayBuffer.isView( array ) && ! ( array instanceof DataView );
-
-	}
-
 }
 
 export default WebGPUUtils;

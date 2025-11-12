@@ -1,7 +1,7 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
-import { error } from '../../../utils.js';
+import { isTypedArray, error } from '../../../utils.js';
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],
@@ -189,8 +189,8 @@ class WebGPUAttributeUtils {
 
 		} else {
 
-			const isTypedArray = backend.utils.isTypedArray( array );
-			const byteOffsetFactor = isTypedArray ? 1 : array.BYTES_PER_ELEMENT;
+			const isTyped = isTypedArray( array );
+			const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
 
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
@@ -211,7 +211,7 @@ class WebGPUAttributeUtils {
 
 				}
 
-				const bufferOffset = dataOffset * ( isTypedArray ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+				const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
 
 				device.queue.writeBuffer(
 					buffer,
