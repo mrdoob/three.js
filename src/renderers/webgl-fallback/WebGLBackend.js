@@ -268,6 +268,7 @@ class WebGLBackend extends Backend {
 
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
+		this.drawBuffersIndexedExt = this.extensions.get( 'OES_draw_buffers_indexed' );
 
 	}
 
@@ -956,6 +957,12 @@ class WebGLBackend extends Backend {
 		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
 		state.setMaterial( material, frontFaceCW, hardwareClippingPlanes );
+
+		if ( context.textures !== null && context.textures.length > 1 ) {
+
+			state.setMRTBlending( context.textures );
+
+		}
 
 		state.useProgram( programGPU );
 
