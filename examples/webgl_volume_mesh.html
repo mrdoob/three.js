@@ -59,7 +59,7 @@
 			let volumeMeshes = [];
 			let instancedVolumeMesh;
 			let layerPass;
-			let pointLight, blueLight;
+			// let pointLight, blueLight;
 
 			init();
 
@@ -83,11 +83,12 @@
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				const environment = new RoomEnvironment();
 				const envMapRT = pmremGenerator.fromScene( environment );
-				// scene.environment = envMapRT.texture;
+				scene.environment = envMapRT.texture;
 				scene.environmentIntensity = 0.2;
 				environment.dispose();
 				pmremGenerator.dispose();
 
+				/*
 				// Helper function to create radial gradient texture (grayscale)
 				function createRadialGradientTexture() {
 
@@ -145,6 +146,7 @@
 				const dirLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
 				dirLight.position.set( 5, 10, 7.5 );
 				scene.add( dirLight );
+				*/
 
 				// camera setup
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 50 );
@@ -390,6 +392,7 @@
 
 			function render() {
 
+				/*
 				// Animate point light in a circle
 				const time = Date.now() * 0.001;
 				const radius = 2;
@@ -401,6 +404,7 @@
 				blueLight.position.x = Math.sin( time * 1.3 ) * radius;
 				blueLight.position.z = Math.cos( time * 1.3 ) * radius;
 				blueLight.position.y = Math.cos( time * 0.7 ) * radius;
+				*/
 
 				renderer.render( scene, camera );
 
