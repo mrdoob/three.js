@@ -44,6 +44,9 @@ class RenderContexts {
 
 		if ( mrt !== null ) {
 
+			// TODO: Improve ChainMap so that it only matches submaps corresponding to the key lengths.
+			// For we use: if ( mrt !== null ) _chainKeys[ 2 ] = mrt;
+
 			_chainKeys[ index ++ ] = mrt;
 
 		}
