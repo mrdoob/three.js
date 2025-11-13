@@ -118,6 +118,12 @@
 
 			}
 
+			if ( selected === null ) {
+
+				panel.classList.add( 'open' );
+
+			}
+
 			if ( viewer.src === '' ) {
 
 				viewer.srcdoc = document.getElementById( 'PlaceholderHTML' ).innerHTML;
