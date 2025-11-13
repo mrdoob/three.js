@@ -353,8 +353,6 @@ class WebGPUPipelineUtils {
 			} )
 		} );
 
-		console.log( pipelineGPU.pipeline );
-
 	}
 
 	/**
