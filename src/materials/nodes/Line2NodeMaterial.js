@@ -8,7 +8,7 @@ import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
-import { viewport } from '../../nodes/display/ScreenNode.js';
+import { screenDPR, viewport } from '../../nodes/display/ScreenNode.js';
 import { viewportSharedTexture } from '../../nodes/display/ViewportSharedTextureNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
@@ -300,7 +300,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				offset.assign( offset.mul( materialLineWidth ) );
 
 				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-				offset.assign( offset.div( viewport.w ) );
+				offset.assign( offset.div( viewport.w.div( screenDPR ) ) );
 
 				// select end
 				clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );

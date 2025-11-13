@@ -21495,7 +21495,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				offset.assign( offset.mul( materialLineWidth ) );
 
 				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-				offset.assign( offset.div( viewport.w ) );
+				offset.assign( offset.div( viewport.w.div( screenDPR ) ) );
 
 				// select end
 				clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
@@ -31057,16 +31057,14 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindGroup.bindings ) {
 
-			if ( binding.isNodeUniformsGroup ) {
+			const updatedGroup = this.nodes.updateGroup( binding );
 
-				const updated = this.nodes.updateGroup( binding );
+			// every uniforms group is a uniform buffer. So if no update is required,
+			// we move one with the next binding. Otherwise the next if block will update the group.
 
-				// every uniforms group is a uniform buffer. So if no update is required,
-				// we move one with the next binding. Otherwise the next if block will update the group.
+			if ( updatedGroup === false ) continue;
 
-				if ( updated === false ) continue;
-
-			}
+			//
 
 			if ( binding.isStorageBuffer ) {
 
@@ -48376,6 +48374,8 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 
 let _id$5 = 0;
 
+const sharedNodeData = new WeakMap();
+
 const rendererCache = new WeakMap();
 
 const typeFromArray = new Map( [
@@ -51291,6 +51291,26 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns shared data object for the given node.
+	 *
+	 * @param {Node} node - The node to get shared data from.
+	 * @return {Object} The shared data.
+	 */
+	getSharedDataFromNode( node ) {
+
+		let data = sharedNodeData.get( node );
+
+		if ( data === undefined ) {
+
+			data = {};
+
+		}
+
+		return data;
+
+	}
+
+	/**
 	 * Returns a uniform representation which is later used for UBO generation and rendering.
 	 *
 	 * @param {NodeUniform} uniformNode - The uniform node.
@@ -51299,16 +51319,31 @@ class NodeBuilder {
 	 */
 	getNodeUniform( uniformNode, type ) {
 
-		if ( type === 'float' || type === 'int' || type === 'uint' ) return new NumberNodeUniform( uniformNode );
-		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return new Vector2NodeUniform( uniformNode );
-		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return new Vector3NodeUniform( uniformNode );
-		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return new Vector4NodeUniform( uniformNode );
-		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
-		if ( type === 'mat2' ) return new Matrix2NodeUniform( uniformNode );
-		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
-		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
+		const nodeData = this.getSharedDataFromNode( uniformNode );
 
-		throw new Error( `Uniform "${type}" not declared.` );
+		let node = nodeData.cache;
+
+		if ( node === undefined ) {
+
+			if ( type === 'float' || type === 'int' || type === 'uint' ) node = new NumberNodeUniform( uniformNode );
+			else if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) node = new Vector2NodeUniform( uniformNode );
+			else if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) node = new Vector3NodeUniform( uniformNode );
+			else if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) node = new Vector4NodeUniform( uniformNode );
+			else if ( type === 'color' ) node = new ColorNodeUniform( uniformNode );
+			else if ( type === 'mat2' ) node = new Matrix2NodeUniform( uniformNode );
+			else if ( type === 'mat3' ) node = new Matrix3NodeUniform( uniformNode );
+			else if ( type === 'mat4' ) node = new Matrix4NodeUniform( uniformNode );
+			else {
+
+				throw new Error( `Uniform "${ type }" not implemented.` );
+
+			}
+
+			nodeData.cache = node;
+
+		}
+
+		return node;
 
 	}
 
@@ -59472,6 +59507,17 @@ class Binding {
 	}
 
 	/**
+	 * The shader stages in which the binding's resource is visible.
+	 *
+	 * @return {number} The visibility bitmask.
+	 */
+	getVisibility() {
+
+		return this.visibility;
+
+	}
+
+	/**
 	 * Clones the binding.
 	 *
 	 * @return {Binding} The cloned binding.
@@ -62072,11 +62118,22 @@ void main() {
 
 			} else if ( type === 'buffer' ) {
 
-				node.name = `NodeBuffer_${ node.id }`;
 				uniformNode.name = `buffer${ node.id }`;
 
-				const buffer = new NodeUniformBuffer( node, group );
-				buffer.name = node.name;
+				const sharedData = this.getSharedDataFromNode( node );
+
+				let buffer = sharedData.buffer;
+
+				if ( buffer === undefined ) {
+
+					node.name = `NodeBuffer_${ node.id }`;
+
+					buffer = new NodeUniformBuffer( node, group );
+					buffer.name = node.name;
+
+					sharedData.buffer = buffer;
+
+				}
 
 				bindings.push( buffer );
 
@@ -66499,9 +66556,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 			}
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'Error in beginQuery:', error );
+			error( 'Error in beginQuery:', e );
 			this.activeQuery = null;
 			this.queryStates.set( baseOffset, 'inactive' );
 
@@ -66542,9 +66599,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 			this.queryStates.set( baseOffset, 'ended' );
 			this.activeQuery = null;
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'Error in endQuery:', error );
+			error( 'Error in endQuery:', e );
 			// Reset state on error
 			this.queryStates.set( baseOffset, 'inactive' );
 			this.activeQuery = null;
@@ -66635,9 +66692,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 			return totalDuration;
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'Error resolving queries:', error );
+			error( 'Error resolving queries:', e );
 			return this.lastValue;
 
 		} finally {
@@ -66723,9 +66780,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 					const elapsed = this.gl.getQueryParameter( query, this.gl.QUERY_RESULT );
 					resolve( Number( elapsed ) / 1e6 ); // Convert nanoseconds to milliseconds
 
-				} catch ( error ) {
+				} catch ( e ) {
 
-					error( 'Error checking query:', error );
+					error( 'Error checking query:', e );
 					resolve( this.lastValue );
 
 				}
@@ -72957,10 +73014,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
-				const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
+				const sharedData = this.getSharedDataFromNode( node );
 
-				const buffer = new bufferClass( node, group );
-				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
+				let buffer = sharedData.buffer;
+
+				if ( buffer === undefined ) {
+
+					const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
+
+					buffer = new bufferClass( node, group );
+
+					sharedData.buffer = buffer;
+
+				}
+
+				buffer.setVisibility( buffer.getVisibility() | gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
 
@@ -76392,9 +76460,9 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 			return totalDuration;
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'Error resolving queries:', error );
+			error( 'Error resolving queries:', e );
 			if ( this.resultBuffer.mapState === 'mapped' ) {
 
 				this.resultBuffer.unmap();
@@ -76430,9 +76498,9 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 				await this.pendingResolve;
 
-			} catch ( error ) {
+			} catch ( e ) {
 
-				error( 'Error waiting for pending resolve:', error );
+				error( 'Error waiting for pending resolve:', e );
 
 			}
 
@@ -76445,9 +76513,9 @@ class WebGPUTimestampQueryPool extends TimestampQueryPool {
 
 				this.resultBuffer.unmap();
 
-			} catch ( error ) {
+			} catch ( e ) {
 
-				error( 'Error unmapping buffer:', error );
+				error( 'Error unmapping buffer:', e );
 
 			}
 

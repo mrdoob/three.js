@@ -1531,11 +1531,22 @@ void main() {
 
 			} else if ( type === 'buffer' ) {
 
-				node.name = `NodeBuffer_${ node.id }`;
 				uniformNode.name = `buffer${ node.id }`;
 
-				const buffer = new NodeUniformBuffer( node, group );
-				buffer.name = node.name;
+				const sharedData = this.getSharedDataFromNode( node );
+
+				let buffer = sharedData.buffer;
+
+				if ( buffer === undefined ) {
+
+					node.name = `NodeBuffer_${ node.id }`;
+
+					buffer = new NodeUniformBuffer( node, group );
+					buffer.name = node.name;
+
+					sharedData.buffer = buffer;
+
+				}
 
 				bindings.push( buffer );
 
