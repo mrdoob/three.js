@@ -240,7 +240,8 @@ class RenderList {
 				renderOrder: object.renderOrder,
 				z: z,
 				group: group,
-				clippingContext: clippingContext
+				clippingContext: clippingContext,
+				instances: null
 			};
 
 			this.renderItems[ this.renderItemsIndex ] = renderItem;
@@ -256,6 +257,7 @@ class RenderList {
 			renderItem.z = z;
 			renderItem.group = group;
 			renderItem.clippingContext = clippingContext;
+			renderItem.instances = null;
 
 		}
 
@@ -394,6 +396,7 @@ class RenderList {
 			renderItem.z = null;
 			renderItem.group = null;
 			renderItem.clippingContext = null;
+			renderItem.instances = null;
 
 		}
 
