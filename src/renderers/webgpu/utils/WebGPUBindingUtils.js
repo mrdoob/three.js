@@ -231,7 +231,6 @@ class WebGPUBindingUtils {
 		}
 
 		const bindGroupLayoutKey = JSON.stringify( entries );
-		console.log( bindGroupLayoutKey );
 
 		let bindGroupLayout = this.bindGroupLayoutCache.get( bindGroupLayoutKey );
 
@@ -546,6 +545,20 @@ class WebGPUBindingUtils {
 			layout: layoutGPU,
 			entries: entriesGPU
 		} );
+
+	}
+
+	/**
+	 * Delete the data associated with a bind group.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 */
+	deleteBindingsData( bindGroup ) {
+
+		const { backend } = this;
+
+		const bindingsData = backend.get( bindGroup );
+		bindingsData.layout = null;
 
 	}
 

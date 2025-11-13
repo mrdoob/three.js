@@ -2120,6 +2120,17 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Delete data associated with the current bind group.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 */
+	deleteBindingsData( bindGroup ) {
+
+		this.bindingsUtils.deleteBindingsData( bindGroup );
+
+	}
+
+	/**
 	 * Updates the given bind group definition.
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.

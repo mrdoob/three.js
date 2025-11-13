@@ -164,6 +164,8 @@ class Bindings extends DataMap {
 
 		for ( const bindGroup of bindings ) {
 
+			this.backend.deleteBindingsData( bindGroup );
+
 			this.delete( bindGroup );
 
 		}
@@ -180,6 +182,8 @@ class Bindings extends DataMap {
 		const bindings = renderObject.getBindings();
 
 		for ( const bindGroup of bindings ) {
+
+			this.backend.deleteBindingsData( bindGroup );
 
 			this.delete( bindGroup );
 
