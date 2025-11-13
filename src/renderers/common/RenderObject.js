@@ -778,6 +778,8 @@ class RenderObject {
 
 		}
 
+		cacheKey += this.context.id + ',';
+
 		cacheKey += object.receiveShadow + ',';
 
 		return hashString( cacheKey );
