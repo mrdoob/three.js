@@ -44,6 +44,46 @@ class Buffer extends Binding {
 		 */
 		this._buffer = buffer;
 
+		/**
+		 * An array of update ranges.
+		 *
+		 * @private
+		 * @type {Array<{start: number, count: number}>}
+		 */
+		this._updateRanges = [];
+
+	}
+
+	/**
+	 * The array of update ranges.
+	 *
+	 * @type {Array<{start: number, count: number}>}
+	 */
+	get updateRanges() {
+
+		return this._updateRanges;
+
+	}
+
+	/**
+	 * Adds an update range.
+	 *
+	 * @param {number} start - The start index.
+	 * @param {number} count - The number of elements.
+	 */
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	/**
+	 * Clears all update ranges.
+	 */
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
+
 	}
 
 	/**
