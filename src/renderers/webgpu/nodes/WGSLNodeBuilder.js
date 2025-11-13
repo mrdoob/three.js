@@ -19,8 +19,7 @@ import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
 import { warn, error } from '../../../utils.js';
 
-// GPUShaderStage is not defined in browsers not supporting WebGPU
-const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+import { GPUShaderStage } from '../utils/WebGPUConstants.js';
 
 const accessNames = {
 	[ NodeAccess.READ_ONLY ]: 'read',
@@ -35,9 +34,9 @@ const wrapNames = {
 };
 
 const gpuShaderStageLib = {
-	'vertex': GPUShaderStage ? GPUShaderStage.VERTEX : 1,
-	'fragment': GPUShaderStage ? GPUShaderStage.FRAGMENT : 2,
-	'compute': GPUShaderStage ? GPUShaderStage.COMPUTE : 4
+	'vertex': GPUShaderStage.VERTEX,
+	'fragment': GPUShaderStage.FRAGMENT,
+	'compute': GPUShaderStage.COMPUTE
 };
 
 const supports = {

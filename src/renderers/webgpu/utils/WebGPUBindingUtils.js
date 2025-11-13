@@ -1,6 +1,6 @@
 import {
 	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType, GPUBufferBindingType, GPUStorageTextureAccess,
-	GPUSamplerBindingType
+	GPUSamplerBindingType, GPUShaderStage
 } from './WebGPUConstants.js';
 
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
@@ -70,7 +70,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					if ( binding.visibility & 4 ) {
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 
 						// compute
 
@@ -373,8 +373,29 @@ class WebGPUBindingUtils {
 
 					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
+					const visibilities = [];
+					if ( binding.visibility & GPUShaderStage.VERTEX ) {
+
+						visibilities.push( 'vertex' );
+
+					}
+
+					if ( binding.visibility & GPUShaderStage.FRAGMENT ) {
+
+						visibilities.push( 'fragment' );
+
+					}
+
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+
+						visibilities.push( 'compute' );
+
+					}
+
+					const bufferVisibility = `(${visibilities.join( ',' )})`;
+
 					const bufferGPU = device.createBuffer( {
-						label: 'bindingBuffer_' + binding.name,
+						label: `bindingBuffer${binding.id}_${binding.name}_${bufferVisibility}`,
 						size: byteLength,
 						usage: usage
 					} );
