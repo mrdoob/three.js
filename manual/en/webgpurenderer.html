@@ -107,7 +107,7 @@ document.body.appendChild( renderer.domElement );
               It's important to understand that WebGPU is initialized in an asynchronous fashion. Hence, it is recommended to use 
               `setAnimationLoop()` to define the animation loop of your app since this approach will automatically ensure the renderer
               is initialized when rendering the first frame. If you prefer to manage your animation loop via `window.requestAnimationFrame()` or
-              if you have to use to the renderer in your init routine, you must add below line after the above code section.
+              if you have to use to the renderer in your init routine, you need an additional line in the above code section.
             </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
 const renderer = new THREE.WebGPURenderer( { antialias: true } );
@@ -153,7 +153,7 @@ document.body.appendChild( renderer.domElement );
                 the current supported effects.
               </li>
               <li>
-                The renderer itself is still in an experimental state although its maturity level has been greatly improved in the last two years. 
+                The renderer itself is still in an experimental state although its maturity level has been greatly improved in the last years. 
                 Still, depending on your application and scene setup, you will encounter missing features or a better performance with `WebGLRenderer`. 
                 Feel free to file an issue at GitHub so we are aware of open tasks. We are improving `WebGPURenderer` with each release so it's 
                 recommended to upgrade to the latest version whenever possible.
