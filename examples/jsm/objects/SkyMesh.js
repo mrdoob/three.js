@@ -90,7 +90,7 @@ class SkyMesh extends Mesh {
 		 * @default true
 		 * @deprecated Use isSkyMesh instead.
 		 */
-		this.isSky = true;
+		this.isSky = true; // @deprecated, r182
 
 		/**
 		 * This flag can be used for type testing.
