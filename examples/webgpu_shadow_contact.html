@@ -33,7 +33,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { vec3, vec4, uniform, texture, depth, float } from 'three/tsl';
+			import { vec3, uniform, texture, depth, float } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -105,22 +105,24 @@
 
 				const planeGeometry = new THREE.PlaneGeometry( PLANE_WIDTH, PLANE_HEIGHT ).rotateX( Math.PI / 2 );
 
-				depthMaterial = new THREE.MeshBasicNodeMaterial();
+				depthMaterial = new THREE.NodeMaterial();
 
 				const alphaDepth = float( 1 ).sub( depth ).mul( uDarkness );
 
-				depthMaterial.outputNode = vec4( vec3( 0 ), alphaDepth );
+				depthMaterial.colorNode = vec3( 0 );
+				depthMaterial.opacityNode = alphaDepth;
 				depthMaterial.depthTest = false;
 				depthMaterial.depthWrite = false;
 
-				shadowPlaneMaterial = new THREE.MeshBasicNodeMaterial();
+				shadowPlaneMaterial = new THREE.NodeMaterial();
 				shadowPlaneMaterial.transparent = true;
 				shadowPlaneMaterial.depthWrite = false;
 
 				if ( ! renderTarget.texture.image ) renderTarget.texture.image = { width: 512, height: 512 };
 
 				const blurredShadow = gaussianBlur( texture( renderTarget.texture ), uBlur, 4, { premultipliedAlpha: false } );
-				shadowPlaneMaterial.outputNode = vec4( vec3( 0 ), blurredShadow.a.mul( uShadowOpacity ) );
+				shadowPlaneMaterial.colorNode = vec3( 0 );
+				shadowPlaneMaterial.opacityNode = blurredShadow.a.mul( uShadowOpacity );
 
 				plane = new THREE.Mesh( planeGeometry, shadowPlaneMaterial );
 				plane.renderOrder = 1;
@@ -128,10 +130,11 @@
 				plane.scale.z = - 1;
 				shadowGroup.add( plane );
 
-				fillPlaneMaterial = new THREE.MeshBasicNodeMaterial();
+				fillPlaneMaterial = new THREE.NodeMaterial();
 				fillPlaneMaterial.transparent = true;
 				fillPlaneMaterial.depthWrite = false;
-				fillPlaneMaterial.outputNode = vec4( uPlaneColor.toVec3(), uPlaneOpacity );
+				fillPlaneMaterial.colorNode = uPlaneColor;
+				fillPlaneMaterial.opacityNode = uPlaneOpacity;
 				fillPlane = new THREE.Mesh( planeGeometry, fillPlaneMaterial );
 				fillPlane.rotateX( Math.PI );
 				shadowGroup.add( fillPlane );
