@@ -553,7 +553,7 @@ class WebGPUBindingUtils {
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
 	 */
-	deleteBindingsData( bindGroup ) {
+	deleteBindGroupData( bindGroup ) {
 
 		const { backend } = this;
 

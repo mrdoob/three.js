@@ -2126,7 +2126,7 @@ class WebGPUBackend extends Backend {
 	 */
 	deleteBindingsData( bindGroup ) {
 
-		this.bindingsUtils.deleteBindingsData( bindGroup );
+		this.bindingsUtils.deleteBindGroupData( bindGroup );
 
 	}
 
