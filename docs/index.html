@@ -1913,6 +1913,12 @@
 
 			const selectedPage = window.location.hash.substring( 1 );
 
+			if ( selectedPage === '' ) {
+
+				panel.classList.add( 'open' );
+
+			}
+
 			const links = navigation.querySelectorAll( 'a' );
 
 			links.forEach( link => {
