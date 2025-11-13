@@ -237,11 +237,7 @@ class MaterialNode extends Node {
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
 				node.normalMapType = material.normalMapType;
 
-				if ( material.normalMap.userData && material.normalMap.userData.unpackNormalMode ) {
-
-					node.unpackNormalMode = material.normalMap.userData.unpackNormalMode;
-
-				} else if ( material.normalMap.format == RGFormat || material.normalMap.format == RED_GREEN_RGTC2_Format ) {
+				if ( material.normalMap.format == RGFormat || material.normalMap.format == RED_GREEN_RGTC2_Format ) {
 
 					node.unpackNormalMode = NormalRGPacking;
 
