@@ -726,6 +726,14 @@ class Backend {
 	}
 
 	/**
+	 * Delete GPU data associated with a bind group.
+	 *
+	 * @abstract
+	 * @param {BindGroup} bindGroup - The bind group.
+	 */
+	deleteBindGroupData( /*bindGroup*/ ) { }
+
+	/**
 	 * Deletes an object from the internal data structure.
 	 *
 	 * @param {Object} object - The object to delete.

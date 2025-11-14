@@ -162,18 +162,9 @@ class Bindings extends DataMap {
 
 		const bindings = this.nodes.getForCompute( computeNode ).bindings;
 
-		if ( this.backend.isWebGPUBackend ) {
-
-			for ( const bindGroup of bindings ) {
-
-				this.backend.deleteBindGroupData( bindGroup );
-
-			}
-
-		}
-
 		for ( const bindGroup of bindings ) {
 
+			this.backend.deleteBindGroupData( bindGroup );
 			this.delete( bindGroup );
 
 		}
@@ -189,18 +180,9 @@ class Bindings extends DataMap {
 
 		const bindings = renderObject.getBindings();
 
-		if ( this.backend.isWebGPUBackend ) {
-
-			for ( const bindGroup of bindings ) {
-
-				this.backend.deleteBindGroupData( bindGroup );
-
-			}
-
-		}
-
 		for ( const bindGroup of bindings ) {
 
+			this.backend.deleteBindGroupData( bindGroup );
 			this.delete( bindGroup );
 
 		}
