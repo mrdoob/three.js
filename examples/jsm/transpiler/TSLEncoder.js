@@ -798,7 +798,8 @@ ${ this.tab }}`;
 
 		if ( node.layout !== false && hasPointer === false ) {
 
-			funcStr += ', { ' + inputs.join( ', ' ) + ', return: \'' + type + '\' }';
+			const inputsStr = inputs.length > 0 ? inputs.join( ', ' ) + ', ' : '';
+			funcStr += ', { ' + inputsStr + 'return: \'' + type + '\' }';
 
 		}
 
