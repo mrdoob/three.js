@@ -62,20 +62,6 @@ class InstanceNode extends Node {
 		this.instanceColor = instanceColor;
 
 		/**
-		 * Tracks whether the matrix data is provided via a storage buffer.
-		 *
-		 * @type {boolean}
-		 */
-		this.isStorageMatrix = instanceMatrix && instanceMatrix.isStorageInstancedBufferAttribute === true;
-
-		/**
-		 * Tracks whether the color data is provided via a storage buffer.
-		 *
-		 * @type {boolean}
-		 */
-		this.isStorageColor = instanceColor && instanceColor.isStorageInstancedBufferAttribute === true;
-
-		/**
 		 * The node that represents the instance matrix data.
 		 *
 		 * @type {?Node}
@@ -112,6 +98,32 @@ class InstanceNode extends Node {
 		 * @type {?InstancedBufferAttribute}
 		 */
 		this.bufferColor = null;
+
+	}
+
+	/**
+	 * Tracks whether the matrix data is provided via a storage buffer.
+	 *
+	 * @type {boolean}
+	 */
+	get isStorageMatrix() {
+
+		const { instanceMatrix } = this;
+
+		return instanceMatrix && instanceMatrix.isStorageInstancedBufferAttribute === true;
+
+	}
+
+	/**
+	 * Tracks whether the color data is provided via a storage buffer.
+	 *
+	 * @type {boolean}
+	 */
+	get isStorageColor() {
+
+		const { instanceColor } = this;
+
+		return instanceColor && instanceColor.isStorageInstancedBufferAttribute === true;
 
 	}
 
