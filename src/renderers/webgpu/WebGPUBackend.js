@@ -1654,8 +1654,6 @@ class WebGPUBackend extends Backend {
 
 					const { layoutGPU } = bindingsData.layout;
 
-					console.log( layoutGPU );
-
 					const bindGroupIndex = this.bindingUtils.createBindGroupIndex( data, layoutGPU );
 
 					indexesGPU.push( bindGroupIndex );
@@ -2130,7 +2128,7 @@ class WebGPUBackend extends Backend {
 	 */
 	deleteBindGroupData( bindGroup ) {
 
-		this.bindingsUtils.deleteBindGroupData( bindGroup );
+		this.bindingUtils.deleteBindGroupData( bindGroup );
 
 	}
 

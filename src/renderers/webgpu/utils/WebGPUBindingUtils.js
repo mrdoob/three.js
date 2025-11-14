@@ -20,21 +20,23 @@ class BindGroupLayout {
 	 */
 	constructor( layoutGPU ) {
 
+		/**
+		 * The current GPUBindGroupLayout
+		 *
+		 * @type {GPUBindGroupLayout}
+		 */
 		this.layoutGPU = layoutGPU;
 
 		/**
-		 * The number of bind groups that use this.layoutGPU
+		 * The number of bind groups that use the current GPUBindGroupLayout
 		 *
-		 * @type {Map<string, GPUBindGroupLayout>}
+		 * @type {number}
 		 */
 		this.usedTimes = 0;
 
 	}
 
 }
-
-
-
 
 /**
  * A WebGPU backend utility module for managing bindings.
@@ -65,7 +67,7 @@ class WebGPUBindingUtils {
 		/**
 		 * A cache that maps combinations of layout entries to existing bind group layouts.
 		 *
-		 * @type {Map<string, GPUBindGroupLayout>}
+		 * @type {Map<string, BindGroupLayout>}
 		 */
 		this.bindGroupLayoutCache = new Map();
 
@@ -83,7 +85,7 @@ class WebGPUBindingUtils {
 		const backend = this.backend;
 
 		const bindingGPU = {
-			binding: index ++,
+			binding: index,
 			visibility: binding.visibility
 		};
 
@@ -626,7 +628,6 @@ class WebGPUBindingUtils {
 
 		// Decrement the layout reference's usedTimes attribute
 		bindingsData.layout.usedTimes --;
-		console.log( bindingsData.layout.usedTimes );
 
 		// Remove reference from map
 		if ( bindingsData.layout.usedTimes === 0 ) {
