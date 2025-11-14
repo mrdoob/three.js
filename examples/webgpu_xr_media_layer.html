@@ -43,7 +43,6 @@
 
 			import * as THREE from 'three';
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
-			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
@@ -175,7 +174,6 @@
 
 				container.appendChild( renderer.domElement );
 
-				//document.body.appendChild( XRButton.createButton( renderer ) );
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				window.addEventListener( 'resize', onWindowResize );
