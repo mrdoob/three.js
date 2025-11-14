@@ -21,7 +21,7 @@ const color = lut.getColor( 0.5 );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">Lut</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">Lut</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { Lut } from 'three/addons/math/Lut.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -33,12 +33,22 @@ const color = lut.getColor( 0.5 );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>colormap</code></td>
-									<td class="description last"><p>Sets a colormap from predefined list of colormaps.<br/>Default is <code>'rainbow'</code>.</p></td>
+									<td class="name">
+										<strong>colormap</strong>
+									</td>
+									<td class="description last">
+										<p>Sets a colormap from predefined list of colormaps.</p>
+										<p>Default is <code>'rainbow'</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>count</code></td>
-									<td class="description last"><p>Sets the number of colors used to represent the data array.<br/>Default is <code>32</code>.</p></td>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>Sets the number of colors used to represent the data array.</p>
+										<p>Default is <code>32</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -48,7 +58,8 @@ const color = lut.getColor( 0.5 );
 				<div class="member">
 					<h3 class="name" id="isLut" translate="no">.<a href="#isLut">isLut</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -66,19 +77,22 @@ const color = lut.getColor( 0.5 );
 				<div class="member">
 					<h3 class="name" id="maxV" translate="no">.<a href="#maxV">maxV</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The maximum value to be represented with the lookup table.<br/>Default is <code>1</code>.</p>
+						<p>The maximum value to be represented with the lookup table.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="minV" translate="no">.<a href="#minV">minV</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The minimum value to be represented with the lookup table.<br/>Default is <code>0</code>.</p>
+						<p>The minimum value to be represented with the lookup table.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="n" translate="no">.<a href="#n">n</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The number of colors of the current selected color map.<br/>Default is <code>32</code>.</p>
+						<p>The number of colors of the current selected color map.</p>
+						<p>Default is <code>32</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -90,13 +104,21 @@ const color = lut.getColor( 0.5 );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the color map.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the color map.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>arrayOfColors</code></td>
-									<td class="description last"><p>An array of color values. Each value is an array
-holding a threshold and the actual color value as a hexadecimal number.</p></td>
+									<td class="name">
+										<strong>arrayOfColors</strong>
+									</td>
+									<td class="description last">
+										<p>An array of color values. Each value is an array
+holding a threshold and the actual color value as a hexadecimal number.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -104,7 +126,7 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this LUT.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( lut : <span class="param-type">Lut</span> )</span><span class="type-signature"> : <a href="Lut.html">Lut</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( lut : <span class="param-type"><a href="Lut.html">Lut</a></span> )</span><span class="type-signature"> : <a href="Lut.html">Lut</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the given lut.</p>
@@ -112,8 +134,12 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>lut</code></td>
-									<td class="description last"><p>The LUT to copy.</p></td>
+									<td class="name">
+										<strong>lut</strong>
+									</td>
+									<td class="description last">
+										<p>The LUT to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -138,8 +164,12 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>alpha</code></td>
-									<td class="description last"><p>The value to lookup.</p></td>
+									<td class="name">
+										<strong>alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The value to lookup.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -147,7 +177,7 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 							<dt class="tag-returns"><strong>Returns:</strong> The color from the LUT.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( value : <span class="param-type">Lut</span> )</span><span class="type-signature"> : <a href="Lut.html">Lut</a></span> </h3>
+					<h3 class="name name-method" id="set" translate="no">.<a href="#set">set</a><span class="signature">( value : <span class="param-type"><a href="Lut.html">Lut</a></span> )</span><span class="type-signature"> : <a href="Lut.html">Lut</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given LUT.</p>
@@ -155,8 +185,12 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The LUT to set.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The LUT to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -172,12 +206,21 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>colormap</code></td>
-									<td class="description last"><p>The name of the color map.</p></td>
+									<td class="name">
+										<strong>colormap</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the color map.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>count</code></td>
-									<td class="description last"><p>The number of colors.<br/>Default is <code>32</code>.</p></td>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>The number of colors.</p>
+										<p>Default is <code>32</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -193,8 +236,12 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>max</code></td>
-									<td class="description last"><p>The maximum value to be represented with the lookup table.</p></td>
+									<td class="name">
+										<strong>max</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum value to be represented with the lookup table.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -210,8 +257,12 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>min</code></td>
-									<td class="description last"><p>The minimum value to be represented with the lookup table.</p></td>
+									<td class="name">
+										<strong>min</strong>
+									</td>
+									<td class="description last">
+										<p>The minimum value to be represented with the lookup table.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -227,8 +278,12 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>canvas</code></td>
-									<td class="description last"><p>The canvas to update.</p></td>
+									<td class="name">
+										<strong>canvas</strong>
+									</td>
+									<td class="description last">
+										<p>The canvas to update.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -238,7 +293,7 @@ holding a threshold and the actual color value as a hexadecimal number.</p></td>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/Lut.js" target="_blank" rel="noopener" translate="no">examples/jsm/math/Lut.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/Lut.js" translate="no" target="_blank" rel="noopener">examples/jsm/math/Lut.js</a>
 				</p>
 			</article>
 		</section>

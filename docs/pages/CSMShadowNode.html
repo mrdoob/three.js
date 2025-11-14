@@ -19,11 +19,11 @@ use <a href="CSM.html">CSM</a> instead.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">CSMShadowNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">CSMShadowNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { CSMShadowNode } from 'three/addons/csm/CSMShadowNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CSMShadowNode" translate="no">new <a href="#CSMShadowNode">CSMShadowNode</a><span class="signature">( light : <span class="param-type">DirectionalLight</span>, data : <span class="param-type">CSMShadowNode~Data</span> )</span> </h3>
+					<h3 class="name name-method" id="CSMShadowNode" translate="no">new <a href="#CSMShadowNode">CSMShadowNode</a><span class="signature">( light : <span class="param-type"><a href="DirectionalLight.html">DirectionalLight</a></span>, data : <span class="param-type"><a href="CSMShadowNode.html#~Data">CSMShadowNode~Data</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new CSM shadow node.</p>
@@ -31,12 +31,21 @@ use <a href="CSM.html">CSM</a> instead.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>light</code></td>
-									<td class="description last"><p>The CSM light.</p></td>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The CSM light.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>The CSM data.<br/>Default is <code>{}</code>.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The CSM data.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -53,13 +62,15 @@ mainCSM frustum should be split up.</p>
 				<div class="member">
 					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
 					<div class="description">
-						<p>The scene's camera.<br/>Default is <code>null</code>.</p>
+						<p>The scene's camera.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="cascades" translate="no">.<a href="#cascades">cascades</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The number of cascades.<br/>Default is <code>3</code>.</p>
+						<p>The number of cascades.</p>
+						<p>Default is <code>3</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -71,7 +82,8 @@ mainCSM frustum should be split up.</p>
 				<div class="member">
 					<h3 class="name" id="fade" translate="no">.<a href="#fade">fade</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to fade between cascades or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether to fade between cascades or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -83,7 +95,8 @@ mainCSM frustum should be split up.</p>
 				<div class="member">
 					<h3 class="name" id="lightMargin" translate="no">.<a href="#lightMargin">lightMargin</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The light margin.<br/>Default is <code>200</code>.</p>
+						<p>The light margin.</p>
+						<p>Default is <code>200</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -97,19 +110,22 @@ cascade.</p>
 				<div class="member">
 					<h3 class="name" id="mainFrustum" translate="no">.<a href="#mainFrustum">mainFrustum</a><span class="type-signature"> : <a href="CSMFrustum.html">CSMFrustum</a></span> </h3>
 					<div class="description">
-						<p>The main frustum.<br/>Default is <code>null</code>.</p>
+						<p>The main frustum.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="maxFar" translate="no">.<a href="#maxFar">maxFar</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The maximum far value.<br/>Default is <code>100000</code>.</p>
+						<p>The maximum far value.</p>
+						<p>Default is <code>100000</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="mode" translate="no">.<a href="#mode">mode</a><span class="type-signature"> : 'practical' | 'uniform' | 'logarithmic' | 'custom'</span> </h3>
 					<div class="description">
-						<p>The frustum split mode.<br/>Default is <code>'practical'</code>.</p>
+						<p>The frustum split mode.</p>
+						<p>Default is <code>'practical'</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -135,47 +151,34 @@ method whenever this instance is no longer used in your app.</p>
 					<div class="description">
 						<p>Constructor data of <code>CSMShadowNode</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>cascades</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>cascades</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The number of cascades.</p>
+						<p>Default is <code>3</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					3
-				</td>
-			<td class="description last"><p>The number of cascades.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>maxFar</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>maxFar</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The maximum far value.</p>
+						<p>Default is <code>100000</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					100000
-				</td>
-			<td class="description last"><p>The maximum far value.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>mode</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>mode</strong>
+						<br>
 <span class="param-type">'practical'</span>
 |
 <span class="param-type">'uniform'</span>
@@ -183,46 +186,39 @@ method whenever this instance is no longer used in your app.</p>
 <span class="param-type">'logarithmic'</span>
 |
 <span class="param-type">'custom'</span>
+				</td>
+			<td class="description last">
+				<p>The frustum split mode.</p>
+						<p>Default is <code>'practical'</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					'practical'
-				</td>
-			<td class="description last"><p>The frustum split mode.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>customSplitsCallback</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>customSplitsCallback</strong>
+						<br>
 <span class="param-type">function</span>
+				</td>
+			<td class="description last">
+				<p>Custom split callback when using <code>mode='custom'</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Custom split callback when using <code>mode='custom'</code>.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>lightMargin</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>lightMargin</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The light margin.</p>
+						<p>Default is <code>200</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					200
-				</td>
-			<td class="description last"><p>The light margin.</p></td>
 		</tr>
 	</tbody>
 </table>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/csm/CSMShadowNode.js" target="_blank" rel="noopener" translate="no">examples/jsm/csm/CSMShadowNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/csm/CSMShadowNode.js" translate="no" target="_blank" rel="noopener">examples/jsm/csm/CSMShadowNode.js</a>
 				</p>
 			</article>
 		</section>

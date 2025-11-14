@@ -17,7 +17,7 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">TorusKnot</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">TorusKnot</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { TorusKnot } from 'three/addons/curves/CurveExtras.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -29,8 +29,13 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scale</code></td>
-									<td class="description last"><p>The curve's scale.<br/>Default is <code>10</code>.</p></td>
+									<td class="name">
+										<strong>scale</strong>
+									</td>
+									<td class="description last">
+										<p>The curve's scale.</p>
+										<p>Default is <code>10</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -40,11 +45,12 @@
 				<div class="member">
 					<h3 class="name" id="scale" translate="no">.<a href="#scale">scale</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The curve's scale.<br/>Default is <code>10</code>.</p>
+						<p>The curve's scale.</p>
+						<p>Default is <code>10</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type">Vector3</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<h3 class="name name-method" id="getPoint" translate="no">.<a href="#getPoint">getPoint</a><span class="signature">( t : <span class="param-type">number</span>, optionalTarget : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method returns a vector in 3D space for the given interpolation factor.</p>
@@ -52,12 +58,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>A interpolation factor representing a position on the curve. Must be in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>optionalTarget</code></td>
-									<td class="description last"><p>The optional target vector the result is written to.</p></td>
+									<td class="name">
+										<strong>optionalTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The optional target vector the result is written to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -70,7 +84,7 @@
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/curves/CurveExtras.js" target="_blank" rel="noopener" translate="no">examples/jsm/curves/CurveExtras.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/curves/CurveExtras.js" translate="no" target="_blank" rel="noopener">examples/jsm/curves/CurveExtras.js</a>
 				</p>
 			</article>
 		</section>

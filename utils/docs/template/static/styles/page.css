@@ -204,6 +204,16 @@ body table td {
 	border-bottom: var(--border-style);
 }
 
+body table table th,
+body table table td {
+	border-bottom: none;
+}
+
+body table tr:last-child th,
+body table tr:last-child td {
+	border-bottom: none;
+}
+
 body table th {
 	text-decoration: none;
 }
@@ -213,23 +223,23 @@ body table td:first-child {
 }
 
 body table code {
-	padding: 0px;
 	margin: 0px;
 	width: auto;
 }
 
-body table.params td.name {
-	min-width: 150px;
-	white-space: nowrap;
-}
-
 body table.props td.name,
-body table.props td.type {
-	white-space: nowrap;
+body table.params td.name {
+	width: 150px;
+	word-break: keep-all;
 }
 
 body table p {
 	margin: 0;
+	margin-top: 10px;
+}
+
+body table td p:first-child {
+	margin-top: 0;
 }
 
 body strong {

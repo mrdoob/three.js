@@ -21,7 +21,7 @@ for the respective format.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="DataTextureLoader" translate="no">new <a href="#DataTextureLoader">DataTextureLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="DataTextureLoader" translate="no">new <a href="#DataTextureLoader">DataTextureLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new data texture loader.</p>
@@ -29,15 +29,19 @@ for the respective format.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : <a href="DataTexture.html">DataTexture</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded data texture
@@ -48,20 +52,36 @@ may pop up in your scene once the respective loading process is finished.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -78,207 +98,167 @@ may pop up in your scene once the respective loading process is finished.</p>
 					<div class="description">
 						<p>Represents the result object type of the <code>parse()</code> method.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>image</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>image</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>An object holding width, height and the texture data.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>An object holding width, height and the texture data.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>width</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>width</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The width of the base mip.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The width of the base mip.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>height</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>height</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The width of the base mip.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The width of the base mip.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>data</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>data</strong>
+						<br>
 <span class="param-type">TypedArray</span>
+				</td>
+			<td class="description last">
+				<p>The texture data.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The texture data.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>format</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>format</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture format.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The texture format.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>type</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>type</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The texture type.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The texture type.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>flipY</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>flipY</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>If set to <code>true</code>, the texture is flipped along the vertical axis when uploaded to the GPU.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>If set to <code>true</code>, the texture is flipped along the vertical axis when uploaded to the GPU.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>wrapS</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>wrapS</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The wrapS value.</p>
+						<p>Default is <code>ClampToEdgeWrapping</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					ClampToEdgeWrapping
-				</td>
-			<td class="description last"><p>The wrapS value.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>wrapT</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>wrapT</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The wrapT value.</p>
+						<p>Default is <code>ClampToEdgeWrapping</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					ClampToEdgeWrapping
-				</td>
-			<td class="description last"><p>The wrapT value.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>anisotropy</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>anisotropy</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The anisotropy value.</p>
+						<p>Default is <code>1</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					1
-				</td>
-			<td class="description last"><p>The anisotropy value.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>generateMipmaps</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>generateMipmaps</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to generate mipmaps or not.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>Whether to generate mipmaps or not.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>colorSpace</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>colorSpace</strong>
+						<br>
 <span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The color space.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The color space.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>magFilter</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>magFilter</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The mag filter.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The mag filter.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>minFilter</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>minFilter</strong>
+						<br>
 <span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The min filter.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The min filter.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>mipmaps</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>mipmaps</strong>
+						<br>
 <span class="param-type">Array.&lt;Object></span>
+				</td>
+			<td class="description last">
+				<p>The mipmaps.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-				</td>
-			<td class="description last"><p>The mipmaps.</p></td>
 		</tr>
 	</tbody>
 </table>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/DataTextureLoader.js" target="_blank" rel="noopener" translate="no">src/loaders/DataTextureLoader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/DataTextureLoader.js" translate="no" target="_blank" rel="noopener">src/loaders/DataTextureLoader.js</a>
 				</p>
 			</article>
 		</section>

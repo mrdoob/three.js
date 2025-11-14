@@ -3,7 +3,7 @@ import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal } from './Position.js';
-import { nodeProxy, vec3, mat4 } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
@@ -127,19 +127,11 @@ class InstanceNode extends Node {
 
 				const buffer = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
 
+				const instancedBufferAttributeFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+
+				instanceMatrixNode = instancedBufferAttributeFn( buffer, 'mat4' );
+
 				this.buffer = buffer;
-
-				const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-				const instanceBuffers = [
-					// F.Signature -> bufferAttribute( array, type, stride, offset )
-					bufferFn( buffer, 'vec4', 16, 0 ),
-					bufferFn( buffer, 'vec4', 16, 4 ),
-					bufferFn( buffer, 'vec4', 16, 8 ),
-					bufferFn( buffer, 'vec4', 16, 12 )
-				];
-
-				instanceMatrixNode = mat4( ...instanceBuffers );
 
 			}
 

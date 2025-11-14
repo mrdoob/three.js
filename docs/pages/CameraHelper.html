@@ -15,7 +15,7 @@
 			<header>
 				<div class="class-description"><p>This helps with visualizing what a camera contains in its frustum. It
 visualizes the frustum of a camera using a line segments.</p>
-<p>Based on frustum visualization in <a href="https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html">lightgl.js shadowmap example</a>.</p>
+<p>Based on frustum visualization in <a href="https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html" target="_blank" rel="noopener">lightgl.js shadowmap example</a>.</p>
 <p><code>CameraHelper</code> must be a child of the scene.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -26,7 +26,7 @@ scene.add( helper );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CameraHelper" translate="no">new <a href="#CameraHelper">CameraHelper</a><span class="signature">( camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="CameraHelper" translate="no">new <a href="#CameraHelper">CameraHelper</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new arrow helper.</p>
@@ -34,8 +34,12 @@ scene.add( helper );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera to visualize.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera to visualize.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,7 +66,7 @@ scene.add( helper );
 method whenever this instance is no longer used in your app.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="setColors" translate="no">.<a href="#setColors">setColors</a><span class="signature">( frustum : <span class="param-type">Color</span>, cone : <span class="param-type">Color</span>, up : <span class="param-type">Color</span>, target : <span class="param-type">Color</span>, cross : <span class="param-type">Color</span> )</span><span class="type-signature"> : <a href="CameraHelper.html">CameraHelper</a></span> </h3>
+					<h3 class="name name-method" id="setColors" translate="no">.<a href="#setColors">setColors</a><span class="signature">( frustum : <span class="param-type"><a href="Color.html">Color</a></span>, cone : <span class="param-type"><a href="Color.html">Color</a></span>, up : <span class="param-type"><a href="Color.html">Color</a></span>, target : <span class="param-type"><a href="Color.html">Color</a></span>, cross : <span class="param-type"><a href="Color.html">Color</a></span> )</span><span class="type-signature"> : <a href="CameraHelper.html">CameraHelper</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Defines the colors of the helper.</p>
@@ -70,24 +74,44 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frustum</code></td>
-									<td class="description last"><p>The frustum line color.</p></td>
+									<td class="name">
+										<strong>frustum</strong>
+									</td>
+									<td class="description last">
+										<p>The frustum line color.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>cone</code></td>
-									<td class="description last"><p>The cone line color.</p></td>
+									<td class="name">
+										<strong>cone</strong>
+									</td>
+									<td class="description last">
+										<p>The cone line color.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>up</code></td>
-									<td class="description last"><p>The up line color.</p></td>
+									<td class="name">
+										<strong>up</strong>
+									</td>
+									<td class="description last">
+										<p>The up line color.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target line color.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target line color.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>cross</code></td>
-									<td class="description last"><p>The cross line color.</p></td>
+									<td class="name">
+										<strong>cross</strong>
+									</td>
+									<td class="description last">
+										<p>The cross line color.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -103,7 +127,7 @@ method whenever this instance is no longer used in your app.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/helpers/CameraHelper.js" target="_blank" rel="noopener" translate="no">src/helpers/CameraHelper.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/helpers/CameraHelper.js" translate="no" target="_blank" rel="noopener">src/helpers/CameraHelper.js</a>
 				</p>
 			</article>
 		</section>

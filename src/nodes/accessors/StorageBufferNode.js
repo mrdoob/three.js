@@ -126,6 +126,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * A reference to the internal buffer attribute node.
 		 *
+		 * @private
 		 * @type {?BufferAttributeNode}
 		 * @default null
 		 */
@@ -134,6 +135,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * A reference to the internal varying node.
 		 *
+		 * @private
 		 * @type {?VaryingNode}
 		 * @default null
 		 */

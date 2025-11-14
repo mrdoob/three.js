@@ -33,7 +33,7 @@ And they have good accessibility since it's possible to add metadata like title 
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">SVGRenderer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">SVGRenderer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { SVGRenderer } from 'three/addons/renderers/SVGRenderer.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -48,7 +48,8 @@ And they have good accessibility since it's possible to add metadata like title 
 				<div class="member">
 					<h3 class="name" id="autoClear" translate="no">.<a href="#autoClear">autoClear</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to automatically perform a clear before a render call or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether to automatically perform a clear before a render call or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -67,26 +68,30 @@ rendered vertices and faces.</p>
 				<div class="member">
 					<h3 class="name" id="outputColorSpace" translate="no">.<a href="#outputColorSpace">outputColorSpace</a><span class="type-signature"> : <a href="global.html#SRGBColorSpace">SRGBColorSpace</a> | <a href="global.html#LinearSRGBColorSpace">LinearSRGBColorSpace</a></span> </h3>
 					<div class="description">
-						<p>The output color space.<br/>Default is <code>SRGBColorSpace</code>.</p>
+						<p>The output color space.</p>
+						<p>Default is <code>SRGBColorSpace</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="overdraw" translate="no">.<a href="#overdraw">overdraw</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Number of fractional pixels to enlarge polygons in order to
-prevent anti-aliasing gaps. Range is <code>[0,1]</code>.<br/>Default is <code>0.5</code>.</p>
+prevent anti-aliasing gaps. Range is <code>[0,1]</code>.</p>
+						<p>Default is <code>0.5</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sortElements" translate="no">.<a href="#sortElements">sortElements</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to sort elements or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether to sort elements or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="sortObjects" translate="no">.<a href="#sortObjects">sortObjects</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to sort 3D objects or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether to sort 3D objects or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -105,7 +110,7 @@ prevent anti-aliasing gaps. Range is <code>[0,1]</code>.<br/>Default is <code>0.
 							<dt class="tag-returns"><strong>Returns:</strong> The size of the renderer.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type">Object3D</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Renders the given scene using the given camera.</p>
@@ -113,17 +118,25 @@ prevent anti-aliasing gaps. Range is <code>[0,1]</code>.<br/>Default is <code>0.
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>A scene or any other type of 3D object.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A scene or any other type of 3D object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setClearColor" translate="no">.<a href="#setClearColor">setClearColor</a><span class="signature">( color : <span class="param-type">number | Color | string</span> )</span> </h3>
+					<h3 class="name name-method" id="setClearColor" translate="no">.<a href="#setClearColor">setClearColor</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the clear color.</p>
@@ -131,8 +144,12 @@ prevent anti-aliasing gaps. Range is <code>[0,1]</code>.<br/>Default is <code>0.
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>color</code></td>
-									<td class="description last"><p>The clear color to set.</p></td>
+									<td class="name">
+										<strong>color</strong>
+									</td>
+									<td class="description last">
+										<p>The clear color to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -145,8 +162,12 @@ prevent anti-aliasing gaps. Range is <code>[0,1]</code>.<br/>Default is <code>0.
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>precision</code></td>
-									<td class="description last"><p>The precision to set.</p></td>
+									<td class="name">
+										<strong>precision</strong>
+									</td>
+									<td class="description last">
+										<p>The precision to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -160,8 +181,12 @@ tries to improve the SVG quality over rendering speed and geometric precision.</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>quality</code></td>
-									<td class="description last"><p>The quality.</p></td>
+									<td class="name">
+										<strong>quality</strong>
+									</td>
+									<td class="description last">
+										<p>The quality.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -174,19 +199,27 @@ tries to improve the SVG quality over rendering speed and geometric precision.</
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the renderer.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the renderer.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/SVGRenderer.js" target="_blank" rel="noopener" translate="no">examples/jsm/renderers/SVGRenderer.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/SVGRenderer.js" translate="no" target="_blank" rel="noopener">examples/jsm/renderers/SVGRenderer.js</a>
 				</p>
 			</article>
 		</section>

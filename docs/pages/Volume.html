@@ -17,7 +17,7 @@ It contains a volume of data and information about it. For now it only handles 3
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">Volume</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">Volume</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { Volume } from 'three/addons/misc/Volume.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -29,24 +29,44 @@ It contains a volume of data and information about it. For now it only handles 3
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>xLength</code></td>
-									<td class="description last"><p>Width of the volume.</p></td>
+									<td class="name">
+										<strong>xLength</strong>
+									</td>
+									<td class="description last">
+										<p>Width of the volume.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>yLength</code></td>
-									<td class="description last"><p>Length of the volume.</p></td>
+									<td class="name">
+										<strong>yLength</strong>
+									</td>
+									<td class="description last">
+										<p>Length of the volume.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>zLength</code></td>
-									<td class="description last"><p>Depth of the volume.</p></td>
+									<td class="name">
+										<strong>zLength</strong>
+									</td>
+									<td class="description last">
+										<p>Depth of the volume.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The type of data (uint8, uint16, ...).</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The type of data (uint8, uint16, ...).</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>arrayBuffer</code></td>
-									<td class="description last"><p>The buffer with volume data.</p></td>
+									<td class="name">
+										<strong>arrayBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer with volume data.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -100,7 +120,8 @@ If changed, geometryNeedsUpdate is automatically set to true on all the slices a
 					<h3 class="name" id="segmentation" translate="no">.<a href="#segmentation">segmentation</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether to use segmentation mode or not.
-It can load 16-bits nrrds correctly.<br/>Default is <code>false</code>.</p>
+It can load 16-bits nrrds correctly.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -125,19 +146,22 @@ If changed, geometryNeedsUpdate is automatically set to true on all the slices a
 				<div class="member">
 					<h3 class="name" id="xLength" translate="no">.<a href="#xLength">xLength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Width of the volume in the IJK coordinate system.<br/>Default is <code>1</code>.</p>
+						<p>Width of the volume in the IJK coordinate system.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="yLength" translate="no">.<a href="#yLength">yLength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Height of the volume in the IJK coordinate system.<br/>Default is <code>1</code>.</p>
+						<p>Height of the volume in the IJK coordinate system.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="zLength" translate="no">.<a href="#zLength">zLength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Depth of the volume in the IJK coordinate system.<br/>Default is <code>1</code>.</p>
+						<p>Depth of the volume in the IJK coordinate system.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -149,16 +173,28 @@ If changed, geometryNeedsUpdate is automatically set to true on all the slices a
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>i</code></td>
-									<td class="description last"><p>First coordinate.</p></td>
+									<td class="name">
+										<strong>i</strong>
+									</td>
+									<td class="description last">
+										<p>First coordinate.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>j</code></td>
-									<td class="description last"><p>Second coordinate.</p></td>
+									<td class="name">
+										<strong>j</strong>
+									</td>
+									<td class="description last">
+										<p>Second coordinate.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>k</code></td>
-									<td class="description last"><p>Third coordinate.</p></td>
+									<td class="name">
+										<strong>k</strong>
+									</td>
+									<td class="description last">
+										<p>Third coordinate.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -184,12 +220,20 @@ the plane matrix (orientation and position in RAS coordinate) and the dimensions
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>axis</code></td>
-									<td class="description last"><p>The normal axis to the slice.</p></td>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The normal axis to the slice.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>RASIndex</code></td>
-									<td class="description last"><p>The index of the slice.</p></td>
+									<td class="name">
+										<strong>RASIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the slice.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -206,12 +250,20 @@ The coordinate are given in the Right Anterior Superior coordinate format.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>axis</code></td>
-									<td class="description last"><p>The normal axis to the slice.</p></td>
+									<td class="name">
+										<strong>axis</strong>
+									</td>
+									<td class="description last">
+										<p>The normal axis to the slice.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index of the slice.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the slice.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -227,16 +279,28 @@ The coordinate are given in the Right Anterior Superior coordinate format.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>i</code></td>
-									<td class="description last"><p>First coordinate.</p></td>
+									<td class="name">
+										<strong>i</strong>
+									</td>
+									<td class="description last">
+										<p>First coordinate.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>j</code></td>
-									<td class="description last"><p>Second coordinate.</p></td>
+									<td class="name">
+										<strong>j</strong>
+									</td>
+									<td class="description last">
+										<p>Second coordinate.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>k</code></td>
-									<td class="description last"><p>Third coordinate.</p></td>
+									<td class="name">
+										<strong>k</strong>
+									</td>
+									<td class="description last">
+										<p>Third coordinate.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -252,13 +316,21 @@ The coordinate are given in the Right Anterior Superior coordinate format.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>functionToMap</code></td>
-									<td class="description last"><p>A function to apply to every voxel, will be called with the following parameters:
-value of the voxel, index of the voxel, the data (TypedArray).</p></td>
+									<td class="name">
+										<strong>functionToMap</strong>
+									</td>
+									<td class="description last">
+										<p>A function to apply to every voxel, will be called with the following parameters:
+value of the voxel, index of the voxel, the data (TypedArray).</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>context</code></td>
-									<td class="description last"><p>You can specify a context in which call the function, default if this Volume.</p></td>
+									<td class="name">
+										<strong>context</strong>
+									</td>
+									<td class="description last">
+										<p>You can specify a context in which call the function, default if this Volume.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -291,8 +363,12 @@ value of the voxel, index of the voxel, the data (TypedArray).</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>Index of the voxel.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the voxel.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -302,7 +378,7 @@ value of the voxel, index of the voxel, the data (TypedArray).</p></td>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/Volume.js" target="_blank" rel="noopener" translate="no">examples/jsm/misc/Volume.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/Volume.js" translate="no" target="_blank" rel="noopener">examples/jsm/misc/Volume.js</a>
 				</p>
 			</article>
 		</section>

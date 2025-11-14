@@ -36,16 +36,28 @@ const loader2 = new ColladaLoader( manager );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executes when all items have been loaded.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executes when all items have been loaded.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executes when single items have been loaded.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executes when single items have been loaded.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executes when an error occurs.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executes when an error occurs.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -61,25 +73,29 @@ const loader2 = new ColladaLoader( manager );
 				<div class="member">
 					<h3 class="name" id="onError" translate="no">.<a href="#onError">onError</a><span class="type-signature"> : function | undefined</span> </h3>
 					<div class="description">
-						<p>Executes when an error occurs.<br/>Default is <code>undefined</code>.</p>
+						<p>Executes when an error occurs.</p>
+						<p>Default is <code>undefined</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="onLoad" translate="no">.<a href="#onLoad">onLoad</a><span class="type-signature"> : function | undefined</span> </h3>
 					<div class="description">
-						<p>Executes when all items have been loaded.<br/>Default is <code>undefined</code>.</p>
+						<p>Executes when all items have been loaded.</p>
+						<p>Default is <code>undefined</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="onProgress" translate="no">.<a href="#onProgress">onProgress</a><span class="type-signature"> : function | undefined</span> </h3>
 					<div class="description">
-						<p>Executes when single items have been loaded.<br/>Default is <code>undefined</code>.</p>
+						<p>Executes when single items have been loaded.</p>
+						<p>Default is <code>undefined</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="onStart" translate="no">.<a href="#onStart">onStart</a><span class="type-signature"> : function | undefined</span> </h3>
 					<div class="description">
-						<p>Executes when an item starts loading.<br/>Default is <code>undefined</code>.</p>
+						<p>Executes when an item starts loading.</p>
+						<p>Default is <code>undefined</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -94,7 +110,7 @@ is supported in the browser.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loading manager.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="addHandler" translate="no">.<a href="#addHandler">addHandler</a><span class="signature">( regex : <span class="param-type">string</span>, loader : <span class="param-type">Loader</span> )</span><span class="type-signature"> : <a href="LoadingManager.html">LoadingManager</a></span> </h3>
+					<h3 class="name name-method" id="addHandler" translate="no">.<a href="#addHandler">addHandler</a><span class="signature">( regex : <span class="param-type">string</span>, loader : <span class="param-type"><a href="Loader.html">Loader</a></span> )</span><span class="type-signature"> : <a href="LoadingManager.html">LoadingManager</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Registers a loader with the given regular expression. Can be used to
@@ -107,12 +123,20 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>regex</code></td>
-									<td class="description last"><p>A regular expression.</p></td>
+									<td class="name">
+										<strong>regex</strong>
+									</td>
+									<td class="description last">
+										<p>A regular expression.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>loader</code></td>
-									<td class="description last"><p>A loader that should handle matched cases.</p></td>
+									<td class="name">
+										<strong>loader</strong>
+									</td>
+									<td class="description last">
+										<p>A loader that should handle matched cases.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -128,8 +152,12 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>file</code></td>
-									<td class="description last"><p>The file path.</p></td>
+									<td class="name">
+										<strong>file</strong>
+									</td>
+									<td class="description last">
+										<p>The file path.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -146,8 +174,12 @@ ended loading an item.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The URL of the loaded item.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The URL of the loaded item.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -161,8 +193,12 @@ encounters an error when loading an item.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The URL of the item that produces an error.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The URL of the item that produces an error.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -176,8 +212,12 @@ starts loading an item.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The URL to load.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The URL to load.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -190,8 +230,12 @@ starts loading an item.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>regex</code></td>
-									<td class="description last"><p>A regular expression.</p></td>
+									<td class="name">
+										<strong>regex</strong>
+									</td>
+									<td class="description last">
+										<p>A regular expression.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -208,8 +252,12 @@ resolved URL. If no URL modifier is set, returns the original URL.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The URL to load.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The URL to load.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -244,8 +292,12 @@ loader.load( 'fish.gltf', (gltf) => {
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>transform</code></td>
-									<td class="description last"><p>URL modifier callback. Called with an URL and must return a resolved URL.</p></td>
+									<td class="name">
+										<strong>transform</strong>
+									</td>
+									<td class="description last">
+										<p>URL modifier callback. Called with an URL and must return a resolved URL.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -255,7 +307,7 @@ loader.load( 'fish.gltf', (gltf) => {
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js" target="_blank" rel="noopener" translate="no">src/loaders/LoadingManager.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js" translate="no" target="_blank" rel="noopener">src/loaders/LoadingManager.js</a>
 				</p>
 			</article>
 		</section>

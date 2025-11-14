@@ -210,6 +210,7 @@ class GTAONode extends TempNode {
 		/**
 		 * Temporal direction that influences the rotation angle for each slice.
 		 *
+		 * @private
 		 * @type {UniformNode<float>}
 		 */
 		this._temporalDirection = uniform( 0 );

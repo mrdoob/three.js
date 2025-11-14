@@ -15,12 +15,12 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">ParametricFunctions</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">ParametricFunctions</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import * as ParametricFunctions from 'three/addons/geometries/ParametricFunctions.js';</code></pre>
 				<div class="container-overview">
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="~klein" translate="no">.<a href="#~klein">klein</a><span class="signature">( v : <span class="param-type">number</span>, u : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~klein" translate="no">.<a href="#~klein">klein</a><span class="signature">( v : <span class="param-type">number</span>, u : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>A parametric function representing the Klein bottle.</p>
@@ -28,21 +28,33 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>v</code></td>
-									<td class="description last"><p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="~mobius" translate="no">.<a href="#~mobius">mobius</a><span class="signature">( u : <span class="param-type">number</span>, t : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~mobius" translate="no">.<a href="#~mobius">mobius</a><span class="signature">( u : <span class="param-type">number</span>, t : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>A parametric function representing a flat mobius strip.</p>
@@ -50,21 +62,33 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="~mobius3d" translate="no">.<a href="#~mobius3d">mobius3d</a><span class="signature">( u : <span class="param-type">number</span>, t : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~mobius3d" translate="no">.<a href="#~mobius3d">mobius3d</a><span class="signature">( u : <span class="param-type">number</span>, t : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>A parametric function representing a volumetric mobius strip.</p>
@@ -72,21 +96,33 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>t</code></td>
-									<td class="description last"><p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>t</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="~plane" translate="no">.<a href="#~plane">plane</a><span class="signature">( u : <span class="param-type">number</span>, v : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~plane" translate="no">.<a href="#~plane">plane</a><span class="signature">( u : <span class="param-type">number</span>, v : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>A parametric function representing a flat plane.</p>
@@ -94,23 +130,35 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>u</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>v</code></td>
-									<td class="description last"><p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p></td>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The <code>v</code> coordinate on the surface in the range <code>[0,1]</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector that is used to store the method's result.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector that is used to store the method's result.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/ParametricFunctions.js" target="_blank" rel="noopener" translate="no">examples/jsm/geometries/ParametricFunctions.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/ParametricFunctions.js" translate="no" target="_blank" rel="noopener">examples/jsm/geometries/ParametricFunctions.js</a>
 				</p>
 			</article>
 		</section>

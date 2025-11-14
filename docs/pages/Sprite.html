@@ -27,7 +27,7 @@ scene.add( sprite );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="Sprite" translate="no">new <a href="#Sprite">Sprite</a><span class="signature">( material : <span class="param-type">SpriteMaterial | SpriteNodeMaterial</span> )</span> </h3>
+					<h3 class="name name-method" id="Sprite" translate="no">new <a href="#Sprite">Sprite</a><span class="signature">( material : <span class="param-type"><a href="SpriteMaterial.html">SpriteMaterial</a> | <a href="SpriteNodeMaterial.html">SpriteNodeMaterial</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new sprite.</p>
@@ -35,8 +35,12 @@ scene.add( sprite );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>material</code></td>
-									<td class="description last"><p>The sprite material.</p></td>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The sprite material.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -48,14 +52,16 @@ scene.add( sprite );
 					<div class="description">
 						<p>The sprite's anchor point, and the point around which the sprite rotates.
 A value of <code>(0.5, 0.5)</code> corresponds to the midpoint of the sprite. A value
-of <code>(0, 0)</code> corresponds to the lower left corner of the sprite.<br/>Default is <code>(0.5,0.5)</code>.</p>
+of <code>(0, 0)</code> corresponds to the lower left corner of the sprite.</p>
+						<p>Default is <code>(0.5,0.5)</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="count" translate="no">.<a href="#count">count</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The number of instances of this sprite.
-Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.<br/>Default is <code>1</code>.</p>
+Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -67,7 +73,8 @@ Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.<br/>Defa
 				<div class="member">
 					<h3 class="name" id="isSprite" translate="no">.<a href="#isSprite">isSprite</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -77,7 +84,7 @@ Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.<br/>Defa
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type">Raycaster</span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
+					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type"><a href="Raycaster.html">Raycaster</a></span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes intersection points between a casted ray and this sprite.</p>
@@ -85,12 +92,20 @@ Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.<br/>Defa
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>raycaster</code></td>
-									<td class="description last"><p>The raycaster.</p></td>
+									<td class="name">
+										<strong>raycaster</strong>
+									</td>
+									<td class="description last">
+										<p>The raycaster.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intersects</code></td>
-									<td class="description last"><p>The target array that holds the intersection points.</p></td>
+									<td class="name">
+										<strong>intersects</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the intersection points.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -100,7 +115,7 @@ Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.<br/>Defa
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/objects/Sprite.js" target="_blank" rel="noopener" translate="no">src/objects/Sprite.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/objects/Sprite.js" translate="no" target="_blank" rel="noopener">src/objects/Sprite.js</a>
 				</p>
 			</article>
 		</section>

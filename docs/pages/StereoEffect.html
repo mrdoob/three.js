@@ -18,11 +18,11 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="Stereo
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">StereoEffect</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">StereoEffect</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { StereoEffect } from 'three/addons/effects/StereoEffect.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="StereoEffect" translate="no">new <a href="#StereoEffect">StereoEffect</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span> )</span> </h3>
+					<h3 class="name name-method" id="StereoEffect" translate="no">new <a href="#StereoEffect">StereoEffect</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new stereo effect.</p>
@@ -30,15 +30,19 @@ When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="Stereo
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type">Object3D</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>When using this effect, this method should be called instead of the
@@ -47,12 +51,20 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene to render.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -65,8 +77,12 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>eyeSep</code></td>
-									<td class="description last"><p>The eye separation to set.</p></td>
+									<td class="name">
+										<strong>eyeSep</strong>
+									</td>
+									<td class="description last">
+										<p>The eye separation to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -79,19 +95,27 @@ default <a href="WebGLRenderer.html#render">WebGLRenderer#render</a>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the effect in logical pixels.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect in logical pixels.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the effect in logical pixels.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect in logical pixels.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/effects/StereoEffect.js" target="_blank" rel="noopener" translate="no">examples/jsm/effects/StereoEffect.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/effects/StereoEffect.js" translate="no" target="_blank" rel="noopener">examples/jsm/effects/StereoEffect.js</a>
 				</p>
 			</article>
 		</section>

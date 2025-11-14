@@ -19,8 +19,7 @@ import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter } from '../../../constants.js';
 import { warn, error } from '../../../utils.js';
 
-// GPUShaderStage is not defined in browsers not supporting WebGPU
-const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+import { GPUShaderStage } from '../utils/WebGPUConstants.js';
 
 const accessNames = {
 	[ NodeAccess.READ_ONLY ]: 'read',
@@ -35,9 +34,9 @@ const wrapNames = {
 };
 
 const gpuShaderStageLib = {
-	'vertex': GPUShaderStage ? GPUShaderStage.VERTEX : 1,
-	'fragment': GPUShaderStage ? GPUShaderStage.FRAGMENT : 2,
-	'compute': GPUShaderStage ? GPUShaderStage.COMPUTE : 4
+	'vertex': GPUShaderStage.VERTEX,
+	'fragment': GPUShaderStage.FRAGMENT,
+	'compute': GPUShaderStage.COMPUTE
 };
 
 const supports = {
@@ -286,7 +285,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateWrapFunction( texture ) {
 
-		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.isData3DTexture ? '3d' : '2d' }T`;
+		const functionName = `tsl_coord_${ wrapNames[ texture.wrapS ] }S_${ wrapNames[ texture.wrapT ] }_${ texture.is3DTexture || texture.isData3DTexture ? '3d' : '2d' }T`;
 
 		let nodeCode = wgslCodeCache[ functionName ];
 
@@ -295,7 +294,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const includes = [];
 
 			// For 3D textures, use vec3f; for texture arrays, keep vec2f since array index is separate
-			const coordType = texture.isData3DTexture ? 'vec3f' : 'vec2f';
+			const coordType = texture.is3DTexture || texture.isData3DTexture ? 'vec3f' : 'vec2f';
 			let code = `fn ${ functionName }( coord : ${ coordType } ) -> ${ coordType } {\n\n\treturn ${ coordType }(\n`;
 
 			const addWrapSnippet = ( wrap, axis ) => {
@@ -334,7 +333,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			addWrapSnippet( texture.wrapT, 'y' );
 
-			if ( texture.isData3DTexture ) {
+			if ( texture.is3DTexture || texture.isData3DTexture ) {
 
 				code += ',\n';
 				addWrapSnippet( texture.wrapR, 'z' );
@@ -392,7 +391,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
 			const isMultisampled = primarySamples > 1;
 
-			if ( texture.isData3DTexture ) {
+			if ( texture.is3DTexture || texture.isData3DTexture ) {
 
 				dimensionType = 'vec3<u32>';
 
@@ -418,7 +417,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			textureData.dimensionsSnippet[ levelSnippet ] = textureDimensionNode;
 
-			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
+			if ( texture.isArrayTexture || texture.isDataArrayTexture || texture.is3DTexture || texture.isData3DTexture ) {
 
 				textureData.arrayLayerCount = new VarNode(
 					new ExpressionNode(
@@ -488,7 +487,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		const wrapFunction = this.generateWrapFunction( texture );
 		const textureDimension = this.generateTextureDimension( texture, textureProperty, levelSnippet );
 
-		const vecType = texture.isData3DTexture ? 'vec3' : 'vec2';
+		const vecType = texture.is3DTexture || texture.isData3DTexture ? 'vec3' : 'vec2';
 
 		if ( offsetSnippet ) {
 
@@ -974,10 +973,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
-				const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
+				const sharedData = this.getSharedDataFromNode( node );
 
-				const buffer = new bufferClass( node, group );
-				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
+				let buffer = sharedData.buffer;
+
+				if ( buffer === undefined ) {
+
+					const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
+
+					buffer = new bufferClass( node, group );
+
+					sharedData.buffer = buffer;
+
+				}
+
+				buffer.setVisibility( buffer.getVisibility() | gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
 

@@ -32,16 +32,29 @@ than similar access operations on globally accessible storage buffers.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scope</code></td>
-									<td class="description last"><p>TODO.</p></td>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>TODO.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>bufferType</code></td>
-									<td class="description last"><p>The data type of a 'workgroup' scoped buffer element.</p></td>
+									<td class="name">
+										<strong>bufferType</strong>
+									</td>
+									<td class="description last">
+										<p>The data type of a 'workgroup' scoped buffer element.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>bufferCount</code></td>
-									<td class="description last"><p>The number of elements in the buffer.<br/>Default is <code>0</code>.</p></td>
+									<td class="name">
+										<strong>bufferCount</strong>
+									</td>
+									<td class="description last">
+										<p>The number of elements in the buffer.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -51,7 +64,8 @@ than similar access operations on globally accessible storage buffers.</p>
 				<div class="member">
 					<h3 class="name" id="bufferCount" translate="no">.<a href="#bufferCount">bufferCount</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The buffer count.<br/>Default is <code>0</code>.</p>
+						<p>The buffer count.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -69,13 +83,15 @@ than similar access operations on globally accessible storage buffers.</p>
 				<div class="member">
 					<h3 class="name" id="isWorkgroupInfoNode" translate="no">.<a href="#isWorkgroupInfoNode">isWorkgroupInfoNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The name of the workgroup scoped buffer.<br/>Default is <code>''</code>.</p>
+						<p>The name of the workgroup scoped buffer.</p>
+						<p>Default is <code>''</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#name">Node#name</a></dt>
@@ -88,7 +104,7 @@ than similar access operations on globally accessible storage buffers.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="element" translate="no">.<a href="#element">element</a><span class="signature">( indexNode : <span class="param-type">IndexNode</span> )</span><span class="type-signature"> : <a href="WorkgroupInfoElementNode.html">WorkgroupInfoElementNode</a></span> </h3>
+					<h3 class="name name-method" id="element" translate="no">.<a href="#element">element</a><span class="signature">( indexNode : <span class="param-type"><a href="IndexNode.html">IndexNode</a></span> )</span><span class="type-signature"> : <a href="WorkgroupInfoElementNode.html">WorkgroupInfoElementNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method can be used to access elements via an index node.</p>
@@ -96,8 +112,12 @@ than similar access operations on globally accessible storage buffers.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>indexNode</code></td>
-									<td class="description last"><p>indexNode.</p></td>
+									<td class="name">
+										<strong>indexNode</strong>
+									</td>
+									<td class="description last">
+										<p>indexNode.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -117,7 +137,7 @@ than similar access operations on globally accessible storage buffers.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The element type.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Overwrites the default implementation since the input type
@@ -126,8 +146,12 @@ is inferred from the scope.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -143,8 +167,12 @@ is inferred from the scope.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name to set.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -163,8 +191,12 @@ is inferred from the scope.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name to set.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -180,8 +212,12 @@ is inferred from the scope.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scope</code></td>
-									<td class="description last"><p>The scope to set.</p></td>
+									<td class="name">
+										<strong>scope</strong>
+									</td>
+									<td class="description last">
+										<p>The scope to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -191,7 +227,7 @@ is inferred from the scope.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/gpgpu/WorkgroupInfoNode.js" target="_blank" rel="noopener" translate="no">src/nodes/gpgpu/WorkgroupInfoNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/gpgpu/WorkgroupInfoNode.js" translate="no" target="_blank" rel="noopener">src/nodes/gpgpu/WorkgroupInfoNode.js</a>
 				</p>
 			</article>
 		</section>

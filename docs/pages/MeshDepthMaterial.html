@@ -28,12 +28,16 @@ near and far plane. White is nearest, black is farthest.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>parameters</code></td>
-									<td class="description last"><p>An object with one or more properties
+									<td class="name">
+										<strong>parameters</strong>
+									</td>
+									<td class="description last">
+										<p>An object with one or more properties
 defining the material's appearance. Any property of the material
 (including any property from inherited materials) can be passed
 in here. Color values can be passed any type of value accepted
-by <a href="Color.html#set">Color#set</a>.</p></td>
+by <a href="Color.html#set">Color#set</a>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -49,13 +53,15 @@ surface (black: fully transparent; white: fully opaque).</p>
 exists. For RGB and RGBA textures, the renderer will use the green channel
 when sampling this texture due to the extra bit of precision provided for
 green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
-luminance/alpha textures will also still work as expected.<br/>Default is <code>null</code>.</p>
+luminance/alpha textures will also still work as expected.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="depthPacking" translate="no">.<a href="#depthPacking">depthPacking</a><span class="type-signature"> : <a href="global.html#BasicDepthPacking">BasicDepthPacking</a> | <a href="global.html#RGBADepthPacking">RGBADepthPacking</a> | <a href="global.html#RGBDepthPacking">RGBDepthPacking</a> | <a href="global.html#RGDepthPacking">RGDepthPacking</a></span> </h3>
 					<div class="description">
-						<p>Type for depth packing.<br/>Default is <code>BasicDepthPacking</code>.</p>
+						<p>Type for depth packing.</p>
+						<p>Default is <code>BasicDepthPacking</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -63,7 +69,8 @@ luminance/alpha textures will also still work as expected.<br/>Default is <code>
 					<div class="description">
 						<p>The offset of the displacement map's values on the mesh's vertices.
 The bias is added to the scaled sample of the displacement map.
-Without a displacement map set, this value is not applied.<br/>Default is <code>0</code>.</p>
+Without a displacement map set, this value is not applied.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -74,7 +81,8 @@ other maps which only affect the light and shade of the material the
 displaced vertices can cast shadows, block other objects, and otherwise
 act as real geometry. The displacement texture is an image where the value
 of each pixel (white being the highest) is mapped against, and
-repositions, the vertices of the mesh.<br/>Default is <code>null</code>.</p>
+repositions, the vertices of the mesh.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -82,26 +90,30 @@ repositions, the vertices of the mesh.<br/>Default is <code>null</code>.</p>
 					<div class="description">
 						<p>How much the displacement map affects the mesh (where black is no
 displacement, and white is maximum displacement). Without a displacement
-map set, this value is not applied.<br/>Default is <code>0</code>.</p>
+map set, this value is not applied.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isMeshDepthMaterial" translate="no">.<a href="#isMeshDepthMaterial">isMeshDepthMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="map" translate="no">.<a href="#map">map</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>The color map. May optionally include an alpha channel, typically combined
-with <a href="Material.html#transparent">Material#transparent</a> or <a href="Material.html#alphaTest">Material#alphaTest</a>.<br/>Default is <code>null</code>.</p>
+with <a href="Material.html#transparent">Material#transparent</a> or <a href="Material.html#alphaTest">Material#alphaTest</a>.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="wireframe" translate="no">.<a href="#wireframe">wireframe</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Renders the geometry as a wireframe.<br/>Default is <code>false</code>.</p>
+						<p>Renders the geometry as a wireframe.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -109,12 +121,13 @@ with <a href="Material.html#transparent">Material#transparent</a> or <a href="Ma
 					<div class="description">
 						<p>Controls the thickness of the wireframe.</p>
 <p>WebGL and WebGPU ignore this property and always render
-1 pixel wide lines.<br/>Default is <code>1</code>.</p>
+1 pixel wide lines.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/MeshDepthMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/MeshDepthMaterial.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/MeshDepthMaterial.js" translate="no" target="_blank" rel="noopener">src/materials/MeshDepthMaterial.js</a>
 				</p>
 			</article>
 		</section>

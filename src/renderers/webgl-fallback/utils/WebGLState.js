@@ -85,7 +85,6 @@ class WebGLState {
 		this.currentBoundTextures = {};
 		this.currentBoundBufferBases = {};
 
-
 		this._init();
 
 	}
@@ -266,6 +265,22 @@ class WebGLState {
 			gl.lineWidth( width );
 
 			this.currentLineWidth = width;
+
+		}
+
+	}
+
+	setMRTBlending( textures ) {
+
+		const gl = this.gl;
+		const drawBuffersIndexedExt = this.backend.drawBuffersIndexedExt;
+
+		if ( ! drawBuffersIndexedExt ) return;
+
+		for ( let i = 1; i < textures.length; i ++ ) {
+
+			// use opaque blending for additional render targets
+			drawBuffersIndexedExt.blendFuncSeparateiOES( i, gl.ONE, gl.ZERO, gl.ONE, gl.ZERO );
 
 		}
 

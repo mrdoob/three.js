@@ -14,7 +14,7 @@
 		<section>
 			<header>
 				<div class="class-description"><p>A loader for the glTF 2.0 format.</p>
-<p>[glTF](https://www.khronos.org/gltf/} (GL Transmission Format) is an <a href="https://github.com/KhronosGroup/glTF/tree/main/specification/2.0)">open format specification</a> whenever possible. Be advised that image bitmaps are not
+<p>[glTF](https://www.khronos.org/gltf/} (GL Transmission Format) is an <a href="https://github.com/KhronosGroup/glTF/tree/main/specification/2.0)" target="_blank" rel="noopener">open format specification</a> whenever possible. Be advised that image bitmaps are not
 automatically GC-collected when they are no longer referenced, and they require special handling during
 the disposal process.</p>
 <p><code>GLTFLoader</code> supports the following glTF 2.0 extensions:</p>
@@ -38,10 +38,10 @@ the disposal process.</p>
 </ul>
 <p>The following glTF 2.0 extension is supported by an external user plugin:</p>
 <ul>
-<li><a href="https://github.com/takahirox/three-gltf-extensions">KHR_materials_variants</a></li>
-<li><a href="https://github.com/takahirox/three-gltf-extensions">MSFT_texture_dds</a></li>
-<li><a href="https://github.com/needle-tools/three-animation-pointer">KHR_animation_pointer</a></li>
-<li><a href="https://github.com/needle-tools/gltf-progressive">NEEDLE_progressive</a></li>
+<li><a href="https://github.com/takahirox/three-gltf-extensions" target="_blank" rel="noopener">KHR_materials_variants</a></li>
+<li><a href="https://github.com/takahirox/three-gltf-extensions" target="_blank" rel="noopener">MSFT_texture_dds</a></li>
+<li><a href="https://github.com/needle-tools/three-animation-pointer" target="_blank" rel="noopener">KHR_animation_pointer</a></li>
+<li><a href="https://github.com/needle-tools/gltf-progressive" target="_blank" rel="noopener">NEEDLE_progressive</a></li>
 </ul></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const loader = new GLTFLoader();
@@ -55,11 +55,11 @@ scene.add( gltf.scene );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">GLTFLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">GLTFLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="GLTFLoader" translate="no">new <a href="#GLTFLoader">GLTFLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="GLTFLoader" translate="no">new <a href="#GLTFLoader">GLTFLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new glTF loader.</p>
@@ -67,15 +67,19 @@ scene.add( gltf.scene );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded glTF asset
@@ -84,20 +88,36 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -105,7 +125,7 @@ to the <code>onLoad()</code> callback.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( data : <span class="param-type">string | ArrayBuffer</span>, path : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( data : <span class="param-type">string | ArrayBuffer</span>, path : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the given FBX data and returns the resulting group.</p>
@@ -113,20 +133,36 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>The raw glTF data.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The raw glTF data.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>path</code></td>
-									<td class="description last"><p>The URL base path.</p></td>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The URL base path.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -142,12 +178,20 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>The raw glTF data.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>The raw glTF data.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>path</code></td>
-									<td class="description last"><p>The URL base path.</p></td>
+									<td class="name">
+										<strong>path</strong>
+									</td>
+									<td class="description last">
+										<p>The URL base path.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -165,8 +209,12 @@ to the loader.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>callback</code></td>
-									<td class="description last"><p>The callback function to register.</p></td>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>The callback function to register.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -174,7 +222,7 @@ to the loader.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setDRACOLoader" translate="no">.<a href="#setDRACOLoader">setDRACOLoader</a><span class="signature">( dracoLoader : <span class="param-type">DRACOLoader</span> )</span><span class="type-signature"> : <a href="GLTFLoader.html">GLTFLoader</a></span> </h3>
+					<h3 class="name name-method" id="setDRACOLoader" translate="no">.<a href="#setDRACOLoader">setDRACOLoader</a><span class="signature">( dracoLoader : <span class="param-type"><a href="DRACOLoader.html">DRACOLoader</a></span> )</span><span class="type-signature"> : <a href="GLTFLoader.html">GLTFLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given Draco loader to this loader. Required for decoding assets
@@ -183,8 +231,12 @@ compressed with the <code>KHR_draco_mesh_compression</code> extension.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>dracoLoader</code></td>
-									<td class="description last"><p>The Draco loader to set.</p></td>
+									<td class="name">
+										<strong>dracoLoader</strong>
+									</td>
+									<td class="description last">
+										<p>The Draco loader to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -192,7 +244,7 @@ compressed with the <code>KHR_draco_mesh_compression</code> extension.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setKTX2Loader" translate="no">.<a href="#setKTX2Loader">setKTX2Loader</a><span class="signature">( ktx2Loader : <span class="param-type">KTX2Loader</span> )</span><span class="type-signature"> : <a href="GLTFLoader.html">GLTFLoader</a></span> </h3>
+					<h3 class="name name-method" id="setKTX2Loader" translate="no">.<a href="#setKTX2Loader">setKTX2Loader</a><span class="signature">( ktx2Loader : <span class="param-type"><a href="KTX2Loader.html">KTX2Loader</a></span> )</span><span class="type-signature"> : <a href="GLTFLoader.html">GLTFLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given KTX2 loader to this loader. Required for loading KTX2
@@ -201,8 +253,12 @@ compressed textures.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>ktx2Loader</code></td>
-									<td class="description last"><p>The KTX2 loader to set.</p></td>
+									<td class="name">
+										<strong>ktx2Loader</strong>
+									</td>
+									<td class="description last">
+										<p>The KTX2 loader to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -219,8 +275,12 @@ compressed with the <code>EXT_meshopt_compression</code> extension.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>meshoptDecoder</code></td>
-									<td class="description last"><p>The meshopt decoder to set.</p></td>
+									<td class="name">
+										<strong>meshoptDecoder</strong>
+									</td>
+									<td class="description last">
+										<p>The meshopt decoder to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -236,8 +296,12 @@ compressed with the <code>EXT_meshopt_compression</code> extension.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>callback</code></td>
-									<td class="description last"><p>The callback function to unregister.</p></td>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>The callback function to unregister.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -251,71 +315,84 @@ compressed with the <code>EXT_meshopt_compression</code> extension.</p>
 					<div class="description">
 						<p>Loader result of <code>GLTFLoader</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>animations</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>animations</strong>
+						<br>
 <span class="param-type">Array.&lt;<a href="AnimationClip.html">AnimationClip</a>></span>
+				</td>
+			<td class="description last">
+				<p>An array of animation clips.</p>
 			</td>
-			<td class="description last"><p>An array of animation clips.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>asset</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>asset</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>Meta data about the loaded asset.</p>
 			</td>
-			<td class="description last"><p>Meta data about the loaded asset.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>cameras</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>cameras</strong>
+						<br>
 <span class="param-type">Array.&lt;<a href="Camera.html">Camera</a>></span>
+				</td>
+			<td class="description last">
+				<p>An array of cameras.</p>
 			</td>
-			<td class="description last"><p>An array of cameras.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>parser</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>parser</strong>
+						<br>
 <span class="param-type">GLTFParser</span>
+				</td>
+			<td class="description last">
+				<p>A reference to the internal parser.</p>
 			</td>
-			<td class="description last"><p>A reference to the internal parser.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>scene</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>scene</strong>
+						<br>
 <span class="param-type"><a href="Group.html">Group</a></span>
+				</td>
+			<td class="description last">
+				<p>The default scene.</p>
 			</td>
-			<td class="description last"><p>The default scene.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>scenes</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>scenes</strong>
+						<br>
 <span class="param-type">Array.&lt;<a href="Group.html">Group</a>></span>
+				</td>
+			<td class="description last">
+				<p>glTF assets might define multiple scenes.</p>
 			</td>
-			<td class="description last"><p>glTF assets might define multiple scenes.</p></td>
 		</tr>
 		<tr>
-				<td class="name"><code>userData</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>userData</strong>
+						<br>
 <span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>Additional data.</p>
 			</td>
-			<td class="description last"><p>Additional data.</p></td>
 		</tr>
 	</tbody>
 </table>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/GLTFLoader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFLoader.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/GLTFLoader.js</a>
 				</p>
 			</article>
 		</section>

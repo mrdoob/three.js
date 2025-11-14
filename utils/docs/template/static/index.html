@@ -188,6 +188,12 @@
 
 			const selectedPage = window.location.hash.substring( 1 );
 
+			if ( selectedPage === '' ) {
+
+				panel.classList.add( 'open' );
+
+			}
+
 			const links = navigation.querySelectorAll( 'a' );
 
 			links.forEach( link => {
@@ -315,7 +321,9 @@
 				}
 
 				const regExp = new RegExp( escapeRegExp( v ), 'gi' );
-				const highlightRegExp = new RegExp( v.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ), 'gi' );
+				// Create highlight regex that matches any of the search words
+				const words = v.split( ' ' ).map( word => word.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ) ).join( '|' );
+				const highlightRegExp = new RegExp( words, 'gi' );
 
 				// Search through all categories
 				const results = [];
@@ -324,7 +332,9 @@
 					const items = searchData[ category ];
 					for ( const item of items ) {
 
-						if ( item.title.match( regExp ) ) {
+						// Match against combined category and title for multi-word searches
+						const searchText = category + ' ' + item.title;
+						if ( searchText.match( regExp ) ) {
 
 							results.push( { ...item, category } );
 
@@ -414,7 +424,8 @@
 
 						if ( ! byCategory[ category ] ) continue;
 
-						html += `<h2>${category}</h2>`;
+						const highlightedCategory = highlightMatch( category, highlightRegExp );
+						html += `<h2>${highlightedCategory}</h2>`;
 
 						for ( const className in byCategory[ category ] ) {
 

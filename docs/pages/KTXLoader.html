@@ -16,8 +16,8 @@
 				<div class="class-description"><p>A loader for the KTX texture compression format.</p>
 <p>References:</p>
 <ul>
-<li><a href="https://www.khronos.org/opengles/sdk/tools/KTX/">The KTX File Format and Tools</a></li>
-<li><a href="https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts">Babylon.JS khronosTextureContainer.ts</a></li>
+<li><a href="https://www.khronos.org/opengles/sdk/tools/KTX/" target="_blank" rel="noopener">The KTX File Format and Tools</a></li>
+<li><a href="https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts" target="_blank" rel="noopener">Babylon.JS khronosTextureContainer.ts</a></li>
 </ul></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const loader = new KTXLoader();
@@ -27,11 +27,11 @@ map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">KTXLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">KTXLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { KTXLoader } from 'three/addons/loaders/KTXLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="KTXLoader" translate="no">new <a href="#KTXLoader">KTXLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="KTXLoader" translate="no">new <a href="#KTXLoader">KTXLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new KTX loader.</p>
@@ -39,8 +39,12 @@ map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -55,12 +59,20 @@ map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>buffer</code></td>
-									<td class="description last"><p>The raw texture data.</p></td>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw texture data.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>loadMipmaps</code></td>
-									<td class="description last"><p>Whether to load mipmaps or not.</p></td>
+									<td class="name">
+										<strong>loadMipmaps</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to load mipmaps or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -73,7 +85,7 @@ map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/KTXLoader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/KTXLoader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/KTXLoader.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/KTXLoader.js</a>
 				</p>
 			</article>
 		</section>

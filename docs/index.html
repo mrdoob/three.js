@@ -293,6 +293,7 @@
 						<li><a href="BasicLightingModel.html">BasicLightingModel</a></li>
 						<li><a href="BatchNode.html">BatchNode</a></li>
 						<li><a href="BitcastNode.html">BitcastNode</a></li>
+						<li><a href="BitcountNode.html">BitcountNode</a></li>
 						<li><a href="BufferAttributeNode.html">BufferAttributeNode</a></li>
 						<li><a href="BufferNode.html">BufferNode</a></li>
 						<li><a href="BuiltinNode.html">BuiltinNode</a></li>
@@ -608,6 +609,10 @@
 						<li><a href="VertexNormalsHelper.html">VertexNormalsHelper</a></li>
 						<li><a href="VertexTangentsHelper.html">VertexTangentsHelper</a></li>
 						<li><a href="ViewHelper.html">ViewHelper</a></li>
+					</ul>
+					<h3>Inspector</h3>
+					<ul>
+						<li><a href="Tab.html">Tab</a></li>
 					</ul>
 					<h3>Interactive</h3>
 					<ul>
@@ -1057,6 +1062,9 @@
 						<li><a href="TSL.html#convertColorSpace">convertColorSpace</a></li>
 						<li><a href="TSL.html#convertToTexture">convertToTexture</a></li>
 						<li><a href="TSL.html#cos">cos</a></li>
+						<li><a href="TSL.html#countLeadingZeros">countLeadingZeros</a></li>
+						<li><a href="TSL.html#countOneBits">countOneBits</a></li>
+						<li><a href="TSL.html#countTrailingZeros">countTrailingZeros</a></li>
 						<li><a href="TSL.html#createVar">createVar</a></li>
 						<li><a href="TSL.html#cross">cross</a></li>
 						<li><a href="TSL.html#cubeMapNode">cubeMapNode</a></li>
@@ -1079,6 +1087,7 @@
 						<li><a href="TSL.html#determinant">determinant</a></li>
 						<li><a href="TSL.html#difference">difference</a></li>
 						<li><a href="TSL.html#diffuseColor">diffuseColor</a></li>
+						<li><a href="TSL.html#diffuseContribution">diffuseContribution</a></li>
 						<li><a href="TSL.html#directionToColor">directionToColor</a></li>
 						<li><a href="TSL.html#directionToFaceDirection">directionToFaceDirection</a></li>
 						<li><a href="TSL.html#dispersion">dispersion</a></li>
@@ -1365,6 +1374,7 @@
 						<li><a href="TSL.html#smoothstepElement">smoothstepElement</a></li>
 						<li><a href="TSL.html#sobel">sobel</a></li>
 						<li><a href="TSL.html#specularColor">specularColor</a></li>
+						<li><a href="TSL.html#specularColorBlended">specularColorBlended</a></li>
 						<li><a href="TSL.html#specularF90">specularF90</a></li>
 						<li><a href="TSL.html#spherizeUV">spherizeUV</a></li>
 						<li><a href="TSL.html#spritesheetUV">spritesheetUV</a></li>
@@ -1416,6 +1426,8 @@
 						<li><a href="TSL.html#tangentWorld">tangentWorld</a></li>
 						<li><a href="TSL.html#texture">texture</a></li>
 						<li><a href="TSL.html#texture3D">texture3D</a></li>
+						<li><a href="TSL.html#texture3DLevel">texture3DLevel</a></li>
+						<li><a href="TSL.html#texture3DLoad">texture3DLoad</a></li>
 						<li><a href="TSL.html#textureBarrier">textureBarrier</a></li>
 						<li><a href="TSL.html#textureBase">textureBase</a></li>
 						<li><a href="TSL.html#textureBicubic">textureBicubic</a></li>
@@ -1688,8 +1700,6 @@
 						<li><a href="global.html#UnsignedShort5551Type">UnsignedShort5551Type</a></li>
 						<li><a href="global.html#UnsignedShortType">UnsignedShortType</a></li>
 						<li><a href="global.html#VK_FORMAT_MAP">VK_FORMAT_MAP</a></li>
-						<li><a href="global.html#VSMPassHorizontal">VSMPassHorizontal</a></li>
-						<li><a href="global.html#VSMPassVertical">VSMPassVertical</a></li>
 						<li><a href="global.html#VSMShadowFilter">VSMShadowFilter</a></li>
 						<li><a href="global.html#VSMShadowMap">VSMShadowMap</a></li>
 						<li><a href="global.html#WebGLCoordinateSystem">WebGLCoordinateSystem</a></li>
@@ -1742,6 +1752,7 @@
 						<li><a href="global.html#seededRandom">seededRandom</a></li>
 						<li><a href="global.html#setProjectionFromUnion">setProjectionFromUnion</a></li>
 						<li><a href="global.html#setQuaternionFromProperEuler">setQuaternionFromProperEuler</a></li>
+						<li><a href="global.html#shadowRenderObjectFunction">shadowRenderObjectFunction</a></li>
 						<li><a href="global.html#smootherstep">smootherstep</a></li>
 						<li><a href="global.html#sortedArray">sortedArray</a></li>
 						<li><a href="global.html#subclip">subclip</a></li>
@@ -1902,6 +1913,12 @@
 
 			const selectedPage = window.location.hash.substring( 1 );
 
+			if ( selectedPage === '' ) {
+
+				panel.classList.add( 'open' );
+
+			}
+
 			const links = navigation.querySelectorAll( 'a' );
 
 			links.forEach( link => {
@@ -2029,7 +2046,9 @@
 				}
 
 				const regExp = new RegExp( escapeRegExp( v ), 'gi' );
-				const highlightRegExp = new RegExp( v.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ), 'gi' );
+				// Create highlight regex that matches any of the search words
+				const words = v.split( ' ' ).map( word => word.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ) ).join( '|' );
+				const highlightRegExp = new RegExp( words, 'gi' );
 
 				// Search through all categories
 				const results = [];
@@ -2038,7 +2057,9 @@
 					const items = searchData[ category ];
 					for ( const item of items ) {
 
-						if ( item.title.match( regExp ) ) {
+						// Match against combined category and title for multi-word searches
+						const searchText = category + ' ' + item.title;
+						if ( searchText.match( regExp ) ) {
 
 							results.push( { ...item, category } );
 
@@ -2128,7 +2149,8 @@
 
 						if ( ! byCategory[ category ] ) continue;
 
-						html += `<h2>${category}</h2>`;
+						const highlightedCategory = highlightMatch( category, highlightRegExp );
+						html += `<h2>${highlightedCategory}</h2>`;
 
 						for ( const className in byCategory[ category ] ) {
 

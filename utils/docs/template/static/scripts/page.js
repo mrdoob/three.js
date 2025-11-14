@@ -1,3 +1,21 @@
+if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
+
+	// navigates to docs home if direct access, e.g.
+	//   https://threejs.org/docs/pages/BoxGeometry.html
+	// ->https://threejs.org/docs/#BoxGeometry
+
+	const url = new URL( window.location.href );
+
+	// hash route, e.g. #BoxGeometry
+	url.hash = url.pathname.replace( /\/docs\/pages\/(.*?)(?:\.html)?$/, '$1' );
+
+	// docs home, e.g. https://threejs.org/docs/
+	url.pathname = url.pathname.replace( /(\/docs\/).*$/, '$1' );
+
+	window.location.replace( url );
+
+}
+
 // Initialize Highlight.js for syntax highlighting
 if ( typeof hljs !== 'undefined' ) {
 
@@ -30,9 +48,15 @@ if ( typeof hljs !== 'undefined' ) {
 
 	document.addEventListener( 'click', function ( event ) {
 
-		const target = event.target.closest( 'a[href^="#"]' );
+		const target = event.target.closest( 'a' );
 
 		if ( ! target || ! target.hash ) return;
+
+		// Check if it's a same-page link (either starting with # or pointing to current page)
+		const href = target.getAttribute( 'href' );
+		const isSamePageLink = href.startsWith( '#' ) || ( target.hostname === window.location.hostname && target.pathname === window.location.pathname );
+
+		if ( ! isSamePageLink ) return;
 
 		const hash = target.hash.substring( 1 );
 		const newHash = ( hash !== className ) ? `#${className}.${hash}` : `#${hash}`;

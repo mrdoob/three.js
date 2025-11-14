@@ -18,7 +18,7 @@ and was previously used by the legacy <code>CanvasRenderer</code>.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">Projector</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">Projector</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { Projector } from 'three/addons/renderers/Projector.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -30,7 +30,7 @@ and was previously used by the legacy <code>CanvasRenderer</code>.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="projectScene" translate="no">.<a href="#projectScene">projectScene</a><span class="signature">( scene : <span class="param-type">Object3D</span>, camera : <span class="param-type">Camera</span>, sortObjects : <span class="param-type">boolean</span>, sortElements : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id="projectScene" translate="no">.<a href="#projectScene">projectScene</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, sortObjects : <span class="param-type">boolean</span>, sortElements : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Projects the given scene in 3D space into a 2D representation. The result
@@ -39,20 +39,36 @@ is an object with renderable items.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>A scene or any other type of 3D object.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A scene or any other type of 3D object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>sortObjects</code></td>
-									<td class="description last"><p>Whether to sort objects or not.</p></td>
+									<td class="name">
+										<strong>sortObjects</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sort objects or not.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>sortElements</code></td>
-									<td class="description last"><p>Whether to sort elements (faces, lines and sprites) or not.</p></td>
+									<td class="name">
+										<strong>sortElements</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sort elements (faces, lines and sprites) or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,7 +78,7 @@ is an object with renderable items.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/Projector.js" target="_blank" rel="noopener" translate="no">examples/jsm/renderers/Projector.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/Projector.js" translate="no" target="_blank" rel="noopener">examples/jsm/renderers/Projector.js</a>
 				</p>
 			</article>
 		</section>

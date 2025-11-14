@@ -35,7 +35,7 @@ renderer.computeAsync( computeNode );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="StorageTextureNode" translate="no">new <a href="#StorageTextureNode">StorageTextureNode</a><span class="signature">( value : <span class="param-type">StorageTexture</span>, uvNode : <span class="param-type">Node.&lt;(vec2|vec3)></span>, storeNode : <span class="param-type">Node</span> )</span> </h3>
+					<h3 class="name name-method" id="StorageTextureNode" translate="no">new <a href="#StorageTextureNode">StorageTextureNode</a><span class="signature">( value : <span class="param-type"><a href="StorageTexture.html">StorageTexture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;(vec2|vec3)></span>, storeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new storage texture node.</p>
@@ -43,16 +43,29 @@ renderer.computeAsync( computeNode );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The storage texture.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The storage texture.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>uvNode</code></td>
-									<td class="description last"><p>The uv node.</p></td>
+									<td class="name">
+										<strong>uvNode</strong>
+									</td>
+									<td class="description last">
+										<p>The uv node.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>storeNode</code></td>
-									<td class="description last"><p>The value node that should be stored in the texture.<br/>Default is <code>null</code>.</p></td>
+									<td class="name">
+										<strong>storeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The value node that should be stored in the texture.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,29 +75,33 @@ renderer.computeAsync( computeNode );
 				<div class="member">
 					<h3 class="name" id="access" translate="no">.<a href="#access">access</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The access type of the texture node.<br/>Default is <code>'writeOnly'</code>.</p>
+						<p>The access type of the texture node.</p>
+						<p>Default is <code>'writeOnly'</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isStorageTextureNode" translate="no">.<a href="#isStorageTextureNode">isStorageTextureNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="mipLevel" translate="no">.<a href="#mipLevel">mipLevel</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The mip level to write to for storage textures.<br/>Default is <code>0</code>.</p>
+						<p>The mip level to write to for storage textures.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="storeNode" translate="no">.<a href="#storeNode">storeNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="description">
-						<p>The value node that should be stored in the texture.<br/>Default is <code>null</code>.</p>
+						<p>The value node that should be stored in the texture.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="generate" translate="no">.<a href="#generate">generate</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, output : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the code snippet of the storage node. If no <code>storeNode</code>
@@ -93,12 +110,20 @@ is defined, the texture node is generated as normal texture.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>output</code></td>
-									<td class="description last"><p>The current output.</p></td>
+									<td class="name">
+										<strong>output</strong>
+									</td>
+									<td class="description last">
+										<p>The current output.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -109,7 +134,7 @@ is defined, the texture node is generated as normal texture.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The generated code snippet.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="generateStore" translate="no">.<a href="#generateStore">generateStore</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> </h3>
+					<h3 class="name name-method" id="generateStore" translate="no">.<a href="#generateStore">generateStore</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Generates the code snippet of the storage texture node.</p>
@@ -117,13 +142,17 @@ is defined, the texture node is generated as normal texture.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : string</span> </h3>
+					<h3 class="name name-method" id="getInputType" translate="no">.<a href="#getInputType">getInputType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Overwrites the default implementation to return a fixed value <code>'storageTexture'</code>.</p>
@@ -131,8 +160,12 @@ is defined, the texture node is generated as normal texture.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -151,8 +184,12 @@ is defined, the texture node is generated as normal texture.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The node access.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The node access.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -168,8 +205,12 @@ is defined, the texture node is generated as normal texture.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>level</code></td>
-									<td class="description last"><p>The mip level.</p></td>
+									<td class="name">
+										<strong>level</strong>
+									</td>
+									<td class="description last">
+										<p>The mip level.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -206,7 +247,7 @@ is defined, the texture node is generated as normal texture.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/StorageTextureNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/StorageTextureNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/StorageTextureNode.js" translate="no" target="_blank" rel="noopener">src/nodes/accessors/StorageTextureNode.js</a>
 				</p>
 			</article>
 		</section>

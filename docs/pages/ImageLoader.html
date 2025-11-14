@@ -16,7 +16,7 @@
 				<div class="class-description"><p>A loader for loading images. The class loads images with the HTML <code>Image</code> API.</p>
 <p>Please note that <code>ImageLoader</code> has dropped support for progress
 events in <code>r84</code>. For an <code>ImageLoader</code> that supports progress events, see
-<a href="https://github.com/mrdoob/three.js/issues/10439#issuecomment-275785639">this thread</a>.</p></div>
+<a href="https://github.com/mrdoob/three.js/issues/10439#issuecomment-275785639" target="_blank" rel="noopener">this thread</a>.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const loader = new THREE.ImageLoader();
 const image = await loader.loadAsync( 'image.png' );
@@ -25,7 +25,7 @@ const image = await loader.loadAsync( 'image.png' );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ImageLoader" translate="no">new <a href="#ImageLoader">ImageLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="ImageLoader" translate="no">new <a href="#ImageLoader">ImageLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new image loader.</p>
@@ -33,15 +33,19 @@ const image = await loader.loadAsync( 'image.png' );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span><span class="type-signature"> : Image</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : Image</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded image
@@ -52,20 +56,36 @@ may pop up in your scene once the respective loading process is finished.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Unsupported in this loader.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Unsupported in this loader.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -78,7 +98,7 @@ may pop up in your scene once the respective loading process is finished.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/ImageLoader.js" target="_blank" rel="noopener" translate="no">src/loaders/ImageLoader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/ImageLoader.js" translate="no" target="_blank" rel="noopener">src/loaders/ImageLoader.js</a>
 				</p>
 			</article>
 		</section>

@@ -24,7 +24,7 @@ const data = exporter.parse( mesh, { binary: true } );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">STLExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">STLExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { STLExporter } from 'three/addons/exporters/STLExporter.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -33,7 +33,7 @@ const data = exporter.parse( mesh, { binary: true } );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( scene : <span class="param-type">Object3D</span>, options : <span class="param-type">STLExporter~Options</span> )</span><span class="type-signature"> : string | ArrayBuffer</span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, options : <span class="param-type"><a href="STLExporter.html#~Options">STLExporter~Options</a></span> )</span><span class="type-signature"> : string | ArrayBuffer</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Parses the given 3D object and generates the STL output.</p>
@@ -42,12 +42,20 @@ const data = exporter.parse( mesh, { binary: true } );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>A scene, mesh or any other 3D object containing meshes to encode.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>A scene, mesh or any other 3D object containing meshes to encode.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The export options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The export options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -61,37 +69,25 @@ const data = exporter.parse( mesh, { binary: true } );
 					<div class="description">
 						<p>Export options of <code>STLExporter</code>.</p>
 					</div>
-						<h5 class="subsection-title">Properties:</h5>
 <table class="props">
-	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Attributes</th>
-		<th>Default</th>
-		<th class="last">Description</th>
-	</tr>
-	</thead>
 	<tbody>
 		<tr>
-				<td class="name"><code>binary</code></td>
-			<td class="type">
+				<td class="name">
+					<strong>binary</strong>
+						<br>
 <span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to export in binary format or ASCII.</p>
+						<p>Default is <code>false</code>.</p>
 			</td>
-				<td class="attributes">
-					&lt;optional><br>
-				</td>
-				<td class="default">
-					false
-				</td>
-			<td class="description last"><p>Whether to export in binary format or ASCII.</p></td>
 		</tr>
 	</tbody>
 </table>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/STLExporter.js" target="_blank" rel="noopener" translate="no">examples/jsm/exporters/STLExporter.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/STLExporter.js" translate="no" target="_blank" rel="noopener">examples/jsm/exporters/STLExporter.js</a>
 				</p>
 			</article>
 		</section>

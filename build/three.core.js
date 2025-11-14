@@ -3,7 +3,7 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '181dev';
+const REVISION = '182dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -11989,43 +11989,18 @@ class Matrix4 {
 		const n31 = te[ 2 ], n32 = te[ 6 ], n33 = te[ 10 ], n34 = te[ 14 ];
 		const n41 = te[ 3 ], n42 = te[ 7 ], n43 = te[ 11 ], n44 = te[ 15 ];
 
-		//TODO: make this more efficient
+		const t11 = n23 * n34 - n24 * n33;
+		const t12 = n22 * n34 - n24 * n32;
+		const t13 = n22 * n33 - n23 * n32;
 
-		return (
-			n41 * (
-				+ n14 * n23 * n32
-				 - n13 * n24 * n32
-				 - n14 * n22 * n33
-				 + n12 * n24 * n33
-				 + n13 * n22 * n34
-				 - n12 * n23 * n34
-			) +
-			n42 * (
-				+ n11 * n23 * n34
-				 - n11 * n24 * n33
-				 + n14 * n21 * n33
-				 - n13 * n21 * n34
-				 + n13 * n24 * n31
-				 - n14 * n23 * n31
-			) +
-			n43 * (
-				+ n11 * n24 * n32
-				 - n11 * n22 * n34
-				 - n14 * n21 * n32
-				 + n12 * n21 * n34
-				 + n14 * n22 * n31
-				 - n12 * n24 * n31
-			) +
-			n44 * (
-				- n13 * n22 * n31
-				 - n11 * n23 * n32
-				 + n11 * n22 * n33
-				 + n13 * n21 * n32
-				 - n12 * n21 * n33
-				 + n12 * n23 * n31
-			)
+		const t21 = n21 * n34 - n24 * n31;
+		const t22 = n21 * n33 - n23 * n31;
+		const t23 = n21 * n32 - n22 * n31;
 
-		);
+		return n11 * ( n42 * t11 - n43 * t12 + n44 * t13 ) -
+			n12 * ( n41 * t11 - n43 * t21 + n44 * t22 ) +
+			n13 * ( n41 * t12 - n42 * t21 + n44 * t23 ) -
+			n14 * ( n41 * t13 - n42 * t22 + n43 * t23 );
 
 	}
 
@@ -21241,8 +21216,21 @@ class ShaderMaterial extends Material {
 		this.wireframeLinewidth = 1;
 
 		/**
-		 * Define whether the material color is affected by global fog settings; `true`
+		 * Defines whether the material color is affected by global fog settings; `true`
 		 * to pass fog uniforms to the shader.
+		 *
+		 * Setting this property to `true` requires the definition of fog uniforms. It is
+		 * recommended to use `UniformsUtils.merge()` to combine the custom shader uniforms
+		 * with predefined fog uniforms.
+		 *
+		 * ```js
+		 * const material = new ShaderMaterial( {
+		 *     uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] );
+		 *     vertexShader: vertexShader,
+		 *     fragmentShader: fragmentShader,
+		 *     fog: true
+		 * } );
+		 * ```
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -21361,6 +21349,12 @@ class ShaderMaterial extends Material {
 		this.extensions = Object.assign( {}, source.extensions );
 
 		this.glslVersion = source.glslVersion;
+
+		this.defaultAttributeValues = Object.assign( {}, source.defaultAttributeValues );
+
+		this.index0AttributeName = source.index0AttributeName;
+
+		this.uniformsNeedUpdate = source.uniformsNeedUpdate;
 
 		return this;
 
@@ -27831,7 +27825,6 @@ class BatchedMesh extends Mesh {
 	 * Repacks the sub geometries in [name] to remove any unused space remaining from
 	 * previously deleted geometry, freeing up space to add new geometry.
 	 *
-	 * @param {number} instanceId - The ID of the instance to remove from the batch.
 	 * @return {BatchedMesh} A reference to this batched mesh.
 	 */
 	optimize() {
@@ -27883,6 +27876,7 @@ class BatchedMesh extends Mesh {
 
 					index.array.copyWithin( nextIndexStart, indexStart, indexStart + reservedIndexCount );
 					index.addUpdateRange( nextIndexStart, reservedIndexCount );
+					index.needsUpdate = true;
 
 					geometryInfo.indexStart = nextIndexStart;
 
@@ -27903,6 +27897,7 @@ class BatchedMesh extends Mesh {
 					const { array, itemSize } = attribute;
 					array.copyWithin( nextVertexStart * itemSize, vertexStart * itemSize, ( vertexStart + reservedVertexCount ) * itemSize );
 					attribute.addUpdateRange( nextVertexStart * itemSize, reservedVertexCount * itemSize );
+					attribute.needsUpdate = true;
 
 				}
 
@@ -27918,6 +27913,8 @@ class BatchedMesh extends Mesh {
 			this._nextVertexStart = geometryInfo.vertexStart + geometryInfo.reservedVertexCount;
 
 		}
+
+		this._visibilityChanged = true;
 
 		return this;
 

@@ -28,11 +28,11 @@ lightShadowMapViewer.update();
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">ShadowMapViewer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">ShadowMapViewer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewer.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ShadowMapViewer" translate="no">new <a href="#ShadowMapViewer">ShadowMapViewer</a><span class="signature">( light : <span class="param-type">Light</span> )</span> </h3>
+					<h3 class="name name-method" id="ShadowMapViewer" translate="no">new <a href="#ShadowMapViewer">ShadowMapViewer</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new shadow map viewer.</p>
@@ -40,8 +40,12 @@ lightShadowMapViewer.update();
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>light</code></td>
-									<td class="description last"><p>The shadow casting light.</p></td>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow casting light.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -51,25 +55,28 @@ lightShadowMapViewer.update();
 				<div class="member">
 					<h3 class="name" id="enabled" translate="no">.<a href="#enabled">enabled</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to display the shadow map viewer or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether to display the shadow map viewer or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="position" translate="no">.<a href="#position">position</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>The position of the viewer. When changing this property, make sure
-to call <a href="ShadowMapViewer.html#update">ShadowMapViewer#update</a>.<br/>Default is <code>true</code>.</p>
+to call <a href="ShadowMapViewer.html#update">ShadowMapViewer#update</a>.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>The size of the viewer. When changing this property, make sure
-to call <a href="ShadowMapViewer.html#update">ShadowMapViewer#update</a>.<br/>Default is <code>true</code>.</p>
+to call <a href="ShadowMapViewer.html#update">ShadowMapViewer#update</a>.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Renders the viewer. This method must be called in the app's animation loop.</p>
@@ -77,8 +84,12 @@ to call <a href="ShadowMapViewer.html#update">ShadowMapViewer#update</a>.<br/>De
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -98,7 +109,7 @@ window is resized.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/ShadowMapViewer.js" target="_blank" rel="noopener" translate="no">examples/jsm/utils/ShadowMapViewer.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/ShadowMapViewer.js" translate="no" target="_blank" rel="noopener">examples/jsm/utils/ShadowMapViewer.js</a>
 				</p>
 			</article>
 		</section>

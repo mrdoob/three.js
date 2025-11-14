@@ -699,7 +699,7 @@ class Renderer {
 				await this.compileAsync( scene, camera );
 
 				const renderList = this._renderLists.get( scene, camera );
-				const renderContext = this._renderContexts.get( scene, camera, this._renderTarget );
+				const renderContext = this._renderContexts.get( scene, camera, this._renderTarget, this._mrt );
 
 				const material = scene.overrideMaterial || object.material;
 
@@ -835,7 +835,7 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
-	 * @return {Promise<Array|undefined>} A Promise that resolves when the compile has been finished.
+	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
 	async compileAsync( scene, camera, targetScene = null ) {
 
@@ -859,7 +859,7 @@ class Renderer {
 		if ( targetScene === null ) targetScene = scene;
 
 		const renderTarget = this._renderTarget;
-		const renderContext = this._renderContexts.get( targetScene, camera, renderTarget );
+		const renderContext = this._renderContexts.get( targetScene, camera, renderTarget, this._mrt );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		const compilationPromises = [];
@@ -996,11 +996,6 @@ class Renderer {
 
 	//
 
-	/**
-	 * Sets the inspector instance. The inspector can be any class that extends from `InspectorBase`.
-	 *
-	 * @param {InspectorBase} value - The new inspector.
-	 */
 	set inspector( value ) {
 
 		if ( this._inspector !== null ) {
@@ -1014,6 +1009,11 @@ class Renderer {
 
 	}
 
+	/**
+	 * The inspector instance. The inspector can be any class that extends from `InspectorBase`.
+	 *
+	 * @type {InspectorBase}
+	 */
 	get inspector() {
 
 		return this._inspector;
@@ -1361,7 +1361,7 @@ class Renderer {
 
 		//
 
-		const renderContext = this._renderContexts.get( scene, camera, renderTarget );
+		const renderContext = this._renderContexts.get( scene, camera, renderTarget, this._mrt );
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
@@ -2360,6 +2360,7 @@ class Renderer {
 	/**
 	 * Resets the renderer to the initial state before WebXR started.
 	 *
+	 * @private
 	 */
 	_resetXRState() {
 
@@ -2750,6 +2751,7 @@ class Renderer {
 	 * Analyzes the given 3D object's hierarchy and builds render lists from the
 	 * processed hierarchy.
 	 *
+	 * @private
 	 * @param {Object3D} object - The 3D object to process (usually a scene).
 	 * @param {Camera} camera - The camera the object is rendered with.
 	 * @param {number} groupOrder - The group order is derived from the `renderOrder` of groups and is used to group 3D objects within groups.
@@ -2975,6 +2977,7 @@ class Renderer {
 	 * Retrieves shadow nodes for the given material. This is used to setup shadow passes.
 	 * The result is cached per material and updated when the material's version changes.
 	 *
+	 * @private
 	 * @param {Material} material
 	 * @returns {Object} - The shadow nodes for the material.
 	 */

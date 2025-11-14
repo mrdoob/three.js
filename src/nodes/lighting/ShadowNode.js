@@ -36,16 +36,7 @@ const _shadowRenderObjectKeys = [];
  * @param {LightShadow} shadow - The light shadow object containing shadow properties.
  * @param {number} shadowType - The type of shadow map (e.g., BasicShadowMap).
  * @param {boolean} useVelocity - Whether to use velocity data for rendering.
- * @return {Function} A function that renders shadow objects.
- *
- * The returned function has the following parameters:
- * @param {Object3D} object - The 3D object to render.
- * @param {Scene} scene - The scene containing the object.
- * @param {Camera} _camera - The camera used for rendering.
- * @param {BufferGeometry} geometry - The geometry of the object.
- * @param {Material} material - The material of the object.
- * @param {Group} group - The group the object belongs to.
- * @param {...any} params - Additional parameters for rendering.
+ * @return {shadowRenderObjectFunction} A function that renders shadow objects.
  */
 export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
@@ -93,6 +84,7 @@ export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, use
 /**
  * Represents the shader code for the first VSM render pass.
  *
+ * @private
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
@@ -139,6 +131,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 /**
  * Represents the shader code for the second VSM render pass.
  *
+ * @private
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
@@ -798,6 +791,19 @@ class ShadowNode extends ShadowBaseNode {
 }
 
 export default ShadowNode;
+
+/**
+ * Shadow Render Object Function.
+ *
+ * @function shadowRenderObjectFunction
+ * @param {Object3D} object - The 3D object to render.
+ * @param {Scene} scene - The scene containing the object.
+ * @param {Camera} _camera - The camera used for rendering.
+ * @param {BufferGeometry} geometry - The geometry of the object.
+ * @param {Material} material - The material of the object.
+ * @param {Group} group - The group the object belongs to.
+ * @param {...any} params - Additional parameters for rendering.
+ */
 
 /**
  * TSL function for creating an instance of `ShadowNode`.

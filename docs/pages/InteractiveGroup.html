@@ -29,7 +29,7 @@ group.add( mesh1, mesh2, mesh3 );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">InteractiveGroup</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">InteractiveGroup</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { InteractiveGroup } from 'three/addons/interactive/InteractiveGroup.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -41,7 +41,8 @@ group.add( mesh1, mesh2, mesh3 );
 				<div class="member">
 					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
 					<div class="description">
-						<p>The camera used for raycasting.<br/>Default is <code>null</code>.</p>
+						<p>The camera used for raycasting.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -53,7 +54,8 @@ group.add( mesh1, mesh2, mesh3 );
 				<div class="member">
 					<h3 class="name" id="element" translate="no">.<a href="#element">element</a><span class="type-signature"> : HTMLElement</span> </h3>
 					<div class="description">
-						<p>The internal raycaster.<br/>Default is <code>null</code>.</p>
+						<p>The internal raycaster.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -81,7 +83,7 @@ group.add( mesh1, mesh2, mesh3 );
 							<p>Disconnects this interactive group from all Pointer and Mouse Events.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="listenToPointerEvents" translate="no">.<a href="#listenToPointerEvents">listenToPointerEvents</a><span class="signature">( renderer : <span class="param-type">WebGPURenderer | WebGLRenderer</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="listenToPointerEvents" translate="no">.<a href="#listenToPointerEvents">listenToPointerEvents</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Calling this method makes sure the interactive group listens to Pointer and Mouse events.
@@ -91,17 +93,25 @@ raycasting so 3D objects can be detected based on the events.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="listenToXRControllerEvents" translate="no">.<a href="#listenToXRControllerEvents">listenToXRControllerEvents</a><span class="signature">( controller : <span class="param-type">Group</span> )</span> </h3>
+					<h3 class="name name-method" id="listenToXRControllerEvents" translate="no">.<a href="#listenToXRControllerEvents">listenToXRControllerEvents</a><span class="signature">( controller : <span class="param-type"><a href="Group.html">Group</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Calling this method makes sure the interactive group listens to events of
@@ -110,15 +120,19 @@ the given XR controller.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>controller</code></td>
-									<td class="description last"><p>The XR controller.</p></td>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The XR controller.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/interactive/InteractiveGroup.js" target="_blank" rel="noopener" translate="no">examples/jsm/interactive/InteractiveGroup.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/interactive/InteractiveGroup.js" translate="no" target="_blank" rel="noopener">examples/jsm/interactive/InteractiveGroup.js</a>
 				</p>
 			</article>
 		</section>

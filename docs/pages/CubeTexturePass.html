@@ -22,11 +22,11 @@ composer.addPass( cubeTexturePass );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">CubeTexturePass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">CubeTexturePass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { CubeTexturePass } from 'three/addons/postprocessing/CubeTexturePass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="CubeTexturePass" translate="no">new <a href="#CubeTexturePass">CubeTexturePass</a><span class="signature">( camera : <span class="param-type">PerspectiveCamera</span>, tCube : <span class="param-type">CubeTexture</span>, opacity : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="CubeTexturePass" translate="no">new <a href="#CubeTexturePass">CubeTexturePass</a><span class="signature">( camera : <span class="param-type"><a href="PerspectiveCamera.html">PerspectiveCamera</a></span>, tCube : <span class="param-type"><a href="CubeTexture.html">CubeTexture</a></span>, opacity : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new cube texture pass.</p>
@@ -34,16 +34,29 @@ composer.addPass( cubeTexturePass );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>tCube</code></td>
-									<td class="description last"><p>The cube texture to render.</p></td>
+									<td class="name">
+										<strong>tCube</strong>
+									</td>
+									<td class="description last">
+										<p>The cube texture to render.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>opacity</code></td>
-									<td class="description last"><p>The opacity.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>opacity</strong>
+									</td>
+									<td class="description last">
+										<p>The opacity.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -59,7 +72,8 @@ composer.addPass( cubeTexturePass );
 				<div class="member">
 					<h3 class="name" id="needsSwap" translate="no">.<a href="#needsSwap">needsSwap</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Overwritten to disable the swap.<br/>Default is <code>false</code>.</p>
+						<p>Overwritten to disable the swap.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#needsSwap">Pass#needsSwap</a></dt>
@@ -68,7 +82,8 @@ composer.addPass( cubeTexturePass );
 				<div class="member">
 					<h3 class="name" id="opacity" translate="no">.<a href="#opacity">opacity</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The opacity.<br/>Default is <code>1</code>.</p>
+						<p>The opacity.</p>
+						<p>Default is <code>1</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -88,7 +103,7 @@ method whenever the pass is no longer used in your app.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#dispose">Pass#dispose</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, writeBuffer : <span class="param-type">WebGLRenderTarget</span>, readBuffer : <span class="param-type">WebGLRenderTarget</span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, writeBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, readBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs the cube texture pass.</p>
@@ -96,26 +111,46 @@ method whenever the pass is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>writeBuffer</code></td>
-									<td class="description last"><p>The write buffer. This buffer is intended as the rendering
-destination for the pass.</p></td>
+									<td class="name">
+										<strong>writeBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>readBuffer</code></td>
-									<td class="description last"><p>The read buffer. The pass can access the result from the
-previous pass from this buffer.</p></td>
+									<td class="name">
+										<strong>readBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>deltaTime</code></td>
-									<td class="description last"><p>The delta time in seconds.</p></td>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maskActive</code></td>
-									<td class="description last"><p>Whether masking is active or not.</p></td>
+									<td class="name">
+										<strong>maskActive</strong>
+									</td>
+									<td class="description last">
+										<p>Whether masking is active or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -125,7 +160,7 @@ previous pass from this buffer.</p></td>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/CubeTexturePass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/CubeTexturePass.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/CubeTexturePass.js" translate="no" target="_blank" rel="noopener">examples/jsm/postprocessing/CubeTexturePass.js</a>
 				</p>
 			</article>
 		</section>

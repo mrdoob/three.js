@@ -8,7 +8,29 @@ import { Viewer } from './tabs/Viewer.js';
 import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
 import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
-import { renderOutput, vec3, vec4 } from 'three/tsl';
+import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform } from 'three/tsl';
+
+const aspectRatioUV = /*@__PURE__*/ Fn( ( [ uv, textureNode ] ) => {
+
+	const aspect = uniform( 0 );
+
+	OnMaterialUpdate( () => {
+
+		const { width, height } = textureNode.value;
+
+		aspect.value = width / height;
+
+	} );
+
+	const centered = uv.sub( 0.5 );
+	const corrected = vec2( centered.x.div( aspect ), centered.y );
+	const finalUV = corrected.add( 0.5 );
+
+	const inBounds = step( 0.0, finalUV.x ).mul( step( finalUV.x, 1.0 ) ).mul( step( 0.0, finalUV.y ) ).mul( step( finalUV.y, 1.0 ) );
+
+	return vec3( finalUV, inBounds );
+
+} );
 
 class Inspector extends RendererInspector {
 
@@ -20,7 +42,10 @@ class Inspector extends RendererInspector {
 
 		const profiler = new Profiler();
 
-		const parameters = new Parameters();
+		const parameters = new Parameters( {
+			builtin: true,
+			icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M4 6l8 0" /><path d="M16 6l4 0" /><path d="M8 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M4 12l2 0" /><path d="M10 12l10 0" /><path d="M17 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M4 18l11 0" /><path d="M19 18l1 0" /></svg>'
+		} );
 		parameters.hide();
 		profiler.addTab( parameters );
 
@@ -31,18 +56,22 @@ class Inspector extends RendererInspector {
 		const performance = new Performance();
 		profiler.addTab( performance );
 
-		const console = new Console();
-		profiler.addTab( console );
+		const consoleTab = new Console();
+		profiler.addTab( consoleTab );
 
-		profiler.setActiveTab( performance.id );
+		profiler.loadLayout();
 
-		//
+		if ( ! profiler.activeTabId ) {
+
+			profiler.setActiveTab( performance.id );
+
+		}
 
 		this.statsData = new Map();
 		this.canvasNodes = new Map();
 		this.profiler = profiler;
 		this.performance = performance;
-		this.console = console;
+		this.console = consoleTab;
 		this.parameters = parameters;
 		this.viewer = viewer;
 		this.once = {};
@@ -178,7 +207,12 @@ class Inspector extends RendererInspector {
 		if ( this.parameters.isVisible === false ) {
 
 			this.parameters.show();
-			this.profiler.setActiveTab( this.parameters.id );
+
+			if ( this.parameters.isDetached === false ) {
+
+				this.profiler.setActiveTab( this.parameters.id );
+
+			}
 
 		}
 
@@ -266,7 +300,17 @@ class Inspector extends RendererInspector {
 
 			const { path, name } = splitPath( splitCamelCase( node.getName() || '(unnamed)' ) );
 
-			let output = vec4( vec3( node ), 1 );
+			const target = node.context( { getUV: ( textureNode ) => {
+
+				const uvData = aspectRatioUV( screenUV, textureNode );
+				const correctedUV = uvData.xy;
+				const mask = uvData.z;
+
+				return correctedUV.mul( mask );
+
+			} } );
+
+			let output = vec4( vec3( target ), 1 );
 			output = renderOutput( output, NoToneMapping, renderer.outputColorSpace );
 			output = output.context( { inspector: true } );
 

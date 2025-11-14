@@ -15,12 +15,12 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">SceneUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">SceneUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import * as SceneUtils from 'three/addons/utils/SceneUtils.js';</code></pre>
 				<div class="container-overview">
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="~createMeshesFromInstancedMesh" translate="no">.<a href="#~createMeshesFromInstancedMesh">createMeshesFromInstancedMesh</a><span class="signature">( instancedMesh : <span class="param-type">InstancedMesh</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~createMeshesFromInstancedMesh" translate="no">.<a href="#~createMeshesFromInstancedMesh">createMeshesFromInstancedMesh</a><span class="signature">( instancedMesh : <span class="param-type"><a href="InstancedMesh.html">InstancedMesh</a></span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This function creates a mesh for each instance of the given instanced mesh and
@@ -30,8 +30,12 @@ corresponding instance.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>instancedMesh</code></td>
-									<td class="description last"><p>The instanced mesh.</p></td>
+									<td class="name">
+										<strong>instancedMesh</strong>
+									</td>
+									<td class="description last">
+										<p>The instanced mesh.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -39,7 +43,7 @@ corresponding instance.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A group of meshes.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~createMeshesFromMultiMaterialMesh" translate="no">.<a href="#~createMeshesFromMultiMaterialMesh">createMeshesFromMultiMaterialMesh</a><span class="signature">( mesh : <span class="param-type">Mesh</span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~createMeshesFromMultiMaterialMesh" translate="no">.<a href="#~createMeshesFromMultiMaterialMesh">createMeshesFromMultiMaterialMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This function creates a mesh for each geometry-group of the given multi-material mesh and
@@ -48,8 +52,12 @@ adds it to a group.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mesh</code></td>
-									<td class="description last"><p>The multi-material mesh.</p></td>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The multi-material mesh.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -57,7 +65,7 @@ adds it to a group.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A group of meshes.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~createMultiMaterialObject" translate="no">.<a href="#~createMultiMaterialObject">createMultiMaterialObject</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, materials : <span class="param-type">Array.&lt;Material></span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~createMultiMaterialObject" translate="no">.<a href="#~createMultiMaterialObject">createMultiMaterialObject</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, materials : <span class="param-type">Array.&lt;<a href="Material.html">Material</a>></span> )</span><span class="type-signature"> : <a href="Group.html">Group</a></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This function represents an alternative way to create 3D objects with multiple materials.
@@ -68,12 +76,20 @@ materials and creates for each material a mesh that is added to a group.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>geometry</code></td>
-									<td class="description last"><p>The geometry.</p></td>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>materials</code></td>
-									<td class="description last"><p>An array of materials.</p></td>
+									<td class="name">
+										<strong>materials</strong>
+									</td>
+									<td class="description last">
+										<p>An array of materials.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -81,7 +97,7 @@ materials and creates for each material a mesh that is added to a group.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A group representing a multi-material object.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~reduceVertices" translate="no">.<a href="#~reduceVertices">reduceVertices</a><span class="signature">( object : <span class="param-type">Object3D</span>, func : <span class="param-type">function</span>, initialValue : <span class="param-type">any</span> )</span><span class="type-signature"> : <a href="global.html#any">any</a></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~reduceVertices" translate="no">.<a href="#~reduceVertices">reduceVertices</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, func : <span class="param-type">function</span>, initialValue : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : <a href="global.html#any">any</a></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Executes a reducer function for each vertex of the given 3D object.
@@ -90,18 +106,30 @@ materials and creates for each material a mesh that is added to a group.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object that should be processed. It must have a
-geometry with a <code>position</code> attribute.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object that should be processed. It must have a
+geometry with a <code>position</code> attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>func</code></td>
-									<td class="description last"><p>The reducer function. First argument
-is the current value, second argument the current vertex.</p></td>
+									<td class="name">
+										<strong>func</strong>
+									</td>
+									<td class="description last">
+										<p>The reducer function. First argument
+is the current value, second argument the current vertex.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>initialValue</code></td>
-									<td class="description last"><p>The initial value.</p></td>
+									<td class="name">
+										<strong>initialValue</strong>
+									</td>
+									<td class="description last">
+										<p>The initial value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -109,7 +137,7 @@ is the current value, second argument the current vertex.</p></td>
 							<dt class="tag-returns"><strong>Returns:</strong> The result.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~sortInstancedMesh" translate="no">.<a href="#~sortInstancedMesh">sortInstancedMesh</a><span class="signature">( mesh : <span class="param-type">InstancedMesh</span>, compareFn : <span class="param-type">function</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~sortInstancedMesh" translate="no">.<a href="#~sortInstancedMesh">sortInstancedMesh</a><span class="signature">( mesh : <span class="param-type"><a href="InstancedMesh.html">InstancedMesh</a></span>, compareFn : <span class="param-type">function</span> )</span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Sorts the instances of the given instanced mesh.</p>
@@ -117,17 +145,25 @@ is the current value, second argument the current vertex.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>mesh</code></td>
-									<td class="description last"><p>The instanced mesh to sort.</p></td>
+									<td class="name">
+										<strong>mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The instanced mesh to sort.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>compareFn</code></td>
-									<td class="description last"><p>A custom compare function for the sort.</p></td>
+									<td class="name">
+										<strong>compareFn</strong>
+									</td>
+									<td class="description last">
+										<p>A custom compare function for the sort.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="~traverseAncestorsGenerator" translate="no">.<a href="#~traverseAncestorsGenerator">traverseAncestorsGenerator</a><span class="signature">( object : <span class="param-type">Object3D</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
+					<h3 class="name name-method" id="~traverseAncestorsGenerator" translate="no">.<a href="#~traverseAncestorsGenerator">traverseAncestorsGenerator</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Generator based alternative to <a href="Object3D.html#traverseAncestors">Object3D#traverseAncestors</a>.</p>
@@ -135,15 +171,19 @@ is the current value, second argument the current vertex.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>Object to traverse.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>Object to traverse.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<h5>Yields:</h5>
 							Objects that passed the filter condition.
 					</div>
-					<h3 class="name name-method" id="~traverseGenerator" translate="no">.<a href="#~traverseGenerator">traverseGenerator</a><span class="signature">( object : <span class="param-type">Object3D</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
+					<h3 class="name name-method" id="~traverseGenerator" translate="no">.<a href="#~traverseGenerator">traverseGenerator</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Generator based alternative to <a href="Object3D.html#traverse">Object3D#traverse</a>.</p>
@@ -151,15 +191,19 @@ is the current value, second argument the current vertex.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>Object to traverse.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>Object to traverse.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<h5>Yields:</h5>
 							Objects that passed the filter condition.
 					</div>
-					<h3 class="name name-method" id="~traverseVisibleGenerator" translate="no">.<a href="#~traverseVisibleGenerator">traverseVisibleGenerator</a><span class="signature">( object : <span class="param-type">Object3D</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
+					<h3 class="name name-method" id="~traverseVisibleGenerator" translate="no">.<a href="#~traverseVisibleGenerator">traverseVisibleGenerator</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> <span class="type-signature">(generator, inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Generator based alternative to <a href="Object3D.html#traverseVisible">Object3D#traverseVisible</a>.</p>
@@ -167,8 +211,12 @@ is the current value, second argument the current vertex.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>Object to traverse.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>Object to traverse.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -177,7 +225,7 @@ is the current value, second argument the current vertex.</p></td>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/SceneUtils.js" target="_blank" rel="noopener" translate="no">examples/jsm/utils/SceneUtils.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/SceneUtils.js" translate="no" target="_blank" rel="noopener">examples/jsm/utils/SceneUtils.js</a>
 				</p>
 			</article>
 		</section>

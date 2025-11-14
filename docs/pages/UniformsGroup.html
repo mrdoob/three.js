@@ -56,13 +56,15 @@ in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
 				<div class="member">
 					<h3 class="name" id="isUniformsGroup" translate="no">.<a href="#isUniformsGroup">isUniformsGroup</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isUniformsGroup" translate="no">.<a href="#isUniformsGroup">isUniformsGroup</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -90,7 +92,8 @@ in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
 				<div class="member">
 					<h3 class="name" id="usage" translate="no">.<a href="#usage">usage</a><span class="type-signature"> : <a href="global.html#StaticDrawUsage">StaticDrawUsage</a> | <a href="global.html#DynamicDrawUsage">DynamicDrawUsage</a> | <a href="global.html#StreamDrawUsage">StreamDrawUsage</a> | <a href="global.html#StaticReadUsage">StaticReadUsage</a> | <a href="global.html#DynamicReadUsage">DynamicReadUsage</a> | <a href="global.html#StreamReadUsage">StreamReadUsage</a> | <a href="global.html#StaticCopyUsage">StaticCopyUsage</a> | <a href="global.html#DynamicCopyUsage">DynamicCopyUsage</a> | <a href="global.html#StreamCopyUsage">StreamCopyUsage</a></span> </h3>
 					<div class="description">
-						<p>The buffer usage.<br/>Default is <code>StaticDrawUsage</code>.</p>
+						<p>The buffer usage.</p>
+						<p>Default is <code>StaticDrawUsage</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -100,24 +103,7 @@ in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="_getBufferForType" translate="no">.<a href="#_getBufferForType">_getBufferForType</a><span class="signature">( type : <span class="param-type">string</span> )</span><span class="type-signature"> : TypedArray</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Returns a typed array that matches the given data type.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The data type.</p></td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The typed array.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( uniform : <span class="param-type">Uniform</span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
+					<h3 class="name name-method" id="add" translate="no">.<a href="#add">add</a><span class="signature">( uniform : <span class="param-type"><a href="Uniform.html">Uniform</a></span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the given uniform to this uniforms group.</p>
@@ -125,8 +111,12 @@ in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The uniform to add.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -134,7 +124,7 @@ in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this uniforms group.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="addUniform" translate="no">.<a href="#addUniform">addUniform</a><span class="signature">( uniform : <span class="param-type">Uniform</span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
+					<h3 class="name name-method" id="addUniform" translate="no">.<a href="#addUniform">addUniform</a><span class="signature">( uniform : <span class="param-type"><a href="Uniform.html">Uniform</a></span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds a uniform to this group.</p>
@@ -142,8 +132,12 @@ in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The uniform to add.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform to add.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -163,7 +157,7 @@ in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
 							<dt class="tag-returns"><strong>Returns:</strong> A clone of this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type">UniformsGroup</span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
+					<h3 class="name name-method" id="copy" translate="no">.<a href="#copy">copy</a><span class="signature">( source : <span class="param-type"><a href="UniformsGroup.html">UniformsGroup</a></span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Copies the values of the given uniforms group to this instance.</p>
@@ -171,8 +165,12 @@ in <a href="WebGLRenderer.html">WebGLRenderer</a>.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>source</code></td>
-									<td class="description last"><p>The uniforms group to copy.</p></td>
+									<td class="name">
+										<strong>source</strong>
+									</td>
+									<td class="description last">
+										<p>The uniforms group to copy.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -191,7 +189,7 @@ method whenever this instance is no longer used in your app.</p>
 							<li><a href="Texture.html#event:dispose">Texture#event:dispose</a></li>
 						</ul>
 					</div>
-					<h3 class="name name-method" id="remove" translate="no">.<a href="#remove">remove</a><span class="signature">( uniform : <span class="param-type">Uniform</span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
+					<h3 class="name name-method" id="remove" translate="no">.<a href="#remove">remove</a><span class="signature">( uniform : <span class="param-type"><a href="Uniform.html">Uniform</a></span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Removes the given uniform from this uniforms group.</p>
@@ -199,8 +197,12 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The uniform to remove.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform to remove.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -208,7 +210,7 @@ method whenever this instance is no longer used in your app.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this uniforms group.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="removeUniform" translate="no">.<a href="#removeUniform">removeUniform</a><span class="signature">( uniform : <span class="param-type">Uniform</span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
+					<h3 class="name name-method" id="removeUniform" translate="no">.<a href="#removeUniform">removeUniform</a><span class="signature">( uniform : <span class="param-type"><a href="Uniform.html">Uniform</a></span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Removes a uniform from this group.</p>
@@ -216,8 +218,12 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The uniform to remove.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform to remove.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -233,8 +239,12 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name to set.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -242,7 +252,7 @@ method whenever this instance is no longer used in your app.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this uniforms group.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setUsage" translate="no">.<a href="#setUsage">setUsage</a><span class="signature">( value : <span class="param-type">StaticDrawUsage | DynamicDrawUsage | StreamDrawUsage | StaticReadUsage | DynamicReadUsage | StreamReadUsage | StaticCopyUsage | DynamicCopyUsage | StreamCopyUsage</span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
+					<h3 class="name name-method" id="setUsage" translate="no">.<a href="#setUsage">setUsage</a><span class="signature">( value : <span class="param-type"><a href="global.html#StaticDrawUsage">StaticDrawUsage</a> | <a href="global.html#DynamicDrawUsage">DynamicDrawUsage</a> | <a href="global.html#StreamDrawUsage">StreamDrawUsage</a> | <a href="global.html#StaticReadUsage">StaticReadUsage</a> | <a href="global.html#DynamicReadUsage">DynamicReadUsage</a> | <a href="global.html#StreamReadUsage">StreamReadUsage</a> | <a href="global.html#StaticCopyUsage">StaticCopyUsage</a> | <a href="global.html#DynamicCopyUsage">DynamicCopyUsage</a> | <a href="global.html#StreamCopyUsage">StreamCopyUsage</a></span> )</span><span class="type-signature"> : <a href="UniformsGroup.html">UniformsGroup</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the usage of this uniforms group.</p>
@@ -250,8 +260,12 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The usage to set.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The usage to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -275,7 +289,7 @@ values has actually changed so this method only returns
 must be uploaded to the GPU.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateByType" translate="no">.<a href="#updateByType">updateByType</a><span class="signature">( uniform : <span class="param-type">Uniform</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="updateByType" translate="no">.<a href="#updateByType">updateByType</a><span class="signature">( uniform : <span class="param-type"><a href="Uniform.html">Uniform</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates a given uniform by calling an update method matching
@@ -284,8 +298,12 @@ the uniforms type.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The uniform to update.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The uniform to update.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -293,7 +311,7 @@ the uniforms type.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the uniform has been updated or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateColor" translate="no">.<a href="#updateColor">updateColor</a><span class="signature">( uniform : <span class="param-type">ColorUniform</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="updateColor" translate="no">.<a href="#updateColor">updateColor</a><span class="signature">( uniform : <span class="param-type"><a href="ColorUniform.html">ColorUniform</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates a given Color uniform.</p>
@@ -301,8 +319,12 @@ the uniforms type.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The Color uniform.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The Color uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -310,7 +332,7 @@ the uniforms type.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the uniform has been updated or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateMatrix3" translate="no">.<a href="#updateMatrix3">updateMatrix3</a><span class="signature">( uniform : <span class="param-type">Matrix3Uniform</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="updateMatrix3" translate="no">.<a href="#updateMatrix3">updateMatrix3</a><span class="signature">( uniform : <span class="param-type"><a href="Matrix3Uniform.html">Matrix3Uniform</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates a given Matrix3 uniform.</p>
@@ -318,8 +340,12 @@ the uniforms type.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The Matrix3 uniform.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The Matrix3 uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -327,7 +353,7 @@ the uniforms type.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the uniform has been updated or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateMatrix4" translate="no">.<a href="#updateMatrix4">updateMatrix4</a><span class="signature">( uniform : <span class="param-type">Matrix4Uniform</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="updateMatrix4" translate="no">.<a href="#updateMatrix4">updateMatrix4</a><span class="signature">( uniform : <span class="param-type"><a href="Matrix4Uniform.html">Matrix4Uniform</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates a given Matrix4 uniform.</p>
@@ -335,8 +361,12 @@ the uniforms type.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The Matrix4 uniform.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The Matrix4 uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -344,7 +374,7 @@ the uniforms type.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the uniform has been updated or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateNumber" translate="no">.<a href="#updateNumber">updateNumber</a><span class="signature">( uniform : <span class="param-type">NumberUniform</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="updateNumber" translate="no">.<a href="#updateNumber">updateNumber</a><span class="signature">( uniform : <span class="param-type"><a href="NumberUniform.html">NumberUniform</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates a given Number uniform.</p>
@@ -352,8 +382,12 @@ the uniforms type.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The Number uniform.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The Number uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -361,7 +395,7 @@ the uniforms type.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the uniform has been updated or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateVector2" translate="no">.<a href="#updateVector2">updateVector2</a><span class="signature">( uniform : <span class="param-type">Vector2Uniform</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="updateVector2" translate="no">.<a href="#updateVector2">updateVector2</a><span class="signature">( uniform : <span class="param-type"><a href="Vector2Uniform.html">Vector2Uniform</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates a given Vector2 uniform.</p>
@@ -369,8 +403,12 @@ the uniforms type.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The Vector2 uniform.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The Vector2 uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -378,7 +416,7 @@ the uniforms type.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the uniform has been updated or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateVector3" translate="no">.<a href="#updateVector3">updateVector3</a><span class="signature">( uniform : <span class="param-type">Vector3Uniform</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="updateVector3" translate="no">.<a href="#updateVector3">updateVector3</a><span class="signature">( uniform : <span class="param-type"><a href="Vector3Uniform.html">Vector3Uniform</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates a given Vector3 uniform.</p>
@@ -386,8 +424,12 @@ the uniforms type.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The Vector3 uniform.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The Vector3 uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -395,7 +437,7 @@ the uniforms type.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the uniform has been updated or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateVector4" translate="no">.<a href="#updateVector4">updateVector4</a><span class="signature">( uniform : <span class="param-type">Vector4Uniform</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="updateVector4" translate="no">.<a href="#updateVector4">updateVector4</a><span class="signature">( uniform : <span class="param-type"><a href="Vector4Uniform.html">Vector4Uniform</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Updates a given Vector4 uniform.</p>
@@ -403,8 +445,12 @@ the uniforms type.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>uniform</code></td>
-									<td class="description last"><p>The Vector4 uniform.</p></td>
+									<td class="name">
+										<strong>uniform</strong>
+									</td>
+									<td class="description last">
+										<p>The Vector4 uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -414,7 +460,7 @@ the uniforms type.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/UniformsGroup.js" target="_blank" rel="noopener" translate="no">src/core/UniformsGroup.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/UniformsGroup.js" translate="no" target="_blank" rel="noopener">src/core/UniformsGroup.js</a>
 				</p>
 			</article>
 		</section>

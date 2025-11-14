@@ -180,6 +180,7 @@ class XRManager extends EventDispatcher {
 		/**
 		 * Whether the XR session uses layers.
 		 *
+		 * @private
 		 * @type {boolean}
 		 * @default false
 		 */

@@ -15,12 +15,12 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">NURBSUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">NURBSUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import * as NURBSUtils from 'three/addons/curves/NURBSUtils.js';</code></pre>
 				<div class="container-overview">
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="~calcBSplineDerivatives" translate="no">.<a href="#~calcBSplineDerivatives">calcBSplineDerivatives</a><span class="signature">( p : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;Vector4></span>, u : <span class="param-type">number</span>, nd : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;<a href="Vector4.html">Vector4</a>></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~calcBSplineDerivatives" translate="no">.<a href="#~calcBSplineDerivatives">calcBSplineDerivatives</a><span class="signature">( p : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, u : <span class="param-type">number</span>, nd : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;<a href="Vector4.html">Vector4</a>></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Calculates derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.</p>
@@ -28,24 +28,44 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>p</code></td>
-									<td class="description last"><p>The degree.</p></td>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The degree.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>U</code></td>
-									<td class="description last"><p>The knot vector.</p></td>
+									<td class="name">
+										<strong>U</strong>
+									</td>
+									<td class="description last">
+										<p>The knot vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>P</code></td>
-									<td class="description last"><p>The control points</p></td>
+									<td class="name">
+										<strong>P</strong>
+									</td>
+									<td class="description last">
+										<p>The control points</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The parametric point.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The parametric point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>nd</code></td>
-									<td class="description last"><p>The number of derivatives.</p></td>
+									<td class="name">
+										<strong>nd</strong>
+									</td>
+									<td class="description last">
+										<p>The number of derivatives.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -53,7 +73,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> An array[d+1] with derivatives.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~calcBSplinePoint" translate="no">.<a href="#~calcBSplinePoint">calcBSplinePoint</a><span class="signature">( p : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;Vector4></span>, u : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector4.html">Vector4</a></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~calcBSplinePoint" translate="no">.<a href="#~calcBSplinePoint">calcBSplinePoint</a><span class="signature">( p : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, u : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Vector4.html">Vector4</a></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Calculates B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.</p>
@@ -61,20 +81,36 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>p</code></td>
-									<td class="description last"><p>The degree of the B-Spline.</p></td>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The degree of the B-Spline.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>U</code></td>
-									<td class="description last"><p>The knot vector.</p></td>
+									<td class="name">
+										<strong>U</strong>
+									</td>
+									<td class="description last">
+										<p>The knot vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>P</code></td>
-									<td class="description last"><p>The control points</p></td>
+									<td class="name">
+										<strong>P</strong>
+									</td>
+									<td class="description last">
+										<p>The control points</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The parametric point.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The parametric point.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -90,24 +126,44 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>span</code></td>
-									<td class="description last"><p>The span in which <code>u</code> lies.</p></td>
+									<td class="name">
+										<strong>span</strong>
+									</td>
+									<td class="description last">
+										<p>The span in which <code>u</code> lies.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The parametric point.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The parametric point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>p</code></td>
-									<td class="description last"><p>The degree.</p></td>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The degree.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>n</code></td>
-									<td class="description last"><p>number of derivatives to calculate</p></td>
+									<td class="name">
+										<strong>n</strong>
+									</td>
+									<td class="description last">
+										<p>number of derivatives to calculate</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>U</code></td>
-									<td class="description last"><p>The knot vector.</p></td>
+									<td class="name">
+										<strong>U</strong>
+									</td>
+									<td class="description last">
+										<p>The knot vector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -123,20 +179,36 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>span</code></td>
-									<td class="description last"><p>The span in which <code>u</code> lies.</p></td>
+									<td class="name">
+										<strong>span</strong>
+									</td>
+									<td class="description last">
+										<p>The span in which <code>u</code> lies.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The parametric value.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The parametric value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>p</code></td>
-									<td class="description last"><p>The degree.</p></td>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The degree.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>U</code></td>
-									<td class="description last"><p>The knot vector.</p></td>
+									<td class="name">
+										<strong>U</strong>
+									</td>
+									<td class="description last">
+										<p>The knot vector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -152,12 +224,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>k</code></td>
-									<td class="description last"><p>The K value.</p></td>
+									<td class="name">
+										<strong>k</strong>
+									</td>
+									<td class="description last">
+										<p>The K value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>i</code></td>
-									<td class="description last"><p>The I value.</p></td>
+									<td class="name">
+										<strong>i</strong>
+									</td>
+									<td class="description last">
+										<p>The I value.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -165,7 +245,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> k!/(i!(k-i)!)</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~calcNURBSDerivatives" translate="no">.<a href="#~calcNURBSDerivatives">calcNURBSDerivatives</a><span class="signature">( p : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;Vector4></span>, u : <span class="param-type">number</span>, nd : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;<a href="Vector3.html">Vector3</a>></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~calcNURBSDerivatives" translate="no">.<a href="#~calcNURBSDerivatives">calcNURBSDerivatives</a><span class="signature">( p : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span>, u : <span class="param-type">number</span>, nd : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;<a href="Vector3.html">Vector3</a>></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Calculates NURBS curve derivatives. See The NURBS Book, page 127, algorithm A4.2.</p>
@@ -173,24 +253,44 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>p</code></td>
-									<td class="description last"><p>The degree.</p></td>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The degree.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>U</code></td>
-									<td class="description last"><p>The knot vector.</p></td>
+									<td class="name">
+										<strong>U</strong>
+									</td>
+									<td class="description last">
+										<p>The knot vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>P</code></td>
-									<td class="description last"><p>The control points in homogeneous space.</p></td>
+									<td class="name">
+										<strong>P</strong>
+									</td>
+									<td class="description last">
+										<p>The control points in homogeneous space.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The parametric point.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The parametric point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>nd</code></td>
-									<td class="description last"><p>The number of derivatives.</p></td>
+									<td class="name">
+										<strong>nd</strong>
+									</td>
+									<td class="description last">
+										<p>The number of derivatives.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -198,7 +298,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> array with derivatives for rational curve.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~calcRationalCurveDerivatives" translate="no">.<a href="#~calcRationalCurveDerivatives">calcRationalCurveDerivatives</a><span class="signature">( Pders : <span class="param-type">Array.&lt;Vector4></span> )</span><span class="type-signature"> : Array.&lt;<a href="Vector3.html">Vector3</a>></span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~calcRationalCurveDerivatives" translate="no">.<a href="#~calcRationalCurveDerivatives">calcRationalCurveDerivatives</a><span class="signature">( Pders : <span class="param-type">Array.&lt;<a href="Vector4.html">Vector4</a>></span> )</span><span class="type-signature"> : Array.&lt;<a href="Vector3.html">Vector3</a>></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Calculates derivatives (0-nd) of rational curve. See The NURBS Book, page 127, algorithm A4.2.</p>
@@ -206,8 +306,12 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>Pders</code></td>
-									<td class="description last"><p>Array with derivatives.</p></td>
+									<td class="name">
+										<strong>Pders</strong>
+									</td>
+									<td class="description last">
+										<p>Array with derivatives.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -215,7 +319,7 @@
 							<dt class="tag-returns"><strong>Returns:</strong> An array with derivatives for rational curve.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="~calcSurfacePoint" translate="no">.<a href="#~calcSurfacePoint">calcSurfacePoint</a><span class="signature">( p : <span class="param-type">number</span>, q : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, V : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;Array.&lt;Vector4>></span>, u : <span class="param-type">number</span>, v : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~calcSurfacePoint" translate="no">.<a href="#~calcSurfacePoint">calcSurfacePoint</a><span class="signature">( p : <span class="param-type">number</span>, q : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, V : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;Array.&lt;<a href="Vector4.html">Vector4</a>>></span>, u : <span class="param-type">number</span>, v : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Calculates a rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.</p>
@@ -223,41 +327,73 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>p</code></td>
-									<td class="description last"><p>The first degree of B-Spline surface.</p></td>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The first degree of B-Spline surface.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>q</code></td>
-									<td class="description last"><p>The second degree of B-Spline surface.</p></td>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The second degree of B-Spline surface.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>U</code></td>
-									<td class="description last"><p>The first knot vector.</p></td>
+									<td class="name">
+										<strong>U</strong>
+									</td>
+									<td class="description last">
+										<p>The first knot vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>V</code></td>
-									<td class="description last"><p>The second knot vector.</p></td>
+									<td class="name">
+										<strong>V</strong>
+									</td>
+									<td class="description last">
+										<p>The second knot vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>P</code></td>
-									<td class="description last"><p>The control points in homogeneous space.</p></td>
+									<td class="name">
+										<strong>P</strong>
+									</td>
+									<td class="description last">
+										<p>The control points in homogeneous space.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The first parametric point.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The first parametric point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>v</code></td>
-									<td class="description last"><p>The second parametric point.</p></td>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The second parametric point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="~calcVolumePoint" translate="no">.<a href="#~calcVolumePoint">calcVolumePoint</a><span class="signature">( p : <span class="param-type">number</span>, q : <span class="param-type">number</span>, r : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, V : <span class="param-type">Array.&lt;number></span>, W : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;Array.&lt;Array.&lt;Vector4>>></span>, u : <span class="param-type">number</span>, v : <span class="param-type">number</span>, w : <span class="param-type">number</span>, target : <span class="param-type">Vector3</span> )</span> <span class="type-signature">(inner) </span></h3>
+					<h3 class="name name-method" id="~calcVolumePoint" translate="no">.<a href="#~calcVolumePoint">calcVolumePoint</a><span class="signature">( p : <span class="param-type">number</span>, q : <span class="param-type">number</span>, r : <span class="param-type">number</span>, U : <span class="param-type">Array.&lt;number></span>, V : <span class="param-type">Array.&lt;number></span>, W : <span class="param-type">Array.&lt;number></span>, P : <span class="param-type">Array.&lt;Array.&lt;Array.&lt;<a href="Vector4.html">Vector4</a>>>></span>, u : <span class="param-type">number</span>, v : <span class="param-type">number</span>, w : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>Calculates a rational B-Spline volume point. See The NURBS Book, page 134, algorithm A4.3.</p>
@@ -265,48 +401,92 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>p</code></td>
-									<td class="description last"><p>The first degree of B-Spline surface.</p></td>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The first degree of B-Spline surface.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>q</code></td>
-									<td class="description last"><p>The second degree of B-Spline surface.</p></td>
+									<td class="name">
+										<strong>q</strong>
+									</td>
+									<td class="description last">
+										<p>The second degree of B-Spline surface.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>r</code></td>
-									<td class="description last"><p>The third degree of B-Spline surface.</p></td>
+									<td class="name">
+										<strong>r</strong>
+									</td>
+									<td class="description last">
+										<p>The third degree of B-Spline surface.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>U</code></td>
-									<td class="description last"><p>The first knot vector.</p></td>
+									<td class="name">
+										<strong>U</strong>
+									</td>
+									<td class="description last">
+										<p>The first knot vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>V</code></td>
-									<td class="description last"><p>The second knot vector.</p></td>
+									<td class="name">
+										<strong>V</strong>
+									</td>
+									<td class="description last">
+										<p>The second knot vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>W</code></td>
-									<td class="description last"><p>The third knot vector.</p></td>
+									<td class="name">
+										<strong>W</strong>
+									</td>
+									<td class="description last">
+										<p>The third knot vector.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>P</code></td>
-									<td class="description last"><p>The control points in homogeneous space.</p></td>
+									<td class="name">
+										<strong>P</strong>
+									</td>
+									<td class="description last">
+										<p>The control points in homogeneous space.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The first parametric point.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The first parametric point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>v</code></td>
-									<td class="description last"><p>The second parametric point.</p></td>
+									<td class="name">
+										<strong>v</strong>
+									</td>
+									<td class="description last">
+										<p>The second parametric point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>w</code></td>
-									<td class="description last"><p>The third parametric point.</p></td>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The third parametric point.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>target</code></td>
-									<td class="description last"><p>The target vector.</p></td>
+									<td class="name">
+										<strong>target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -319,16 +499,28 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>p</code></td>
-									<td class="description last"><p>The degree.</p></td>
+									<td class="name">
+										<strong>p</strong>
+									</td>
+									<td class="description last">
+										<p>The degree.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>u</code></td>
-									<td class="description last"><p>The parametric value.</p></td>
+									<td class="name">
+										<strong>u</strong>
+									</td>
+									<td class="description last">
+										<p>The parametric value.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>U</code></td>
-									<td class="description last"><p>The knot vector.</p></td>
+									<td class="name">
+										<strong>U</strong>
+									</td>
+									<td class="description last">
+										<p>The knot vector.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -338,7 +530,7 @@
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/curves/NURBSUtils.js" target="_blank" rel="noopener" translate="no">examples/jsm/curves/NURBSUtils.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/curves/NURBSUtils.js" translate="no" target="_blank" rel="noopener">examples/jsm/curves/NURBSUtils.js</a>
 				</p>
 			</article>
 		</section>

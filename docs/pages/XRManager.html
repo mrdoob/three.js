@@ -20,7 +20,7 @@ manage XR sessions with <code>WebGPURenderer</code>.</p>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="XRManager" translate="no">new <a href="#XRManager">XRManager</a><span class="signature">( renderer : <span class="param-type">Renderer</span>, multiview : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="XRManager" translate="no">new <a href="#XRManager">XRManager</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, multiview : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new XR manager.</p>
@@ -28,12 +28,21 @@ manage XR sessions with <code>WebGPURenderer</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>multiview</code></td>
-									<td class="description last"><p>Enables multiview if the device supports it.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>multiview</strong>
+									</td>
+									<td class="description last">
+										<p>Enables multiview if the device supports it.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -41,31 +50,28 @@ manage XR sessions with <code>WebGPURenderer</code>.</p>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
-					<h3 class="name" id="_sessionUsesLayers" translate="no">.<a href="#_sessionUsesLayers">_sessionUsesLayers</a><span class="type-signature"> : boolean</span> </h3>
-					<div class="description">
-						<p>Whether the XR session uses layers.<br/>Default is <code>false</code>.</p>
-					</div>
-				</div>
-				<div class="member">
 					<h3 class="name" id="cameraAutoUpdate" translate="no">.<a href="#cameraAutoUpdate">cameraAutoUpdate</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the XR camera should automatically be updated or not.<br/>Default is <code>true</code>.</p>
+						<p>Whether the XR camera should automatically be updated or not.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="enabled" translate="no">.<a href="#enabled">enabled</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>This flag globally enables XR rendering.<br/>Default is <code>false</code>.</p>
+						<p>This flag globally enables XR rendering.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isPresenting" translate="no">.<a href="#isPresenting">isPresenting</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>Whether the XR device is currently presenting or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether the XR device is currently presenting or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="createCylinderLayer" translate="no">.<a href="#createCylinderLayer">createCylinderLayer</a><span class="signature">( radius : <span class="param-type">number</span>, centralAngle : <span class="param-type">number</span>, aspectratio : <span class="param-type">number</span>, translation : <span class="param-type">Vector3</span>, quaternion : <span class="param-type">Quaternion</span>, pixelwidth : <span class="param-type">number</span>, pixelheight : <span class="param-type">number</span>, rendercall : <span class="param-type">function</span>, attributes : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<h3 class="name name-method" id="createCylinderLayer" translate="no">.<a href="#createCylinderLayer">createCylinderLayer</a><span class="signature">( radius : <span class="param-type">number</span>, centralAngle : <span class="param-type">number</span>, aspectratio : <span class="param-type">number</span>, translation : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, quaternion : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, pixelwidth : <span class="param-type">number</span>, pixelheight : <span class="param-type">number</span>, rendercall : <span class="param-type">function</span>, attributes : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method can be used in XR applications to create a cylindrical layer that presents a separate
@@ -74,41 +80,78 @@ rendered scene.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>radius</code></td>
-									<td class="description last"><p>The radius of the cylinder in world units.</p></td>
+									<td class="name">
+										<strong>radius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius of the cylinder in world units.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>centralAngle</code></td>
-									<td class="description last"><p>The central angle of the cylinder in radians.</p></td>
+									<td class="name">
+										<strong>centralAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The central angle of the cylinder in radians.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>aspectratio</code></td>
-									<td class="description last"><p>The aspect ratio.</p></td>
+									<td class="name">
+										<strong>aspectratio</strong>
+									</td>
+									<td class="description last">
+										<p>The aspect ratio.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>translation</code></td>
-									<td class="description last"><p>The position/translation of the layer plane in world units.</p></td>
+									<td class="name">
+										<strong>translation</strong>
+									</td>
+									<td class="description last">
+										<p>The position/translation of the layer plane in world units.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>quaternion</code></td>
-									<td class="description last"><p>The orientation of the layer plane expressed as a quaternion.</p></td>
+									<td class="name">
+										<strong>quaternion</strong>
+									</td>
+									<td class="description last">
+										<p>The orientation of the layer plane expressed as a quaternion.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>pixelwidth</code></td>
-									<td class="description last"><p>The width of the layer's render target in pixels.</p></td>
+									<td class="name">
+										<strong>pixelwidth</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the layer's render target in pixels.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>pixelheight</code></td>
-									<td class="description last"><p>The height of the layer's render target in pixels.</p></td>
+									<td class="name">
+										<strong>pixelheight</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the layer's render target in pixels.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>rendercall</code></td>
-									<td class="description last"><p>A callback function that renders the layer. Similar to code in
-the default animation loop, this method can be used to update/transform 3D object in the layer's scene.</p></td>
+									<td class="name">
+										<strong>rendercall</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that renders the layer. Similar to code in
+the default animation loop, this method can be used to update/transform 3D object in the layer's scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>attributes</code></td>
-									<td class="description last"><p>Allows to configure the layer's render target.<br/>Default is <code>{}</code>.</p></td>
+									<td class="name">
+										<strong>attributes</strong>
+									</td>
+									<td class="description last">
+										<p>Allows to configure the layer's render target.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -116,7 +159,7 @@ the default animation loop, this method can be used to update/transform 3D objec
 							<dt class="tag-returns"><strong>Returns:</strong> A mesh representing the cylindrical XR layer. This mesh should be added to the XR scene.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="createQuadLayer" translate="no">.<a href="#createQuadLayer">createQuadLayer</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, translation : <span class="param-type">Vector3</span>, quaternion : <span class="param-type">Quaternion</span>, pixelwidth : <span class="param-type">number</span>, pixelheight : <span class="param-type">number</span>, rendercall : <span class="param-type">function</span>, attributes : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<h3 class="name name-method" id="createQuadLayer" translate="no">.<a href="#createQuadLayer">createQuadLayer</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, translation : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, quaternion : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, pixelwidth : <span class="param-type">number</span>, pixelheight : <span class="param-type">number</span>, rendercall : <span class="param-type">function</span>, attributes : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method can be used in XR applications to create a quadratic layer that presents a separate
@@ -125,37 +168,70 @@ rendered scene.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the layer plane in world units.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the layer plane in world units.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the layer plane in world units.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the layer plane in world units.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>translation</code></td>
-									<td class="description last"><p>The position/translation of the layer plane in world units.</p></td>
+									<td class="name">
+										<strong>translation</strong>
+									</td>
+									<td class="description last">
+										<p>The position/translation of the layer plane in world units.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>quaternion</code></td>
-									<td class="description last"><p>The orientation of the layer plane expressed as a quaternion.</p></td>
+									<td class="name">
+										<strong>quaternion</strong>
+									</td>
+									<td class="description last">
+										<p>The orientation of the layer plane expressed as a quaternion.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>pixelwidth</code></td>
-									<td class="description last"><p>The width of the layer's render target in pixels.</p></td>
+									<td class="name">
+										<strong>pixelwidth</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the layer's render target in pixels.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>pixelheight</code></td>
-									<td class="description last"><p>The height of the layer's render target in pixels.</p></td>
+									<td class="name">
+										<strong>pixelheight</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the layer's render target in pixels.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>rendercall</code></td>
-									<td class="description last"><p>A callback function that renders the layer. Similar to code in
-the default animation loop, this method can be used to update/transform 3D object in the layer's scene.</p></td>
+									<td class="name">
+										<strong>rendercall</strong>
+									</td>
+									<td class="description last">
+										<p>A callback function that renders the layer. Similar to code in
+the default animation loop, this method can be used to update/transform 3D object in the layer's scene.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>attributes</code></td>
-									<td class="description last"><p>Allows to configure the layer's render target.<br/>Default is <code>{}</code>.</p></td>
+									<td class="name">
+										<strong>attributes</strong>
+									</td>
+									<td class="description last">
+										<p>Allows to configure the layer's render target.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -193,8 +269,12 @@ by the given index.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index of the XR controller.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the XR controller.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -212,8 +292,12 @@ by the given index.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index of the XR controller.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the XR controller.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -267,8 +351,12 @@ by the given index.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index of the XR controller.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the XR controller.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -319,9 +407,13 @@ the actual scene via <code>renderer.render( scene, camera );</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>foveation</code></td>
-									<td class="description last"><p>A number in the range <code>[0,1]</code> where <code>0</code> means no foveation (full resolution)
-and <code>1</code> means maximum foveation (the edges render at lower resolution).</p></td>
+									<td class="name">
+										<strong>foveation</strong>
+									</td>
+									<td class="description last">
+										<p>A number in the range <code>[0,1]</code> where <code>0</code> means no foveation (full resolution)
+and <code>1</code> means maximum foveation (the edges render at lower resolution).</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -335,8 +427,12 @@ and <code>1</code> means maximum foveation (the edges render at lower resolution
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>factor</code></td>
-									<td class="description last"><p>The framebuffer scale factor.</p></td>
+									<td class="name">
+										<strong>factor</strong>
+									</td>
+									<td class="description last">
+										<p>The framebuffer scale factor.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -349,8 +445,12 @@ and <code>1</code> means maximum foveation (the edges render at lower resolution
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>space</code></td>
-									<td class="description last"><p>The XR reference space.</p></td>
+									<td class="name">
+										<strong>space</strong>
+									</td>
+									<td class="description last">
+										<p>The XR reference space.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -364,8 +464,12 @@ and <code>1</code> means maximum foveation (the edges render at lower resolution
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>type</code></td>
-									<td class="description last"><p>The reference space type.</p></td>
+									<td class="name">
+										<strong>type</strong>
+									</td>
+									<td class="description last">
+										<p>The reference space type.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -380,8 +484,12 @@ the actual XR rendering.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>session</code></td>
-									<td class="description last"><p>The XR session to set.</p></td>
+									<td class="name">
+										<strong>session</strong>
+									</td>
+									<td class="description last">
+										<p>The XR session to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -389,7 +497,7 @@ the actual XR rendering.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves when the session has been set.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateCamera" translate="no">.<a href="#updateCamera">updateCamera</a><span class="signature">( camera : <span class="param-type">PerspectiveCamera</span> )</span> </h3>
+					<h3 class="name name-method" id="updateCamera" translate="no">.<a href="#updateCamera">updateCamera</a><span class="signature">( camera : <span class="param-type"><a href="PerspectiveCamera.html">PerspectiveCamera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is called by the renderer per frame and updates the XR camera
@@ -399,8 +507,12 @@ camera created on application level and used for non-XR rendering.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -416,7 +528,7 @@ camera created on application level and used for non-XR rendering.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/XRManager.js" target="_blank" rel="noopener" translate="no">src/renderers/common/XRManager.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/XRManager.js" translate="no" target="_blank" rel="noopener">src/renderers/common/XRManager.js</a>
 				</p>
 			</article>
 		</section>

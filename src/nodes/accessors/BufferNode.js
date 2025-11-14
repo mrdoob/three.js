@@ -58,6 +58,34 @@ class BufferNode extends UniformNode {
 		 */
 		this.bufferCount = bufferCount;
 
+		/**
+		 * An array of update ranges.
+		 *
+		 * @type {Array<{start: number, count: number}>}
+		 */
+		this.updateRanges = [];
+
+	}
+
+	/**
+	 * Adds a range of data in the data array to be updated on the GPU.
+	 *
+	 * @param {number} start - Position at which to start update.
+	 * @param {number} count - The number of components to update.
+	 */
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	/**
+	 * Clears the update ranges.
+	 */
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
+
 	}
 
 	/**

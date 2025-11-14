@@ -74,6 +74,7 @@ class PixelationNode extends TempNode {
 		/**
 		 * Uniform node that represents the resolution.
 		 *
+		 * @private
 		 * @type {Node<vec4>}
 		 */
 		this._resolution = uniform( new Vector4() );
@@ -193,7 +194,7 @@ class PixelationNode extends TempNode {
 
 			const nei = property( 'float', 'nei' );
 
-			If( this.normalEdgeStrength.greaterThan( 0.0 ), () => {
+			If( this.normalEdgeStrength.greaterThan( 0.0 ).and( normal.length().greaterThan( 0 ) ), () => {
 
 				nei.assign( normalEdgeIndicator( depth, normal ) );
 

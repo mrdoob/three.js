@@ -19,7 +19,7 @@ different offsets into the buffer.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="InterleavedBufferAttribute" translate="no">new <a href="#InterleavedBufferAttribute">InterleavedBufferAttribute</a><span class="signature">( interleavedBuffer : <span class="param-type">InterleavedBuffer</span>, itemSize : <span class="param-type">number</span>, offset : <span class="param-type">number</span>, normalized : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="InterleavedBufferAttribute" translate="no">new <a href="#InterleavedBufferAttribute">InterleavedBufferAttribute</a><span class="signature">( interleavedBuffer : <span class="param-type"><a href="InterleavedBuffer.html">InterleavedBuffer</a></span>, itemSize : <span class="param-type">number</span>, offset : <span class="param-type">number</span>, normalized : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new interleaved buffer attribute.</p>
@@ -27,20 +27,37 @@ different offsets into the buffer.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>interleavedBuffer</code></td>
-									<td class="description last"><p>The buffer holding the interleaved data.</p></td>
+									<td class="name">
+										<strong>interleavedBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer holding the interleaved data.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>itemSize</code></td>
-									<td class="description last"><p>The item size.</p></td>
+									<td class="name">
+										<strong>itemSize</strong>
+									</td>
+									<td class="description last">
+										<p>The item size.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>offset</code></td>
-									<td class="description last"><p>The attribute offset into the buffer.</p></td>
+									<td class="name">
+										<strong>offset</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute offset into the buffer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>normalized</code></td>
-									<td class="description last"><p>Whether the data are normalized or not.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>normalized</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the data are normalized or not.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -68,7 +85,8 @@ different offsets into the buffer.</p></div>
 				<div class="member">
 					<h3 class="name" id="isInterleavedBufferAttribute" translate="no">.<a href="#isInterleavedBufferAttribute">isInterleavedBufferAttribute</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -87,7 +105,8 @@ different offsets into the buffer.</p></div>
 					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Flag to indicate that this attribute has changed and should be re-sent to
-the GPU. Set this to <code>true</code> when you modify the value of the array.<br/>Default is <code>false</code>.</p>
+the GPU. Set this to <code>true</code> when you modify the value of the array.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -103,7 +122,7 @@ the GPU. Set this to <code>true</code> when you modify the value of the array.<b
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( m : <span class="param-type">Matrix4</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<h3 class="name name-method" id="applyMatrix4" translate="no">.<a href="#applyMatrix4">applyMatrix4</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Applies the given 4x4 matrix to the given attribute. Only works with
@@ -112,8 +131,12 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>m</code></td>
-									<td class="description last"><p>The matrix to apply.</p></td>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -121,7 +144,7 @@ item size <code>3</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="applyNormalMatrix" translate="no">.<a href="#applyNormalMatrix">applyNormalMatrix</a><span class="signature">( m : <span class="param-type">Matrix3</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<h3 class="name name-method" id="applyNormalMatrix" translate="no">.<a href="#applyNormalMatrix">applyNormalMatrix</a><span class="signature">( m : <span class="param-type"><a href="Matrix3.html">Matrix3</a></span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Applies the given 3x3 normal matrix to the given attribute. Only works with
@@ -130,8 +153,12 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>m</code></td>
-									<td class="description last"><p>The normal matrix to apply.</p></td>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The normal matrix to apply.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -148,8 +175,12 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>An object with interleaved buffers that allows to retain the interleaved property.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>An object with interleaved buffers that allows to retain the interleaved property.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -165,12 +196,20 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>component</code></td>
-									<td class="description last"><p>The component index.</p></td>
+									<td class="name">
+										<strong>component</strong>
+									</td>
+									<td class="description last">
+										<p>The component index.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -186,8 +225,12 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -203,8 +246,12 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -220,8 +267,12 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -237,8 +288,12 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -254,16 +309,28 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>component</code></td>
-									<td class="description last"><p>The component index.</p></td>
+									<td class="name">
+										<strong>component</strong>
+									</td>
+									<td class="description last">
+										<p>The component index.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>value</code></td>
-									<td class="description last"><p>The value to set.</p></td>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -279,12 +346,20 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>w</code></td>
-									<td class="description last"><p>The value to set.</p></td>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -300,12 +375,20 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The value to set.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -321,16 +404,28 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The value for the x component to set.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The value for the y component to set.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -346,20 +441,36 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The value for the x component to set.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The value for the y component to set.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>z</code></td>
-									<td class="description last"><p>The value for the z component to set.</p></td>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the z component to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -375,24 +486,44 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>x</code></td>
-									<td class="description last"><p>The value for the x component to set.</p></td>
+									<td class="name">
+										<strong>x</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the x component to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The value for the y component to set.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the y component to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>z</code></td>
-									<td class="description last"><p>The value for the z component to set.</p></td>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the z component to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>w</code></td>
-									<td class="description last"><p>The value for the w component to set.</p></td>
+									<td class="name">
+										<strong>w</strong>
+									</td>
+									<td class="description last">
+										<p>The value for the w component to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -408,12 +539,20 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>y</code></td>
-									<td class="description last"><p>The value to set.</p></td>
+									<td class="name">
+										<strong>y</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -429,12 +568,20 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>index</code></td>
-									<td class="description last"><p>The index into the buffer attribute.</p></td>
+									<td class="name">
+										<strong>index</strong>
+									</td>
+									<td class="description last">
+										<p>The index into the buffer attribute.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>z</code></td>
-									<td class="description last"><p>The value to set.</p></td>
+									<td class="name">
+										<strong>z</strong>
+									</td>
+									<td class="description last">
+										<p>The value to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -451,8 +598,12 @@ item size <code>3</code>.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>data</code></td>
-									<td class="description last"><p>An optional value holding meta information about the serialization.</p></td>
+									<td class="name">
+										<strong>data</strong>
+									</td>
+									<td class="description last">
+										<p>An optional value holding meta information about the serialization.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -460,7 +611,7 @@ item size <code>3</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A JSON object representing the serialized buffer attribute.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="transformDirection" translate="no">.<a href="#transformDirection">transformDirection</a><span class="signature">( m : <span class="param-type">Matrix4</span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<h3 class="name name-method" id="transformDirection" translate="no">.<a href="#transformDirection">transformDirection</a><span class="signature">( m : <span class="param-type"><a href="Matrix4.html">Matrix4</a></span> )</span><span class="type-signature"> : <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Applies the given 4x4 matrix to the given attribute. Only works with
@@ -469,8 +620,12 @@ item size <code>3</code> and with direction vectors.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>m</code></td>
-									<td class="description last"><p>The matrix to apply.</p></td>
+									<td class="name">
+										<strong>m</strong>
+									</td>
+									<td class="description last">
+										<p>The matrix to apply.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -480,7 +635,7 @@ item size <code>3</code> and with direction vectors.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBufferAttribute.js" target="_blank" rel="noopener" translate="no">src/core/InterleavedBufferAttribute.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBufferAttribute.js" translate="no" target="_blank" rel="noopener">src/core/InterleavedBufferAttribute.js</a>
 				</p>
 			</article>
 		</section>

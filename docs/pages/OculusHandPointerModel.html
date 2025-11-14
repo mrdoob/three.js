@@ -17,11 +17,11 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">OculusHandPointerModel</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">OculusHandPointerModel</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { OculusHandPointerModel } from 'three/addons/webxr/OculusHandPointerModel.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="OculusHandPointerModel" translate="no">new <a href="#OculusHandPointerModel">OculusHandPointerModel</a><span class="signature">( hand : <span class="param-type">Group</span>, controller : <span class="param-type">Group</span> )</span> </h3>
+					<h3 class="name name-method" id="OculusHandPointerModel" translate="no">new <a href="#OculusHandPointerModel">OculusHandPointerModel</a><span class="signature">( hand : <span class="param-type"><a href="Group.html">Group</a></span>, controller : <span class="param-type"><a href="Group.html">Group</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new Oculus hand model.</p>
@@ -29,12 +29,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>hand</code></td>
-									<td class="description last"><p>The hand controller.</p></td>
+									<td class="name">
+										<strong>hand</strong>
+									</td>
+									<td class="description last">
+										<p>The hand controller.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>controller</code></td>
-									<td class="description last"><p>The WebXR controller in target ray space.</p></td>
+									<td class="name">
+										<strong>controller</strong>
+									</td>
+									<td class="description last">
+										<p>The WebXR controller in target ray space.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -44,7 +52,8 @@
 				<div class="member">
 					<h3 class="name" id="attached" translate="no">.<a href="#attached">attached</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the model is attached or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether the model is attached or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -56,7 +65,8 @@
 				<div class="member">
 					<h3 class="name" id="cursorObject" translate="no">.<a href="#cursorObject">cursorObject</a><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
 					<div class="description">
-						<p>The cursor object.<br/>Default is <code>null</code>.</p>
+						<p>The cursor object.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -68,36 +78,41 @@
 				<div class="member">
 					<h3 class="name" id="pinched" translate="no">.<a href="#pinched">pinched</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the model is pinched or not.<br/>Default is <code>false</code>.</p>
+						<p>Whether the model is pinched or not.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="pointerGeometry" translate="no">.<a href="#pointerGeometry">pointerGeometry</a><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
 					<div class="description">
-						<p>The pointer geometry.<br/>Default is <code>null</code>.</p>
+						<p>The pointer geometry.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="pointerMesh" translate="no">.<a href="#pointerMesh">pointerMesh</a><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
 					<div class="description">
-						<p>The pointer mesh.<br/>Default is <code>null</code>.</p>
+						<p>The pointer mesh.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="pointerObject" translate="no">.<a href="#pointerObject">pointerObject</a><span class="type-signature"> : <a href="Object3D.html">Object3D</a></span> </h3>
 					<div class="description">
-						<p>The pointer object that holds the pointer mesh.<br/>Default is <code>null</code>.</p>
+						<p>The pointer object that holds the pointer mesh.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="raycaster" translate="no">.<a href="#raycaster">raycaster</a><span class="type-signature"> : <a href="Raycaster.html">Raycaster</a></span> </h3>
 					<div class="description">
 						<p>The internal raycaster used for detecting
-intersections.<br/>Default is <code>null</code>.</p>
+intersections.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="checkIntersections" translate="no">.<a href="#checkIntersections">checkIntersections</a><span class="signature">( objects : <span class="param-type">Array.&lt;Object3D></span>, recursive : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="checkIntersections" translate="no">.<a href="#checkIntersections">checkIntersections</a><span class="signature">( objects : <span class="param-type">Array.&lt;<a href="Object3D.html">Object3D</a>></span>, recursive : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Checks for intersections between the model's raycaster and the given objects. The method
@@ -106,13 +121,22 @@ updates the cursor object to the intersection point.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>objects</code></td>
-									<td class="description last"><p>The 3D objects to check for intersection with the ray.</p></td>
+									<td class="name">
+										<strong>objects</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D objects to check for intersection with the ray.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>recursive</code></td>
-									<td class="description last"><p>If set to <code>true</code>, it also checks all descendants.
-Otherwise it only checks intersection with the object.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>recursive</strong>
+									</td>
+									<td class="description last">
+										<p>If set to <code>true</code>, it also checks all descendants.
+Otherwise it only checks intersection with the object.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -130,7 +154,7 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>fals
 method whenever this instance is no longer used in your app.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="intersectObject" translate="no">.<a href="#intersectObject">intersectObject</a><span class="signature">( object : <span class="param-type">Object3D</span>, recursive : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
+					<h3 class="name name-method" id="intersectObject" translate="no">.<a href="#intersectObject">intersectObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, recursive : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs an intersection test with the model's raycaster and the given object.</p>
@@ -138,13 +162,22 @@ method whenever this instance is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>object</code></td>
-									<td class="description last"><p>The 3D object to check for intersection with the ray.</p></td>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to check for intersection with the ray.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>recursive</code></td>
-									<td class="description last"><p>If set to <code>true</code>, it also checks all descendants.
-Otherwise it only checks intersection with the object.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>recursive</strong>
+									</td>
+									<td class="description last">
+										<p>If set to <code>true</code>, it also checks all descendants.
+Otherwise it only checks intersection with the object.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -152,7 +185,7 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 							<dt class="tag-returns"><strong>Returns:</strong> An array holding the intersection points.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectObjects" translate="no">.<a href="#intersectObjects">intersectObjects</a><span class="signature">( objects : <span class="param-type">Array.&lt;Object3D></span>, recursive : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
+					<h3 class="name name-method" id="intersectObjects" translate="no">.<a href="#intersectObjects">intersectObjects</a><span class="signature">( objects : <span class="param-type">Array.&lt;<a href="Object3D.html">Object3D</a>></span>, recursive : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs an intersection test with the model's raycaster and the given objects.</p>
@@ -160,13 +193,22 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>objects</code></td>
-									<td class="description last"><p>The 3D objects to check for intersection with the ray.</p></td>
+									<td class="name">
+										<strong>objects</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D objects to check for intersection with the ray.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>recursive</code></td>
-									<td class="description last"><p>If set to <code>true</code>, it also checks all descendants.
-Otherwise it only checks intersection with the object.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>recursive</strong>
+									</td>
+									<td class="description last">
+										<p>If set to <code>true</code>, it also checks all descendants.
+Otherwise it only checks intersection with the object.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -200,8 +242,12 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>attached</code></td>
-									<td class="description last"><p>Whether the model is attached or not.</p></td>
+									<td class="name">
+										<strong>attached</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the model is attached or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -214,8 +260,12 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>distance</code></td>
-									<td class="description last"><p>The distance to set the cursor to.</p></td>
+									<td class="name">
+										<strong>distance</strong>
+									</td>
+									<td class="description last">
+										<p>The distance to set the cursor to.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -228,9 +278,14 @@ Otherwise it only checks intersection with the object.<br/>Default is <code>true
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>force</code></td>
-									<td class="description last"><p>When set to <code>true</code>, a recomputation of world matrices is forced even
-when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.<br/>Default is <code>false</code>.</p></td>
+									<td class="name">
+										<strong>force</strong>
+									</td>
+									<td class="description last">
+										<p>When set to <code>true</code>, a recomputation of world matrices is forced even
+when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdate</a> is set to <code>false</code>.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -240,7 +295,7 @@ when <a href="Object3D.html#matrixWorldAutoUpdate">Object3D#matrixWorldAutoUpdat
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/OculusHandPointerModel.js" target="_blank" rel="noopener" translate="no">examples/jsm/webxr/OculusHandPointerModel.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/OculusHandPointerModel.js" translate="no" target="_blank" rel="noopener">examples/jsm/webxr/OculusHandPointerModel.js</a>
 				</p>
 			</article>
 		</section>

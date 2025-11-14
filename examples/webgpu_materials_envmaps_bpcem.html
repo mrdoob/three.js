@@ -50,7 +50,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				THREE.RectAreaLightNode.setLTC( RectAreaLightTexturesLib.init() );
 
@@ -102,9 +102,11 @@
 
 				// walls
 			
-				const diffuseTex = loader.load( 'textures/brick_diffuse.jpg' );
+				const [ diffuseTex, bumpTex ] = await Promise.all( [
+					loader.loadAsync( 'textures/brick_diffuse.jpg' ),
+					loader.loadAsync( 'textures/brick_bump.jpg' )
+				] );
 				diffuseTex.colorSpace = THREE.SRGBColorSpace;
-				const bumpTex = loader.load( 'textures/brick_bump.jpg' );
 
 				wallMat = new THREE.MeshStandardNodeMaterial();
 
@@ -176,6 +178,10 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
+				await renderer.init();
+
+				updateCubeMap();
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				// controls
@@ -223,8 +229,6 @@
 			}
 
 			function animate() {
-
-				updateCubeMap();
 
 				renderer.render( scene, camera );
 

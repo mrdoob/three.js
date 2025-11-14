@@ -16,17 +16,17 @@
 				<div class="class-description"><p>A special node that applies TRAA (Temporal Reprojection Anti-Aliasing).</p>
 <p>References:</p>
 <ul>
-<li><a href="https://alextardif.com/TAA.html">https://alextardif.com/TAA.html</a></li>
-<li><a href="https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/">https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/</a></li>
+<li><a href="https://alextardif.com/TAA.html" target="_blank" rel="noopener">https://alextardif.com/TAA.html</a></li>
+<li><a href="https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/" target="_blank" rel="noopener">https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/</a></li>
 </ul></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">TRAANode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">TRAANode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { traa } from 'three/addons/tsl/display/TRAANode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="TRAANode" translate="no">new <a href="#TRAANode">TRAANode</a><span class="signature">( beautyNode : <span class="param-type">TextureNode</span>, depthNode : <span class="param-type">TextureNode</span>, velocityNode : <span class="param-type">TextureNode</span>, camera : <span class="param-type">Camera</span> )</span> </h3>
+					<h3 class="name name-method" id="TRAANode" translate="no">new <a href="#TRAANode">TRAANode</a><span class="signature">( beautyNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, depthNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, velocityNode : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new TRAA node.</p>
@@ -34,20 +34,36 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>beautyNode</code></td>
-									<td class="description last"><p>The texture node that represents the input of the effect.</p></td>
+									<td class="name">
+										<strong>beautyNode</strong>
+									</td>
+									<td class="description last">
+										<p>The texture node that represents the input of the effect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>depthNode</code></td>
-									<td class="description last"><p>A node that represents the scene's depth.</p></td>
+									<td class="name">
+										<strong>depthNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the scene's depth.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>velocityNode</code></td>
-									<td class="description last"><p>A node that represents the scene's velocity.</p></td>
+									<td class="name">
+										<strong>velocityNode</strong>
+									</td>
+									<td class="description last">
+										<p>A node that represents the scene's velocity.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera the scene is rendered with.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -75,14 +91,16 @@
 				<div class="member">
 					<h3 class="name" id="isTRAANode" translate="no">.<a href="#isTRAANode">isTRAANode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node renders
-its effect once per frame in <code>updateBefore()</code>.<br/>Default is <code>'frame'</code>.</p>
+its effect once per frame in <code>updateBefore()</code>.</p>
+						<p>Default is <code>'frame'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
@@ -128,12 +146,20 @@ when the effect is no longer required.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the effect.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the effect.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -147,17 +173,25 @@ to the scene's camera.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width of the effect.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the effect.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height of the effect.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the effect.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's render targets and TSL code.</p>
@@ -165,19 +199,20 @@ to the scene's camera.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
 						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
-						</dl>
 					</div>
-					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to render the effect once per frame.</p>
@@ -185,8 +220,12 @@ to the scene's camera.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>The current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -196,7 +235,7 @@ to the scene's camera.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/TRAANode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/TRAANode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/TRAANode.js" translate="no" target="_blank" rel="noopener">examples/jsm/tsl/display/TRAANode.js</a>
 				</p>
 			</article>
 		</section>

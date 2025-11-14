@@ -192,6 +192,7 @@ class SSSNode extends TempNode {
 		/**
 		 * Temporal offset added to the initial ray step.
 		 *
+		 * @private
 		 * @type {UniformNode<float>}
 		 */
 		this._temporalOffset = uniform( 0 );
@@ -199,6 +200,7 @@ class SSSNode extends TempNode {
 		/**
 		 * The frame ID use when temporal filtering is enabled.
 		 *
+		 * @private
 		 * @type {UniformNode<uint>}
 		 */
 		this._frameId = uniform( 0 );

@@ -5,8 +5,12 @@ uniform sampler2D dfgLUT;
 struct PhysicalMaterial {
 
 	vec3 diffuseColor;
-	float roughness;
+	vec3 diffuseContribution;
 	vec3 specularColor;
+	vec3 specularColorBlended;
+
+	float roughness;
+	float metalness;
 	float specularF90;
 	float dispersion;
 
@@ -149,7 +153,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 
 vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {
 
-	vec3 f0 = material.specularColor;
+	vec3 f0 = material.specularColorBlended;
 	float f90 = material.specularF90;
 	float roughness = material.roughness;
 
@@ -443,8 +447,8 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 	vec2 dfgL = DFGApprox( vec3(0.0, 0.0, 1.0), vec3(sqrt(1.0 - dotNL * dotNL), 0.0, dotNL), material.roughness );
 
 	// Single-scattering energy for view and light
-	vec3 FssEss_V = material.specularColor * dfgV.x + material.specularF90 * dfgV.y;
-	vec3 FssEss_L = material.specularColor * dfgL.x + material.specularF90 * dfgL.y;
+	vec3 FssEss_V = material.specularColorBlended * dfgV.x + material.specularF90 * dfgV.y;
+	vec3 FssEss_L = material.specularColorBlended * dfgL.x + material.specularF90 * dfgL.y;
 
 	float Ess_V = dfgV.x + dfgV.y;
 	float Ess_L = dfgL.x + dfgL.y;
@@ -454,7 +458,7 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 	float Ems_L = 1.0 - Ess_L;
 
 	// Average Fresnel reflectance
-	vec3 Favg = material.specularColor + ( 1.0 - material.specularColor ) * 0.047619; // 1/21
+	vec3 Favg = material.specularColorBlended + ( 1.0 - material.specularColorBlended ) * 0.047619; // 1/21
 
 	// Multiple scattering contribution
 	vec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg * Favg + EPSILON );
@@ -500,11 +504,11 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 
 		// LTC Fresnel Approximation by Stephen Hill
 		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
-		vec3 fresnel = ( material.specularColor * t2.x + ( vec3( 1.0 ) - material.specularColor ) * t2.y );
+		vec3 fresnel = ( material.specularColorBlended * t2.x + ( vec3( 1.0 ) - material.specularColorBlended ) * t2.y );
 
 		reflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );
 
-		reflectedLight.directDiffuse += lightColor * material.diffuseColor * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );
+		reflectedLight.directDiffuse += lightColor * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );
 
 	}
 
@@ -534,12 +538,12 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
 
-	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
 
 }
 
@@ -558,23 +562,35 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	#endif
 
 	// Both indirect specular and indirect diffuse light accumulate here
+	// Compute multiscattering separately for dielectric and metallic, then mix
 
-	vec3 singleScattering = vec3( 0.0 );
-	vec3 multiScattering = vec3( 0.0 );
-	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
+	vec3 singleScatteringDielectric = vec3( 0.0 );
+	vec3 multiScatteringDielectric = vec3( 0.0 );
+
+	vec3 singleScatteringMetallic = vec3( 0.0 );
+	vec3 multiScatteringMetallic = vec3( 0.0 );
 
 	#ifdef USE_IRIDESCENCE
 
-		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScattering, multiScattering );
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#else
 
-		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );
+		computeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScatteringDielectric, multiScatteringDielectric );
+		computeMultiscattering( geometryNormal, geometryViewDir, material.diffuseColor, material.specularF90, material.roughness, singleScatteringMetallic, multiScatteringMetallic );
 
 	#endif
 
-	vec3 totalScattering = singleScattering + multiScattering;
-	vec3 diffuse = material.diffuseColor * ( 1.0 - max( max( totalScattering.r, totalScattering.g ), totalScattering.b ) );
+	// Mix based on metalness
+	vec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );
+	vec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );
+
+	// Diffuse energy conservation uses dielectric path
+	vec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;
+	vec3 diffuse = material.diffuseContribution * ( 1.0 - max( max( totalScatteringDielectric.r, totalScatteringDielectric.g ), totalScatteringDielectric.b ) );
+
+	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
 	reflectedLight.indirectSpecular += radiance * singleScattering;
 	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;

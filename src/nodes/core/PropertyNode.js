@@ -135,6 +135,14 @@ export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( t
 export const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
 
 /**
+ * TSL object that represents the shader variable `DiffuseContribution`.
+ *
+ * @tsl
+ * @type {PropertyNode<vec3>}
+ */
+export const diffuseContribution = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'DiffuseContribution' );
+
+/**
  * TSL object that represents the shader variable `EmissiveColor`.
  *
  * @tsl
@@ -253,6 +261,14 @@ export const anisotropyB = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'A
  * @type {PropertyNode<color>}
  */
 export const specularColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
+
+/**
+ * TSL object that represents the shader variable `SpecularColorBlended`.
+ *
+ * @tsl
+ * @type {PropertyNode<color>}
+ */
+export const specularColorBlended = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColorBlended' );
 
 /**
  * TSL object that represents the shader variable `SpecularF90`.

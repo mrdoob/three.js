@@ -17,7 +17,7 @@
 loaded via <a href="ImageLoader.html">ImageLoader</a>.</p>
 <p>Please note that <code>TextureLoader</code> has dropped support for progress
 events in <code>r84</code>. For a <code>TextureLoader</code> that supports progress events, see
-<a href="https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145">this thread</a>.</p></div>
+<a href="https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145" target="_blank" rel="noopener">this thread</a>.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const loader = new THREE.TextureLoader();
 const texture = await loader.loadAsync( 'textures/land_ocean_ice_cloud_2048.jpg' );
@@ -27,7 +27,7 @@ const material = new THREE.MeshBasicMaterial( { map:texture } );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="TextureLoader" translate="no">new <a href="#TextureLoader">TextureLoader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="TextureLoader" translate="no">new <a href="#TextureLoader">TextureLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new texture loader.</p>
@@ -35,15 +35,19 @@ const material = new THREE.MeshBasicMaterial( { map:texture } );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and pass the fully loaded texture
@@ -54,20 +58,36 @@ may pop up in your scene once the respective loading process is finished.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Unsupported in this loader.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Unsupported in this loader.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -80,7 +100,7 @@ may pop up in your scene once the respective loading process is finished.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/TextureLoader.js" target="_blank" rel="noopener" translate="no">src/loaders/TextureLoader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/TextureLoader.js" translate="no" target="_blank" rel="noopener">src/loaders/TextureLoader.js</a>
 				</p>
 			</article>
 		</section>

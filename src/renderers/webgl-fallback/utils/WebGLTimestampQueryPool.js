@@ -1,4 +1,4 @@
-import { warnOnce, warn } from '../../../utils.js';
+import { error, warnOnce, warn } from '../../../utils.js';
 import TimestampQueryPool from '../../common/TimestampQueryPool.js';
 
 /**
@@ -122,9 +122,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 			}
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'Error in beginQuery:', error );
+			error( 'Error in beginQuery:', e );
 			this.activeQuery = null;
 			this.queryStates.set( baseOffset, 'inactive' );
 
@@ -165,9 +165,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 			this.queryStates.set( baseOffset, 'ended' );
 			this.activeQuery = null;
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'Error in endQuery:', error );
+			error( 'Error in endQuery:', e );
 			// Reset state on error
 			this.queryStates.set( baseOffset, 'inactive' );
 			this.activeQuery = null;
@@ -258,9 +258,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 
 			return totalDuration;
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			error( 'Error resolving queries:', error );
+			error( 'Error resolving queries:', e );
 			return this.lastValue;
 
 		} finally {
@@ -346,9 +346,9 @@ class WebGLTimestampQueryPool extends TimestampQueryPool {
 					const elapsed = this.gl.getQueryParameter( query, this.gl.QUERY_RESULT );
 					resolve( Number( elapsed ) / 1e6 ); // Convert nanoseconds to milliseconds
 
-				} catch ( error ) {
+				} catch ( e ) {
 
-					error( 'Error checking query:', error );
+					error( 'Error checking query:', e );
 					resolve( this.lastValue );
 
 				}

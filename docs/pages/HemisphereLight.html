@@ -24,7 +24,7 @@ scene.add( light );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="HemisphereLight" translate="no">new <a href="#HemisphereLight">HemisphereLight</a><span class="signature">( skyColor : <span class="param-type">number | Color | string</span>, groundColor : <span class="param-type">number | Color | string</span>, intensity : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="HemisphereLight" translate="no">new <a href="#HemisphereLight">HemisphereLight</a><span class="signature">( skyColor : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, groundColor : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, intensity : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new hemisphere light.</p>
@@ -32,16 +32,31 @@ scene.add( light );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>skyColor</code></td>
-									<td class="description last"><p>The light's sky color.<br/>Default is <code>0xffffff</code>.</p></td>
+									<td class="name">
+										<strong>skyColor</strong>
+									</td>
+									<td class="description last">
+										<p>The light's sky color.</p>
+										<p>Default is <code>0xffffff</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>groundColor</code></td>
-									<td class="description last"><p>The light's ground color.<br/>Default is <code>0xffffff</code>.</p></td>
+									<td class="name">
+										<strong>groundColor</strong>
+									</td>
+									<td class="description last">
+										<p>The light's ground color.</p>
+										<p>Default is <code>0xffffff</code>.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>intensity</code></td>
-									<td class="description last"><p>The light's strength/intensity.<br/>Default is <code>1</code>.</p></td>
+									<td class="name">
+										<strong>intensity</strong>
+									</td>
+									<td class="description last">
+										<p>The light's strength/intensity.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -57,12 +72,13 @@ scene.add( light );
 				<div class="member">
 					<h3 class="name" id="isHemisphereLight" translate="no">.<a href="#isHemisphereLight">isHemisphereLight</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/lights/HemisphereLight.js" target="_blank" rel="noopener" translate="no">src/lights/HemisphereLight.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/lights/HemisphereLight.js" translate="no" target="_blank" rel="noopener">src/lights/HemisphereLight.js</a>
 				</p>
 			</article>
 		</section>

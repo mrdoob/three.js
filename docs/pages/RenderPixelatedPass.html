@@ -21,11 +21,11 @@ composer.addPass( renderPixelatedPass );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">RenderPixelatedPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">RenderPixelatedPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="RenderPixelatedPass" translate="no">new <a href="#RenderPixelatedPass">RenderPixelatedPass</a><span class="signature">( pixelSize : <span class="param-type">number</span>, scene : <span class="param-type">Scene</span>, camera : <span class="param-type">Camera</span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="RenderPixelatedPass" translate="no">new <a href="#RenderPixelatedPass">RenderPixelatedPass</a><span class="signature">( pixelSize : <span class="param-type">number</span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new render pixelated pass.</p>
@@ -33,20 +33,36 @@ composer.addPass( renderPixelatedPass );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pixelSize</code></td>
-									<td class="description last"><p>The effect's pixel size.</p></td>
+									<td class="name">
+										<strong>pixelSize</strong>
+									</td>
+									<td class="description last">
+										<p>The effect's pixel size.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>scene</code></td>
-									<td class="description last"><p>The scene to render.</p></td>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>camera</code></td>
-									<td class="description last"><p>The camera.</p></td>
+									<td class="name">
+										<strong>camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>options</code></td>
-									<td class="description last"><p>The pass options.</p></td>
+									<td class="name">
+										<strong>options</strong>
+									</td>
+									<td class="description last">
+										<p>The pass options.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -62,13 +78,15 @@ composer.addPass( renderPixelatedPass );
 				<div class="member">
 					<h3 class="name" id="depthEdgeStrength" translate="no">.<a href="#depthEdgeStrength">depthEdgeStrength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The normal edge strength.<br/>Default is <code>0.4</code>.</p>
+						<p>The normal edge strength.</p>
+						<p>Default is <code>0.4</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="normalEdgeStrength" translate="no">.<a href="#normalEdgeStrength">normalEdgeStrength</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The normal edge strength.<br/>Default is <code>0.3</code>.</p>
+						<p>The normal edge strength.</p>
+						<p>Default is <code>0.3</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -100,7 +118,7 @@ method whenever the pass is no longer used in your app.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#dispose">Pass#dispose</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, writeBuffer : <span class="param-type">WebGLRenderTarget</span>, readBuffer : <span class="param-type">WebGLRenderTarget</span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, writeBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, readBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs the pixelation pass.</p>
@@ -108,26 +126,46 @@ method whenever the pass is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>writeBuffer</code></td>
-									<td class="description last"><p>The write buffer. This buffer is intended as the rendering
-destination for the pass.</p></td>
+									<td class="name">
+										<strong>writeBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>readBuffer</code></td>
-									<td class="description last"><p>The read buffer. The pass can access the result from the
-previous pass from this buffer.</p></td>
+									<td class="name">
+										<strong>readBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>deltaTime</code></td>
-									<td class="description last"><p>The delta time in seconds.</p></td>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maskActive</code></td>
-									<td class="description last"><p>Whether masking is active or not.</p></td>
+									<td class="name">
+										<strong>maskActive</strong>
+									</td>
+									<td class="description last">
+										<p>Whether masking is active or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -143,8 +181,12 @@ previous pass from this buffer.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>pixelSize</code></td>
-									<td class="description last"><p>The pixel size to set.</p></td>
+									<td class="name">
+										<strong>pixelSize</strong>
+									</td>
+									<td class="description last">
+										<p>The pixel size to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -157,12 +199,20 @@ previous pass from this buffer.</p></td>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>width</code></td>
-									<td class="description last"><p>The width to set.</p></td>
+									<td class="name">
+										<strong>width</strong>
+									</td>
+									<td class="description last">
+										<p>The width to set.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>height</code></td>
-									<td class="description last"><p>The height to set.</p></td>
+									<td class="name">
+										<strong>height</strong>
+									</td>
+									<td class="description last">
+										<p>The height to set.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -172,7 +222,7 @@ previous pass from this buffer.</p></td>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/RenderPixelatedPass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/RenderPixelatedPass.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/RenderPixelatedPass.js" translate="no" target="_blank" rel="noopener">examples/jsm/postprocessing/RenderPixelatedPass.js</a>
 				</p>
 			</article>
 		</section>

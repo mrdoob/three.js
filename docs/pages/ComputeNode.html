@@ -18,7 +18,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ComputeNode" translate="no">new <a href="#ComputeNode">ComputeNode</a><span class="signature">( computeNode : <span class="param-type">Node</span>, workgroupSize : <span class="param-type">Array.&lt;number></span> )</span> </h3>
+					<h3 class="name name-method" id="ComputeNode" translate="no">new <a href="#ComputeNode">ComputeNode</a><span class="signature">( computeNode : <span class="param-type"><a href="Node.html">Node</a></span>, workgroupSize : <span class="param-type">Array.&lt;number></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new compute node.</p>
@@ -26,12 +26,20 @@
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>computeNode</code></td>
-									<td class="description last"><p>TODO</p></td>
+									<td class="name">
+										<strong>computeNode</strong>
+									</td>
+									<td class="description last">
+										<p>TODO</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>workgroupSize</code></td>
-									<td class="description last"><p>TODO.</p></td>
+									<td class="name">
+										<strong>workgroupSize</strong>
+									</td>
+									<td class="description last">
+										<p>TODO.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -53,13 +61,15 @@
 				<div class="member">
 					<h3 class="name" id="isComputeNode" translate="no">.<a href="#isComputeNode">isComputeNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>This flag can be used for type testing.<br/>Default is <code>true</code>.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="name" translate="no">.<a href="#name">name</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The name or label of the uniform.<br/>Default is <code>''</code>.</p>
+						<p>The name or label of the uniform.</p>
+						<p>Default is <code>''</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#name">Node#name</a></dt>
@@ -75,7 +85,8 @@
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.OBJECT</code> since <a href="ComputeNode.html#updateBefore">ComputeNode#updateBefore</a>
-is executed once per object by default.<br/>Default is <code>'object'</code>.</p>
+is executed once per object by default.</p>
+						<p>Default is <code>'object'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBeforeType">Node#updateBeforeType</a></dt>
@@ -93,7 +104,8 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 				<div class="member">
 					<h3 class="name" id="workgroupSize" translate="no">.<a href="#workgroupSize">workgroupSize</a><span class="type-signature"> : Array.&lt;number></span> </h3>
 					<div class="description">
-						<p>TODO<br/>Default is <code>[ 64 ]</code>.</p>
+						<p>TODO</p>
+						<p>Default is <code>[ 64 ]</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -111,9 +123,6 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 						<div class="description">
 							<p>TODO</p>
 						</div>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
-						</dl>
 					</div>
 					<h3 class="name name-method" id="label" translate="no">.<a href="#label">label</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
 					<div class="method">
@@ -123,8 +132,12 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the uniform.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -143,8 +156,12 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>callback</code></td>
-									<td class="description last"><p>TODO.</p></td>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>TODO.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -160,14 +177,15 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>count</code></td>
-									<td class="description last"><p>Array with [ x, y, z ] values for dispatch or a single number for the count</p></td>
+									<td class="name">
+										<strong>count</strong>
+									</td>
+									<td class="description last">
+										<p>Array with [ x, y, z ] values for dispatch or a single number for the count</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> </dt>
-						</dl>
 					</div>
 					<h3 class="name name-method" id="setName" translate="no">.<a href="#setName">setName</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>
 					<div class="method">
@@ -177,8 +195,12 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>name</code></td>
-									<td class="description last"><p>The name of the uniform.</p></td>
+									<td class="name">
+										<strong>name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the uniform.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -186,7 +208,7 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type">NodeFrame</span> )</span> </h3>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>The method execute the compute for this node.</p>
@@ -194,8 +216,12 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>frame</code></td>
-									<td class="description last"><p>A reference to the current node frame.</p></td>
+									<td class="name">
+										<strong>frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -205,7 +231,7 @@ is executed once per object by default.<br/>Default is <code>'object'</code>.</p
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/gpgpu/ComputeNode.js" target="_blank" rel="noopener" translate="no">src/nodes/gpgpu/ComputeNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/gpgpu/ComputeNode.js" translate="no" target="_blank" rel="noopener">src/nodes/gpgpu/ComputeNode.js</a>
 				</p>
 			</article>
 		</section>

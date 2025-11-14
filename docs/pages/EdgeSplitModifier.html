@@ -21,7 +21,7 @@ geometry = modifier.modify( geometry, Math.PI * 0.4 );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">EdgeSplitModifier</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">EdgeSplitModifier</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { EdgeSplitModifier } from 'three/addons/modifiers/EdgeSplitModifier.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -30,7 +30,7 @@ geometry = modifier.modify( geometry, Math.PI * 0.4 );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="modify" translate="no">.<a href="#modify">modify</a><span class="signature">( geometry : <span class="param-type">BufferGeometry</span>, cutOffAngle : <span class="param-type">number</span>, tryKeepNormals : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<h3 class="name name-method" id="modify" translate="no">.<a href="#modify">modify</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, cutOffAngle : <span class="param-type">number</span>, tryKeepNormals : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a new, modified version of the given geometry by applying an edge-split operation.
@@ -39,16 +39,29 @@ Please note that the resulting geometry is always indexed.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>geometry</code></td>
-									<td class="description last"><p>The geometry to modify.</p></td>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry to modify.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>cutOffAngle</code></td>
-									<td class="description last"><p>The cut off angle in radians.</p></td>
+									<td class="name">
+										<strong>cutOffAngle</strong>
+									</td>
+									<td class="description last">
+										<p>The cut off angle in radians.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>tryKeepNormals</code></td>
-									<td class="description last"><p>Whether to try to keep normals or not.<br/>Default is <code>true</code>.</p></td>
+									<td class="name">
+										<strong>tryKeepNormals</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to try to keep normals or not.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -58,7 +71,7 @@ Please note that the resulting geometry is always indexed.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/modifiers/EdgeSplitModifier.js" target="_blank" rel="noopener" translate="no">examples/jsm/modifiers/EdgeSplitModifier.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/modifiers/EdgeSplitModifier.js" translate="no" target="_blank" rel="noopener">examples/jsm/modifiers/EdgeSplitModifier.js</a>
 				</p>
 			</article>
 		</section>

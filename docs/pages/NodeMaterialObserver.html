@@ -19,7 +19,7 @@ refresh right before they are going to be rendered or not.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="NodeMaterialObserver" translate="no">new <a href="#NodeMaterialObserver">NodeMaterialObserver</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span> </h3>
+					<h3 class="name name-method" id="NodeMaterialObserver" translate="no">new <a href="#NodeMaterialObserver">NodeMaterialObserver</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new node material observer.</p>
@@ -27,8 +27,12 @@ refresh right before they are going to be rendered or not.</p></div>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -56,7 +60,8 @@ refresh right before they are going to be rendered or not.</p></div>
 				<div class="member">
 					<h3 class="name" id="renderId" translate="no">.<a href="#renderId">renderId</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>Holds the current render ID from the node frame.<br/>Default is <code>0</code>.</p>
+						<p>Holds the current render ID from the node frame.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -67,7 +72,7 @@ monitor must maintain a list of render objects.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="containsNode" translate="no">.<a href="#containsNode">containsNode</a><span class="signature">( builder : <span class="param-type">NodeBuilder</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="containsNode" translate="no">.<a href="#containsNode">containsNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the node builder's material uses
@@ -76,8 +81,12 @@ node properties.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>builder</code></td>
-									<td class="description last"><p>The current node builder.</p></td>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -85,7 +94,7 @@ node properties.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the node builder's material uses node properties or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( renderObject : <span class="param-type">RenderObject</span>, lightsData : <span class="param-type">Array.&lt;Light></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, lightsData : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given render object has not changed its state.</p>
@@ -93,12 +102,20 @@ node properties.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderObject</code></td>
-									<td class="description last"><p>The render object.</p></td>
+									<td class="name">
+										<strong>renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>lightsData</code></td>
-									<td class="description last"><p>The current material lights.</p></td>
+									<td class="name">
+										<strong>lightsData</strong>
+									</td>
+									<td class="description last">
+										<p>The current material lights.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -106,7 +123,7 @@ node properties.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the given render object has changed its state or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="firstInitialization" translate="no">.<a href="#firstInitialization">firstInitialization</a><span class="signature">( renderObject : <span class="param-type">RenderObject</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="firstInitialization" translate="no">.<a href="#firstInitialization">firstInitialization</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given render object is verified for the first time of this observer.</p>
@@ -114,8 +131,12 @@ node properties.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderObject</code></td>
-									<td class="description last"><p>The render object.</p></td>
+									<td class="name">
+										<strong>renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -132,8 +153,12 @@ monitoring.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>attributes</code></td>
-									<td class="description last"><p>The geometry attributes.</p></td>
+									<td class="name">
+										<strong>attributes</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry attributes.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -141,7 +166,7 @@ monitoring.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring the versions of attributes.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getLights" translate="no">.<a href="#getLights">getLights</a><span class="signature">( lightsNode : <span class="param-type">LightsNode</span>, renderId : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<h3 class="name name-method" id="getLights" translate="no">.<a href="#getLights">getLights</a><span class="signature">( lightsNode : <span class="param-type"><a href="LightsNode.html">LightsNode</a></span>, renderId : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the lights for the given lights node and render ID.</p>
@@ -149,12 +174,20 @@ monitoring.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>lightsNode</code></td>
-									<td class="description last"><p>The lights node.</p></td>
+									<td class="name">
+										<strong>lightsNode</strong>
+									</td>
+									<td class="description last">
+										<p>The lights node.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>renderId</code></td>
-									<td class="description last"><p>The render ID.</p></td>
+									<td class="name">
+										<strong>renderId</strong>
+									</td>
+									<td class="description last">
+										<p>The render ID.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -162,7 +195,7 @@ monitoring.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The lights for the given lights node and render ID.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getLightsData" translate="no">.<a href="#getLightsData">getLightsData</a><span class="signature">( materialLights : <span class="param-type">Array.&lt;Light></span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<h3 class="name name-method" id="getLightsData" translate="no">.<a href="#getLightsData">getLightsData</a><span class="signature">( materialLights : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns the lights data for the given material lights.</p>
@@ -170,8 +203,12 @@ monitoring.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>materialLights</code></td>
-									<td class="description last"><p>The material lights.</p></td>
+									<td class="name">
+										<strong>materialLights</strong>
+									</td>
+									<td class="description last">
+										<p>The material lights.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -179,7 +216,7 @@ monitoring.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The lights data for the given material lights.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getMaterialData" translate="no">.<a href="#getMaterialData">getMaterialData</a><span class="signature">( material : <span class="param-type">Material</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id="getMaterialData" translate="no">.<a href="#getMaterialData">getMaterialData</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns a material data structure holding the material property values for
@@ -188,8 +225,12 @@ monitoring.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>material</code></td>
-									<td class="description last"><p>The material.</p></td>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -197,7 +238,7 @@ monitoring.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring material properties.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getRenderObjectData" translate="no">.<a href="#getRenderObjectData">getRenderObjectData</a><span class="signature">( renderObject : <span class="param-type">RenderObject</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<h3 class="name name-method" id="getRenderObjectData" translate="no">.<a href="#getRenderObjectData">getRenderObjectData</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns monitoring data for the given render object.</p>
@@ -205,8 +246,12 @@ monitoring.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderObject</code></td>
-									<td class="description last"><p>The render object.</p></td>
+									<td class="name">
+										<strong>renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -214,7 +259,7 @@ monitoring.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The monitoring data.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="needsRefresh" translate="no">.<a href="#needsRefresh">needsRefresh</a><span class="signature">( renderObject : <span class="param-type">RenderObject</span>, nodeFrame : <span class="param-type">NodeFrame</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="needsRefresh" translate="no">.<a href="#needsRefresh">needsRefresh</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, nodeFrame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Checks if the given render object requires a refresh.</p>
@@ -222,12 +267,20 @@ monitoring.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderObject</code></td>
-									<td class="description last"><p>The render object.</p></td>
+									<td class="name">
+										<strong>renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>nodeFrame</code></td>
-									<td class="description last"><p>The current node frame.</p></td>
+									<td class="name">
+										<strong>nodeFrame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -235,7 +288,7 @@ monitoring.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the given render object requires a refresh or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="needsVelocity" translate="no">.<a href="#needsVelocity">needsVelocity</a><span class="signature">( renderer : <span class="param-type">Renderer</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="needsVelocity" translate="no">.<a href="#needsVelocity">needsVelocity</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the current rendering produces motion vectors.</p>
@@ -243,8 +296,12 @@ monitoring.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -254,7 +311,7 @@ monitoring.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/manager/NodeMaterialObserver.js" target="_blank" rel="noopener" translate="no">src/materials/nodes/manager/NodeMaterialObserver.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/nodes/manager/NodeMaterialObserver.js" translate="no" target="_blank" rel="noopener">src/materials/nodes/manager/NodeMaterialObserver.js</a>
 				</p>
 			</article>
 		</section>

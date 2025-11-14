@@ -23,11 +23,11 @@ composer.addPass( fxaaPass );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">ShaderPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">ShaderPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="ShaderPass" translate="no">new <a href="#ShaderPass">ShaderPass</a><span class="signature">( shader : <span class="param-type">Object | ShaderMaterial</span>, textureID : <span class="param-type">string</span> )</span> </h3>
+					<h3 class="name name-method" id="ShaderPass" translate="no">new <a href="#ShaderPass">ShaderPass</a><span class="signature">( shader : <span class="param-type">Object | <a href="ShaderMaterial.html">ShaderMaterial</a></span>, textureID : <span class="param-type">string</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new shader pass.</p>
@@ -35,14 +35,23 @@ composer.addPass( fxaaPass );
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>shader</code></td>
-									<td class="description last"><p>A shader object holding vertex and fragment shader as well as
-defines and uniforms. It's also valid to pass a custom shader material.</p></td>
+									<td class="name">
+										<strong>shader</strong>
+									</td>
+									<td class="description last">
+										<p>A shader object holding vertex and fragment shader as well as
+defines and uniforms. It's also valid to pass a custom shader material.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>textureID</code></td>
-									<td class="description last"><p>The name of the texture uniform that should sample
-the read buffer.<br/>Default is <code>'tDiffuse'</code>.</p></td>
+									<td class="name">
+										<strong>textureID</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the texture uniform that should sample
+the read buffer.</p>
+										<p>Default is <code>'tDiffuse'</code>.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -58,7 +67,8 @@ the read buffer.<br/>Default is <code>'tDiffuse'</code>.</p></td>
 				<div class="member">
 					<h3 class="name" id="textureID" translate="no">.<a href="#textureID">textureID</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The name of the texture uniform that should sample the read buffer.<br/>Default is <code>'tDiffuse'</code>.</p>
+						<p>The name of the texture uniform that should sample the read buffer.</p>
+						<p>Default is <code>'tDiffuse'</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -78,7 +88,7 @@ method whenever the pass is no longer used in your app.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Pass.html#dispose">Pass#dispose</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type">WebGLRenderer</span>, writeBuffer : <span class="param-type">WebGLRenderTarget</span>, readBuffer : <span class="param-type">WebGLRenderTarget</span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="render" translate="no">.<a href="#render">render</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, writeBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, readBuffer : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span>, deltaTime : <span class="param-type">number</span>, maskActive : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Performs the shader pass.</p>
@@ -86,26 +96,46 @@ method whenever the pass is no longer used in your app.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>renderer</code></td>
-									<td class="description last"><p>The renderer.</p></td>
+									<td class="name">
+										<strong>renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>writeBuffer</code></td>
-									<td class="description last"><p>The write buffer. This buffer is intended as the rendering
-destination for the pass.</p></td>
+									<td class="name">
+										<strong>writeBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The write buffer. This buffer is intended as the rendering
+destination for the pass.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>readBuffer</code></td>
-									<td class="description last"><p>The read buffer. The pass can access the result from the
-previous pass from this buffer.</p></td>
+									<td class="name">
+										<strong>readBuffer</strong>
+									</td>
+									<td class="description last">
+										<p>The read buffer. The pass can access the result from the
+previous pass from this buffer.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>deltaTime</code></td>
-									<td class="description last"><p>The delta time in seconds.</p></td>
+									<td class="name">
+										<strong>deltaTime</strong>
+									</td>
+									<td class="description last">
+										<p>The delta time in seconds.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>maskActive</code></td>
-									<td class="description last"><p>Whether masking is active or not.</p></td>
+									<td class="name">
+										<strong>maskActive</strong>
+									</td>
+									<td class="description last">
+										<p>Whether masking is active or not.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -115,7 +145,7 @@ previous pass from this buffer.</p></td>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/ShaderPass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/ShaderPass.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/ShaderPass.js" translate="no" target="_blank" rel="noopener">examples/jsm/postprocessing/ShaderPass.js</a>
 				</p>
 			</article>
 		</section>

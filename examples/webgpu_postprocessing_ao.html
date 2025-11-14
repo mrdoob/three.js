@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity, vec3, vec4, directionToColor } from 'three/tsl';
+			import { pass, mrt, output, normalView, velocity, vec3, vec4, directionToColor, colorSpaceToWorking } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -116,7 +116,7 @@
 				} );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', () => {
 
-					return directionToColor( scenePassNormal.sample() );
+					return colorSpaceToWorking( directionToColor( scenePassNormal ), THREE.SRGBColorSpace );
 
 				} );
 				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );

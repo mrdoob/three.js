@@ -24,11 +24,11 @@ const animations = geometry.animations;
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">MD2Loader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">MD2Loader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { MD2Loader } from 'three/addons/loaders/MD2Loader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="MD2Loader" translate="no">new <a href="#MD2Loader">MD2Loader</a><span class="signature">( manager : <span class="param-type">LoadingManager</span> )</span> </h3>
+					<h3 class="name name-method" id="MD2Loader" translate="no">new <a href="#MD2Loader">MD2Loader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new MD2 loader.</p>
@@ -36,15 +36,19 @@ const animations = geometry.animations;
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>manager</code></td>
-									<td class="description last"><p>The loading manager.</p></td>
+									<td class="name">
+										<strong>manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type">onProgressCallback</span>, onError : <span class="param-type">onErrorCallback</span> )</span> </h3>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded MD2 asset
@@ -53,20 +57,36 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>url</code></td>
-									<td class="description last"><p>The path/URL of the file to be loaded. This can also be a data URI.</p></td>
+									<td class="name">
+										<strong>url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onLoad</code></td>
-									<td class="description last"><p>Executed when the loading process has been finished.</p></td>
+									<td class="name">
+										<strong>onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onProgress</code></td>
-									<td class="description last"><p>Executed while the loading is in progress.</p></td>
+									<td class="name">
+										<strong>onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
 								</tr>
 								<tr>
-									<td class="name"><code>onError</code></td>
-									<td class="description last"><p>Executed when errors occur.</p></td>
+									<td class="name">
+										<strong>onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -82,8 +102,12 @@ to the <code>onLoad()</code> callback.</p>
 						<table class="params">
 							<tbody>
 								<tr>
-									<td class="name"><code>buffer</code></td>
-									<td class="description last"><p>The raw MD2 data as an array buffer.</p></td>
+									<td class="name">
+										<strong>buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw MD2 data as an array buffer.</p>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -96,7 +120,7 @@ to the <code>onLoad()</code> callback.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/MD2Loader.js" target="_blank" rel="noopener" translate="no">examples/jsm/loaders/MD2Loader.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/MD2Loader.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/MD2Loader.js</a>
 				</p>
 			</article>
 		</section>
