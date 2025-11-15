@@ -904,6 +904,7 @@ export class Style {
 
 .list-item-wrapper.header-wrapper>.list-item-row>.list-item-cell:first-child {
 	font-weight: 600;
+	line-height: 1;
 }
 
 .list-item-row.collapsible,
