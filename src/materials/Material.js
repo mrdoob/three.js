@@ -584,6 +584,10 @@ class Material extends EventDispatcher {
 
 				currentValue.copy( newValue );
 
+			} else if ( Array.isArray( currentValue ) && Array.isArray( newValue ) ) {
+
+				this[ key ] = [ ...newValue ];
+
 			} else {
 
 				this[ key ] = newValue;
