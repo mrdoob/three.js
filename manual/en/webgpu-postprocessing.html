@@ -48,10 +48,10 @@
                 `WebGPURenderer` and `PostProcessing` come with full, built-in MRT support.
               </li>
               <li>
-                The system tries to combine effects if possible which reduces the overall number of render passes.
+                The system combines effects if possible which reduces the overall number of render passes.
               </li>
               <li>
-                The effect chain is expressed as a node composition which allows more a flexible effect setup.
+                The effect chain is expressed as a node composition which allows a more flexible effect setup.
               </li>
             </ul>
             <p>
@@ -62,7 +62,7 @@
 
             <p>
               First, please read the instructions in the guide about <a href="webgpurenderer">WebGPURenderer</a> to correctly configure your 
-              imports. After that, you can create an instance of the the post-processing module like so.
+              imports. After that, you can create an instance of the post-processing module like so.
             </p>
 
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
@@ -91,7 +91,7 @@ import { pass } from 'three/tsl';
 const scenePass = pass( scene, camera );
 </pre>
             <p>
-             The basic idea of the node system is to represent materials or post-processing effects as node compositions. So to configure a basic 
+             The basic idea of the node system is to represent materials or post-processing effects as node compositions. To configure a basic 
              Dotscreen and RGB shift effect, you create effect nodes with TSL functions and compose them together.
             </p>
 
