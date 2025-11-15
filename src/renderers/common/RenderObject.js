@@ -871,7 +871,7 @@ class RenderObject {
 
 		}
 
-		cacheKey = hash( cacheKey, this.camera.id );
+		cacheKey = hash( cacheKey, this.camera.id, this.renderer.globalContext.id, this.renderer.globalContext.version );
 
 		return cacheKey;
 

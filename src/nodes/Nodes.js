@@ -9,6 +9,7 @@ export { default as BypassNode } from './core/BypassNode.js';
 export { default as IsolateNode } from './core/IsolateNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode } from './core/ContextNode.js';
+export { default as GlobalContextNode } from './core/GlobalContextNode.js';
 export { default as IndexNode } from './core/IndexNode.js';
 export { default as LightingModel } from './core/LightingModel.js';
 export { default as Node } from './core/Node.js';

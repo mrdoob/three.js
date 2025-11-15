@@ -25,7 +25,7 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { vertexColor } from '../../nodes/accessors/VertexColorNode.js';
 import { premultiplyAlpha } from '../../nodes/display/BlendModes.js';
 import { subBuild } from '../../nodes/core/SubBuildNode.js';
-import { warn } from '../../utils.js';
+import { error, warn } from '../../utils.js';
 
 /**
  * Base class for all node materials.
@@ -382,6 +382,14 @@ class NodeMaterial extends Material {
 		 */
 		this.vertexNode = null;
 
+		/**
+		 * This node can be used as a global context management component for this material.
+		 *
+		 * @type {?GlobalContextNode}
+		 * @default null
+		 */
+		this.contextNode = null;
+
 		// Deprecated properties
 
 		Object.defineProperty( this, 'shadowPositionNode', { // @deprecated, r176
@@ -488,6 +496,32 @@ class NodeMaterial extends Material {
 
 		const renderer = builder.renderer;
 		const renderTarget = renderer.getRenderTarget();
+
+		// < CONTEXT >
+
+		if ( renderer.globalContext.isGlobalContextNode === true ) {
+
+			builder.context = { ...builder.context, ...renderer.globalContext.value };
+
+		} else {
+
+			error( 'NodeMaterial: "renderer.globalContext" must be an instance of `globalContext()`.' );
+
+		}
+
+		if ( this.contextNode !== null ) {
+
+			if ( this.contextNode.isGlobalContextNode === true ) {
+
+				builder.context = { ...builder.context, ...this.contextNode.value };
+
+			} else {
+
+				error( 'NodeMaterial: "material.contextNode" must be an instance of `globalContext()`.' );
+
+			}
+
+		}
 
 		// < VERTEX STAGE >
 
@@ -1300,6 +1334,8 @@ class NodeMaterial extends Material {
 
 		this.fragmentNode = source.fragmentNode;
 		this.vertexNode = source.vertexNode;
+
+		this.contextNode = source.contextNode;
 
 		return super.copy( source );
 
