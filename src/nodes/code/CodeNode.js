@@ -124,7 +124,6 @@ class CodeNode extends Node {
 
 	}
 
-
 	deserialize( data ) {
 
 		super.deserialize( data );
