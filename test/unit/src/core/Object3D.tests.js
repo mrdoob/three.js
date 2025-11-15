@@ -14,6 +14,8 @@ import {
 	eps
 } from '../../utils/math-constants.js';
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
+import { MeshDepthMaterial } from '../../../../src/materials/MeshDepthMaterial.js';
+import { MeshDistanceMaterial } from '../../../../src/materials/MeshDistanceMaterial.js';
 
 const matrixEquals4 = ( a, b ) => {
 
@@ -1361,6 +1363,9 @@ export default QUnit.module( 'Core', () => {
 			b.frustumCulled = false;
 			b.renderOrder = 1;
 
+			b.customDepthMaterial = new MeshDepthMaterial();
+			b.customDistanceMaterial = new MeshDistanceMaterial();
+
 			b.userData[ 'foo' ] = 'bar';
 
 			child.add( childChild );
@@ -1383,6 +1388,58 @@ export default QUnit.module( 'Core', () => {
 			a.children[ 0 ].children[ 0 ].uuid = b.children[ 0 ].children[ 0 ].uuid;
 
 			assert.deepEqual( a, b, 'Objects are equal post-copy()' );
+
+		} );
+
+		QUnit.test( 'copy - customDepthMaterial and customDistanceMaterial', ( assert ) => {
+
+			const a = new Object3D();
+			const b = new Object3D();
+
+			const depthMaterial = new MeshDepthMaterial();
+			const distanceMaterial = new MeshDistanceMaterial();
+
+			b.customDepthMaterial = depthMaterial;
+			b.customDistanceMaterial = distanceMaterial;
+
+			a.copy( b );
+
+			assert.strictEqual( a.customDepthMaterial, depthMaterial, 'customDepthMaterial is copied' );
+			assert.strictEqual( a.customDistanceMaterial, distanceMaterial, 'customDistanceMaterial is copied' );
+
+			// Test with undefined values
+			const c = new Object3D();
+			const d = new Object3D();
+
+			c.customDepthMaterial = depthMaterial;
+			c.customDistanceMaterial = distanceMaterial;
+
+			d.copy( c );
+
+			c.customDepthMaterial = undefined;
+			c.customDistanceMaterial = undefined;
+
+			d.copy( c );
+
+			assert.strictEqual( d.customDepthMaterial, undefined, 'customDepthMaterial can be set to undefined' );
+			assert.strictEqual( d.customDistanceMaterial, undefined, 'customDistanceMaterial can be set to undefined' );
+
+		} );
+
+		QUnit.test( 'clone - customDepthMaterial and customDistanceMaterial', ( assert ) => {
+
+			const depthMaterial = new MeshDepthMaterial();
+			const distanceMaterial = new MeshDistanceMaterial();
+
+			const source = new Object3D();
+			source.customDepthMaterial = depthMaterial;
+			source.customDistanceMaterial = distanceMaterial;
+
+			const cloned = source.clone();
+
+			assert.strictEqual( cloned.customDepthMaterial, depthMaterial, 'customDepthMaterial is cloned' );
+			assert.strictEqual( cloned.customDistanceMaterial, distanceMaterial, 'customDistanceMaterial is cloned' );
+			assert.notStrictEqual( cloned, source, 'Clone is a different instance' );
 
 		} );
 

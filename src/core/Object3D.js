@@ -1567,6 +1567,9 @@ class Object3D extends EventDispatcher {
 
 		this.animations = source.animations.slice();
 
+		this.customDepthMaterial = source.customDepthMaterial;
+		this.customDistanceMaterial = source.customDistanceMaterial;
+
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		if ( recursive === true ) {
