@@ -314,7 +314,107 @@ class ShaderMaterial extends Material {
 			const uniform = this.uniforms[ name ];
 			const value = uniform.value;
 
-			if ( value && value.isTexture ) {
+			// Check for array variants first
+			if ( Array.isArray( value ) ) {
+
+				if ( value.length === 0 ) {
+
+					// Empty array, serialize as-is
+					data.uniforms[ name ] = {
+						value: value
+					};
+
+					continue;
+
+				}
+
+				const firstElement = value[ 0 ];
+
+				if ( firstElement && firstElement.isTexture ) {
+
+					// Array of textures (tv)
+					const uuids = [];
+					for ( let i = 0; i < value.length; i ++ ) {
+
+						uuids.push( value[ i ].toJSON( meta ).uuid );
+
+					}
+
+					data.uniforms[ name ] = {
+						type: 'tv',
+						value: uuids
+					};
+
+				} else if ( firstElement && firstElement.isVector2 ) {
+
+					// Array of Vector2 (v2v)
+					const arrays = [];
+					for ( let i = 0; i < value.length; i ++ ) {
+
+						arrays.push( value[ i ].toArray() );
+
+					}
+
+					data.uniforms[ name ] = {
+						type: 'v2v',
+						value: arrays
+					};
+
+				} else if ( firstElement && firstElement.isVector3 ) {
+
+					// Array of Vector3 (v3v)
+					const arrays = [];
+					for ( let i = 0; i < value.length; i ++ ) {
+
+						arrays.push( value[ i ].toArray() );
+
+					}
+
+					data.uniforms[ name ] = {
+						type: 'v3v',
+						value: arrays
+					};
+
+				} else if ( firstElement && firstElement.isVector4 ) {
+
+					// Array of Vector4 (v4v)
+					const arrays = [];
+					for ( let i = 0; i < value.length; i ++ ) {
+
+						arrays.push( value[ i ].toArray() );
+
+					}
+
+					data.uniforms[ name ] = {
+						type: 'v4v',
+						value: arrays
+					};
+
+				} else if ( firstElement && firstElement.isMatrix4 ) {
+
+					// Array of Matrix4 (m4v)
+					const arrays = [];
+					for ( let i = 0; i < value.length; i ++ ) {
+
+						arrays.push( value[ i ].toArray() );
+
+					}
+
+					data.uniforms[ name ] = {
+						type: 'm4v',
+						value: arrays
+					};
+
+				} else {
+
+					// Unknown array type, serialize as-is
+					data.uniforms[ name ] = {
+						value: value
+					};
+
+				}
+
+			} else if ( value && value.isTexture ) {
 
 				data.uniforms[ name ] = {
 					type: 't',
@@ -368,8 +468,6 @@ class ShaderMaterial extends Material {
 				data.uniforms[ name ] = {
 					value: value
 				};
-
-				// note: the array variants v2v, v3v, v4v, m4v and tv are not supported so far
 
 			}
 

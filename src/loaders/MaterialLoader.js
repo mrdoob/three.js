@@ -265,6 +265,31 @@ class MaterialLoader extends Loader {
 						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
 						break;
 
+					case 'tv':
+						// Array of textures
+						material.uniforms[ name ].value = uniform.value.map( uuid => getTexture( uuid ) );
+						break;
+
+					case 'v2v':
+						// Array of Vector2
+						material.uniforms[ name ].value = uniform.value.map( arr => new Vector2().fromArray( arr ) );
+						break;
+
+					case 'v3v':
+						// Array of Vector3
+						material.uniforms[ name ].value = uniform.value.map( arr => new Vector3().fromArray( arr ) );
+						break;
+
+					case 'v4v':
+						// Array of Vector4
+						material.uniforms[ name ].value = uniform.value.map( arr => new Vector4().fromArray( arr ) );
+						break;
+
+					case 'm4v':
+						// Array of Matrix4
+						material.uniforms[ name ].value = uniform.value.map( arr => new Matrix4().fromArray( arr ) );
+						break;
+
 					default:
 						material.uniforms[ name ].value = uniform.value;
 
