@@ -115,12 +115,15 @@ class CodeNode extends Node {
 
 	serialize( data ) {
 
-		super.serialize( data );
+    super.serialize( data );
 
-		data.code = this.code;
-		data.language = this.language;
+    data.code = this.code;
+	data.language = this.language;
+
+    return data;
 
 	}
+
 
 	deserialize( data ) {
 
@@ -128,8 +131,13 @@ class CodeNode extends Node {
 
 		this.code = data.code;
 		this.language = data.language;
+		this.includes = data.includes || [];
+
+		return this;
 
 	}
+
+
 
 }
 
