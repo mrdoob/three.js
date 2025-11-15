@@ -968,6 +968,8 @@ class Material extends EventDispatcher {
 		this.premultipliedAlpha = source.premultipliedAlpha;
 		this.forceSinglePass = source.forceSinglePass;
 
+		this.allowOverride = source.allowOverride;
+
 		this.visible = source.visible;
 
 		this.toneMapped = source.toneMapped;
