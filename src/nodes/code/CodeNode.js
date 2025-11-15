@@ -115,12 +115,12 @@ class CodeNode extends Node {
 
 	serialize( data ) {
 
-    super.serialize( data );
+		super.serialize( data );
 
-    data.code = this.code;
-	data.language = this.language;
+		data.code = this.code;
+		data.language = this.language;
 
-    return data;
+    	return data;
 
 	}
 
@@ -135,9 +135,6 @@ class CodeNode extends Node {
 		return this;
 
 	}
-
-
-
 }
 
 export default CodeNode;
