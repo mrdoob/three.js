@@ -25,9 +25,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.tsl.js",
+					"three": "../src/three.webgpu.js",
+					"three/webgpu": "../src/three.webgpu.js",
+					"three/tsl": "../src/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity, vec3, vec4, directionToColor, colorSpaceToWorking } from 'three/tsl';
+			import { sample, pass, mrt, globalContext, screenUV, normalView, velocity, vec3, vec4, directionToColor, colorToDirection, colorSpaceToWorking } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -49,7 +49,7 @@
 
 			let camera, scene, renderer, postProcessing, controls;
 
-			let aoPass, traaPass, blendPassAO, scenePassColor;
+			let aoPass, traaPass;
 
 			const params = {
 				samples: 16,
@@ -101,36 +101,55 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
-					output: output,
-					normal: normalView,
+				//
+
+				const prePass = pass( scene, camera ).toInspector( 'Normal', ( inspectNode ) => colorSpaceToWorking( inspectNode, THREE.SRGBColorSpace ) );
+				prePass.name = 'Pre-Pass';
+				prePass.setMRT( mrt( {
+					output: directionToColor( normalView ),
 					velocity: velocity
 				} ) );
+				prePass.transparent = false;
 
-				scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+				const prePassNormal = sample( ( uv ) => {
 
-					return scenePass.getLinearDepthNode();
-
-				} );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', () => {
-
-					return colorSpaceToWorking( directionToColor( scenePassNormal ), THREE.SRGBColorSpace );
+					return colorToDirection( prePass.getTextureNode().sample( uv ) );
 
 				} );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				// bandwidth optimization
+
+				const normalTexture = prePass.getTexture( 'output' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				//
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
+				scenePass.name = 'Scene Pass';
+
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+
+					return prePass.getLinearDepthNode();
+
+				} );
+				const scenePassVelocity = prePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
 
 				// ao
 
-				aoPass = ao( scenePassDepth, scenePassNormal, camera );
-				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
+				aoPass = ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
+				aoPass.name = 'GTAO Pass';
+				aoPass.resolutionScale = .5; // running AO in half resolution is often sufficient
 				aoPass.useTemporalFiltering = true;
-				blendPassAO = vec4( scenePassColor.rgb.mul( aoPass.r.toInspector( 'AO' ) ), scenePassColor.a ); // the AO is stored only in the red channel
+
+				// global context
+
+				scenePass.globalContext = globalContext( {
+					ao: aoPass.getTextureNode().sample( screenUV ).r
+				} );
 
 				// traa
 
-				traaPass = traa( blendPassAO, scenePassDepth, scenePassVelocity, camera );
+				traaPass = traa( scenePass, prePassDepth, scenePassVelocity, camera );
 				postProcessing.outputNode = traaPass;
 
 				//
@@ -157,19 +176,6 @@
 				scene.add( planeRefractor );
 
 				//
-
-				model.traverse( ( o ) => {
-
-					// Transparent objects (e.g. loaded via GLTFLoader) might have "depthWrite" set to "false".
-					// This is wanted when rendering the beauty pass however it produces wrong results when computing
-					// AO since depth and normal data are out of sync. Computing normals from depth by not using MRT
-					// can mitigate the issue although the depth information (and thus the normals) are not correct in
-					// first place. Besides, normal estimation is computationally more expensive than just sampling a
-					// normal texture. So depending on your scene, consider to enable "depthWrite" for all transparent objects.
-
-					if ( o.material ) o.material.depthWrite = true;
-
-				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 

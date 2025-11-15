@@ -155,6 +155,9 @@ class NodeFrame {
 
 			if ( nodeUpdateBeforeMap.frameId !== this.frameId ) {
 
+				// TODO: Temp fix for recursive calls
+				nodeUpdateBeforeMap.frameId = this.frameId;
+
 				if ( node.updateBefore( this ) !== false ) {
 
 					nodeUpdateBeforeMap.frameId = this.frameId;
@@ -168,6 +171,9 @@ class NodeFrame {
 			const nodeUpdateBeforeMap = this._getMaps( this.updateBeforeMap, reference );
 
 			if ( nodeUpdateBeforeMap.renderId !== this.renderId ) {
+
+				// TODO: Temp fix for recursive calls
+				nodeUpdateBeforeMap.renderId = this.renderId;
 
 				if ( node.updateBefore( this ) !== false ) {
 

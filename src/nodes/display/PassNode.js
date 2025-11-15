@@ -249,6 +249,36 @@ class PassNode extends TempNode {
 		this.renderTarget = renderTarget;
 
 		/**
+		 * An optional override material for the pass.
+		 *
+		 * @type {Material|null}
+		 */
+		this.overrideMaterial = null;
+
+		/**
+		 * An optional global context for the pass.
+		 *
+		 * @type {GlobalContextNode|null}
+		 */
+		this.globalContext = null;
+
+		/**
+		 * Whether the pass is transparent.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.transparent = true;
+
+		/**
+		 * Whether the pass is opaque.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.opaque = true;
+
+		/**
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
@@ -738,7 +768,11 @@ class PassNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 		const currentAutoClear = renderer.autoClear;
+		const currentTransparent = renderer.transparent;
+		const currentOpaque = renderer.opaque;
 		const currentMask = camera.layers.mask;
+		const currentOverrideMaterial = scene.overrideMaterial;
+		const currentGlobalContext = renderer.globalContext;
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
@@ -755,9 +789,23 @@ class PassNode extends TempNode {
 
 		}
 
+		if ( this.overrideMaterial !== null ) {
+
+			scene.overrideMaterial = this.overrideMaterial;
+
+		}
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
 		renderer.autoClear = true;
+		renderer.transparent = this.transparent;
+		renderer.opaque = this.opaque;
+
+		if ( this.globalContext !== null ) {
+
+			renderer.globalContext = this.globalContext;
+
+		}
 
 		const currentSceneName = scene.name;
 
@@ -766,10 +814,14 @@ class PassNode extends TempNode {
 		renderer.render( scene, camera );
 
 		scene.name = currentSceneName;
+		scene.overrideMaterial = currentOverrideMaterial;
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.autoClear = currentAutoClear;
+		renderer.transparent = currentTransparent;
+		renderer.opaque = currentOpaque;
+		renderer.globalContext = currentGlobalContext;
 
 		camera.layers.mask = currentMask;
 
