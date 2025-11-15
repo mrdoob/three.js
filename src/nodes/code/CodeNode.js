@@ -135,6 +135,7 @@ class CodeNode extends Node {
 		return this;
 
 	}
+	
 }
 
 export default CodeNode;
