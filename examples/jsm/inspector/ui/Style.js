@@ -879,6 +879,7 @@ export class Style {
 	border-bottom: none;
 	user-select: none;
 	-webkit-user-select: none;
+	min-height: 31px;
 }
 
 .list-item-wrapper {
@@ -912,6 +913,7 @@ export class Style {
 
 .list-item-row.collapsible {
 	background-color: rgba(0, 170, 255, 0.15) !important;
+	min-height: 23px;
 }
 
 .list-item-row.collapsible.alert,
@@ -1299,6 +1301,10 @@ export class Style {
 .mini-panel-content .custom-checkbox .checkmark::after {
 	width: 8px;
 	height: 8px;
+}
+
+.mini-panel-content .list-container.parameters .list-item-row:not(.collapsible) {
+	margin-bottom: 2px;
 }
 
 @media screen and (max-width: 450px) and (orientation: portrait) {
