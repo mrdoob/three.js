@@ -105,6 +105,14 @@ class FunctionNode extends CodeNode {
 
 			nodeFunction = builder.parser.parseFunction( this.code );
 
+			if ( ! nodeFunction ) {
+
+				throw new Error(
+					'TSL: Failed to parse function in FunctionNode. Check the shader syntax:\n' + this.code
+				);
+
+			}
+
 			nodeData.nodeFunction = nodeFunction;
 
 		}
@@ -112,6 +120,7 @@ class FunctionNode extends CodeNode {
 		return nodeFunction;
 
 	}
+
 
 	generate( builder, output ) {
 
