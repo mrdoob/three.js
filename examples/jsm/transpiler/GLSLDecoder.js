@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break, While, Comment } from './AST.js';
+import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break, While, Comment, StructMember, StructDefinition } from './AST.js';
 
 import { isType } from './TranspilerUtils.js';
 
@@ -780,6 +780,47 @@ class GLSLDecoder {
 
 	}
 
+	parseStructDefinition() {
+
+		const tokens = this.readTokensUntil( ';' );
+
+		const structName = tokens[ 1 ].str;
+
+		if (tokens[ 2 ].str !== '{' ) {
+
+			throw new Error( 'Expected \'{\' after struct name ' );
+
+		}
+
+		const structMembers = [];
+		for ( let i = 3; i < tokens.length - 2; i += 3 ) {
+
+			const typeToken = tokens[ i ];
+			const nameToken = tokens[ i + 1 ];
+
+			if (typeToken.type != 'literal' || nameToken.type != 'literal') {
+				throw new Error( 'Invalid struct declaration' );
+			}
+
+			if (tokens[ i + 2 ].str !== ';' ) {
+				throw new Error( 'Missing \';\' after struct member name' );
+			}
+
+			const member = new StructMember(typeToken.str, nameToken.str);
+			structMembers.push(member);
+
+		}
+
+		if (tokens[ tokens.length - 2 ].str !== '}' ) {
+
+			throw new Error( 'Missing closing \'}\' for struct ' + structName );
+
+		}
+
+		return new StructDefinition(structName, structMembers);
+
+	}
+
 	parseReturn() {
 
 		this.readToken(); // skip 'return'
@@ -1078,6 +1119,10 @@ class GLSLDecoder {
 				} else if ( token.str === 'varying' ) {
 
 					statement = this.parseVarying();
+
+				} else if ( token.str === 'struct' ) {
+
+					statement = this.parseStructDefinition();
 
 				} else if ( isType( token.str ) ) {
 

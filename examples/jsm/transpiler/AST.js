@@ -629,3 +629,32 @@ export class SwitchCase extends ASTNode {
 	}
 
 }
+
+// helper class for StructDefinition
+export class StructMember {
+
+	constructor( type, name ) {
+
+		this.type = type;
+		this.name = name;
+		this.isStructMember = true;
+
+	}
+
+}
+
+export class StructDefinition extends ASTNode {
+
+	constructor( name, members = [] ) {
+
+		super();
+
+		this.name = name;
+		this.members = members;
+		this.isStructDefinition = true;
+
+		this.initialize();
+
+	}
+
+}

@@ -314,6 +314,10 @@ class TSLEncoder {
 
 			code = this.emitVarying( node );
 
+		} else if ( node.isStructDefinition ) {
+
+			code = this.emitStructDefinition( node );
+
 		} else if ( node.isTernary ) {
 
 			code = this.emitTernary( node );
@@ -699,6 +703,31 @@ ${ this.tab }} )`;
 		this.addImport( type );
 
 		return `const ${ name } = varying( ${ type }(), '${ name }' )`;
+
+	}
+
+	emitStructDefinition( node ) {
+
+		const { name, members } = node;
+
+		this.addImport( 'struct' );
+
+		let structString = `const ${ name } = struct({\n\n`;
+
+		for ( let i = 0; i < members.length; i += 1 ) {
+
+			const member = members[i];
+
+			structString += `${this.tab}\t${member.name}: '${member.type}'`;
+
+			const delimiter = (i != members.length - 1) ? ',\n' : '\n';
+			structString += delimiter;
+
+		}
+
+		structString += `\n${this.tab}}, \'${name}\' )`;
+
+		return structString;
 
 	}
 
