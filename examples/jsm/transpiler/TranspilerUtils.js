@@ -10,9 +10,9 @@ export function isPrimitive( value ) {
 
 }
 
-export function isType( str ) {
+export function isBuiltinType( str ) {
 
-	return /void|bool|float|u?int|mat[234]|mat[234]x[234]|(u|i|b)?vec[234]/.test( str );
+	return /^(void|bool|float|u?int|mat[234]|mat[234]x[234]|(u|i|b)?vec[234])$/.test( str );
 
 }
 

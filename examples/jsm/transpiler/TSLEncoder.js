@@ -673,9 +673,17 @@ ${ this.tab }} )`;
 
 		} else {
 
-			varStr += ` = property( '${ type }' )`;
+			if ( node.isUserDefinedStructType ) {
 
-			this.addImport( 'property' );
+				varStr += ` = ${type}()`;
+
+			} else {
+
+				varStr += ` = property( '${ type }' )`;
+
+				this.addImport( 'property' );
+
+			}
 
 		}
 

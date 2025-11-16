@@ -125,7 +125,7 @@ export class Program extends ASTNode {
 
 export class VariableDeclaration extends ASTNode {
 
-	constructor( type, name, value = null, next = null, immutable = false ) {
+	constructor( type, name, value = null, next = null, immutable = false, isUserDefinedStructType = false ) {
 
 		super();
 
@@ -135,6 +135,8 @@ export class VariableDeclaration extends ASTNode {
 		this.next = next;
 
 		this.immutable = immutable;
+
+		this.isUserDefinedStructType = isUserDefinedStructType;
 
 		this.isVariableDeclaration = true;
 

@@ -1,6 +1,6 @@
 import { Program, FunctionDeclaration, Switch, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard, SwitchCase, Continue, Break, While, Comment, StructMember, StructDefinition } from './AST.js';
 
-import { isType } from './TranspilerUtils.js';
+import { isBuiltinType } from './TranspilerUtils.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -255,6 +255,7 @@ class GLSLDecoder {
 		this.index = 0;
 		this.tokenizer = null;
 		this.keywords = [];
+		this.userDefinedStructTypes = new Set();
 
 		this.addPolyfill( 'gl_FragCoord', 'vec3 gl_FragCoord = vec3( screenCoordinate.x, screenCoordinate.y.oneMinus(), screenCoordinate.z );' );
 
@@ -708,6 +709,7 @@ class GLSLDecoder {
 		if ( immutable ) index ++;
 
 		type = type || tokens[ index ++ ].str;
+		const isUserDefinedStructType = this.userDefinedStructTypes.has(type);
 		const name = tokens[ index ++ ].str;
 
 		const token = tokens[ index ];
@@ -738,7 +740,7 @@ class GLSLDecoder {
 
 		}
 
-		const variable = new VariableDeclaration( type, name, init, next, immutable );
+		const variable = new VariableDeclaration( type, name, init, next, immutable, isUserDefinedStructType );
 
 		return variable;
 
@@ -785,6 +787,7 @@ class GLSLDecoder {
 		const tokens = this.readTokensUntil( ';' );
 
 		const structName = tokens[ 1 ].str;
+		this.userDefinedStructTypes.add(structName);
 
 		if (tokens[ 2 ].str !== '{' ) {
 
@@ -868,7 +871,8 @@ class GLSLDecoder {
 
 		let initialization;
 
-		if ( initializationTokens[ 0 ] && isType( initializationTokens[ 0 ].str ) ) {
+		const firstToken = initializationTokens[ 0 ];
+		if ( firstToken && ( isBuiltinType( firstToken.str ) || this.userDefinedStructTypes.has( firstToken.str ) ) ) {
 
 			initialization = this.parseVariablesFromToken( initializationTokens );
 
@@ -1124,7 +1128,7 @@ class GLSLDecoder {
 
 					statement = this.parseStructDefinition();
 
-				} else if ( isType( token.str ) ) {
+				} else if ( isBuiltinType( token.str ) || this.userDefinedStructTypes.has( token.str ) ) {
 
 					if ( this.getToken( 2 ).str === '(' ) {
 
