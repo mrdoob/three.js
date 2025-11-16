@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, velocity, vec3, vec4, directionToColor, colorSpaceToWorking } from 'three/tsl';
+			import { sample, pass, mrt, globalContext, screenUV, normalView, velocity, vec3, vec4, directionToColor, colorToDirection, colorSpaceToWorking } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -49,7 +49,7 @@
 
 			let camera, scene, renderer, postProcessing, controls;
 
-			let aoPass, traaPass, blendPassAO, scenePassColor;
+			let aoPass, traaPass;
 
 			const params = {
 				samples: 16,
@@ -79,15 +79,7 @@
 
 				await renderer.init();
 
-				const environment = new RoomEnvironment();
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-
-				scene.background = new THREE.Color( 0x666666 );
-				scene.environment = pmremGenerator.fromScene( environment ).texture;
-				environment.dispose();
-				pmremGenerator.dispose();
-
-				//
+				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0.5, - 1 );
@@ -97,43 +89,70 @@
 				controls.minDistance = 2;
 				controls.maxDistance = 8;
 
-				//
+				// environment
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.background = new THREE.Color( 0x666666 );
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				environment.dispose();
+				pmremGenerator.dispose();
+
+				// post-processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
-					output: output,
-					normal: normalView,
+				// pre-pass
+
+				const prePass = pass( scene, camera ).toInspector( 'Normal', ( inspectNode ) => colorSpaceToWorking( inspectNode, THREE.SRGBColorSpace ) );
+				prePass.name = 'Pre-Pass';
+				prePass.transparent = false;
+
+				prePass.setMRT( mrt( {
+					output: directionToColor( normalView ),
 					velocity: velocity
 				} ) );
 
-				scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+				const prePassNormal = sample( ( uv ) => {
 
-					return scenePass.getLinearDepthNode();
-
-				} );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', () => {
-
-					return colorSpaceToWorking( directionToColor( scenePassNormal ), THREE.SRGBColorSpace );
+					return colorToDirection( prePass.getTextureNode().sample( uv ) );
 
 				} );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
+				const prePassVelocity = prePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				// pre-pass - bandwidth optimization
+
+				const normalTexture = prePass.getTexture( 'output' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				// scene pass
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 
 				// ao
 
-				aoPass = ao( scenePassDepth, scenePassNormal, camera );
-				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
+				aoPass = ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
+				aoPass.resolutionScale = .5; // running AO in half resolution is often sufficient
 				aoPass.useTemporalFiltering = true;
-				blendPassAO = vec4( scenePassColor.rgb.mul( aoPass.r.toInspector( 'AO' ) ), scenePassColor.a ); // the AO is stored only in the red channel
 
-				// traa
+				const aoPassOutput = aoPass.getTextureNode( 'output' );
 
-				traaPass = traa( blendPassAO, scenePassDepth, scenePassVelocity, camera );
+				// global context
+
+				scenePass.globalContext = globalContext( {
+					ao: aoPassOutput.sample( screenUV ).r
+				} );
+
+				// final output + traa
+
+				traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
+
 				postProcessing.outputNode = traaPass;
 
-				//
+				// models
 
 				const dracoLoader = new DRACOLoader();
 				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
@@ -150,26 +169,14 @@
 
 				//
 
-				const planeRefractor = new THREE.Mesh( new THREE.PlaneGeometry( 1.8, 2 ), new THREE.MeshStandardNodeMaterial( { transparent: true, opacity: .1 } ) );
-				planeRefractor.material.transparent = true;
-				planeRefractor.position.z = 0;
-				planeRefractor.position.y = 0.5;
-				scene.add( planeRefractor );
+				const transparentMesh = new THREE.Mesh( new THREE.PlaneGeometry( 1.8, 2 ), new THREE.MeshStandardNodeMaterial( { transparent: true, opacity: .1 } ) );
+				transparentMesh.material.transparent = true;
+				transparentMesh.position.z = 0;
+				transparentMesh.position.y = 0.5;
+				transparentMesh.visible = false;
+				scene.add( transparentMesh );
 
-				//
-
-				model.traverse( ( o ) => {
-
-					// Transparent objects (e.g. loaded via GLTFLoader) might have "depthWrite" set to "false".
-					// This is wanted when rendering the beauty pass however it produces wrong results when computing
-					// AO since depth and normal data are out of sync. Computing normals from depth by not using MRT
-					// can mitigate the issue although the depth information (and thus the normals) are not correct in
-					// first place. Besides, normal estimation is computationally more expensive than just sampling a
-					// normal texture. So depending on your scene, consider to enable "depthWrite" for all transparent objects.
-
-					if ( o.material ) o.material.depthWrite = true;
-
-				} );
+				// events
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -183,6 +190,7 @@
 				gui.add( params, 'scale', 0.01, 2 ).onChange( updateParameters );
 				gui.add( params, 'thickness', 0.01, 2 ).onChange( updateParameters );
 				gui.add( aoPass, 'useTemporalFiltering' ).name( 'temporal filtering' );
+				gui.add( transparentMesh, 'visible' ).name( 'show transparent mesh' );
 				gui.add( params, 'aoOnly' ).onChange( ( value ) => {
 
 					if ( value === true ) {
