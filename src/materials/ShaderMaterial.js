@@ -283,6 +283,7 @@ class ShaderMaterial extends Material {
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
+		this.linewidth = source.linewidth;
 
 		this.fog = source.fog;
 		this.lights = source.lights;
