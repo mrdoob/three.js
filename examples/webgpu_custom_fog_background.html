@@ -25,9 +25,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../src/three.webgpu.js",
-					"three/webgpu": "../src/three.webgpu.js",
-					"three/tsl": "../src/three.tsl.js",
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, color, rangeFogFactor, context, uv, renderOutput } from 'three/tsl';
+			import { pass, color, rangeFogFactor } from 'three/tsl';
 
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
@@ -54,34 +54,36 @@
 				camera.position.set( - 1.8, 0.6, 2.7 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x4080cc );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.toneMapping = THREE.NoToneMapping; // apply tone mapping in post processing, instead
 				document.body.appendChild( renderer.domElement );
 
-				renderer.contextNode = context( {
+				// post processing
 
-					getUV: () => {
+				// render scene pass
+				const scenePass = pass( scene, camera );
+				const scenePassViewZ = scenePass.getViewZNode();
 
-						return uv();
+				// fog color
+				const fogColor = color( 0x4080cc ); // in sRGB color space
 
-					},
+				// get fog factor from the scene pass context
+				// equivalent to: scene.fog = new THREE.Fog( 0x4080cc, 2.7, 4 );
+				const fogFactor = rangeFogFactor( 2.7, 4 ).context( { getViewZ: () => scenePassViewZ } );
 
-					getOutput: ( node, { material } ) => {
+				// tone-mapped scene pass
+				const scenePassTM = scenePass.toneMapping( THREE.ACESFilmicToneMapping, 1 );
 
-						const toneMapping = material.toneMapped ? THREE.NeutralToneMapping : THREE.NoToneMapping;
-						const outputColorSpace = THREE.SRGBColorSpace;
+				// mix fog using fog factor and fog color
+				const compose = fogFactor.mix( scenePassTM, fogColor );
 
-						return renderOutput( node, toneMapping, outputColorSpace );
-
-					}
-
-				} );
+				postProcessing = new THREE.PostProcessing( renderer );
+				postProcessing.outputColorTransform = true; // no tone mapping will be applied, only the default color space transform
+				postProcessing.outputNode = compose;
 
 				//
 
@@ -128,7 +130,7 @@
 
 			function animate() {
 
-				renderer.render( scene, camera );
+				postProcessing.render();
 
 			}
 
