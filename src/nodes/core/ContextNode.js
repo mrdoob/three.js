@@ -12,9 +12,9 @@ import { warn } from '../../utils.js';
  *\// or
  *material.contextNode = context( { getUV: () => customCoord } );
  *\// or
- *renderer.globalContext = context( { getUV: () => customCoord } );
+ *renderer.contextNode = context( { getUV: () => customCoord } );
  *\// or
- *scenePass.globalContext = context( { getUV: () => customCoord } );
+ *scenePass.contextNode = context( { getUV: () => customCoord } );
  *```
  * @augments Node
  */
@@ -82,6 +82,29 @@ class ContextNode extends Node {
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
+
+	}
+
+	/**
+	 * Gathers the context data from all parent context nodes.
+	 *
+	 * @return {Object} The gathered context data.
+	 */
+	getFlowContextData() {
+
+		const children = [];
+
+		this.traverse( ( node ) => {
+
+			if ( node.isContextNode === true ) {
+
+				children.push( node.value );
+
+			}
+
+		} );
+
+		return Object.assign( {}, ...children );
 
 	}
 

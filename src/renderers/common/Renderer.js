@@ -229,7 +229,7 @@ class Renderer {
 		 * @type {ContextNode}
 		 * @property {Object} value - The context value object.
 		 */
-		this.globalContext = context();
+		this.contextNode = context();
 
 		/**
 		 * The node library defines how certain library objects like materials, lights
@@ -1028,17 +1028,17 @@ class Renderer {
 	 */
 	set highPrecision( value ) {
 
-		const globalContextData = this.globalContext.value;
+		const contextNodeData = this.contextNode.value;
 
 		if ( value === true ) {
 
-			globalContextData.modelViewMatrix = highpModelViewMatrix;
-			globalContextData.modelNormalViewMatrix = highpModelNormalViewMatrix;
+			contextNodeData.modelViewMatrix = highpModelViewMatrix;
+			contextNodeData.modelNormalViewMatrix = highpModelNormalViewMatrix;
 
 		} else if ( this.highPrecision ) {
 
-			delete globalContextData.modelViewMatrix;
-			delete globalContextData.modelNormalViewMatrix;
+			delete contextNodeData.modelViewMatrix;
+			delete contextNodeData.modelNormalViewMatrix;
 
 		}
 
@@ -1052,9 +1052,9 @@ class Renderer {
 	 */
 	get highPrecision() {
 
-		const globalContextData = this.globalContext.value;
+		const contextNodeData = this.contextNode.value;
 
-		return globalContextData.modelViewMatrix === highpModelViewMatrix && globalContextData.modelNormalViewMatrix === highpModelNormalViewMatrix;
+		return contextNodeData.modelViewMatrix === highpModelViewMatrix && contextNodeData.modelNormalViewMatrix === highpModelNormalViewMatrix;
 
 	}
 

@@ -499,13 +499,13 @@ class NodeMaterial extends Material {
 
 		// < CONTEXT >
 
-		if ( renderer.globalContext.isContextNode === true ) {
+		if ( renderer.contextNode.isContextNode === true ) {
 
-			builder.context = { ...builder.context, ...renderer.globalContext.value };
+			builder.context = { ...builder.context, ...renderer.contextNode.getFlowContextData() };
 
 		} else {
 
-			error( 'NodeMaterial: "renderer.globalContext" must be an instance of `context()`.' );
+			error( 'NodeMaterial: "renderer.contextNode" must be an instance of `context()`.' );
 
 		}
 
@@ -513,7 +513,7 @@ class NodeMaterial extends Material {
 
 			if ( this.contextNode.isContextNode === true ) {
 
-				builder.context = { ...builder.context, ...this.contextNode.value };
+				builder.context = { ...builder.context, ...this.contextNode.getFlowContextData() };
 
 			} else {
 
