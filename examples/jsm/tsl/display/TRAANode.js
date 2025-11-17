@@ -116,22 +116,6 @@ class TRAANode extends TempNode {
 		this._invSize = uniform( new Vector2() );
 
 		/**
-		 * A uniform node holding the previous frame's view matrix.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._previousCameraWorldMatrix = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the previous frame's projection matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
-
-		/**
 		 * The render target that represents the history of frame data.
 		 *
 		 * @private
