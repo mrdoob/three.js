@@ -452,8 +452,8 @@ class TRAANode extends TempNode {
 			// higher velocity = more weight on current frame
 			// zero out history weight where disocclusion
 
-			const motionFactor = uvNode.sub( historyUV ).length().mul( 10 ).saturate();
-			const currentWeight = isDisocclusion.select( 1, float( 0.05 ).add( motionFactor ) ).toVar();
+			const motionFactor = uvNode.sub( historyUV ).length().mul( 10 );
+			const currentWeight = isDisocclusion.select( 1, float( 0.05 ).add( motionFactor ).saturate() ).toVar();
 			const historyWeight = currentWeight.oneMinus().toVar();
 
 			// flicker reduction based on luminance weighing
