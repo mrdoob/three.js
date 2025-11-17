@@ -465,6 +465,7 @@ export const remapClamp = TSL.remapClamp;
 export const renderGroup = TSL.renderGroup;
 export const renderOutput = TSL.renderOutput;
 export const rendererReference = TSL.rendererReference;
+export const replaceDefaultUV = TSL.replaceDefaultUV;
 export const rotate = TSL.rotate;
 export const rotateUV = TSL.rotateUV;
 export const roughness = TSL.roughness;
