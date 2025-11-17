@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
-import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection } from '../../nodes/TSL.js';
+import { vec4, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection } from '../../nodes/TSL.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Mesh } from '../../objects/Mesh.js';
@@ -88,7 +88,7 @@ class Background extends DataMap {
 
 			if ( backgroundMesh === undefined ) {
 
-				const backgroundMeshNode = context( vec4( backgroundNode ).mul( backgroundIntensity ), {
+				const backgroundMeshNode = vec4( backgroundNode ).mul( backgroundIntensity ).context( {
 					// @TODO: Add Texture2D support using node context
 					getUV: () => backgroundRotation.mul( normalWorldGeometry ),
 					getTextureLevel: () => backgroundBlurriness

@@ -385,7 +385,7 @@ class NodeMaterial extends Material {
 		/**
 		 * This node can be used as a global context management component for this material.
 		 *
-		 * @type {?GlobalContextNode}
+		 * @type {?ContextNode}
 		 * @default null
 		 */
 		this.contextNode = null;
@@ -499,25 +499,25 @@ class NodeMaterial extends Material {
 
 		// < CONTEXT >
 
-		if ( renderer.globalContext.isGlobalContextNode === true ) {
+		if ( renderer.globalContext.isContextNode === true ) {
 
 			builder.context = { ...builder.context, ...renderer.globalContext.value };
 
 		} else {
 
-			error( 'NodeMaterial: "renderer.globalContext" must be an instance of `globalContext()`.' );
+			error( 'NodeMaterial: "renderer.globalContext" must be an instance of `context()`.' );
 
 		}
 
 		if ( this.contextNode !== null ) {
 
-			if ( this.contextNode.isGlobalContextNode === true ) {
+			if ( this.contextNode.isContextNode === true ) {
 
 				builder.context = { ...builder.context, ...this.contextNode.value };
 
 			} else {
 
-				error( 'NodeMaterial: "material.contextNode" must be an instance of `globalContext()`.' );
+				error( 'NodeMaterial: "material.contextNode" must be an instance of `context()`.' );
 
 			}
 

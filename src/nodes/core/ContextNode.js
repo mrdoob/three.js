@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining } from '../tsl/TSLCore.js';
 import { warn } from '../../utils.js';
 
 /**
@@ -9,6 +9,12 @@ import { warn } from '../../utils.js';
  *
  * ```js
  *node.context( { getUV: () => customCoord } );
+ *\// or
+ *material.contextNode = context( { getUV: () => customCoord } );
+ *\// or
+ *renderer.globalContext = context( { getUV: () => customCoord } );
+ *\// or
+ *scenePass.globalContext = context( { getUV: () => customCoord } );
  *```
  * @augments Node
  */
@@ -26,7 +32,7 @@ class ContextNode extends Node {
 	 * @param {Node} node - The node whose context should be modified.
 	 * @param {Object} [value={}] - The modified context data.
 	 */
-	constructor( node, value = {} ) {
+	constructor( node = null, value = {} ) {
 
 		super();
 
@@ -133,11 +139,24 @@ export default ContextNode;
  *
  * @tsl
  * @function
- * @param {Node} node - The node whose context should be modified.
+ * @param {Node|Object} [nodeOrValue={}] - The node whose context should be modified or the modified context data.
  * @param {Object} [value={}] - The modified context data.
  * @returns {ContextNode}
  */
-export const context = /*@__PURE__*/ nodeProxy( ContextNode ).setParameterLength( 1, 2 );
+export const context = /*@__PURE__*/ ( nodeOrValue = null, value = {} ) => {
+
+	let node = nodeOrValue;
+
+	if ( node === null || node.isNode !== true ) {
+
+		value = node || value;
+		node = null;
+
+	}
+
+	return new ContextNode( node, value );
+
+};
 
 /**
  * TSL function for defining a uniformFlow context value for a given node.
