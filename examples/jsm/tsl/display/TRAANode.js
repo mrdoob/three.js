@@ -92,7 +92,7 @@ class TRAANode extends TempNode {
 		this.depthThreshold = 0.0001;
 
 		/**
-		 * The difference between current and previous depth to consider a pixel as an edge.
+		 * The depth difference within the 3×3 neighborhood to consider a pixel as an edge.
 		 *
 		 * @type {number}
 		 */
