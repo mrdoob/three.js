@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -35,9 +36,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { uniform, varying, vec4, add, abs, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
+			import { uniform, varying, vec4, add, sub, max, dot, sin, mat3, uint, negate, instancedArray, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, float, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length, vertexIndex } from 'three/tsl';
+
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-			import { PrefixSum } from 'three/addons/gpgpu/PrefixSum.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -49,10 +50,9 @@
 			let last = performance.now();
 
 			let pointer, raycaster;
-			let computeVelocity, computePosition, effectController, computeHash;
+			let computeVelocity, computePosition, effectController;
 
 			const BIRDS = 16384;
-			const TABLE_SIZE = BIRDS * 2;
 			const SPEED_LIMIT = 9.0;
 			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
@@ -176,8 +176,6 @@
 				const velocityArray = new Float32Array( BIRDS * 3 );
 				const phaseArray = new Float32Array( BIRDS );
 
-			
-
 				for ( let i = 0; i < BIRDS; i ++ ) {
 
 					const posX = Math.random() * BOUNDS - BOUNDS_HALF;
@@ -290,196 +288,6 @@
 
 				// Define GPU Compute shaders.
 				// Shaders are computationally identical to their GLSL counterparts outside of texture destructuring.
-				const intCoord = Fn( ( [ x, spacing ] ) => {
-
-					return floor( x.div( spacing ) );
-
-				} ).setLayout( {
-					name: 'intCoord',
-					type: 'int',
-					inputs: [
-						{ name: 'x', type: 'float' },
-						{ name: 'spacing', type: 'float' }
-					]
-				} );
-
-				const hash3DFloatCoord = Fn( ( [ v ] ) => {
-
-					const x = intCoord( v.x );
-					const y = intCoord( v.y );
-					const z = intCoord( v.z );
-
-					const xMul = x.mul( 92837111 );
-					const yMul = y.mul( 689287499 );
-					const zMul = z.mul( 283923481 );
-
-					const h = xMul.pow( yMul ).pow( zMul );
-
-					return abs( h ).modInt( TABLE_SIZE );
-
-				} ).setLayout( {
-					name: 'hash3DCoord',
-					type: 'int',
-					inputs: [
-						{ name: 'v', type: 'vec3' },
-						{ name: 'spacing', type: 'float' }
-					]
-				} );
-
-				const hash3DIntCoord = Fn( ( [ x, y, z ] ) => {
-
-					const xMul = x.mul( 92837111 );
-					const yMul = y.mul( 689287499 );
-					const zMul = z.mul( 283923481 );
-
-					const h = xMul.pow( yMul ).pow( zMul );
-
-					return abs( h ).modInt( TABLE_SIZE );
-
-				} ).setLayout( {
-					name: 'hash3DIntCoord',
-					type: 'int',
-					inputs: [
-						{ name: 'x', type: 'int' },
-						{ name: 'y', type: 'int'}
-						{ name: 'z', type: 'int'}
-					]
-				} );
-
-				class Hash {
-
-					constructor( renderer, spacing, maxNumObjects ) {
-
-						this.spacing = spacing;
-						this.tableSize = maxNumObjects * 2;
-						this.cellStartArrayBuffer = new Int32Array( this.tableSize + 1 );
-						this.cellStartStorage = instancedArray( this.cellStartArrayBuffer, 'int' );
-						this.cellEntriesArrayBuffer = new Int32Array( maxNumObjects );
-						this.cellEntriesStorage = instancedArray( this.cellEntriesArrayBuffer, 'int' );
-						this.queryIdsArrayBuffer = new Int32Array( maxNumObjects );
-						this.queryIdsStorage = instancedArray( this.queryIdsArrayBuffer, 'int' );
-						this.querySize = 0;
-
-						// TODO: Check if faster to replace with .fill() operation
-						this.resetFn = this._createResetFn( maxNumObjects );
-						this.calculateHashFn = this._createCalculateHashFn( maxNumObjects );
-						this.prefixSumModule = new PrefixSum( renderer, [ 1, 2, 3, 4, 5, 6, 7, 8 ], 'uint' );
-						this.calculateCellEntriesFn = this._createCalculateCellEntriesFn( maxNumObjects );
-			
-					}
-
-					_createResetFn( maxNumObjects ) {
-
-						const fnDef = Fn( () => {
-
-							const { cellStartStorage, cellEntriesStorage } = this;
-
-							cellStartStorage.element( instanceIndex ).assign( 0 );
-							cellEntriesStorage.element( instanceIndex ).assign( 0 );
-			
-						} )().compute( maxNumObjects );
-
-						return fnDef;
-
-					}
-
-					_createCalculateHashFn( maxNumObjects ) {
-
-						const fnDef = Fn( () => {
-
-							const { cellStartStorage } = this;
-
-							const hashedCoord = hash3DFloatCoord( positionStorage.element( instanceIndex ) );
-							cellStartStorage.element( hashedCoord ).addAssign( 1 );
-			
-						} )().compute( maxNumObjects );
-
-						return fnDef;
-
-					}
-
-					_createCalculateCellEntriesFn( maxNumObjects ) {
-
-						const fnDef = Fn( () => {
-
-							const { cellStartStorage, cellEntriesStorage } = this;
-
-							const hashedCoord = hash3DCoord( positionStorage.element( instanceIndex ) );
-							cellStartStorage.element( hashedCoord ).subAssign( 1 );
-
-							// TODO: Prevent errors from two threads substracting the same cellStart entry at the same time
-							const cellStart = cellStartStorage.element( hashedCoord ).toVar();
-							cellEntriesStorage.element( cellStart ).assign( instanceIndex );
-
-						} )().compute( maxNumObjects );
-
-						return fnDef;
-
-					}
-
-					query() {
-
-						const fnDef = Fn( ( [ position, maxDist ] ) => {
-
-							const {queryIdsStorage, cellEntriesStorage} = this;
-
-							const x0 = intCoord( position.x.sub( maxDist ) );
-							const y0 = intCoord( position.y.sub( maxDist ) );
-							const z0 = intCoord( position.z.sub( maxDist ) );
-
-							const x1 = intCoord( position.x.sub( maxDist ) );
-							const y1 = intCoord( position.y.sub( maxDist ) );
-							const z1 = intCoord( position.z.sub( maxDist ) );
-
-							const xi = uint( x0 ).toVar();
-							const yi = uint( y0 ).toVar();
-							const zi = uint( z0 ).toVar();
-
-							const querySize = uint(0).toVar();
-
-							Loop( xi.lessThanEqual( x1 ), () => {
-
-								Loop( yi.lessThanEqual( y1 ), () => {
-
-									Loop( zi.lessThanEqual( z1 ), () => {
-
-										const hashedCoord = hash3DIntCoord(xi, yi, zi);
-										const start = cellStartStorage.element(hashedCoord);
-										const end = cellStartStorage.element(hashedCoord.add(1))
-
-										Loop({start: start, end: end, condition: '<', type: 'int'}, ({i}) => {
-
-											queryIdsStorage.element(querySize).assign(cellEntriesStorage.element(i))
-											querySize.addAssign(1)
-
-										})
-										
-										zi.addAssign( 1 );
-
-									} );
-
-									yi.addAssign( 1 );
-
-								} );
-
-								xi.addAssign( 1 );
-
-							} );
-
-						} ).setLayout( {
-							name: 'queryPosition',
-							type: 'float',
-							inputs: [
-								{ name: 'pos', type: 'vec3' },
-								{ name: 'maxDist', type: 'float' }
-							]
-						} );
-
-						return fnDef;
-
-					}
-
-				}
 
 				computeVelocity = Fn( () => {
 

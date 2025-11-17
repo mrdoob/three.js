@@ -50,8 +50,7 @@
 			};
 
 			const PREFIX_SUM_BUFFER_TYPES = {
-				INPUT_UNVECTORIZED: 'Input Unvectorized',
-				INPUT_VECTORIZED: 'Input Vectorized',
+				INPUT: 'Input',
 				REDUCTION: 'Reduction',
 				OUTPUT: 'Output'
 			};
@@ -97,7 +96,8 @@
 
 				await renderer.init();
 
-				const prefixSumModule = new PrefixSum( renderer, dynamicArray, 'uint' );
+				// Arguments: renderer/compute engine + default typed array
+				const prefixSumModule = new PrefixSum( renderer, new Uint32Array( dynamicArray ) );
 
 				computeReset = Fn( () => {
 
@@ -175,13 +175,9 @@
 
 						selectedBuffer = prefixSumModule.storageBuffers.reductionBuffer;
 
-					} else if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.INPUT_UNVECTORIZED ) {
+					} else if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.INPUT ) {
 
 						selectedBuffer = prefixSumModule.storageBuffers.unvectorizedOutputBuffer;
-
-					} else if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.INPUT_VECTORIZED ) {
-
-						selectedBuffer = prefixSumModule.storageBuffers.dataBuffer;
 
 					} else {
 
@@ -211,13 +207,9 @@
 
 					if ( prefixSumComplete ) {
 
-						console.log( 'reset prefix sum' );
-
 						renderer.compute( computeReset );
 			
 					} else {
-
-						console.log( 'compute prefix sum' );
 
 						await prefixSumModule.compute();
 

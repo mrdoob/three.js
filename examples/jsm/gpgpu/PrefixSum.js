@@ -1,11 +1,45 @@
 import {
-	StorageInstancedBufferAttribute
+	StorageInstancedBufferAttribute,
 } from 'three';
 import { Fn, If, instancedArray, invocationLocalIndex, countTrailingZeros, Loop, workgroupArray, subgroupSize, workgroupBarrier, workgroupId, uint, select, invocationSubgroupIndex, dot, uvec4, vec4, float, subgroupAdd, array, subgroupShuffle, subgroupInclusiveAdd, subgroupBroadcast, invocationSubgroupMetaIndex, arrayBuffer, storage } from 'three/tsl';
 
 const divRoundUp = ( size, part_size ) => {
 
+	console.log( Math.floor( ( size + part_size - 1 ) / part_size ) );
+
 	return Math.floor( ( size + part_size - 1 ) / part_size );
+
+};
+
+const getTypeFromTypedArray = ( typedArray ) => {
+
+	switch ( typedArray.constructor.name ) {
+
+		case 'Float32Array': {
+
+			return 'float';
+
+		}
+
+		case 'Int32Array': {
+
+			return 'int';
+
+		}
+
+		case 'Uint32Array': {
+
+			return 'uint';
+
+		}
+
+		default: {
+
+			return typedArray.constructor.name.substring( 0, - 6 ).toLowerCase();
+
+		}
+
+	}
 
 };
 
@@ -58,11 +92,10 @@ export class PrefixSum {
 	 * Constructs a new light probe helper.
 	 *
 	 * @param {Renderer} renderer - A renderer with the ability to execute compute operations.
-	 * @param {number[] | TypedArray | StorageInstancedBufferAttribute } inputArray - The data buffer to sum.
-	 * @param {'uint' | 'float'} inputArrayType - Type of input array
+	 * @param {TypedArray} inputArray - The data buffer to sum. Must have n % 4 == 0 num elements
 	 * @param {Object} [options={}] - Options that modify the behavior of the prefix sum.
 	 */
-	constructor( renderer, inputArray, inputArrayType, options = {} ) {
+	constructor( renderer, inputArray, options = {} ) {
 
 		/**
 		 * A reference to the renderer.
@@ -93,8 +126,25 @@ export class PrefixSum {
 		 */
 		this.utilityNodes = {};
 
-		this.type = inputArrayType;
-		this.vecType = inputArrayType === 'uint' ? 'uvec4' : 'vec4';
+		/**
+		 * The type of each individual data element.
+		 *
+		 * @type {number}
+		 */
+		this.type = getTypeFromTypedArray( inputArray );
+
+		this.vecType = 'vec4';
+
+		if ( this.type === 'int' ) {
+
+			this.vecType = 'ivec4';
+
+		} else if ( this.type === 'uint' ) {
+
+			this.vecType = 'uvec4';
+
+		}
+
 
 		/**
 		 * The size of the data.
@@ -102,6 +152,21 @@ export class PrefixSum {
 		 * @type {number}
 		 */
 		this.count = inputArray.length;
+
+		// Allign size of buffer to vec4
+		if ( inputArray.length % 4 !== 0 ) {
+
+			const missingElements = ( 4 - inputArray.length % 4 );
+			const bytesToAdd = missingElements * inputArray.constructor.BYTES_PER_ELEMENT;
+			this.inputArrayBuffer = new inputArray.constructor( new ArrayBuffer( inputArray.byteLength + bytesToAdd ) );
+			this.inputArrayBuffer.set( [ ...inputArray, ...Array( missingElements ).fill( 0 ) ] );
+
+		} else {
+
+			this.inputArrayBuffer = new inputArray.constructor( new ArrayBuffer( inputArray.byteLength ) );
+			this.inputArrayBuffer.set( inputArray );
+
+		}
 
 		/**
 		 * The number of 4-dimensional vectors needed to fully represent the data in the data buffer.
@@ -111,12 +176,6 @@ export class PrefixSum {
 		 * @type {number}
 		 */
 		this.vecCount = divRoundUp( this.count, 4 );
-
-		while ( inputArray.length % 4 !== 0 ) {
-
-			inputArray.push( 0 );
-
-		}
 
 		/**
 		 * The number of 4-dimensional vectors that will be read from global storage in each invocation of the reduction/downsweep step.
@@ -173,7 +232,7 @@ export class PrefixSum {
 		*/
 		this.dispatchSize = this.numWorkgroups * this.workgroupSize;
 
-		this._createStorageBuffers( inputArray, inputArrayType, this.vecType, this.numWorkgroups );
+		this._createStorageBuffers();
 		this._createUtilityNodes();
 
 		/**
@@ -192,18 +251,18 @@ export class PrefixSum {
 
 	}
 
-	_createStorageBuffers( inputArray ) {
+	_createStorageBuffers() {
 
-		this.arrayBuffer = this.type === 'uint' ? Uint32Array.from( inputArray ) : Float32Array.from( inputArray );
-		this.outputArrayBuffer = this.type === 'uint' ? Uint32Array.from( inputArray ) : Float32Array.from( inputArray );
+		this.outputArrayBuffer = new this.inputArrayBuffer.constructor( new ArrayBuffer( this.inputArrayBuffer.byteLength ) );
+		this.outputArrayBuffer.set( this.inputArrayBuffer );
 
-		const inputAttribute = new StorageInstancedBufferAttribute( this.arrayBuffer, 1 );
+		const inputAttribute = new StorageInstancedBufferAttribute( this.inputArrayBuffer, 1 );
 		const outputAttribute = new StorageInstancedBufferAttribute( this.outputArrayBuffer, 1 );
 
-		this.storageBuffers.dataBuffer = storage( inputAttribute, this.vecType, inputAttribute.count / 4 ).setName( `Prefix_Sum_Input_Vec_${id}` );
+		this.storageBuffers.dataBuffer = storage( inputAttribute, this.vecType, this.vecCount ).setName( `Prefix_Sum_Input_Vec_${id}` );
 		this.storageBuffers.unvectorizedDataBuffer = storage( inputAttribute, this.type, inputAttribute.count ).setName( `Prefix_Sum_Input_Unvec_${id}` );
 
-		this.storageBuffers.outputBuffer = storage( outputAttribute, this.vecType, outputAttribute.count / 4 ).setName( `Prefix_Sum_Output_Vec_${id}` );
+		this.storageBuffers.outputBuffer = storage( outputAttribute, this.vecType, this.vecCount ).setName( `Prefix_Sum_Output_Vec_${id}` );
 		this.storageBuffers.unvectorizedOutputBuffer = storage( outputAttribute, this.type, outputAttribute.count ).setName( `Prefix_Sum_Output_Unvec_${id}` );
 
 		this.storageBuffers.reductionBuffer = instancedArray( this.numWorkgroups, this.type ).setPBO( true ).setName( `Prefix_Sum_Reduction_${id}` );
