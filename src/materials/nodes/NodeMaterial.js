@@ -592,6 +592,14 @@ class NodeMaterial extends Material {
 
 			if ( isCustomOutput ) resultNode = this.outputNode;
 
+			//
+
+			if ( builder.context.getOutput ) {
+
+				resultNode = builder.context.getOutput( resultNode, builder );
+
+			}
+
 			// MRT
 
 			if ( renderTarget !== null ) {
