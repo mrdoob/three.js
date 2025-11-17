@@ -1765,12 +1765,20 @@
 			"kind": "class"
 		},
 		{
+			"title": "BufferNode#addUpdateRange",
+			"kind": "function"
+		},
+		{
 			"title": "BufferNode#bufferCount",
 			"kind": "member"
 		},
 		{
 			"title": "BufferNode#bufferType",
 			"kind": "member"
+		},
+		{
+			"title": "BufferNode#clearUpdateRanges",
+			"kind": "function"
 		},
 		{
 			"title": "BufferNode#getElementType",
@@ -1782,6 +1790,10 @@
 		},
 		{
 			"title": "BufferNode#isBufferNode",
+			"kind": "member"
+		},
+		{
+			"title": "BufferNode#updateRanges",
 			"kind": "member"
 		},
 		{
@@ -4218,6 +4230,14 @@
 		},
 		{
 			"title": "InstanceNode#instanceMatrixNode",
+			"kind": "member"
+		},
+		{
+			"title": "InstanceNode#isStorageColor",
+			"kind": "member"
+		},
+		{
+			"title": "InstanceNode#isStorageMatrix",
 			"kind": "member"
 		},
 		{
@@ -8078,6 +8098,10 @@
 		},
 		{
 			"title": "NodeBuilder#getSharedContext",
+			"kind": "function"
+		},
+		{
+			"title": "NodeBuilder#getSharedDataFromNode",
 			"kind": "function"
 		},
 		{
@@ -22092,6 +22116,10 @@
 		},
 		{
 			"title": "SkyMesh#isSky",
+			"kind": "member"
+		},
+		{
+			"title": "SkyMesh#isSkyMesh",
 			"kind": "member"
 		},
 		{
