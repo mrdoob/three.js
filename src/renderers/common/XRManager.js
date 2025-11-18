@@ -20,6 +20,7 @@ import { warn } from '../../utils.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
+const _correctionQuaternion = /*@__PURE__*/ new Quaternion().setFromAxisAngle( new Vector3( 0, 1, 0 ), - Math.PI / 2 );
 
 /**
  * The XR manager is built on top of the WebXR Device API to
@@ -65,6 +66,16 @@ class XRManager extends EventDispatcher {
 		 * @default true
 		 */
 		this.cameraAutoUpdate = true;
+
+		/**
+		 * Whether to apply a -90° Y-axis rotation correction to the XR camera for video textures.
+		 * This corrects the orientation of video textures in WebXR projection layers.
+		 * When enabled, this rotates the entire camera, affecting all rendered content.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.videoTextureCorrection = false;
 
 		/**
 		 * The renderer.
@@ -1624,6 +1635,14 @@ function onAnimationFrame( time, frame ) {
 
 			camera.matrix.fromArray( view.transform.matrix );
 			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+
+			if ( this.videoTextureCorrection ) {
+
+				camera.quaternion.premultiply( _correctionQuaternion );
+				camera.matrix.compose( camera.position, camera.quaternion, camera.scale );
+
+			}
+
 			camera.projectionMatrix.fromArray( view.projectionMatrix );
 			camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
 			camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
