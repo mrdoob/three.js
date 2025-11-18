@@ -1,4 +1,3 @@
-import { Source } from './Source.js';
 import { DepthTexture } from './DepthTexture.js';
 import { CubeReflectionMapping, NearestFilter, UnsignedIntType, DepthFormat } from '../constants.js';
 
