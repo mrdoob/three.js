@@ -1129,7 +1129,7 @@ class WebGLUniforms {
 
 		for ( const u of this.seq ) {
 
-			if ( u.type === gl.SAMPLER_2D_SHADOW ) {
+			if ( u.type === gl.SAMPLER_2D_SHADOW || u.type === gl.SAMPLER_CUBE_SHADOW ) {
 
 				shadowSamplers.push( u );
 
