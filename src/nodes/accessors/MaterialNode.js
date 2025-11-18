@@ -7,6 +7,8 @@ import { uniform } from '../core/UniformNode.js';
 import { normalMap } from '../display/NormalMapNode.js';
 import { bumpMap } from '../display/BumpMapNode.js';
 import { Vector2 } from '../../math/Vector2.js';
+import { RGFormat, RED_GREEN_RGTC2_Format, NormalRGPacking } from '../../constants.js';
+
 
 const _propertyCache = new Map();
 
@@ -234,6 +236,12 @@ class MaterialNode extends Node {
 
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
 				node.normalMapType = material.normalMapType;
+
+				if ( material.normalMap.format == RGFormat || material.normalMap.format == RED_GREEN_RGTC2_Format ) {
+
+					node.unpackNormalMode = NormalRGPacking;
+
+				}
 
 			} else if ( material.bumpMap ) {
 
