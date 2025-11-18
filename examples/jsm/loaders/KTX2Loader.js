@@ -21,7 +21,7 @@ import {
 	RGBA_S3TC_DXT3_Format,
 	RGBA_ETC2_EAC_Format,
 	R11_UNORM_EAC_Format,
-	RG11_UNORM_EAC_Format
+	RG11_UNORM_EAC_Format,
 	RGBA_PVRTC_4BPPV1_Format,
 	RGBA_PVRTC_2BPPV1_Format,
 	RGBA_S3TC_DXT1_Format,
