@@ -21,7 +21,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	const shaderIDs = {
 		MeshDepthMaterial: 'depth',
-		MeshDistanceMaterial: 'distanceRGBA',
+		MeshDistanceMaterial: 'distance',
 		MeshNormalMaterial: 'normal',
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
