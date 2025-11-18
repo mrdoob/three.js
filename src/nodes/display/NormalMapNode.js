@@ -77,15 +77,15 @@ class NormalMapNode extends TempNode {
 
 		if ( normalMapType === TangentSpaceNormalMap ) {
 
-			if ( unpackNormalMode == NormalRGPacking ) {
+			if ( unpackNormalMode === NormalRGPacking ) {
 
 				normalMap = unpackNormal( normalMap.xy );
 
-			} else if ( unpackNormalMode == NormalGAPacking ) {
+			} else if ( unpackNormalMode === NormalGAPacking ) {
 
 				normalMap = unpackNormal( normalMap.yw );
 
-			} else if ( unpackNormalMode != NoNormalPacking ) {
+			} else if ( unpackNormalMode !== NoNormalPacking ) {
 
 				console.error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormalMode }` );
 
@@ -93,7 +93,7 @@ class NormalMapNode extends TempNode {
 
 		} else {
 
-			if ( unpackNormalMode != NoNormalPacking ) {
+			if ( unpackNormalMode !== NoNormalPacking ) {
 
 				console.error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormalMode }'` );
 
