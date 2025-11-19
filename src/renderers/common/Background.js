@@ -94,13 +94,13 @@ class Background extends DataMap {
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
-				// when using orthographic cameras, we must scale the sphere
+				// when using orthographic cameras, we must scale the skybox sphere
 				// up to exceed the dimensions of the camera's viewing box.
 				const isOrtho = cameraProjectionMatrix.element( 3 ).element( 3 ).equal( 1.0 );
 
 				// calculate the orthographic scale
 				// projectionMatrix[1][1] is (1 / top). Invert it to get the height and multiply by 3.0
-				// (an arbitrary safety factor) to ensure the Sphere is large enough to cover the corners
+				// (an arbitrary safety factor) to ensure the skybox is large enough to cover the corners
 				// of the rectangular screen
 				const orthoScale = div( 1.0, cameraProjectionMatrix.element( 1 ).element( 1 ) ).mul( 3.0 );
 
@@ -108,7 +108,7 @@ class Background extends DataMap {
 				const modifiedPosition = isOrtho.select( positionLocal.mul( orthoScale ), positionLocal );
 				let viewProj = cameraProjectionMatrix.mul( modelViewMatrix.mul( vec4( modifiedPosition, 1.0 ) ) );
 
-				// forces background to far plane
+				// force background to far plane so it does not occlude objects
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
