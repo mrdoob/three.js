@@ -96,7 +96,7 @@ class TRAANode extends TempNode {
 		 *
 		 * @type {number}
 		 */
-		this.edgeDepthDiff = 0.0001;
+		this.edgeDepthDiff = 0.001;
 
 		/**
 		 * The jitter index selects the current camera offset value.
