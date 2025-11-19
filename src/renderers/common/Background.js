@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
-import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection, positionLocal } from '../../nodes/TSL.js';
+import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection, positionLocal, cameraProjectionMatrix, modelViewMatrix, div } from '../../nodes/TSL.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Mesh } from '../../objects/Mesh.js';
@@ -95,36 +95,36 @@ class Background extends DataMap {
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
+				// when using orthographic cameras, we must scale the sphere
+				// up to exceed the dimensions of the camera's viewing box.
+				const isOrtho = cameraProjectionMatrix.element( 3 ).element( 3 ).equal( 1.0 );
+
+				// calculate the orthographic scale
+				// projectionMatrix[1][1] is (1 / top). Invert it to get the height and multiply by 3.0
+				// (an arbitrary safety factor) to ensure the Sphere is large enough to cover the corners
+				// of the rectangular screen
+				const orthoScale = div( 1.0, cameraProjectionMatrix.element( 1 ).element( 1 ) ).mul( 3.0 );
+
+				// compute vertex position
+				const modifiedPosition = isOrtho.select( positionLocal.mul( orthoScale ), positionLocal );
+				let viewProj = cameraProjectionMatrix.mul( modelViewMatrix.mul( vec4( modifiedPosition, 1.0 ) ) );
+
+				// forces background to far plane
+				viewProj = viewProj.setZ( viewProj.w );
+
 				const nodeMaterial = new NodeMaterial();
 				nodeMaterial.name = 'Background.material';
+				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.allowOverride = false;
 				nodeMaterial.fog = false;
 				nodeMaterial.lights = false;
+				nodeMaterial.vertexNode = viewProj;
 				nodeMaterial.colorNode = backgroundMeshNode;
 
-				if ( background.isEnvironmentMapNode === true ) {
-
-					let viewProj = modelViewProjection;
-					viewProj = viewProj.setZ( viewProj.w );
-
-					nodeMaterial.side = BackSide;
-					nodeMaterial.vertexNode = viewProj;
-
-					backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
-
-				} else {
-
-					nodeMaterial.side = FrontSide;
-					nodeMaterial.vertexNode = vec4( positionLocal.xy, 1, 1 );
-
-					backgroundMesh = new Mesh( new PlaneGeometry( 2, 2 ), nodeMaterial );
-
-				}
-
-				sceneData.backgroundMesh = backgroundMesh;
 				sceneData.backgroundMeshNode = backgroundMeshNode;
+				sceneData.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
 
 				backgroundMesh.frustumCulled = false;
 				backgroundMesh.name = 'Background.mesh';
