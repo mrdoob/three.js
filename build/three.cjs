@@ -1288,6 +1288,30 @@ const LinearTransfer = 'linear';
 const SRGBTransfer = 'srgb';
 
 /**
+ * No normal map packing.
+ *
+ * @type {string}
+ * @constant
+ */
+const NoNormalPacking = '';
+
+/**
+ * Normal RG packing.
+ *
+ * @type {string}
+ * @constant
+ */
+const NormalRGPacking = 'rg';
+
+/**
+ * Normal GA packing.
+ *
+ * @type {string}
+ * @constant
+ */
+const NormalGAPacking = 'ga';
+
+/**
  * Sets the stencil buffer value to `0`.
  *
  * @type {number}
@@ -6798,7 +6822,7 @@ class Source {
 
 			target.set( data.videoWidth, data.videoHeight, 0 );
 
-		} else if ( data instanceof VideoFrame ) {
+		} else if ( ( typeof VideoFrame !== 'undefined' ) && ( data instanceof VideoFrame ) ) {
 
 			target.set( data.displayHeight, data.displayWidth, 0 );
 
@@ -77698,9 +77722,12 @@ exports.NeverDepth = NeverDepth;
 exports.NeverStencilFunc = NeverStencilFunc;
 exports.NoBlending = NoBlending;
 exports.NoColorSpace = NoColorSpace;
+exports.NoNormalPacking = NoNormalPacking;
 exports.NoToneMapping = NoToneMapping;
 exports.NormalAnimationBlendMode = NormalAnimationBlendMode;
 exports.NormalBlending = NormalBlending;
+exports.NormalGAPacking = NormalGAPacking;
+exports.NormalRGPacking = NormalRGPacking;
 exports.NotEqualCompare = NotEqualCompare;
 exports.NotEqualDepth = NotEqualDepth;
 exports.NotEqualStencilFunc = NotEqualStencilFunc;
