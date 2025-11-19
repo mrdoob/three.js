@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, screenSize } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, screenSize, ivec2 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -436,11 +436,6 @@ class TRAANode extends TempNode {
 
 		}
 
-		const historyTexture = texture( this._historyRenderTarget.texture );
-		const sampleTexture = this.beautyNode;
-		const depthTexture = this.depthNode;
-		const velocityTexture = this.velocityNode;
-
 		const currentDepthStruct = struct( {
 
 			closestDepth: 'float',
@@ -460,7 +455,7 @@ class TRAANode extends TempNode {
 				for ( let y = - 1; y <= 1; ++ y ) {
 
 					const neighbor = positionTexel.add( vec2( x, y ) ).toVar();
-					const depth = depthTexture.load( neighbor ).r.toVar();
+					const depth = this.depthNode.load( neighbor ).r.toVar();
 
 					If( depth.lessThan( closestDepth ), () => {
 
@@ -493,49 +488,95 @@ class TRAANode extends TempNode {
 
 		};
 
+		// Optimized version of AABB clipping.
+		// Reference: https://github.com/playdeadgames/temporal
+		const clipAABB = Fn( ( [ current, history, minColor, maxColor ] ) => {
+
+			const pClip = maxColor.rgb.add( minColor.rgb ).mul( 0.5 );
+			const eClip = maxColor.rgb.sub( minColor.rgb ).mul( 0.5 ).add( 1e-7 );
+			const vClip = history.sub( vec4( pClip, current.a ) );
+			const vUnit = vClip.xyz.div( eClip );
+			const absUnit = vUnit.abs();
+			const maxUnit = max( absUnit.x, absUnit.y, absUnit.z );
+			return maxUnit.greaterThan( 1 ).select(
+				vec4( pClip, current.a ).add( vClip.div( maxUnit ) ),
+				history
+			);
+
+		} ).setLayout( {
+			name: 'clipAABB',
+			type: 'vec4',
+			inputs: [
+				{ name: 'current', type: 'vec4' },
+				{ name: 'history', type: 'vec4' },
+				{ name: 'minColor', type: 'vec4' },
+				{ name: 'maxColor', type: 'vec4' }
+			]
+		} );
+
+		// Performs variance clipping.
+		// See: https://developer.download.nvidia.com/gameworks/events/GDC2016/msalvi_temporal_supersampling.pdf
+		const varianceClipping = ( positionTexel, currentColor, historyColor, gamma ) => {
+
+			const varianceOffsets = [
+				[ - 1, - 1 ],
+				[ - 1, 1 ],
+				[ 1, - 1 ],
+				[ 1, 1 ],
+				[ 1, 0 ],
+				[ 0, - 1 ],
+				[ 0, 1 ],
+				[ - 1, 0 ]
+			];
+
+			const moment1 = currentColor.toVar();
+			const moment2 = currentColor.pow2().toVar();
+
+			for ( const [ x, y ] of varianceOffsets ) {
+
+				// Use max() to prevent NaN values from propagating.
+				const neighbor = this.beautyNode.offset( ivec2( x, y ) ).load( positionTexel ).max( 0 );
+				moment1.addAssign( neighbor );
+				moment2.addAssign( neighbor.pow2() );
+
+			}
+
+			const N = float( varianceOffsets.length + 1 );
+			const mean = moment1.div( N );
+			const variance = moment2.div( N ).sub( mean.pow2() ).max( 0 ).sqrt().mul( gamma );
+			const minColor = mean.sub( variance );
+			const maxColor = mean.add( variance );
+
+			return clipAABB( mean.clamp( minColor, maxColor ), historyColor, minColor, maxColor );
+
+		};
+
+		const historyNode = texture( this._historyRenderTarget.texture );
+
 		const resolve = Fn( () => {
 
 			const uvNode = uv();
+			const positionTexel = uvNode.mul( screenSize );
 
-			const minColor = vec4( 10000 ).toVar();
-			const maxColor = vec4( - 10000 ).toVar();
-
-			// sample a 3x3 neighborhood to create a box in color space
-			// clamping the history color with the resulting min/max colors mitigates ghosting
-
-			Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=', name: 'x' }, ( { x } ) => {
-
-				Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=', name: 'y' }, ( { y } ) => {
-
-					const uvNeighbor = uvNode.add( vec2( float( x ), float( y ) ).mul( this._invSize ) ).toVar();
-					const colorNeighbor = max( vec4( 0 ), sampleTexture.sample( uvNeighbor ) ).toVar(); // use max() to avoid propagate garbage values
-
-					minColor.assign( min( minColor, colorNeighbor ) );
-					maxColor.assign( max( maxColor, colorNeighbor ) );
-
-				} );
-
-			} );
-
-			const currentDepthStruct = sampleCurrentDepth( uvNode.mul( screenSize ) );
+			const currentDepthStruct = sampleCurrentDepth( positionTexel );
 			const closestDepth = currentDepthStruct.get( 'closestDepth' );
 			const closestPositionTexel = currentDepthStruct.get( 'closestPositionTexel' );
 			const farthestDepth = currentDepthStruct.get( 'farthestDepth' );
 
 			// sampling/reprojection
 
-			const offset = velocityTexture.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
+			const offset = this.velocityNode.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
 
-			const currentColor = sampleTexture.sample( uvNode );
-			const historyColor = historyTexture.sample( uvNode.sub( offset ) );
+			const currentColor = this.beautyNode.sample( uvNode );
+			const historyColor = historyNode.sample( uvNode.sub( offset ) );
 
-			// clamping
+			// neighborhood clipping
 
-			const clampedHistoryColor = clamp( historyColor, minColor, maxColor );
+			const clippedHistoryColor = varianceClipping( positionTexel, currentColor, historyColor, 1 );
 
 			// sample the current and previous depths
 
-			const currentDepth = depthTexture.sample( uvNode ).r;
+			const currentDepth = this.depthNode.sample( uvNode ).r;
 			const historyUV = uvNode.sub( offset );
 			const previousDepth = samplePreviousDepth( historyUV );
 
@@ -554,7 +595,7 @@ class TRAANode extends TempNode {
 			// flicker reduction based on luminance weighing
 
 			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1.0 ) ) ) );
-			const compressedHistory = clampedHistoryColor.mul( float( 1 ).div( ( max( clampedHistoryColor.r, clampedHistoryColor.g, clampedHistoryColor.b ).add( 1.0 ) ) ) );
+			const compressedHistory = clippedHistoryColor.mul( float( 1 ).div( ( max( clippedHistoryColor.r, clippedHistoryColor.g, clippedHistoryColor.b ).add( 1.0 ) ) ) );
 
 			const luminanceCurrent = luminance( compressedCurrent.rgb );
 			const luminanceHistory = luminance( compressedHistory.rgb );
@@ -562,7 +603,7 @@ class TRAANode extends TempNode {
 			currentWeight.mulAssign( float( 1 ).div( luminanceCurrent.add( 1 ) ) );
 			historyWeight.mulAssign( float( 1 ).div( luminanceHistory.add( 1 ) ) );
 
-			const smoothedOutput = add( currentColor.mul( currentWeight ), clampedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
+			const smoothedOutput = add( currentColor.mul( currentWeight ), clippedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
 
 			return smoothedOutput;
 
