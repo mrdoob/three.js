@@ -130,7 +130,6 @@ uniform float opacity;
 varying vec3 vViewPosition;
 
 #include <common>
-#include <packing>
 #include <dithering_pars_fragment>
 #include <color_pars_fragment>
 #include <uv_pars_fragment>

@@ -3508,7 +3508,7 @@ class WebGLRenderer {
  * If you do not require dynamic lighting / shadows, you may set this to `false`.
  * @property {boolean} [needsUpdate=false] - When set to `true`, shadow maps in the scene
  * will be updated in the next `render` call.
- * @property {(BasicShadowMap|PCFShadowMap|PCFSoftShadowMap|VSMShadowMap)} [type=PCFShadowMap] - Defines the shadow map type.
+ * @property {(BasicShadowMap|PCFShadowMap|VSMShadowMap)} [type=PCFShadowMap] - Defines the shadow map type.
  **/
 
 export { WebGLRenderer };

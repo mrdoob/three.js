@@ -36,7 +36,6 @@ uniform vec3 color;
 uniform float opacity;
 
 #include <common>
-#include <packing>
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>

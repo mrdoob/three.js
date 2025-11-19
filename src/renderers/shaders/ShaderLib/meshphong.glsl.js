@@ -60,7 +60,6 @@ uniform float shininess;
 uniform float opacity;
 
 #include <common>
-#include <packing>
 #include <dithering_pars_fragment>
 #include <color_pars_fragment>
 #include <uv_pars_fragment>

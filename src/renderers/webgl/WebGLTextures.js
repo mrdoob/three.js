@@ -583,7 +583,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const textureProperties = properties.get( texture );
 
-		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
+		if ( texture.isCubeDepthTexture !== true && texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			uploadCubeTexture( textureProperties, texture, slot );
 			return;
@@ -1642,10 +1642,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	}
 
 	// Setup resources for a Depth Texture for a FBO (needs an extension)
-	function setupDepthTexture( framebuffer, renderTarget ) {
+	function setupDepthTexture( framebuffer, renderTarget, cubeFace ) {
 
-		const isCube = ( renderTarget && renderTarget.isWebGLCubeRenderTarget );
-		if ( isCube ) throw new Error( 'Depth Texture with cube render targets is not supported' );
+		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 
 		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
@@ -1669,20 +1668,69 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		setTexture2D( renderTarget.depthTexture, 0 );
+		if ( isCube ) {
+
+			// For cube depth textures, initialize and bind without uploading image data
+			if ( textureProperties.__webglInit === undefined ) {
+
+				textureProperties.__webglInit = true;
+				renderTarget.depthTexture.addEventListener( 'dispose', onTextureDispose );
+
+			}
+
+			// Only create and allocate storage once
+			if ( textureProperties.__webglTexture === undefined ) {
+
+				textureProperties.__webglTexture = _gl.createTexture();
+
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
+				setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget.depthTexture );
+
+				// Allocate storage for all 6 faces with correct depth texture format
+				const glFormat = utils.convert( renderTarget.depthTexture.format );
+				const glType = utils.convert( renderTarget.depthTexture.type );
+
+				// Use proper internal format for depth textures
+				let glInternalFormat;
+				if ( renderTarget.depthTexture.format === DepthFormat ) {
+
+					glInternalFormat = _gl.DEPTH_COMPONENT24;
+
+				} else if ( renderTarget.depthTexture.format === DepthStencilFormat ) {
+
+					glInternalFormat = _gl.DEPTH24_STENCIL8;
+
+				}
+
+				for ( let i = 0; i < 6; i ++ ) {
+
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+
+				}
+
+			}
+
+		} else {
+
+			setTexture2D( renderTarget.depthTexture, 0 );
+
+		}
 
 		const webglDepthTexture = textureProperties.__webglTexture;
 		const samples = getRenderTargetSamples( renderTarget );
+
+		const glTextureType = isCube ? _gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace : _gl.TEXTURE_2D;
+		const glAttachmentType = renderTarget.depthTexture.format === DepthStencilFormat ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
 
 		if ( renderTarget.depthTexture.format === DepthFormat ) {
 
 			if ( useMultisampledRTT( renderTarget ) ) {
 
-				multisampledRTTExt.framebufferTexture2DMultisampleEXT( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0, samples );
+				multisampledRTTExt.framebufferTexture2DMultisampleEXT( _gl.FRAMEBUFFER, glAttachmentType, glTextureType, webglDepthTexture, 0, samples );
 
 			} else {
 
-				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, glAttachmentType, glTextureType, webglDepthTexture, 0 );
 
 			}
 
@@ -1690,11 +1738,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( useMultisampledRTT( renderTarget ) ) {
 
-				multisampledRTTExt.framebufferTexture2DMultisampleEXT( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0, samples );
+				multisampledRTTExt.framebufferTexture2DMultisampleEXT( _gl.FRAMEBUFFER, glAttachmentType, glTextureType, webglDepthTexture, 0, samples );
 
 			} else {
 
-				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, glAttachmentType, glTextureType, webglDepthTexture, 0 );
 
 			}
 
@@ -1745,17 +1793,28 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthTexture && ! renderTargetProperties.__autoAllocateDepthBuffer ) {
 
-			if ( isCube ) throw new Error( 'target.depthTexture not supported in Cube render targets' );
+			if ( isCube ) {
 
-			const mipmaps = renderTarget.texture.mipmaps;
+				// For cube render targets with depth texture, setup each face
+				for ( let i = 0; i < 6; i ++ ) {
 
-			if ( mipmaps && mipmaps.length > 0 ) {
+					setupDepthTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, i );
 
-				setupDepthTexture( renderTargetProperties.__webglFramebuffer[ 0 ], renderTarget );
+				}
 
 			} else {
 
-				setupDepthTexture( renderTargetProperties.__webglFramebuffer, renderTarget );
+				const mipmaps = renderTarget.texture.mipmaps;
+
+				if ( mipmaps && mipmaps.length > 0 ) {
+
+					setupDepthTexture( renderTargetProperties.__webglFramebuffer[ 0 ], renderTarget, 0 );
+
+				} else {
+
+					setupDepthTexture( renderTargetProperties.__webglFramebuffer, renderTarget, 0 );
+
+				}
 
 			}
 
@@ -2336,6 +2395,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	this.setupDepthRenderbuffer = setupDepthRenderbuffer;
 	this.setupFrameBufferTexture = setupFrameBufferTexture;
 	this.useMultisampledRTT = useMultisampledRTT;
+
+	this.isReversedDepthBuffer = function () {
+
+		return state.buffers.depth.getReversed();
+
+	};
 
 }
 

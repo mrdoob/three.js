@@ -50,7 +50,6 @@ uniform float farDistance;
 varying vec3 vWorldPosition;
 
 #include <common>
-#include <packing>
 #include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
@@ -72,7 +71,7 @@ void main () {
 	dist = ( dist - nearDistance ) / ( farDistance - nearDistance );
 	dist = saturate( dist ); // clamp to [ 0, 1 ]
 
-	gl_FragColor = packDepthToRGBA( dist );
+	gl_FragColor = vec4( dist, 0.0, 0.0, 1.0 );
 
 }
 `;

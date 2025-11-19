@@ -69,9 +69,6 @@ class LightShadow {
 		 * map size will allow for a higher value to be used here before these effects
 		 * become visible.
 		 *
-		 * The property has no effect when the shadow map type is `PCFSoftShadowMap` and
-		 * and it is recommended to increase softness by decreasing the shadow map size instead.
-		 *
 		 * The property has no effect when the shadow map type is `BasicShadowMap`.
 		 *
 		 * @type {number}
