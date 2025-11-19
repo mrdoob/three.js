@@ -468,6 +468,22 @@ class PhysicalLightingModel extends LightingModel {
 		 */
 		this.iridescenceF0 = null;
 
+		/**
+		 * The iridescence F0 dielectric.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.iridescenceF0Dielectric = null;
+
+		/**
+		 * The iridescence F0 metallic.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.iridescenceF0Metallic = null;
+
 	}
 
 	/**
@@ -497,15 +513,28 @@ class PhysicalLightingModel extends LightingModel {
 
 			const dotNVi = normalView.dot( positionViewDirection ).clamp();
 
-			this.iridescenceFresnel = evalIridescence( {
+			const iridescenceFresnelDielectric = evalIridescence( {
 				outsideIOR: float( 1.0 ),
 				eta2: iridescenceIOR,
 				cosTheta1: dotNVi,
 				thinFilmThickness: iridescenceThickness,
-				baseF0: specularColorBlended
+				baseF0: specularColor
 			} );
 
-			this.iridescenceF0 = Schlick_to_F0( { f: this.iridescenceFresnel, f90: 1.0, dotVH: dotNVi } );
+			const iridescenceFresnelMetallic = evalIridescence( {
+				outsideIOR: float( 1.0 ),
+				eta2: iridescenceIOR,
+				cosTheta1: dotNVi,
+				thinFilmThickness: iridescenceThickness,
+				baseF0: diffuseColor.rgb
+			} );
+
+			this.iridescenceFresnel = mix( iridescenceFresnelDielectric, iridescenceFresnelMetallic, metalness );
+
+			this.iridescenceF0Dielectric = Schlick_to_F0( { f: iridescenceFresnelDielectric, f90: 1.0, dotVH: dotNVi } );
+			this.iridescenceF0Metallic = Schlick_to_F0( { f: iridescenceFresnelMetallic, f90: 1.0, dotVH: dotNVi } );
+
+			this.iridescenceF0 = mix( this.iridescenceF0Dielectric, this.iridescenceF0Metallic, metalness );
 
 		}
 
@@ -549,13 +578,13 @@ class PhysicalLightingModel extends LightingModel {
 	// Approximates multi-scattering in order to preserve energy.
 	// http://www.jcgt.org/published/0008/01/03/
 
-	computeMultiscattering( singleScatter, multiScatter, specularF90, f0 ) {
+	computeMultiscattering( singleScatter, multiScatter, specularF90, f0, iridescenceF0 = null ) {
 
 		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
 		const fab = DFGApprox( { roughness, dotNV } );
 
-		const Fr = this.iridescenceF0 ? iridescence.mix( f0, this.iridescenceF0 ) : f0;
+		const Fr = iridescenceF0 ? iridescence.mix( f0, iridescenceF0 ) : f0;
 
 		const FssEss = Fr.mul( fab.x ).add( specularF90.mul( fab.y ) );
 
@@ -712,8 +741,8 @@ class PhysicalLightingModel extends LightingModel {
 		const singleScatteringMetallic = vec3().toVar( 'singleScatteringMetallic' );
 		const multiScatteringMetallic = vec3().toVar( 'multiScatteringMetallic' );
 
-		this.computeMultiscattering( singleScatteringDielectric, multiScatteringDielectric, specularF90, specularColor );
-		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb );
+		this.computeMultiscattering( singleScatteringDielectric, multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb, this.iridescenceF0Metallic );
 
 		// Mix based on metalness
 		const singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, metalness );
