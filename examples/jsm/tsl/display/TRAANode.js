@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, screenSize } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -441,6 +441,48 @@ class TRAANode extends TempNode {
 		const depthTexture = this.depthNode;
 		const velocityTexture = this.velocityNode;
 
+		const currentDepthStruct = struct( {
+
+			closestDepth: 'float',
+			closestPositionTexel: 'ivec2',
+			farthestDepth: 'float',
+
+		} );
+
+		const sampleCurrentDepth = Fn( ( [ positionTexel ] ) => {
+
+			const closestDepth = float( 2 ).toVar();
+			const closestPositionTexel = vec2( 0 ).toVar();
+			const farthestDepth = float( - 1 ).toVar();
+
+			for ( let x = - 1; x <= 1; ++ x ) {
+
+				for ( let y = - 1; y <= 1; ++ y ) {
+
+					const neighbor = positionTexel.add( vec2( x, y ) ).toVar();
+					const depth = depthTexture.load( neighbor ).r.toVar();
+
+					If( depth.lessThan( closestDepth ), () => {
+
+						closestDepth.assign( depth );
+						closestPositionTexel.assign( neighbor );
+
+					} );
+
+					If( depth.greaterThan( farthestDepth ), () => {
+
+						farthestDepth.assign( depth );
+
+					} );
+
+				}
+
+			}
+
+			return currentDepthStruct( closestDepth, closestPositionTexel, farthestDepth );
+
+		} );
+
 		const samplePreviousDepth = ( uv ) => {
 
 			const depth = this._previousDepthNode.sample( uv ).r;
@@ -457,9 +499,6 @@ class TRAANode extends TempNode {
 
 			const minColor = vec4( 10000 ).toVar();
 			const maxColor = vec4( - 10000 ).toVar();
-			const closestDepth = float( 2 ).toVar();
-			const farthestDepth = float( - 1 ).toVar();
-			const closestDepthPixelPosition = vec2( 0 ).toVar();
 
 			// sample a 3x3 neighborhood to create a box in color space
 			// clamping the history color with the resulting min/max colors mitigates ghosting
@@ -474,32 +513,18 @@ class TRAANode extends TempNode {
 					minColor.assign( min( minColor, colorNeighbor ) );
 					maxColor.assign( max( maxColor, colorNeighbor ) );
 
-					const currentDepth = depthTexture.sample( uvNeighbor ).r.toVar();
-
-					// find the sample position of the closest depth in the neighborhood (used for velocity)
-
-					If( currentDepth.lessThan( closestDepth ), () => {
-
-						closestDepth.assign( currentDepth );
-						closestDepthPixelPosition.assign( uvNeighbor );
-
-					} );
-
-					// find the farthest depth in the neighborhood (used to preserve edge anti-aliasing)
-
-					If( currentDepth.greaterThan( farthestDepth ), () => {
-
-						farthestDepth.assign( currentDepth );
-
-					} );
-
 				} );
 
 			} );
 
+			const currentDepthStruct = sampleCurrentDepth( uvNode.mul( screenSize ) );
+			const closestDepth = currentDepthStruct.get( 'closestDepth' );
+			const closestPositionTexel = currentDepthStruct.get( 'closestPositionTexel' );
+			const farthestDepth = currentDepthStruct.get( 'farthestDepth' );
+
 			// sampling/reprojection
 
-			const offset = velocityTexture.sample( closestDepthPixelPosition ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
+			const offset = velocityTexture.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
 
 			const currentColor = sampleTexture.sample( uvNode );
 			const historyColor = historyTexture.sample( uvNode.sub( offset ) );
