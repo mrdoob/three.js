@@ -98,11 +98,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		if ( _state.buffers.depth.getReversed() === true ) {
 
-			_state.buffers.color.setClear( 0, 0, 0, 0 );
+			_state.buffers.color.setClear( 1, 1, 1, 1 );
 
 		} else {
 
-			_state.buffers.color.setClear( 1, 1, 1, 1 );
+			_state.buffers.color.setClear( 0, 0, 0, 0 );
 
 		}
 
