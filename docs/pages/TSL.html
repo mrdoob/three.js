@@ -12092,6 +12092,17 @@ complete before the barrier can be surpassed.</p>
 					</div>
 			</article>
 		</section>
+ <script>
+        (function() {
+            // Safari bug: hashes like "#TSL.Break" don't match element ids like "Break"
+            const rawHash = location.hash.slice(1);
+            if (rawHash.includes('.')) {
+                const id = rawHash.split('.').pop();
+                const el = document.getElementById(id);
+                if (el) el.scrollIntoView();
+            }
+        })();
+</script>
 <script src="../scripts/linenumber.js"></script>
 <script src="../scripts/page.js"></script>
 </body>
