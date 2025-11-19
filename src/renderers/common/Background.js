@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
-import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection } from '../../nodes/TSL.js';
+import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, positionLocal, cameraProjectionMatrix, modelViewMatrix, div } from '../../nodes/TSL.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Mesh } from '../../objects/Mesh.js';
@@ -94,7 +94,21 @@ class Background extends DataMap {
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
-				let viewProj = modelViewProjection;
+				// when using orthographic cameras, we must scale the skybox sphere
+				// up to exceed the dimensions of the camera's viewing box.
+				const isOrtho = cameraProjectionMatrix.element( 3 ).element( 3 ).equal( 1.0 );
+
+				// calculate the orthographic scale
+				// projectionMatrix[1][1] is (1 / top). Invert it to get the height and multiply by 3.0
+				// (an arbitrary safety factor) to ensure the skybox is large enough to cover the corners
+				// of the rectangular screen
+				const orthoScale = div( 1.0, cameraProjectionMatrix.element( 1 ).element( 1 ) ).mul( 3.0 );
+
+				// compute vertex position
+				const modifiedPosition = isOrtho.select( positionLocal.mul( orthoScale ), positionLocal );
+				let viewProj = cameraProjectionMatrix.mul( modelViewMatrix.mul( vec4( modifiedPosition, 1.0 ) ) );
+
+				// force background to far plane so it does not occlude objects
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
