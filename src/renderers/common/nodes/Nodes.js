@@ -483,9 +483,11 @@ class Nodes extends DataMap {
 
 					if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping ) ) {
 
+						let node;
+
 						if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
 
-							return pmremTexture( background );
+							node = pmremTexture( background );
 
 						} else {
 
@@ -501,9 +503,13 @@ class Nodes extends DataMap {
 
 							}
 
-							return cubeMapNode( envMap );
+							node = cubeMapNode( envMap );
 
 						}
+
+						node.isEnvironmentMapNode = true;
+
+						return node;
 
 					} else if ( background.isTexture === true ) {
 

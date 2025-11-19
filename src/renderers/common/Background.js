@@ -1,11 +1,12 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
-import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection } from '../../nodes/TSL.js';
+import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection, positionLocal } from '../../nodes/TSL.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Mesh } from '../../objects/Mesh.js';
+import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { SphereGeometry } from '../../geometries/SphereGeometry.js';
-import { BackSide } from '../../constants.js';
+import { BackSide, FrontSide } from '../../constants.js';
 import { error } from '../../utils.js';
 
 const _clearColor = /*@__PURE__*/ new Color4();
@@ -94,22 +95,37 @@ class Background extends DataMap {
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
-				let viewProj = modelViewProjection;
-				viewProj = viewProj.setZ( viewProj.w );
-
 				const nodeMaterial = new NodeMaterial();
 				nodeMaterial.name = 'Background.material';
-				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.allowOverride = false;
 				nodeMaterial.fog = false;
 				nodeMaterial.lights = false;
-				nodeMaterial.vertexNode = viewProj;
 				nodeMaterial.colorNode = backgroundMeshNode;
 
+				if ( background.isEnvironmentMapNode === true ) {
+
+					let viewProj = modelViewProjection;
+					viewProj = viewProj.setZ( viewProj.w );
+
+					nodeMaterial.side = BackSide;
+					nodeMaterial.vertexNode = viewProj;
+
+					backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
+
+				} else {
+
+					nodeMaterial.side = FrontSide;
+					nodeMaterial.vertexNode = vec4( positionLocal.xy, 1, 1 );
+
+					backgroundMesh = new Mesh( new PlaneGeometry( 2, 2 ), nodeMaterial );
+
+				}
+
+				sceneData.backgroundMesh = backgroundMesh;
 				sceneData.backgroundMeshNode = backgroundMeshNode;
-				sceneData.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
+
 				backgroundMesh.frustumCulled = false;
 				backgroundMesh.name = 'Background.mesh';
 
