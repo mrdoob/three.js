@@ -90,6 +90,21 @@ class Light extends Object3D {
 
 	}
 
+	/**
+	 * Deserializes the light from the given JSON.
+	 *
+	 * @param {Object} json - The JSON holding the serialized light.
+	 * @return {Light} A reference to this light.
+	 */
+	fromJSON( json ) {
+
+		if ( json.color !== undefined ) this.color.setHex( json.color );
+		if ( json.intensity !== undefined ) this.intensity = json.intensity;
+
+		return this;
+
+	}
+
 }
 
 export { Light };

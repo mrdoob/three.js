@@ -100,6 +100,21 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
+		QUnit.test( 'fromJSON', ( assert ) => {
+
+			const object = new Light();
+			const json = {
+				color: 0xff8844,
+				intensity: 2.5
+			};
+
+			object.fromJSON( json );
+
+			assert.strictEqual( object.color.getHex(), json.color, 'color restored from JSON' );
+			assert.strictEqual( object.intensity, json.intensity, 'intensity restored from JSON' );
+
+		} );
+
 		// OTHERS
 		QUnit.test( 'Standard light tests', ( assert ) => {
 
