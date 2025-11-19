@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, screenSize, ivec2 } from 'three/tsl';
+import { add, float, If, Fn, max, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, screenSize, ivec2 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -518,7 +518,7 @@ class TRAANode extends TempNode {
 		// See: https://developer.download.nvidia.com/gameworks/events/GDC2016/msalvi_temporal_supersampling.pdf
 		const varianceClipping = ( positionTexel, currentColor, historyColor, gamma ) => {
 
-			const varianceOffsets = [
+			const offsets = [
 				[ - 1, - 1 ],
 				[ - 1, 1 ],
 				[ 1, - 1 ],
@@ -532,7 +532,7 @@ class TRAANode extends TempNode {
 			const moment1 = currentColor.toVar();
 			const moment2 = currentColor.pow2().toVar();
 
-			for ( const [ x, y ] of varianceOffsets ) {
+			for ( const [ x, y ] of offsets ) {
 
 				// Use max() to prevent NaN values from propagating.
 				const neighbor = this.beautyNode.offset( ivec2( x, y ) ).load( positionTexel ).max( 0 );
@@ -541,7 +541,7 @@ class TRAANode extends TempNode {
 
 			}
 
-			const N = float( varianceOffsets.length + 1 );
+			const N = float( offsets.length + 1 );
 			const mean = moment1.div( N );
 			const variance = moment2.div( N ).sub( mean.pow2() ).max( 0 ).sqrt().mul( gamma );
 			const minColor = mean.sub( variance );
@@ -550,6 +550,23 @@ class TRAANode extends TempNode {
 			return clipAABB( mean.clamp( minColor, maxColor ), historyColor, minColor, maxColor );
 
 		};
+
+		// Flicker reduction based on luminance weighing.
+		const flickerReduction = Fn( ( [ currentColor, historyColor, currentWeight ] ) => {
+
+			const historyWeight = currentWeight.oneMinus();
+			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1 ) ) ) );
+			const compressedHistory = historyColor.mul( float( 1 ).div( ( max( historyColor.r, historyColor.g, historyColor.b ).add( 1 ) ) ) );
+
+			const luminanceCurrent = luminance( compressedCurrent.rgb );
+			const luminanceHistory = luminance( compressedHistory.rgb );
+
+			currentWeight.mulAssign( float( 1 ).div( luminanceCurrent.add( 1 ) ) );
+			historyWeight.mulAssign( float( 1 ).div( luminanceHistory.add( 1 ) ) );
+
+			return add( currentColor.mul( currentWeight ), historyColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
+
+		} );
 
 		const historyNode = texture( this._historyRenderTarget.texture );
 
@@ -563,16 +580,7 @@ class TRAANode extends TempNode {
 			const closestPositionTexel = currentDepthStruct.get( 'closestPositionTexel' );
 			const farthestDepth = currentDepthStruct.get( 'farthestDepth' );
 
-			// sampling/reprojection
-
 			const offset = this.velocityNode.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
-
-			const currentColor = this.beautyNode.sample( uvNode );
-			const historyColor = historyNode.sample( uvNode.sub( offset ) );
-
-			// neighborhood clipping
-
-			const clippedHistoryColor = varianceClipping( positionTexel, currentColor, historyColor, 1 );
 
 			// sample the current and previous depths
 
@@ -590,20 +598,20 @@ class TRAANode extends TempNode {
 
 			const motionFactor = uvNode.sub( historyUV ).length().mul( 10 );
 			const currentWeight = isDisocclusion.select( 1, float( 0.05 ).add( motionFactor ).saturate() ).toVar();
-			const historyWeight = currentWeight.oneMinus().toVar();
+
+			// sampling
+
+			const currentColor = this.beautyNode.sample( uvNode );
+			const historyColor = historyNode.sample( uvNode.sub( offset ) );
+
+			// neighborhood clipping
+
+			const varianceGamma = motionFactor.saturate().pow2().remapClamp( 1, 0, 0.75, 2 );
+			const clippedHistoryColor = varianceClipping( positionTexel, currentColor, historyColor, varianceGamma );
 
 			// flicker reduction based on luminance weighing
 
-			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1.0 ) ) ) );
-			const compressedHistory = clippedHistoryColor.mul( float( 1 ).div( ( max( clippedHistoryColor.r, clippedHistoryColor.g, clippedHistoryColor.b ).add( 1.0 ) ) ) );
-
-			const luminanceCurrent = luminance( compressedCurrent.rgb );
-			const luminanceHistory = luminance( compressedHistory.rgb );
-
-			currentWeight.mulAssign( float( 1 ).div( luminanceCurrent.add( 1 ) ) );
-			historyWeight.mulAssign( float( 1 ).div( luminanceHistory.add( 1 ) ) );
-
-			const smoothedOutput = add( currentColor.mul( currentWeight ), clippedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
+			const smoothedOutput = flickerReduction( currentColor, clippedHistoryColor, currentWeight );
 
 			return smoothedOutput;
 
