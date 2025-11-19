@@ -247,13 +247,13 @@ class TRAANode extends TempNode {
 
 		};
 
-		const jitterOffset = _JitterVectors[ this._jitterIndex ];
+		const jitterOffset = _haltonOffsets[ this._jitterIndex ];
 
 		this.camera.setViewOffset(
 
 			viewOffset.fullWidth, viewOffset.fullHeight,
 
-			viewOffset.offsetX + jitterOffset[ 0 ] * 0.0625, viewOffset.offsetY + jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
+			viewOffset.offsetX + jitterOffset[ 0 ] - 0.5, viewOffset.offsetY + jitterOffset[ 1 ] - 0.5,
 
 			viewOffset.width, viewOffset.height
 
@@ -273,7 +273,7 @@ class TRAANode extends TempNode {
 		// update jitter index
 
 		this._jitterIndex ++;
-		this._jitterIndex = this._jitterIndex % ( _JitterVectors.length - 1 );
+		this._jitterIndex = this._jitterIndex % ( _haltonOffsets.length - 1 );
 
 	}
 
@@ -548,21 +548,26 @@ class TRAANode extends TempNode {
 
 export default TRAANode;
 
-// These jitter vectors are specified in integers because it is easier.
-// I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
-// before being used, thus these integers need to be scaled by 1/16.
-//
-// Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
-const _JitterVectors = [
-	[ - 4, - 7 ], [ - 7, - 5 ], [ - 3, - 5 ], [ - 5, - 4 ],
-	[ - 1, - 4 ], [ - 2, - 2 ], [ - 6, - 1 ], [ - 4, 0 ],
-	[ - 7, 1 ], [ - 1, 2 ], [ - 6, 3 ], [ - 3, 3 ],
-	[ - 7, 6 ], [ - 3, 6 ], [ - 5, 7 ], [ - 1, 7 ],
-	[ 5, - 7 ], [ 1, - 6 ], [ 6, - 5 ], [ 4, - 4 ],
-	[ 2, - 3 ], [ 7, - 2 ], [ 1, - 1 ], [ 4, - 1 ],
-	[ 2, 1 ], [ 6, 2 ], [ 0, 4 ], [ 4, 4 ],
-	[ 2, 5 ], [ 7, 5 ], [ 5, 6 ], [ 3, 7 ]
-];
+function _halton( index, base ) {
+
+	let fraction = 1;
+	let result = 0;
+	while ( index > 0 ) {
+
+		fraction /= base;
+		result += fraction * ( index % base );
+		index = Math.floor( index / base );
+
+	}
+
+	return result;
+
+}
+
+const _haltonOffsets = /*@__PURE__*/ Array.from(
+	{ length: 32 },
+	( _, index ) => [ _halton( index + 1, 2 ), _halton( index + 1, 3 ) ]
+);
 
 /**
  * TSL function for creating a TRAA node for Temporal Reprojection Anti-Aliasing.
