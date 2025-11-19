@@ -1,6 +1,7 @@
 export default /* glsl */`
 
 uniform sampler2D dfgLUT;
+uniform sampler2D sheenLUT;
 
 struct PhysicalMaterial {
 
@@ -534,6 +535,21 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 		sheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );
 
+		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
+		float maxSheenColor = max( max( material.sheenColor.r, material.sheenColor.g ), material.sheenColor.b );
+
+		// Lookup directional albedo for both view and light angles
+		float E_sheen_V = texture2D( sheenLUT, vec2( dotNV, material.sheenRoughness ) ).r;
+		float E_sheen_L = texture2D( sheenLUT, vec2( dotNL, material.sheenRoughness ) ).r;
+
+		// Take minimum for proper energy conservation
+		float sheenScaling = min(
+			1.0 - maxSheenColor * E_sheen_V,
+			1.0 - maxSheenColor * E_sheen_L
+		);
+
+		irradiance *= sheenScaling;
+
 	#endif
 
 	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
@@ -558,6 +574,15 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	#ifdef USE_SHEEN
 
 		sheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
+
+		// Energy conservation for indirect lighting
+		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
+		float maxSheenColor = max( max( material.sheenColor.r, material.sheenColor.g ), material.sheenColor.b );
+		
+		// Lookup directional albedo from LUT
+		float E_sheen = texture2D( sheenLUT, vec2( dotNV, material.sheenRoughness ) ).r;
+		
+		float sheenScaling = 1.0 - maxSheenColor * E_sheen;
 
 	#endif
 
@@ -592,10 +617,16 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
-	reflectedLight.indirectSpecular += radiance * singleScattering;
-	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
-
-	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+	#ifdef USE_SHEEN
+		// Apply energy conservation scaling to base layers
+		reflectedLight.indirectSpecular += radiance * singleScattering * sheenScaling;
+		reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance * sheenScaling;
+		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance * sheenScaling;
+	#else
+		reflectedLight.indirectSpecular += radiance * singleScattering;
+		reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
+		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+	#endif
 
 }
 
