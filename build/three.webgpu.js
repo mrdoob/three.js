@@ -24948,6 +24948,7 @@ class PMREMGenerator {
 			( { lodMeshes: this._lodMeshes, sizeLods: this._sizeLods, sigmas: this._sigmas } = _createPlanes( _lodMax ) );
 
 			this._blurMaterial = _getBlurShader( _lodMax, renderTarget.width, renderTarget.height );
+			this._ggxMaterial = _getGGXShader( _lodMax, renderTarget.width, renderTarget.height );
 
 		}
 
@@ -25138,13 +25139,6 @@ class PMREMGenerator {
 
 		const renderer = this._renderer;
 		const pingPongRenderTarget = this._pingPongRenderTarget;
-
-		// Lazy create GGX material only when first used
-		if ( this._ggxMaterial === null ) {
-
-			this._ggxMaterial = _getGGXShader( this._lodMax, this._pingPongRenderTarget.width, this._pingPongRenderTarget.height );
-
-		}
 
 		const ggxMaterial = this._ggxMaterial;
 		const ggxMesh = this._lodMeshes[ lodOut ];
