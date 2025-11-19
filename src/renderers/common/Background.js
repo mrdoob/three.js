@@ -1,12 +1,11 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
-import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection, positionLocal, cameraProjectionMatrix, modelViewMatrix, div } from '../../nodes/TSL.js';
+import { vec4, context, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, positionLocal, cameraProjectionMatrix, modelViewMatrix, div } from '../../nodes/TSL.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Mesh } from '../../objects/Mesh.js';
-import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { SphereGeometry } from '../../geometries/SphereGeometry.js';
-import { BackSide, FrontSide } from '../../constants.js';
+import { BackSide } from '../../constants.js';
 import { error } from '../../utils.js';
 
 const _clearColor = /*@__PURE__*/ new Color4();
@@ -125,7 +124,6 @@ class Background extends DataMap {
 
 				sceneData.backgroundMeshNode = backgroundMeshNode;
 				sceneData.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
-
 				backgroundMesh.frustumCulled = false;
 				backgroundMesh.name = 'Background.mesh';
 
