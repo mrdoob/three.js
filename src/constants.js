@@ -921,7 +921,7 @@ export const R11_EAC_Format = 37488; // 0x9270
  * @type {number}
  * @constant
  */
-export const R11_SIGNED_EAC_Format = 37489; // 0x9271
+export const SIGNED_R11_EAC_Format = 37489; // 0x9271
 
 /**
  * EAC RG11 UNORM format.
@@ -937,7 +937,7 @@ export const RG11_EAC_Format = 37490; // 0x9272
  * @type {number}
  * @constant
  */
-export const RG11_SIGNED_EAC_Format = 37491; // 0x9273
+export const SIGNED_RG11_EAC_Format = 37491; // 0x9273
 
 /**
  * ASTC RGBA 4x4 format.
