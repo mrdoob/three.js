@@ -47064,7 +47064,7 @@ class LightProbe extends Light {
 }
 
 /**
- * Class for loading geometries. The files are internally
+ * Class for loading materials. The files are internally
  * loaded via {@link FileLoader}.
  *
  * ```js
