@@ -728,8 +728,11 @@ ${ this.tab }} )`;
 
 			structString += `${this.tab}\t${member.name}: '${member.type}'`;
 
-			const delimiter = ( i != members.length - 1 ) ? ',\n' : '';
-			structString += delimiter;
+			if ( i != members.length - 1 ) {
+
+				structString += ',\n';
+
+			}
 
 		}
 
