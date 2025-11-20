@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, length } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -84,6 +84,21 @@ class TRAANode extends TempNode {
 		this.camera = camera;
 
 		/**
+		 * When the difference between the current and previous depth goes above
+		 * this threshold, the history is considered invalid.
+		 *
+		 * @type {number}
+		 */
+		this.depthThreshold = 0.0001;
+
+		/**
+		 * The depth difference within the 3×3 neighborhood to consider a pixel as an edge.
+		 *
+		 * @type {number}
+		 */
+		this.edgeDepthDiff = 0.0001;
+
+		/**
 		 * The jitter index selects the current camera offset value.
 		 *
 		 * @private
@@ -99,38 +114,6 @@ class TRAANode extends TempNode {
 		 * @type {UniformNode<vec2>}
 		 */
 		this._invSize = uniform( new Vector2() );
-
-		/**
-		 * A uniform node holding the camera world matrix.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._cameraWorldMatrix = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the camera projection matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._cameraProjectionMatrixInverse = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the previous frame's view matrix.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._previousCameraWorldMatrix = uniform( new Matrix4() );
-
-		/**
-		 * A uniform node holding the previous frame's projection matrix inverse.
-		 *
-		 * @private
-		 * @type {UniformNode<mat4>}
-		 */
-		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
 
 		/**
 		 * The render target that represents the history of frame data.
@@ -174,6 +157,54 @@ class TRAANode extends TempNode {
 		 * @type {Matrix4}
 		 */
 		this._originalProjectionMatrix = new Matrix4();
+
+		/**
+		 * A uniform node holding the camera's near and far.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._cameraNearFar = uniform( new Vector2() );
+
+		/**
+		 * A uniform node holding the camera world matrix.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraWorldMatrix = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the camera world matrix inverse.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraWorldMatrixInverse = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the camera projection matrix inverse.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraProjectionMatrixInverse = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the previous frame's view matrix.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._previousCameraWorldMatrix = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the previous frame's projection matrix inverse.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
 
 		/**
 		 * A texture node for the previous depth buffer.
@@ -247,13 +278,13 @@ class TRAANode extends TempNode {
 
 		};
 
-		const jitterOffset = _JitterVectors[ this._jitterIndex ];
+		const jitterOffset = _haltonOffsets[ this._jitterIndex ];
 
 		this.camera.setViewOffset(
 
 			viewOffset.fullWidth, viewOffset.fullHeight,
 
-			viewOffset.offsetX + jitterOffset[ 0 ] * 0.0625, viewOffset.offsetY + jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
+			viewOffset.offsetX + jitterOffset[ 0 ] - 0.5, viewOffset.offsetY + jitterOffset[ 1 ] - 0.5,
 
 			viewOffset.width, viewOffset.height
 
@@ -273,7 +304,7 @@ class TRAANode extends TempNode {
 		// update jitter index
 
 		this._jitterIndex ++;
-		this._jitterIndex = this._jitterIndex % ( _JitterVectors.length - 1 );
+		this._jitterIndex = this._jitterIndex % ( _haltonOffsets.length - 1 );
 
 	}
 
@@ -293,7 +324,9 @@ class TRAANode extends TempNode {
 
 		// update camera matrices uniforms
 
+		this._cameraNearFar.value.set( this.camera.near, this.camera.far );
 		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
+		this._cameraWorldMatrixInverse.value.copy( this.camera.matrixWorldInverse );
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
 		// keep the TRAA in sync with the dimensions of the beauty node
@@ -408,14 +441,24 @@ class TRAANode extends TempNode {
 		const depthTexture = this.depthNode;
 		const velocityTexture = this.velocityNode;
 
+		const samplePreviousDepth = ( uv ) => {
+
+			const depth = this._previousDepthNode.sample( uv ).r;
+			const positionView = getViewPosition( uv, depth, this._previousCameraProjectionMatrixInverse );
+			const positionWorld = this._previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
+			const viewZ = this._cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
+			return viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
+
+		};
+
 		const resolve = Fn( () => {
 
 			const uvNode = uv();
 
 			const minColor = vec4( 10000 ).toVar();
 			const maxColor = vec4( - 10000 ).toVar();
-			const closestDepth = float( 1 ).toVar();
-			const farthestDepth = float( 0 ).toVar();
+			const closestDepth = float( 2 ).toVar();
+			const farthestDepth = float( - 1 ).toVar();
 			const closestDepthPixelPosition = vec2( 0 ).toVar();
 
 			// sample a 3x3 neighborhood to create a box in color space
@@ -465,46 +508,23 @@ class TRAANode extends TempNode {
 
 			const clampedHistoryColor = clamp( historyColor, minColor, maxColor );
 
-			// calculate current frame world position
+			// sample the current and previous depths
 
 			const currentDepth = depthTexture.sample( uvNode ).r;
-			const currentViewPosition = getViewPosition( uvNode, currentDepth, this._cameraProjectionMatrixInverse );
-			const currentWorldPosition = this._cameraWorldMatrix.mul( vec4( currentViewPosition, 1.0 ) ).xyz;
-
-			// calculate previous frame world position from history UV and previous depth
-
 			const historyUV = uvNode.sub( offset );
-			const previousDepth = this._previousDepthNode.sample( historyUV ).r;
-			const previousViewPosition = getViewPosition( historyUV, previousDepth, this._previousCameraProjectionMatrixInverse );
-			const previousWorldPosition = this._previousCameraWorldMatrix.mul( vec4( previousViewPosition, 1.0 ) ).xyz;
+			const previousDepth = samplePreviousDepth( historyUV );
 
-			// calculate difference in world positions
+			// disocclusion except on edges
 
-			const worldPositionDifference = length( currentWorldPosition.sub( previousWorldPosition ) ).toVar();
-			worldPositionDifference.assign( min( max( worldPositionDifference.sub( 1.0 ), 0.0 ), 1.0 ) );
+			const isEdge = farthestDepth.sub( closestDepth ).greaterThan( this.edgeDepthDiff );
+			const isDisocclusion = currentDepth.sub( previousDepth ).greaterThan( this.depthThreshold ).and( isEdge.not() );
 
-			// Adaptive blend weights based on velocity magnitude suggested by CLAUDE in #32133
-			// Higher velocity or position difference = more weight on current frame to reduce ghosting
+			// higher velocity = more weight on current frame
+			// zero out history weight where disocclusion
 
-			const velocityMagnitude = length( offset ).toConst();
-			const motionFactor = max( worldPositionDifference.mul( 0.5 ), velocityMagnitude.mul( 10.0 ) ).toVar();
-			motionFactor.assign( min( motionFactor, 1.0 ) );
-
-			const currentWeight = float( 0.05 ).add( motionFactor.mul( 0.25 ) ).toVar();
+			const motionFactor = uvNode.sub( historyUV ).length().mul( 10 );
+			const currentWeight = isDisocclusion.select( 1, float( 0.05 ).add( motionFactor ).saturate() ).toVar();
 			const historyWeight = currentWeight.oneMinus().toVar();
-
-			// zero out history weight if world positions are different (indicating motion) except on edges.
-			// note that the constants 0.00001 and 0.5 were suggested by CLAUDE in #32133
-
-			const isEdge = farthestDepth.sub( closestDepth ).greaterThan( 0.00001 );
-			const strongDisocclusion = worldPositionDifference.greaterThan( 0.5 ).and( isEdge.not() );
-
-			If( strongDisocclusion, () => {
-
-				currentWeight.assign( 1.0 );
-				historyWeight.assign( 0.0 );
-
-			} );
 
 			// flicker reduction based on luminance weighing
 
@@ -514,8 +534,8 @@ class TRAANode extends TempNode {
 			const luminanceCurrent = luminance( compressedCurrent.rgb );
 			const luminanceHistory = luminance( compressedHistory.rgb );
 
-			currentWeight.mulAssign( float( 1.0 ).div( luminanceCurrent.add( 1 ) ) );
-			historyWeight.mulAssign( float( 1.0 ).div( luminanceHistory.add( 1 ) ) );
+			currentWeight.mulAssign( float( 1 ).div( luminanceCurrent.add( 1 ) ) );
+			historyWeight.mulAssign( float( 1 ).div( luminanceHistory.add( 1 ) ) );
 
 			const smoothedOutput = add( currentColor.mul( currentWeight ), clampedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
 
@@ -548,21 +568,26 @@ class TRAANode extends TempNode {
 
 export default TRAANode;
 
-// These jitter vectors are specified in integers because it is easier.
-// I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
-// before being used, thus these integers need to be scaled by 1/16.
-//
-// Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
-const _JitterVectors = [
-	[ - 4, - 7 ], [ - 7, - 5 ], [ - 3, - 5 ], [ - 5, - 4 ],
-	[ - 1, - 4 ], [ - 2, - 2 ], [ - 6, - 1 ], [ - 4, 0 ],
-	[ - 7, 1 ], [ - 1, 2 ], [ - 6, 3 ], [ - 3, 3 ],
-	[ - 7, 6 ], [ - 3, 6 ], [ - 5, 7 ], [ - 1, 7 ],
-	[ 5, - 7 ], [ 1, - 6 ], [ 6, - 5 ], [ 4, - 4 ],
-	[ 2, - 3 ], [ 7, - 2 ], [ 1, - 1 ], [ 4, - 1 ],
-	[ 2, 1 ], [ 6, 2 ], [ 0, 4 ], [ 4, 4 ],
-	[ 2, 5 ], [ 7, 5 ], [ 5, 6 ], [ 3, 7 ]
-];
+function _halton( index, base ) {
+
+	let fraction = 1;
+	let result = 0;
+	while ( index > 0 ) {
+
+		fraction /= base;
+		result += fraction * ( index % base );
+		index = Math.floor( index / base );
+
+	}
+
+	return result;
+
+}
+
+const _haltonOffsets = /*@__PURE__*/ Array.from(
+	{ length: 32 },
+	( _, index ) => [ _halton( index + 1, 2 ), _halton( index + 1, 3 ) ]
+);
 
 /**
  * TSL function for creating a TRAA node for Temporal Reprojection Anti-Aliasing.

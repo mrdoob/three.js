@@ -444,7 +444,7 @@ export class Profiler {
 		// Create a button for the builtin tab in the profiler-toggle
 		const builtinButton = document.createElement( 'button' );
 		builtinButton.className = 'builtin-tab-btn';
-		
+
 		// Use icon if provided, otherwise use first letter
 		if ( tab.icon ) {
 

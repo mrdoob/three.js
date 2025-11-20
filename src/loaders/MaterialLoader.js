@@ -29,7 +29,7 @@ import {
 import { error, warn } from '../utils.js';
 
 /**
- * Class for loading geometries. The files are internally
+ * Class for loading materials. The files are internally
  * loaded via {@link FileLoader}.
  *
  * ```js
@@ -203,6 +203,7 @@ class MaterialLoader extends Loader {
 		if ( json.alphaToCoverage !== undefined ) material.alphaToCoverage = json.alphaToCoverage;
 		if ( json.premultipliedAlpha !== undefined ) material.premultipliedAlpha = json.premultipliedAlpha;
 		if ( json.forceSinglePass !== undefined ) material.forceSinglePass = json.forceSinglePass;
+		if ( json.allowOverride !== undefined ) material.allowOverride = json.allowOverride;
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
 

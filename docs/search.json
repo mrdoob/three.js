@@ -1765,12 +1765,20 @@
 			"kind": "class"
 		},
 		{
+			"title": "BufferNode#addUpdateRange",
+			"kind": "function"
+		},
+		{
 			"title": "BufferNode#bufferCount",
 			"kind": "member"
 		},
 		{
 			"title": "BufferNode#bufferType",
 			"kind": "member"
+		},
+		{
+			"title": "BufferNode#clearUpdateRanges",
+			"kind": "function"
 		},
 		{
 			"title": "BufferNode#getElementType",
@@ -1782,6 +1790,10 @@
 		},
 		{
 			"title": "BufferNode#isBufferNode",
+			"kind": "member"
+		},
+		{
+			"title": "BufferNode#updateRanges",
 			"kind": "member"
 		},
 		{
@@ -4218,6 +4230,14 @@
 		},
 		{
 			"title": "InstanceNode#instanceMatrixNode",
+			"kind": "member"
+		},
+		{
+			"title": "InstanceNode#isStorageColor",
+			"kind": "member"
+		},
+		{
+			"title": "InstanceNode#isStorageMatrix",
 			"kind": "member"
 		},
 		{
@@ -8081,6 +8101,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "NodeBuilder#getSharedDataFromNode",
+			"kind": "function"
+		},
+		{
 			"title": "NodeBuilder#getSignature",
 			"kind": "function"
 		},
@@ -9005,6 +9029,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "NormalMapNode#unpackNormalMode",
+			"kind": "member"
+		},
+		{
 			"title": "NumberKeyframeTrack",
 			"kind": "class"
 		},
@@ -9898,6 +9926,14 @@
 		},
 		{
 			"title": "PhysicalLightingModel#iridescenceF0",
+			"kind": "member"
+		},
+		{
+			"title": "PhysicalLightingModel#iridescenceF0Dielectric",
+			"kind": "member"
+		},
+		{
+			"title": "PhysicalLightingModel#iridescenceF0Metallic",
 			"kind": "member"
 		},
 		{
@@ -22095,6 +22131,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "SkyMesh#isSkyMesh",
+			"kind": "member"
+		},
+		{
 			"title": "SkyMesh#mieCoefficient",
 			"kind": "member"
 		},
@@ -24997,6 +25037,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "NoNormalPacking",
+			"kind": "member"
+		},
+		{
 			"title": "NoToneMapping",
 			"kind": "member"
 		},
@@ -25022,6 +25066,14 @@
 		},
 		{
 			"title": "NormalBlending",
+			"kind": "member"
+		},
+		{
+			"title": "NormalGAPacking",
+			"kind": "member"
+		},
+		{
+			"title": "NormalRGPacking",
 			"kind": "member"
 		},
 		{
@@ -27459,6 +27511,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "radialBlur",
+			"kind": "function"
+		},
+		{
 			"title": "radians",
 			"kind": "function"
 		},
@@ -28060,6 +28116,10 @@
 		},
 		{
 			"title": "uniformTexture",
+			"kind": "function"
+		},
+		{
+			"title": "unpackNormal",
 			"kind": "function"
 		},
 		{

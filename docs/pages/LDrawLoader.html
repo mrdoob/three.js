@@ -14,7 +14,34 @@
 		<section>
 			<header>
 				<div class="class-description"><p>A loader for the LDraw format.</p>
-<p>[LDraw](https://ldraw.org/} (LEGO Draw) is an <a href="https://ldraw.org/article/218.html)" target="_blank" rel="noopener">open format specification</a> from 'three/addons/loaders/LDrawLoader.js';</code></pre>
+<p>[LDraw](https://ldraw.org/} (LEGO Draw) is an <a href="https://ldraw.org/article/218.html" target="_blank" rel="noopener">open format specification</a>
+for describing LEGO and other construction set 3D models.</p>
+<p>An LDraw asset (a text file usually with extension .ldr, .dat or .txt) can describe just a single construction
+piece, or an entire model. In the case of a model the LDraw file can reference other LDraw files, which are
+loaded from a library path set with <code>setPartsLibraryPath</code>. You usually download the LDraw official parts library,
+extract to a folder and point setPartsLibraryPath to it.</p>
+<p>Library parts will be loaded by trial and error in subfolders 'parts', 'p' and 'models'. These file accesses
+are not optimal for web environment, so a script tool has been made to pack an LDraw file with all its dependencies
+into a single file, which loads much faster. See section 'Packing LDraw models'. The LDrawLoader example loads
+several packed files. The official parts library is not included due to its large size.</p>
+<p><code>LDrawLoader</code> supports the following extensions:</p>
+<ul>
+<li>!COLOUR: Color and surface finish declarations.</li>
+<li>BFC: Back Face Culling specification.</li>
+<li>!CATEGORY: Model/part category declarations.</li>
+<li>!KEYWORDS: Model/part keywords declarations.</li>
+</ul></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new LDrawLoader();
+loader.setConditionalLineMaterial( LDrawConditionalLineMaterial ); // the type of line material depends on the used renderer
+const object = await loader.loadAsync( 'models/ldraw/officialLibrary/models/car.ldr_Packed.mpd' );
+scene.add( object );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LDrawLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
 					<h3 class="name name-method" id="LDrawLoader" translate="no">new <a href="#LDrawLoader">LDrawLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
