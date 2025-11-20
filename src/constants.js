@@ -908,6 +908,38 @@ export const RGB_ETC2_Format = 37492;
 export const RGBA_ETC2_EAC_Format = 37496;
 
 /**
+ * EAC R11 UNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const R11_EAC_Format = 37488; // 0x9270
+
+/**
+ * EAC R11 SNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const SIGNED_R11_EAC_Format = 37489; // 0x9271
+
+/**
+ * EAC RG11 UNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const RG11_EAC_Format = 37490; // 0x9272
+
+/**
+ * EAC RG11 SNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const SIGNED_RG11_EAC_Format = 37491; // 0x9273
+
+/**
  * ASTC RGBA 4x4 format.
  *
  * @type {number}
