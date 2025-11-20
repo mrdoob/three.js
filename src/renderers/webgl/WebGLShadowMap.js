@@ -7,7 +7,10 @@ import { BufferAttribute } from '../../core/BufferAttribute.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { Vector3 } from '../../math/Vector3.js';
 import { Vector2 } from '../../math/Vector2.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+import { Box3 } from '../../math/Box3.js';
 import { Frustum } from '../../math/Frustum.js';
 
 import * as vsm from '../shaders/ShaderLib/vsm.glsl.js';
@@ -21,6 +24,26 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		_viewportSize = new Vector2(),
 
 		_viewport = new Vector4(),
+
+		_projScreenMatrix = new Matrix4(),
+		_shadowCameraInverseMatrix = new Matrix4(),
+		_lightDirection = new Vector3(),
+		_lightPositionWorld = new Vector3(),
+		_targetPositionWorld = new Vector3(),
+		_frustumCenter = new Vector3(),
+		_shadowCameraViewMatrix = new Matrix4(),
+		_shadowBox = new Box3(),
+		_tempVector3 = new Vector3(),
+		_frustumCornersNDC = [
+			new Vector3( - 1, - 1, - 1 ), new Vector3( 1, - 1, - 1 ),
+			new Vector3( - 1, 1, - 1 ), new Vector3( 1, 1, - 1 ),
+			new Vector3( - 1, - 1, 1 ), new Vector3( 1, - 1, 1 ),
+			new Vector3( - 1, 1, 1 ), new Vector3( 1, 1, 1 )
+		],
+		_frustumCorners = [
+			new Vector3(), new Vector3(), new Vector3(), new Vector3(),
+			new Vector3(), new Vector3(), new Vector3(), new Vector3()
+		],
 
 		_depthMaterial = new MeshDepthMaterial( { depthPacking: RGBADepthPacking } ),
 		_distanceMaterial = new MeshDistanceMaterial(),
@@ -119,6 +142,69 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 			}
 
 			if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) continue;
+
+			if ( shadow.isDirectionalLightShadow && shadow.autoFit ) {
+
+				// Calculate view frustum corners in world space
+				_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+				_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+				_shadowCameraInverseMatrix.copy( _projScreenMatrix ).invert();
+
+				_frustumCenter.set( 0, 0, 0 );
+
+				for ( let i = 0; i < 8; i ++ ) {
+
+					_frustumCorners[ i ].copy( _frustumCornersNDC[ i ] ).applyMatrix4( _shadowCameraInverseMatrix );
+					_frustumCenter.add( _frustumCorners[ i ] );
+
+				}
+
+				_frustumCenter.multiplyScalar( 1 / 8 );
+
+				// Position shadow camera to look at frustum center
+				_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+				_targetPositionWorld.setFromMatrixPosition( light.target.matrixWorld );
+				_lightDirection.subVectors( _targetPositionWorld, _lightPositionWorld ).normalize();
+
+				shadow.camera.position.copy( _frustumCenter ).addScaledVector( _lightDirection, - 500 );
+				shadow.camera.lookAt( _frustumCenter );
+				shadow.camera.updateMatrixWorld();
+
+				// Calculate shadow camera bounds
+				_shadowCameraViewMatrix.copy( shadow.camera.matrixWorld ).invert();
+				_shadowBox.makeEmpty();
+
+				for ( let i = 0; i < 8; i ++ ) {
+
+					_tempVector3.copy( _frustumCorners[ i ] ).applyMatrix4( _shadowCameraViewMatrix );
+					_shadowBox.expandByPoint( _tempVector3 );
+
+				}
+
+				// Snap to texel grid to stabilize shadows
+				const shadowMapSize = shadow.mapSize;
+				const xPixelSize = ( _shadowBox.max.x - _shadowBox.min.x ) / shadowMapSize.x;
+				const yPixelSize = ( _shadowBox.max.y - _shadowBox.min.y ) / shadowMapSize.y;
+				const originX = _shadowCameraViewMatrix.elements[ 12 ];
+				const originY = _shadowCameraViewMatrix.elements[ 13 ];
+
+				_shadowBox.min.x = Math.floor( ( _shadowBox.min.x - originX ) / xPixelSize ) * xPixelSize + originX;
+				_shadowBox.max.x = Math.ceil( ( _shadowBox.max.x - originX ) / xPixelSize ) * xPixelSize + originX;
+				_shadowBox.min.y = Math.floor( ( _shadowBox.min.y - originY ) / yPixelSize ) * yPixelSize + originY;
+				_shadowBox.max.y = Math.ceil( ( _shadowBox.max.y - originY ) / yPixelSize ) * yPixelSize + originY;
+
+				// Update shadow camera properties
+				const zRange = _shadowBox.max.z - _shadowBox.min.z;
+				shadow.camera.left = _shadowBox.min.x;
+				shadow.camera.right = _shadowBox.max.x;
+				shadow.camera.top = _shadowBox.max.y;
+				shadow.camera.bottom = _shadowBox.min.y;
+				shadow.camera.near = - _shadowBox.max.z - zRange;
+				shadow.camera.far = - _shadowBox.min.z + zRange * 0.1;
+
+				shadow.camera.updateProjectionMatrix();
+
+			}
 
 			_shadowMapSize.copy( shadow.mapSize );
 

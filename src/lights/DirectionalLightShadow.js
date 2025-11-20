@@ -1,5 +1,6 @@
 import { LightShadow } from './LightShadow.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
+import { Matrix4 } from '../math/Matrix4.js';
 
 /**
  * Represents the shadow configuration of directional lights.
@@ -24,8 +25,52 @@ class DirectionalLightShadow extends LightShadow {
 		 */
 		this.isDirectionalLightShadow = true;
 
+		this.autoFit = true;
+
+	}
+
+	updateMatrices( light ) {
+
+		if ( this.autoFit === true ) {
+
+			const shadowCamera = this.camera;
+			const shadowMatrix = this.matrix;
+
+			_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+			this._frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
+
+			if ( shadowCamera.reversedDepth ) {
+
+				shadowMatrix.set(
+					0.5, 0.0, 0.0, 0.5,
+					0.0, 0.5, 0.0, 0.5,
+					0.0, 0.0, 1.0, 0.0,
+					0.0, 0.0, 0.0, 1.0
+				);
+
+			} else {
+
+				shadowMatrix.set(
+					0.5, 0.0, 0.0, 0.5,
+					0.0, 0.5, 0.0, 0.5,
+					0.0, 0.0, 0.5, 0.5,
+					0.0, 0.0, 0.0, 1.0
+				);
+
+			}
+
+			shadowMatrix.multiply( _projScreenMatrix );
+
+		} else {
+
+			super.updateMatrices( light );
+
+		}
+
 	}
 
 }
+
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 
 export { DirectionalLightShadow };

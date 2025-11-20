@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - shadow map - automatic</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			background-color: #cce0ff;
+			color: #000;
+			margin: 0;
+		}
+
+		a {
+			color: #080;
+		}
+
+		canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - automatic shadow map<br />
+		<label><input type="checkbox" id="autoUpdate" checked> Auto Fit Shadow Camera</label><br />
+		Use WASD or Arrow Keys to drive the car.
+	</div>
+
+	<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+	<script type="module">
+
+		import * as THREE from 'three';
+		import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewer.js';
+
+		let camera, scene, renderer;
+		let light, shadowCameraHelper, hud;
+		let car;
+		let frameCount = 0;
+
+		const keys = {
+			ArrowUp: false,
+			ArrowDown: false,
+			ArrowLeft: false,
+			ArrowRight: false,
+			w: false,
+			s: false,
+			a: false,
+			d: false
+		};
+
+		const carSpeed = 0.5;
+		const carTurnSpeed = 0.05;
+
+		init();
+		animate();
+
+		function init() {
+
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			// scene
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xcce0ff );
+
+			// camera
+
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.set( 0, 20, 40 );
+
+			// lights
+
+			scene.add( new THREE.AmbientLight( 0x666666 ) );
+
+			light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
+			light.position.set( 50, 200, 100 );
+			light.castShadow = true;
+			light.shadow.mapSize.width = 2048;
+			light.shadow.mapSize.height = 2048;
+			light.shadow.autoFit = true;
+			light.shadow.cascadeCount = 3;
+
+			scene.add( light );
+
+			// helper
+
+			shadowCameraHelper = new THREE.CameraHelper( light.shadow.camera );
+			scene.add( shadowCameraHelper );
+
+			// ground with terrain
+
+			const groundGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
+			const positions = groundGeometry.attributes.position;
+
+			for ( let i = 0; i < positions.count; i ++ ) {
+
+				const x = positions.getX( i );
+				const z = positions.getY( i );
+				const y = Math.sin( x * 0.01 ) * 20 + Math.cos( z * 0.01 ) * 20;
+				positions.setZ( i, y );
+
+			}
+
+			groundGeometry.computeVertexNormals();
+
+			const groundMaterial = new THREE.MeshPhongMaterial( { color: 0x999999 } );
+			const ground = new THREE.Mesh( groundGeometry, groundMaterial );
+			ground.rotation.x = - Math.PI / 2;
+			ground.receiveShadow = true;
+			scene.add( ground );
+
+			// car
+
+			const geometry = new THREE.BoxGeometry( 5, 5, 10 );
+			const material = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
+			car = new THREE.Mesh( geometry, material );
+			car.position.y = 2.5;
+			car.castShadow = true;
+			car.receiveShadow = true;
+			scene.add( car );
+
+			// cubes
+
+			for ( let i = 0; i < 200; i ++ ) {
+
+				const geometry = new THREE.BoxGeometry( 5, 100, 5 );
+				const material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = Math.random() * 1000 - 500;
+				mesh.position.y = 10;
+				mesh.position.z = Math.random() * 1000 - 500;
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+			}
+
+			// renderer
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			container.appendChild( renderer.domElement );
+
+			// hud
+
+			hud = new ShadowMapViewer( light );
+			hud.position.x = 10;
+			hud.position.y = 10;
+			hud.size.width = 256;
+			hud.size.height = 256;
+			hud.update();
+
+			// events
+
+			window.addEventListener( 'resize', onWindowResize );
+			window.addEventListener( 'keydown', onKeyDown );
+			window.addEventListener( 'keyup', onKeyUp );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			hud.updateForWindowResize();
+
+		}
+
+		function onKeyDown( event ) {
+
+			if ( keys.hasOwnProperty( event.key ) ) keys[ event.key ] = true;
+
+		}
+
+		function onKeyUp( event ) {
+
+			if ( keys.hasOwnProperty( event.key ) ) keys[ event.key ] = false;
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			const autoUpdate = document.getElementById( 'autoUpdate' ).checked;
+
+			light.shadow.autoFit = autoUpdate;
+
+			if ( car ) {
+
+				if ( keys.ArrowUp || keys.w ) car.translateZ( carSpeed );
+				if ( keys.ArrowDown || keys.s ) car.translateZ( - carSpeed );
+				if ( keys.ArrowLeft || keys.a ) car.rotateY( carTurnSpeed );
+				if ( keys.ArrowRight || keys.d ) car.rotateY( - carTurnSpeed );
+
+				// Update car height to follow terrain
+				const x = car.position.x;
+				const z = car.position.z;
+				const terrainHeight = Math.sin( x * 0.01 ) * 20 + Math.cos( z * 0.01 ) * 20;
+				car.position.y = terrainHeight + 2.5;
+
+				// Camera follow
+				const relativeCameraOffset = new THREE.Vector3( 0, 10, - 20 );
+				const cameraOffset = relativeCameraOffset.applyMatrix4( car.matrixWorld );
+
+				camera.position.lerp( cameraOffset, 0.1 );
+				camera.lookAt( car.position );
+
+			}
+
+			renderer.render( scene, camera );
+
+			hud.render( renderer );
+
+			shadowCameraHelper.update();
+
+			/*
+			if ( frameCount < 100 ) {
+
+				console.log( 'Shadow Camera:', {
+					left: light.shadow.camera.left,
+					right: light.shadow.camera.right,
+					top: light.shadow.camera.top,
+					bottom: light.shadow.camera.bottom,
+					near: light.shadow.camera.near,
+					far: light.shadow.camera.far,
+					position: light.shadow.camera.position.toArray(),
+					zoom: light.shadow.camera.zoom
+				} );
+				frameCount ++;
+		
+			}
+			*/
+
+		}
+
+	</script>
+</body>
+
+</html>
