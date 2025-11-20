@@ -109,7 +109,7 @@ export class Comment extends ASTNode {
 
 export class Program extends ASTNode {
 
-	constructor( body = [], userDefinedStructTypes = new Set() ) {
+	constructor( body = [], userDefinedStructTypes = new Map() ) {
 
 		super();
 
