@@ -3,7 +3,7 @@ export default /* glsl */`
 
 	#ifdef FOG_EXP2
 
-		float fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
+		float fogFactor = 1.0 - exp( - pow2( fogDensity * vFogDepth ) );
 
 	#else
 
