@@ -84,6 +84,14 @@ class TRAANode extends TempNode {
 		this.camera = camera;
 
 		/**
+		 * The velocity node used as the source for `velocityNode`, which requires
+		 * the original projection matrix to be updated before the jitter is applied.
+		 *
+		 * @type {Node}
+		 */
+		this.velocityNodeSource = velocity;
+
+		/**
 		 * The jitter index selects the current camera offset value.
 		 *
 		 * @private
@@ -232,7 +240,7 @@ class TRAANode extends TempNode {
 		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
 
-		velocity.setProjectionMatrix( this._originalProjectionMatrix );
+		this.velocityNodeSource.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
@@ -268,7 +276,7 @@ class TRAANode extends TempNode {
 
 		this.camera.clearViewOffset();
 
-		velocity.setProjectionMatrix( null );
+		this.velocityNodeSource.setProjectionMatrix( null );
 
 		// update jitter index
 
