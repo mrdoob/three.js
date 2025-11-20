@@ -1,6 +1,6 @@
 export function isExpression( st ) {
 
-	return st.isFunctionDeclaration !== true && st.isFor !== true && st.isWhile !== true && st.isConditional !== true && st.isSwitch !== true;
+	return st.isFunctionDeclaration !== true && st.isFor !== true && st.isWhile !== true && st.isConditional !== true && st.isSwitch !== true && st.isStructDefinition !== true;
 
 }
 

@@ -46,6 +46,20 @@ export class ASTNode {
 
 	}
 
+	getProgram() {
+
+		let current = this;
+
+		while ( current.parent !== null ) {
+
+			current = current.parent;
+
+		}
+
+		return current;
+
+	}
+
 	getParent( parents = [] ) {
 
 		if ( this.parent === null ) {
@@ -109,12 +123,12 @@ export class Comment extends ASTNode {
 
 export class Program extends ASTNode {
 
-	constructor( body = [], userDefinedStructTypes = new Map() ) {
+	constructor( body = [] ) {
 
 		super();
 
 		this.body = body;
-		this.userDefinedStructTypes = userDefinedStructTypes;
+		this.structTypes = new Map();
 
 		this.isProgram = true;
 

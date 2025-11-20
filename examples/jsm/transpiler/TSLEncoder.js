@@ -56,7 +56,6 @@ class TSLEncoder {
 		this.imports = new Set();
 		this.global = new Set();
 		this.overloadings = new Map();
-		this.userDefinedStructTypes = new Map();
 		this.iife = false;
 		this.reference = false;
 
@@ -674,7 +673,7 @@ ${ this.tab }} )`;
 
 		} else {
 
-			if ( this.userDefinedStructTypes.has( type ) ) {
+			if ( node.getProgram().structTypes.has( type ) ) {
 
 				varStr += ` = ${ type }()`;
 
@@ -721,7 +720,7 @@ ${ this.tab }} )`;
 
 		this.addImport( 'struct' );
 
-		let structString = `const ${ name } = struct({\n\n`;
+		let structString = `const ${ name } = struct( {\n`;
 
 		for ( let i = 0; i < members.length; i += 1 ) {
 
@@ -729,7 +728,7 @@ ${ this.tab }} )`;
 
 			structString += `${this.tab}\t${member.name}: '${member.type}'`;
 
-			const delimiter = ( i != members.length - 1 ) ? ',\n' : '\n';
+			const delimiter = ( i != members.length - 1 ) ? ',\n' : '';
 			structString += delimiter;
 
 		}
@@ -924,8 +923,6 @@ ${ this.tab }}`;
 			}
 
 		}
-
-		this.userDefinedStructTypes = ast.userDefinedStructTypes;
 
 		for ( const statement of ast.body ) {
 

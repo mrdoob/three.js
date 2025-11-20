@@ -255,7 +255,7 @@ class GLSLDecoder {
 		this.index = 0;
 		this.tokenizer = null;
 		this.keywords = [];
-		this.userDefinedStructTypes = new Map();
+		this.structTypes = new Map();
 
 		this.addPolyfill( 'gl_FragCoord', 'vec3 gl_FragCoord = vec3( screenCoordinate.x, screenCoordinate.y.oneMinus(), screenCoordinate.z );' );
 
@@ -823,7 +823,7 @@ class GLSLDecoder {
 		}
 
 		const definition = new StructDefinition( structName, structMembers );
-		this.userDefinedStructTypes.set( structName, definition );
+		this.structTypes.set( structName, definition );
 
 		return definition;
 
@@ -877,7 +877,8 @@ class GLSLDecoder {
 		let initialization;
 
 		const firstToken = initializationTokens[ 0 ];
-		if ( firstToken && ( isBuiltinType( firstToken.str ) || this.userDefinedStructTypes.has( firstToken.str ) ) ) {
+
+		if ( firstToken && ( isBuiltinType( firstToken.str ) || this.structTypes.has( firstToken.str ) ) ) {
 
 			initialization = this.parseVariablesFromToken( initializationTokens );
 
@@ -1133,7 +1134,7 @@ class GLSLDecoder {
 
 					statement = this.parseStructDefinition();
 
-				} else if ( isBuiltinType( token.str ) || this.userDefinedStructTypes.has( token.str ) ) {
+				} else if ( isBuiltinType( token.str ) || this.structTypes.has( token.str ) ) {
 
 					if ( this.getToken( 2 ).str === '(' ) {
 
@@ -1213,7 +1214,9 @@ class GLSLDecoder {
 		this.tokenizer = new Tokenizer( polyfill + source ).tokenize();
 
 		const body = this.parseBlock();
-		const program = new Program( body, this.userDefinedStructTypes );
+
+		const program = new Program( body );
+		program.structTypes = this.structTypes;
 
 		return program;
 
