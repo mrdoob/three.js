@@ -36,6 +36,7 @@ function Editor() {
 		// notifications
 
 		editorCleared: new Signal(),
+		storageLoaded: new Signal(),
 
 		savingStarted: new Signal(),
 		savingFinished: new Signal(),
