@@ -255,7 +255,7 @@ class GLSLDecoder {
 		this.index = 0;
 		this.tokenizer = null;
 		this.keywords = [];
-		this.userDefinedStructTypes = new Set();
+		this.userDefinedStructTypes = new Map();
 
 		this.addPolyfill( 'gl_FragCoord', 'vec3 gl_FragCoord = vec3( screenCoordinate.x, screenCoordinate.y.oneMinus(), screenCoordinate.z );' );
 
@@ -709,7 +709,6 @@ class GLSLDecoder {
 		if ( immutable ) index ++;
 
 		type = type || tokens[ index ++ ].str;
-		const isUserDefinedStructType = this.userDefinedStructTypes.has(type);
 		const name = tokens[ index ++ ].str;
 
 		const token = tokens[ index ];
@@ -740,7 +739,7 @@ class GLSLDecoder {
 
 		}
 
-		const variable = new VariableDeclaration( type, name, init, next, immutable, isUserDefinedStructType );
+		const variable = new VariableDeclaration( type, name, init, next, immutable );
 
 		return variable;
 
@@ -787,9 +786,8 @@ class GLSLDecoder {
 		const tokens = this.readTokensUntil( ';' );
 
 		const structName = tokens[ 1 ].str;
-		this.userDefinedStructTypes.add(structName);
 
-		if (tokens[ 2 ].str !== '{' ) {
+		if ( tokens[ 2 ].str !== '{' ) {
 
 			throw new Error( 'Expected \'{\' after struct name ' );
 
@@ -801,26 +799,33 @@ class GLSLDecoder {
 			const typeToken = tokens[ i ];
 			const nameToken = tokens[ i + 1 ];
 
-			if (typeToken.type != 'literal' || nameToken.type != 'literal') {
+			if ( typeToken.type != 'literal' || nameToken.type != 'literal' ) {
+
 				throw new Error( 'Invalid struct declaration' );
+
 			}
 
-			if (tokens[ i + 2 ].str !== ';' ) {
+			if ( tokens[ i + 2 ].str !== ';' ) {
+
 				throw new Error( 'Missing \';\' after struct member name' );
+
 			}
 
-			const member = new StructMember(typeToken.str, nameToken.str);
-			structMembers.push(member);
+			const member = new StructMember( typeToken.str, nameToken.str );
+			structMembers.push( member );
 
 		}
 
-		if (tokens[ tokens.length - 2 ].str !== '}' ) {
+		if ( tokens[ tokens.length - 2 ].str !== '}' ) {
 
 			throw new Error( 'Missing closing \'}\' for struct ' + structName );
 
 		}
 
-		return new StructDefinition(structName, structMembers);
+		const definition = new StructDefinition( structName, structMembers );
+		this.userDefinedStructTypes.set( structName, definition );
+
+		return definition;
 
 	}
 
@@ -1208,7 +1213,7 @@ class GLSLDecoder {
 		this.tokenizer = new Tokenizer( polyfill + source ).tokenize();
 
 		const body = this.parseBlock();
-		const program = new Program( body );
+		const program = new Program( body, this.userDefinedStructTypes );
 
 		return program;
 

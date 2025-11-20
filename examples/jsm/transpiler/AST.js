@@ -109,11 +109,12 @@ export class Comment extends ASTNode {
 
 export class Program extends ASTNode {
 
-	constructor( body = [] ) {
+	constructor( body = [], userDefinedStructTypes = new Set() ) {
 
 		super();
 
 		this.body = body;
+		this.userDefinedStructTypes = userDefinedStructTypes;
 
 		this.isProgram = true;
 
@@ -125,7 +126,7 @@ export class Program extends ASTNode {
 
 export class VariableDeclaration extends ASTNode {
 
-	constructor( type, name, value = null, next = null, immutable = false, isUserDefinedStructType = false ) {
+	constructor( type, name, value = null, next = null, immutable = false ) {
 
 		super();
 
@@ -135,8 +136,6 @@ export class VariableDeclaration extends ASTNode {
 		this.next = next;
 
 		this.immutable = immutable;
-
-		this.isUserDefinedStructType = isUserDefinedStructType;
 
 		this.isVariableDeclaration = true;
 

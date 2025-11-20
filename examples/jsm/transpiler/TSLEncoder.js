@@ -56,6 +56,7 @@ class TSLEncoder {
 		this.imports = new Set();
 		this.global = new Set();
 		this.overloadings = new Map();
+		this.userDefinedStructTypes = new Map();
 		this.iife = false;
 		this.reference = false;
 
@@ -673,9 +674,9 @@ ${ this.tab }} )`;
 
 		} else {
 
-			if ( node.isUserDefinedStructType ) {
+			if ( this.userDefinedStructTypes.has( type ) ) {
 
-				varStr += ` = ${type}()`;
+				varStr += ` = ${ type }()`;
 
 			} else {
 
@@ -923,6 +924,8 @@ ${ this.tab }}`;
 			}
 
 		}
+
+		this.userDefinedStructTypes = ast.userDefinedStructTypes;
 
 		for ( const statement of ast.body ) {
 
