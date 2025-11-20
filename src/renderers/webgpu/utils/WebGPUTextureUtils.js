@@ -15,7 +15,7 @@ import {
 	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, UnsignedIntType, UnsignedShortType, UnsignedInt248Type, UnsignedInt5999Type,
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, IntType, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat,
 	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format,
-	R11_UNORM_EAC_Format, R11_SNORM_EAC_Format, RG11_UNORM_EAC_Format, RG11_SNORM_EAC_Format,
+	R11_EAC_Format, R11_SIGNED_EAC_Format, RG11_EAC_Format, RG11_SIGNED_EAC_Format,
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
 import { Texture } from '../../../textures/Texture.js';
@@ -1240,19 +1240,19 @@ export function getFormat( texture, device = null ) {
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.ETC2RGBA8UnormSRGB : GPUTextureFormat.ETC2RGBA8Unorm;
 				break;
 
-			case R11_UNORM_EAC_Format:
+			case R11_EAC_Format:
 				formatGPU = GPUTextureFormat.EACR11Unorm;
 				break;
 
-			case R11_SNORM_EAC_Format:
+			case R11_SIGNED_EAC_Format:
 				formatGPU = GPUTextureFormat.EACR11Snorm;
 				break;
 
-			case RG11_UNORM_EAC_Format:
+			case RG11_EAC_Format:
 				formatGPU = GPUTextureFormat.EACRG11Unorm;
 				break;
 
-			case RG11_SNORM_EAC_Format:
+			case RG11_SIGNED_EAC_Format:
 				formatGPU = GPUTextureFormat.EACRG11Snorm;
 				break;
 

@@ -913,7 +913,7 @@ export const RGBA_ETC2_EAC_Format = 37496;
  * @type {number}
  * @constant
  */
-export const R11_UNORM_EAC_Format = 37488; // 0x9270
+export const R11_EAC_Format = 37488; // 0x9270
 
 /**
  * EAC R11 SNORM format.
@@ -921,7 +921,7 @@ export const R11_UNORM_EAC_Format = 37488; // 0x9270
  * @type {number}
  * @constant
  */
-export const R11_SNORM_EAC_Format = 37489; // 0x9271
+export const R11_SIGNED_EAC_Format = 37489; // 0x9271
 
 /**
  * EAC RG11 UNORM format.
@@ -929,7 +929,7 @@ export const R11_SNORM_EAC_Format = 37489; // 0x9271
  * @type {number}
  * @constant
  */
-export const RG11_UNORM_EAC_Format = 37490; // 0x9272
+export const RG11_EAC_Format = 37490; // 0x9272
 
 /**
  * EAC RG11 SNORM format.
@@ -937,7 +937,7 @@ export const RG11_UNORM_EAC_Format = 37490; // 0x9272
  * @type {number}
  * @constant
  */
-export const RG11_SNORM_EAC_Format = 37491; // 0x9273
+export const RG11_SIGNED_EAC_Format = 37491; // 0x9273
 
 /**
  * ASTC RGBA 4x4 format.
