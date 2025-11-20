@@ -9029,6 +9029,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "NormalMapNode#unpackNormalMode",
+			"kind": "member"
+		},
+		{
 			"title": "NumberKeyframeTrack",
 			"kind": "class"
 		},
@@ -9922,6 +9926,14 @@
 		},
 		{
 			"title": "PhysicalLightingModel#iridescenceF0",
+			"kind": "member"
+		},
+		{
+			"title": "PhysicalLightingModel#iridescenceF0Dielectric",
+			"kind": "member"
+		},
+		{
+			"title": "PhysicalLightingModel#iridescenceF0Metallic",
 			"kind": "member"
 		},
 		{
@@ -25025,6 +25037,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "NoNormalPacking",
+			"kind": "member"
+		},
+		{
 			"title": "NoToneMapping",
 			"kind": "member"
 		},
@@ -25050,6 +25066,14 @@
 		},
 		{
 			"title": "NormalBlending",
+			"kind": "member"
+		},
+		{
+			"title": "NormalGAPacking",
+			"kind": "member"
+		},
+		{
+			"title": "NormalRGPacking",
 			"kind": "member"
 		},
 		{
@@ -27487,6 +27511,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "radialBlur",
+			"kind": "function"
+		},
+		{
 			"title": "radians",
 			"kind": "function"
 		},
@@ -28088,6 +28116,10 @@
 		},
 		{
 			"title": "uniformTexture",
+			"kind": "function"
+		},
+		{
+			"title": "unpackNormal",
 			"kind": "function"
 		},
 		{
