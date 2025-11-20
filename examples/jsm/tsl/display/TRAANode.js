@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -159,6 +159,54 @@ class TRAANode extends TempNode {
 		this._originalProjectionMatrix = new Matrix4();
 
 		/**
+		 * A uniform node holding the camera's near and far.
+		 *
+		 * @private
+		 * @type {UniformNode<vec2>}
+		 */
+		this._cameraNearFar = uniform( new Vector2() );
+
+		/**
+		 * A uniform node holding the camera world matrix.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraWorldMatrix = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the camera world matrix inverse.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraWorldMatrixInverse = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the camera projection matrix inverse.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._cameraProjectionMatrixInverse = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the previous frame's view matrix.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._previousCameraWorldMatrix = uniform( new Matrix4() );
+
+		/**
+		 * A uniform node holding the previous frame's projection matrix inverse.
+		 *
+		 * @private
+		 * @type {UniformNode<mat4>}
+		 */
+		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
+
+		/**
 		 * A texture node for the previous depth buffer.
 		 *
 		 * @private
@@ -268,6 +316,18 @@ class TRAANode extends TempNode {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
+
+		// store previous frame matrices before updating current ones
+
+		this._previousCameraWorldMatrix.value.copy( this._cameraWorldMatrix.value );
+		this._previousCameraProjectionMatrixInverse.value.copy( this._cameraProjectionMatrixInverse.value );
+
+		// update camera matrices uniforms
+
+		this._cameraNearFar.value.set( this.camera.near, this.camera.far );
+		this._cameraWorldMatrix.value.copy( this.camera.matrixWorld );
+		this._cameraWorldMatrixInverse.value.copy( this.camera.matrixWorldInverse );
+		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
 		// keep the TRAA in sync with the dimensions of the beauty node
 
@@ -381,6 +441,16 @@ class TRAANode extends TempNode {
 		const depthTexture = this.depthNode;
 		const velocityTexture = this.velocityNode;
 
+		const samplePreviousDepth = ( uv ) => {
+
+			const depth = this._previousDepthNode.sample( uv ).r;
+			const positionView = getViewPosition( uv, depth, this._previousCameraProjectionMatrixInverse );
+			const positionWorld = this._previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
+			const viewZ = this._cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
+			return viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
+
+		};
+
 		const resolve = Fn( () => {
 
 			const uvNode = uv();
@@ -442,7 +512,7 @@ class TRAANode extends TempNode {
 
 			const currentDepth = depthTexture.sample( uvNode ).r;
 			const historyUV = uvNode.sub( offset );
-			const previousDepth = this._previousDepthNode.sample( historyUV ).r;
+			const previousDepth = samplePreviousDepth( historyUV );
 
 			// disocclusion except on edges
 
