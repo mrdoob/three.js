@@ -673,7 +673,9 @@ ${ this.tab }} )`;
 
 		} else {
 
-			if ( node.getProgram().structTypes.has( type ) ) {
+			const program = node.getProgram();
+
+			if ( program && program.structTypes.has( type ) ) {
 
 				varStr += ` = ${ type }()`;
 
