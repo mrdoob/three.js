@@ -135,7 +135,7 @@
 				// ao
 
 				aoPass = ao( prePassDepth, prePassNormal, camera ).toInspector( 'GTAO', ( inspectNode ) => inspectNode.r );
-				aoPass.resolutionScale = 0.5; // running AO in half resolution is often sufficient
+				aoPass.resolutionScale = .5; // running AO in half resolution is often sufficient
 				aoPass.useTemporalFiltering = true;
 
 				const aoPassOutput = aoPass.getTextureNode( 'output' );
