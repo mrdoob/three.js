@@ -56,7 +56,7 @@ export class ASTNode {
 
 		}
 
-		return current && current.isProgram === true ? current : null;
+		return current.isProgram === true ? current : null;
 
 	}
 
