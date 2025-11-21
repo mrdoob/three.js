@@ -385,7 +385,7 @@ class NodeMaterial extends Material {
 		/**
 		 * This node can be used as a global context management component for this material.
 		 *
-		 * @type {?GlobalContextNode}
+		 * @type {?ContextNode}
 		 * @default null
 		 */
 		this.contextNode = null;
@@ -499,25 +499,25 @@ class NodeMaterial extends Material {
 
 		// < CONTEXT >
 
-		if ( renderer.globalContext.isGlobalContextNode === true ) {
+		if ( renderer.contextNode.isContextNode === true ) {
 
-			builder.context = { ...builder.context, ...renderer.globalContext.value };
+			builder.context = { ...builder.context, ...renderer.contextNode.getFlowContextData() };
 
 		} else {
 
-			error( 'NodeMaterial: "renderer.globalContext" must be an instance of `globalContext()`.' );
+			error( 'NodeMaterial: "renderer.contextNode" must be an instance of `context()`.' );
 
 		}
 
 		if ( this.contextNode !== null ) {
 
-			if ( this.contextNode.isGlobalContextNode === true ) {
+			if ( this.contextNode.isContextNode === true ) {
 
-				builder.context = { ...builder.context, ...this.contextNode.value };
+				builder.context = { ...builder.context, ...this.contextNode.getFlowContextData() };
 
 			} else {
 
-				error( 'NodeMaterial: "material.contextNode" must be an instance of `globalContext()`.' );
+				error( 'NodeMaterial: "material.contextNode" must be an instance of `context()`.' );
 
 			}
 
@@ -591,6 +591,14 @@ class NodeMaterial extends Material {
 			const isCustomOutput = this.outputNode !== null;
 
 			if ( isCustomOutput ) resultNode = this.outputNode;
+
+			//
+
+			if ( builder.context.getOutput ) {
+
+				resultNode = builder.context.getOutput( resultNode, builder );
+
+			}
 
 			// MRT
 

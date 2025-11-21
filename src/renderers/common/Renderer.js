@@ -35,7 +35,7 @@ import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearF
 import { float, vec3, vec4 } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
-import { globalContext } from '../../nodes/core/GlobalContextNode.js';
+import { context } from '../../nodes/core/ContextNode.js';
 import { error, warn, warnOnce } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
@@ -226,10 +226,10 @@ class Renderer {
 		 * A global context node that stores override nodes for specific transformations or calculations.
 		 * These nodes can be used to replace default behavior in the rendering pipeline.
 		 *
-		 * @type {GlobalContextNode}
+		 * @type {ContextNode}
 		 * @property {Object} value - The context value object.
 		 */
-		this.globalContext = globalContext();
+		this.contextNode = context();
 
 		/**
 		 * The node library defines how certain library objects like materials, lights
@@ -1028,17 +1028,17 @@ class Renderer {
 	 */
 	set highPrecision( value ) {
 
-		const globalContextData = this.globalContext.value;
+		const contextNodeData = this.contextNode.value;
 
 		if ( value === true ) {
 
-			globalContextData.modelViewMatrix = highpModelViewMatrix;
-			globalContextData.modelNormalViewMatrix = highpModelNormalViewMatrix;
+			contextNodeData.modelViewMatrix = highpModelViewMatrix;
+			contextNodeData.modelNormalViewMatrix = highpModelNormalViewMatrix;
 
 		} else if ( this.highPrecision ) {
 
-			delete globalContextData.modelViewMatrix;
-			delete globalContextData.modelNormalViewMatrix;
+			delete contextNodeData.modelViewMatrix;
+			delete contextNodeData.modelNormalViewMatrix;
 
 		}
 
@@ -1052,9 +1052,9 @@ class Renderer {
 	 */
 	get highPrecision() {
 
-		const globalContextData = this.globalContext.value;
+		const contextNodeData = this.contextNode.value;
 
-		return globalContextData.modelViewMatrix === highpModelViewMatrix && globalContextData.modelNormalViewMatrix === highpModelNormalViewMatrix;
+		return contextNodeData.modelViewMatrix === highpModelViewMatrix && contextNodeData.modelNormalViewMatrix === highpModelNormalViewMatrix;
 
 	}
 

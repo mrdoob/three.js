@@ -73,7 +73,8 @@
 			"Start making a Game": "en/game"
 		},
 		"WebGPU": {
-			"WebGPURenderer": "en/webgpurenderer"
+			"WebGPURenderer": "en/webgpurenderer",
+			"Post-Processing": "en/webgpu-postprocessing"
 		},
 		"WebXR": {
 			"VR - Basics": "en/webxr-basics",
