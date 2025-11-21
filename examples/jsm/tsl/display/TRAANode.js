@@ -1,5 +1,5 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Fn, min, max, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, screenSize, ivec2, mix } from 'three/tsl';
+import { add, float, If, Fn, min, max, nodeObject, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -77,19 +77,19 @@ class TRAANode extends TempNode {
 		this.velocityNode = velocityNode;
 
 		/**
-		 *  The camera the scene is rendered with.
+		 * The camera the scene is rendered with.
 		 *
 		 * @type {Camera}
 		 */
 		this.camera = camera;
 
 		/**
-		 * When the difference between the current and previous depth goes above
-		 * this threshold, the history is considered invalid.
+		 * When the difference between the current and previous depth goes above this threshold,
+		 * the history is considered invalid.
 		 *
 		 * @type {number}
 		 */
-		this.depthThreshold = 0.0001;
+		this.depthThreshold = 0.0005;
 
 		/**
 		 * The depth difference within the 3×3 neighborhood to consider a pixel as an edge.
@@ -99,8 +99,15 @@ class TRAANode extends TempNode {
 		this.edgeDepthDiff = 0.001;
 
 		/**
+		 * The history becomes invalid as the pixel length of the velocity approaches this value.
+		 *
+		 * @type {number}
+		 */
+		this.maxVelocityLength = 128;
+
+		/**
 		 * Whether to decrease the weight on the current frame when the velocity is more subpixel.
-		 * This reduces blurriness under motion as well as smearing, but can introduce subpixel pattern artifacts.
+		 * This reduces blurriness under motion, but can introduce a square pattern artifact.
 		 *
 		 * @type {boolean}
 		 */
@@ -447,11 +454,12 @@ class TRAANode extends TempNode {
 		const currentDepthStruct = struct( {
 
 			closestDepth: 'float',
-			closestPositionTexel: 'ivec2',
+			closestPositionTexel: 'vec2',
 			farthestDepth: 'float',
 
 		} );
 
+		// Samples 3×3 neighborhood pixels and returns the closest and farthest depths.
 		const sampleCurrentDepth = Fn( ( [ positionTexel ] ) => {
 
 			const closestDepth = float( 2 ).toVar();
@@ -486,6 +494,7 @@ class TRAANode extends TempNode {
 
 		} );
 
+		// Samples a previous depth and reproject it using the current camera matrices.
 		const samplePreviousDepth = ( uv ) => {
 
 			const depth = this._previousDepthNode.sample( uv ).r;
@@ -498,25 +507,25 @@ class TRAANode extends TempNode {
 
 		// Optimized version of AABB clipping.
 		// Reference: https://github.com/playdeadgames/temporal
-		const clipAABB = Fn( ( [ current, history, minColor, maxColor ] ) => {
+		const clipAABB = Fn( ( [ currentColor, historyColor, minColor, maxColor ] ) => {
 
 			const pClip = maxColor.rgb.add( minColor.rgb ).mul( 0.5 );
 			const eClip = maxColor.rgb.sub( minColor.rgb ).mul( 0.5 ).add( 1e-7 );
-			const vClip = history.sub( vec4( pClip, current.a ) );
+			const vClip = historyColor.sub( vec4( pClip, currentColor.a ) );
 			const vUnit = vClip.xyz.div( eClip );
 			const absUnit = vUnit.abs();
 			const maxUnit = max( absUnit.x, absUnit.y, absUnit.z );
 			return maxUnit.greaterThan( 1 ).select(
-				vec4( pClip, current.a ).add( vClip.div( maxUnit ) ),
-				history
+				vec4( pClip, currentColor.a ).add( vClip.div( maxUnit ) ),
+				historyColor
 			);
 
 		} ).setLayout( {
 			name: 'clipAABB',
 			type: 'vec4',
 			inputs: [
-				{ name: 'current', type: 'vec4' },
-				{ name: 'history', type: 'vec4' },
+				{ name: 'currentColor', type: 'vec4' },
+				{ name: 'historyColor', type: 'vec4' },
 				{ name: 'minColor', type: 'vec4' },
 				{ name: 'maxColor', type: 'vec4' }
 			]
@@ -524,7 +533,7 @@ class TRAANode extends TempNode {
 
 		// Performs variance clipping.
 		// See: https://developer.download.nvidia.com/gameworks/events/GDC2016/msalvi_temporal_supersampling.pdf
-		const varianceClipping = ( positionTexel, currentColor, historyColor, gamma ) => {
+		const varianceClipping = Fn( ( [ positionTexel, currentColor, historyColor, gamma ] ) => {
 
 			const offsets = [
 				[ - 1, - 1 ],
@@ -557,21 +566,22 @@ class TRAANode extends TempNode {
 
 			return clipAABB( mean.clamp( minColor, maxColor ), historyColor, minColor, maxColor );
 
-		};
+		} );
 
-		// Returns the amount of subpixel in the velocity expressed within [0, 1].
-		const subpixelCorrection = Fn( ( [ offsetUV ] ) => {
+		// Returns the amount of subpixel (expressed within [0, 1]) in the velocity.
+		const subpixelCorrection = Fn( ( [ velocityUV, textureSize ] ) => {
 
-			const velocityTexel = offsetUV.xy.mul( screenSize );
+			const velocityTexel = velocityUV.mul( textureSize );
 			const subpixelPhase = velocityTexel.fract().abs();
 			const subpixelAmount = min( subpixelPhase, subpixelPhase.oneMinus() ).mul( 2 );
 			return max( subpixelAmount.x, subpixelAmount.y );
 
 		} ).setLayout( {
 			name: 'subpixelCorrection',
-			type: 'vec2',
+			type: 'float',
 			inputs: [
-				{ name: 'velocity', type: 'vec2' }
+				{ name: 'velocityUV', type: 'vec2' },
+				{ name: 'textureSize', type: 'ivec2' }
 			]
 		} );
 
@@ -597,53 +607,57 @@ class TRAANode extends TempNode {
 		const resolve = Fn( () => {
 
 			const uvNode = uv();
-			const positionTexel = uvNode.mul( screenSize );
+			const textureSize = this.beautyNode.size(); // Assumes all the buffers share the same size.
+			const positionTexel = uvNode.mul( textureSize );
 
-			// Sample the closest and farthest depths in the current buffer.
+			// sample the closest and farthest depths in the current buffer
 
 			const currentDepth = sampleCurrentDepth( positionTexel );
 			const closestDepth = currentDepth.get( 'closestDepth' );
 			const closestPositionTexel = currentDepth.get( 'closestPositionTexel' );
 			const farthestDepth = currentDepth.get( 'farthestDepth' );
 
-			// Convert the NDC offset to UV offset.
+			// convert the NDC offset to UV offset
 
-			const offset = this.velocityNode.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) );
+			const offsetUV = this.velocityNode.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) );
 
-			// Sample the previous depth.
+			// sample the previous depth
 
-			const historyUV = uvNode.sub( offset );
+			const historyUV = uvNode.sub( offsetUV );
 			const previousDepth = samplePreviousDepth( historyUV );
 
-			const motionFactor = uvNode.sub( historyUV ).length().mul( 5 );
+			// history is considered valid when the UV is in range and there's no disocclusion except on edges
+
 			const isValidUV = historyUV.greaterThanEqual( 0 ).all().and( historyUV.lessThanEqual( 1 ).all() );
 			const isEdge = farthestDepth.sub( closestDepth ).greaterThan( this.edgeDepthDiff );
 			const isDisocclusion = closestDepth.sub( previousDepth ).greaterThan( this.depthThreshold );
 			const hasValidHistory = isValidUV.and( isEdge.or( isDisocclusion.not() ) );
 
-			// Sample the current and previous colors.
+			// sample the current and previous colors
 
 			const currentColor = this.beautyNode.sample( uvNode );
-			const historyColor = historyNode.sample( uvNode.sub( offset ) );
+			const historyColor = historyNode.sample( uvNode.sub( offsetUV ) );
 
-			// Perform neighborhood clipping.
+			// increase the weight towards the current frame under motion
 
-			const varianceGamma = motionFactor.saturate().pow2().remapClamp( 1, 0, 0.75, 2 );
-			const clippedHistoryColor = varianceClipping( positionTexel, currentColor, historyColor, varianceGamma );
-
-			// Increase the weight on the current color under motion.
-
-			const currentWeight = float( 0.05 ).toVar();
+			const motionFactor = uvNode.sub( historyUV ).mul( textureSize ).length().div( this.maxVelocityLength ).saturate();
+			const currentWeight = float( 0.05 ).toVar(); // A minimum weight
 
 			if ( this.useSubpixelCorrection ) {
 
-				currentWeight.assign( mix( currentWeight, 0.4, subpixelCorrection( offset ) ) );
+				// Increase the minimum weight towards the current frame when the velocity is more subpixel.
+				currentWeight.addAssign( subpixelCorrection( offsetUV, textureSize ).mul( 0.25 ) );
 
 			}
 
 			currentWeight.assign( hasValidHistory.select( currentWeight.add( motionFactor ).saturate(), 1 ) );
 
-			// Flicker reduction based on luminance weighing.
+			// Perform neighborhood clipping/clamping. We use variance clipping here.
+
+			const varianceGamma = mix( 0.5, 1, motionFactor.oneMinus().pow2() ); // Reasonable gamma range is [0.75, 2]
+			const clippedHistoryColor = varianceClipping( positionTexel, currentColor, historyColor, varianceGamma );
+
+			// flicker reduction based on luminance weighing
 
 			const output = flickerReduction( currentColor, clippedHistoryColor, currentWeight );
 
