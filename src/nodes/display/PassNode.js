@@ -816,7 +816,7 @@ class PassNode extends TempNode {
 
 				this._contextNodeCache = {
 					version: this.version,
-					context: context( { ...renderer.contextNode.value, ...this.contextNode.getFlowContextData() } )
+					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
 				};
 
 			}
