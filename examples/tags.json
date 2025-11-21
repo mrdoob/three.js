@@ -131,6 +131,7 @@
 	"webgpu_compute_reduce": [ "gpgpu" ],
 	"webgpu_compute_sort_bitonic": [ "gpgpu" ],
 	"webgpu_compute_texture": [ "gpgpu" ],
+	"webgpu_compute_texture_fluid": [ "gpgpu" ],
 	"webgpu_compute_texture_pingpong": [ "gpgpu" ],
 	"webgpu_compute_water": [ "gpgpu", "struct" ],
 	"webgpu_depth_texture": [ "renderTarget" ],
