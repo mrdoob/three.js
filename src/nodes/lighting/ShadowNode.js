@@ -123,7 +123,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
 
-	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ) );
+	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ).max( 0 ) );
 	return vec2( mean, std_dev );
 
 } );
@@ -168,7 +168,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
 
-	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ) );
+	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ).max( 0 ) );
 	return vec2( mean, std_dev );
 
 } );
