@@ -211,7 +211,6 @@ export const getShadowRenderObjectFunction = TSL.getShadowRenderObjectFunction;
 export const getTextureIndex = TSL.getTextureIndex;
 export const getViewPosition = TSL.getViewPosition;
 export const globalId = TSL.globalId;
-export const globalContext = TSL.globalContext;
 export const glsl = TSL.glsl;
 export const glslFn = TSL.glslFn;
 export const grayscale = TSL.grayscale;
