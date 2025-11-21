@@ -47,6 +47,7 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
+				camera.focus = 3200;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.CubeTextureLoader()
@@ -83,6 +84,7 @@
 				container.appendChild( renderer.domElement );
 
 				effect = new StereoEffect( renderer );
+				effect.setEyeSeparation( 100 );
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//
