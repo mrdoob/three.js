@@ -55,12 +55,12 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.5;
+				renderer.toneMappingExposure = 0.0025;
 				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
