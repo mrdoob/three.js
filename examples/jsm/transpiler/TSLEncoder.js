@@ -675,7 +675,7 @@ ${ this.tab }} )`;
 
 			const program = node.getProgram();
 
-			if ( program && program.structTypes.has( type ) ) {
+			if ( program.structTypes.has( type ) ) {
 
 				varStr += ` = ${ type }()`;
 
