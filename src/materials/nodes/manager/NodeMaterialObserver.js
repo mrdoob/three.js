@@ -259,7 +259,7 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.renderer.overrideNodes.modelViewMatrix !== null || builder.renderer.overrideNodes.modelNormalViewMatrix !== null )
+		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix )
 			return true;
 
 		return false;
