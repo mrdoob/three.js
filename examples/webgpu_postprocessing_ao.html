@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, globalContext, screenUV, normalView, velocity, vec3, vec4, directionToColor, colorToDirection, colorSpaceToWorking } from 'three/tsl';
+			import { sample, pass, mrt, context, screenUV, normalView, velocity, vec3, vec4, directionToColor, colorToDirection, colorSpaceToWorking } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -140,9 +140,9 @@
 
 				const aoPassOutput = aoPass.getTextureNode( 'output' );
 
-				// global context
+				// scene context
 
-				scenePass.globalContext = globalContext( {
+				scenePass.contextNode = context( {
 					ao: aoPassOutput.sample( screenUV ).r
 				} );
 
