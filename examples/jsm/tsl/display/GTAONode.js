@@ -568,4 +568,4 @@ function generateMagicSquare( size ) {
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {GTAONode}
  */
-export const ao = ( depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
+export const ao = ( depthNode, normalNode, camera ) => new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera );

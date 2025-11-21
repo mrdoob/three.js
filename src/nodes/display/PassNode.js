@@ -249,6 +249,29 @@ class PassNode extends TempNode {
 		this.renderTarget = renderTarget;
 
 		/**
+		 * An optional override material for the pass.
+		 *
+		 * @type {Material|null}
+		 */
+		this.overrideMaterial = null;
+
+		/**
+		 * Whether the pass is transparent.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.transparent = true;
+
+		/**
+		 * Whether the pass is opaque.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.opaque = true;
+
+		/**
 		 * An optional global context for the pass.
 		 *
 		 * @type {ContextNode|null}
@@ -754,8 +777,11 @@ class PassNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 		const currentAutoClear = renderer.autoClear;
+		const currentTransparent = renderer.transparent;
+		const currentOpaque = renderer.opaque;
 		const currentMask = camera.layers.mask;
 		const currentContextNode = renderer.contextNode;
+		const currentOverrideMaterial = scene.overrideMaterial;
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
@@ -772,9 +798,17 @@ class PassNode extends TempNode {
 
 		}
 
+		if ( this.overrideMaterial !== null ) {
+
+			scene.overrideMaterial = this.overrideMaterial;
+
+		}
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
 		renderer.autoClear = true;
+		renderer.transparent = this.transparent;
+		renderer.opaque = this.opaque;
 
 		if ( this.contextNode !== null ) {
 
@@ -782,7 +816,7 @@ class PassNode extends TempNode {
 
 				this._contextNodeCache = {
 					version: this.version,
-					context: context( { ...renderer.contextNode.value, ...this.contextNode.getFlowContextData() } )
+					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
 				};
 
 			}
@@ -798,10 +832,13 @@ class PassNode extends TempNode {
 		renderer.render( scene, camera );
 
 		scene.name = currentSceneName;
+		scene.overrideMaterial = currentOverrideMaterial;
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.autoClear = currentAutoClear;
+		renderer.transparent = currentTransparent;
+		renderer.opaque = currentOpaque;
 		renderer.contextNode = currentContextNode;
 
 		camera.layers.mask = currentMask;

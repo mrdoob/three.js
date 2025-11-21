@@ -1060,9 +1060,17 @@ class NodeMaterial extends Material {
 
 		}
 
+		let aoNode = builder.context.ao || null;
+
 		if ( this.aoNode !== null || builder.material.aoMap ) {
 
-			const aoNode = this.aoNode !== null ? this.aoNode : materialAO;
+			const mtlAO = this.aoNode !== null ? this.aoNode : materialAO;
+
+			aoNode = aoNode !== null ? aoNode.mul( mtlAO ) : mtlAO;
+
+		}
+
+		if ( aoNode !== null ) {
 
 			materialLightsNode.push( new AONode( aoNode ) );
 
