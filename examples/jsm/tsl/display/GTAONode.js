@@ -317,6 +317,25 @@ class GTAONode extends TempNode {
 	 */
 	setup( builder ) {
 
+		//
+
+		let hasTRAA = false;
+
+		for ( const node of builder.chaining ) {
+
+			if ( node.isTRAANode ) {
+
+				hasTRAA = true;
+				break;
+
+			}
+
+		}
+
+		console.log( builder.context.postProcessing );
+
+		//
+
 		const uvNode = uv();
 
 		const sampleDepth = ( uv ) => {
