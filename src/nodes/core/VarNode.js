@@ -181,6 +181,14 @@ class VarNode extends Node {
 
 		const builder = params[ 0 ];
 
+		const nodeFromContext = builder.context[ this.uuid ];
+
+		if ( nodeFromContext !== undefined ) {
+
+			return nodeFromContext.build( ...params );
+
+		}
+
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
 			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {

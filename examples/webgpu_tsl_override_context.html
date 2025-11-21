@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Three.js webgpu - tsl override context</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> - WebGPU - TSL Override Context<br />
+			Left: Default Normals | Right: Overridden Normals (Rotated via Context)
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { float, vec3, vec4, mat4, normalLocal, positionLocal, Fn, overrideContext, instanceIndex, transformNormal } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 10;
+
+				scene = new THREE.Scene();
+
+				// TSL Function that uses normalLocal
+				const visualizeNormal = Fn( () => {
+
+					return normalLocal.normalize().mul( 0.5 ).add( 0.5 );
+
+				} );
+
+				const geometry = new THREE.SphereGeometry( 0.5, 32, 16 );
+				const count = 5;
+
+				// 1. Left Mesh: Instanced, Vertical Stack, Default Normals
+				const material1 = new THREE.MeshBasicNodeMaterial();
+
+				// Move instances in Y based on instanceIndex
+				const offset1 = vec3( 0, instanceIndex.toFloat().mul( 1.5 ).sub( 3 ), 0 );
+				material1.positionNode = positionLocal.add( offset1 );
+
+				material1.colorNode = visualizeNormal();
+
+				const mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - 2;
+				mesh1.count = count; // Enable instancing
+				scene.add( mesh1 );
+
+				// 2. Right Mesh: Instanced, Vertical Stack, Overridden Normals
+				const material2 = new THREE.MeshBasicNodeMaterial();
+
+				// Move instances in Y based on instanceIndex
+				const y = instanceIndex.toFloat().mul( 1.5 ).sub( 3 );
+				const offset2 = vec3( 0, y, 0 );
+				material2.positionNode = positionLocal.add( offset2 );
+
+				// Construct instance matrix with rotation to demonstrate normal transformation
+				const angle = instanceIndex.toFloat().mul( 0.5 );
+				const s = angle.sin();
+				const c = angle.cos();
+
+				// Rotation around Y axis + Translation
+				const instanceMatrixNode = mat4(
+					vec4( c, 0, s, 0 ),
+					vec4( 0, 1, 0, 0 ),
+					vec4( s.negate(), 0, c, 0 ),
+					vec4( 0, y, 0, 1 )
+				);
+
+				// Transform normalLocal using the instance matrix
+				// Note: Since it's a pure translation, the normal direction won't change,
+				// but this demonstrates the mechanism.
+				const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
+
+				// Override normalLocal in the visualizeNormal function context
+				material2.colorNode = overrideContext( visualizeNormal(), normalLocal, instanceNormal );
+
+				const mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = 2;
+				mesh2.count = count; // Enable instancing
+				scene.add( mesh2 );
+
+				//
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

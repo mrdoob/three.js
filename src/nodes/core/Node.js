@@ -720,6 +720,16 @@ class Node extends EventDispatcher {
 	 */
 	build( builder, output = null ) {
 
+		const nodeFromContext = builder.context[ this.uuid ];
+
+		if ( nodeFromContext !== undefined ) {
+
+			return nodeFromContext.build( builder, output );
+
+		}
+
+		//
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
