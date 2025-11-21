@@ -572,9 +572,9 @@ class TRAANode extends TempNode {
 		const subpixelCorrection = Fn( ( [ velocityUV, textureSize ] ) => {
 
 			const velocityTexel = velocityUV.mul( textureSize );
-			const subpixelPhase = velocityTexel.fract().abs();
-			const subpixelAmount = min( subpixelPhase, subpixelPhase.oneMinus() ).mul( 2 );
-			return max( subpixelAmount.x, subpixelAmount.y );
+			const phase = velocityTexel.fract().abs();
+			const weight = max( phase, phase.oneMinus() );
+			return weight.x.mul( weight.y ).oneMinus().div( 0.75 );
 
 		} ).setLayout( {
 			name: 'subpixelCorrection',
