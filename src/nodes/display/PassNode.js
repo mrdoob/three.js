@@ -810,12 +810,6 @@ class PassNode extends TempNode {
 		renderer.transparent = this.transparent;
 		renderer.opaque = this.opaque;
 
-		if ( this.globalContext !== null ) {
-
-			renderer.globalContext = this.globalContext;
-
-		}
-
 		if ( this.contextNode !== null ) {
 
 			if ( this._contextNodeCache === null || this._contextNodeCache.version !== this.version ) {
