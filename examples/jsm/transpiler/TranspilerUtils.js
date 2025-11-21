@@ -1,6 +1,6 @@
 export function isExpression( st ) {
 
-	return st.isFunctionDeclaration !== true && st.isFor !== true && st.isWhile !== true && st.isConditional !== true && st.isSwitch !== true;
+	return st.isFunctionDeclaration !== true && st.isFor !== true && st.isWhile !== true && st.isConditional !== true && st.isSwitch !== true && st.isStructDefinition !== true;
 
 }
 
@@ -10,9 +10,9 @@ export function isPrimitive( value ) {
 
 }
 
-export function isType( str ) {
+export function isBuiltinType( str ) {
 
-	return /void|bool|float|u?int|mat[234]|mat[234]x[234]|(u|i|b)?vec[234]/.test( str );
+	return /^(void|bool|float|u?int|mat[234]|mat[234]x[234]|(u|i|b)?vec[234])$/.test( str );
 
 }
 
