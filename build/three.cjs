@@ -915,6 +915,38 @@ const RGB_ETC2_Format = 37492;
 const RGBA_ETC2_EAC_Format = 37496;
 
 /**
+ * EAC R11 UNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+const R11_EAC_Format = 37488; // 0x9270
+
+/**
+ * EAC R11 SNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+const SIGNED_R11_EAC_Format = 37489; // 0x9271
+
+/**
+ * EAC RG11 UNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+const RG11_EAC_Format = 37490; // 0x9272
+
+/**
+ * EAC RG11 SNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+const SIGNED_RG11_EAC_Format = 37491; // 0x9273
+
+/**
  * ASTC RGBA 4x4 format.
  *
  * @type {number}
@@ -58803,8 +58835,12 @@ function getByteLength( width, height, format, type ) {
 		// https://registry.khronos.org/webgl/extensions/WEBGL_compressed_texture_etc/
 		case RGB_ETC1_Format:
 		case RGB_ETC2_Format:
+		case R11_EAC_Format:
+		case SIGNED_R11_EAC_Format:
 			return Math.floor( ( width + 3 ) / 4 ) * Math.floor( ( height + 3 ) / 4 ) * 8;
 		case RGBA_ETC2_EAC_Format:
+		case RG11_EAC_Format:
+		case SIGNED_RG11_EAC_Format:
 			return Math.floor( ( width + 3 ) / 4 ) * Math.floor( ( height + 3 ) / 4 ) * 16;
 
 		// https://registry.khronos.org/webgl/extensions/WEBGL_compressed_texture_astc/
@@ -71734,7 +71770,7 @@ function WebGLUtils( gl, extensions ) {
 
 		// ETC
 
-		if ( p === RGB_ETC1_Format || p === RGB_ETC2_Format || p === RGBA_ETC2_EAC_Format ) {
+		if ( p === RGB_ETC1_Format || p === RGB_ETC2_Format || p === RGBA_ETC2_EAC_Format || p === R11_EAC_Format || p === SIGNED_R11_EAC_Format || p === RG11_EAC_Format || p === SIGNED_RG11_EAC_Format ) {
 
 			extension = extensions.get( 'WEBGL_compressed_texture_etc' );
 
@@ -71742,6 +71778,10 @@ function WebGLUtils( gl, extensions ) {
 
 				if ( p === RGB_ETC1_Format || p === RGB_ETC2_Format ) return ( transfer === SRGBTransfer ) ? extension.COMPRESSED_SRGB8_ETC2 : extension.COMPRESSED_RGB8_ETC2;
 				if ( p === RGBA_ETC2_EAC_Format ) return ( transfer === SRGBTransfer ) ? extension.COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : extension.COMPRESSED_RGBA8_ETC2_EAC;
+				if ( p === R11_EAC_Format ) return extension.COMPRESSED_R11_EAC;
+				if ( p === SIGNED_R11_EAC_Format ) return extension.COMPRESSED_SIGNED_R11_EAC;
+				if ( p === RG11_EAC_Format ) return extension.COMPRESSED_RG11_EAC;
+				if ( p === SIGNED_RG11_EAC_Format ) return extension.COMPRESSED_SIGNED_RG11_EAC;
 
 			} else {
 
@@ -77759,9 +77799,11 @@ exports.QuadraticBezierCurve3 = QuadraticBezierCurve3;
 exports.Quaternion = Quaternion;
 exports.QuaternionKeyframeTrack = QuaternionKeyframeTrack;
 exports.QuaternionLinearInterpolant = QuaternionLinearInterpolant;
+exports.R11_EAC_Format = R11_EAC_Format;
 exports.RED_GREEN_RGTC2_Format = RED_GREEN_RGTC2_Format;
 exports.RED_RGTC1_Format = RED_RGTC1_Format;
 exports.REVISION = REVISION;
+exports.RG11_EAC_Format = RG11_EAC_Format;
 exports.RGBADepthPacking = RGBADepthPacking;
 exports.RGBAFormat = RGBAFormat;
 exports.RGBAIntegerFormat = RGBAIntegerFormat;
@@ -77812,8 +77854,10 @@ exports.RepeatWrapping = RepeatWrapping;
 exports.ReplaceStencilOp = ReplaceStencilOp;
 exports.ReverseSubtractEquation = ReverseSubtractEquation;
 exports.RingGeometry = RingGeometry;
+exports.SIGNED_R11_EAC_Format = SIGNED_R11_EAC_Format;
 exports.SIGNED_RED_GREEN_RGTC2_Format = SIGNED_RED_GREEN_RGTC2_Format;
 exports.SIGNED_RED_RGTC1_Format = SIGNED_RED_RGTC1_Format;
+exports.SIGNED_RG11_EAC_Format = SIGNED_RG11_EAC_Format;
 exports.SRGBColorSpace = SRGBColorSpace;
 exports.SRGBTransfer = SRGBTransfer;
 exports.Scene = Scene;
