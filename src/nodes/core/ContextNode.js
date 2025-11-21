@@ -166,7 +166,7 @@ export default ContextNode;
  * @param {Object} [value={}] - The modified context data.
  * @returns {ContextNode}
  */
-export const context = /*@__PURE__*/ ( nodeOrValue = null, value = {} ) => {
+export const context = ( nodeOrValue = null, value = {} ) => {
 
 	let node = nodeOrValue;
 
