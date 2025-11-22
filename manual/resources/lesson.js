@@ -89,3 +89,43 @@
 
 // ios needs this to allow touch events in an iframe
 window.addEventListener( 'touchstart', {} );
+
+document.addEventListener("DOMContentLoaded", () => {
+
+	const blocks = document.querySelectorAll("pre");
+	
+	blocks.forEach(pre => {
+	
+	// Create the copy button
+	const button = document.createElement("button");
+	button.className = "copy-btn";
+	button.innerHTML = "📋";
+	
+	// Copy logic
+	button.addEventListener("click", async () => {
+	
+	  // Clone the node and remove the button before copying
+	  const clone = pre.cloneNode(true);
+	  clone.querySelector(".copy-btn")?.remove();
+	
+	  const code = clone.innerText.trim();
+	
+	  await navigator.clipboard.writeText(code);
+	
+	  button.innerText = "✔";
+	  setTimeout(() => (button.innerHTML = "📋"), 1200);
+	});
+	
+	// Position button
+	pre.style.position = "relative";
+	pre.appendChild(button);
+	
+	
+	});
+	
+	});
+	
+	// Leave this line as-is
+	document.body.appendChild(VRButton.createButton(renderer));
+	
+	
