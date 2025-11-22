@@ -66,17 +66,6 @@ class UnpackFloatNode extends TempNode {
 export default UnpackFloatNode;
 
 /**
- * Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted according to the specified encoding. Returns a vec2 with both values.
- *
- * @tsl
- * @function
- * @param {Node<uint>} value - The unsigned integer to be unpacked
- * @param {string} encoding - The encoding that describes how the integer values are mapped to the float range. Can be 'snorm', 'unorm', or 'float16'.
- * @returns {Node}
- */
-export const unpackFloats = /*@__PURE__*/ nodeProxyIntent( UnpackFloatNode ).setParameterLength( 2 );
-
-/**
  * Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted as normalized signed integers. Returns a vec2 with both values.
  *
  * @tsl

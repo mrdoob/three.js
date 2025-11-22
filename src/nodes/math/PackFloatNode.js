@@ -66,17 +66,6 @@ class PackFloatNode extends TempNode {
 export default PackFloatNode;
 
 /**
- * Packs the components of a vector into a single unsigned integer according to the specified encoding.
- *
- * @tsl
- * @function
- * @param {Node<vec2>} value - The 2-component vector to be packed
- * @param {string} encoding - The encoding that describes how the float values are mapped to the integer range. Can be 'snorm', 'unorm', or 'float16'.
- * @returns {Node}
- */
-export const packFloats = /*@__PURE__*/ nodeProxyIntent( PackFloatNode ).setParameterLength( 2 );
-
-/**
  * Converts each component of the normalized float to 16-bit integer values. The results are packed into a single unsigned integer.
  * round(clamp(c, -1, +1) * 32767.0)
  *
