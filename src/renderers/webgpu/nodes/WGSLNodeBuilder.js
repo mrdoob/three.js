@@ -128,7 +128,13 @@ const wgslMethods = {
 	equals_bvec3: 'tsl_equals_bvec3',
 	equals_bvec4: 'tsl_equals_bvec4',
 	inversesqrt: 'inverseSqrt',
-	bitcast: 'bitcast<f32>'
+	bitcast: 'bitcast<f32>',
+	floatpack_snorm_2x16: 'pack2x16snorm',
+	floatpack_unorm_2x16: 'pack2x16unorm',
+	floatpack_float16_2x16: 'pack2x16float',
+	floatunpack_snorm_2x16: 'unpack2x16snorm',
+	floatunpack_unorm_2x16: 'unpack2x16unorm',
+	floatunpack_float16_2x16: 'unpack2x16float'
 };
 
 //
@@ -1987,6 +1993,30 @@ ${ flowData.code }
 		const dataType = this.getType( type );
 
 		return `bitcast<${ dataType }>`;
+
+	}
+
+	/**
+	 * Returns the float packing method name for a given numeric encoding.
+	 *
+	 * @param {string} encoding - The numeric encoding that describes how the float values are mapped to the integer range.
+	 * @returns {string} The resolve WGSL float packing method name.
+	 */
+	getFloatPackingMethod( encoding ) {
+
+		return this.getMethod( `floatpack_${ encoding }_2x16` );
+
+	}
+
+	/**
+	 * Returns the float unpacking method name for a given numeric encoding.
+	 *
+	 * @param {string} encoding - The numeric encoding that describes how the integer values are mapped to the float range.
+	 * @returns {string} The resolve WGSL float unpacking method name.
+	 */
+	getFloatUnpackingMethod( encoding ) {
+
+		return this.getMethod( `floatunpack_${ encoding }_2x16` );
 
 	}
 

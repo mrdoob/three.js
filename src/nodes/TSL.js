@@ -23,6 +23,8 @@ export * from './math/BitcastNode.js';
 export * from './math/BitcountNode.js';
 export * from './math/Hash.js';
 export * from './math/MathUtils.js';
+export * from './math/PackFloatNode.js';
+export * from './math/UnpackFloatNode.js';
 export * from './math/TriNoise3D.js';
 
 // utils
