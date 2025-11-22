@@ -79,9 +79,9 @@ export class BitonicSort {
 	/**
 	 * Constructs a new light probe helper.
 	 *
-	 * @param {Renderer} renderer - The current scene's renderer.
+	 * @param {Renderer} renderer - A renderer with the ability to execute compute operations.
 	 * @param {StorageBufferNode} dataBuffer - The data buffer to sort.
-	 * @param {Object} [options={}] - Options that modify the bitonic sort.
+	 * @param {Object} [options={}] - Options that modify the behavior of the bitonic sort.
 	 */
 	constructor( renderer, dataBuffer, options = {} ) {
 
@@ -119,7 +119,7 @@ export class BitonicSort {
 		 *
 		 * @type {StorageBufferNode}
 		*/
-		this.workgroupSize = options.workgroupSize ? Math.min( this.dispatchSize, options.workgroupSize ) : Math.min( this.dispatchSize, 64 );
+		this.workgroupSize = options.workgroupSize ? Math.min( this.dispatchSize, options.workgroupSize ) : Math.min( this.dispatchSize, this.renderer.backend.device.limits.maxComputeWorkgroupSizeX );
 
 		/**
 		 * A node representing a workgroup scoped buffer that holds locally sorted elements.

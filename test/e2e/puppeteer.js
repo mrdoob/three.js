@@ -70,6 +70,7 @@ const exceptionList = [
 	'webgpu_compute_birds',
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',
+	"webgpu_compute_prefix_sum",
 	'webgpu_compute_reduce',
 	'webgpu_compute_sort_bitonic',
 	'webgpu_compute_texture',

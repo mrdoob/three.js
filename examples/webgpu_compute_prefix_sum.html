@@ -1,0 +1,252 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - compute reduction</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body> 
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<br /> This example demonstrates a prefix sum operation on a buffer of data.
+			<br /> Reference implementations are translated from the WGSL code present in <a href="https://github.com/b0nes164/GPUPrefixSums/blob/main/GPUPrefixSumsWebGPUapis/SharedShaders/rts.wgsl"><i>GPUPrefixSums</i></a> by <a href="https://github.com/b0nes164">b0nes164</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { vec3, vec4, uv, uint, Fn, vec2, uvec2, floor, instanceIndex } from 'three/tsl';
+
+			import { PrefixSum } from 'three/addons/gpgpu/PrefixSum.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			const effectController = {
+				currentStep: 'Reduce',
+				loggedBuffer: 'Reduction',
+				displayedBuffer: 'Reduction',
+			};
+
+			const PREFIX_SUM_BUFFER_TYPES = {
+				INPUT: 'Input',
+				REDUCTION: 'Reduction',
+				OUTPUT: 'Output'
+			};
+
+			const gui = new GUI();
+
+			let computeReset;
+
+			const size = 32768;
+
+			const getGridDimensions = ( reductionArray ) => {
+
+				const gridWidth = Math.sqrt( reductionArray.length ) % 2 === 0
+      	? Math.floor( Math.sqrt( reductionArray.length ) )
+      	: Math.floor( Math.sqrt( reductionArray.length / 2 ) );
+
+				const gridHeight = reductionArray.length / gridWidth;
+
+				return { gridWidth, gridHeight };
+
+			};
+			
+			async function init() {
+
+				const aspect = window.innerWidth / window.innerHeight;
+				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
+				camera.position.z = 1;
+
+				const scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x212121 );
+
+				const dynamicArray = [];
+
+				for ( let i = 0; i < size; i ++ ) {
+
+					dynamicArray.push( 1 );
+
+				}
+
+				const renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				await renderer.init();
+
+				// Arguments: renderer/compute engine + default typed array
+				const prefixSumModule = new PrefixSum( renderer, new Uint32Array( dynamicArray ) );
+
+				computeReset = Fn( () => {
+
+					const { outputBuffer } = prefixSumModule.storageBuffers;
+
+					outputBuffer.element( instanceIndex ).assign( vec4( 1, 1, 1, 1 ) );
+
+				} )().compute( size, [ prefixSumModule.workgroupSize ] );
+
+				const getElementIndex = Fn( ( [ uvNode, gridWidth, gridHeight ] ) => {
+
+					const newUV = uvNode.mul( vec2( gridWidth, gridHeight ) );
+					const pixel = uvec2( uint( floor( newUV.x ) ), uint( floor( newUV.y ) ) );
+					const elementIndex = uint( gridWidth ).mul( pixel.y ).add( pixel.x );
+
+					return elementIndex;
+
+				}, {
+					uvNode: 'vec2',
+					gridWidth: 'uint',
+					gridHeight: 'uint',
+					return: 'uint'
+				} );
+
+				const getColor = Fn( ( [ colorChanger, gridWidth, gridHeight ] ) => {
+
+					const subtracter = colorChanger.div( gridWidth.mul( gridHeight ) );
+					return vec3( subtracter.oneMinus() ).toVar();
+
+				}, {
+					colorChanger: 'float',
+					gridWidth: 'float',
+					gridHeight: 'float',
+					return: 'vec3'
+				} );
+
+				const createDisplayMesh = ( elementsStorage ) => {
+
+					const material = new THREE.MeshBasicNodeMaterial( { color: 0x00ff00 } );
+
+					const display = Fn( () => {
+
+						const { gridWidth, gridHeight } = getGridDimensions( dynamicArray );
+
+						const elementIndex = getElementIndex( uv(), gridWidth, gridHeight );
+			
+						const color = getColor( elementsStorage.element( elementIndex ), gridWidth, gridHeight ).toVar();
+
+						return color;
+
+					} );
+
+					material.colorNode = display();
+					const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+					return plane;
+
+				};
+
+				scene.add( createDisplayMesh( prefixSumModule.storageBuffers.unvectorizedOutputBuffer ) );
+
+				const animate = () => {
+
+					renderer.render( scene, camera );
+
+				};
+
+				gui.add( effectController, 'loggedBuffer', Object.values( PREFIX_SUM_BUFFER_TYPES ) ).name( 'Buffer to Log' );
+				const logFunctionName = 'Log Selected Buffer';
+				const functionObj = {};
+				functionObj[ logFunctionName ] = async() => {
+
+					let selectedBuffer;
+
+					if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.REDUCTION ) {
+
+						selectedBuffer = prefixSumModule.storageBuffers.reductionBuffer;
+
+					} else if ( effectController.loggedBuffer === PREFIX_SUM_BUFFER_TYPES.INPUT ) {
+
+						selectedBuffer = prefixSumModule.storageBuffers.unvectorizedOutputBuffer;
+
+					} else {
+
+						selectedBuffer = prefixSumModule.storageBuffers.outputBuffer;
+
+					}
+
+					console.log( new Uint32Array( await renderer.getArrayBufferAsync( selectedBuffer.value ) ) );
+
+				};
+
+				functionObj[ 'Log Prefix Sum Class' ] = () => {
+
+					console.log( prefixSumModule );
+
+				};
+
+				gui.add( functionObj, 'Log Selected Buffer' );
+				gui.add( functionObj, 'Log Prefix Sum Class' );
+
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				let prefixSumComplete = false;
+
+				const stepAnimation = async function () {
+
+					if ( prefixSumComplete ) {
+
+						renderer.compute( computeReset );
+			
+					} else {
+
+						await prefixSumModule.compute();
+
+					}
+
+					prefixSumComplete = ! prefixSumComplete;
+
+					setTimeout( stepAnimation, 1000 );
+
+				};
+
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function onWindowResize() {
+
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+					const aspect = window.innerWidth / window.innerHeight;
+
+					const frustumHeight = camera.top - camera.bottom;
+
+					camera.left = - frustumHeight * aspect / 2;
+					camera.right = frustumHeight * aspect / 2;
+
+					camera.updateProjectionMatrix();
+
+					renderer.render( scene, camera );
+
+				}
+
+				stepAnimation();
+
+			}
+
+			init();
+
+		</script>
+	</body>
+</html>

@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { nodeImmutable, varying } from '../tsl/TSLBase.js';
+import { subgroupSize } from '../gpgpu/ComputeBuiltinNode.js';
 
 /**
  * This class represents shader indices of different types. The following predefined node
@@ -154,6 +155,14 @@ export const invocationSubgroupIndex = /*@__PURE__*/ nodeImmutable( IndexNode, I
  * @type {IndexNode}
  */
 export const invocationLocalIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
+
+/**
+ * TSL object that represents the index of a compute invocation within the scope of a subgroup.
+ *
+ * @tsl
+ * @type {IndexNode}
+ */
+export const invocationSubgroupMetaIndex = /*@__PURE__*/ invocationLocalIndex.div( subgroupSize ).toVar( 'invocationSubgroupMetaIndex' );
 
 /**
  * TSL object that represents the index of a draw call.

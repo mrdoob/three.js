@@ -324,10 +324,7 @@
 
 				const bitonicSortModule = new BitonicSort(
 					renderer,
-					currentElementsStorage,
-					{
-						workgroupSize: 64,
-					}
+					currentElementsStorage
 				);
 
 				scene.add( createDisplayMesh2( currentElementsStorage, bitonicSortModule.infoStorage ) );
