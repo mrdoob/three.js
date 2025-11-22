@@ -751,7 +751,7 @@ class PhysicalLightingModel extends LightingModel {
 		// Diffuse energy conservation uses dielectric path
 		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
 
-		const diffuse = diffuseContribution.mul( totalScatteringDielectric.r.max( totalScatteringDielectric.g ).max( totalScatteringDielectric.b ).oneMinus() );
+		const diffuse = diffuseContribution.mul( totalScatteringDielectric.oneMinus() );
 
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
