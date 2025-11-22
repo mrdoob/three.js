@@ -267,7 +267,7 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix )
+		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.ao )
 			return true;
 
 		return false;
@@ -20920,9 +20920,17 @@ class NodeMaterial extends Material {
 
 		}
 
+		let aoNode = builder.context.ao || null;
+
 		if ( this.aoNode !== null || builder.material.aoMap ) {
 
-			const aoNode = this.aoNode !== null ? this.aoNode : materialAO;
+			const mtlAO = this.aoNode !== null ? this.aoNode : materialAO;
+
+			aoNode = aoNode !== null ? aoNode.mul( mtlAO ) : mtlAO;
+
+		}
+
+		if ( aoNode !== null ) {
 
 			materialLightsNode.push( new AONode( aoNode ) );
 
@@ -37937,6 +37945,29 @@ class PassNode extends TempNode {
 		this.renderTarget = renderTarget;
 
 		/**
+		 * An optional override material for the pass.
+		 *
+		 * @type {Material|null}
+		 */
+		this.overrideMaterial = null;
+
+		/**
+		 * Whether the pass is transparent.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.transparent = true;
+
+		/**
+		 * Whether the pass is opaque.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.opaque = true;
+
+		/**
 		 * An optional global context for the pass.
 		 *
 		 * @type {ContextNode|null}
@@ -38442,8 +38473,11 @@ class PassNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 		const currentAutoClear = renderer.autoClear;
+		const currentTransparent = renderer.transparent;
+		const currentOpaque = renderer.opaque;
 		const currentMask = camera.layers.mask;
 		const currentContextNode = renderer.contextNode;
+		const currentOverrideMaterial = scene.overrideMaterial;
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
@@ -38460,9 +38494,17 @@ class PassNode extends TempNode {
 
 		}
 
+		if ( this.overrideMaterial !== null ) {
+
+			scene.overrideMaterial = this.overrideMaterial;
+
+		}
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
 		renderer.autoClear = true;
+		renderer.transparent = this.transparent;
+		renderer.opaque = this.opaque;
 
 		if ( this.contextNode !== null ) {
 
@@ -38470,7 +38512,7 @@ class PassNode extends TempNode {
 
 				this._contextNodeCache = {
 					version: this.version,
-					context: context( { ...renderer.contextNode.value, ...this.contextNode.getFlowContextData() } )
+					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
 				};
 
 			}
@@ -38486,10 +38528,13 @@ class PassNode extends TempNode {
 		renderer.render( scene, camera );
 
 		scene.name = currentSceneName;
+		scene.overrideMaterial = currentOverrideMaterial;
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.autoClear = currentAutoClear;
+		renderer.transparent = currentTransparent;
+		renderer.opaque = currentOpaque;
 		renderer.contextNode = currentContextNode;
 
 		camera.layers.mask = currentMask;
@@ -43204,7 +43249,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
 
-	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ) );
+	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ).max( 0 ) );
 	return vec2( mean, std_dev );
 
 } );
@@ -43249,7 +43294,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
 
-	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ) );
+	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ).max( 0 ) );
 	return vec2( mean, std_dev );
 
 } );
@@ -51930,9 +51975,13 @@ class NodeFrame {
 
 			if ( nodeUpdateBeforeMap.frameId !== this.frameId ) {
 
-				if ( node.updateBefore( this ) !== false ) {
+				const previousFrameId = nodeUpdateBeforeMap.frameId;
 
-					nodeUpdateBeforeMap.frameId = this.frameId;
+				nodeUpdateBeforeMap.frameId = this.frameId;
+
+				if ( node.updateBefore( this ) === false ) {
+
+					nodeUpdateBeforeMap.frameId = previousFrameId;
 
 				}
 
@@ -51944,9 +51993,13 @@ class NodeFrame {
 
 			if ( nodeUpdateBeforeMap.renderId !== this.renderId ) {
 
-				if ( node.updateBefore( this ) !== false ) {
+				const previousRenderId = nodeUpdateBeforeMap.renderId;
 
-					nodeUpdateBeforeMap.renderId = this.renderId;
+				nodeUpdateBeforeMap.renderId = this.renderId;
+
+				if ( node.updateBefore( this ) === false ) {
+
+					nodeUpdateBeforeMap.renderId = previousRenderId;
 
 				}
 
