@@ -71,12 +71,10 @@ vec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) 
     return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );
 }
 
-// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
-// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+// Heitz 2014, "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs"
 float V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
 
 	float a2 = pow2( alpha );
-
 	float gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );
 	float gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );
 
@@ -106,7 +104,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 		float gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );
 		float v = 0.5 / ( gv + gl );
 
-		return saturate(v);
+		return v;
 
 	}
 
@@ -463,7 +461,7 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 	vec3 Favg = material.specularColorBlended + ( 1.0 - material.specularColorBlended ) * 0.047619; // 1/21
 
 	// Multiple scattering contribution
-	vec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg * Favg + EPSILON );
+	vec3 Fms = FssEss_V * FssEss_L * Favg / ( 1.0 - Ems_V * Ems_L * Favg + EPSILON );
 
 	// Energy compensation factor
 	float compensationFactor = Ems_V * Ems_L;
@@ -590,7 +588,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	// Diffuse energy conservation uses dielectric path
 	vec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;
-	vec3 diffuse = material.diffuseContribution * ( 1.0 - max( max( totalScatteringDielectric.r, totalScatteringDielectric.g ), totalScatteringDielectric.b ) );
+	vec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );
 
 	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
