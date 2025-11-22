@@ -133,6 +133,7 @@ export const compute = TSL.compute;
 export const computeKernel = TSL.computeKernel;
 export const computeSkinning = TSL.computeSkinning;
 export const context = TSL.context;
+export const overrideContext = TSL.overrideContext;
 export const convert = TSL.convert;
 export const convertColorSpace = TSL.convertColorSpace;
 export const convertToTexture = TSL.convertToTexture;

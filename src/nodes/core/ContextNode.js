@@ -220,7 +220,26 @@ export function label( node, name ) {
 
 }
 
+/**
+ * TSL function for overriding a context for a given node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node whose context should be modified.
+ * @param {Node} targetNode - The node that will be replaced.
+ * @param {Node} sourceNode - The node that will replace the targetNode.
+ * @returns {ContextNode}
+ */
+export const overrideContext = ( node, targetNode, sourceNode ) => {
+
+	const cleanSource = context( sourceNode, { [ targetNode.uuid ]: undefined } );
+
+	return context( node, { [ targetNode.uuid ]: cleanSource } );
+
+};
+
 addMethodChaining( 'context', context );
 addMethodChaining( 'label', label );
 addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
+addMethodChaining( 'overrideContext', overrideContext );

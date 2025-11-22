@@ -467,6 +467,7 @@
 		"webgpu_tsl_galaxy",
 		"webgpu_tsl_halftone",
 		"webgpu_tsl_interoperability",
+		"webgpu_tsl_override_context",
 		"webgpu_tsl_procedural_terrain",
 		"webgpu_tsl_raging_sea",
 		"webgpu_tsl_transpiler",
