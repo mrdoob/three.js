@@ -1,6 +1,7 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { Quaternion } from '../../math/Quaternion.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -101,6 +102,16 @@ class WebXRManager extends EventDispatcher {
 		 * @default false
 		 */
 		this.enabled = false;
+
+		/**
+		 * Whether to apply a -90° Y-axis rotation correction to the XR camera for video textures.
+		 * This corrects the orientation of video textures in WebXR projection layers.
+		 * When enabled, this rotates the entire camera, affecting all rendered content.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.videoTextureCorrection = false;
 
 		/**
 		 * Whether XR presentation is active or not.
@@ -912,7 +923,7 @@ class WebXRManager extends EventDispatcher {
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
-
+		const correctionQuaternion = new Quaternion().setFromAxisAngle( new Vector3( 0, 1, 0 ), - Math.PI / 2 );
 		function onAnimationFrame( time, frame ) {
 
 			pose = frame.getViewerPose( customReferenceSpace || referenceSpace );
@@ -982,6 +993,14 @@ class WebXRManager extends EventDispatcher {
 
 					camera.matrix.fromArray( view.transform.matrix );
 					camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+
+					if ( scope.videoTextureCorrection ) {
+
+						camera.quaternion.premultiply( correctionQuaternion );
+						camera.matrix.compose( camera.position, camera.quaternion, camera.scale );
+
+					}
+
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
 					camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
 					camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
