@@ -518,3 +518,20 @@ div.threejs_bottombar code {
   }
 
 }
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.copy-btn:hover {
+  background: rgba(255,255,255,0.3);
+}

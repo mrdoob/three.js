@@ -89,3 +89,29 @@
 
 // ios needs this to allow touch events in an iframe
 window.addEventListener( 'touchstart', {} );
+document.addEventListener("DOMContentLoaded", () => {
+
+	const blocks = document.querySelectorAll("pre");
+  
+	blocks.forEach(pre => {
+  
+	  // Create the button
+	  const button = document.createElement("button");
+	  button.className = "copy-btn";
+	  button.innerHTML = "📋";
+  
+	  // Copy logic
+	  button.addEventListener("click", async () => {
+		const code = pre.innerText;
+		await navigator.clipboard.writeText(code);
+		button.innerText = "✔";
+		setTimeout(() => (button.innerHTML = "📋"), 1200);
+	  });
+  
+	  // Position
+	  pre.style.position = "relative";
+	  pre.appendChild(button);
+  
+	});
+  });
+  

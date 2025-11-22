@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Copy Button Demo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ========== BASIC PAGE STYLE (Optional) ========== -->
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #181a1b;
+      color: #e6e6e6;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    /* Code block styling */
+    pre {
+      background: #2a2c2d;
+      border-radius: 6px;
+      padding: 16px;
+      position: relative;
+      overflow: auto;
+      margin-bottom: 20px;
+    }
+
+    pre code {
+      font-family: Consolas, Monaco, monospace;
+      color: #c5e887;
+      white-space: pre;
+      display: block;
+    }
+
+    /* COPY BUTTON STYLES */
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 6px 10px;
+      background: #4a4a4a;
+      border: 1px solid #666;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+      opacity: 0.7;
+      transition: 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Code Copy Button Demo</h1>
+
+<p>This page demonstrates a working copy button like the one we want in the Three.js manual.</p>
+
+<!-- ========== SAMPLE CODE BLOCK ========== -->
+<pre><code>
+// Create an AnimationMixer
+const mixer = new THREE.AnimationMixer(mesh);
+
+// Update each frame
+function update() {
+  mixer.update(deltaSeconds);
+}
+</code></pre>
+
+<!-- ========== COPY BUTTON SCRIPT ========== -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Select all <pre><code> blocks
+  const blocks = document.querySelectorAll("pre");
+
+  blocks.forEach(block => {
+
+    // Create button
+    const button = document.createElement("button");
+    button.className = "copy-btn";
+    button.textContent = "Copy";
+
+    // Copy handler
+    button.onclick = async () => {
+      const text = block.innerText;
+      await navigator.clipboard.writeText(text);
+      button.textContent = "Copied!";
+      setTimeout(() => button.textContent = "Copy", 1200);
+    };
+
+    // Add button to pre
+    block.appendChild(button);
+  });
+});
+</script>
+
+</body>
+</html>
