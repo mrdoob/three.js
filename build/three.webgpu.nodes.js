@@ -23123,7 +23123,7 @@ const V_GGX_SmithCorrelated_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, 
 	const gl = dotNV.mul( vec3( alphaT.mul( dotTL ), alphaB.mul( dotBL ), dotNL ).length() );
 	const v = div( 0.5, gv.add( gl ) );
 
-	return v.saturate();
+	return v;
 
 } ).setLayout( {
 	name: 'V_GGX_SmithCorrelated_Anisotropic',
@@ -24402,7 +24402,7 @@ class PhysicalLightingModel extends LightingModel {
 		// Diffuse energy conservation uses dielectric path
 		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
 
-		const diffuse = diffuseContribution.mul( totalScatteringDielectric.r.max( totalScatteringDielectric.g ).max( totalScatteringDielectric.b ).oneMinus() );
+		const diffuse = diffuseContribution.mul( totalScatteringDielectric.oneMinus() );
 
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
