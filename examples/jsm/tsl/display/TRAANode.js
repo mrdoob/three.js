@@ -88,6 +88,7 @@ class TRAANode extends TempNode {
 		 * the history is considered invalid.
 		 *
 		 * @type {number}
+		 * @default 0.0005
 		 */
 		this.depthThreshold = 0.0005;
 
@@ -95,6 +96,7 @@ class TRAANode extends TempNode {
 		 * The depth difference within the 3×3 neighborhood to consider a pixel as an edge.
 		 *
 		 * @type {number}
+		 * @default 0.001
 		 */
 		this.edgeDepthDiff = 0.001;
 
@@ -102,6 +104,7 @@ class TRAANode extends TempNode {
 		 * The history becomes invalid as the pixel length of the velocity approaches this value.
 		 *
 		 * @type {number}
+		 * @default 128
 		 */
 		this.maxVelocityLength = 128;
 
@@ -110,6 +113,7 @@ class TRAANode extends TempNode {
 		 * This reduces blurriness under motion, but can introduce a square pattern artifact.
 		 *
 		 * @type {boolean}
+		 * @default true
 		 */
 		this.useSubpixelCorrection = true;
 
