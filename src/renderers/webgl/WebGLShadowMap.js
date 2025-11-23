@@ -1,4 +1,4 @@
-import { FrontSide, BackSide, DoubleSide, NearestFilter, LinearFilter, PCFShadowMap, VSMShadowMap, NoBlending, LessEqualCompare, GreaterEqualCompare, DepthFormat, UnsignedIntType, RGFormat, HalfFloatType, PCFSoftShadowMap } from '../../constants.js';
+import { FrontSide, BackSide, DoubleSide, NearestFilter, LinearFilter, PCFShadowMap, VSMShadowMap, NoBlending, LessEqualCompare, GreaterEqualCompare, DepthFormat, UnsignedIntType, RGFormat, HalfFloatType, PCFSoftShadowMap, IdentityDepthPacking } from '../../constants.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebGLCubeRenderTarget } from '../WebGLCubeRenderTarget.js';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
@@ -26,6 +26,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		_viewport = new Vector4(),
 
 		_depthMaterial = new MeshDepthMaterial(),
+		_depthMaterialVSM = new MeshDepthMaterial( { depthPacking: IdentityDepthPacking } ),
 		_distanceMaterial = new MeshDistanceMaterial(),
 
 		_materialCache = {},
@@ -98,11 +99,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		if ( _state.buffers.depth.getReversed() === true ) {
 
-			_state.buffers.color.setClear( 1, 1, 1, 1 );
+			_state.buffers.color.setClear( 0, 0, 0, 0 );
 
 		} else {
 
-			_state.buffers.color.setClear( 0, 0, 0, 0 );
+			_state.buffers.color.setClear( 1, 1, 1, 1 );
 
 		}
 
@@ -370,7 +371,15 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		} else {
 
-			result = ( light.isPointLight === true ) ? _distanceMaterial : _depthMaterial;
+			if ( type === VSMShadowMap ) {
+
+				result = _depthMaterialVSM;
+
+			} else {
+
+				result = ( light.isPointLight === true ) ? _distanceMaterial : _depthMaterial;
+
+			}
 
 			if ( ( renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
 				( material.displacementMap && material.displacementScale !== 0 ) ||

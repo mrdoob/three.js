@@ -32,7 +32,7 @@ void main() {
 
 		#else
 
-			float depth = 1.0 - texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ).r;
+			float depth = texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ).r;
 			mean += depth;
 			squared_mean += depth * depth;
 
