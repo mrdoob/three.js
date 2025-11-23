@@ -20,9 +20,10 @@ class IESSpotLightNode extends SpotLightNode {
 	 *
 	 * @param {NodeBuilder} builder - The node builder.
 	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
+	 * @param {Node<float>} azimuthAngle - The azimuthal angle
 	 * @return {Node<float>} The spot attenuation.
 	 */
-	getSpotAttenuation( builder, angleCosine ) {
+	getSpotAttenuation( builder, angleCosine, azimuthAngle ) {
 
 		const iesMap = this.light.iesMap;
 
@@ -30,13 +31,14 @@ class IESSpotLightNode extends SpotLightNode {
 
 		if ( iesMap && iesMap.isTexture === true ) {
 
-			const angle = angleCosine.acos().mul( 1.0 / Math.PI );
+			const inclinationNormalized = angleCosine.acos().mul( 1.0 / Math.PI );
+			const azimuthNormalized = azimuthAngle.mul( 1.0 / ( 2 * Math.PI ) );
 
-			spotAttenuation = texture( iesMap, vec2( angle, 0 ), 0 ).r;
+			spotAttenuation = texture( iesMap, vec2( azimuthNormalized, inclinationNormalized ), 0 ).r;
 
 		} else {
 
-			spotAttenuation = super.getSpotAttenuation( angleCosine );
+			spotAttenuation = super.getSpotAttenuation( angleCosine, azimuthAngle );
 
 		}
 
