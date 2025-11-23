@@ -17,8 +17,8 @@
 
 			<small>
 				Ambient Occlusion based on GTAO.<br />
-				<a href="https://skfb.ly/oCnNx" target="_blank" rel="noopener">Minimalistic Modern Bedroom</a> by 
-				<a href="https://sketchfab.com/dylanheyes" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.	
+				<a href="https://skfb.ly/oCnNx" target="_blank" rel="noopener">Minimalistic Modern Bedroom</a> by
+				<a href="https://sketchfab.com/dylanheyes" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.
 			</small>
 		</div>
 
@@ -149,6 +149,7 @@
 				// final output + traa
 
 				traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
+				traaPass.useSubpixelCorrection = false;
 
 				postProcessing.outputNode = traaPass;
 
