@@ -46,6 +46,20 @@ export class ASTNode {
 
 	}
 
+	getProgram() {
+
+		let current = this;
+
+		while ( current.parent !== null ) {
+
+			current = current.parent;
+
+		}
+
+		return current.isProgram === true ? current : null;
+
+	}
+
 	getParent( parents = [] ) {
 
 		if ( this.parent === null ) {
@@ -114,6 +128,7 @@ export class Program extends ASTNode {
 		super();
 
 		this.body = body;
+		this.structTypes = new Map();
 
 		this.isProgram = true;
 
@@ -623,6 +638,35 @@ export class SwitchCase extends ASTNode {
 
 		this.isDefault = conditions === null ? true : false;
 		this.isSwitchCase = true;
+
+		this.initialize();
+
+	}
+
+}
+
+// helper class for StructDefinition
+export class StructMember {
+
+	constructor( type, name ) {
+
+		this.type = type;
+		this.name = name;
+		this.isStructMember = true;
+
+	}
+
+}
+
+export class StructDefinition extends ASTNode {
+
+	constructor( name, members = [] ) {
+
+		super();
+
+		this.name = name;
+		this.members = members;
+		this.isStructDefinition = true;
 
 		this.initialize();
 

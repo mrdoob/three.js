@@ -35,6 +35,7 @@ import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearF
 import { float, vec3, vec4 } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
 import { highpModelNormalViewMatrix, highpModelViewMatrix } from '../../nodes/accessors/ModelNode.js';
+import { context } from '../../nodes/core/ContextNode.js';
 import { error, warn, warnOnce } from '../../utils.js';
 
 const _scene = /*@__PURE__*/ new Scene();
@@ -222,17 +223,13 @@ class Renderer {
 		this.info = new Info();
 
 		/**
-		 * Stores override nodes for specific transformations or calculations.
+		 * A global context node that stores override nodes for specific transformations or calculations.
 		 * These nodes can be used to replace default behavior in the rendering pipeline.
 		 *
-		 * @type {Object}
-		 * @property {?Node} modelViewMatrix - An override node for the model-view matrix.
-		 * @property {?Node} modelNormalViewMatrix - An override node for the model normal view matrix.
+		 * @type {ContextNode}
+		 * @property {Object} value - The context value object.
 		 */
-		this.overrideNodes = {
-			modelViewMatrix: null,
-			modelNormalViewMatrix: null
-		};
+		this.contextNode = context();
 
 		/**
 		 * The node library defines how certain library objects like materials, lights
@@ -1031,15 +1028,17 @@ class Renderer {
 	 */
 	set highPrecision( value ) {
 
+		const contextNodeData = this.contextNode.value;
+
 		if ( value === true ) {
 
-			this.overrideNodes.modelViewMatrix = highpModelViewMatrix;
-			this.overrideNodes.modelNormalViewMatrix = highpModelNormalViewMatrix;
+			contextNodeData.modelViewMatrix = highpModelViewMatrix;
+			contextNodeData.modelNormalViewMatrix = highpModelNormalViewMatrix;
 
 		} else if ( this.highPrecision ) {
 
-			this.overrideNodes.modelViewMatrix = null;
-			this.overrideNodes.modelNormalViewMatrix = null;
+			delete contextNodeData.modelViewMatrix;
+			delete contextNodeData.modelNormalViewMatrix;
 
 		}
 
@@ -1053,7 +1052,9 @@ class Renderer {
 	 */
 	get highPrecision() {
 
-		return this.overrideNodes.modelViewMatrix === highpModelViewMatrix && this.overrideNodes.modelNormalViewMatrix === highpModelNormalViewMatrix;
+		const contextNodeData = this.contextNode.value;
+
+		return contextNodeData.modelViewMatrix === highpModelViewMatrix && contextNodeData.modelNormalViewMatrix === highpModelNormalViewMatrix;
 
 	}
 

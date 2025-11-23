@@ -15,8 +15,8 @@
 			<header>
 				<div class="class-description"><p>Represents a skydome for scene backgrounds. Based on <a href="https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight" target="_blank" rel="noopener">A Practical Analytic Model for Daylight</a>
 aka The Preetham Model, the de facto standard for analytical skydomes.</p>
-<p>Note that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.
-When using <a href="WebGPURenderer.html">WebGPURenderer</a>, use <a href="SkyMesh.html">SkyMesh</a>.</p>
+<p>Note that this class can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.
+When using <a href="WebGLRenderer.html">WebGLRenderer</a>, use <a href="Sky.html">Sky</a>.</p>
 <p>More references:</p>
 <ul>
 <li><a href="http://simonwallner.at/project/atmospheric-scattering/" target="_blank" rel="noopener">http://simonwallner.at/project/atmospheric-scattering/</a></li>
@@ -44,6 +44,16 @@ scene.add( sky );
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
 					<h3 class="name" id="isSky" translate="no">.<a href="#isSky">isSky</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> Use isSkyMesh instead.</dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isSkyMesh" translate="no">.<a href="#isSkyMesh">isSkyMesh</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
 						<p>Default is <code>true</code>.</p>

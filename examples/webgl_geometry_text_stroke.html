@@ -53,6 +53,7 @@
 				new THREE.FileLoader()
 					.setResponseType( 'arraybuffer' )
 					.load( 'fonts/MPLUSRounded1c/MPLUSRounded1c-Regular.typeface.json.zip', function ( data ) {
+
 						const zip = unzipSync( new Uint8Array( data ) );
 						const strArray = strFromU8( new Uint8Array( zip[ 'MPLUSRounded1c-Regular.typeface.json' ].buffer ) );
 
@@ -101,7 +102,7 @@
 
 						render();
 
-				} ); //end load function
+					} ); //end load function
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -118,7 +119,7 @@
 
 			} // end init
 
-			function generateStrokeText(font, material, message, size, direction = 'ltr') {
+			function generateStrokeText( font, material, message, size, direction = 'ltr' ) {
 
 				const shapes = font.generateShapes( message, size, direction );
 
@@ -138,7 +139,7 @@
 
 				text.position.z = - 150;
 
-				strokeText.add(text);
+				strokeText.add( text );
 
 				// make line shape ( N.B. edge view remains visible )
 

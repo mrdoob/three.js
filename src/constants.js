@@ -908,6 +908,38 @@ export const RGB_ETC2_Format = 37492;
 export const RGBA_ETC2_EAC_Format = 37496;
 
 /**
+ * EAC R11 UNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const R11_EAC_Format = 37488; // 0x9270
+
+/**
+ * EAC R11 SNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const SIGNED_R11_EAC_Format = 37489; // 0x9271
+
+/**
+ * EAC RG11 UNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const RG11_EAC_Format = 37490; // 0x9272
+
+/**
+ * EAC RG11 SNORM format.
+ *
+ * @type {number}
+ * @constant
+ */
+export const SIGNED_RG11_EAC_Format = 37491; // 0x9273
+
+/**
  * ASTC RGBA 4x4 format.
  *
  * @type {number}
@@ -1191,7 +1223,7 @@ export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
 
 /**
- * Basic depth packing.
+ * The depth value is inverted (1.0 - z) for visualization purposes.
  *
  * @type {number}
  * @constant
@@ -1199,7 +1231,7 @@ export const TriangleFanDrawMode = 2;
 export const BasicDepthPacking = 3200;
 
 /**
- * A depth value is packed into 32 bit RGBA.
+ * The depth value is packed into 32 bit RGBA.
  *
  * @type {number}
  * @constant
@@ -1207,7 +1239,7 @@ export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 
 /**
- * A depth value is packed into 24 bit RGB.
+ * The depth value is packed into 24 bit RGB.
  *
  * @type {number}
  * @constant
@@ -1215,12 +1247,20 @@ export const RGBADepthPacking = 3201;
 export const RGBDepthPacking = 3202;
 
 /**
- * A depth value is packed into 16 bit RG.
+ * The depth value is packed into 16 bit RG.
  *
  * @type {number}
  * @constant
  */
 export const RGDepthPacking = 3203;
+
+/**
+ * The depth value is not packed.
+ *
+ * @type {number}
+ * @constant
+ */
+export const IdentityDepthPacking = 3204;
 
 /**
  * Normal information is relative to the underlying surface.
@@ -1279,6 +1319,30 @@ export const LinearTransfer = 'linear';
  * @constant
  */
 export const SRGBTransfer = 'srgb';
+
+/**
+ * No normal map packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NoNormalPacking = '';
+
+/**
+ * Normal RG packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NormalRGPacking = 'rg';
+
+/**
+ * Normal GA packing.
+ *
+ * @type {string}
+ * @constant
+ */
+export const NormalGAPacking = 'ga';
 
 /**
  * Sets the stencil buffer value to `0`.

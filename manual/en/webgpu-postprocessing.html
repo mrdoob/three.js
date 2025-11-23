@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Post-Processing with WebGPURenderer</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Post-Processing with WebGPURenderer">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "../../build/three.module.js"
+      }
+    }
+    </script>
+    </head>
+    <body>
+      <div class="container">
+        <div class="lesson-title">
+          <h1>Post-Processing with WebGPURenderer</h1>
+        </div>
+        <div class="lesson">
+          <div class="lesson-main">
+            
+            <p>
+              `WebGPURenderer` comes with a brand-new component for post-processing. This article shows how the new system 
+              works and provides some basic guidelines about the usage.
+            </p>
+
+            <h2>Overview</h2>
+
+             <p>
+              The previous post-processing for `WebGLRenderer` had many conceptual issues. Making use of Multiple Render Targets 
+              (MRT) was cumbersome due to the limited support in the renderer and there was no automatic pass/effect combination
+              to improve the overall performance.
+            </p>
+
+            <p>
+              The new post-processing stack for `WebGPURenderer` was designed to support these use cases right from the beginning.
+            </p>
+            <ul>
+              <li>
+                `WebGPURenderer` and `PostProcessing` come with full, built-in MRT support.
+              </li>
+              <li>
+                The system combines effects if possible which reduces the overall number of render passes.
+              </li>
+              <li>
+                The effect chain is expressed as a node composition which allows a more flexible effect setup.
+              </li>
+            </ul>
+            <p>
+               Let's find out how to integrate `PostProcessing` in three.js applications.
+            </p>
+
+            <h2>Basics</h2>
+
+            <p>
+              First, please read the instructions in the guide about <a href="webgpurenderer">WebGPURenderer</a> to correctly configure your 
+              imports. After that, you can create an instance of the post-processing module like so.
+            </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const postProcessing = new THREE.PostProcessing( renderer );
+</pre>
+
+            <p>
+              The instance of `PostProcessing` replaces the previous instance of `EffectComposer`. To make sure you actually
+              use the output of the module, you have to update your animation loop like so:
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+-  renderer.render( scene, camera );
++  postProcessing.render();
+</pre>
+
+            <p>
+             Many post-processing setups start with a so called "scene pass" or "beauty pass" that represents the image of you rendered scene.
+             This image should be subsequently enhanced by different effects like Bloom, Depth-of-Field or SSR. Start by importing the `pass()` TSL 
+             function from the TSL namespace and use it to create the pass.
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { pass } from 'three/tsl';
+
+// in your init routine
+
+const scenePass = pass( scene, camera );
+</pre>
+            <p>
+             The basic idea of the node system is to represent materials or post-processing effects as node compositions. To configure a basic 
+             Dotscreen and RGB shift effect, you create effect nodes with TSL functions and compose them together.
+            </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { pass } from 'three/tsl';
++  import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
++  import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';
+
+// in your init routine
+
+const scenePass = pass( scene, camera );
+
++  const dotScreenPass = dotScreen( scenePass );
++  const rgbShiftPass = rgbShift( dotScreenPass );
+</pre>
+
+            <p>
+            When you are done, you can simply assign the final node to the `PostProcessing` instance.
+            </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+postProcessing.outputNode = rgbShiftPass;
+</pre>
+
+            <h2>Tone Mapping and Color Spaces</h2>
+
+            <p>
+            When using post-processing, tone mapping and color space conversion are automatically applied at the end 
+            of your effect chain. Sometimes you want full control over how and when these steps are executed though.
+            For example if you want to apply FXAA with `FXAANode` or color grading with `Lut3DNode`, you can disable automatic tone 
+            mapping and color space conversion and apply it via `renderOutput()` by yourself.
+            </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { pass, renderOutput } from 'three/tsl';
+import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+
+// in your init routine
+
+const postProcessing = new THREE.PostProcessing( renderer );
+postProcessing.outputColorTransform = false; // disable default output color transform
+
+const scenePass = pass( scene, camera );
+const outputPass = renderOutput( scenePass ); // apply tone mapping and color space conversion here
+
+// FXAA must be computed in sRGB color space
+
+const fxaaPass = fxaa( outputPass );
+postProcessing.outputNode = fxaaPass;
+</pre>
+
+          <p>
+            It is not mandatory to use `renderOutput()`, you can also implement a custom tone mapping and color space conversion
+            based on your requirements.
+          </p>
+
+          <h2>MRT</h2>
+
+          <p>
+            The new post-processing stack has built-in Multiple Render Targets (MRT) support which is crucial for more advanced
+            setups. MRT allows you to produce multiple outputs in a single render pass. So for example when rendering your scene 
+            with TRAA, you need below setup to prepare the inputs for the anti-aliasing.
+          </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { pass, mrt, output, velocity } from 'three/tsl';
+
+// in your init routine
+
+const scenePass = pass( scene, camera );
+scenePass.setMRT( mrt( {
+  output: output,
+  velocity: velocity
+} ) );
+</pre>
+          <p>
+            The configuration object you assign to the `mrt()` TSL function describes the different outputs of the pass. In this case,
+            we save the default output (the scene's beauty) and scene's velocity since we want to setup a TRAA. If you also require 
+            the scene's depth, there is no need to configure it as a MRT output. You get it for free in your default output pass if 
+            you request it in your app. If you know want to use these outputs in subsequent effects, you can query them as texture nodes.
+          </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+// in your init routine
+
+const scenePassColor = scenePass.getTextureNode( 'output' );
+const scenePassDepth = scenePass.getTextureNode( 'depth' );
+const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
+
+const traaPass = traa( scenePassColor, scenePassDepth, scenePassVelocity, camera );
+postProcessing.outputNode = traaPass;
+</pre>
+
+          <p>
+           The MRT configuration varies depending on your setup. There are many different TSL objects like `output`, `velocity`,
+           `normalView` or `emissive` than you can use to save per-fragment data in MRT attachments. To improve performance and avoid
+           hitting memory restrictions, it's important to pack and optimize your data in complex MRT setups. By default all attachments 
+           are RGBA16 (Half-Float) in precision which is not necessary for all types of data. As an example, below code queries the 
+           `diffuseColor` attachment and sets its format to RGBA8 which cuts down the memory and bandwidth by half.
+          </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
+diffuseTexture.type = THREE.UnsignedByteType;
+</pre> 
+
+          <p>
+            Below setup for Scree-Space Reflections (SSR) converts the default FP16 normals into RGBA8 colors and packs metalness/roughness 
+            into a single attachment. The usage of the `sample()` TSL functions allows to implement custom unpacking. In this instance, it
+            converts the color back to a (normalized) direction vector.
+          </p>
+
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+scenePass.setMRT( mrt( {
+  output: output,
+  normal: directionToColor( normalView ),
+  metalrough: vec2( metalness, roughness )
+} ) );
+
+// use RGBA8 instead of RGBA16
+
+const normalTexture = scenePass.getTexture( 'normal' );
+normalTexture.type = THREE.UnsignedByteType;
+
+const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+metalRoughTexture.type = THREE.UnsignedByteType;
+
+// custom unpacking. use the resulting "sceneNormal" instead of "scenePassNormal"
+// in subsequent effects
+
+const sceneNormal = sample( ( uv ) => {
+
+  return colorToDirection( scenePassNormal.sample( uv ) );
+
+} );
+</pre>
+
+          <p>
+            We want to further improve the packing/unpacking features in the future to offer more ways to pack/unpack MRT data. In the meanwhile,
+            please have a look at the <a href="https://threejs.org/examples/?q=webgpu%20postprocessing" target="_blank">official examples</a> to
+            get an overview about the existing effects and setups.
+          </p>
+          </div>
+        </div>
+      </div>
+
+    <script src="../resources/prettify.js"></script>
+    <script src="../resources/lesson.js"></script>
+  </body>
+</html>
