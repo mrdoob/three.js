@@ -163,8 +163,18 @@
 
 				// scene context
 
+				const sssSample = sssPass.getTextureNode().sample( screenUV ).r;
+
 				const sssContext = context( {
-					sss: sssPass.getTextureNode().sample( screenUV ).r
+
+					getSSS: ( light ) => {
+
+						if ( light === dirLight ) return sssSample;
+
+						return null;
+
+					}
+
 				} );
 
 				scenePass.contextNode = sssContext;
