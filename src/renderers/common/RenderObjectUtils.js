@@ -82,7 +82,7 @@ export function getGeometryCacheKey( geometry ) {
 
 }
 
-export function getProgramCacheKey( object, material, renderer, clippingContext = null ) {
+export function getProgramCacheKey( object, material, renderer, context, clippingContext = null ) {
 
 	let cacheKey = material.customProgramCacheKey();
 
@@ -181,6 +181,8 @@ export function getProgramCacheKey( object, material, renderer, clippingContext 
 		cacheKey += object.uuid + ',';
 
 	}
+
+	cacheKey += context.id + ',';
 
 	cacheKey += object.receiveShadow + ',';
 
