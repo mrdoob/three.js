@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Cosmic Particle Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        button {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .slider-container {
+            margin: 10px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="info">
+        <h2>Cosmic Particle System</h2>
+        <p>Click and drag to rotate the camera</p>
+        <p>Scroll to zoom in/out</p>
+    </div>
+    
+    <div id="controls">
+        <h3>Controls</h3>
+        <button onclick="toggleAnimation()">Pause/Resume</button>
+        <button onclick="changeParticleColor()">Change Colors</button>
+        <button onclick="resetCamera()">Reset Camera</button>
+        
+        <div class="slider-container">
+            <label for="particleCount">Particle Count: <span id="countDisplay">5000</span></label>
+            <input type="range" id="particleCount" min="1000" max="20000" value="5000" oninput="updateParticleCount(this.value)">
+        </div>
+        
+        <div class="slider-container">
+            <label for="speed">Animation Speed: <span id="speedDisplay">1.0</span></label>
+            <input type="range" id="speed" min="0" max="2" step="0.1" value="1.0" oninput="updateSpeed(this.value)">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        let scene, camera, renderer, particles, particleSystem;
+        let mouseX = 0, mouseY = 0;
+        let windowHalfX = window.innerWidth / 2;
+        let windowHalfY = window.innerHeight / 2;
+        let animationId;
+        let isAnimating = true;
+        let animationSpeed = 1.0;
+        let currentColorScheme = 0;
+
+        const colorSchemes = [
+            { primary: 0x00ff88, secondary: 0x0088ff },
+            { primary: 0xff0088, secondary: 0x8800ff },
+            { primary: 0xffff00, secondary: 0xff8800 },
+            { primary: 0x00ffff, secondary: 0x0088ff }
+        ];
+
+        init();
+        animate();
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000011);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 100;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+
+            // Create particle system
+            createParticleSystem(5000);
+
+            // Event listeners
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('mousemove', onDocumentMouseMove);
+            document.addEventListener('wheel', onDocumentMouseWheel);
+
+            // Add some floating objects for visual interest
+            createFloatingObjects();
+        }
+
+        function createParticleSystem(count) {
+            if (particleSystem) {
+                scene.remove(particleSystem);
+                particleSystem.geometry.dispose();
+                particleSystem.material.dispose();
+            }
+
+            const particles = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            const sizes = new Float32Array(count);
+
+            const colorScheme = colorSchemes[currentColorScheme];
+
+            for (let i = 0; i < count * 3; i += 3) {
+                // Random positions in a sphere
+                const radius = Math.random() * 50 + 10;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+
+                positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                positions[i + 2] = radius * Math.cos(phi);
+
+                // Colors
+                const colorMix = Math.random();
+                colors[i] = ((colorScheme.primary >> 16) & 255) / 255 * colorMix + ((colorScheme.secondary >> 16) & 255) / 255 * (1 - colorMix);
+                colors[i + 1] = ((colorScheme.primary >> 8) & 255) / 255 * colorMix + ((colorScheme.secondary >> 8) & 255) / 255 * (1 - colorMix);
+                colors[i + 2] = (colorScheme.primary & 255) / 255 * colorMix + (colorScheme.secondary & 255) / 255 * (1 - colorMix);
+
+                // Sizes
+                sizes[i / 3] = Math.random() * 2 + 0.5;
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+
+            particleSystem = new THREE.Points(particles, particleMaterial);
+            scene.add(particleSystem);
+        }
+
+        function createFloatingObjects() {
+            // Add some geometric objects for visual variety
+            const geometries = [
+                new THREE.TorusGeometry(15, 5, 16, 100),
+                new THREE.OctahedronGeometry(12, 0),
+                new THREE.IcosahedronGeometry(10, 0)
+            ];
+
+            geometries.forEach((geometry, index) => {
+                const material = new THREE.MeshPhongMaterial({
+                    color: colorSchemes[currentColorScheme].primary,
+                    transparent: true,
+                    opacity: 0.3,
+                    wireframe: true
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.x = (index - 1) * 25;
+                mesh.rotation.x = Math.random() * Math.PI;
+                mesh.rotation.y = Math.random() * Math.PI;
+                scene.add(mesh);
+            });
+        }
+
+        function animate() {
+            if (isAnimating) {
+                animationId = requestAnimationFrame(animate);
+
+                // Rotate particle system
+                if (particleSystem) {
+                    particleSystem.rotation.x += 0.001 * animationSpeed;
+                    particleSystem.rotation.y += 0.002 * animationSpeed;
+
+                    // Pulsating effect
+                    const scale = 1 + Math.sin(Date.now() * 0.001) * 0.1;
+                    particleSystem.scale.set(scale, scale, scale);
+                }
+
+                // Camera movement based on mouse
+                camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+                camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.05;
+                camera.lookAt(scene.position);
+
+                // Animate floating objects
+                scene.children.forEach(child => {
+                    if (child instanceof THREE.Mesh && child !== particleSystem) {
+                        child.rotation.x += 0.01 * animationSpeed;
+                        child.rotation.y += 0.005 * animationSpeed;
+                    }
+                });
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onDocumentMouseMove(event) {
+            mouseX = (event.clientX - windowHalfX) / 100;
+            mouseY = (event.clientY - windowHalfY) / 100;
+        }
+
+        function onDocumentMouseWheel(event) {
+            camera.position.z += event.deltaY * 0.1;
+            camera.position.z = Math.max(10, Math.min(200, camera.position.z));
+        }
+
+        // Control functions
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            if (isAnimating) {
+                animate();
+            } else {
+                cancelAnimationFrame(animationId);
+            }
+        }
+
+        function changeParticleColor() {
+            currentColorScheme = (currentColorScheme + 1) % colorSchemes.length;
+            createParticleSystem(parseInt(document.getElementById('particleCount').value));
+            
+            // Update floating objects colors
+            scene.children.forEach(child => {
+                if (child instanceof THREE.Mesh && child !== particleSystem) {
+                    child.material.color.setHex(colorSchemes[currentColorScheme].primary);
+                }
+            });
+        }
+
+        function resetCamera() {
+            camera.position.set(0, 0, 100);
+            camera.lookAt(scene.position);
+        }
+
+        function updateParticleCount(count) {
+            document.getElementById('countDisplay').textContent = count;
+            createParticleSystem(parseInt(count));
+        }
+
+        function updateSpeed(speed) {
+            animationSpeed = parseFloat(speed);
+            document.getElementById('speedDisplay').textContent = speed;
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', onWindowResize);
+    </script>
+</body>
+</html>
