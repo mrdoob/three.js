@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cosmic Particles</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            pointer-events: none;
+        }
+        
+        a {
+            color: #8FF;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        Cosmic Particle Animation<br/>
+        Move mouse to rotate camera | Scroll to zoom
+    </div>
+
+    <script type="module">
+        import * as THREE from './jsm/build/three.module.js';
+        import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+        let scene, camera, renderer, particles, particleSystem;
+        let mouseX = 0, mouseY = 0;
+        let windowHalfX = window.innerWidth / 2;
+        let windowHalfY = window.innerHeight / 2;
+
+        // Use a fixed seed for consistent results in tests
+        Math.seed = 12345;
+        Math.seededRandom = function() {
+            Math.seed = (Math.seed * 9301 + 49297) % 233280;
+            return Math.seed / 233280;
+        };
+
+        init();
+        animate();
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000011);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 100;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+
+            // Controls
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Create particle system
+            createParticleSystem(5000);
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createParticleSystem(count) {
+            const particles = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            const sizes = new Float32Array(count);
+
+            const color1 = new THREE.Color(0x00ff88);
+            const color2 = new THREE.Color(0x0088ff);
+
+            for (let i = 0; i < count * 3; i += 3) {
+                // Use seeded random for consistent results
+                const radius = Math.seededRandom() * 50 + 10;
+                const theta = Math.seededRandom() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.seededRandom() - 1);
+
+                positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                positions[i + 2] = radius * Math.cos(phi);
+
+                // Colors
+                const colorMix = Math.seededRandom();
+                colors[i] = color1.r * colorMix + color2.r * (1 - colorMix);
+                colors[i + 1] = color1.g * colorMix + color2.g * (1 - colorMix);
+                colors[i + 2] = color1.b * colorMix + color2.b * (1 - colorMix);
+
+                // Sizes
+                sizes[i / 3] = Math.seededRandom() * 2 + 0.5;
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+
+            particleSystem = new THREE.Points(particles, particleMaterial);
+            scene.add(particleSystem);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Slow, consistent rotation for tests
+            if (particleSystem) {
+                particleSystem.rotation.x += 0.001;
+                particleSystem.rotation.y += 0.002;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+    </script>
+</body>
+</html>
