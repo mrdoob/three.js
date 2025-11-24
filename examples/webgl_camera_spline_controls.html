@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - spline camera controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			#info {
+				background-color: rgba(0, 0, 0, 0.8);
+				padding: 10px;
+			}
+			#controls {
+				position: absolute;
+				top: 60px;
+				left: 10px;
+				background-color: rgba(0, 0, 0, 0.8);
+				padding: 10px;
+				color: white;
+				font-family: monospace;
+			}
+			button {
+				margin: 5px;
+				padding: 8px 16px;
+				font-size: 14px;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - spline camera controls<br/>
+			Camera follows a curved path automatically
+		</div>
+
+		<div id="controls">
+			<button id="play">Play</button>
+			<button id="pause">Pause</button>
+			<button id="reset">Reset</button>
+			<br/>
+			<label>Speed: <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1.0"></label>
+			<span id="speedValue">1.0x</span>
+			<br/>
+			<label><input type="checkbox" id="loop" checked> Loop</label>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { SplineCameraControls } from 'three/addons/controls/SplineCameraControls.js';
+
+			let camera, scene, renderer, controls, clock;
+
+			init();
+
+			function init() {
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
+				scene.fog = new THREE.Fog( 0x050505, 200, 1000 );
+
+				// Camera
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+				// Define a curved path through 3D space
+				const points = [
+					new THREE.Vector3( 0, 5, 50 ),
+					new THREE.Vector3( 50, 10, 0 ),
+					new THREE.Vector3( 0, 15, -50 ),
+					new THREE.Vector3( -50, 10, 0 ),
+					new THREE.Vector3( 0, 5, 50 )
+				];
+
+				const curve = new THREE.CatmullRomCurve3( points, true );
+
+				// Spline camera controls
+				controls = new SplineCameraControls( camera, curve );
+				controls.loopTime = 20.0;  // 20 seconds for full loop
+				controls.autoPlay = true;
+				controls.loop = true;
+				controls.lookAhead = 0.02;
+
+				// Create scene content
+				createScene();
+
+				// Visualize the curve path
+				const curveGeometry = new THREE.BufferGeometry().setFromPoints( curve.getPoints( 100 ) );
+				const curveMaterial = new THREE.LineBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+				const curveLine = new THREE.Line( curveGeometry, curveMaterial );
+				scene.add( curveLine );
+
+				// Renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				// Clock for delta time
+				clock = new THREE.Clock();
+
+				// UI event listeners
+				document.getElementById( 'play' ).addEventListener( 'click', () => controls.play() );
+				document.getElementById( 'pause' ).addEventListener( 'click', () => controls.pause() );
+				document.getElementById( 'reset' ).addEventListener( 'click', () => controls.reset() );
+
+				document.getElementById( 'speed' ).addEventListener( 'input', ( e ) => {
+					controls.playbackSpeed = parseFloat( e.target.value );
+					document.getElementById( 'speedValue' ).textContent = e.target.value + 'x';
+				} );
+
+				document.getElementById( 'loop' ).addEventListener( 'change', ( e ) => {
+					controls.loop = e.target.checked;
+				} );
+
+				// Window resize
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function createScene() {
+
+				// Ground plane
+				const groundGeometry = new THREE.PlaneGeometry( 200, 200, 20, 20 );
+				const groundMaterial = new THREE.MeshBasicMaterial( {
+					color: 0x333333,
+					wireframe: true,
+					transparent: true,
+					opacity: 0.3
+				} );
+				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
+				ground.rotation.x = - Math.PI / 2;
+				scene.add( ground );
+
+				// Add some geometric shapes along the path
+				const geometry = new THREE.BoxGeometry( 5, 5, 5 );
+
+				for ( let i = 0; i < 20; i ++ ) {
+
+					const material = new THREE.MeshBasicMaterial( {
+						color: new THREE.Color().setHSL( i / 20, 1.0, 0.5 ),
+						wireframe: true
+					} );
+					const mesh = new THREE.Mesh( geometry, material );
+
+					const angle = ( i / 20 ) * Math.PI * 2;
+					mesh.position.x = Math.cos( angle ) * 30;
+					mesh.position.y = 5 + Math.sin( i ) * 3;
+					mesh.position.z = Math.sin( angle ) * 30;
+
+					scene.add( mesh );
+
+				}
+
+				// Lighting
+				const ambientLight = new THREE.AmbientLight( 0x404040 );
+				scene.add( ambientLight );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight.position.set( 1, 1, 1 );
+				scene.add( directionalLight );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const delta = clock.getDelta();
+				controls.update( delta );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
