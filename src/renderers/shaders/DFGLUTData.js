@@ -50,6 +50,7 @@ export function getDFGLUT() {
 	if ( lut === null ) {
 
 		lut = new DataTexture( DATA, 32, 32, RGFormat, HalfFloatType );
+		lut.name = 'DFG_LUT';
 		lut.minFilter = LinearFilter;
 		lut.magFilter = LinearFilter;
 		lut.wrapS = ClampToEdgeWrapping;

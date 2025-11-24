@@ -22,7 +22,13 @@ const glslMethods = {
 	bitcast_uint_float: 'uintBitsToFloat',
 	bitcast_float_uint: 'floatBitsToUint',
 	bitcast_uint_int: 'tsl_bitcast_uint_to_int',
-	bitcast_int_uint: 'tsl_bitcast_int_to_uint'
+	bitcast_int_uint: 'tsl_bitcast_int_to_uint',
+	floatpack_snorm_2x16: 'packSnorm2x16',
+	floatpack_unorm_2x16: 'packUnorm2x16',
+	floatpack_float16_2x16: 'packHalf2x16',
+	floatunpack_snorm_2x16: 'unpackSnorm2x16',
+	floatunpack_unorm_2x16: 'unpackUnorm2x16',
+	floatunpack_float16_2x16: 'unpackHalf2x16'
 };
 
 const precisionLib = {
@@ -181,6 +187,30 @@ class GLSLNodeBuilder extends NodeBuilder {
 	getBitcastMethod( type, inputType ) {
 
 		return this.getMethod( `bitcast_${ inputType }_${ type }` );
+
+	}
+
+	/**
+	 * Returns the float packing method name for a given numeric encoding.
+	 *
+	 * @param {string} encoding - The numeric encoding that describes how the float values are mapped to the integer range.
+	 * @returns {string} The resolved GLSL float packing method name.
+	 */
+	getFloatPackingMethod( encoding ) {
+
+		return this.getMethod( `floatpack_${ encoding }_2x16` );
+
+	}
+
+	/**
+	 * Returns the float unpacking method name for a given numeric encoding.
+	 *
+	 * @param {string} encoding - The numeric encoding that describes how the integer values are mapped to the float range.
+	 * @returns {string} The resolved GLSL float unpacking method name.
+	 */
+	getFloatUnpackingMethod( encoding ) {
+
+		return this.getMethod( `floatunpack_${ encoding }_2x16` );
 
 	}
 

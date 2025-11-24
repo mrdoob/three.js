@@ -103,7 +103,7 @@ class PMREMGenerator {
 	 * @param {number} [far=100] - The far plane distance.
 	 * @param {Object} [options={}] - The configuration options.
 	 * @param {number} [options.size=256] - The texture size of the PMREM.
-	 * @param {Vector3} [options.renderTarget=origin] - The position of the internal cube camera that renders the scene.
+	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
 	 * @return {WebGLRenderTarget} The resulting PMREM.
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, options = {} ) {
@@ -314,6 +314,7 @@ class PMREMGenerator {
 			( { lodMeshes: this._lodMeshes, sizeLods: this._sizeLods, sigmas: this._sigmas } = _createPlanes( _lodMax ) );
 
 			this._blurMaterial = _getBlurShader( _lodMax, width, height );
+			this._ggxMaterial = _getGGXShader( _lodMax, width, height );
 
 		}
 
@@ -519,14 +520,6 @@ class PMREMGenerator {
 		const renderer = this._renderer;
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
-		if ( this._ggxMaterial === null ) {
-
-			const width = 3 * Math.max( this._cubeSize, 16 );
-			const height = 4 * this._cubeSize;
-			this._ggxMaterial = _getGGXShader( this._lodMax, width, height );
-
-		}
-
 		const ggxMaterial = this._ggxMaterial;
 		const ggxMesh = this._lodMeshes[ lodOut ];
 		ggxMesh.material = ggxMaterial;
@@ -539,7 +532,7 @@ class PMREMGenerator {
 		const incrementalRoughness = Math.sqrt( targetRoughness * targetRoughness - sourceRoughness * sourceRoughness );
 
 		// Apply blur strength mapping for better quality across the roughness range
-		const blurStrength = 0.05 + targetRoughness * 0.95;
+		const blurStrength = 0.0 + targetRoughness * 1.25;
 		const adjustedRoughness = incrementalRoughness * blurStrength;
 
 		// Calculate viewport position based on output LOD level

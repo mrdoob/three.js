@@ -152,11 +152,22 @@ class WebGPUPipelineUtils {
 
 				const colorFormat = utils.getTextureFormatGPU( textures[ i ] );
 
-				targets.push( {
-					format: colorFormat,
-					blend: blending,
-					writeMask: colorWriteMask
-				} );
+				if ( i === 0 ) {
+
+					targets.push( {
+						format: colorFormat,
+						blend: blending,
+						writeMask: colorWriteMask
+					} );
+
+				} else {
+
+					targets.push( {
+						format: colorFormat,
+						writeMask: colorWriteMask
+					} );
+
+				}
 
 			}
 

@@ -1,11 +1,11 @@
 import {
 	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType, GPUBufferBindingType, GPUStorageTextureAccess,
-	GPUSamplerBindingType
+	GPUSamplerBindingType, GPUShaderStage
 } from './WebGPUConstants.js';
 
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
-import { error } from '../../../utils.js';
+import { isTypedArray, error } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing bindings.
@@ -70,7 +70,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					if ( binding.visibility & 4 ) {
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 
 						// compute
 
@@ -306,10 +306,47 @@ class WebGPUBindingUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
-		const buffer = binding.buffer;
-		const bufferGPU = backend.get( binding ).buffer;
+		const array = binding.buffer; // cpu
+		const buffer = backend.get( binding ).buffer; // gpu
 
-		device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
+		const updateRanges = binding.updateRanges;
+
+		if ( updateRanges.length === 0 ) {
+
+			device.queue.writeBuffer(
+				buffer,
+				0,
+				array,
+				0
+			);
+
+		} else {
+
+			const isTyped = isTypedArray( array );
+			const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
+
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+				const range = updateRanges[ i ];
+
+				const dataOffset = range.start * byteOffsetFactor;
+				const size = range.count * byteOffsetFactor;
+
+				const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
+				device.queue.writeBuffer(
+					buffer,
+					bufferOffset,
+					array,
+					dataOffset,
+					size
+				);
+
+			}
+
+			binding.clearUpdateRanges();
+
+		}
 
 	}
 
@@ -373,8 +410,29 @@ class WebGPUBindingUtils {
 
 					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
+					const visibilities = [];
+					if ( binding.visibility & GPUShaderStage.VERTEX ) {
+
+						visibilities.push( 'vertex' );
+
+					}
+
+					if ( binding.visibility & GPUShaderStage.FRAGMENT ) {
+
+						visibilities.push( 'fragment' );
+
+					}
+
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+
+						visibilities.push( 'compute' );
+
+					}
+
+					const bufferVisibility = `(${visibilities.join( ',' )})`;
+
 					const bufferGPU = device.createBuffer( {
-						label: 'bindingBuffer_' + binding.name,
+						label: `bindingBuffer${binding.id}_${binding.name}_${bufferVisibility}`,
 						size: byteLength,
 						usage: usage
 					} );

@@ -36,12 +36,13 @@ export class Style {
 	right: 15px;
 	background-color: rgba(30, 30, 36, 0.85);
 	border: 1px solid #4a4a5a54;
-	border-radius: 6px 12px 12px 6px;
+	border-radius: 12px 6px 6px 12px;
 	color: var(--text-primary);
 	cursor: pointer;
 	z-index: 1001;
 	transition: all 0.2s ease-in-out;
-	font-size: 14px;
+	/*font-size: 14px;*/
+	font-size: 15px;
 	backdrop-filter: blur(8px);
 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 	display: flex;
@@ -90,6 +91,289 @@ export class Style {
 	font-size: 0.7em;
 	margin-left: 10px;
     color: #999;
+}
+
+#builtin-tabs-container {
+	display: flex;
+	align-items: stretch;
+	gap: 0;
+	border-right: 1px solid #262636;
+	order: -1;
+}
+
+.builtin-tab-btn {
+	background: transparent;
+	border: none;
+	color: var(--text-secondary);
+	cursor: pointer;
+	padding: 8px 14px;
+	font-family: var(--font-family);
+	font-size: 13px;
+	font-weight: 600;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 32px;
+	position: relative;
+}
+
+.builtin-tab-btn svg {
+	width: 20px;
+	height: 20px;
+	stroke: currentColor;
+}
+
+.builtin-tab-btn:hover {
+	background-color: rgba(255, 255, 255, 0.08);
+	color: var(--accent-color);
+}
+
+.builtin-tab-btn:active {
+	background-color: rgba(255, 255, 255, 0.12);
+}
+
+.builtin-tab-btn.active {
+	background-color: rgba(0, 170, 255, 0.2);
+	color: var(--accent-color);
+}
+
+.builtin-tab-btn.active:hover {
+	background-color: rgba(0, 170, 255, 0.3);
+}
+
+#profiler-mini-panel {
+	position: fixed;
+	top: 60px;
+	right: 15px;
+	background-color: rgba(30, 30, 36, 0.85);
+	border: 1px solid #4a4a5a54;
+	border-radius: 8px;
+	color: var(--text-primary);
+	z-index: 9999;
+	backdrop-filter: blur(8px);
+	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+	font-family: var(--font-family);
+	font-size: 11px;
+	width: 350px;
+	max-height: calc(100vh - 100px);
+	overflow-y: auto;
+	overflow-x: hidden;
+	display: none;
+	opacity: 0;
+	transform: translateY(-10px) scale(0.98);
+	transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+	            transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#profiler-mini-panel.visible {
+	display: block;
+	opacity: 1;
+	transform: translateY(0) scale(1);
+}
+
+#profiler-mini-panel::-webkit-scrollbar {
+	width: 6px;
+}
+
+#profiler-mini-panel::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+#profiler-mini-panel::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.15);
+	border-radius: 3px;
+	transition: background 0.2s;
+}
+
+#profiler-mini-panel::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.mini-panel-content {
+	padding: 0;
+	font-size: 11px;
+	line-height: 1.5;
+	font-family: var(--font-mono);
+	letter-spacing: 0.3px;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.mini-panel-content .profiler-content {
+	display: block !important;
+	background: transparent;
+}
+
+.mini-panel-content .list-scroll-wrapper {
+	max-height: calc(100vh - 120px);
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.mini-panel-content .list-scroll-wrapper::-webkit-scrollbar {
+	width: 4px;
+}
+
+.mini-panel-content .list-scroll-wrapper::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.mini-panel-content .list-scroll-wrapper::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 2px;
+}
+
+.mini-panel-content .list-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.mini-panel-content .parameters {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	padding: 4px;
+}
+
+.mini-panel-content .list-container.parameters {
+	padding: 2px 6px 0px 6px !important;
+}
+
+.mini-panel-content .list-header {
+	display: none;
+	padding: 2px 4px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.mini-panel-content .list-item {
+	border-bottom: 1px solid rgba(74, 74, 90, 0.2);
+	transition: background-color 0.15s;
+}
+
+.mini-panel-content .list-item:last-child {
+	border-bottom: none;
+}
+
+.mini-panel-content .list-item:hover {
+	background-color: rgba(255, 255, 255, 0.04);
+}
+
+.mini-panel-content .list-item.actionable:hover {
+	background-color: rgba(255, 255, 255, 0.06);
+	cursor: pointer;
+}
+
+/* Style adjustments for lil-gui look */
+.mini-panel-content .item-row {
+	padding: 3px 8px;
+	min-height: 24px;
+}
+
+.mini-panel-content .list-item-row {
+	padding: 1px 4px;
+	gap: 8px;
+	min-height: 21px;
+	align-items: center;
+}
+
+.mini-panel-content input[type="checkbox"] {
+	width: 12px;
+	height: 12px;
+}
+
+.mini-panel-content input[type="range"] {
+	height: 18px;
+}
+
+.mini-panel-content .value-number input,
+.mini-panel-content .value-slider input {
+	background-color: rgba(0, 0, 0, 0.3);
+	border: 1px solid rgba(74, 74, 90, 0.5);
+	font-size: 10px;
+}
+
+.mini-panel-content .value-number input:focus,
+.mini-panel-content .value-slider input:focus {
+	border-color: var(--accent-color);
+}
+
+.mini-panel-content .value-slider {
+	gap: 6px;
+}
+
+/* Compact nested items */
+.mini-panel-content .list-item .list-item {
+	margin-left: 8px;
+}
+
+.mini-panel-content .list-item .list-item .item-row,
+.mini-panel-content .list-item .list-item .list-item-row {
+	padding: 2px 6px;
+	min-height: 22px;
+}
+
+/* Compact collapsible headers */
+.mini-panel-content .collapsible .item-row,
+.mini-panel-content .list-item-row.collapsible {
+	padding: 2px 8px;
+	font-weight: 600;
+	min-height: 16px;
+	display: flex;
+	align-items: center;
+}
+
+.mini-panel-content .collapsible-icon {
+	font-size: 10px;
+	width: 14px;
+	height: 14px;
+}
+
+.mini-panel-content .param-control input[type="range"] {
+	height: 12px;
+	margin-top: 1px;
+	padding-top: 5px;
+	user-select: none;
+	-webkit-user-select: none;
+	outline: none;
+}
+
+.mini-panel-content .param-control input[type="range"]::-webkit-slider-thumb {
+	width: 14px;
+	height: 14px;
+	margin-top: -5px;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.mini-panel-content .param-control input[type="range"]::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	user-select: none;
+	-moz-user-select: none;
+}
+
+.mini-panel-content .list-children-container {
+	padding-left: 0;
+}
+
+.mini-panel-content .param-control input[type="number"] {
+	flex-basis: 60px !important;
+}
+
+.mini-panel-content .param-control {
+	align-items: center;
+}
+
+.mini-panel-content .param-control select {
+	font-size: 11px;
+}
+
+.mini-panel-content .list-item-wrapper {
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 #profiler-panel {
@@ -544,6 +828,8 @@ export class Style {
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
+	user-select: none;
+	-webkit-user-select: none;
 }
 
 .profiler-content.active {
@@ -591,11 +877,16 @@ export class Style {
 	transition: background-color 0.2s;
 	gap: 10px;
 	border-bottom: none;
+	user-select: none;
+	-webkit-user-select: none;
+	min-height: 31px;
 }
 
 .list-item-wrapper {
 	margin-top: 2px;
 	margin-bottom: 2px;
+	user-select: none;
+	-webkit-user-select: none;
 }
 
 .list-item-wrapper:first-child {
@@ -613,6 +904,7 @@ export class Style {
 
 .list-item-wrapper.header-wrapper>.list-item-row>.list-item-cell:first-child {
 	font-weight: 600;
+	line-height: 1;
 }
 
 .list-item-row.collapsible,
@@ -622,6 +914,7 @@ export class Style {
 
 .list-item-row.collapsible {
 	background-color: rgba(0, 170, 255, 0.15) !important;
+	min-height: 23px;
 }
 
 .list-item-row.collapsible.alert,
@@ -648,6 +941,8 @@ export class Style {
 	white-space: pre;
 	display: flex;
 	align-items: center;
+	user-select: none;
+	-webkit-user-select: none;
 }
 
 .list-item-cell:not(:first-child) {
@@ -665,6 +960,8 @@ export class Style {
 	border-bottom: 1px solid var(--profiler-border);
 	margin-bottom: 5px;
 	gap: 10px;
+	user-select: none;
+	-webkit-user-select: none;
 }
 
 .list-item-wrapper.section-start {
@@ -716,10 +1013,11 @@ export class Style {
 .list-scroll-wrapper {
 	overflow-x: auto;
 	width: 100%;
+	user-select: none;
+	-webkit-user-select: none;
 }
 
 .list-container.parameters .list-item-row:not(.collapsible) {
-	height: 31px;
 }
 
 .graph-container {
@@ -956,6 +1254,58 @@ export class Style {
 	background: var(--profiler-header);
 	border-radius: 5px;
 	border: 1px solid var(--profiler-border);
+}
+
+/* Override .param-control styles for mini-panel-content */
+.mini-panel-content input,
+.mini-panel-content select,
+.mini-panel-content button {
+	padding: 2px 4px;
+	height: 21px;
+	line-height: 1.4;
+	padding-top: 4px;
+}
+
+.mini-panel-content .param-control input,
+.mini-panel-content .param-control select,
+.mini-panel-content .param-control button {
+	background-color: #1e1e24c2;
+}
+
+.mini-panel-content .param-control select {
+	padding: 2px 2px;
+	padding-top: 3px;
+}
+
+.mini-panel-content .param-control input[type="number"]::-webkit-outer-spin-button,
+.mini-panel-content .param-control input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.mini-panel-content .param-control input[type="number"] {
+	-moz-appearance: textfield;
+}
+
+.mini-panel-content .list-item-cell span {
+	position: relative;
+	top: 1px;
+	margin-left: 2px;
+}
+
+.mini-panel-content .custom-checkbox .checkmark {
+	width: 12px;
+	height: 12px;
+	margin-bottom: 2px;
+}
+
+.mini-panel-content .custom-checkbox .checkmark::after {
+	width: 8px;
+	height: 8px;
+}
+
+.mini-panel-content .list-container.parameters .list-item-row:not(.collapsible) {
+	margin-bottom: 2px;
 }
 
 @media screen and (max-width: 450px) and (orientation: portrait) {

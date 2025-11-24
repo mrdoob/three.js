@@ -614,7 +614,7 @@ class RenderObject {
 	 */
 	getMaterialCacheKey() {
 
-		return getProgramCacheKey( this.object, this.material, this.renderer, this.clippingContext );
+		return getProgramCacheKey( this.object, this.material, this.renderer, this.context, this.clippingContext );
 
 	}
 
@@ -711,7 +711,7 @@ class RenderObject {
 
 		}
 
-		cacheKey = hash( cacheKey, this.camera.id );
+		cacheKey = hash( cacheKey, this.camera.id, this.renderer.contextNode.id, this.renderer.contextNode.version );
 
 		return cacheKey;
 

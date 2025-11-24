@@ -12,8 +12,8 @@ import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelV
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
  * aka The Preetham Model, the de facto standard for analytical skydomes.
  *
- * Note that this class can only be used with {@link WebGLRenderer}.
- * When using {@link WebGPURenderer}, use {@link SkyMesh}.
+ * Note that this class can only be used with {@link WebGPURenderer}.
+ * When using {@link WebGLRenderer}, use {@link Sky}.
  *
  * More references:
  *
@@ -88,8 +88,18 @@ class SkyMesh extends Mesh {
 		 * @type {boolean}
 		 * @readonly
 		 * @default true
+		 * @deprecated Use isSkyMesh instead.
 		 */
-		this.isSky = true;
+		this.isSky = true; // @deprecated, r182
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSkyMesh = true;
 
 		// Varyings
 

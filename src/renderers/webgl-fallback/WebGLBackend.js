@@ -11,7 +11,7 @@ import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
-import { warnOnce, warn, error } from '../../utils.js';
+import { isTypedArray, warnOnce, warn, error } from '../../utils.js';
 import { WebGLCoordinateSystem, TimestampQuery } from '../../constants.js';
 import WebGLTimestampQueryPool from './utils/WebGLTimestampQueryPool.js';
 
@@ -268,6 +268,7 @@ class WebGLBackend extends Backend {
 
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
+		this.drawBuffersIndexedExt = this.extensions.get( 'OES_draw_buffers_indexed' );
 
 	}
 
@@ -956,6 +957,12 @@ class WebGLBackend extends Backend {
 		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
 		state.setMaterial( material, frontFaceCW, hardwareClippingPlanes );
+
+		if ( context.textures !== null && context.textures.length > 1 ) {
+
+			state.setMRTBlending( context.textures );
+
+		}
 
 		state.useProgram( programGPU );
 
@@ -1743,25 +1750,53 @@ class WebGLBackend extends Backend {
 
 			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
-				const data = binding.buffer;
-				let { bufferGPU } = this.get( data );
+				const array = binding.buffer;
+				let { bufferGPU } = this.get( array );
 
 				if ( bufferGPU === undefined ) {
 
 					// create
 
 					bufferGPU = gl.createBuffer();
-					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
 
-					this.set( data, { bufferGPU } );
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferData( gl.UNIFORM_BUFFER, array.byteLength, gl.DYNAMIC_DRAW );
+
+					this.set( array, { bufferGPU } );
 
 				} else {
 
-					// update
-
 					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-					gl.bufferSubData( gl.UNIFORM_BUFFER, 0, data );
+
+				}
+
+				// update
+
+				const updateRanges = binding.updateRanges;
+
+				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+
+				if ( updateRanges.length === 0 ) {
+
+					gl.bufferData( gl.UNIFORM_BUFFER, array, gl.DYNAMIC_DRAW );
+
+				} else {
+
+					const isTyped = isTypedArray( array );
+					const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
+
+					for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+						const range = updateRanges[ i ];
+
+						const dataOffset = range.start * byteOffsetFactor;
+						const size = range.count * byteOffsetFactor;
+
+						const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
+						gl.bufferSubData( gl.UNIFORM_BUFFER, bufferOffset, array, dataOffset, size );
+
+					}
 
 				}
 
@@ -1799,10 +1834,35 @@ class WebGLBackend extends Backend {
 
 			const bindingData = this.get( binding );
 			const bufferGPU = bindingData.bufferGPU;
-			const data = binding.buffer;
+			const array = binding.buffer;
+
+			const updateRanges = binding.updateRanges;
 
 			gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-			gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+
+			if ( updateRanges.length === 0 ) {
+
+				gl.bufferData( gl.UNIFORM_BUFFER, array, gl.DYNAMIC_DRAW );
+
+			} else {
+
+				const isTyped = isTypedArray( array );
+				const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
+
+				for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+					const range = updateRanges[ i ];
+
+					const dataOffset = range.start * byteOffsetFactor;
+					const size = range.count * byteOffsetFactor;
+
+					const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
+					gl.bufferSubData( gl.UNIFORM_BUFFER, bufferOffset, array, dataOffset, size );
+
+				}
+
+			}
 
 		}
 

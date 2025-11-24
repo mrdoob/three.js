@@ -871,7 +871,7 @@ class BatchedMesh extends Mesh {
 	}
 
 	/**
-	 * Repacks the sub geometries in [name] to remove any unused space remaining from
+	 * Repacks the sub geometries in BatchedMesh to remove any unused space remaining from
 	 * previously deleted geometry, freeing up space to add new geometry.
 	 *
 	 * @return {BatchedMesh} A reference to this batched mesh.
