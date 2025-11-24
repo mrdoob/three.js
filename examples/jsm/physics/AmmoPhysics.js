@@ -101,11 +101,11 @@ async function AmmoPhysics() {
 
 			if ( mesh.isInstancedMesh ) {
 
-				handleInstancedMesh( mesh, mass, shape );
+				handleInstancedMesh( mesh, shape, mass );
 
 			} else if ( mesh.isMesh ) {
 
-				handleMesh( mesh, mass, shape );
+				handleMesh( mesh, shape, mass );
 
 			}
 
@@ -113,7 +113,7 @@ async function AmmoPhysics() {
 
 	}
 
-	function handleMesh( mesh, mass, shape ) {
+	function handleMesh( mesh, shape, mass ) {
 
 		const position = mesh.position;
 		const quaternion = mesh.quaternion;
@@ -144,7 +144,7 @@ async function AmmoPhysics() {
 
 	}
 
-	function handleInstancedMesh( mesh, mass, shape ) {
+	function handleInstancedMesh( mesh, shape, mass ) {
 
 		const array = mesh.instanceMatrix.array;
 
