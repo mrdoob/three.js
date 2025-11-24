@@ -1,16 +1,16 @@
-var APP = {
+const APP = {
 
 	Player: function () {
 
-		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		const renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
 
-		var loader = new THREE.ObjectLoader();
-		var camera, scene;
+		const loader = new THREE.ObjectLoader();
+		let camera, scene;
 
-		var events = {};
+		let events = {};
 
-		var dom = document.createElement( 'div' );
+		const dom = document.createElement( 'div' );
 		dom.appendChild( renderer.domElement );
 
 		this.dom = dom;
@@ -21,7 +21,7 @@ var APP = {
 
 		this.load = function ( json ) {
 
-			var project = json.project;
+			const project = json.project;
 
 			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
 			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
@@ -43,8 +43,8 @@ var APP = {
 				update: []
 			};
 
-			var scriptWrapParams = 'player,renderer,scene,camera';
-			var scriptWrapResultObj = {};
+			let scriptWrapParams = 'player,renderer,scene,camera';
+			const scriptWrapResultObj = {};
 
 			for ( var eventKey in events ) {
 
@@ -53,11 +53,11 @@ var APP = {
 
 			}
 
-			var scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
+			const scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
 
-			for ( var uuid in json.scripts ) {
+			for ( let uuid in json.scripts ) {
 
-				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+				const object = scene.getObjectByProperty( 'uuid', uuid, true );
 
 				if ( object === undefined ) {
 
@@ -66,15 +66,15 @@ var APP = {
 
 				}
 
-				var scripts = json.scripts[ uuid ];
+				const scripts = json.scripts[ uuid ];
 
-				for ( var i = 0; i < scripts.length; i ++ ) {
+				for ( let i = 0; i < scripts.length; i ++ ) {
 
-					var script = scripts[ i ];
+					const script = scripts[ i ];
 
-					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
+					const functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
 
-					for ( var name in functions ) {
+					for ( let name in functions ) {
 
 						if ( functions[ name ] === undefined ) continue;
 
@@ -135,7 +135,7 @@ var APP = {
 
 		function dispatch( array, event ) {
 
-			for ( var i = 0, l = array.length; i < l; i ++ ) {
+			for ( let i = 0, l = array.length; i < l; i ++ ) {
 
 				array[ i ]( event );
 
@@ -143,7 +143,7 @@ var APP = {
 
 		}
 
-		var time, startTime, prevTime;
+		let time, startTime, prevTime;
 
 		function animate() {
 
