@@ -259,7 +259,7 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.ao )
+		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.ao || builder.context.sss )
 			return true;
 
 		return false;

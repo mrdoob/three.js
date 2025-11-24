@@ -188,6 +188,12 @@ class AnalyticLightNode extends LightingNode {
 
 		//
 
+		if ( builder.context.sss ) {
+
+			shadowColorNode = shadowColorNode.mul( builder.context.sss );
+
+		}
+
 		this.colorNode = shadowColorNode;
 
 	}
