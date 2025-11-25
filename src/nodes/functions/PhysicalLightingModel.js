@@ -12,7 +12,6 @@ import { diffuseColor, diffuseContribution, specularColor, specularColorBlended,
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
-import { select } from '../math/ConditionalNode.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep, inverseSqrt } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
 import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/Camera.js';
