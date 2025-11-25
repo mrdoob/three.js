@@ -9,7 +9,7 @@
 
 import * as fs from 'fs';
 
-const LUT_SIZE = 32;
+const LUT_SIZE = 16;
 const SAMPLE_COUNT = 4096;
 
 // Van der Corput sequence
