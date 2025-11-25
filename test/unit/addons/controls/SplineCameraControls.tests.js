@@ -384,6 +384,123 @@ export default QUnit.module( 'Controls', () => {
 
 		} );
 
+		QUnit.test( 'keys property', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+
+			assert.ok( controls.keys, 'keys property exists' );
+			assert.strictEqual( controls.keys.FORWARD, 'ArrowUp', 'FORWARD key defaults to ArrowUp' );
+			assert.strictEqual( controls.keys.BACKWARD, 'ArrowDown', 'BACKWARD key defaults to ArrowDown' );
+			assert.strictEqual( controls.keys.INCREASE_SPEED, 'PageUp', 'INCREASE_SPEED key defaults to PageUp' );
+			assert.strictEqual( controls.keys.DECREASE_SPEED, 'PageDown', 'DECREASE_SPEED key defaults to PageDown' );
+
+		} );
+
+		QUnit.test( 'listenToKeyEvents', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+			const element = document.createElement( 'div' );
+
+			controls.listenToKeyEvents( element );
+
+			assert.ok( controls._keyboardElement === element, 'keyboard element is stored' );
+
+			controls.stopListenToKeyEvents();
+
+		} );
+
+		QUnit.test( 'stopListenToKeyEvents', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+			const element = document.createElement( 'div' );
+
+			controls.listenToKeyEvents( element );
+			controls.stopListenToKeyEvents();
+
+			assert.strictEqual( controls._keyboardElement, null, 'keyboard element is cleared' );
+
+		} );
+
+		QUnit.test( 'onKeyDown - FORWARD key', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+
+			controls.currentTime = 0;
+
+			const event = { code: 'ArrowUp' };
+			controls.onKeyDown( event );
+
+			assert.ok( controls.currentTime > 0, 'FORWARD key advances currentTime' );
+
+		} );
+
+		QUnit.test( 'onKeyDown - BACKWARD key', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+
+			controls.currentTime = 5.0;
+
+			const event = { code: 'ArrowDown' };
+			controls.onKeyDown( event );
+
+			assert.ok( controls.currentTime < 5.0, 'BACKWARD key decreases currentTime' );
+
+		} );
+
+		QUnit.test( 'onKeyDown - INCREASE_SPEED key', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+
+			const initialSpeed = controls.playbackSpeed;
+
+			const event = { code: 'PageUp' };
+			controls.onKeyDown( event );
+
+			assert.ok( controls.playbackSpeed > initialSpeed, 'INCREASE_SPEED key increases playbackSpeed' );
+
+		} );
+
+		QUnit.test( 'onKeyDown - DECREASE_SPEED key', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+
+			const initialSpeed = controls.playbackSpeed;
+
+			const event = { code: 'PageDown' };
+			controls.onKeyDown( event );
+
+			assert.ok( controls.playbackSpeed < initialSpeed, 'DECREASE_SPEED key decreases playbackSpeed' );
+
+		} );
+
+		QUnit.test( 'dispose cleans up keyboard listeners', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+			const element = document.createElement( 'div' );
+
+			controls.listenToKeyEvents( element );
+			controls.dispose();
+
+			assert.strictEqual( controls._keyboardElement, null, 'dispose() removes keyboard listeners' );
+
+		} );
+
 		QUnit.test( 'dispose', ( assert ) => {
 
 			const camera = new PerspectiveCamera();

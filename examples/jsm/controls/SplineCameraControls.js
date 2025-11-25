@@ -127,8 +127,23 @@ class SplineCameraControls extends Controls {
 		 */
 		this.offset = new Vector3( 0, 0, 0 );
 
+		/**
+		 * Keyboard control keys configuration.
+		 * Default mappings can be changed to use different keys.
+		 *
+		 * @type {Object}
+		 */
+		this.keys = {
+			FORWARD: 'ArrowUp',
+			BACKWARD: 'ArrowDown',
+			INCREASE_SPEED: 'PageUp',
+			DECREASE_SPEED: 'PageDown'
+		};
+
 		// Internal state
 		this._playing = false;
+		this._keyboardElement = null;
+		this._onKeyDown = this.onKeyDown.bind( this );
 
 	}
 
@@ -191,6 +206,101 @@ class SplineCameraControls extends Controls {
 	getPosition() {
 
 		return this.currentTime / this.loopTime;
+
+	}
+
+	/**
+	 * Enable keyboard controls by adding event listeners.
+	 *
+	 * @param {HTMLElement} domElement - The element to listen for keyboard events.
+	 * @return {SplineCameraControls}
+	 */
+	listenToKeyEvents( domElement ) {
+
+		domElement.addEventListener( 'keydown', this._onKeyDown );
+		this._keyboardElement = domElement;
+		return this;
+
+	}
+
+	/**
+	 * Disable keyboard controls by removing event listeners.
+	 *
+	 * @return {SplineCameraControls}
+	 */
+	stopListenToKeyEvents() {
+
+		if ( this._keyboardElement ) {
+
+			this._keyboardElement.removeEventListener( 'keydown', this._onKeyDown );
+			this._keyboardElement = null;
+
+		}
+
+		return this;
+
+	}
+
+	/**
+	 * Handle keyboard input for camera control.
+	 *
+	 * @param {KeyboardEvent} event - The keyboard event.
+	 */
+	onKeyDown( event ) {
+
+		if ( ! this.enabled ) return;
+
+		const key = event.code;
+
+		switch ( key ) {
+
+			case this.keys.FORWARD:
+				// Move forward along path
+				this.currentTime += 0.5;
+				if ( ! this.loop ) {
+
+					this.currentTime = Math.min( this.currentTime, this.loopTime );
+
+				} else {
+
+					this.currentTime = this.currentTime % this.loopTime;
+
+				}
+
+				this.update( 0 );
+				break;
+
+			case this.keys.BACKWARD:
+				// Move backward along path
+				this.currentTime -= 0.5;
+				if ( this.currentTime < 0 ) {
+
+					if ( this.loop ) {
+
+						this.currentTime = this.loopTime + this.currentTime;
+
+					} else {
+
+						this.currentTime = 0;
+
+					}
+
+				}
+
+				this.update( 0 );
+				break;
+
+			case this.keys.INCREASE_SPEED:
+				// Increase playback speed
+				this.playbackSpeed = Math.min( this.playbackSpeed * 1.2, 10.0 );
+				break;
+
+			case this.keys.DECREASE_SPEED:
+				// Decrease playback speed
+				this.playbackSpeed = Math.max( this.playbackSpeed / 1.2, 0.1 );
+				break;
+
+		}
 
 	}
 
@@ -292,8 +402,7 @@ class SplineCameraControls extends Controls {
 	 */
 	dispose() {
 
-		// No event listeners to remove in Phase 1
-		// This will be expanded in Phase 4 when keyboard support is added
+		this.stopListenToKeyEvents();
 
 	}
 
