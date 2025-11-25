@@ -118,7 +118,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#endif
 
-	material.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );
+	material.sheenRoughness = clamp( sheenRoughness, 0.0001, 1.0 );
 
 	#ifdef USE_SHEEN_ROUGHNESSMAP
 
