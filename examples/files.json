@@ -64,6 +64,7 @@
 		"webgl_lights_rectarealight",
 		"webgl_lines_colors",
 		"webgl_lines_dashed",
+		"webgl_lines_dashed_screenspace",
 		"webgl_lines_fat",
 		"webgl_lines_fat_raycasting",
 		"webgl_lines_fat_wireframe",
