@@ -852,7 +852,7 @@ class PhysicalLightingModel extends LightingModel {
 
 			const sheenLight = outgoingLight.add( this.sheenSpecularDirect, this.sheenSpecularIndirect.mul( 1.0 / Math.PI ) );
 
- 			outgoingLight.assign( sheenLight );
+			outgoingLight.assign( sheenLight );
 
 		}
 

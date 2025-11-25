@@ -375,21 +375,10 @@ float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float 
 
 }
 
-// DFG LUT sampling for physically-based rendering.
-// Uses a precomputed lookup table for the split-sum approximation
-// used in indirect specular lighting.
-// Reference: "Real Shading in Unreal Engine 4" by Brian Karis
-vec2 DFGApprox( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {
-
-	float dotNV = saturate( dot( normal, viewDir ) );
-	vec2 uv = vec2( roughness, dotNV );
-	return texture2D( dfgLUT, uv ).rg;
-
-}
-
 vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {
 
-	vec2 fab = DFGApprox( normal, viewDir, roughness );
+	float dotNV = saturate( dot( normal, viewDir ) );
+	vec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;
 
 	return specularColor * fab.x + specularF90 * fab.y;
 
@@ -404,7 +393,8 @@ void computeMultiscatteringIridescence( const in vec3 normal, const in vec3 view
 void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
 #endif
 
-	vec2 fab = DFGApprox( normal, viewDir, roughness );
+	float dotNV = saturate( dot( normal, viewDir ) );
+	vec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;
 
 	#ifdef USE_IRIDESCENCE
 
@@ -442,8 +432,8 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 	float dotNV = saturate( dot( normal, viewDir ) );
 
 	// Precomputed DFG values for view and light directions
-	vec2 dfgV = DFGApprox( vec3(0.0, 0.0, 1.0), vec3(sqrt(1.0 - dotNV * dotNV), 0.0, dotNV), material.roughness );
-	vec2 dfgL = DFGApprox( vec3(0.0, 0.0, 1.0), vec3(sqrt(1.0 - dotNL * dotNL), 0.0, dotNL), material.roughness );
+	vec2 dfgV = texture2D( dfgLUT, vec2( material.roughness, dotNV ) ).rg;
+	vec2 dfgL = texture2D( dfgLUT, vec2( material.roughness, dotNL ) ).rg;
 
 	// Single-scattering energy for view and light
 	vec3 FssEss_V = material.specularColorBlended * dfgV.x + material.specularF90 * dfgV.y;
