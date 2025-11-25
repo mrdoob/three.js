@@ -54974,7 +54974,7 @@ class Raycaster {
 		this.near = near;
 
 		/**
-		 * All results returned are further away than near. Near can't be negative.
+		 * All results returned are closer than far. Far can't be lower than near.
 		 *
 		 * @type {number}
 		 * @default Infinity
