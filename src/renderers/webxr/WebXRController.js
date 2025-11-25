@@ -367,6 +367,15 @@ class WebXRController {
 					}
 
 					this.dispatchEvent( _moveEvent );
+					const gp = inputSource && inputSource.gamepad;
+					if ( gp ) {
+						this.dispatchEvent( {
+							type: 'update',
+							data: { gamepad: gp ,buttons: gp.buttons,axes: gp.axes }
+						} );
+					}
+		
+           
 
 				}
 
