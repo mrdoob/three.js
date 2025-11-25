@@ -129,7 +129,7 @@ async function AmmoPhysics() {
 		shape.calculateLocalInertia( mass, localInertia );
 
 		const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia );
-		rbInfo.set_m_restitution(restitution);
+		rbInfo.set_m_restitution( restitution );
 
 		const body = new AmmoLib.btRigidBody( rbInfo );
 		// body.setFriction( 4 );
@@ -164,7 +164,7 @@ async function AmmoPhysics() {
 			shape.calculateLocalInertia( mass, localInertia );
 
 			const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia );
-			rbInfo.m_restitution = restitution;
+			rbInfo.set_m_restitution( restitution );
 
 			const body = new AmmoLib.btRigidBody( rbInfo );
 			world.addRigidBody( body );
