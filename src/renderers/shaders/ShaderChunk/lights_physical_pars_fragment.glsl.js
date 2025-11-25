@@ -358,21 +358,20 @@ vec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 no
 #endif
 
 // This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from
-// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
-// in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
+// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF".
+// The low roughness fit (< 0.25) uses an inversesqrt/log model to accurately capture the sharp peak.
 float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {
 
 	float dotNV = saturate( dot( normal, viewDir ) );
 
 	float r2 = roughness * roughness;
 
-	float a = roughness < 0.25 ? -339.2 * r2 + 161.4 * roughness - 25.9 : -8.48 * r2 + 14.3 * roughness - 9.95;
+	float a = roughness < 0.25 ? - 1.57 * inversesqrt( roughness ) : - 3.33 * r2 + 6.27 * roughness - 4.40;
+	float b = roughness < 0.25 ? - 0.46 * log( roughness ) - 0.64 : 0.92 * r2 - 1.79 * roughness + 0.35;
 
-	float b = roughness < 0.25 ? 44.0 * r2 - 23.7 * roughness + 3.26 : 1.97 * r2 - 3.27 * roughness + 0.72;
+	float DG = exp( a * dotNV + b );
 
-	float DG = exp( a * dotNV + b ) + ( roughness < 0.25 ? 0.0 : 0.1 * ( roughness - 0.25 ) );
-
-	return saturate( DG * RECIPROCAL_PI );
+	return saturate( DG );
 
 }
 
@@ -531,10 +530,17 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 	#endif
 
 	#ifdef USE_SHEEN
-
-		sheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );
-
-	#endif
+ 
+ 		sheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );
+ 
+ 		float sheenAlbedoV = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
+ 		float sheenAlbedoL = IBLSheenBRDF( geometryNormal, directLight.direction, material.sheenRoughness );
+ 
+ 		float sheenEnergyComp = 1.0 - max3( material.sheenColor ) * max( sheenAlbedoV, sheenAlbedoL );
+ 
+ 		irradiance *= sheenEnergyComp;
+ 
+ 	#endif
 
 	reflectedLight.directSpecular += irradiance * BRDF_GGX_Multiscatter( directLight.direction, geometryViewDir, geometryNormal, material );
 
@@ -543,7 +549,19 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseContribution );
+	vec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution );
+
+	#ifdef USE_SHEEN
+
+		float sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
+
+		float sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;
+
+		diffuse *= sheenEnergyComp;
+
+	#endif
+
+	reflectedLight.indirectDiffuse += diffuse;
 
 }
 
@@ -557,9 +575,9 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#ifdef USE_SHEEN
 
-		sheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
+		sheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;
 
-	#endif
+ 	#endif
 
 	// Both indirect specular and indirect diffuse light accumulate here
 	// Compute multiscattering separately for dielectric and metallic, then mix
@@ -592,10 +610,24 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
-	reflectedLight.indirectSpecular += radiance * singleScattering;
-	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
+	vec3 indirectSpecular = radiance * singleScattering;
+	indirectSpecular += multiScattering * cosineWeightedIrradiance;
 
-	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+	vec3 indirectDiffuse = diffuse * cosineWeightedIrradiance;
+
+	#ifdef USE_SHEEN
+
+		float sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
+
+		float sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;
+
+		indirectSpecular *= sheenEnergyComp;
+		indirectDiffuse *= sheenEnergyComp;
+
+	#endif
+
+	reflectedLight.indirectSpecular += indirectSpecular;
+	reflectedLight.indirectDiffuse += indirectDiffuse;
 
 }
 

@@ -321,7 +321,7 @@ class MaterialNode extends Node {
 
 			}
 
-			node = node.clamp( 0.07, 1.0 );
+			node = node.clamp( 0.0001, 1.0 );
 
 		} else if ( scope === MaterialNode.ANISOTROPY ) {
 
