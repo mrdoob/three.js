@@ -181,6 +181,9 @@ import './src/materials/ShaderMaterial.tests.js';
 import './src/materials/ShadowMaterial.tests.js';
 import './src/materials/SpriteMaterial.tests.js';
 
+//src/materials/nodes
+import './src/materials/nodes/LineDashedNodeMaterial.tests.js';
+
 
 //src/math
 import './src/math/Box2.tests.js';

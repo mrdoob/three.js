@@ -3,6 +3,7 @@ import { attribute } from '../../nodes/core/AttributeNode.js';
 import { materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale } from '../../nodes/accessors/MaterialNode.js';
 import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
 import { varying, float } from '../../nodes/tsl/TSLBase.js';
+import { screenDPR, viewport } from '../../nodes/display/ScreenNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
 
@@ -114,8 +115,17 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 		const offsetNode = this.offsetNode ? float( this.offsetNode ) : materialLineDashOffset;
 		const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
-		const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
-		const gapSizeNode = this.gapSizeNode ? float( this.gapSizeNode ) : materialLineGapSize;
+		let dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
+		let gapSizeNode = this.gapSizeNode ? float( this.gapSizeNode ) : materialLineGapSize;
+
+		// Screen-space conversion: scale dash/gap sizes by viewport height
+		if ( this.screenSpace ) {
+
+			const screenSpaceScale = viewport.w.div( screenDPR );
+			dashSizeNode = dashSizeNode.div( screenSpaceScale );
+			gapSizeNode = gapSizeNode.div( screenSpaceScale );
+
+		}
 
 		dashSize.assign( dashSizeNode );
 		gapSize.assign( gapSizeNode );
@@ -124,6 +134,31 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		const vLineDistanceOffset = offsetNode ? vLineDistance.add( offsetNode ) : vLineDistance;
 
 		vLineDistanceOffset.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard();
+
+	}
+
+	/**
+	 * Copies the properties of the given node material to this instance.
+	 *
+	 * @param {LineDashedNodeMaterial} source - The material to copy.
+	 * @return {LineDashedNodeMaterial} A reference to this node material.
+	 */
+	copy( source ) {
+
+		// Properties from LineDashedMaterial (inherited via setDefaultValues)
+		this.scale = source.scale;
+		this.dashSize = source.dashSize;
+		this.gapSize = source.gapSize;
+		this.screenSpace = source.screenSpace;
+
+		// LineDashedNodeMaterial-specific properties
+		this.dashOffset = source.dashOffset;
+		this.offsetNode = source.offsetNode;
+		this.dashScaleNode = source.dashScaleNode;
+		this.dashSizeNode = source.dashSizeNode;
+		this.gapSizeNode = source.gapSizeNode;
+
+		return super.copy( source );
 
 	}
 
