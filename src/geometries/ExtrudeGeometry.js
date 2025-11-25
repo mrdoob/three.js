@@ -114,7 +114,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				// TODO1 - have a .isClosed in spline?
 
-				splineTube = extrudePath.computeFrenetFrames( steps, false );
+				splineTube = extrudePath.computeFrenetFrames( steps, !! extrudePath.closed );
 
 				// log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
