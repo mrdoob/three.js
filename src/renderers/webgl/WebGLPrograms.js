@@ -305,6 +305,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			flatShading: ( material.flatShading === true && material.wireframe === false ),
 
+			screenSpaceDash: material.isLineDashedMaterial && material.screenSpace === true,
+
 			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 			reversedDepthBuffer: reversedDepthBuffer,
@@ -566,6 +568,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 20 );
 		if ( parameters.alphaToCoverage )
 			_programLayers.enable( 21 );
+		if ( parameters.screenSpaceDash )
+			_programLayers.enable( 22 );
 
 		array.push( _programLayers.mask );
 

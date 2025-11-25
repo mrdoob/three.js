@@ -802,6 +802,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
+			parameters.screenSpaceDash ? '#define SCREEN_SPACE_DASH' : '',
+
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 			parameters.doubleSided ? '#define DOUBLE_SIDED' : '',

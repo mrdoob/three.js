@@ -52,11 +52,31 @@ void main() {
 	vec4 diffuseColor = vec4( diffuse, opacity );
 	#include <clipping_planes_fragment>
 
-	if ( mod( vLineDistance, totalSize ) > dashSize ) {
+	#ifdef SCREEN_SPACE_DASH
 
-		discard;
+		// Compute screen-space distance rate using derivatives
+		// dFdx/dFdy give the change in vLineDistance per pixel (world units per pixel)
+		float worldUnitsPerPixel = length( vec2( dFdx( vLineDistance ), dFdy( vLineDistance ) ) );
 
-	}
+		// Convert pixel-based dash sizes to world-space equivalent for this fragment
+		float worldDashSize = dashSize * worldUnitsPerPixel;
+		float worldTotalSize = totalSize * worldUnitsPerPixel;
+
+		if ( mod( vLineDistance, worldTotalSize ) > worldDashSize ) {
+
+			discard;
+
+		}
+
+	#else
+
+		if ( mod( vLineDistance, totalSize ) > dashSize ) {
+
+			discard;
+
+		}
+
+	#endif
 
 	vec3 outgoingLight = vec3( 0.0 );
 

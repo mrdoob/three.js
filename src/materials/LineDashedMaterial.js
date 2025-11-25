@@ -65,6 +65,15 @@ class LineDashedMaterial extends LineBasicMaterial {
 		 */
 		this.gapSize = 1;
 
+		/**
+		 * Whether dash/gap sizes are in screen-space pixels rather than world-space units.
+		 * When true, dashes remain constant pixel size regardless of zoom level.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.screenSpace = false;
+
 		this.setValues( parameters );
 
 	}
@@ -76,6 +85,7 @@ class LineDashedMaterial extends LineBasicMaterial {
 		this.scale = source.scale;
 		this.dashSize = source.dashSize;
 		this.gapSize = source.gapSize;
+		this.screenSpace = source.screenSpace;
 
 		return this;
 
