@@ -68,6 +68,7 @@
 
 			import * as THREE from 'three';
 			import { SplineCameraControls } from 'three/addons/controls/SplineCameraControls.js';
+			import { SplineHelper } from 'three/addons/helpers/SplineHelper.js';
 
 			let camera, scene, renderer, controls, clock;
 
@@ -107,10 +108,8 @@
 				createScene();
 
 				// Visualize the curve path
-				const curveGeometry = new THREE.BufferGeometry().setFromPoints( curve.getPoints( 100 ) );
-				const curveMaterial = new THREE.LineBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-				const curveLine = new THREE.Line( curveGeometry, curveMaterial );
-				scene.add( curveLine );
+				const splineHelper = new SplineHelper( curve, 100, 0xff0000 );
+				scene.add( splineHelper );
 
 				// Renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
