@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - spline camera controls editor</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			#info {
+				background-color: rgba(0, 0, 0, 0.8);
+				padding: 10px;
+			}
+			#panel {
+				position: absolute;
+				top: 60px;
+				right: 10px;
+				width: 300px;
+				background-color: rgba(0, 0, 0, 0.8);
+				padding: 15px;
+				color: white;
+				font-family: monospace;
+				font-size: 12px;
+				max-height: calc(100vh - 80px);
+				overflow-y: auto;
+			}
+			#panel h3 {
+				margin: 0 0 10px 0;
+				font-size: 14px;
+				border-bottom: 1px solid #666;
+				padding-bottom: 5px;
+			}
+			#panel button {
+				width: 100%;
+				margin: 3px 0;
+				padding: 8px;
+				font-size: 12px;
+				cursor: pointer;
+			}
+			#panel input[type="range"] {
+				width: 100%;
+			}
+			#panel label {
+				display: block;
+				margin: 8px 0 3px 0;
+			}
+			#timeline {
+				position: absolute;
+				bottom: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 80%;
+				max-width: 800px;
+				background-color: rgba(0, 0, 0, 0.8);
+				padding: 15px;
+				border-radius: 5px;
+			}
+			#timeline input[type="range"] {
+				width: 100%;
+			}
+			#events {
+				margin-top: 15px;
+				padding: 10px;
+				background-color: rgba(0, 0, 0, 0.5);
+				max-height: 100px;
+				overflow-y: auto;
+				font-size: 11px;
+			}
+			.event-log {
+				margin: 2px 0;
+				padding: 2px 5px;
+				background-color: rgba(255, 255, 255, 0.1);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - spline camera controls editor<br/>
+			Interactive editor with full feature showcase
+		</div>
+
+		<div id="panel">
+			<h3>Playback Controls</h3>
+			<button id="play">▶ Play</button>
+			<button id="pause">⏸ Pause</button>
+			<button id="reset">⏮ Reset</button>
+
+			<h3>Settings</h3>
+			<label>Speed: <span id="speedValue">1.0x</span></label>
+			<input type="range" id="speed" min="0.1" max="5" step="0.1" value="1.0">
+
+			<label>Loop Time: <span id="loopTimeValue">20.0s</span></label>
+			<input type="range" id="loopTime" min="5" max="60" step="1" value="20">
+
+			<label><input type="checkbox" id="loop" checked> Loop</label>
+			<label><input type="checkbox" id="autoplay" checked> Auto Play</label>
+
+			<h3>Camera Orientation</h3>
+			<label>Look Ahead: <span id="lookAheadValue">0.02</span></label>
+			<input type="range" id="lookAhead" min="0" max="0.2" step="0.01" value="0.02">
+
+			<h3>Position Offset</h3>
+			<label>X (Left/Right): <span id="offsetXValue">0.0</span></label>
+			<input type="range" id="offsetX" min="-20" max="20" step="0.5" value="0">
+
+			<label>Y (Up/Down): <span id="offsetYValue">0.0</span></label>
+			<input type="range" id="offsetY" min="-20" max="20" step="0.5" value="0">
+
+			<label>Z (Forward/Back): <span id="offsetZValue">0.0</span></label>
+			<input type="range" id="offsetZ" min="-20" max="20" step="0.5" value="0">
+
+			<h3>Path Presets</h3>
+			<button id="presetCircle">Circle Path</button>
+			<button id="presetFigure8">Figure-8 Path</button>
+			<button id="presetSpiral">Spiral Path</button>
+
+			<h3>Helper Options</h3>
+			<label><input type="checkbox" id="showHelper" checked> Show Path Helper</label>
+			<label><input type="checkbox" id="showPoints" checked> Show Control Points</label>
+
+			<h3>Event Log</h3>
+			<div id="events"></div>
+		</div>
+
+		<div id="timeline">
+			<label>Timeline Position: <span id="timelineValue">0%</span></label>
+			<input type="range" id="timelineSlider" min="0" max="100" step="0.1" value="0">
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { SplineCameraControls } from 'three/addons/controls/SplineCameraControls.js';
+			import { SplineHelper } from 'three/addons/helpers/SplineHelper.js';
+
+			let camera, scene, renderer, controls, clock;
+			let splineHelper, controlPointsGroup;
+			let curve;
+
+			init();
+
+			function init() {
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
+				scene.fog = new THREE.Fog( 0x050505, 200, 1000 );
+
+				// Camera
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+				// Create initial curve
+				createCurve( 'circle' );
+
+				// Spline camera controls
+				controls = new SplineCameraControls( camera, curve );
+				controls.loopTime = 20.0;
+				controls.autoPlay = true;
+				controls.loop = true;
+				controls.lookAhead = 0.02;
+
+				// Enable keyboard
+				controls.listenToKeyEvents( window );
+
+				// Event listeners for debugging
+				controls.addEventListener( 'change', () => {
+					logEvent( 'Camera position changed' );
+				} );
+
+				// Create scene content
+				createScene();
+
+				// Helpers
+				splineHelper = new SplineHelper( curve, 100, 0xff0000 );
+				scene.add( splineHelper );
+
+				createControlPoints();
+
+				// Renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				// Clock
+				clock = new THREE.Clock();
+
+				// UI Setup
+				setupUI();
+
+				// Window resize
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function createCurve( preset ) {
+
+				let points = [];
+
+				switch ( preset ) {
+
+					case 'circle':
+						for ( let i = 0; i < 8; i ++ ) {
+							const angle = ( i / 8 ) * Math.PI * 2;
+							points.push( new THREE.Vector3(
+								Math.cos( angle ) * 50,
+								5 + Math.sin( i ) * 3,
+								Math.sin( angle ) * 50
+							) );
+						}
+						break;
+
+					case 'figure8':
+						for ( let i = 0; i < 16; i ++ ) {
+							const t = ( i / 16 ) * Math.PI * 2;
+							points.push( new THREE.Vector3(
+								Math.sin( t ) * 50,
+								10 + Math.sin( t * 2 ) * 5,
+								Math.sin( t * 2 ) * 30
+							) );
+						}
+						break;
+
+					case 'spiral':
+						for ( let i = 0; i < 20; i ++ ) {
+							const angle = ( i / 20 ) * Math.PI * 4;
+							const radius = 20 + i * 2;
+							points.push( new THREE.Vector3(
+								Math.cos( angle ) * radius,
+								i * 3,
+								Math.sin( angle ) * radius
+							) );
+						}
+						break;
+
+				}
+
+				curve = new THREE.CatmullRomCurve3( points, preset !== 'spiral' );
+
+				if ( controls ) {
+
+					controls.curve = curve;
+					splineHelper.curve = curve;
+					splineHelper.update();
+					updateControlPoints();
+
+				}
+
+			}
+
+			function createControlPoints() {
+
+				controlPointsGroup = new THREE.Group();
+
+				const geometry = new THREE.SphereGeometry( 1, 8, 8 );
+				const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+
+				curve.points.forEach( point => {
+					const sphere = new THREE.Mesh( geometry, material );
+					sphere.position.copy( point );
+					controlPointsGroup.add( sphere );
+				} );
+
+				scene.add( controlPointsGroup );
+
+			}
+
+			function updateControlPoints() {
+
+				// Remove old points
+				while ( controlPointsGroup.children.length > 0 ) {
+					controlPointsGroup.remove( controlPointsGroup.children[ 0 ] );
+				}
+
+				// Add new points
+				const geometry = new THREE.SphereGeometry( 1, 8, 8 );
+				const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+
+				curve.points.forEach( point => {
+					const sphere = new THREE.Mesh( geometry, material );
+					sphere.position.copy( point );
+					controlPointsGroup.add( sphere );
+				} );
+
+			}
+
+			function createScene() {
+
+				// Ground plane
+				const groundGeometry = new THREE.PlaneGeometry( 200, 200, 20, 20 );
+				const groundMaterial = new THREE.MeshBasicMaterial( {
+					color: 0x333333,
+					wireframe: true,
+					transparent: true,
+					opacity: 0.3
+				} );
+				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
+				ground.rotation.x = - Math.PI / 2;
+				scene.add( ground );
+
+				// Reference grid
+				const gridHelper = new THREE.GridHelper( 200, 20, 0x444444, 0x222222 );
+				scene.add( gridHelper );
+
+				// Scene objects
+				const boxGeometry = new THREE.BoxGeometry( 5, 5, 5 );
+
+				for ( let i = 0; i < 30; i ++ ) {
+
+					const material = new THREE.MeshLambertMaterial( {
+						color: new THREE.Color().setHSL( i / 30, 1.0, 0.5 )
+					} );
+					const mesh = new THREE.Mesh( boxGeometry, material );
+
+					mesh.position.x = ( Math.random() - 0.5 ) * 150;
+					mesh.position.y = Math.random() * 10;
+					mesh.position.z = ( Math.random() - 0.5 ) * 150;
+
+					mesh.rotation.x = Math.random() * Math.PI;
+					mesh.rotation.y = Math.random() * Math.PI;
+
+					scene.add( mesh );
+
+				}
+
+				// Lighting
+				const ambientLight = new THREE.AmbientLight( 0x404040 );
+				scene.add( ambientLight );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight.position.set( 50, 50, 50 );
+				scene.add( directionalLight );
+
+			}
+
+			function setupUI() {
+
+				// Playback controls
+				document.getElementById( 'play' ).addEventListener( 'click', () => {
+					controls.play();
+					logEvent( 'Playback started' );
+				} );
+
+				document.getElementById( 'pause' ).addEventListener( 'click', () => {
+					controls.pause();
+					logEvent( 'Playback paused' );
+				} );
+
+				document.getElementById( 'reset' ).addEventListener( 'click', () => {
+					controls.reset();
+					document.getElementById( 'timelineSlider' ).value = 0;
+					document.getElementById( 'timelineValue' ).textContent = '0%';
+					logEvent( 'Reset to beginning' );
+				} );
+
+				// Settings
+				document.getElementById( 'speed' ).addEventListener( 'input', ( e ) => {
+					const value = parseFloat( e.target.value );
+					controls.playbackSpeed = value;
+					document.getElementById( 'speedValue' ).textContent = value.toFixed( 1 ) + 'x';
+				} );
+
+				document.getElementById( 'loopTime' ).addEventListener( 'input', ( e ) => {
+					const value = parseFloat( e.target.value );
+					controls.loopTime = value;
+					document.getElementById( 'loopTimeValue' ).textContent = value.toFixed( 1 ) + 's';
+				} );
+
+				document.getElementById( 'loop' ).addEventListener( 'change', ( e ) => {
+					controls.loop = e.target.checked;
+					logEvent( 'Loop: ' + e.target.checked );
+				} );
+
+				document.getElementById( 'autoplay' ).addEventListener( 'change', ( e ) => {
+					controls.autoPlay = e.target.checked;
+					logEvent( 'Auto play: ' + e.target.checked );
+				} );
+
+				// Orientation
+				document.getElementById( 'lookAhead' ).addEventListener( 'input', ( e ) => {
+					const value = parseFloat( e.target.value );
+					controls.lookAhead = value;
+					document.getElementById( 'lookAheadValue' ).textContent = value.toFixed( 2 );
+				} );
+
+				// Offsets
+				document.getElementById( 'offsetX' ).addEventListener( 'input', ( e ) => {
+					const value = parseFloat( e.target.value );
+					controls.offset.x = value;
+					document.getElementById( 'offsetXValue' ).textContent = value.toFixed( 1 );
+				} );
+
+				document.getElementById( 'offsetY' ).addEventListener( 'input', ( e ) => {
+					const value = parseFloat( e.target.value );
+					controls.offset.y = value;
+					document.getElementById( 'offsetYValue' ).textContent = value.toFixed( 1 );
+				} );
+
+				document.getElementById( 'offsetZ' ).addEventListener( 'input', ( e ) => {
+					const value = parseFloat( e.target.value );
+					controls.offset.z = value;
+					document.getElementById( 'offsetZValue' ).textContent = value.toFixed( 1 );
+				} );
+
+				// Presets
+				document.getElementById( 'presetCircle' ).addEventListener( 'click', () => {
+					createCurve( 'circle' );
+					logEvent( 'Loaded circle path preset' );
+				} );
+
+				document.getElementById( 'presetFigure8' ).addEventListener( 'click', () => {
+					createCurve( 'figure8' );
+					logEvent( 'Loaded figure-8 path preset' );
+				} );
+
+				document.getElementById( 'presetSpiral' ).addEventListener( 'click', () => {
+					createCurve( 'spiral' );
+					controls.loop = false;
+					document.getElementById( 'loop' ).checked = false;
+					logEvent( 'Loaded spiral path preset' );
+				} );
+
+				// Helpers
+				document.getElementById( 'showHelper' ).addEventListener( 'change', ( e ) => {
+					splineHelper.visible = e.target.checked;
+				} );
+
+				document.getElementById( 'showPoints' ).addEventListener( 'change', ( e ) => {
+					controlPointsGroup.visible = e.target.checked;
+				} );
+
+				// Timeline scrubber
+				let scrubbing = false;
+
+				document.getElementById( 'timelineSlider' ).addEventListener( 'mousedown', () => {
+					scrubbing = true;
+					controls.pause();
+				} );
+
+				document.getElementById( 'timelineSlider' ).addEventListener( 'mouseup', () => {
+					scrubbing = false;
+				} );
+
+				document.getElementById( 'timelineSlider' ).addEventListener( 'input', ( e ) => {
+					const value = parseFloat( e.target.value ) / 100;
+					controls.setPosition( value );
+					document.getElementById( 'timelineValue' ).textContent = ( value * 100 ).toFixed( 1 ) + '%';
+				} );
+
+			}
+
+			function logEvent( message ) {
+
+				const eventsDiv = document.getElementById( 'events' );
+				const timestamp = new Date().toLocaleTimeString();
+				const eventLog = document.createElement( 'div' );
+				eventLog.className = 'event-log';
+				eventLog.textContent = `[${ timestamp }] ${ message }`;
+				eventsDiv.insertBefore( eventLog, eventsDiv.firstChild );
+
+				// Keep only last 20 events
+				while ( eventsDiv.children.length > 20 ) {
+					eventsDiv.removeChild( eventsDiv.lastChild );
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const delta = clock.getDelta();
+				controls.update( delta );
+
+				// Update timeline scrubber (if not being dragged)
+				const timelineSlider = document.getElementById( 'timelineSlider' );
+				if ( ! timelineSlider.matches( ':active' ) ) {
+					const position = controls.getPosition();
+					timelineSlider.value = position * 100;
+					document.getElementById( 'timelineValue' ).textContent = ( position * 100 ).toFixed( 1 ) + '%';
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
