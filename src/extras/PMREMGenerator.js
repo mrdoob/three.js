@@ -675,7 +675,6 @@ function _createPlanes( lodMax ) {
 				// logic matching _getCommonVertexShader
 				const x = u * 2 - 1;
 				const y = v * 2 - 1;
-				const z = 1;
 
 				if ( face === 0 ) {
 
