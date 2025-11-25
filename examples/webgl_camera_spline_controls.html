@@ -43,6 +43,12 @@
 			<span id="speedValue">1.0x</span>
 			<br/>
 			<label><input type="checkbox" id="loop" checked> Loop</label>
+			<br/>
+			<label>Look-ahead: <input type="range" id="lookahead" min="0" max="0.1" step="0.001" value="0.02"></label>
+			<span id="lookaheadValue">0.02</span>
+			<br/>
+			<label>Y Offset: <input type="range" id="yoffset" min="-10" max="10" step="0.5" value="0"></label>
+			<span id="yoffsetValue">0</span>
 		</div>
 
 		<script type="importmap">
@@ -121,6 +127,17 @@
 
 				document.getElementById( 'loop' ).addEventListener( 'change', ( e ) => {
 					controls.loop = e.target.checked;
+				} );
+
+				document.getElementById( 'lookahead' ).addEventListener( 'input', ( e ) => {
+					controls.lookAhead = parseFloat( e.target.value );
+					document.getElementById( 'lookaheadValue' ).textContent = e.target.value;
+				} );
+
+				document.getElementById( 'yoffset' ).addEventListener( 'input', ( e ) => {
+					const value = parseFloat( e.target.value );
+					controls.offset.y = value;
+					document.getElementById( 'yoffsetValue' ).textContent = value;
 				} );
 
 				// Window resize

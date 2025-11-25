@@ -1,6 +1,7 @@
 import {
 	Controls,
-	Vector3
+	Vector3,
+	Matrix4
 } from 'three';
 
 /**
@@ -15,6 +16,9 @@ const _changeEvent = { type: 'change' };
 const _position = new Vector3();
 const _tangent = new Vector3();
 const _lookAtPosition = new Vector3();
+const _normal = new Vector3();
+const _binormal = new Vector3();
+const _matrix = new Matrix4();
 
 /**
  * SplineCameraControls allows the camera to follow a curved path defined by any Curve object.
@@ -227,18 +231,43 @@ class SplineCameraControls extends Controls {
 		// Calculate position along curve (0-1)
 		const t = this.currentTime / this.loopTime;
 
-		// Get position and tangent at current point
+		// Get position on curve
 		curve.getPointAt( t, camera.position );
 
-		// Apply offset (simplified for Phase 1 - just add offset directly)
+		// Get tangent (forward direction)
+		curve.getTangentAt( t, _tangent );
+
+		// Calculate normal and binormal for local coordinate system
+		// Normal is perpendicular to tangent, binormal completes the right-handed system
+		if ( Math.abs( _tangent.y ) < 0.999 ) {
+
+			// Use world up if tangent is not vertical
+			_binormal.crossVectors( _tangent, this.upVector ).normalize();
+			_normal.crossVectors( _binormal, _tangent ).normalize();
+
+		} else {
+
+			// If tangent is nearly vertical, use world forward
+			_binormal.set( 1, 0, 0 );
+			_normal.crossVectors( _binormal, _tangent ).normalize();
+			_binormal.crossVectors( _tangent, _normal ).normalize();
+
+		}
+
+		// Apply offset in curve-local coordinates
+		// offset.x = along binormal (left/right relative to path)
+		// offset.y = along normal (up/down relative to path)
+		// offset.z = along tangent (forward/back relative to path)
 		if ( this.offset.lengthSq() > 0 ) {
 
-			camera.position.add( this.offset );
+			camera.position.x += _binormal.x * this.offset.x + _normal.x * this.offset.y + _tangent.x * this.offset.z;
+			camera.position.y += _binormal.y * this.offset.x + _normal.y * this.offset.y + _tangent.y * this.offset.z;
+			camera.position.z += _binormal.z * this.offset.x + _normal.z * this.offset.y + _tangent.z * this.offset.z;
 
 		}
 
 		// Calculate look-ahead target
-		const lookAheadT = ( t + this.lookAhead ) % 1.0;
+		const lookAheadT = this.loop ? ( t + this.lookAhead ) % 1.0 : Math.min( t + this.lookAhead, 1.0 );
 		curve.getPointAt( lookAheadT, _lookAtPosition );
 
 		// Orient camera to look at the target point

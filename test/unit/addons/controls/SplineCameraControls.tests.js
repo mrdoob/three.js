@@ -323,6 +323,67 @@ export default QUnit.module( 'Controls', () => {
 
 		} );
 
+		QUnit.test( 'update - applies offset correctly', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			camera.position.set( 0, 0, 0 );
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+
+			// Get position without offset
+			controls.setPosition( 0.5 );
+			controls.update( 0 );
+			const positionWithoutOffset = camera.position.clone();
+
+			// Apply Y offset (up)
+			controls.offset.set( 0, 5, 0 );
+			controls.update( 0 );
+
+			const distance = camera.position.distanceTo( positionWithoutOffset );
+			assert.ok( distance > 4.9, 'Offset is applied to camera position' );
+
+		} );
+
+		QUnit.test( 'update - lookAhead affects orientation', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+
+			controls.setPosition( 0.0 );
+			controls.lookAhead = 0.0;
+			controls.update( 0 );
+			const quaternion1 = camera.quaternion.clone();
+
+			controls.setPosition( 0.0 );
+			controls.lookAhead = 0.1;
+			controls.update( 0 );
+			const quaternion2 = camera.quaternion.clone();
+
+			// Quaternions should be different with different lookAhead values
+			const angleDiff = quaternion1.angleTo( quaternion2 );
+			assert.ok( angleDiff > 0.01, 'lookAhead affects camera orientation' );
+
+		} );
+
+		QUnit.test( 'update - respects custom upVector', ( assert ) => {
+
+			const camera = new PerspectiveCamera();
+			const curve = new CatmullRomCurve3( points );
+			const controls = new SplineCameraControls( camera, curve );
+
+			// Set custom up vector
+			controls.upVector.set( 0, 0, 1 );
+
+			controls.setPosition( 0.5 );
+			controls.update( 0 );
+
+			// Camera's up should match the custom upVector (approximately)
+			const dot = camera.up.dot( controls.upVector );
+			assert.ok( dot > 0.9, 'Camera up direction respects custom upVector' );
+
+		} );
+
 		QUnit.test( 'dispose', ( assert ) => {
 
 			const camera = new PerspectiveCamera();
