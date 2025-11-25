@@ -549,6 +549,8 @@
 		"misc_controls_map",
 		"misc_controls_orbit",
 		"misc_controls_pointerlock",
+		"misc_controls_spline",
+		"misc_controls_spline_editor",
 		"misc_controls_trackball",
 		"misc_controls_transform",
 		"misc_exporter_draco",
