@@ -83,7 +83,7 @@ async function AmmoPhysics() {
 
 				if ( physics ) {
 
-					addMesh( child, physics.mass );
+					addMesh( child, physics.mass, physics.restitution );
 
 				}
 
@@ -93,7 +93,7 @@ async function AmmoPhysics() {
 
 	}
 
-	function addMesh( mesh, mass = 0 ) {
+	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
 		const shape = getShape( mesh.geometry );
 
@@ -101,11 +101,11 @@ async function AmmoPhysics() {
 
 			if ( mesh.isInstancedMesh ) {
 
-				handleInstancedMesh( mesh, mass, shape );
+				handleInstancedMesh( mesh, shape, mass, restitution );
 
 			} else if ( mesh.isMesh ) {
 
-				handleMesh( mesh, mass, shape );
+				handleMesh( mesh, shape, mass, restitution );
 
 			}
 
@@ -113,7 +113,7 @@ async function AmmoPhysics() {
 
 	}
 
-	function handleMesh( mesh, mass, shape ) {
+	function handleMesh( mesh, shape, mass, restitution ) {
 
 		const position = mesh.position;
 		const quaternion = mesh.quaternion;
@@ -129,6 +129,7 @@ async function AmmoPhysics() {
 		shape.calculateLocalInertia( mass, localInertia );
 
 		const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia );
+		rbInfo.set_m_restitution( restitution );
 
 		const body = new AmmoLib.btRigidBody( rbInfo );
 		// body.setFriction( 4 );
@@ -144,7 +145,7 @@ async function AmmoPhysics() {
 
 	}
 
-	function handleInstancedMesh( mesh, mass, shape ) {
+	function handleInstancedMesh( mesh, shape, mass, restitution ) {
 
 		const array = mesh.instanceMatrix.array;
 
@@ -163,6 +164,7 @@ async function AmmoPhysics() {
 			shape.calculateLocalInertia( mass, localInertia );
 
 			const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia );
+			rbInfo.set_m_restitution( restitution );
 
 			const body = new AmmoLib.btRigidBody( rbInfo );
 			world.addRigidBody( body );
@@ -302,6 +304,7 @@ async function AmmoPhysics() {
 		 * @name AmmoPhysics#addMesh
 		 * @param {Mesh} mesh The mesh to add.
 		 * @param {number} [mass=0] The mass in kg of the mesh.
+		 * @param {number} [restitution=0] The restitution of the mesh, usually from 0 to 1. Represents how "bouncy" objects are when they collide with each other.
 		 */
 		addMesh: addMesh,
 
