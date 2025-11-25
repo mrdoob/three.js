@@ -645,7 +645,6 @@ function _createPlanes( lodMax ) {
 		const vertices = 6;
 		const positionSize = 3;
 		const uvSize = 2;
-		const faceIndexSize = 1;
 
 		const position = new Float32Array( positionSize * vertices * cubeFaces );
 		const uv = new Float32Array( uvSize * vertices * cubeFaces );
