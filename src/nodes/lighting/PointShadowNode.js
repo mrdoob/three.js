@@ -1,6 +1,6 @@
 import ShadowNode from './ShadowNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { float, vec3, If, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec2, If, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
@@ -51,17 +51,17 @@ export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, s
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
 	const texelSize = float( 1 ).div( mapSize.x );
-	const offset = radius.mul( texelSize );
+	const offset = vec2( - 1.0, 1.0 ).mul( radius ).mul( texelSize );
 
-	return cubeTexture( depthTexture, bd3D.add( vec3( offset, offset, offset ) ) ).compare( dp )
-		.add( cubeTexture( depthTexture, bd3D.add( vec3( offset, offset, offset.negate() ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( vec3( offset, offset.negate(), offset ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( vec3( offset, offset.negate(), offset.negate() ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( vec3( offset.negate(), offset, offset ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( vec3( offset.negate(), offset, offset.negate() ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( vec3( offset.negate(), offset.negate(), offset ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( vec3( offset.negate(), offset.negate(), offset.negate() ) ) ).compare( dp ) )
+	return cubeTexture( depthTexture, bd3D.add( offset.xyy ) ).compare( dp )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.yyy ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.xyx ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.yyx ) ).compare( dp ) )
 		.add( cubeTexture( depthTexture, bd3D ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.xxy ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.yxy ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.xxx ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.yxx ) ).compare( dp ) )
 		.mul( 1.0 / 9.0 );
 
 } );
