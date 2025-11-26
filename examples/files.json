@@ -551,6 +551,7 @@
 		"misc_controls_orbit",
 		"misc_controls_pointerlock",
 		"misc_controls_trackball",
+		"misc_controls_thirdperson",
 		"misc_controls_transform",
 		"misc_exporter_draco",
 		"misc_exporter_gltf",
