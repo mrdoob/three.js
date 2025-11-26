@@ -57,3 +57,11 @@ export const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onRefe
 	return _m1;
 
 } );
+
+/**
+ * TSL object that represents whether the material is transparent.
+ *
+ * @tsl
+ * @type {UniformNode<bool>}
+ */
+export const materialTransparent = /*@__PURE__*/ uniform( false ).onReference( ( { material } ) => material ).onObjectUpdate( ( { material } ) => material.transparent );

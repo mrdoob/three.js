@@ -309,6 +309,7 @@ export const materialSpecularIntensity = TSL.materialSpecularIntensity;
 export const materialSpecularStrength = TSL.materialSpecularStrength;
 export const materialThickness = TSL.materialThickness;
 export const materialTransmission = TSL.materialTransmission;
+export const materialTransparent = TSL.materialTransparent;
 export const max = TSL.max;
 export const maxMipLevel = TSL.maxMipLevel;
 export const mediumpModelViewMatrix = TSL.mediumpModelViewMatrix;
