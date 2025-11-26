@@ -7,6 +7,7 @@ const frameRate = 60;
 const _scale = new Vector3( 1, 1, 1 );
 const ZERO = new Vector3();
 
+/** @type {import("@dimforge/rapier3d-compat") | null} */
 let RAPIER = null;
 
 function getShape( geometry ) {

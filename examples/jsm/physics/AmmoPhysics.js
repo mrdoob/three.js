@@ -23,6 +23,7 @@ async function AmmoPhysics() {
 
 	}
 
+	/** @type {import("ammojs3").default} */
 	const AmmoLib = await Ammo(); // eslint-disable-line no-undef
 
 	const frameRate = 60;

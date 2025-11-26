@@ -94,8 +94,10 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
+    "@dimforge/rapier3d-compat": "^0.17.3",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.0",
+    "ammojs3": "^0.0.11",
     "concurrently": "^9.0.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
@@ -103,6 +105,7 @@
     "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
     "jimp": "^1.6.0",
+    "jolt-physics": "^0.23.0",
     "jsdoc": "^4.0.5",
     "magic-string": "^0.30.0",
     "pixelmatch": "^7.0.0",
