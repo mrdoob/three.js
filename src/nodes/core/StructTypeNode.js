@@ -87,7 +87,7 @@ class StructTypeNode extends Node {
 	getLength() {
 
 		const BYTES_PER_ELEMENT = Float32Array.BYTES_PER_ELEMENT;
-		const CHUNK_SIZE = 4; // Webgpu aligns most data in blocks of 4 elements (16 bytes)
+		let maxAlignment = 1; // maximum alignment value in this struct
 		let offset = 0; // global buffer offset in 4 byte elements
 
 		for ( const member of this.membersLayout ) {
@@ -96,8 +96,9 @@ class StructTypeNode extends Node {
 
 			const itemSize = getMemoryLengthFromType( type );
 			const alignment = getAlignmentFromType( type ) / BYTES_PER_ELEMENT;
+			maxAlignment = Math.max( maxAlignment, alignment );
 
-			const chunkOffset = offset % CHUNK_SIZE; // offset in the current chunk of 4 elements
+			const chunkOffset = offset % maxAlignment; // offset in the current chunk of maxAlignment elements
 			const overhang = chunkOffset % alignment; // distance from the last aligned offset
 			if ( overhang !== 0 ) {
 
@@ -109,7 +110,7 @@ class StructTypeNode extends Node {
 
 		}
 
-		return ( Math.ceil( offset / CHUNK_SIZE ) * CHUNK_SIZE ); // ensure length is a multiple of 4
+		return ( Math.ceil( offset / maxAlignment ) * maxAlignment ); // ensure length is a multiple of maxAlignment
 
 	}
 
