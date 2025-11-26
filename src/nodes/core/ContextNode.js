@@ -233,6 +233,31 @@ export function builtinShadowContext( shadowNode, light, node = null ) {
 }
 
 /**
+ * TSL function for defining a built-in ambient occlusion context for a given node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} aoValue - The ambient occlusion value node to apply.
+ * @param {Node} [node=null] - The node whose context should be modified.
+ * @returns {ContextNode}
+ */
+export function builtinAOContext( aoValue, node = null ) {
+
+	return context( node, {
+
+		getAO: ( inputNode, { material } ) => {
+
+			if ( material.transparent === true ) return inputNode;
+
+			return inputNode !== null ? inputNode.mul( aoValue ) : aoValue;
+
+		}
+
+	} );
+
+}
+
+/**
  * TSL function for defining a label context value for a given node.
  *
  * @tsl
@@ -255,3 +280,4 @@ addMethodChaining( 'label', label );
 addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
 addMethodChaining( 'builtinShadowContext', ( node, shadowNode, light ) => builtinShadowContext( shadowNode, light, node ) );
+addMethodChaining( 'builtinAOContext', ( node, aoValue ) => builtinAOContext( aoValue, node ) );

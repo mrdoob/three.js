@@ -101,6 +101,7 @@ export const bumpMap = TSL.bumpMap;
 export const burn = TSL.burn;
 export const builtin = TSL.builtin;
 export const builtinShadowContext = TSL.builtinShadowContext;
+export const builtinAOContext = TSL.builtinAOContext;
 export const bvec2 = TSL.bvec2;
 export const bvec3 = TSL.bvec3;
 export const bvec4 = TSL.bvec4;
