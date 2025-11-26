@@ -4,6 +4,7 @@ const JOLT_PATH = 'https://cdn.jsdelivr.net/npm/jolt-physics@0.23.0/dist/jolt-ph
 
 const frameRate = 60;
 
+/** @type {import("jolt-physics").default | null} */
 let Jolt = null;
 
 function getShape( geometry ) {
