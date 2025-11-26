@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - third person controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #1a1a2e;
+				color: #eee;
+			}
+
+			a {
+				color: #9d4edd;
+			}
+
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+			}
+
+			#controls-info {
+				position: absolute;
+				bottom: 20px;
+				left: 20px;
+				background: rgba(0, 0, 0, 0.7);
+				padding: 15px 20px;
+				border-radius: 10px;
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				font-size: 13px;
+				line-height: 1.8;
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(157, 78, 221, 0.3);
+				max-width: 280px;
+			}
+
+			#controls-info h3 {
+				margin: 0 0 12px 0;
+				color: #9d4edd;
+				font-size: 14px;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+
+			#controls-info kbd {
+				background: rgba(157, 78, 221, 0.2);
+				padding: 2px 8px;
+				border-radius: 4px;
+				font-family: monospace;
+				border: 1px solid rgba(157, 78, 221, 0.4);
+				font-size: 12px;
+			}
+
+			#controls-info .row {
+				margin-bottom: 6px;
+			}
+
+			#status {
+				position: absolute;
+				top: 50px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: rgba(157, 78, 221, 0.9);
+				padding: 10px 20px;
+				border-radius: 20px;
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				font-size: 14px;
+				font-weight: 600;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				pointer-events: none;
+			}
+
+			#status.visible {
+				opacity: 1;
+			}
+
+			#character-indicator {
+				position: absolute;
+				bottom: 20px;
+				right: 20px;
+				background: rgba(0, 0, 0, 0.7);
+				padding: 15px 20px;
+				border-radius: 10px;
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(157, 78, 221, 0.3);
+			}
+
+			#character-indicator h4 {
+				margin: 0 0 10px 0;
+				color: #9d4edd;
+				font-size: 12px;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+
+			.character-btn {
+				display: inline-block;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				border: 3px solid transparent;
+				margin: 0 5px;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+
+			.character-btn:hover {
+				transform: scale(1.1);
+			}
+
+			.character-btn.active {
+				border-color: #fff;
+				box-shadow: 0 0 15px rgba(157, 78, 221, 0.8);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - third person controls
+		</div>
+
+		<div id="status">Switching target...</div>
+
+		<div id="controls-info">
+			<h3>Controls</h3>
+			<div class="row"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> - Move character</div>
+			<div class="row"><kbd>Mouse Drag</kbd> - Orbit camera</div>
+			<div class="row"><kbd>Scroll</kbd> - Zoom in/out</div>
+			<div class="row"><kbd>Click Character</kbd> - Switch target</div>
+			<div class="row"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> - Select character</div>
+			<div class="row"><kbd>Space</kbd> - Toggle collision</div>
+			<div class="row"><kbd>Tab</kbd> - Cycle characters</div>
+		</div>
+
+		<div id="character-indicator">
+			<h4>Characters</h4>
+			<div id="character-buttons"></div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { ThirdPersonControls } from 'three/addons/controls/ThirdPersonControls.js';
+
+			let camera, scene, renderer, controls;
+			const characters = [];
+			let activeCharacterIndex = 0;
+			let clock;
+			const collisionObjects = [];
+			let raycaster, mouse;
+
+			const characterColors = [
+				{ body: 0x9d4edd, head: 0xe0aaff, name: 'Violet' },
+				{ body: 0x00b4d8, head: 0x90e0ef, name: 'Cyan' },
+				{ body: 0xf77f00, head: 0xfcbf49, name: 'Orange' }
+			];
+
+			const moveState = {
+				forward: false,
+				backward: false,
+				left: false,
+				right: false
+			};
+
+			const characterVelocity = new THREE.Vector3();
+			const characterDirection = new THREE.Vector3();
+			const moveSpeed = 5;
+
+			init();
+
+			function init() {
+
+				clock = new THREE.Clock();
+				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x1a1a2e );
+				scene.fog = new THREE.FogExp2( 0x1a1a2e, 0.015 );
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				document.body.appendChild( renderer.domElement );
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( 0, 5, 10 );
+
+				// Lights
+
+				const ambientLight = new THREE.AmbientLight( 0x404060, 0.5 );
+				scene.add( ambientLight );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				directionalLight.position.set( 50, 100, 50 );
+				directionalLight.castShadow = true;
+				directionalLight.shadow.mapSize.width = 2048;
+				directionalLight.shadow.mapSize.height = 2048;
+				directionalLight.shadow.camera.near = 10;
+				directionalLight.shadow.camera.far = 400;
+				directionalLight.shadow.camera.left = - 100;
+				directionalLight.shadow.camera.right = 100;
+				directionalLight.shadow.camera.top = 100;
+				directionalLight.shadow.camera.bottom = - 100;
+				scene.add( directionalLight );
+
+				const hemisphereLight = new THREE.HemisphereLight( 0x9d4edd, 0x1a1a2e, 0.6 );
+				scene.add( hemisphereLight );
+
+				// Ground
+
+				const groundGeometry = new THREE.PlaneGeometry( 200, 200 );
+				const groundMaterial = new THREE.MeshStandardMaterial( {
+					color: 0x2d2d44,
+					roughness: 0.9,
+					metalness: 0.1
+				} );
+				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				// Grid helper
+
+				const gridHelper = new THREE.GridHelper( 200, 40, 0x9d4edd, 0x3d3d5c );
+				gridHelper.position.y = 0.01;
+				scene.add( gridHelper );
+
+				// Create multiple characters
+
+				createCharacters();
+
+				// Create obstacles for collision testing
+
+				createObstacles();
+
+				// Create character selection buttons
+
+				createCharacterButtons();
+
+				// Third Person Controls
+
+				controls = new ThirdPersonControls( camera, characters[ 0 ], renderer.domElement );
+				controls.distance = 6;
+				controls.height = 1.5;
+				controls.pivotOffset.set( 0, 0.3, 0 );
+				controls.smoothingFactor = 0.12;
+				controls.rotationSpeed = 0.004;
+				controls.enableCollision = true;
+				controls.collisionObjects = collisionObjects;
+				controls.collisionRadius = 0.5;
+				controls.minDistance = 2;
+				controls.maxDistance = 15;
+				controls.minPolarAngle = 0.3;
+				controls.maxPolarAngle = Math.PI - 0.3;
+				controls.targetTransitionDuration = 0.6;
+
+				// Listen for target change events
+				controls.addEventListener( 'targetchange', () => {
+
+					showStatus( `Following: ${characterColors[ activeCharacterIndex ].name}` );
+
+				} );
+
+				// Event listeners
+
+				window.addEventListener( 'resize', onWindowResize );
+				document.addEventListener( 'keydown', onKeyDown );
+				document.addEventListener( 'keyup', onKeyUp );
+				renderer.domElement.addEventListener( 'click', onCanvasClick );
+
+			}
+
+			function createCharacters() {
+
+				const startPositions = [
+					new THREE.Vector3( 0, 0, 0 ),
+					new THREE.Vector3( 10, 0, - 5 ),
+					new THREE.Vector3( - 8, 0, 8 )
+				];
+
+				for ( let i = 0; i < characterColors.length; i ++ ) {
+
+					const char = createCharacter( characterColors[ i ] );
+					char.position.copy( startPositions[ i ] );
+					char.userData.index = i;
+					char.userData.isCharacter = true;
+					char.userData.color = characterColors[ i ];
+					characters.push( char );
+					scene.add( char );
+
+				}
+
+			}
+
+			function createCharacter( colorConfig ) {
+
+				// Character group
+
+				const character = new THREE.Group();
+
+				// Body (capsule shape)
+
+				const bodyGeometry = new THREE.CapsuleGeometry( 0.3, 0.8, 4, 16 );
+				const bodyMaterial = new THREE.MeshStandardMaterial( {
+					color: colorConfig.body,
+					roughness: 0.4,
+					metalness: 0.6
+				} );
+				const body = new THREE.Mesh( bodyGeometry, bodyMaterial );
+				body.position.y = 0.9;
+				body.castShadow = true;
+				character.add( body );
+
+				// Head
+
+				const headGeometry = new THREE.SphereGeometry( 0.25, 16, 16 );
+				const headMaterial = new THREE.MeshStandardMaterial( {
+					color: colorConfig.head,
+					roughness: 0.3,
+					metalness: 0.5
+				} );
+				const head = new THREE.Mesh( headGeometry, headMaterial );
+				head.position.y = 1.65;
+				head.castShadow = true;
+				character.add( head );
+
+				// Eyes
+
+				const eyeGeometry = new THREE.SphereGeometry( 0.05, 8, 8 );
+				const eyeMaterial = new THREE.MeshStandardMaterial( {
+					color: 0x10002b,
+					roughness: 0.1,
+					metalness: 0.8,
+					emissive: 0x3c096c,
+					emissiveIntensity: 0.5
+				} );
+
+				const leftEye = new THREE.Mesh( eyeGeometry, eyeMaterial );
+				leftEye.position.set( 0.1, 1.7, 0.2 );
+				character.add( leftEye );
+
+				const rightEye = new THREE.Mesh( eyeGeometry, eyeMaterial );
+				rightEye.position.set( - 0.1, 1.7, 0.2 );
+				character.add( rightEye );
+
+				// Indicator arrow (shows forward direction)
+
+				const arrowGeometry = new THREE.ConeGeometry( 0.15, 0.3, 8 );
+				const arrowMaterial = new THREE.MeshStandardMaterial( {
+					color: colorConfig.body,
+					emissive: colorConfig.body,
+					emissiveIntensity: 0.3
+				} );
+				const arrow = new THREE.Mesh( arrowGeometry, arrowMaterial );
+				arrow.rotation.x = Math.PI / 2;
+				arrow.position.set( 0, 0.9, 0.5 );
+				character.add( arrow );
+
+				// Selection ring (visible when active)
+
+				const ringGeometry = new THREE.RingGeometry( 0.6, 0.7, 32 );
+				const ringMaterial = new THREE.MeshBasicMaterial( {
+					color: 0xffffff,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: 0
+				} );
+				const ring = new THREE.Mesh( ringGeometry, ringMaterial );
+				ring.rotation.x = - Math.PI / 2;
+				ring.position.y = 0.02;
+				ring.userData.isSelectionRing = true;
+				character.add( ring );
+
+				return character;
+
+			}
+
+			function createCharacterButtons() {
+
+				const container = document.getElementById( 'character-buttons' );
+
+				characterColors.forEach( ( color, index ) => {
+
+					const btn = document.createElement( 'div' );
+					btn.className = 'character-btn' + ( index === 0 ? ' active' : '' );
+					btn.style.backgroundColor = '#' + color.body.toString( 16 ).padStart( 6, '0' );
+					btn.title = color.name;
+					btn.addEventListener( 'click', () => switchToCharacter( index ) );
+					container.appendChild( btn );
+
+				} );
+
+			}
+
+			function updateCharacterButtons() {
+
+				const buttons = document.querySelectorAll( '.character-btn' );
+				buttons.forEach( ( btn, index ) => {
+
+					btn.classList.toggle( 'active', index === activeCharacterIndex );
+
+				} );
+
+			}
+
+			function updateSelectionRings() {
+
+				characters.forEach( ( char, index ) => {
+
+					char.traverse( ( child ) => {
+
+						if ( child.userData.isSelectionRing ) {
+
+							child.material.opacity = index === activeCharacterIndex ? 0.8 : 0;
+
+						}
+
+					} );
+
+				} );
+
+			}
+
+			function switchToCharacter( index ) {
+
+				if ( index === activeCharacterIndex ) return;
+				if ( index < 0 || index >= characters.length ) return;
+
+				activeCharacterIndex = index;
+				controls.setTarget( characters[ index ], true ); // Smooth transition!
+				updateCharacterButtons();
+				updateSelectionRings();
+
+			}
+
+			function cycleCharacter() {
+
+				const nextIndex = ( activeCharacterIndex + 1 ) % characters.length;
+				switchToCharacter( nextIndex );
+
+			}
+
+			function showStatus( message ) {
+
+				const status = document.getElementById( 'status' );
+				status.textContent = message;
+				status.classList.add( 'visible' );
+
+				setTimeout( () => {
+
+					status.classList.remove( 'visible' );
+
+				}, 1500 );
+
+			}
+
+			function createObstacles() {
+
+				const wallMaterial = new THREE.MeshStandardMaterial( {
+					color: 0x5a189a,
+					roughness: 0.7,
+					metalness: 0.3
+				} );
+
+				const wallMaterial2 = new THREE.MeshStandardMaterial( {
+					color: 0x7b2cbf,
+					roughness: 0.6,
+					metalness: 0.4
+				} );
+
+				const accentMaterial = new THREE.MeshStandardMaterial( {
+					color: 0x9d4edd,
+					roughness: 0.5,
+					metalness: 0.5
+				} );
+
+				// ============ ROOM 1: Main Hall (near spawn) ============
+
+				createRoom( 0, 0, 20, 20, 6, wallMaterial );
+
+				// Pillars in main hall
+				createPillar( - 6, 4, 0.8, 6, accentMaterial );
+				createPillar( 6, 4, 0.8, 6, accentMaterial );
+				createPillar( - 6, - 4, 0.8, 6, accentMaterial );
+				createPillar( 6, - 4, 0.8, 6, accentMaterial );
+
+				// ============ TUNNEL 1: North Corridor ============
+
+				createTunnel( 0, - 15, 4, 10, 4, wallMaterial2, 'z' );
+
+				// ============ ROOM 2: North Chamber ============
+
+				createRoom( 0, - 30, 16, 14, 5, wallMaterial );
+
+				// Central platform in north chamber
+				const platformGeo = new THREE.CylinderGeometry( 3, 3.5, 1, 8 );
+				const platform = new THREE.Mesh( platformGeo, accentMaterial );
+				platform.position.set( 0, 0.5, - 30 );
+				platform.castShadow = true;
+				platform.receiveShadow = true;
+				scene.add( platform );
+				collisionObjects.push( platform );
+
+				// ============ TUNNEL 2: East Corridor ============
+
+				createTunnel( 15, 0, 10, 4, 4, wallMaterial2, 'x' );
+
+				// ============ ROOM 3: East Storage ============
+
+				createRoom( 30, 0, 12, 18, 5, wallMaterial );
+
+				// Crates in storage room
+				for ( let i = 0; i < 6; i ++ ) {
+
+					const size = 1.5 + Math.random();
+					const crate = new THREE.Mesh(
+						new THREE.BoxGeometry( size, size, size ),
+						accentMaterial
+					);
+					crate.position.set(
+						28 + ( Math.random() - 0.5 ) * 6,
+						size / 2,
+						( Math.random() - 0.5 ) * 12
+					);
+					crate.rotation.y = Math.random() * Math.PI;
+					crate.castShadow = true;
+					crate.receiveShadow = true;
+					scene.add( crate );
+					collisionObjects.push( crate );
+
+				}
+
+				// ============ TUNNEL 3: West Corridor (L-shaped) ============
+
+				createTunnel( - 15, 0, 10, 4, 4, wallMaterial2, 'x' );
+				createTunnel( - 25, - 10, 4, 16, 4, wallMaterial2, 'z' );
+
+				// ============ ROOM 4: West Arena ============
+
+				createRoom( - 40, - 20, 18, 18, 7, wallMaterial );
+
+				// Arena pillars (circular arrangement)
+				for ( let i = 0; i < 6; i ++ ) {
+
+					const angle = ( i / 6 ) * Math.PI * 2;
+					const radius = 6;
+					createPillar(
+						- 40 + Math.cos( angle ) * radius,
+						- 20 + Math.sin( angle ) * radius,
+						0.6, 7, accentMaterial
+					);
+
+				}
+
+				// ============ TUNNEL 4: Underground Passage ============
+
+				createTunnel( 15, - 30, 24, 3, 3, wallMaterial2, 'x' );
+
+				// ============ ROOM 5: Secret Chamber (low ceiling) ============
+
+				createRoom( 45, - 30, 10, 10, 3.5, wallMaterial2 );
+
+				// ============ Scattered Pillars in Open Areas ============
+
+				const pillarPositions = [
+					[ 15, 15 ], [ - 15, 15 ], [ 20, - 10 ], [ - 10, 10 ],
+					[ 50, 10 ], [ - 50, 5 ], [ 40, 20 ], [ - 30, 30 ]
+				];
+
+				pillarPositions.forEach( pos => {
+
+					createPillar( pos[ 0 ], pos[ 1 ], 0.5 + Math.random() * 0.3, 3 + Math.random() * 3, wallMaterial );
+
+				} );
+
+				// ============ Archways ============
+
+				createArchway( 0, - 10, 0, wallMaterial2 ); // North entrance
+				createArchway( 10, 0, Math.PI / 2, wallMaterial2 ); // East entrance
+				createArchway( - 10, 0, Math.PI / 2, wallMaterial2 ); // West entrance
+
+			}
+
+			function createRoom( x, z, width, depth, height, material ) {
+
+				const wallThickness = 0.5;
+				const halfW = width / 2;
+				const halfD = depth / 2;
+
+				// Back wall (with door opening)
+				const backWallLeft = new THREE.Mesh(
+					new THREE.BoxGeometry( halfW - 2, height, wallThickness ),
+					material
+				);
+				backWallLeft.position.set( x - halfW / 2 - 1, height / 2, z - halfD );
+				backWallLeft.castShadow = true;
+				backWallLeft.receiveShadow = true;
+				scene.add( backWallLeft );
+				collisionObjects.push( backWallLeft );
+
+				const backWallRight = new THREE.Mesh(
+					new THREE.BoxGeometry( halfW - 2, height, wallThickness ),
+					material
+				);
+				backWallRight.position.set( x + halfW / 2 + 1, height / 2, z - halfD );
+				backWallRight.castShadow = true;
+				backWallRight.receiveShadow = true;
+				scene.add( backWallRight );
+				collisionObjects.push( backWallRight );
+
+				// Front wall (with door opening)
+				const frontWallLeft = new THREE.Mesh(
+					new THREE.BoxGeometry( halfW - 2, height, wallThickness ),
+					material
+				);
+				frontWallLeft.position.set( x - halfW / 2 - 1, height / 2, z + halfD );
+				frontWallLeft.castShadow = true;
+				frontWallLeft.receiveShadow = true;
+				scene.add( frontWallLeft );
+				collisionObjects.push( frontWallLeft );
+
+				const frontWallRight = new THREE.Mesh(
+					new THREE.BoxGeometry( halfW - 2, height, wallThickness ),
+					material
+				);
+				frontWallRight.position.set( x + halfW / 2 + 1, height / 2, z + halfD );
+				frontWallRight.castShadow = true;
+				frontWallRight.receiveShadow = true;
+				scene.add( frontWallRight );
+				collisionObjects.push( frontWallRight );
+
+				// Left wall
+				const leftWall = new THREE.Mesh(
+					new THREE.BoxGeometry( wallThickness, height, depth ),
+					material
+				);
+				leftWall.position.set( x - halfW, height / 2, z );
+				leftWall.castShadow = true;
+				leftWall.receiveShadow = true;
+				scene.add( leftWall );
+				collisionObjects.push( leftWall );
+
+				// Right wall
+				const rightWall = new THREE.Mesh(
+					new THREE.BoxGeometry( wallThickness, height, depth ),
+					material
+				);
+				rightWall.position.set( x + halfW, height / 2, z );
+				rightWall.castShadow = true;
+				rightWall.receiveShadow = true;
+				scene.add( rightWall );
+				collisionObjects.push( rightWall );
+
+				// Ceiling
+				const ceiling = new THREE.Mesh(
+					new THREE.BoxGeometry( width + wallThickness, wallThickness, depth + wallThickness ),
+					material
+				);
+				ceiling.position.set( x, height + wallThickness / 2, z );
+				ceiling.castShadow = true;
+				ceiling.receiveShadow = true;
+				scene.add( ceiling );
+				collisionObjects.push( ceiling );
+
+			}
+
+			function createTunnel( x, z, length, width, height, material, direction ) {
+
+				const wallThickness = 0.5;
+
+				if ( direction === 'x' ) {
+
+					// Tunnel along X axis
+					// Left wall
+					const leftWall = new THREE.Mesh(
+						new THREE.BoxGeometry( length, height, wallThickness ),
+						material
+					);
+					leftWall.position.set( x, height / 2, z - width / 2 );
+					leftWall.castShadow = true;
+					leftWall.receiveShadow = true;
+					scene.add( leftWall );
+					collisionObjects.push( leftWall );
+
+					// Right wall
+					const rightWall = new THREE.Mesh(
+						new THREE.BoxGeometry( length, height, wallThickness ),
+						material
+					);
+					rightWall.position.set( x, height / 2, z + width / 2 );
+					rightWall.castShadow = true;
+					rightWall.receiveShadow = true;
+					scene.add( rightWall );
+					collisionObjects.push( rightWall );
+
+					// Ceiling
+					const ceiling = new THREE.Mesh(
+						new THREE.BoxGeometry( length, wallThickness, width + wallThickness ),
+						material
+					);
+					ceiling.position.set( x, height + wallThickness / 2, z );
+					ceiling.castShadow = true;
+					ceiling.receiveShadow = true;
+					scene.add( ceiling );
+					collisionObjects.push( ceiling );
+
+				} else {
+
+					// Tunnel along Z axis
+					// Left wall
+					const leftWall = new THREE.Mesh(
+						new THREE.BoxGeometry( wallThickness, height, length ),
+						material
+					);
+					leftWall.position.set( x - width / 2, height / 2, z );
+					leftWall.castShadow = true;
+					leftWall.receiveShadow = true;
+					scene.add( leftWall );
+					collisionObjects.push( leftWall );
+
+					// Right wall
+					const rightWall = new THREE.Mesh(
+						new THREE.BoxGeometry( wallThickness, height, length ),
+						material
+					);
+					rightWall.position.set( x + width / 2, height / 2, z );
+					rightWall.castShadow = true;
+					rightWall.receiveShadow = true;
+					scene.add( rightWall );
+					collisionObjects.push( rightWall );
+
+					// Ceiling
+					const ceiling = new THREE.Mesh(
+						new THREE.BoxGeometry( width + wallThickness, wallThickness, length ),
+						material
+					);
+					ceiling.position.set( x, height + wallThickness / 2, z );
+					ceiling.castShadow = true;
+					ceiling.receiveShadow = true;
+					scene.add( ceiling );
+					collisionObjects.push( ceiling );
+
+				}
+
+			}
+
+			function createPillar( x, z, radius, height, material ) {
+
+				const pillar = new THREE.Mesh(
+					new THREE.CylinderGeometry( radius, radius * 1.1, height, 12 ),
+					material
+				);
+				pillar.position.set( x, height / 2, z );
+				pillar.castShadow = true;
+				pillar.receiveShadow = true;
+				scene.add( pillar );
+				collisionObjects.push( pillar );
+
+			}
+
+			function createArchway( x, z, rotation, material ) {
+
+				const archGroup = new THREE.Group();
+
+				// Left pillar
+				const leftPillar = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.8, 4, 0.8 ),
+					material
+				);
+				leftPillar.position.set( - 1.5, 2, 0 );
+				leftPillar.castShadow = true;
+				archGroup.add( leftPillar );
+				collisionObjects.push( leftPillar );
+
+				// Right pillar
+				const rightPillar = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.8, 4, 0.8 ),
+					material
+				);
+				rightPillar.position.set( 1.5, 2, 0 );
+				rightPillar.castShadow = true;
+				archGroup.add( rightPillar );
+				collisionObjects.push( rightPillar );
+
+				// Top beam
+				const topBeam = new THREE.Mesh(
+					new THREE.BoxGeometry( 4, 0.6, 0.8 ),
+					material
+				);
+				topBeam.position.set( 0, 4.3, 0 );
+				topBeam.castShadow = true;
+				archGroup.add( topBeam );
+				collisionObjects.push( topBeam );
+
+				archGroup.position.set( x, 0, z );
+				archGroup.rotation.y = rotation;
+				scene.add( archGroup );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onCanvasClick( event ) {
+
+				// Check if we clicked on a character
+
+				const rect = renderer.domElement.getBoundingClientRect();
+				mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+				mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+
+				raycaster.setFromCamera( mouse, camera );
+
+				// Test intersection with all characters
+				const characterMeshes = [];
+				characters.forEach( char => {
+
+					char.traverse( child => {
+
+						if ( child.isMesh ) {
+
+							child.userData.characterIndex = char.userData.index;
+							characterMeshes.push( child );
+
+						}
+
+					} );
+
+				} );
+
+				const intersects = raycaster.intersectObjects( characterMeshes );
+
+				if ( intersects.length > 0 ) {
+
+					const clickedIndex = intersects[ 0 ].object.userData.characterIndex;
+
+					if ( clickedIndex !== undefined && clickedIndex !== activeCharacterIndex ) {
+
+						switchToCharacter( clickedIndex );
+
+					}
+
+				}
+
+			}
+
+			function onKeyDown( event ) {
+
+				switch ( event.code ) {
+
+					case 'KeyW':
+					case 'ArrowUp':
+						moveState.forward = true;
+						break;
+
+					case 'KeyS':
+					case 'ArrowDown':
+						moveState.backward = true;
+						break;
+
+					case 'KeyA':
+					case 'ArrowLeft':
+						moveState.left = true;
+						break;
+
+					case 'KeyD':
+					case 'ArrowRight':
+						moveState.right = true;
+						break;
+
+					case 'Space':
+						controls.enableCollision = ! controls.enableCollision;
+						showStatus( 'Collision: ' + ( controls.enableCollision ? 'ON' : 'OFF' ) );
+						break;
+
+					case 'Tab':
+						event.preventDefault();
+						cycleCharacter();
+						break;
+
+					case 'Digit1':
+						switchToCharacter( 0 );
+						break;
+
+					case 'Digit2':
+						switchToCharacter( 1 );
+						break;
+
+					case 'Digit3':
+						switchToCharacter( 2 );
+						break;
+
+				}
+
+			}
+
+			function onKeyUp( event ) {
+
+				switch ( event.code ) {
+
+					case 'KeyW':
+					case 'ArrowUp':
+						moveState.forward = false;
+						break;
+
+					case 'KeyS':
+					case 'ArrowDown':
+						moveState.backward = false;
+						break;
+
+					case 'KeyA':
+					case 'ArrowLeft':
+						moveState.left = false;
+						break;
+
+					case 'KeyD':
+					case 'ArrowRight':
+						moveState.right = false;
+						break;
+
+				}
+
+			}
+
+			function updateCharacterMovement( delta ) {
+
+				const activeCharacter = characters[ activeCharacterIndex ];
+
+				// Get camera's forward direction (projected onto XZ plane)
+
+				const cameraDirection = new THREE.Vector3();
+				camera.getWorldDirection( cameraDirection );
+				cameraDirection.y = 0;
+				cameraDirection.normalize();
+
+				// Get camera's right direction
+
+				const cameraRight = new THREE.Vector3();
+				cameraRight.crossVectors( cameraDirection, new THREE.Vector3( 0, 1, 0 ) ).normalize();
+
+				// Calculate movement direction based on input and camera orientation
+
+				characterDirection.set( 0, 0, 0 );
+
+				if ( moveState.forward ) characterDirection.add( cameraDirection );
+				if ( moveState.backward ) characterDirection.sub( cameraDirection );
+				if ( moveState.left ) characterDirection.sub( cameraRight );
+				if ( moveState.right ) characterDirection.add( cameraRight );
+
+				if ( characterDirection.lengthSq() > 0 ) {
+
+					characterDirection.normalize();
+
+					// Move character
+
+					activeCharacter.position.addScaledVector( characterDirection, moveSpeed * delta );
+
+					// Rotate character to face movement direction
+
+					const targetRotation = Math.atan2( characterDirection.x, characterDirection.z );
+					const currentRotation = activeCharacter.rotation.y;
+
+					// Smooth rotation
+
+					let rotationDiff = targetRotation - currentRotation;
+					while ( rotationDiff > Math.PI ) rotationDiff -= Math.PI * 2;
+					while ( rotationDiff < - Math.PI ) rotationDiff += Math.PI * 2;
+
+					activeCharacter.rotation.y += rotationDiff * 10 * delta;
+
+				}
+
+				// Keep character on ground
+
+				activeCharacter.position.y = 0;
+
+				// Clamp character to world bounds
+
+				activeCharacter.position.x = THREE.MathUtils.clamp( activeCharacter.position.x, - 95, 95 );
+				activeCharacter.position.z = THREE.MathUtils.clamp( activeCharacter.position.z, - 95, 95 );
+
+				// Animate non-active characters (simple idle movement)
+
+				characters.forEach( ( char, index ) => {
+
+					if ( index !== activeCharacterIndex ) {
+
+						// Simple floating animation for inactive characters
+						const time = clock.getElapsedTime();
+						char.children.forEach( child => {
+
+							if ( child.position.y > 0.5 ) {
+
+								child.position.y += Math.sin( time * 2 + index ) * 0.001;
+
+							}
+
+						} );
+
+					}
+
+				} );
+
+			}
+
+			function animate() {
+
+				const delta = clock.getDelta();
+
+				// Update character movement
+
+				updateCharacterMovement( delta );
+
+				// Update selection rings animation
+				updateSelectionRings();
+
+				// Update third-person controls
+
+				controls.update( delta );
+
+				// Render
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
