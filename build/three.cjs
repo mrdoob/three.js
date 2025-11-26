@@ -5305,8 +5305,6 @@ class Vector3 {
 
 	}
 
-	// TODO lengthSquared?
-
 	/**
 	 * Computes the square of the Euclidean length (straight-line length) from
 	 * (0, 0, 0) to (x, y, z). If you are comparing the lengths of vectors, you should

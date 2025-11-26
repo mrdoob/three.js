@@ -71,7 +71,8 @@ vec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) 
     return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );
 }
 
-// Heitz 2014, "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs"
+// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
+// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
 
 	float a2 = pow2( alpha );

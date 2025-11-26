@@ -6,12 +6,57 @@ import { texture } from '../accessors/TextureNode.js';
 import { max, abs, sign } from '../math/MathNode.js';
 import { sub, div } from '../math/OperatorNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
+import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
+import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Color } from '../../math/Color.js';
 import { BasicShadowMap } from '../../constants.js';
 
 const _clearColor = /*@__PURE__*/ new Color();
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _lightPositionWorld = /*@__PURE__*/ new Vector3();
+const _lookTarget = /*@__PURE__*/ new Vector3();
+
+// These viewports map a cube-map onto a 2D texture with the
+// following orientation:
+//
+//  xzXZ
+//   y Y
+//
+// X - Positive x direction
+// x - Negative x direction
+// Y - Positive y direction
+// y - Negative y direction
+// Z - Positive z direction
+// z - Negative z direction
+
+const _frameExtents = /*@__PURE__*/ new Vector2( 4, 2 );
+
+const _viewports = [
+	// positive X
+	/*@__PURE__*/ new Vector4( 2, 1, 1, 1 ),
+	// negative X
+	/*@__PURE__*/ new Vector4( 0, 1, 1, 1 ),
+	// positive Z
+	/*@__PURE__*/ new Vector4( 3, 1, 1, 1 ),
+	// negative Z
+	/*@__PURE__*/ new Vector4( 1, 1, 1, 1 ),
+	// positive Y
+	/*@__PURE__*/ new Vector4( 3, 0, 1, 1 ),
+	// negative Y
+	/*@__PURE__*/ new Vector4( 1, 0, 1, 1 )
+];
+
+const _cubeDirections = [
+	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( - 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
+	/*@__PURE__*/ new Vector3( 0, 0, - 1 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 )
+];
+
+const _cubeUps = [
+	/*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
+	/*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, - 1 )
+];
 
 // cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
 // vector suitable for 2D texture mapping. This code uses the following layout for the
@@ -239,10 +284,11 @@ class PointShadowNode extends ShadowNode {
 		const { shadow, shadowMap, light } = this;
 		const { renderer, scene } = frame;
 
-		const shadowFrameExtents = shadow.getFrameExtents();
+		const camera = shadow.camera;
+		const shadowMatrix = shadow.matrix;
 
 		_shadowMapSize.copy( shadow.mapSize );
-		_shadowMapSize.multiply( shadowFrameExtents );
+		_shadowMapSize.multiply( _frameExtents );
 
 		shadowMap.setSize( _shadowMapSize.width, _shadowMapSize.height );
 
@@ -259,11 +305,9 @@ class PointShadowNode extends ShadowNode {
 		renderer.setClearColor( shadow.clearColor, shadow.clearAlpha );
 		renderer.clear();
 
-		const viewportCount = shadow.getViewportCount();
+		for ( let vp = 0; vp < 6; vp ++ ) {
 
-		for ( let vp = 0; vp < viewportCount; vp ++ ) {
-
-			const viewport = shadow.getViewport( vp );
+			const viewport = _viewports[ vp ];
 
 			const x = _viewportSize.x * viewport.x;
 			const y = _shadowMapSize.y - _viewportSize.y - ( _viewportSize.y * viewport.y );
@@ -277,13 +321,38 @@ class PointShadowNode extends ShadowNode {
 
 			shadowMap.viewport.copy( _viewport );
 
-			shadow.updateMatrices( light, vp );
+			// Update shadow camera matrices for this face
+
+			const far = light.distance || camera.far;
+
+			if ( far !== camera.far ) {
+
+				camera.far = far;
+				camera.updateProjectionMatrix();
+
+			}
+
+			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			camera.position.copy( _lightPositionWorld );
+
+			_lookTarget.copy( camera.position );
+			_lookTarget.add( _cubeDirections[ vp ] );
+			camera.up.copy( _cubeUps[ vp ] );
+			camera.lookAt( _lookTarget );
+			camera.updateMatrixWorld();
+
+			shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			shadow._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
+			//
 
 			const currentSceneName = scene.name;
 
 			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ vp + 1 }`;
 
-			renderer.render( scene, shadow.camera );
+			renderer.render( scene, camera );
 
 			scene.name = currentSceneName;
 
