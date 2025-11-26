@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - PointLight ShadowMap</title>
+		<title>three.js webgpu - PointLight ShadowMap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - PointLight ShadowMap
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - PointLight ShadowMap
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -33,7 +33,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 10, 40 );
@@ -66,7 +66,7 @@
 					texture.repeat.set( 1, 4.5 );
 
 					geometry = new THREE.SphereGeometry( 2, 32, 8 );
-					material = new THREE.MeshPhongMaterial( {
+					material = new THREE.MeshPhongNodeMaterial( {
 						side: THREE.DoubleSide,
 						alphaMap: texture,
 						alphaTest: 0.5
@@ -90,7 +90,7 @@
 
 				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
 
-				const material = new THREE.MeshPhongMaterial( {
+				const material = new THREE.MeshPhongNodeMaterial( {
 					color: 0xa0adaf,
 					shininess: 10,
 					specular: 0x111111,
@@ -104,12 +104,13 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				// renderer.shadowMap.type = THREE.BasicShadowMap;
+				await renderer.init();
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );

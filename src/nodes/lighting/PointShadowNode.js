@@ -2,165 +2,66 @@ import ShadowNode from './ShadowNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { float, vec2, If, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { max, abs, sign } from '../math/MathNode.js';
-import { sub, div } from '../math/OperatorNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { Matrix4 } from '../../math/Matrix4.js';
-import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
-import { Vector4 } from '../../math/Vector4.js';
 import { Color } from '../../math/Color.js';
-import { BasicShadowMap } from '../../constants.js';
+import { BasicShadowMap, LessCompare, WebGPUCoordinateSystem } from '../../constants.js';
+import { CubeDepthTexture } from '../../textures/CubeDepthTexture.js';
 
 const _clearColor = /*@__PURE__*/ new Color();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 
-// These viewports map a cube-map onto a 2D texture with the
-// following orientation:
-//
-//  xzXZ
-//   y Y
-//
-// X - Positive x direction
-// x - Negative x direction
-// Y - Positive y direction
-// y - Negative y direction
-// Z - Positive z direction
-// z - Negative z direction
-
-const _frameExtents = /*@__PURE__*/ new Vector2( 4, 2 );
-
-const _viewports = [
-	// positive X
-	/*@__PURE__*/ new Vector4( 2, 1, 1, 1 ),
-	// negative X
-	/*@__PURE__*/ new Vector4( 0, 1, 1, 1 ),
-	// positive Z
-	/*@__PURE__*/ new Vector4( 3, 1, 1, 1 ),
-	// negative Z
-	/*@__PURE__*/ new Vector4( 1, 1, 1, 1 ),
-	// positive Y
-	/*@__PURE__*/ new Vector4( 3, 0, 1, 1 ),
-	// negative Y
-	/*@__PURE__*/ new Vector4( 1, 0, 1, 1 )
-];
-
-const _cubeDirections = [
-	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( - 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
-	/*@__PURE__*/ new Vector3( 0, 0, - 1 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 )
-];
-
-const _cubeUps = [
-	/*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
+// Cube map face directions and up vectors for point light shadows
+// Face order: +X, -X, +Y, -Y, +Z, -Z
+// WebGPU coordinate system - Y faces swapped to match texture sampling convention
+const _cubeDirectionsWebGPU = [
+	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( - 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 ),
 	/*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, - 1 )
 ];
 
-// cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D
-// vector suitable for 2D texture mapping. This code uses the following layout for the
-// 2D texture:
-//
-// xzXZ
-//  y Y
-//
-// Y - Positive y direction
-// y - Negative y direction
-// X - Positive x direction
-// x - Negative x direction
-// Z - Positive z direction
-// z - Negative z direction
-//
-// Source and test bed:
-// https://gist.github.com/tschw/da10c43c467ce8afd0c4
+const _cubeUpsWebGPU = [
+	/*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, - 1 ),
+	/*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 )
+];
 
-export const cubeToUV = /*@__PURE__*/ Fn( ( [ pos, texelSizeY ] ) => {
+// WebGL coordinate system - standard OpenGL convention
+const _cubeDirectionsWebGL = [
+	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( - 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
+	/*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, - 1 )
+];
 
-	const v = pos.toVar();
+const _cubeUpsWebGL = [
+	/*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
+	/*@__PURE__*/ new Vector3( 0, 0, - 1 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 )
+];
 
-	// Number of texels to avoid at the edge of each square
+export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp } ) => {
 
-	const absV = abs( v );
-
-	// Intersect unit cube
-
-	const scaleToCube = div( 1.0, max( absV.x, max( absV.y, absV.z ) ) );
-	absV.mulAssign( scaleToCube );
-
-	// Apply scale to avoid seams
-
-	// two texels less per square (one texel will do for NEAREST)
-	v.mulAssign( scaleToCube.mul( texelSizeY.mul( 2 ).oneMinus() ) );
-
-	// Unwrap
-
-	// space: -1 ... 1 range for each square
-	//
-	// #X##		dim    := ( 4 , 2 )
-	//  # #		center := ( 1 , 1 )
-
-	const planar = vec2( v.xy ).toVar();
-
-	const almostATexel = texelSizeY.mul( 1.5 );
-	const almostOne = almostATexel.oneMinus();
-
-	If( absV.z.greaterThanEqual( almostOne ), () => {
-
-		If( v.z.greaterThan( 0.0 ), () => {
-
-			planar.x.assign( sub( 4.0, v.x ) );
-
-		} );
-
-	} ).ElseIf( absV.x.greaterThanEqual( almostOne ), () => {
-
-		const signX = sign( v.x );
-		planar.x.assign( v.z.mul( signX ).add( signX.mul( 2.0 ) ) );
-
-	} ).ElseIf( absV.y.greaterThanEqual( almostOne ), () => {
-
-		const signY = sign( v.y );
-		planar.x.assign( v.x.add( signY.mul( 2.0 ) ).add( 2.0 ) );
-		planar.y.assign( v.z.mul( signY ).sub( 2.0 ) );
-
-	} );
-
-	// Transform to UV space
-
-	// scale := 0.5 / dim
-	// translate := ( center + 0.5 ) / dim
-	return vec2( 0.125, 0.25 ).mul( planar ).add( vec2( 0.375, 0.75 ) ).flipY();
-
-} ).setLayout( {
-	name: 'cubeToUV',
-	type: 'vec2',
-	inputs: [
-		{ name: 'pos', type: 'vec3' },
-		{ name: 'texelSizeY', type: 'float' }
-	]
-} );
-
-export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize } ) => {
-
-	return texture( depthTexture, cubeToUV( bd3D, texelSize.y ) ).compare( dp );
+	return cubeTexture( depthTexture, bd3D ).compare( dp );
 
 } );
 
-export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, texelSize, shadow } ) => {
+export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow } ) => {
 
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
-	const offset = vec2( - 1.0, 1.0 ).mul( radius ).mul( texelSize.y );
+	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
-	return texture( depthTexture, cubeToUV( bd3D.add( offset.xyy ), texelSize.y ) ).compare( dp )
-		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yyy ), texelSize.y ) ).compare( dp ) )
-		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.xyx ), texelSize.y ) ).compare( dp ) )
-		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yyx ), texelSize.y ) ).compare( dp ) )
-		.add( texture( depthTexture, cubeToUV( bd3D, texelSize.y ) ).compare( dp ) )
-		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.xxy ), texelSize.y ) ).compare( dp ) )
-		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yxy ), texelSize.y ) ).compare( dp ) )
-		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.xxx ), texelSize.y ) ).compare( dp ) )
-		.add( texture( depthTexture, cubeToUV( bd3D.add( offset.yxx ), texelSize.y ) ).compare( dp ) )
+	const texelSize = float( 1 ).div( mapSize.x );
+	const offset = vec2( - 1.0, 1.0 ).mul( radius ).mul( texelSize );
+
+	return cubeTexture( depthTexture, bd3D.add( offset.xyy ) ).compare( dp )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.yyy ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.xyx ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.yyx ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.xxy ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.yxy ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.xxx ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( offset.yxx ) ).compare( dp ) )
 		.mul( 1.0 / 9.0 );
 
 } );
@@ -175,7 +76,6 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	const cameraNearLocal = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
 	const cameraFarLocal = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
 	const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
-	const mapSize = uniform( shadow.mapSize ).setGroup( renderGroup );
 
 	const result = float( 1.0 ).toVar();
 
@@ -185,22 +85,17 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar(); // need to clamp?
 		dp.addAssign( bias );
 
-		// bd3D = base direction 3D
+		// bd3D = base direction 3D (direction from light to fragment)
 		const bd3D = lightToPosition.normalize();
-		const texelSize = vec2( 1.0 ).div( mapSize.mul( vec2( 4.0, 2.0 ) ) );
 
-		// percentage-closer filtering
-		result.assign( filterFn( { depthTexture, bd3D, dp, texelSize, shadow } ) );
+		// percentage-closer filtering using cube texture sampling
+		result.assign( filterFn( { depthTexture, bd3D, dp, shadow } ) );
 
 	} );
 
 	return result;
 
 } );
-
-const _viewport = /*@__PURE__*/ new Vector4();
-const _viewportSize = /*@__PURE__*/ new Vector2();
-const _shadowMapSize = /*@__PURE__*/ new Vector2();
 
 
 /**
@@ -261,15 +156,35 @@ class PointShadowNode extends ShadowNode {
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
 	 * @param {Object} inputs - A configuration object that defines the shadow filtering.
 	 * @param {Function} inputs.filterFn - This function defines the filtering type of the shadow map e.g. PCF.
-	 * @param {Texture} inputs.shadowTexture - A reference to the shadow map's texture.
-	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's texture data.
+	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's depth texture.
 	 * @param {Node<vec3>} inputs.shadowCoord - Shadow coordinates which are used to sample from the shadow map.
 	 * @param {LightShadow} inputs.shadow - The light shadow.
 	 * @return {Node<float>} The result node of the shadow filtering.
 	 */
-	setupShadowFilter( builder, { filterFn, shadowTexture, depthTexture, shadowCoord, shadow } ) {
+	setupShadowFilter( builder, { filterFn, depthTexture, shadowCoord, shadow } ) {
 
-		return pointShadowFilter( { filterFn, shadowTexture, depthTexture, shadowCoord, shadow } );
+		return pointShadowFilter( { filterFn, depthTexture, shadowCoord, shadow } );
+
+	}
+
+	/**
+	 * Overwrites the default implementation to create a CubeRenderTarget with CubeDepthTexture.
+	 *
+	 * @param {LightShadow} shadow - The light shadow object.
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Object} An object containing the shadow map and depth texture.
+	 */
+	setupRenderTarget( shadow, builder ) {
+
+		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
+		depthTexture.name = 'PointShadowDepthTexture';
+		depthTexture.compareFunction = LessCompare;
+
+		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
+		shadowMap.texture.name = 'PointShadowMap';
+		shadowMap.depthTexture = depthTexture;
+
+		return { shadowMap, depthTexture };
 
 	}
 
@@ -287,12 +202,12 @@ class PointShadowNode extends ShadowNode {
 		const camera = shadow.camera;
 		const shadowMatrix = shadow.matrix;
 
-		_shadowMapSize.copy( shadow.mapSize );
-		_shadowMapSize.multiply( _frameExtents );
+		// Select cube directions/ups based on coordinate system
+		const isWebGPU = renderer.coordinateSystem === WebGPUCoordinateSystem;
+		const cubeDirections = isWebGPU ? _cubeDirectionsWebGPU : _cubeDirectionsWebGL;
+		const cubeUps = isWebGPU ? _cubeUpsWebGPU : _cubeUpsWebGL;
 
-		shadowMap.setSize( _shadowMapSize.width, _shadowMapSize.height );
-
-		_viewportSize.copy( shadow.mapSize );
+		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.width );
 
 		//
 
@@ -303,23 +218,13 @@ class PointShadowNode extends ShadowNode {
 
 		renderer.autoClear = false;
 		renderer.setClearColor( shadow.clearColor, shadow.clearAlpha );
-		renderer.clear();
 
-		for ( let vp = 0; vp < 6; vp ++ ) {
+		// Render each cube face
+		for ( let face = 0; face < 6; face ++ ) {
 
-			const viewport = _viewports[ vp ];
-
-			const x = _viewportSize.x * viewport.x;
-			const y = _shadowMapSize.y - _viewportSize.y - ( _viewportSize.y * viewport.y );
-
-			_viewport.set(
-				x,
-				y,
-				_viewportSize.x * viewport.z,
-				_viewportSize.y * viewport.w
-			);
-
-			shadowMap.viewport.copy( _viewport );
+			// Set render target to the specific cube face
+			renderer.setRenderTarget( shadowMap, face );
+			renderer.clear();
 
 			// Update shadow camera matrices for this face
 
@@ -336,8 +241,8 @@ class PointShadowNode extends ShadowNode {
 			camera.position.copy( _lightPositionWorld );
 
 			_lookTarget.copy( camera.position );
-			_lookTarget.add( _cubeDirections[ vp ] );
-			camera.up.copy( _cubeUps[ vp ] );
+			_lookTarget.add( cubeDirections[ face ] );
+			camera.up.copy( cubeUps[ face ] );
 			camera.lookAt( _lookTarget );
 			camera.updateMatrixWorld();
 
@@ -350,7 +255,7 @@ class PointShadowNode extends ShadowNode {
 
 			const currentSceneName = scene.name;
 
-			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ vp + 1 }`;
+			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
 
 			renderer.render( scene, camera );
 

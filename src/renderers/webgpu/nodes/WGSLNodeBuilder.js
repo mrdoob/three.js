@@ -802,7 +802,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const name = node.name;
 			const type = node.type;
 
-			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
+			if ( type === 'texture' || type === 'cubeTexture' || type === 'cubeDepthTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
 				return name;
 
@@ -928,7 +928,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			const bindings = this.getBindGroupArray( groupName, shaderStage );
 
-			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
+			if ( type === 'texture' || type === 'cubeTexture' || type === 'cubeDepthTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
 				let texture = null;
 
@@ -946,7 +946,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					}
 
-				} else if ( type === 'cubeTexture' ) {
+				} else if ( type === 'cubeTexture' || type === 'cubeDepthTexture' ) {
 
 					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group, access );
 
@@ -1714,7 +1714,7 @@ ${ flowData.code }
 			const groupName = uniform.groupNode.name;
 			const uniformIndexes = this.bindingsIndexes[ groupName ];
 
-			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
+			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'cubeDepthTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
 				const texture = uniform.node.value;
 
@@ -1744,7 +1744,11 @@ ${ flowData.code }
 
 				}
 
-				if ( texture.isCubeTexture === true ) {
+				if ( texture.isCubeTexture === true && texture.isDepthTexture === true ) {
+
+					textureType = 'texture_depth_cube';
+
+				} else if ( texture.isCubeTexture === true ) {
 
 					textureType = 'texture_cube<f32>';
 

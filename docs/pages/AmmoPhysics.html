@@ -30,7 +30,7 @@
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="addMesh" translate="no">.<a href="#addMesh">addMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, mass : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="addMesh" translate="no">.<a href="#addMesh">addMesh</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, mass : <span class="param-type">number</span>, restitution : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Adds the given mesh to this physics simulation.</p>
@@ -51,6 +51,15 @@
 									</td>
 									<td class="description last">
 										<p>The mass in kg of the mesh.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>restitution</strong>
+									</td>
+									<td class="description last">
+										<p>The restitution of the mesh, usually from 0 to 1. Represents how &quot;bouncy&quot; objects are when they collide with each other.</p>
 										<p>Default is <code>0</code>.</p>
 									</td>
 								</tr>
