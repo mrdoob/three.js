@@ -28,7 +28,8 @@ function getShape( geometry ) {
 
 	}
 
-	console.warn( "Tried to get shape of unsupported geometry " + geometry.type );
+	console.error( 'JoltPhysics: Unsupported geometry type:', geometry.type );
+
 	return null;
 
 }
