@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>LOD Generator Tool</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+
+		body {
+			font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+			background: #0d1117;
+			color: #c9d1d9;
+			overflow: hidden;
+		}
+
+		#viewport {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		#header {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 48px;
+			background: linear-gradient(90deg, #161b22 0%, #0d1117 100%);
+			border-bottom: 1px solid #30363d;
+			display: flex;
+			align-items: center;
+			padding: 0 20px;
+			z-index: 100;
+		}
+
+		#header h1 {
+			font-size: 16px;
+			font-weight: 600;
+			color: #58a6ff;
+		}
+
+		#header h1 span {
+			color: #8b949e;
+			font-weight: 400;
+			margin-left: 8px;
+		}
+
+		#panel {
+			position: absolute;
+			top: 58px;
+			right: 10px;
+			width: 320px;
+			background: #161b22;
+			border: 1px solid #30363d;
+			border-radius: 6px;
+			padding: 16px;
+			z-index: 100;
+			max-height: calc(100vh - 70px);
+			overflow-y: auto;
+		}
+
+		#panel::-webkit-scrollbar { width: 8px; }
+		#panel::-webkit-scrollbar-track { background: transparent; }
+		#panel::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+
+		.section { margin-bottom: 16px; }
+
+		.section-title {
+			font-size: 12px;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: #8b949e;
+			margin-bottom: 10px;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.btn {
+			background: #238636;
+			border: 1px solid rgba(240,246,252,0.1);
+			color: #fff;
+			padding: 8px 16px;
+			border-radius: 6px;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: 500;
+			transition: background 0.15s;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.btn:hover { background: #2ea043; }
+		.btn:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+
+		.btn.loading {
+			background: #238636;
+			pointer-events: none;
+			position: relative;
+		}
+
+		.btn .spinner {
+			width: 14px;
+			height: 14px;
+			border: 2px solid rgba(255,255,255,0.3);
+			border-top-color: #fff;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		.btn.secondary {
+			background: #21262d;
+			border-color: #30363d;
+			color: #c9d1d9;
+		}
+
+		.btn.secondary:hover { background: #30363d; }
+
+		.lod-card {
+			background: #0d1117;
+			border: 1px solid #30363d;
+			border-radius: 6px;
+			padding: 12px;
+			margin-bottom: 8px;
+			transition: border-color 0.15s;
+		}
+
+		.lod-card.active {
+			border-color: #58a6ff;
+			border-left-width: 3px;
+		}
+
+		.lod-card-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 8px;
+		}
+
+		.lod-card-title {
+			font-weight: 600;
+			font-size: 13px;
+			color: #c9d1d9;
+		}
+
+		.remove-btn {
+			background: transparent;
+			border: 1px solid #30363d;
+			color: #8b949e;
+			padding: 2px 8px;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 12px;
+		}
+
+		.remove-btn:hover { border-color: #f85149; color: #f85149; }
+
+		.slider-row { margin: 8px 0; }
+
+		.slider-row label {
+			display: flex;
+			justify-content: space-between;
+			font-size: 12px;
+			color: #8b949e;
+			margin-bottom: 4px;
+		}
+
+		.slider-row label strong { color: #c9d1d9; }
+
+		input[type="range"] {
+			width: 100%;
+			height: 6px;
+			border-radius: 3px;
+			background: #30363d;
+			outline: none;
+			-webkit-appearance: none;
+		}
+
+		input[type="range"]::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			width: 14px;
+			height: 14px;
+			border-radius: 50%;
+			background: #58a6ff;
+			cursor: pointer;
+		}
+
+		input[type="number"] {
+			width: 60px;
+			padding: 4px 8px;
+			background: #0d1117;
+			border: 1px solid #30363d;
+			color: #c9d1d9;
+			border-radius: 4px;
+			font-size: 12px;
+		}
+
+		.stats-text {
+			font-size: 11px;
+			color: #8b949e;
+			margin-top: 4px;
+		}
+
+		.preview-buttons {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 4px;
+		}
+
+		.preview-btn {
+			flex: 1;
+			min-width: 50px;
+			padding: 6px 8px;
+			background: #21262d;
+			border: 1px solid #30363d;
+			color: #8b949e;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 11px;
+			font-weight: 500;
+			transition: all 0.15s;
+		}
+
+		.preview-btn:hover { background: #30363d; color: #c9d1d9; }
+
+		.preview-btn.active {
+			background: #388bfd;
+			border-color: #58a6ff;
+			color: #fff;
+		}
+
+		.current-lod-box {
+			background: rgba(56, 139, 253, 0.1);
+			border: 1px solid #388bfd;
+			border-radius: 6px;
+			padding: 12px;
+			margin-top: 10px;
+			text-align: center;
+		}
+
+		.current-lod-box .label {
+			font-size: 10px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: #8b949e;
+		}
+
+		.current-lod-box .value {
+			font-size: 20px;
+			font-weight: 700;
+			color: #58a6ff;
+			margin: 4px 0;
+		}
+
+		.current-lod-box .details {
+			font-size: 11px;
+			color: #8b949e;
+		}
+
+		.checkbox-row {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin: 6px 0;
+		}
+
+		.checkbox-row input[type="checkbox"] {
+			width: 16px;
+			height: 16px;
+			accent-color: #58a6ff;
+		}
+
+		.checkbox-row label { font-size: 12px; color: #c9d1d9; }
+
+		.progress-bar {
+			height: 4px;
+			background: #21262d;
+			border-radius: 2px;
+			margin-top: 10px;
+			overflow: hidden;
+		}
+
+		.progress-fill {
+			height: 100%;
+			background: linear-gradient(90deg, #238636, #2ea043);
+			width: 0%;
+			transition: width 0.2s;
+		}
+
+		.info-text {
+			font-size: 12px;
+			color: #8b949e;
+			line-height: 1.5;
+		}
+
+		.info-text strong { color: #c9d1d9; }
+
+		#dropzone {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(56, 139, 253, 0.15);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 1000;
+			pointer-events: none;
+		}
+
+		#dropzone.active { display: flex; }
+
+		#dropzone-box {
+			background: #161b22;
+			border: 2px dashed #58a6ff;
+			border-radius: 12px;
+			padding: 48px 64px;
+			text-align: center;
+		}
+
+		#dropzone-box .icon { font-size: 40px; margin-bottom: 12px; }
+		#dropzone-box .text { font-size: 16px; color: #c9d1d9; }
+
+		.hidden { display: none !important; }
+	</style>
+</head>
+<body>
+	<div id="viewport"></div>
+
+	<div id="header">
+		<h1>🎚️ LOD Generator<span>three.js tool</span></h1>
+	</div>
+
+	<div id="panel">
+		<div class="section">
+			<div class="section-title">📂 Load Model</div>
+			<button class="btn" id="loadBtn">Load File</button>
+			<button class="btn secondary" id="sampleBtn">Sample</button>
+			<input type="file" id="fileInput" accept=".glb,.gltf,.obj,.fbx" class="hidden">
+		</div>
+
+		<div class="section">
+			<div class="section-title">📊 Model Info</div>
+			<div class="info-text" id="modelInfo">Drag & drop or load a GLB, GLTF, OBJ, or FBX file.</div>
+		</div>
+
+		<div class="section">
+			<div class="section-title">⚙️ LOD Levels</div>
+			<div id="lodLevels"></div>
+			<button class="btn secondary" id="addLevelBtn" style="width:100%;margin-top:4px;">+ Add Level</button>
+		</div>
+
+		<div class="section">
+			<div class="section-title">🔧 Options</div>
+			<div class="checkbox-row">
+				<input type="checkbox" id="preserveBoundary" checked>
+				<label for="preserveBoundary">Preserve Boundaries</label>
+			</div>
+			<div class="checkbox-row">
+				<input type="checkbox" id="preserveUV" checked>
+				<label for="preserveUV">Preserve UV Seams</label>
+			</div>
+			<div class="checkbox-row">
+				<input type="checkbox" id="showWireframe">
+				<label for="showWireframe">Show Wireframe</label>
+			</div>
+		</div>
+
+		<div class="section">
+			<div class="section-title">👁️ Preview</div>
+			<div class="preview-buttons" id="previewButtons">
+				<button class="preview-btn active" data-level="auto">Auto</button>
+			</div>
+			<div class="current-lod-box hidden" id="currentLodBox">
+				<div class="label">Currently Rendering</div>
+				<div class="value" id="currentLodValue">LOD 0</div>
+				<div class="details" id="currentLodDetails">Distance: 0 | Triangles: -</div>
+			</div>
+		</div>
+
+		<div class="section">
+			<button class="btn" id="generateBtn" disabled style="width:calc(50% - 4px);">⚡ Generate</button>
+			<button class="btn secondary" id="exportBtn" disabled style="width:calc(50% - 4px);">💾 Export ZIP</button>
+			<div class="progress-bar">
+				<div class="progress-fill" id="progressBar"></div>
+			</div>
+		</div>
+
+		<div class="section">
+			<div class="section-title">📈 Statistics</div>
+			<div class="info-text" id="statsInfo">Generate LODs to see statistics.</div>
+		</div>
+	</div>
+
+	<div id="dropzone">
+		<div id="dropzone-box">
+			<div class="icon">📦</div>
+			<div class="text">Drop 3D model here</div>
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+	<script type="importmap">
+	{
+		"imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+		}
+	}
+	</script>
+
+	<script type="module">
+		import * as THREE from 'three';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+		import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+		import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+		import { LODGenerator, LODDistanceCalculator } from './LODGenerator.js';
+
+		let renderer, scene, camera, controls;
+		let currentMesh = null;
+		let currentLOD = null;
+		let generator = null;
+		let previewLevel = 'auto';
+		let originalMaterial = null;
+		let wireframeMaterial = null;
+		let lastActiveLOD = -1;
+
+		let lodLevels = [
+			{ ratio: 1.0, distance: 0 },
+			{ ratio: 0.5, distance: 50 },
+			{ ratio: 0.25, distance: 100 },
+			{ ratio: 0.1, distance: 150 }
+		];
+
+		const viewport = document.getElementById('viewport');
+		const fileInput = document.getElementById('fileInput');
+		const loadBtn = document.getElementById('loadBtn');
+		const sampleBtn = document.getElementById('sampleBtn');
+		const modelInfo = document.getElementById('modelInfo');
+		const lodLevelsEl = document.getElementById('lodLevels');
+		const addLevelBtn = document.getElementById('addLevelBtn');
+		const previewButtons = document.getElementById('previewButtons');
+		const generateBtn = document.getElementById('generateBtn');
+		const exportBtn = document.getElementById('exportBtn');
+		const progressBar = document.getElementById('progressBar');
+		const statsInfo = document.getElementById('statsInfo');
+		const dropzone = document.getElementById('dropzone');
+		const showWireframeEl = document.getElementById('showWireframe');
+		const currentLodBox = document.getElementById('currentLodBox');
+
+		init();
+
+		function init() {
+			renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setClearColor(0x0d1117);
+			renderer.setAnimationLoop(animate);
+			viewport.appendChild(renderer.domElement);
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
+			camera.position.set(0, 0, 5);
+
+			controls = new OrbitControls(camera, renderer.domElement);
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.05;
+
+			scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+			const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+			dirLight.position.set(5, 10, 7.5);
+			scene.add(dirLight);
+			const dirLight2 = new THREE.DirectionalLight(0x4488ff, 0.4);
+			dirLight2.position.set(-5, -5, -5);
+			scene.add(dirLight2);
+
+			const grid = new THREE.GridHelper(20, 20, 0x30363d, 0x21262d);
+			grid.position.y = -1;
+			scene.add(grid);
+
+			wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0x58a6ff, wireframe: true });
+
+			generator = new LODGenerator();
+
+			loadBtn.onclick = () => fileInput.click();
+			fileInput.onchange = (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); };
+			sampleBtn.onclick = loadSampleModel;
+			addLevelBtn.onclick = addLODLevel;
+			generateBtn.onclick = generateLODs;
+			exportBtn.onclick = exportZIP;
+			showWireframeEl.onchange = updateWireframe;
+
+			document.ondragover = (e) => { e.preventDefault(); dropzone.classList.add('active'); };
+			document.ondragleave = (e) => { if (!e.relatedTarget) dropzone.classList.remove('active'); };
+			document.ondrop = (e) => { e.preventDefault(); dropzone.classList.remove('active'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); };
+
+			window.onresize = () => {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			};
+
+			renderLODLevels();
+		}
+
+		function handleFile(file) {
+			const name = file.name.toLowerCase();
+			const reader = new FileReader();
+
+			reader.onload = (e) => {
+				if (name.endsWith('.glb') || name.endsWith('.gltf')) {
+					loadGLTF(e.target.result, file.name);
+				} else if (name.endsWith('.obj')) {
+					loadOBJ(e.target.result);
+				} else if (name.endsWith('.fbx')) {
+					loadFBX(e.target.result);
+				}
+			};
+
+			if (name.endsWith('.glb')) reader.readAsArrayBuffer(file);
+			else reader.readAsDataURL(file);
+		}
+
+		function loadGLTF(data, name) {
+			const loader = new GLTFLoader();
+			if (data instanceof ArrayBuffer) {
+				loader.parse(data, '', (gltf) => processLoadedModel(gltf.scene, name), (err) => alert('Load failed'));
+			} else {
+				loader.load(data, (gltf) => processLoadedModel(gltf.scene, name));
+			}
+		}
+
+		function loadOBJ(data) {
+			const loader = new OBJLoader();
+			processLoadedModel(loader.parse(data), 'obj_model');
+		}
+
+		function loadFBX(data) {
+			const loader = new FBXLoader();
+			loader.load(data, (fbx) => processLoadedModel(fbx, 'fbx_model'));
+		}
+
+		function loadSampleModel() {
+			const loader = new GLTFLoader();
+			const draco = new DRACOLoader();
+			draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+			loader.setDRACOLoader(draco);
+			loader.load('https://threejs.org/examples/models/gltf/LeePerrySmith/LeePerrySmith.glb',
+				(gltf) => processLoadedModel(gltf.scene, 'LeePerrySmith'),
+				undefined,
+				(err) => alert('Failed to load sample model'));
+		}
+
+		function processLoadedModel(object, name = 'model') {
+			if (currentMesh) { scene.remove(currentMesh); currentMesh = null; }
+			if (currentLOD) { scene.remove(currentLOD); LODGenerator.disposeLOD(currentLOD); currentLOD = null; }
+
+			currentLodBox.classList.add('hidden');
+			lastActiveLOD = -1;
+
+			let mesh = null;
+			object.traverse((child) => { if (child.isMesh && !mesh) mesh = child; });
+
+			if (!mesh) { alert('No mesh found'); return; }
+
+			currentMesh = mesh.clone();
+			currentMesh.name = name;
+			originalMaterial = currentMesh.material;
+
+			const box = new THREE.Box3().setFromObject(currentMesh);
+			const center = box.getCenter(new THREE.Vector3());
+			const size = box.getSize(new THREE.Vector3());
+			const maxDim = Math.max(size.x, size.y, size.z);
+			const scale = 3 / maxDim;
+
+			currentMesh.position.sub(center);
+			currentMesh.scale.multiplyScalar(scale);
+			currentMesh.position.set(0, 0, 0);
+
+			scene.add(currentMesh);
+
+			const geo = currentMesh.geometry;
+			const tris = geo.index ? geo.index.count / 3 : geo.getAttribute('position').count / 3;
+			const verts = geo.getAttribute('position').count;
+
+			modelInfo.innerHTML = `<strong>Name:</strong> ${name}<br><strong>Triangles:</strong> ${Math.floor(tris).toLocaleString()}<br><strong>Vertices:</strong> ${verts.toLocaleString()}`;
+
+			generateBtn.disabled = false;
+			exportBtn.disabled = true;
+
+			renderLODLevels();
+
+			camera.position.set(0, 0, 5);
+			controls.target.set(0, 0, 0);
+			controls.update();
+		}
+
+		function renderLODLevels() {
+			lodLevelsEl.innerHTML = '';
+			previewButtons.innerHTML = '<button class="preview-btn ' + (previewLevel === 'auto' ? 'active' : '') + '" data-level="auto">Auto</button>';
+
+			lodLevels.forEach((level, index) => {
+				const card = document.createElement('div');
+				card.className = 'lod-card';
+				card.id = `lodCard${index}`;
+
+				const isOriginal = level.ratio >= 1.0;
+				const estTris = currentMesh ? Math.floor(getTriangleCount() * level.ratio) : '?';
+
+				card.innerHTML = `
+					<div class="lod-card-header">
+						<span class="lod-card-title">LOD ${index}</span>
+						${index > 0 ? `<button class="remove-btn" onclick="window.removeLODLevel(${index})">×</button>` : ''}
+					</div>
+					${isOriginal ? '<div class="stats-text">Original (100%)</div>' : `
+						<div class="slider-row">
+							<label>Reduction: <strong>${Math.round(level.ratio * 100)}%</strong></label>
+							<input type="range" min="0.01" max="0.99" step="0.01" value="${level.ratio}" onchange="window.updateLODRatio(${index}, this.value)">
+						</div>
+					`}
+					<div class="slider-row">
+						<label>Distance: <input type="number" min="0" value="${level.distance}" onchange="window.updateLODDistance(${index}, this.value)"></label>
+					</div>
+					<div class="stats-text" id="levelStats${index}">~${typeof estTris === 'number' ? estTris.toLocaleString() : estTris} triangles</div>
+				`;
+
+				lodLevelsEl.appendChild(card);
+
+				const btn = document.createElement('button');
+				btn.className = 'preview-btn' + (previewLevel === index ? ' active' : '');
+				btn.dataset.level = index;
+				btn.textContent = `LOD${index}`;
+				btn.onclick = () => setPreviewLevel(index);
+				previewButtons.appendChild(btn);
+			});
+
+			previewButtons.querySelector('[data-level="auto"]').onclick = () => setPreviewLevel('auto');
+		}
+
+		function getTriangleCount() {
+			if (!currentMesh || !currentMesh.geometry) return 0;
+			const geo = currentMesh.geometry;
+			return geo.index ? geo.index.count / 3 : geo.getAttribute('position').count / 3;
+		}
+
+		window.updateLODRatio = (index, value) => { lodLevels[index].ratio = parseFloat(value); renderLODLevels(); };
+		window.updateLODDistance = (index, value) => { lodLevels[index].distance = parseFloat(value); if (currentLOD && currentLOD.levels[index]) currentLOD.levels[index].distance = parseFloat(value); };
+		window.removeLODLevel = (index) => { if (lodLevels.length > 2) { lodLevels.splice(index, 1); renderLODLevels(); } };
+
+		function addLODLevel() {
+			const last = lodLevels[lodLevels.length - 1];
+			lodLevels.push({ ratio: Math.max(0.01, last.ratio * 0.5), distance: last.distance + 50 });
+			renderLODLevels();
+		}
+
+		function setPreviewLevel(level) {
+			previewLevel = level;
+			lastActiveLOD = -1;
+
+			previewButtons.querySelectorAll('.preview-btn').forEach(btn => {
+				const btnLevel = btn.dataset.level === 'auto' ? 'auto' : parseInt(btn.dataset.level);
+				btn.classList.toggle('active', btnLevel === level);
+			});
+
+			if (currentLOD) {
+				if (level === 'auto') {
+					currentLOD.autoUpdate = true;
+					currentLOD.update(camera);
+				} else {
+					currentLOD.autoUpdate = false;
+					currentLOD.levels.forEach((l, i) => { l.object.visible = (i === level); });
+				}
+			}
+		}
+
+		function updateWireframe() {
+			const show = showWireframeEl.checked;
+			const target = currentLOD || currentMesh;
+			if (target) target.traverse((child) => { if (child.isMesh) child.material = show ? wireframeMaterial : originalMaterial; });
+		}
+
+		async function generateLODs() {
+			if (!currentMesh) return;
+
+			// Show loading state with spinner
+			generateBtn.disabled = true;
+			generateBtn.classList.add('loading');
+			generateBtn.innerHTML = '<span class="spinner"></span> Generating...';
+			progressBar.style.width = '0%';
+
+			// Use setTimeout to allow UI to update before heavy processing
+			await new Promise(resolve => setTimeout(resolve, 50));
+
+			const startTime = performance.now();
+
+			try {
+				if (currentLOD) { scene.remove(currentLOD); LODGenerator.disposeLOD(currentLOD); }
+				scene.remove(currentMesh);
+
+				currentLOD = generator.generate(currentMesh, {
+					levels: lodLevels,
+					preserveBoundary: document.getElementById('preserveBoundary').checked,
+					preserveUVSeams: document.getElementById('preserveUV').checked,
+					onProgress: (level, progress) => { progressBar.style.width = `${((level + progress) / lodLevels.length) * 100}%`; }
+				});
+
+				scene.add(currentLOD);
+
+				const timeTaken = performance.now() - startTime;
+				updateStats(timeTaken);
+
+				currentLOD.levels.forEach((level, i) => {
+					const el = document.getElementById(`levelStats${i}`);
+					if (el && level.object.geometry) {
+						const geo = level.object.geometry;
+						const tris = geo.index ? geo.index.count / 3 : geo.getAttribute('position').count / 3;
+						el.textContent = `${Math.floor(tris).toLocaleString()} triangles`;
+					}
+				});
+
+				updateWireframe();
+				exportBtn.disabled = false;
+				currentLodBox.classList.remove('hidden');
+
+			} catch (error) {
+				console.error('LOD generation failed:', error);
+				alert('LOD generation failed: ' + error.message);
+				scene.add(currentMesh);
+			}
+
+			// Reset button state
+			generateBtn.disabled = false;
+			generateBtn.classList.remove('loading');
+			generateBtn.innerHTML = '⚡ Generate';
+		}
+
+		function updateStats(timeTaken) {
+			if (!currentLOD) return;
+
+			let html = `<strong>Time:</strong> ${timeTaken.toFixed(0)}ms<br><br>`;
+			currentLOD.levels.forEach((level, i) => {
+				if (level.object.geometry) {
+					const geo = level.object.geometry;
+					const tris = geo.index ? geo.index.count / 3 : geo.getAttribute('position').count / 3;
+					const verts = geo.getAttribute('position').count;
+					html += `<strong>LOD${i}:</strong> ${Math.floor(tris).toLocaleString()} tris, ${verts.toLocaleString()} verts<br>`;
+				}
+			});
+			statsInfo.innerHTML = html;
+		}
+
+		async function exportZIP() {
+			if (!currentLOD) return;
+
+			exportBtn.disabled = true;
+			exportBtn.classList.add('loading');
+			exportBtn.innerHTML = '<span class="spinner"></span> Exporting...';
+
+			try {
+				const zip = new JSZip();
+				const exporter = new GLTFExporter();
+				const modelName = currentMesh?.name || 'model';
+
+				const promises = currentLOD.levels.map((level, index) => {
+					return new Promise((resolve) => {
+						const mesh = level.object;
+						if (!mesh || !mesh.geometry) { resolve(null); return; }
+
+						const exportMesh = new THREE.Mesh(mesh.geometry.clone(), mesh.material);
+						exportMesh.name = `${modelName}_LOD${index}`;
+
+						exporter.parse(exportMesh, (gltf) => {
+							resolve({
+								name: `${modelName}_LOD${index}.glb`,
+								data: gltf,
+								level: index,
+								distance: level.distance,
+								triangles: mesh.geometry.index ? mesh.geometry.index.count / 3 : mesh.geometry.getAttribute('position').count / 3
+							});
+						}, (err) => { console.error(err); resolve(null); }, { binary: true });
+					});
+				});
+
+				const results = await Promise.all(promises);
+				results.forEach(r => { if (r) zip.file(r.name, r.data); });
+
+				const manifest = {
+					name: modelName,
+					exportDate: new Date().toISOString(),
+					lodLevels: results.filter(r => r).map(r => ({ file: r.name, level: r.level, distance: r.distance, triangles: Math.floor(r.triangles) }))
+				};
+				zip.file('lod_manifest.json', JSON.stringify(manifest, null, 2));
+
+				const blob = await zip.generateAsync({ type: 'blob' });
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = `${modelName}_LODs.zip`;
+				link.click();
+				URL.revokeObjectURL(url);
+
+			} catch (error) {
+				console.error('Export failed:', error);
+				alert('Export failed: ' + error.message);
+			}
+
+			exportBtn.disabled = false;
+			exportBtn.classList.remove('loading');
+			exportBtn.innerHTML = '💾 Export ZIP';
+		}
+
+		function updateCurrentLODDisplay() {
+			const valueEl = document.getElementById('currentLodValue');
+			const detailsEl = document.getElementById('currentLodDetails');
+
+			if (!currentLOD) return;
+
+			const lodPos = new THREE.Vector3();
+			currentLOD.getWorldPosition(lodPos);
+			const camPos = new THREE.Vector3();
+			camera.getWorldPosition(camPos);
+			const distance = camPos.distanceTo(lodPos);
+
+			let activeLODIndex = 0;
+			let activeLODTriangles = 0;
+
+			if (previewLevel === 'auto') {
+				for (let i = 0; i < currentLOD.levels.length; i++) {
+					if (currentLOD.levels[i].object.visible) {
+						activeLODIndex = i;
+						const geo = currentLOD.levels[i].object.geometry;
+						if (geo) activeLODTriangles = geo.index ? geo.index.count / 3 : geo.getAttribute('position').count / 3;
+						break;
+					}
+				}
+			} else {
+				activeLODIndex = previewLevel;
+				const geo = currentLOD.levels[previewLevel]?.object?.geometry;
+				if (geo) activeLODTriangles = geo.index ? geo.index.count / 3 : geo.getAttribute('position').count / 3;
+			}
+
+			valueEl.textContent = `LOD ${activeLODIndex}`;
+
+			const threshold = currentLOD.levels[activeLODIndex]?.distance ?? 0;
+			const nextThreshold = currentLOD.levels[activeLODIndex + 1]?.distance ?? '∞';
+
+			detailsEl.innerHTML = `Distance: <strong>${distance.toFixed(1)}</strong> | Triangles: <strong>${Math.floor(activeLODTriangles).toLocaleString()}</strong><br><span style="font-size:10px;color:#484f58;">Range: ${threshold} - ${nextThreshold}</span>`;
+
+			if (lastActiveLOD !== activeLODIndex) {
+				lastActiveLOD = activeLODIndex;
+				document.querySelectorAll('.lod-card').forEach((card, i) => { card.classList.toggle('active', i === activeLODIndex); });
+			}
+		}
+
+		function animate() {
+			controls.update();
+			if (currentLOD && previewLevel === 'auto') currentLOD.update(camera);
+			if (currentLOD) updateCurrentLODDisplay();
+			renderer.render(scene, camera);
+		}
+	</script>
+</body>
+</html>
+
