@@ -158,6 +158,11 @@
 			controls.maxPolarAngle = Math.PI / 2.1;
 			controls.minDistance = 10;
 			controls.maxDistance = 375; // Increased by 25% to match terrain
+			
+			// Disable controls during testing for deterministic screenshots
+			if ( window.TESTING ) {
+				controls.enabled = false;
+			}
 
 			// Stats
 			stats = new Stats();
@@ -740,6 +745,9 @@
 		function animateFoxes() {
 
 			if ( ! foxMesh ) return;
+			
+			// Disable animation during automated testing for deterministic screenshots
+			if ( window.TESTING ) return;
 
 			const t = Date.now() * 0.001;
 
@@ -777,16 +785,19 @@
 
 			requestAnimationFrame( animate );
 
-			controls.update();
-			animateFoxes();
+			// Disable updates during testing for deterministic screenshots
+			if ( ! window.TESTING ) {
+				controls.update();
+				animateFoxes();
+			}
 
 			frame ++;
 
-			// LOD update every 2 frames
-			if ( frame % 2 === 0 ) updateLOD();
+			// LOD update every 2 frames (disabled during testing for deterministic screenshots)
+			if ( ! window.TESTING && frame % 2 === 0 ) updateLOD();
 
 			// UI update every 10 frames
-			if ( frame % 10 === 0 ) updateUI();
+			if ( ! window.TESTING && frame % 10 === 0 ) updateUI();
 
 			renderer.render( scene, camera );
 			stats.update();
