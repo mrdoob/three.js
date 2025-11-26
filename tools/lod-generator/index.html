@@ -465,6 +465,15 @@
 
 		init();
 
+		// Escape HTML to prevent XSS
+		function escapeHTML(str) {
+			if (str == null) return '';
+			if (typeof str !== 'string') return String(str);
+			const div = document.createElement('div');
+			div.textContent = str;
+			return div.innerHTML;
+		}
+
 		function init() {
 			renderer = new THREE.WebGLRenderer({ antialias: true });
 			renderer.setPixelRatio(window.devicePixelRatio);
@@ -599,7 +608,7 @@
 			const tris = geo.index ? geo.index.count / 3 : geo.getAttribute('position').count / 3;
 			const verts = geo.getAttribute('position').count;
 
-			modelInfo.innerHTML = `<strong>Name:</strong> ${name}<br><strong>Triangles:</strong> ${Math.floor(tris).toLocaleString()}<br><strong>Vertices:</strong> ${verts.toLocaleString()}`;
+			modelInfo.innerHTML = `<strong>Name:</strong> ${escapeHTML(name)}<br><strong>Triangles:</strong> ${Math.floor(tris).toLocaleString()}<br><strong>Vertices:</strong> ${verts.toLocaleString()}`;
 
 			generateBtn.disabled = false;
 			exportBtn.disabled = true;
