@@ -157,6 +157,14 @@ class ValueNumber extends Value {
 
 	}
 
+	setValue( val ) {
+
+		this.input.value = val;
+
+		return super.setValue( val );
+
+	}
+
 	getValue() {
 
 		return parseFloat( this.input.value );
@@ -191,6 +199,14 @@ class ValueCheckbox extends Value {
 			this.dispatchChange();
 
 		} );
+
+	}
+
+	setValue( val ) {
+
+		this.checkbox.value = val;
+
+		return super.setValue( val );
 
 	}
 

@@ -5303,8 +5303,6 @@ class Vector3 {
 
 	}
 
-	// TODO lengthSquared?
-
 	/**
 	 * Computes the square of the Euclidean length (straight-line length) from
 	 * (0, 0, 0) to (x, y, z). If you are comparing the lengths of vectors, you should
@@ -7140,7 +7138,7 @@ class Texture extends EventDispatcher {
 		 * texture samples being used.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default Texture.DEFAULT_ANISOTROPY
 		 */
 		this.anisotropy = anisotropy;
 
@@ -54974,7 +54972,7 @@ class Raycaster {
 		this.near = near;
 
 		/**
-		 * All results returned are further away than near. Near can't be negative.
+		 * All results returned are closer than far. Far can't be lower than near.
 		 *
 		 * @type {number}
 		 * @default Infinity
