@@ -519,7 +519,7 @@ class WebGPUBackend extends Backend {
 
 				const depthTextureData = this.get( renderContext.depthTexture );
 				const options = {};
-				if ( renderContext.depthTexture.isArrayTexture ) {
+				if ( renderContext.depthTexture.isArrayTexture || renderContext.depthTexture.isCubeTexture ) {
 
 					options.dimension = GPUTextureViewDimension.TwoD;
 					options.arrayLayerCount = 1;
