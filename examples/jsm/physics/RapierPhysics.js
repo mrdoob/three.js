@@ -73,6 +73,7 @@ function getShape( geometry ) {
 
 	}
 
+	console.warn( "Tried to get shape of unsupported geometry " + geometry.type );
 	return null;
 
 }

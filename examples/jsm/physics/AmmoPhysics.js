@@ -66,6 +66,7 @@ async function AmmoPhysics() {
 
 		}
 
+		console.warn( "Tried to get shape of unsupported geometry " + geometry.type );
 		return null;
 
 	}
