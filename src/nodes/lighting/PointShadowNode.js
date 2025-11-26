@@ -1,6 +1,6 @@
 import ShadowNode from './ShadowNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { float, vec2, If, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec3, If, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
@@ -9,6 +9,9 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Color } from '../../math/Color.js';
 import { BasicShadowMap, LessCompare, WebGPUCoordinateSystem } from '../../constants.js';
 import { CubeDepthTexture } from '../../textures/CubeDepthTexture.js';
+import { screenCoordinate } from '../display/ScreenNode.js';
+import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
+import { abs, normalize, cross } from '../math/MathNode.js';
 
 const _clearColor = /*@__PURE__*/ new Color();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
@@ -45,24 +48,48 @@ export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, 
 
 } );
 
+/**
+ * A shadow filtering function for point lights using Vogel disk sampling and IGN.
+ *
+ * Uses 5 samples distributed via Vogel disk pattern in tangent space around the
+ * sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {CubeDepthTexture} inputs.depthTexture - A reference to the shadow cube map.
+ * @param {Node<vec3>} inputs.bd3D - The normalized direction from light to fragment.
+ * @param {Node<float>} inputs.dp - The depth value to compare against.
+ * @param {LightShadow} inputs.shadow - The light shadow.
+ * @return {Node<float>} The filtering result.
+ */
 export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow } ) => {
 
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
-	const texelSize = float( 1 ).div( mapSize.x );
-	const offset = vec2( - 1.0, 1.0 ).mul( radius ).mul( texelSize );
+	const texelSize = radius.div( mapSize.x );
 
-	return cubeTexture( depthTexture, bd3D.add( offset.xyy ) ).compare( dp )
-		.add( cubeTexture( depthTexture, bd3D.add( offset.yyy ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( offset.xyx ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( offset.yyx ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( offset.xxy ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( offset.yxy ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( offset.xxx ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( offset.yxx ) ).compare( dp ) )
-		.mul( 1.0 / 9.0 );
+	// Build a tangent-space coordinate system for applying offsets
+	const absDir = abs( bd3D );
+	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
+	const bitangent = cross( bd3D, tangent );
+
+	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
+	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
+
+	// 5 samples using Vogel disk distribution in tangent space
+	const sample0 = vogelDiskSample( 0, 5, phi );
+	const sample1 = vogelDiskSample( 1, 5, phi );
+	const sample2 = vogelDiskSample( 2, 5, phi );
+	const sample3 = vogelDiskSample( 3, 5, phi );
+	const sample4 = vogelDiskSample( 4, 5, phi );
+
+	return cubeTexture( depthTexture, bd3D.add( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ) ).compare( dp )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.mul( 1.0 / 5.0 );
 
 } );
 
