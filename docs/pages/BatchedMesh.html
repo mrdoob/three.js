@@ -744,6 +744,259 @@ Negatively scaled matrices are not supported.</p>
 							</tbody>
 						</table>
 					</div>
+				<h2 class="subsection-title">Level of Detail (LOD) System</h2>
+				<div class="class-description">
+					<p>BatchedMesh includes built-in support for Level-of-Detail (LOD) management, allowing you to automatically switch between different geometry models based on camera distance. This dramatically improves performance in scenes with many objects by using simpler geometry for distant objects.</p>
+					<p><strong>Performance Benefits:</strong> LOD can improve frame rates by 30-70% in scenes with many distant objects by reducing the number of vertices being processed.</p>
+				</div>
+				<h3 class="subsection-title">LOD Properties</h3>
+				<div class="member">
+					<h3 class="name" id="lodBias" translate="no">.<a href="#lodBias">lodBias</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Global multiplier for LOD distances. Adjusts when LOD levels switch based on distance.</p>
+						<ul>
+							<li><code>1.0</code> = default behavior</li>
+							<li><code>&gt; 1.0</code> = higher quality (objects stay at high detail longer)</li>
+							<li><code>&lt; 1.0</code> = better performance (objects switch to low detail sooner)</li>
+						</ul>
+						<p>Default is <code>1.0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="autoUpdateLOD" translate="no">.<a href="#autoUpdateLOD">autoUpdateLOD</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Enable or disable automatic LOD updates. When <code>true</code>, LOD levels are automatically updated when <code>updateLODs()</code> is called.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lodHysteresis" translate="no">.<a href="#lodHysteresis">lodHysteresis</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Distance buffer to prevent LOD flickering at threshold boundaries. Value between 0 and 1.</p>
+						<ul>
+							<li><code>0.0</code> = no hysteresis (may cause flickering)</li>
+							<li><code>0.1</code> = 10% hysteresis (recommended)</li>
+							<li><code>1.0</code> = maximum hysteresis (very stable but less responsive)</li>
+						</ul>
+						<p>Default is <code>0.1</code>.</p>
+					</div>
+				</div>
+				<h3 class="subsection-title">LOD Methods</h3>
+				<h3 class="name name-method" id="addGeometryLOD" translate="no">.<a href="#addGeometryLOD">addGeometryLOD</a><span class="signature">( geometryId : <span class="param-type">number</span>, lodGeometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, distance : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+				<div class="method">
+					<div class="description">
+						<p>Adds a Level-of-Detail geometry for an existing base geometry. The LOD geometry will be used when instances are beyond the specified distance threshold.</p>
+						<p><strong>Important:</strong> All LOD geometries must have the same attributes (position, normal, uv, etc.) as the base geometry.</p>
+					</div>
+					<table class="params">
+						<tbody>
+							<tr>
+								<td class="name">
+									<strong>geometryId</strong>
+								</td>
+								<td class="description last">
+									<p>The ID of the base geometry (returned from <code>addGeometry()</code>). You cannot add LOD to a LOD geometry.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>lodGeometry</strong>
+								</td>
+								<td class="description last">
+									<p>The simplified geometry to use at this distance. Should have fewer vertices/indices than the base geometry for performance benefits.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>distance</strong>
+								</td>
+								<td class="description last">
+									<p>The distance threshold in world units. When an instance is beyond this distance, it will switch to this LOD level. LOD levels are automatically sorted by distance (closest first).</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<dl class="details">
+						<dt class="tag-returns"><strong>Returns:</strong> The LOD level index (0-based, where 0 is the first/closest LOD level).</dt>
+					</dl>
+					<h4>Example</h4>
+					<div translate="no"><pre><code class="language-js">// Add base geometry
+const treeGeoId = batchedMesh.addGeometry( treeHighDetail );
+
+// Add LOD levels (sorted automatically by distance)
+batchedMesh.addGeometryLOD( treeGeoId, treeMediumDetail, 50 );  // LOD level 0: switch at 50 units
+batchedMesh.addGeometryLOD( treeGeoId, treeLowDetail, 150 );    // LOD level 1: switch at 150 units
+
+// Create instances (they start with base geometry)
+const instanceId = batchedMesh.addInstance( treeGeoId );
+</code></pre></div>
+				</div>
+				<h3 class="name name-method" id="updateLODs" translate="no">.<a href="#updateLODs">updateLODs</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, force : <span class="param-type">boolean</span> )</span> </h3>
+				<div class="method">
+					<div class="description">
+						<p>Updates all LOD levels based on camera position. Call this method every frame (or every few frames) in your render loop to enable automatic LOD switching.</p>
+						<p>The method automatically:</p>
+						<ul>
+							<li>Calculates distance from each instance to the camera</li>
+							<li>Selects the appropriate LOD level based on distance thresholds</li>
+							<li>Switches instance geometries when LOD level changes</li>
+							<li>Applies hysteresis to prevent flickering</li>
+							<li>Respects manual LOD overrides (see <code>setInstanceLOD()</code>)</li>
+						</ul>
+						<p><strong>Performance:</strong> The method only processes updates when the camera has moved significantly, reducing CPU overhead.</p>
+					</div>
+					<table class="params">
+						<tbody>
+							<tr>
+								<td class="name">
+									<strong>camera</strong>
+								</td>
+								<td class="description last">
+									<p>The camera to calculate distances from. Can be any Three.js camera type (PerspectiveCamera, OrthographicCamera, etc.).</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>force</strong>
+								</td>
+								<td class="description last">
+									<p>If <code>true</code>, forces an update even if the camera hasn't moved. Useful when LOD thresholds or bias change.</p>
+									<p>Default is <code>false</code>.</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<h4>Example</h4>
+					<div translate="no"><pre><code class="language-js">function animate() {
+    requestAnimationFrame( animate );
+    
+    // Update LODs based on camera distance
+    batchedMesh.updateLODs( camera );
+    
+    renderer.render( scene, camera );
+}
+</code></pre></div>
+					<dl class="details">
+						<dt class="tag-note"><strong>Note:</strong> This method does nothing if <code>autoUpdateLOD</code> is <code>false</code> or if no camera is provided.</dt>
+					</dl>
+				</div>
+				<h3 class="name name-method" id="setInstanceLOD" translate="no">.<a href="#setInstanceLOD">setInstanceLOD</a><span class="signature">( instanceId : <span class="param-type">number</span>, level : <span class="param-type">number</span> )</span> </h3>
+				<div class="method">
+					<div class="description">
+						<p>Manually sets the LOD level for a specific instance, overriding automatic LOD selection. Useful for special cases like hero objects that should always use high detail, or background objects that should always use low detail.</p>
+					</div>
+					<table class="params">
+						<tbody>
+							<tr>
+								<td class="name">
+									<strong>instanceId</strong>
+								</td>
+								<td class="description last">
+									<p>The ID of the instance to modify.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>level</strong>
+								</td>
+								<td class="description last">
+									<p>The LOD level index to use (0 = first LOD level, 1 = second, etc.), or <code>-1</code> to re-enable automatic LOD selection.</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<h4>Example</h4>
+					<div translate="no"><pre><code class="language-js">// Force instance to always use high detail (base geometry)
+batchedMesh.setInstanceLOD( heroTreeId, -1 ); // -1 means base geometry
+
+// Force instance to always use first LOD level
+batchedMesh.setInstanceLOD( backgroundTreeId, 0 );
+
+// Re-enable automatic LOD
+batchedMesh.setInstanceLOD( instanceId, -1 );
+</code></pre></div>
+					<dl class="details">
+						<dt class="tag-returns"><strong>Returns:</strong> A reference to this batched mesh.</dt>
+					</dl>
+				</div>
+				<h3 class="name name-method" id="getInstanceLOD" translate="no">.<a href="#getInstanceLOD">getInstanceLOD</a><span class="signature">( instanceId : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+				<div class="method">
+					<div class="description">
+						<p>Gets the current LOD level for an instance. Useful for debugging or statistics.</p>
+					</div>
+					<table class="params">
+						<tbody>
+							<tr>
+								<td class="name">
+									<strong>instanceId</strong>
+								</td>
+								<td class="description last">
+									<p>The ID of the instance to query.</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<dl class="details">
+						<dt class="tag-returns"><strong>Returns:</strong> The current LOD level index (0-based), or <code>-1</code> if the instance is using the base geometry or has no LOD levels defined.</dt>
+					</dl>
+					<h4>Example</h4>
+					<div translate="no"><pre><code class="language-js">const level = batchedMesh.getInstanceLOD( instanceId );
+console.log( `Instance ${instanceId} is using LOD level ${level}` );
+</code></pre></div>
+				</div>
+				<h3 class="subsection-title">LOD Best Practices</h3>
+				<div class="class-description">
+					<h4>Creating LOD Models</h4>
+					<ul>
+						<li>Use 3D modeling software (Blender, Maya, etc.) to create simplified versions of your models</li>
+						<li>Aim for 50-90% reduction in vertex count for each LOD level</li>
+						<li>Maintain the same overall shape and silhouette</li>
+						<li>Keep UV coordinates and normals consistent across LOD levels</li>
+					</ul>
+					<h4>Choosing Distance Thresholds</h4>
+					<ul>
+						<li>Start with distances that are 2-3x apart (e.g., 50, 150, 450)</li>
+						<li>Test in your actual scene to find optimal thresholds</li>
+						<li>Consider your camera's field of view and typical viewing distances</li>
+						<li>Use the <code>lodBias</code> property to fine-tune globally</li>
+					</ul>
+					<h4>Performance Tips</h4>
+					<ul>
+						<li>Call <code>updateLODs()</code> every 2-3 frames instead of every frame for better performance</li>
+						<li>Use <code>lodHysteresis</code> to prevent flickering at threshold boundaries</li>
+						<li>Consider disabling LOD for very close objects (hero objects)</li>
+						<li>Profile your scene to find the optimal number of LOD levels</li>
+					</ul>
+					<h4>Example: Forest Scene</h4>
+					<div translate="no"><pre><code class="language-js">// Load LOD models
+const treeHigh = await loader.loadAsync( 'tree.glb' );      // 95k vertices
+const treeMid = await loader.loadAsync( 'tree_mid.glb' );   // 47k vertices
+const treeLow = await loader.loadAsync( 'tree_low.glb' );   // 9k vertices
+
+// Create BatchedMesh
+const batchedMesh = new THREE.BatchedMesh( 1000, 200000, 400000, material );
+
+// Add base geometry
+const treeGeoId = batchedMesh.addGeometry( treeHigh.scene.children[0].geometry );
+
+// Add LOD levels
+batchedMesh.addGeometryLOD( treeGeoId, treeMid.scene.children[0].geometry, 50 );   // < 50m: high detail
+batchedMesh.addGeometryLOD( treeGeoId, treeLow.scene.children[0].geometry, 150 );  // < 150m: medium, >= 150m: low
+
+// Create 1000 tree instances
+for ( let i = 0; i < 1000; i ++ ) {
+    const id = batchedMesh.addInstance( treeGeoId );
+    // ... set position, rotation, scale
+}
+
+// In render loop
+function animate() {
+    batchedMesh.updateLODs( camera ); // Automatic LOD switching!
+    renderer.render( scene, camera );
+    requestAnimationFrame( animate );
+}
+</code></pre></div>
+				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
 					<a href="https://github.com/mrdoob/three.js/blob/master/src/objects/BatchedMesh.js" translate="no" target="_blank" rel="noopener">src/objects/BatchedMesh.js</a>

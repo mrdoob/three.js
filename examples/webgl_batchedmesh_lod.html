@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - BatchedMesh LOD Demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="../files/main.css">
+		<style>
+			body {
+				font-family: 'Segoe UI', Arial, sans-serif;
+				background-color: #000;
+				color: #fff;
+				margin: 0;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+			}
+			#info a { color: #4df; text-decoration: none; }
+			#info a:hover { text-decoration: underline; }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank">three.js</a> - BatchedMesh LOD Demo<br/>
+			<span id="loading" style="color:#8cf;">Loading models...</span>
+		</div>
+		<div id="stats" style="position:absolute; top:10px; right:10px;"></div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+		import * as THREE from 'three';
+		import Stats from 'three/addons/libs/stats.module.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+		let camera, scene, renderer, stats, controls;
+
+		// Object counts
+		const FOX_COUNT = 50;
+		const TREE_COUNT = 1000;
+
+		// LOD Configuration
+		// distances array defines thresholds - creates (distances.length + 1) LOD levels
+		// Example: [50, 150] creates 3 levels: L0 (<50m), L1 (50-150m), L2 (>=150m)
+		// Example: [25, 50, 100, 200] creates 5 levels: L0-L4
+		const lod = {
+			distances: [ 50, 150 ],  // L0 < 50m (high), L1 50-150m (mid), L2 >= 150m (low)
+			showColors: true,
+			useReference: false,
+			refPos: null,
+			get numLevels() { return this.distances.length + 1; },
+			counts: {
+				fox: [],
+				tree: []
+			}
+		};
+
+		// Initialize counts arrays dynamically
+		lod.counts.fox = new Array( lod.numLevels ).fill( 0 );
+		lod.counts.tree = new Array( lod.numLevels ).fill( 0 );
+
+		// Generate LOD colors dynamically
+		const LOD_COLORS = generateLODColors( lod.numLevels );
+
+		/**
+		 * Generate LOD colors dynamically based on number of levels.
+		 * Creates a gradient from green (high detail) to red (low detail).
+		 * @param {number} numLevels - Number of LOD levels
+		 * @returns {Array<THREE.Color>} Array of colors
+		 */
+		function generateLODColors( numLevels ) {
+
+			const colors = [];
+			for ( let i = 0; i < numLevels; i ++ ) {
+
+				const ratio = i / ( numLevels - 1 ); // 0.0 to 1.0
+				// Interpolate from green (0x00ff44) to red (0xff4400)
+				const r = Math.floor( 0x00 + ratio * 0xff );
+				const g = Math.floor( 0xff - ratio * 0xbb );
+				const b = Math.floor( 0x44 - ratio * 0x44 );
+				colors.push( new THREE.Color( ( r << 16 ) | ( g << 8 ) | b ) );
+
+			}
+
+			return colors;
+
+		}
+
+		// Batched meshes
+		let foxMesh = null;
+		let treeMesh = null;
+
+		// Geometry IDs for LOD levels
+		let foxGeoIds = [];  // 3 levels
+		let treeGeoIds = []; // 3 levels
+
+		// Instance data
+		const foxes = [];
+		const trees = [];
+
+		// Materials
+		let foxMaterial = null;
+		let treeMaterial = null;
+
+		// Terrain
+		const TERRAIN_SIZE = 500; // Increased by 25% (was 400)
+		const TERRAIN_RES = 80;
+		let terrainHeights = [];
+		let treeYOffset = 0;
+
+		// Temp objects (reused for performance)
+		const _m = new THREE.Matrix4();
+		const _p = new THREE.Vector3();
+		const _q = new THREE.Quaternion();
+		const _s = new THREE.Vector3();
+		const _yAxis = new THREE.Vector3( 0, 1, 0 );
+
+		init();
+
+		async function init() {
+
+			// Scene with nice sky gradient
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x6eb5ff );
+			scene.fog = new THREE.Fog( 0x8ec8ff, 80, 440 ); // Increased far distance by 25%
+
+			// Camera
+			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.5, 1000 );
+			camera.position.set( 0, 40, 70 );
+
+			// Renderer with good quality
+			renderer = new THREE.WebGLRenderer( { antialias: true, powerPreference: 'high-performance' } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1.0;
+			document.body.appendChild( renderer.domElement );
+
+			// Controls
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.05;
+			controls.maxPolarAngle = Math.PI / 2.1;
+			controls.minDistance = 10;
+			controls.maxDistance = 375; // Increased by 25% to match terrain
+
+			// Stats
+			stats = new Stats();
+			document.getElementById( 'stats' ).appendChild( stats.dom );
+
+			// Lighting - warm sunlight
+			const ambient = new THREE.AmbientLight( 0xffffff, 0.6 );
+			scene.add( ambient );
+
+			const sun = new THREE.DirectionalLight( 0xfffaed, 1.2 );
+			sun.position.set( 50, 100, 30 );
+			scene.add( sun );
+
+			// Terrain
+			generateTerrain();
+			createTerrainMesh();
+
+			// UI
+			createUI();
+
+			// Load models
+			await loadModels();
+
+			// Start animation
+			animate();
+			window.addEventListener( 'resize', onWindowResize );
+
+		}
+
+		function generateTerrain() {
+
+			terrainHeights = [];
+			for ( let z = 0; z < TERRAIN_RES; z ++ ) {
+
+				terrainHeights[ z ] = [];
+				for ( let x = 0; x < TERRAIN_RES; x ++ ) {
+
+					// Smooth rolling hills
+					const n1 = Math.sin( x * 0.04 ) * Math.cos( z * 0.04 ) * 15;
+					const n2 = Math.sin( x * 0.12 + 3 ) * Math.cos( z * 0.12 + 2 ) * 8;
+					const n3 = Math.sin( x * 0.25 + 7 ) * Math.cos( z * 0.25 + 5 ) * 3;
+					terrainHeights[ z ][ x ] = n1 + n2 + n3;
+
+				}
+
+			}
+
+		}
+
+		function getHeight( x, z ) {
+
+			const gx = ( ( x + TERRAIN_SIZE / 2 ) / TERRAIN_SIZE ) * ( TERRAIN_RES - 1 );
+			const gz = ( ( z + TERRAIN_SIZE / 2 ) / TERRAIN_SIZE ) * ( TERRAIN_RES - 1 );
+			const x0 = Math.floor( gx ), x1 = Math.ceil( gx );
+			const z0 = Math.floor( gz ), z1 = Math.ceil( gz );
+
+			if ( x0 < 0 || x1 >= TERRAIN_RES || z0 < 0 || z1 >= TERRAIN_RES ) return 0;
+
+			const fx = gx - x0, fz = gz - z0;
+			const h00 = terrainHeights[ z0 ][ x0 ], h10 = terrainHeights[ z0 ][ x1 ];
+			const h01 = terrainHeights[ z1 ][ x0 ], h11 = terrainHeights[ z1 ][ x1 ];
+			return ( h00 * ( 1 - fx ) + h10 * fx ) * ( 1 - fz ) + ( h01 * ( 1 - fx ) + h11 * fx ) * fz;
+
+		}
+
+		function createTerrainMesh() {
+
+			const geo = new THREE.PlaneGeometry( TERRAIN_SIZE, TERRAIN_SIZE, TERRAIN_RES - 1, TERRAIN_RES - 1 );
+			geo.rotateX( - Math.PI / 2 );
+
+			const pos = geo.attributes.position;
+			for ( let i = 0; i < pos.count; i ++ ) {
+
+				pos.setY( i, getHeight( pos.getX( i ), pos.getZ( i ) ) );
+
+			}
+
+			geo.computeVertexNormals();
+
+			const mat = new THREE.MeshLambertMaterial( { color: 0x4a8c3c } );
+			scene.add( new THREE.Mesh( geo, mat ) );
+
+		}
+
+		// Create LOD geometry - for this demo, we use the same geometry for all levels
+		// Real-world LOD would use pre-made decimated models from Blender/meshoptimizer
+		// The LOD system is demonstrated via color coding showing distance zones
+		function createLODGeometry( geometry ) {
+
+			// Clone the geometry and ensure it's non-indexed for BatchedMesh
+			const geo = geometry.index ? geometry.toNonIndexed() : geometry.clone();
+			geo.computeBoundingSphere();
+			return geo;
+
+		}
+
+		function extractFromGLTF( gltf, scale = 1.0 ) {
+
+			let geometry = null, material = null;
+
+			gltf.scene.traverse( ( child ) => {
+
+				if ( child.isMesh && ! geometry ) {
+
+					geometry = child.geometry.clone();
+					geometry.scale( scale, scale, scale );
+					geometry.deleteAttribute( 'skinIndex' );
+					geometry.deleteAttribute( 'skinWeight' );
+					if ( ! geometry.attributes.normal ) geometry.computeVertexNormals();
+					material = child.material;
+
+				}
+
+			} );
+
+			return { geometry, material };
+
+		}
+
+		function createMaterial( src, fallbackColor ) {
+
+			const mat = new THREE.MeshLambertMaterial( {
+				color: src?.color?.clone() || new THREE.Color( fallbackColor ),
+				map: src?.map || null,
+				side: THREE.DoubleSide
+			} );
+
+			if ( mat.map ) mat.map.needsUpdate = true;
+			return mat;
+
+		}
+
+		async function loadModels() {
+
+			const loader = new GLTFLoader();
+
+			// === LOAD FOX ===
+			try {
+
+				console.log( '🦊 Loading fox...' );
+				const gltf = await loader.loadAsync( './models/gltf/fox.glb' );
+				const { geometry, material } = extractFromGLTF( gltf, 2.5 );
+
+				if ( geometry ) {
+
+					foxMaterial = createMaterial( material, 0xff8844 );
+
+					// Use same geometry for all LOD levels (colors show LOD zones)
+					// Real-world LOD would use pre-made decimated models
+					const baseGeo = createLODGeometry( geometry );
+					const vertCount = baseGeo.attributes.position.count;
+					console.log( `  Geometry: ${vertCount} vertices` );
+
+					// Create BatchedMesh
+					foxMesh = new THREE.BatchedMesh( FOX_COUNT, vertCount * 2, vertCount * 2, foxMaterial );
+					foxMesh.frustumCulled = false;
+					scene.add( foxMesh );
+
+					// Add single geometry (LOD switching via setGeometryIdAt won't change visuals,
+					// but the LOD system distance detection still works - shown by colors)
+					const baseGeoId = foxMesh.addGeometry( baseGeo );
+					// Use same geometry for all LOD levels (colors show LOD zones)
+					foxGeoIds = new Array( lod.numLevels ).fill( baseGeoId );
+
+					// Create instances
+					createFoxes();
+					console.log( `  ✓ ${foxes.length} foxes created` );
+
+				}
+
+			} catch ( e ) {
+
+				console.error( '🦊 Fox error:', e );
+
+			}
+
+			// === LOAD TREE (with actual LOD models!) ===
+			try {
+
+				console.log( '🌲 Loading tree LOD models...' );
+
+				// Load all LOD levels:
+				// tree.glb = high detail (close)
+				// tree_mid.glb = medium detail (mid distance)
+				// tree_low.glb = low detail (far)
+				const [ gltfHigh, gltfMid, gltfLow ] = await Promise.all( [
+					loader.loadAsync( './models/gltf/tree.glb' ),
+					loader.loadAsync( './models/gltf/tree_mid.glb' ),
+					loader.loadAsync( './models/gltf/tree_low.glb' )
+				] );
+
+				const treeScale = 8.0;
+				const { geometry: geoHigh, material } = extractFromGLTF( gltfHigh, treeScale );
+				const { geometry: geoMid } = extractFromGLTF( gltfMid, treeScale );
+				const { geometry: geoLow } = extractFromGLTF( gltfLow, treeScale );
+
+				if ( geoHigh && geoMid && geoLow ) {
+
+					geoHigh.computeBoundingBox();
+					treeYOffset = geoHigh.boundingBox ? - geoHigh.boundingBox.min.y : 0;
+
+					treeMaterial = createMaterial( material, 0x2d6016 );
+
+					// Prepare LOD geometries - 3 levels for 3 models
+					const lodGeos = [
+						createLODGeometry( geoHigh ),  // L0: tree.glb (< 50m)
+						createLODGeometry( geoMid ),   // L1: tree_mid.glb (50-150m)
+						createLODGeometry( geoLow )   // L2: tree_low.glb (>= 150m)
+					];
+
+					// Log vertex counts for each LOD
+					console.log( `  L0 tree.glb (High):     ${lodGeos[ 0 ].attributes.position.count} verts` );
+					console.log( `  L1 tree_mid.glb:        ${lodGeos[ 1 ].attributes.position.count} verts` );
+					console.log( `  L2 tree_low.glb (Low):  ${lodGeos[ 2 ].attributes.position.count} verts` );
+
+					// Calculate total buffer size needed
+					let totalV = 0;
+					for ( const geo of lodGeos ) {
+
+						totalV += geo.attributes.position.count;
+
+					}
+
+					// Create BatchedMesh with space for all LOD geometries
+					treeMesh = new THREE.BatchedMesh( TREE_COUNT, totalV * 2, totalV * 2, treeMaterial );
+					treeMesh.frustumCulled = false;
+					scene.add( treeMesh );
+
+					// Add all LOD geometries - each gets a unique ID
+					treeGeoIds = [];
+					for ( let i = 0; i < lodGeos.length; i ++ ) {
+
+						const geoId = treeMesh.addGeometry( lodGeos[ i ] );
+						treeGeoIds.push( geoId );
+						console.log( `  LOD${i}: geoId=${geoId}, ${lodGeos[ i ].attributes.position.count} verts` );
+
+					}
+
+					console.log( `  🎯 treeGeoIds array: [${treeGeoIds.join( ', ' )}]` );
+					console.log( `     Mapping: L0→geoId${treeGeoIds[ 0 ]}, L1→geoId${treeGeoIds[ 1 ]}, L2→geoId${treeGeoIds[ 2 ]}` );
+
+					// Create instances (start with high detail, LOD system will switch)
+					createTrees();
+					console.log( `  ✓ ${trees.length} trees created, all start with geoId ${treeGeoIds[ 0 ]} (95k verts)` );
+
+				}
+
+			} catch ( e ) {
+
+				console.error( '🌲 Tree error:', e );
+
+			}
+
+			// Update loading text
+			document.getElementById( 'loading' ).innerHTML = 
+				`<span style="color:#4f8;">✓</span> ${foxes.length} foxes + ${trees.length} trees with <b>real LOD models!</b>`;
+
+		}
+
+		function createFoxes() {
+
+			for ( let i = 0; i < FOX_COUNT; i ++ ) {
+
+				const x = ( Math.random() - 0.5 ) * TERRAIN_SIZE * 0.85;
+				const z = ( Math.random() - 0.5 ) * TERRAIN_SIZE * 0.85;
+				const y = getHeight( x, z );
+				const angle = Math.random() * Math.PI * 2;
+
+				const id = foxMesh.addInstance( foxGeoIds[ 0 ] );
+
+				_m.makeRotationY( angle );
+				_m.setPosition( x, y, z );
+				foxMesh.setMatrixAt( id, _m );
+
+				foxes.push( {
+					id,
+					pos: new THREE.Vector3( x, y, z ),
+					angle,
+					speed: 0.015 + Math.random() * 0.03,
+					turnSpeed: 0.0008 + Math.random() * 0.0015,
+					time: Math.random() * 1000,
+					lod: 0
+				} );
+
+			}
+
+		}
+
+		function createTrees() {
+
+			const minDistSq = 5 * 5; // Reduced spacing for more trees
+			let planted = 0;
+
+			for ( let attempt = 0; attempt < TREE_COUNT * 100 && planted < TREE_COUNT; attempt ++ ) {
+
+				const x = ( Math.random() - 0.5 ) * TERRAIN_SIZE * 0.9;
+				const z = ( Math.random() - 0.5 ) * TERRAIN_SIZE * 0.9;
+				const h = getHeight( x, z );
+
+				// Allow trees anywhere (removed height restriction)
+				// if ( h > 8 ) continue;
+
+				// Check spacing
+				let ok = true;
+				for ( const t of trees ) {
+
+					const dx = t.pos.x - x, dz = t.pos.z - z;
+					if ( dx * dx + dz * dz < minDistSq ) { ok = false; break; }
+
+				}
+
+				if ( ! ok ) continue;
+
+				const scale = 1.8 + Math.random() * 1.2;
+				const y = h + treeYOffset * scale;
+				const rot = Math.random() * Math.PI * 2;
+
+				const id = treeMesh.addInstance( treeGeoIds[ 0 ] );
+
+				_q.setFromAxisAngle( _yAxis, rot );
+				_p.set( x, y, z );
+				_s.set( scale, scale, scale );
+				_m.compose( _p, _q, _s );
+				treeMesh.setMatrixAt( id, _m );
+
+				trees.push( { id, pos: new THREE.Vector3( x, y, z ), lod: 0 } );
+				planted ++;
+
+			}
+
+		}
+
+		function createUI() {
+
+			const panel = document.createElement( 'div' );
+			panel.style.cssText = `
+				position: absolute;
+				bottom: 20px;
+				left: 20px;
+				padding: 14px 16px;
+				background: linear-gradient(145deg, rgba(20,25,35,0.95), rgba(10,15,25,0.95));
+				color: #fff;
+				font-family: 'Segoe UI', sans-serif;
+				font-size: 12px;
+				border-radius: 12px;
+				border: 1px solid rgba(100,150,255,0.2);
+				box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+				width: 220px;
+			`;
+
+			panel.innerHTML = `
+				<h3 style="margin:0 0 12px 0; text-align:center; color:#6cf; font-size:14px; font-weight:600;">
+					🎮 LOD System
+				</h3>
+				
+				${lod.distances.map( ( dist, i ) => `
+					<div style="margin-bottom:10px;">
+						<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px;">
+							<span>Distance ${i + 1}:</span>
+							<span id="d${i + 1}v" style="color:#8cf; font-weight:600;">${dist}m</span>
+						</div>
+						<input type="range" id="d${i + 1}" min="${( i + 1 ) * 20}" max="${( i + 1 ) * 100}" value="${dist}" 
+							style="width:100%; height:4px; cursor:pointer;">
+					</div>
+				` ).join( '' )}
+				
+				<hr style="border:none; border-top:1px solid rgba(100,150,255,0.2); margin:12px 0;">
+				
+				<div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:8px;">
+					<div style="font-weight:600; margin-bottom:6px; color:#f94;">🦊 Foxes:</div>
+					<div style="display:flex; justify-content:space-between; font-size:10px; flex-wrap:wrap;">
+						${Array.from( { length: lod.numLevels }, ( _, i ) => {
+							const color = LOD_COLORS[ i ];
+							const hex = '#' + color.getHexString();
+							return `<span style="color:${hex};">
+								L${i}: <b id="f${i}">0</b>
+							</span>`;
+						} ).join( '' )}
+					</div>
+				</div>
+				
+				<div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:12px;">
+					<div style="font-weight:600; margin-bottom:6px; color:#4c8;">🌲 Trees:</div>
+					<div style="display:flex; justify-content:space-between; font-size:10px; flex-wrap:wrap;">
+						${Array.from( { length: lod.numLevels }, ( _, i ) => {
+							const color = LOD_COLORS[ i ];
+							const hex = '#' + color.getHexString();
+							return `<span style="color:${hex};">
+								L${i}: <b id="t${i}">0</b>
+							</span>`;
+						} ).join( '' )}
+					</div>
+				</div>
+				
+				<hr style="border:none; border-top:1px solid rgba(100,150,255,0.2); margin:12px 0;">
+				
+				<label style="display:flex; align-items:center; cursor:pointer; margin-bottom:8px; padding:6px; background:rgba(255,255,255,0.05); border-radius:6px;">
+					<input type="checkbox" id="showColors" checked style="margin-right:10px; cursor:pointer;">
+					<span>🎨 Show LOD Colors</span>
+				</label>
+				
+				<label style="display:flex; align-items:center; cursor:pointer; padding:6px; background:rgba(255,255,255,0.05); border-radius:6px;">
+					<input type="checkbox" id="useRef" style="margin-right:10px; cursor:pointer;">
+					<span>📍 Lock Reference</span>
+				</label>
+				
+				<div id="refStatus" style="text-align:center; font-size:10px; color:#888; margin-top:8px;">
+					LOD calculated from camera
+				</div>
+			`;
+
+			document.body.appendChild( panel );
+
+			// Event listeners - dynamically create for all distance sliders
+			lod.distances.forEach( ( dist, i ) => {
+
+				const sliderId = i + 1;
+				document.getElementById( `d${sliderId}` ).addEventListener( 'input', e => {
+
+					lod.distances[ i ] = parseInt( e.target.value );
+					document.getElementById( `d${sliderId}v` ).textContent = e.target.value + 'm';
+
+				} );
+
+			} );
+
+			document.getElementById( 'showColors' ).addEventListener( 'change', e => {
+
+				lod.showColors = e.target.checked;
+
+				if ( ! lod.showColors ) {
+
+					const white = new THREE.Color( 0xffffff );
+					foxes.forEach( f => foxMesh?.setColorAt( f.id, white ) );
+					trees.forEach( t => treeMesh?.setColorAt( t.id, white ) );
+
+				}
+
+			} );
+
+			document.getElementById( 'useRef' ).addEventListener( 'change', e => {
+
+				lod.useReference = e.target.checked;
+
+				if ( lod.useReference ) {
+
+					lod.refPos = camera.position.clone();
+					document.getElementById( 'refStatus' ).textContent = 
+						`Locked at (${lod.refPos.x.toFixed( 0 )}, ${lod.refPos.z.toFixed( 0 )})`;
+					document.getElementById( 'refStatus' ).style.color = '#4f8';
+
+				} else {
+
+					lod.refPos = null;
+					document.getElementById( 'refStatus' ).textContent = 'LOD calculated from camera';
+					document.getElementById( 'refStatus' ).style.color = '#888';
+
+				}
+
+			} );
+
+		}
+
+		/**
+		 * Get LOD level for a given distance.
+		 * Supports any number of distance thresholds dynamically.
+		 * @param {number} dist - Distance from camera
+		 * @returns {number} LOD level (0 = highest detail, increases with distance)
+		 */
+		function getLOD( dist ) {
+
+			// Dynamically check all distance thresholds
+			for ( let i = 0; i < lod.distances.length; i ++ ) {
+
+				if ( dist < lod.distances[ i ] ) return i;
+
+			}
+
+			// Beyond all thresholds = lowest LOD level
+			return lod.distances.length;
+
+		}
+
+		function updateLOD() {
+
+			const ref = lod.useReference && lod.refPos ? lod.refPos : camera.position;
+
+			// Reset counters
+			lod.counts.fox.fill( 0 );
+			lod.counts.tree.fill( 0 );
+
+			// Update foxes - calculate LOD level and apply colors
+			if ( foxMesh && foxGeoIds.length === lod.numLevels ) {
+
+				let foxGeometryChanged = false;
+				for ( const fox of foxes ) {
+
+					const dist = fox.pos.distanceTo( ref );
+					const level = getLOD( dist );
+					lod.counts.fox[ level ] ++;
+
+					if ( level !== fox.lod ) {
+
+						foxMesh.setGeometryIdAt( fox.id, foxGeoIds[ level ] );
+						fox.lod = level;
+						foxGeometryChanged = true;
+
+					}
+
+					if ( lod.showColors ) {
+
+						foxMesh.setColorAt( fox.id, LOD_COLORS[ level ] );
+
+					}
+
+				}
+
+				// Trigger visibility update so geometry switch takes effect
+				if ( foxGeometryChanged ) {
+
+					foxMesh._visibilityChanged = true;
+
+				}
+
+			}
+
+			// Update trees
+			if ( treeMesh && treeGeoIds.length === lod.numLevels ) {
+
+				let geometryChanged = false;
+
+				for ( const tree of trees ) {
+
+					const dist = tree.pos.distanceTo( ref );
+					const level = getLOD( dist );
+					lod.counts.tree[ level ] ++;
+
+					if ( level !== tree.lod ) {
+
+						// Switch geometry to different LOD model
+						const newGeoId = treeGeoIds[ level ];
+						treeMesh.setGeometryIdAt( tree.id, newGeoId );
+						tree.lod = level;
+						geometryChanged = true;
+
+					}
+
+					if ( lod.showColors ) {
+
+						treeMesh.setColorAt( tree.id, LOD_COLORS[ level ] );
+
+					}
+
+				}
+
+				// IMPORTANT: Trigger visibility update so geometry switch takes effect!
+				if ( geometryChanged ) {
+
+					treeMesh._visibilityChanged = true;
+
+				}
+
+			}
+
+		}
+
+		function updateUI() {
+
+			for ( let i = 0; i < lod.numLevels; i ++ ) {
+
+				const foxEl = document.getElementById( `f${i}` );
+				const treeEl = document.getElementById( `t${i}` );
+				if ( foxEl ) foxEl.textContent = lod.counts.fox[ i ];
+				if ( treeEl ) treeEl.textContent = lod.counts.tree[ i ];
+
+			}
+
+		}
+
+		function animateFoxes() {
+
+			if ( ! foxMesh ) return;
+
+			const t = Date.now() * 0.001;
+
+			for ( const fox of foxes ) {
+
+				// Smooth wandering movement
+				fox.angle += fox.turnSpeed * Math.sin( t * 0.5 + fox.time );
+				fox.pos.x += Math.cos( fox.angle ) * fox.speed;
+				fox.pos.z += Math.sin( fox.angle ) * fox.speed;
+
+				// Wrap around terrain
+				const h = TERRAIN_SIZE / 2;
+				if ( fox.pos.x > h ) fox.pos.x = - h;
+				if ( fox.pos.x < - h ) fox.pos.x = h;
+				if ( fox.pos.z > h ) fox.pos.z = - h;
+				if ( fox.pos.z < - h ) fox.pos.z = h;
+
+				fox.pos.y = getHeight( fox.pos.x, fox.pos.z );
+
+				// Update transform
+				foxMesh.getMatrixAt( fox.id, _m );
+				_m.decompose( _p, _q, _s );
+				_p.copy( fox.pos );
+				_q.setFromAxisAngle( _yAxis, fox.angle );
+				_m.compose( _p, _q, _s );
+				foxMesh.setMatrixAt( fox.id, _m );
+
+			}
+
+		}
+
+		let frame = 0;
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			controls.update();
+			animateFoxes();
+
+			frame ++;
+
+			// LOD update every 2 frames
+			if ( frame % 2 === 0 ) updateLOD();
+
+			// UI update every 10 frames
+			if ( frame % 10 === 0 ) updateUI();
+
+			renderer.render( scene, camera );
+			stats.update();
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		</script>
+	</body>
+</html>

@@ -263,6 +263,21 @@ class BatchedMesh extends Mesh {
 		this._visibilityChanged = true;
 		this._geometryInitialized = false;
 
+		// LOD system data structures
+		this._lodLevels = new Map(); // Map<baseGeometryId, Array<{geometryId, distance}>>
+		this._activeLODs = new Map(); // Map<instanceId, {currentLevel, lastDistance, locked, forcedLevel}>
+		this._lodUpdateQueue = [];
+		this._baseGeometryMap = new Map(); // Map<geometryId, baseGeometryId> - tracks which geometry is base vs LOD
+
+		// LOD properties
+		this.lodBias = 1.0;
+		this.autoUpdateLOD = true;
+		this.lodHysteresis = 0.1;
+		this._lastCameraPosition = new Vector3();
+		this._cameraMovedThreshold = 0.01;
+		this._lodUpdateIndex = 0; // For staggered updates
+		this._lodUpdateBatchSize = 10000; // Process all instances per frame
+
 		// cached user options
 		this._maxInstanceCount = maxInstanceCount;
 		this._maxVertexCount = maxVertexCount;
@@ -812,7 +827,454 @@ class BatchedMesh extends Mesh {
 		}
 
 		this._visibilityChanged = true;
+		// Track base geometry (not a LOD)
+		this._baseGeometryMap.set( geometryId, geometryId );
+
 		return geometryId;
+
+	}
+
+	/**
+	 * Add a Level-of-Detail geometry for an existing base geometry.
+	 *
+	 * @param {number} geometryId - ID returned from addGeometry() (base geometry)
+	 * @param {BufferGeometry} lodGeometry - Simplified geometry for this LOD level
+	 * @param {number} distance - Distance threshold for switching to this LOD level
+	 * @return {number} LOD level index
+	 */
+	addGeometryLOD( geometryId, lodGeometry, distance ) {
+
+		this.validateGeometryId( geometryId );
+
+		// Ensure this is a base geometry, not a LOD
+		const baseGeometryId = this._baseGeometryMap.get( geometryId );
+		if ( baseGeometryId !== geometryId ) {
+
+			throw new Error( 'THREE.BatchedMesh: Cannot add LOD to a LOD geometry. Use the base geometry ID.' );
+
+		}
+
+		// Validate LOD geometry
+		this._validateGeometry( lodGeometry );
+
+		// Add LOD geometry as a new geometry
+		const lodGeometryId = this.addGeometry( lodGeometry );
+		this._baseGeometryMap.set( lodGeometryId, geometryId ); // Mark as LOD of baseGeometryId
+
+		// Get or create LOD levels array for this base geometry
+		if ( ! this._lodLevels.has( geometryId ) ) {
+
+			this._lodLevels.set( geometryId, [] );
+
+		}
+
+		const lodLevels = this._lodLevels.get( geometryId );
+		lodLevels.push( {
+			geometryId: lodGeometryId,
+			distance: distance
+		} );
+
+		// Sort by distance (ascending - closest first)
+		lodLevels.sort( ( a, b ) => a.distance - b.distance );
+
+		return lodLevels.length - 1;
+
+	}
+
+	/**
+	 * Calculate squared distance from instance to camera.
+	 *
+	 * @private
+	 * @param {number} instanceId - Instance ID
+	 * @param {Camera} camera - Camera to calculate distance from
+	 * @return {number} Squared distance
+	 */
+	_calculateInstanceDistance( instanceId, camera ) {
+
+		this.validateInstanceId( instanceId );
+
+		// Get instance local position
+		this.getMatrixAt( instanceId, _matrix );
+		_vector.setFromMatrixPosition( _matrix );
+
+		// Transform to world space (only update world matrix once per frame)
+		if ( ! this._worldMatrixUpdated ) {
+
+			this.updateWorldMatrix( true, false );
+			this._worldMatrixUpdated = true;
+
+		}
+
+		_vector.applyMatrix4( this.matrixWorld );
+
+		// Get camera world position (only update once per frame)
+		if ( ! camera._lodWorldMatrixUpdated ) {
+
+			camera.updateWorldMatrix( true, false );
+			camera._lodWorldMatrixUpdated = true;
+
+		}
+
+		const camPos = _temp.setFromMatrixPosition( camera.matrixWorld );
+
+		// Calculate squared distance
+		return _vector.distanceToSquared( camPos );
+
+	}
+
+	/**
+	 * Select appropriate LOD level for given distance.
+	 *
+	 * @private
+	 * @param {number} geometryId - Base geometry ID
+	 * @param {number} distanceSq - Squared distance to camera
+	 * @param {number} currentLevel - Current LOD level (-1 = base)
+	 * @return {number} LOD level index (-1 = base geometry)
+	 */
+	_selectLODLevel( geometryId, distanceSq, currentLevel ) {
+
+		const lodLevels = this._lodLevels.get( geometryId );
+		if ( ! lodLevels || lodLevels.length === 0 ) {
+
+			return - 1; // No LODs, use base geometry
+
+		}
+
+		const distance = Math.sqrt( distanceSq );
+		const adjustedDistance = distance / this.lodBias;
+
+		// Find appropriate LOD level
+		for ( let i = 0; i < lodLevels.length; i ++ ) {
+
+			let threshold = lodLevels[ i ].distance;
+
+			// Apply hysteresis
+			if ( currentLevel !== - 1 ) {
+
+				if ( i < currentLevel ) {
+
+					// Switching to higher quality (closer)
+					threshold *= ( 1 - this.lodHysteresis );
+
+				} else if ( i > currentLevel ) {
+
+					// Switching to lower quality (farther)
+					threshold *= ( 1 + this.lodHysteresis );
+
+				}
+
+			}
+
+			if ( adjustedDistance < threshold ) {
+
+				return i;
+
+			}
+
+		}
+
+		// Beyond all thresholds, use lowest quality (last LOD)
+		return lodLevels.length - 1;
+
+	}
+
+	/**
+	 * Queue a LOD update for an instance.
+	 *
+	 * @private
+	 * @param {number} instanceId - Instance ID
+	 * @param {number} newLevel - New LOD level (-1 = base)
+	 */
+	_queueLODUpdate( instanceId, newLevel ) {
+
+		const activeLOD = this._activeLODs.get( instanceId );
+		const oldLevel = activeLOD ? activeLOD.currentLevel : - 1;
+
+		if ( oldLevel === newLevel ) {
+
+			return; // No change needed
+
+		}
+
+		this._lodUpdateQueue.push( {
+			instanceId: instanceId,
+			oldLevel: oldLevel,
+			newLevel: newLevel
+		} );
+
+	}
+
+	/**
+	 * Swap instance geometry to a different LOD level.
+	 *
+	 * @private
+	 * @param {number} instanceId - Instance ID
+	 * @param {number} geometryId - Base geometry ID
+	 * @param {number} oldLevel - Old LOD level (-1 = base)
+	 * @param {number} newLevel - New LOD level (-1 = base)
+	 */
+	_swapInstanceGeometry( instanceId, geometryId, oldLevel, newLevel ) {
+
+		const lodLevels = this._lodLevels.get( geometryId );
+		let targetGeometryId = geometryId; // Default to base geometry
+
+		if ( newLevel >= 0 && lodLevels && lodLevels[ newLevel ] ) {
+
+			targetGeometryId = lodLevels[ newLevel ].geometryId;
+
+		}
+
+		// Update instance's geometry index
+		this._instanceInfo[ instanceId ].geometryIndex = targetGeometryId;
+		this._visibilityChanged = true;
+
+		// Update active LOD tracking
+		if ( ! this._activeLODs.has( instanceId ) ) {
+
+			this._activeLODs.set( instanceId, {
+				currentLevel: - 1,
+				lastDistance: 0,
+				locked: false,
+				forcedLevel: null
+			} );
+
+		}
+
+		const activeLOD = this._activeLODs.get( instanceId );
+		activeLOD.currentLevel = newLevel;
+
+	}
+
+	/**
+	 * Process batched LOD updates.
+	 *
+	 * @private
+	 */
+	_processBatchedLODUpdates() {
+
+		if ( this._lodUpdateQueue.length === 0 ) {
+
+			return;
+
+		}
+
+		// Process all queued updates
+		for ( const update of this._lodUpdateQueue ) {
+
+			const instanceInfo = this._instanceInfo[ update.instanceId ];
+			if ( ! instanceInfo || ! instanceInfo.active ) {
+
+				continue;
+
+			}
+
+			// Get base geometry ID
+			let baseGeometryId = instanceInfo.geometryIndex;
+			const mappedBase = this._baseGeometryMap.get( baseGeometryId );
+			if ( mappedBase !== baseGeometryId ) {
+
+				baseGeometryId = mappedBase;
+
+			}
+
+			this._swapInstanceGeometry( update.instanceId, baseGeometryId, update.oldLevel, update.newLevel );
+
+		}
+
+		// Clear queue
+		this._lodUpdateQueue.length = 0;
+
+	}
+
+	/**
+	 * Update all LOD levels based on camera position.
+	 *
+	 * @param {Camera} camera - Camera to calculate distances from
+	 * @param {boolean} [force=false] - Force update even if camera hasn't moved
+	 */
+	updateLODs( camera, force = false ) {
+
+		if ( ! this.autoUpdateLOD || ! camera ) {
+
+			return;
+
+		}
+
+		// Check if camera has moved significantly
+		camera.updateWorldMatrix( true, false );
+		const camPos = _vector.setFromMatrixPosition( camera.matrixWorld );
+		const camMoved = force || camPos.distanceToSquared( this._lastCameraPosition ) > this._cameraMovedThreshold * this._cameraMovedThreshold;
+		this._lastCameraPosition.copy( camPos );
+
+		if ( ! camMoved && ! force ) {
+
+			return;
+
+		}
+
+		// Reset flags for this frame
+		this._worldMatrixUpdated = false;
+		camera._lodWorldMatrixUpdated = false;
+
+		// Clear update queue
+		this._lodUpdateQueue.length = 0;
+
+		// Update LOD for active instances (staggered for performance)
+		const instanceInfo = this._instanceInfo;
+		const totalInstances = instanceInfo.length;
+		const batchSize = this._lodUpdateBatchSize;
+		const startIndex = this._lodUpdateIndex;
+		const endIndex = Math.min( startIndex + batchSize, totalInstances );
+
+		// Process batch of instances
+		for ( let i = startIndex; i < endIndex; i ++ ) {
+
+			if ( ! instanceInfo[ i ].active || ! instanceInfo[ i ].visible ) {
+
+				continue;
+
+			}
+
+			// Skip if instance has manual LOD override
+			const activeLOD = this._activeLODs.get( i );
+			if ( activeLOD && activeLOD.locked ) {
+
+				continue;
+
+			}
+
+			// Get base geometry ID
+			let geometryId = instanceInfo[ i ].geometryIndex;
+			const mappedBase = this._baseGeometryMap.get( geometryId );
+			if ( mappedBase !== geometryId ) {
+
+				geometryId = mappedBase;
+
+			}
+
+			// Skip if geometry has no LODs
+			if ( ! this._lodLevels.has( geometryId ) ) {
+
+				continue;
+
+			}
+
+			// Calculate distance
+			const distanceSq = this._calculateInstanceDistance( i, camera );
+
+			// Get current LOD level
+			const currentLevel = activeLOD ? activeLOD.currentLevel : - 1;
+
+			// Check if distance changed significantly
+			if ( ! force && activeLOD ) {
+
+				const distanceChange = Math.abs( distanceSq - activeLOD.lastDistance );
+				const threshold = Math.max( activeLOD.lastDistance * 0.05, 100 ); // 5% change or 10 units
+				if ( distanceChange < threshold ) {
+
+					continue; // Skip if distance hasn't changed much
+
+				}
+
+			}
+
+			// Select new LOD level
+			const newLevel = this._selectLODLevel( geometryId, distanceSq, currentLevel );
+
+			// Queue update if level changed
+			if ( newLevel !== currentLevel ) {
+
+				this._queueLODUpdate( i, newLevel );
+
+			}
+
+			// Update cached distance
+			if ( ! activeLOD ) {
+
+				this._activeLODs.set( i, {
+					currentLevel: newLevel,
+					lastDistance: distanceSq,
+					locked: false,
+					forcedLevel: null
+				} );
+
+			} else {
+
+				activeLOD.lastDistance = distanceSq;
+
+			}
+
+		}
+
+		// Advance index for next frame (staggered updates)
+		this._lodUpdateIndex = endIndex >= totalInstances ? 0 : endIndex;
+
+		// Process batched updates
+		this._processBatchedLODUpdates();
+
+	}
+
+	/**
+	 * Manually set LOD level for an instance (overrides automatic).
+	 *
+	 * @param {number} instanceId - Instance to modify
+	 * @param {number} level - LOD level index (-1 for automatic, or specific level)
+	 */
+	setInstanceLOD( instanceId, level ) {
+
+		this.validateInstanceId( instanceId );
+
+		const instanceInfo = this._instanceInfo[ instanceId ];
+		let baseGeometryId = instanceInfo.geometryIndex;
+		const mappedBase = this._baseGeometryMap.get( baseGeometryId );
+		if ( mappedBase !== baseGeometryId ) {
+
+			baseGeometryId = mappedBase;
+
+		}
+
+		if ( ! this._activeLODs.has( instanceId ) ) {
+
+			this._activeLODs.set( instanceId, {
+				currentLevel: - 1,
+				lastDistance: 0,
+				locked: false,
+				forcedLevel: null
+			} );
+
+		}
+
+		const activeLOD = this._activeLODs.get( instanceId );
+
+		if ( level === - 1 ) {
+
+			// Enable automatic LOD
+			activeLOD.locked = false;
+			activeLOD.forcedLevel = null;
+
+		} else {
+
+			// Set manual LOD level
+			activeLOD.locked = true;
+			activeLOD.forcedLevel = level;
+			this._swapInstanceGeometry( instanceId, baseGeometryId, activeLOD.currentLevel, level );
+
+		}
+
+	}
+
+	/**
+	 * Get current LOD level for an instance.
+	 *
+	 * @param {number} instanceId - Instance to query
+	 * @return {number} Current LOD level index (-1 = base geometry)
+	 */
+	getInstanceLOD( instanceId ) {
+
+		this.validateInstanceId( instanceId );
+
+		const activeLOD = this._activeLODs.get( instanceId );
+		return activeLOD ? activeLOD.currentLevel : - 1;
 
 	}
 
@@ -832,6 +1294,38 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		// Delete LOD levels if this is a base geometry
+		if ( this._lodLevels.has( geometryId ) ) {
+
+			const lodLevels = this._lodLevels.get( geometryId );
+			for ( const lodLevel of lodLevels ) {
+
+				// Delete LOD geometry
+				const lodGeometryId = lodLevel.geometryId;
+				geometryInfoList[ lodGeometryId ].active = false;
+				this._availableGeometryIds.push( lodGeometryId );
+				this._baseGeometryMap.delete( lodGeometryId );
+
+			}
+
+			this._lodLevels.delete( geometryId );
+
+		}
+
+		// Delete this geometry if it's a LOD
+		const baseGeometryId = this._baseGeometryMap.get( geometryId );
+		if ( baseGeometryId !== geometryId && this._lodLevels.has( baseGeometryId ) ) {
+
+			const lodLevels = this._lodLevels.get( baseGeometryId );
+			const index = lodLevels.findIndex( lod => lod.geometryId === geometryId );
+			if ( index !== - 1 ) {
+
+				lodLevels.splice( index, 1 );
+
+			}
+
+		}
+
 		// delete any instances associated with this geometry
 		const instanceInfo = this._instanceInfo;
 		for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
@@ -846,6 +1340,7 @@ class BatchedMesh extends Mesh {
 
 		geometryInfoList[ geometryId ].active = false;
 		this._availableGeometryIds.push( geometryId );
+		this._baseGeometryMap.delete( geometryId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -864,6 +1359,7 @@ class BatchedMesh extends Mesh {
 
 		this._instanceInfo[ instanceId ].active = false;
 		this._availableInstanceIds.push( instanceId );
+		this._activeLODs.delete( instanceId );
 		this._visibilityChanged = true;
 
 		return this;
@@ -1499,6 +1995,12 @@ class BatchedMesh extends Mesh {
 			this._colorsTexture = null;
 
 		}
+
+		// Clean up LOD data structures
+		this._lodLevels.clear();
+		this._activeLODs.clear();
+		this._lodUpdateQueue.length = 0;
+		this._baseGeometryMap.clear();
 
 	}
 
