@@ -1852,7 +1852,15 @@ class ShaderDebuggerUI {
 			input.value = value.toFixed( 2 );
 			input.step = 0.01;
 
-			const update = v => { uniform.value = parseFloat( v ); slider.value = v; input.value = parseFloat( v ).toFixed( 2 ); };
+			const update = ( v ) => {
+
+				uniform.value = parseFloat( v );
+				slider.value = v;
+				input.value = parseFloat( v ).toFixed( 2 );
+				this._autoSave();
+
+			};
+
 			slider.addEventListener( 'input', e => update( e.target.value ) );
 			input.addEventListener( 'input', e => update( e.target.value ) );
 
@@ -1873,6 +1881,7 @@ class ShaderDebuggerUI {
 
 				value.setHex( parseInt( e.target.value.slice( 1 ), 16 ) );
 				swatch.style.background = e.target.value;
+				this._autoSave();
 
 			} );
 
@@ -1891,7 +1900,13 @@ class ShaderDebuggerUI {
 				input.value = value[ comp ].toFixed( 2 );
 				input.step = 0.01;
 				input.placeholder = comp.toUpperCase();
-				input.addEventListener( 'input', e => { value[ comp ] = parseFloat( e.target.value ) || 0; } );
+				input.addEventListener( 'input', e => {
+
+					value[ comp ] = parseFloat( e.target.value ) || 0;
+					this._autoSave();
+
+				} );
+
 				controlRow.appendChild( input );
 
 			} );
