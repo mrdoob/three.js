@@ -746,32 +746,19 @@ class ShaderDebuggerUI {
 		matActions.appendChild( importMatBtn );
 		content.appendChild( matActions );
 
-		// Save/Load scene
-		const sceneActions = document.createElement( 'div' );
-		sceneActions.className = 'sdu-btn-group';
-		sceneActions.style.marginTop = '8px';
-
-		const exportBtn = document.createElement( 'button' );
-		exportBtn.className = 'sdu-btn secondary';
-		exportBtn.textContent = '💾 Export Scene';
-		exportBtn.title = 'Export full scene as .json';
-		exportBtn.addEventListener( 'click', () => this._saveScene() );
-
-		const importSceneBtn = document.createElement( 'button' );
-		importSceneBtn.className = 'sdu-btn secondary';
-		importSceneBtn.textContent = '📂 Import Scene';
-		importSceneBtn.title = 'Import scene from .json file';
-		importSceneBtn.addEventListener( 'click', () => this._loadScene() );
+		// Reset button
+		const resetRow = document.createElement( 'div' );
+		resetRow.className = 'sdu-btn-group';
+		resetRow.style.marginTop = '8px';
 
 		const resetBtn = document.createElement( 'button' );
 		resetBtn.className = 'sdu-btn danger';
-		resetBtn.textContent = 'Reset';
+		resetBtn.textContent = 'Reset Session';
+		resetBtn.title = 'Clear all saved data and reload';
 		resetBtn.addEventListener( 'click', () => this._hardReload() );
 
-		sceneActions.appendChild( exportBtn );
-		sceneActions.appendChild( importSceneBtn );
-		sceneActions.appendChild( resetBtn );
-		content.appendChild( sceneActions );
+		resetRow.appendChild( resetBtn );
+		content.appendChild( resetRow );
 
 	}
 
