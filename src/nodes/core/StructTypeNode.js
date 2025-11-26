@@ -1,6 +1,6 @@
 
 import Node from './Node.js';
-import { getByteBoundaryFromType, getMemoryLengthFromType } from './NodeUtils.js';
+import { getAlignmentFromType, getMemoryLengthFromType } from './NodeUtils.js';
 
 /**
  * Generates a layout for struct members.
@@ -86,29 +86,22 @@ class StructTypeNode extends Node {
 	 */
 	getLength() {
 
-		const GPU_CHUNK_BYTES = 8;
 		const BYTES_PER_ELEMENT = Float32Array.BYTES_PER_ELEMENT;
-
-		let offset = 0; // global buffer offset in bytes
+		const CHUNK_SIZE = 4; // Webgpu aligns most data in blocks of 4 elements (16 bytes)
+		let offset = 0; // global buffer offset in 4 byte elements
 
 		for ( const member of this.membersLayout ) {
 
 			const type = member.type;
 
-			const itemSize = getMemoryLengthFromType( type ) * BYTES_PER_ELEMENT;
-			const boundary = getByteBoundaryFromType( type );
+			const itemSize = getMemoryLengthFromType( type );
+			const alignment = getAlignmentFromType( type ) / BYTES_PER_ELEMENT;
 
-			const chunkOffset = offset % GPU_CHUNK_BYTES; // offset in the current chunk
-			const chunkPadding = chunkOffset % boundary; // required padding to match boundary
-			const chunkStart = chunkOffset + chunkPadding; // start position in the current chunk for the data
+			const chunkOffset = offset % CHUNK_SIZE; // offset in the current chunk of 4 elements
+			const overhang = chunkOffset % alignment; // distance from the last aligned offset
+			if ( overhang !== 0 ) {
 
-			offset += chunkPadding;
-
-			// Check for chunk overflow
-			if ( chunkStart !== 0 && ( GPU_CHUNK_BYTES - chunkStart ) < itemSize ) {
-
-				// Add padding to the end of the chunk
-				offset += ( GPU_CHUNK_BYTES - chunkStart );
+				offset += alignment - overhang; // move to next aligned offset
 
 			}
 
@@ -116,7 +109,7 @@ class StructTypeNode extends Node {
 
 		}
 
-		return ( Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES ) / BYTES_PER_ELEMENT;
+		return ( Math.ceil( offset / CHUNK_SIZE ) * CHUNK_SIZE ); // ensure length is a multiple of 4
 
 	}
 

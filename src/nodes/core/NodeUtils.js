@@ -181,22 +181,22 @@ export function getMemoryLengthFromType( type ) {
 }
 
 /**
- * Returns the byte boundary for the given data type.
+ * Returns the alignment requirement for the given data type.
  *
  * @private
  * @method
  * @param {string} type - The data type.
- * @return {number} The byte boundary.
+ * @return {number} The alignment requirement in bytes.
  */
-export function getByteBoundaryFromType( type ) {
+export function getAlignmentFromType( type ) {
 
 	if ( /float|int|uint/.test( type ) ) return 4;
 	if ( /vec2/.test( type ) ) return 8;
 	if ( /vec3/.test( type ) ) return 16;
 	if ( /vec4/.test( type ) ) return 16;
 	if ( /mat2/.test( type ) ) return 8;
-	if ( /mat3/.test( type ) ) return 48;
-	if ( /mat4/.test( type ) ) return 64;
+	if ( /mat3/.test( type ) ) return 16;
+	if ( /mat4/.test( type ) ) return 16;
 
 	error( 'TSL: Unsupported type:', type );
 
