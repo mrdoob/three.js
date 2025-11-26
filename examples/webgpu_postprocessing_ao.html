@@ -143,8 +143,18 @@
 
 				// scene context
 
+				const aoSample = aoPassOutput.sample( screenUV ).r;
+
 				scenePass.contextNode = context( {
-					ao: select( materialTransparent, 1, aoPassOutput.sample( screenUV ).r )
+
+					getAO: ( node, { material } ) => {
+
+						if ( material.transparent === true ) return node;
+
+						return node !== null ? node.mul( aoSample ) : aoSample;
+
+					}
+
 				} );
 
 				// final output + traa
