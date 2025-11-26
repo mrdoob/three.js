@@ -170,6 +170,8 @@ class ShaderDebuggerUI {
 				display: none;
 				flex-direction: column;
 				z-index: 10000;
+				min-width: 320px;
+				max-width: 800px;
 			}
 			.sdu-panel.right {
 				right: 10px;
@@ -184,6 +186,20 @@ class ShaderDebuggerUI {
 				bottom: 10px;
 				height: 350px;
 				border-radius: 8px;
+			}
+			.sdu-resize-handle {
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 6px;
+				cursor: ew-resize;
+				background: transparent;
+				z-index: 10;
+			}
+			.sdu-resize-handle:hover,
+			.sdu-resize-handle.active {
+				background: linear-gradient(90deg, #0078d4 0%, transparent 100%);
 			}
 			.sdu-header {
 				display: flex;
@@ -457,6 +473,12 @@ class ShaderDebuggerUI {
 		this._createPropertiesSection( content );
 		this._createPerformanceSection( content );
 
+		// Resize handle
+		const resizeHandle = document.createElement( 'div' );
+		resizeHandle.className = 'sdu-resize-handle';
+		this._makeResizable( resizeHandle );
+
+		this.panel.appendChild( resizeHandle );
 		this.panel.appendChild( header );
 		this.panel.appendChild( content );
 
@@ -501,6 +523,52 @@ class ShaderDebuggerUI {
 		document.addEventListener( 'mouseup', () => {
 
 			isDragging = false;
+
+		} );
+
+	}
+
+	/**
+	 * Makes the panel horizontally resizable.
+	 * @private
+	 */
+	_makeResizable( handle ) {
+
+		let isResizing = false;
+		let startX, startWidth;
+
+		handle.addEventListener( 'mousedown', ( e ) => {
+
+			if ( e.button !== 0 ) return;
+			isResizing = true;
+			startX = e.clientX;
+			startWidth = this.panel.offsetWidth;
+			handle.classList.add( 'active' );
+			e.preventDefault();
+			e.stopPropagation();
+
+		} );
+
+		document.addEventListener( 'mousemove', ( e ) => {
+
+			if ( ! isResizing ) return;
+
+			// Calculate new width (dragging left = wider, right = narrower)
+			const dx = startX - e.clientX;
+			const newWidth = Math.max( 320, Math.min( 800, startWidth + dx ) );
+
+			this.panel.style.width = newWidth + 'px';
+
+		} );
+
+		document.addEventListener( 'mouseup', () => {
+
+			if ( isResizing ) {
+
+				isResizing = false;
+				handle.classList.remove( 'active' );
+
+			}
 
 		} );
 
@@ -657,6 +725,27 @@ class ShaderDebuggerUI {
 		actions.appendChild( deleteMatBtn );
 		content.appendChild( actions );
 
+		// Material export/import
+		const matActions = document.createElement( 'div' );
+		matActions.className = 'sdu-btn-group';
+		matActions.style.marginTop = '8px';
+
+		const exportMatBtn = document.createElement( 'button' );
+		exportMatBtn.className = 'sdu-btn secondary';
+		exportMatBtn.textContent = '📦 Export Material';
+		exportMatBtn.title = 'Export selected material as .json (three.js compatible)';
+		exportMatBtn.addEventListener( 'click', () => this._exportMaterial() );
+
+		const importMatBtn = document.createElement( 'button' );
+		importMatBtn.className = 'sdu-btn secondary';
+		importMatBtn.textContent = '📂 Import Material';
+		importMatBtn.title = 'Import material from .json file';
+		importMatBtn.addEventListener( 'click', () => this._importMaterial() );
+
+		matActions.appendChild( exportMatBtn );
+		matActions.appendChild( importMatBtn );
+		content.appendChild( matActions );
+
 		// Save/Load scene
 		const sceneActions = document.createElement( 'div' );
 		sceneActions.className = 'sdu-btn-group';
@@ -664,12 +753,14 @@ class ShaderDebuggerUI {
 
 		const exportBtn = document.createElement( 'button' );
 		exportBtn.className = 'sdu-btn secondary';
-		exportBtn.textContent = 'Export';
+		exportBtn.textContent = '💾 Export Scene';
+		exportBtn.title = 'Export full scene as .json';
 		exportBtn.addEventListener( 'click', () => this._saveScene() );
 
 		const importSceneBtn = document.createElement( 'button' );
 		importSceneBtn.className = 'sdu-btn secondary';
-		importSceneBtn.textContent = 'Import';
+		importSceneBtn.textContent = '📂 Import Scene';
+		importSceneBtn.title = 'Import scene from .json file';
 		importSceneBtn.addEventListener( 'click', () => this._loadScene() );
 
 		const resetBtn = document.createElement( 'button' );
@@ -723,7 +814,7 @@ class ShaderDebuggerUI {
 
 		const compileBtn = document.createElement( 'button' );
 		compileBtn.className = 'sdu-btn';
-		compileBtn.textContent = 'Compile';
+		compileBtn.textContent = '▶ Compile';
 		compileBtn.addEventListener( 'click', () => this._applyShaderCode() );
 
 		const resetBtn = document.createElement( 'button' );
@@ -731,15 +822,36 @@ class ShaderDebuggerUI {
 		resetBtn.textContent = 'Reset';
 		resetBtn.addEventListener( 'click', () => this._resetShaderCode() );
 
-		const saveBtn = document.createElement( 'button' );
-		saveBtn.className = 'sdu-btn secondary';
-		saveBtn.textContent = 'Export';
-		saveBtn.addEventListener( 'click', () => this._saveShaderCode() );
-
 		actions.appendChild( compileBtn );
 		actions.appendChild( resetBtn );
-		actions.appendChild( saveBtn );
 		content.appendChild( actions );
+
+		// Export shader buttons
+		const exportActions = document.createElement( 'div' );
+		exportActions.className = 'sdu-btn-group';
+
+		const exportVertBtn = document.createElement( 'button' );
+		exportVertBtn.className = 'sdu-btn secondary';
+		exportVertBtn.textContent = '📄 Export .vert';
+		exportVertBtn.title = 'Export vertex shader as .vert file';
+		exportVertBtn.addEventListener( 'click', () => this._exportShader( 'vertex' ) );
+
+		const exportFragBtn = document.createElement( 'button' );
+		exportFragBtn.className = 'sdu-btn secondary';
+		exportFragBtn.textContent = '📄 Export .frag';
+		exportFragBtn.title = 'Export fragment shader as .frag file';
+		exportFragBtn.addEventListener( 'click', () => this._exportShader( 'fragment' ) );
+
+		const importShaderBtn = document.createElement( 'button' );
+		importShaderBtn.className = 'sdu-btn secondary';
+		importShaderBtn.textContent = '📂 Import';
+		importShaderBtn.title = 'Import shader from .glsl/.vert/.frag file';
+		importShaderBtn.addEventListener( 'click', () => this._importShader() );
+
+		exportActions.appendChild( exportVertBtn );
+		exportActions.appendChild( exportFragBtn );
+		exportActions.appendChild( importShaderBtn );
+		content.appendChild( exportActions );
 
 		// Error panel
 		this.errorPanel = document.createElement( 'div' );
@@ -1325,16 +1437,304 @@ class ShaderDebuggerUI {
 
 	}
 
-	_saveShaderCode() {
+	/**
+	 * Exports a shader as .vert or .frag file.
+	 * @param {string} type - 'vertex' or 'fragment'
+	 */
+	_exportShader( type ) {
 
-		const code = this.shaderEditor.value;
-		const blob = new Blob( [ code ], { type: 'text/plain' } );
+		if ( ! this.currentMaterial ) {
+
+			alert( 'Select a material first' );
+			return;
+
+		}
+
+		const code = type === 'vertex'
+			? this.currentMaterial.vertexShader
+			: this.currentMaterial.fragmentShader;
+
+		const ext = type === 'vertex' ? '.vert' : '.frag';
+		const entry = this.materialLibrary.find( m => m.material === this.currentMaterial );
+		const baseName = entry ? entry.name.replace( /\s+/g, '_' ) : 'shader';
+
+		// Add header comment with metadata
+		const header = `// ${type.charAt( 0 ).toUpperCase() + type.slice( 1 )} Shader
+// Generated by three.js Shader Debugger
+// Material: ${entry?.name || 'Unknown'}
+// Date: ${new Date().toISOString()}
+// 
+// Usage in three.js:
+//   const material = new THREE.ShaderMaterial({
+//     vertexShader: /* load ${baseName}${ext === '.vert' ? ext : '.vert'} */,
+//     fragmentShader: /* load ${baseName}${ext === '.frag' ? ext : '.frag'} */,
+//     uniforms: { /* your uniforms */ }
+//   });
+//
+
+`;
+
+		const fullCode = header + code;
+		const blob = new Blob( [ fullCode ], { type: 'text/plain' } );
 		const url = URL.createObjectURL( blob );
 		const a = document.createElement( 'a' );
 		a.href = url;
-		a.download = `${this.currentShaderTab}_shader.glsl`;
+		a.download = `${baseName}${ext}`;
 		a.click();
 		URL.revokeObjectURL( url );
+
+	}
+
+	/**
+	 * Imports a shader from file.
+	 */
+	_importShader() {
+
+		const input = document.createElement( 'input' );
+		input.type = 'file';
+		input.accept = '.glsl,.vert,.frag,.vs,.fs,.shader';
+		input.addEventListener( 'change', ( e ) => {
+
+			const file = e.target.files[ 0 ];
+			if ( ! file ) return;
+
+			const reader = new FileReader();
+			reader.onload = ( ev ) => {
+
+				let code = ev.target.result;
+
+				// Strip header comments if present (lines starting with //)
+				const lines = code.split( '\n' );
+				let startIdx = 0;
+				for ( let i = 0; i < lines.length; i ++ ) {
+
+					const trimmed = lines[ i ].trim();
+					if ( trimmed && ! trimmed.startsWith( '//' ) ) {
+
+						startIdx = i;
+						break;
+
+					}
+
+				}
+
+				// Detect shader type from extension or content
+				const ext = file.name.split( '.' ).pop().toLowerCase();
+				let shaderType = this.currentShaderTab;
+
+				if ( ext === 'vert' || ext === 'vs' ) shaderType = 'vertex';
+				else if ( ext === 'frag' || ext === 'fs' ) shaderType = 'fragment';
+				else if ( code.includes( 'gl_Position' ) ) shaderType = 'vertex';
+				else if ( code.includes( 'gl_FragColor' ) || code.includes( 'fragColor' ) ) shaderType = 'fragment';
+
+				// Switch to the correct tab and load code
+				this._showShaderTab( shaderType );
+				this.shaderEditor.value = code;
+				this._applyShaderCode();
+
+			};
+
+			reader.readAsText( file );
+
+		} );
+
+		input.click();
+
+	}
+
+	/**
+	 * Exports the current material as a three.js compatible JSON file.
+	 */
+	_exportMaterial() {
+
+		if ( ! this.currentMaterial ) {
+
+			alert( 'Select a material first' );
+			return;
+
+		}
+
+		const entry = this.materialLibrary.find( m => m.material === this.currentMaterial );
+		const name = entry?.name || 'Material';
+
+		// Build uniforms object
+		const uniforms = {};
+		for ( const key in this.currentMaterial.uniforms ) {
+
+			const v = this.currentMaterial.uniforms[ key ].value;
+
+			if ( typeof v === 'number' ) {
+
+				uniforms[ key ] = { type: 'float', value: v };
+
+			} else if ( v?.isColor ) {
+
+				uniforms[ key ] = { type: 'color', value: '#' + v.getHexString() };
+
+			} else if ( v?.isVector2 ) {
+
+				uniforms[ key ] = { type: 'vec2', value: [ v.x, v.y ] };
+
+			} else if ( v?.isVector3 ) {
+
+				uniforms[ key ] = { type: 'vec3', value: [ v.x, v.y, v.z ] };
+
+			} else if ( v?.isVector4 ) {
+
+				uniforms[ key ] = { type: 'vec4', value: [ v.x, v.y, v.z, v.w ] };
+
+			}
+
+		}
+
+		const materialData = {
+			// Metadata
+			metadata: {
+				version: '1.0',
+				type: 'ShaderMaterial',
+				generator: 'three.js Shader Debugger',
+				date: new Date().toISOString()
+			},
+
+			// Material properties
+			name: name,
+
+			// Shaders
+			vertexShader: this.currentMaterial.vertexShader,
+			fragmentShader: this.currentMaterial.fragmentShader,
+
+			// Uniforms with types for easy reconstruction
+			uniforms: uniforms,
+
+			// Usage example in comments
+			_usage: `
+// Load this material in three.js:
+//
+// import * as THREE from 'three';
+// 
+// async function loadMaterial(jsonPath) {
+//   const response = await fetch(jsonPath);
+//   const data = await response.json();
+//   
+//   const uniforms = {};
+//   for (const key in data.uniforms) {
+//     const u = data.uniforms[key];
+//     switch (u.type) {
+//       case 'float': uniforms[key] = { value: u.value }; break;
+//       case 'color': uniforms[key] = { value: new THREE.Color(u.value) }; break;
+//       case 'vec2': uniforms[key] = { value: new THREE.Vector2(...u.value) }; break;
+//       case 'vec3': uniforms[key] = { value: new THREE.Vector3(...u.value) }; break;
+//       case 'vec4': uniforms[key] = { value: new THREE.Vector4(...u.value) }; break;
+//     }
+//   }
+//   
+//   return new THREE.ShaderMaterial({
+//     vertexShader: data.vertexShader,
+//     fragmentShader: data.fragmentShader,
+//     uniforms: uniforms
+//   });
+// }
+`
+		};
+
+		const blob = new Blob( [ JSON.stringify( materialData, null, 2 ) ], { type: 'application/json' } );
+		const url = URL.createObjectURL( blob );
+		const a = document.createElement( 'a' );
+		a.href = url;
+		a.download = `${name.replace( /\s+/g, '_' )}.material.json`;
+		a.click();
+		URL.revokeObjectURL( url );
+
+	}
+
+	/**
+	 * Imports a material from a JSON file.
+	 */
+	_importMaterial() {
+
+		const input = document.createElement( 'input' );
+		input.type = 'file';
+		input.accept = '.json';
+		input.addEventListener( 'change', ( e ) => {
+
+			const file = e.target.files[ 0 ];
+			if ( ! file ) return;
+
+			const reader = new FileReader();
+			reader.onload = ( ev ) => {
+
+				try {
+
+					const data = JSON.parse( ev.target.result );
+
+					// Validate it's a material file
+					if ( ! data.vertexShader || ! data.fragmentShader ) {
+
+						throw new Error( 'Invalid material file: missing shaders' );
+
+					}
+
+					// Build uniforms
+					const uniforms = {};
+					if ( data.uniforms ) {
+
+						for ( const key in data.uniforms ) {
+
+							const u = data.uniforms[ key ];
+
+							switch ( u.type ) {
+
+								case 'float':
+								case 'int':
+									uniforms[ key ] = { value: u.value };
+									break;
+								case 'color':
+									uniforms[ key ] = { value: new THREE.Color( u.value ) };
+									break;
+								case 'vec2':
+									uniforms[ key ] = { value: new THREE.Vector2( ...u.value ) };
+									break;
+								case 'vec3':
+									uniforms[ key ] = { value: new THREE.Vector3( ...u.value ) };
+									break;
+								case 'vec4':
+									uniforms[ key ] = { value: new THREE.Vector4( ...u.value ) };
+									break;
+
+							}
+
+						}
+
+					}
+
+					// Create material
+					const material = new THREE.ShaderMaterial( {
+						vertexShader: data.vertexShader,
+						fragmentShader: data.fragmentShader,
+						uniforms: uniforms
+					} );
+
+					// Add to library
+					const name = data.name || file.name.replace( /\.material\.json$/i, '' ).replace( /\.json$/i, '' );
+					this._addMaterialToLibrary( material, name );
+					this._updateMaterialList();
+					this._selectMaterial( name );
+
+					this._autoSave();
+
+				} catch ( err ) {
+
+					alert( 'Failed to import material: ' + err.message );
+
+				}
+
+			};
+
+			reader.readAsText( file );
+
+		} );
+
+		input.click();
 
 	}
 
