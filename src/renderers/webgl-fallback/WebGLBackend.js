@@ -2151,6 +2151,12 @@ class WebGLBackend extends Backend {
 
 								gl.framebufferTextureLayer( gl.FRAMEBUFFER, depthStyle, textureData.textureGPU, 0, layer );
 
+							} else if ( descriptor.depthTexture.isCubeTexture ) {
+
+								const cubeFace = this.renderer._activeCubeFace;
+
+								gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureData.textureGPU, 0 );
+
 							} else {
 
 								gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );

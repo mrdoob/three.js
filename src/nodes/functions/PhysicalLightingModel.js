@@ -12,8 +12,7 @@ import { diffuseColor, diffuseContribution, specularColor, specularColorBlended,
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
-import { select } from '../math/ConditionalNode.js';
-import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
+import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep, inverseSqrt } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
 import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/Camera.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
@@ -313,29 +312,26 @@ const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinF
 //
 
 // This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from
-// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
-// in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
+// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF".
+// The low roughness fit (< 0.25) uses an inversesqrt/log model to accurately capture the sharp peak.
 const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	const dotNV = normal.dot( viewDir ).saturate();
+	const r2 = roughness.mul( roughness );
 
-	const r2 = roughness.pow2();
-
-	const a = select(
-		roughness.lessThan( 0.25 ),
-		float( - 339.2 ).mul( r2 ).add( float( 161.4 ).mul( roughness ) ).sub( 25.9 ),
-		float( - 8.48 ).mul( r2 ).add( float( 14.3 ).mul( roughness ) ).sub( 9.95 )
+	const a = roughness.lessThan( 0.25 ).select(
+		inverseSqrt( roughness ).mul( - 1.57 ),
+		r2.mul( - 3.33 ).add( roughness.mul( 6.27 ) ).sub( 4.40 )
 	);
 
-	const b = select(
-		roughness.lessThan( 0.25 ),
-		float( 44.0 ).mul( r2 ).sub( float( 23.7 ).mul( roughness ) ).add( 3.26 ),
-		float( 1.97 ).mul( r2 ).sub( float( 3.27 ).mul( roughness ) ).add( 0.72 )
+	const b = roughness.lessThan( 0.25 ).select(
+		log( roughness ).mul( - 0.46 ).sub( 0.64 ),
+		r2.mul( 0.92 ).sub( roughness.mul( 1.79 ) ).add( 0.35 )
 	);
 
-	const DG = select( roughness.lessThan( 0.25 ), 0.0, float( 0.1 ).mul( roughness ).sub( 0.025 ) ).add( a.mul( dotNV ).add( b ).exp() );
+	const DG = a.mul( dotNV ).add( b ).exp();
 
-	return DG.mul( 1.0 / Math.PI ).saturate();
+	return DG.saturate();
 
 } );
 
@@ -608,11 +604,18 @@ class PhysicalLightingModel extends LightingModel {
 	direct( { lightDirection, lightColor, reflectedLight }, /* builder */ ) {
 
 		const dotNL = normalView.dot( lightDirection ).clamp();
-		const irradiance = dotNL.mul( lightColor );
+		const irradiance = dotNL.mul( lightColor ).toVar();
 
 		if ( this.sheen === true ) {
 
 			this.sheenSpecularDirect.addAssign( irradiance.mul( BRDF_Sheen( { lightDirection } ) ) );
+
+			const sheenAlbedoV = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
+			const sheenAlbedoL = IBLSheenBRDF( { normal: normalView, viewDir: lightDirection, roughness: sheenRoughness } );
+
+			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedoV.max( sheenAlbedoL ) ).oneMinus();
+
+			irradiance.mulAssign( sheenEnergyComp );
 
 		}
 
@@ -692,7 +695,19 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { irradiance, reflectedLight } = builder.context;
 
-		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ) );
+		const diffuse = irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).toVar();
+
+		if ( this.sheen === true ) {
+
+			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
+
+			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
+
+			diffuse.mulAssign( sheenEnergyComp );
+
+		}
+
+		reflectedLight.indirectDiffuse.addAssign( diffuse );
 
 	}
 
@@ -755,10 +770,23 @@ class PhysicalLightingModel extends LightingModel {
 
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
-		reflectedLight.indirectSpecular.addAssign( radiance.mul( singleScattering ) );
-		reflectedLight.indirectSpecular.addAssign( multiScattering.mul( cosineWeightedIrradiance ) );
+		const indirectSpecular = radiance.mul( singleScattering ).add( multiScattering.mul( cosineWeightedIrradiance ) ).toVar();
+		const indirectDiffuse = diffuse.mul( cosineWeightedIrradiance ).toVar();
 
-		reflectedLight.indirectDiffuse.addAssign( diffuse.mul( cosineWeightedIrradiance ) );
+		if ( this.sheen === true ) {
+
+			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
+
+			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
+
+			indirectSpecular.mulAssign( sheenEnergyComp );
+			indirectDiffuse.mulAssign( sheenEnergyComp );
+
+		}
+
+		reflectedLight.indirectSpecular.addAssign( indirectSpecular );
+
+		reflectedLight.indirectDiffuse.addAssign( indirectDiffuse );
 
 	}
 
@@ -822,8 +850,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		if ( this.sheen === true ) {
 
-			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
-			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
+			const sheenLight = outgoingLight.add( this.sheenSpecularDirect, this.sheenSpecularIndirect.mul( 1.0 / Math.PI ) );
 
 			outgoingLight.assign( sheenLight );
 

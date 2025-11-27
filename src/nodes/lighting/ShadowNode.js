@@ -2,6 +2,7 @@ import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
 import { float, vec2, vec3, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture, textureLoad } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { normalWorld } from '../accessors/Normal.js';
 import { mix, sqrt } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
@@ -516,11 +517,22 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow, depthLayer: this.depthLayer } );
 
-		let shadowColor = texture( shadowMap.texture, shadowCoord );
+		let shadowColor;
 
-		if ( depthTexture.isArrayTexture ) {
+		if ( shadowMap.texture.isCubeTexture ) {
 
-			shadowColor = shadowColor.depth( this.depthLayer );
+			// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
+			shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
+
+		} else {
+
+			shadowColor = texture( shadowMap.texture, shadowCoord );
+
+			if ( depthTexture.isArrayTexture ) {
+
+				shadowColor = shadowColor.depth( this.depthLayer );
+
+			}
 
 		}
 
@@ -534,6 +546,12 @@ class ShadowNode extends ShadowBaseNode {
 		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
 
 		return shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+
+			if ( this.shadowMap.texture.isCubeTexture ) {
+
+				return cubeTexture( this.shadowMap.texture );
+
+			}
 
 			return texture( this.shadowMap.texture );
 

@@ -67,7 +67,6 @@
 				scene = new THREE.Scene();
 
 				const loader = new UltraHDRLoader();
-				loader.setDataType( THREE.HalfFloatType );
 				loader.load( 'textures/equirectangular/moonless_golf_2k.hdr.jpg', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;

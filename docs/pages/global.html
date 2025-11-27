@@ -93,7 +93,7 @@ each other to build complex performances from smaller re-usable assets.</p>
 				<div class="member">
 					<h3 class="name" id="BasicDepthPacking" translate="no">.<a href="#BasicDepthPacking">BasicDepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>Basic depth packing.</p>
+						<p>The depth value is inverted (1.0 - z) for visualization purposes.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -191,7 +191,7 @@ each other to build complex performances from smaller re-usable assets.</p>
 					<h3 class="name" id="DATA" translate="no">.<a href="#DATA">DATA</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Precomputed DFG LUT for Image-Based Lighting
-Resolution: 32x32
+Resolution: 16x16
 Samples: 4096 per texel
 Format: RG16F (2 half floats per texel: scale, bias)</p>
 					</div>
@@ -368,6 +368,12 @@ many times by the application.</p>
 					<h3 class="name" id="HalfFloatType" translate="no">.<a href="#HalfFloatType">HalfFloatType</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>A half float data type for textures.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="IdentityDepthPacking" translate="no">.<a href="#IdentityDepthPacking">IdentityDepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>The depth value is not packed.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1010,6 +1016,12 @@ better soft shadows especially when using low-resolution shadow maps.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="R11_EAC_Format" translate="no">.<a href="#R11_EAC_Format">R11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>EAC R11 UNORM format.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="RED_GREEN_RGTC2_Format" translate="no">.<a href="#RED_GREEN_RGTC2_Format">RED_GREEN_RGTC2_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>RGTC2 Red Green format.</p>
@@ -1022,9 +1034,15 @@ better soft shadows especially when using low-resolution shadow maps.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="RG11_EAC_Format" translate="no">.<a href="#RG11_EAC_Format">RG11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>EAC RG11 UNORM format.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="RGBADepthPacking" translate="no">.<a href="#RGBADepthPacking">RGBADepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>A depth value is packed into 32 bit RGBA.</p>
+						<p>The depth value is packed into 32 bit RGBA.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1169,7 +1187,7 @@ compression in how the alpha compression is done.</p>
 				<div class="member">
 					<h3 class="name" id="RGBDepthPacking" translate="no">.<a href="#RGBDepthPacking">RGBDepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>A depth value is packed into 24 bit RGB.</p>
+						<p>The depth value is packed into 24 bit RGB.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1229,7 +1247,7 @@ compression in how the alpha compression is done.</p>
 				<div class="member">
 					<h3 class="name" id="RGDepthPacking" translate="no">.<a href="#RGDepthPacking">RGDepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>A depth value is packed into 16 bit RG.</p>
+						<p>The depth value is packed into 16 bit RG.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1281,6 +1299,12 @@ compression in how the alpha compression is done.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="SIGNED_R11_EAC_Format" translate="no">.<a href="#SIGNED_R11_EAC_Format">SIGNED_R11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>EAC R11 SNORM format.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="SIGNED_RED_GREEN_RGTC2_Format" translate="no">.<a href="#SIGNED_RED_GREEN_RGTC2_Format">SIGNED_RED_GREEN_RGTC2_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>RGTC2 Signed Red Green format.</p>
@@ -1290,6 +1314,12 @@ compression in how the alpha compression is done.</p>
 					<h3 class="name" id="SIGNED_RED_RGTC1_Format" translate="no">.<a href="#SIGNED_RED_RGTC1_Format">SIGNED_RED_RGTC1_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>RGTC1 Signed Red format.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="SIGNED_RG11_EAC_Format" translate="no">.<a href="#SIGNED_RG11_EAC_Format">SIGNED_RG11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>EAC RG11 SNORM format.</p>
 					</div>
 				</div>
 				<div class="member">

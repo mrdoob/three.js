@@ -2557,6 +2557,10 @@
 			"kind": "class"
 		},
 		{
+			"title": "ContextNode#getFlowContextData",
+			"kind": "function"
+		},
+		{
 			"title": "ContextNode#getMemberType",
 			"kind": "function"
 		},
@@ -2667,6 +2671,22 @@
 		{
 			"title": "CubeCamera#updateCoordinateSystem",
 			"kind": "function"
+		},
+		{
+			"title": "CubeDepthTexture",
+			"kind": "class"
+		},
+		{
+			"title": "CubeDepthTexture#images",
+			"kind": "member"
+		},
+		{
+			"title": "CubeDepthTexture#isCubeDepthTexture",
+			"kind": "member"
+		},
+		{
+			"title": "CubeDepthTexture#isCubeTexture",
+			"kind": "member"
 		},
 		{
 			"title": "CubeMapNode",
@@ -3770,6 +3790,14 @@
 		},
 		{
 			"title": "GLSLNodeBuilder#getExtensions",
+			"kind": "function"
+		},
+		{
+			"title": "GLSLNodeBuilder#getFloatPackingMethod",
+			"kind": "function"
+		},
+		{
+			"title": "GLSLNodeBuilder#getFloatUnpackingMethod",
 			"kind": "function"
 		},
 		{
@@ -8629,6 +8657,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "NodeMaterial#contextNode",
+			"kind": "member"
+		},
+		{
 			"title": "NodeMaterial#copy",
 			"kind": "function"
 		},
@@ -9561,6 +9593,22 @@
 			"kind": "member"
 		},
 		{
+			"title": "PackFloatNode",
+			"kind": "class"
+		},
+		{
+			"title": "PackFloatNode#encoding",
+			"kind": "member"
+		},
+		{
+			"title": "PackFloatNode#isPackFloatNode",
+			"kind": "member"
+		},
+		{
+			"title": "PackFloatNode#vectorNode",
+			"kind": "member"
+		},
+		{
 			"title": "ParameterNode",
 			"kind": "class"
 		},
@@ -9599,6 +9647,10 @@
 		{
 			"title": "PassNode#compileAsync",
 			"kind": "function"
+		},
+		{
+			"title": "PassNode#contextNode",
+			"kind": "member"
 		},
 		{
 			"title": "PassNode#dispose",
@@ -9653,7 +9705,15 @@
 			"kind": "member"
 		},
 		{
+			"title": "PassNode#opaque",
+			"kind": "member"
+		},
+		{
 			"title": "PassNode#options",
+			"kind": "member"
+		},
+		{
+			"title": "PassNode#overrideMaterial",
 			"kind": "member"
 		},
 		{
@@ -9703,6 +9763,10 @@
 		{
 			"title": "PassNode#toggleTexture",
 			"kind": "function"
+		},
+		{
+			"title": "PassNode#transparent",
+			"kind": "member"
 		},
 		{
 			"title": "PassNode#updateBeforeType",
@@ -11401,6 +11465,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Renderer#contextNode",
+			"kind": "member"
+		},
+		{
 			"title": "Renderer#coordinateSystem",
 			"kind": "member"
 		},
@@ -11610,10 +11678,6 @@
 		},
 		{
 			"title": "Renderer#outputColorSpace",
-			"kind": "member"
-		},
-		{
-			"title": "Renderer#overrideNodes",
 			"kind": "member"
 		},
 		{
@@ -14493,6 +14557,22 @@
 			"kind": "member"
 		},
 		{
+			"title": "UnpackFloatNode",
+			"kind": "class"
+		},
+		{
+			"title": "UnpackFloatNode#encoding",
+			"kind": "member"
+		},
+		{
+			"title": "UnpackFloatNode#isUnpackFloatNode",
+			"kind": "member"
+		},
+		{
+			"title": "UnpackFloatNode#uintNode",
+			"kind": "member"
+		},
+		{
 			"title": "UserDataNode",
 			"kind": "class"
 		},
@@ -15642,6 +15722,14 @@
 		},
 		{
 			"title": "WGSLNodeBuilder#getDrawIndex",
+			"kind": "function"
+		},
+		{
+			"title": "WGSLNodeBuilder#getFloatPackingMethod",
+			"kind": "function"
+		},
+		{
+			"title": "WGSLNodeBuilder#getFloatUnpackingMethod",
 			"kind": "function"
 		},
 		{
@@ -20043,6 +20131,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "Octree#boxIntersect",
+			"kind": "function"
+		},
+		{
 			"title": "Octree#build",
 			"kind": "function"
 		},
@@ -20060,6 +20152,10 @@
 		},
 		{
 			"title": "Octree#fromGraphNode",
+			"kind": "function"
+		},
+		{
+			"title": "Octree#getBoxTriangles",
 			"kind": "function"
 		},
 		{
@@ -20092,6 +20188,10 @@
 		},
 		{
 			"title": "Octree#split",
+			"kind": "function"
+		},
+		{
+			"title": "Octree#triangleBoxIntersect",
 			"kind": "function"
 		},
 		{
@@ -22315,8 +22415,16 @@
 			"kind": "member"
 		},
 		{
+			"title": "TRAANode#depthThreshold",
+			"kind": "member"
+		},
+		{
 			"title": "TRAANode#dispose",
 			"kind": "function"
+		},
+		{
+			"title": "TRAANode#edgeDepthDiff",
+			"kind": "member"
 		},
 		{
 			"title": "TRAANode#getTextureNode",
@@ -22324,6 +22432,10 @@
 		},
 		{
 			"title": "TRAANode#isTRAANode",
+			"kind": "member"
+		},
+		{
+			"title": "TRAANode#maxVelocityLength",
 			"kind": "member"
 		},
 		{
@@ -22344,6 +22456,10 @@
 		},
 		{
 			"title": "TRAANode#updateBeforeType",
+			"kind": "member"
+		},
+		{
+			"title": "TRAANode#useSubpixelCorrection",
 			"kind": "member"
 		},
 		{
@@ -24733,6 +24849,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "IdentityDepthPacking",
+			"kind": "member"
+		},
+		{
 			"title": "ImageUtils.getDataURL",
 			"kind": "function"
 		},
@@ -25209,11 +25329,19 @@
 			"kind": "function"
 		},
 		{
+			"title": "R11_EAC_Format",
+			"kind": "member"
+		},
+		{
 			"title": "RED_GREEN_RGTC2_Format",
 			"kind": "member"
 		},
 		{
 			"title": "RED_RGTC1_Format",
+			"kind": "member"
+		},
+		{
+			"title": "RG11_EAC_Format",
 			"kind": "member"
 		},
 		{
@@ -25425,11 +25553,19 @@
 			"kind": "function"
 		},
 		{
+			"title": "SIGNED_R11_EAC_Format",
+			"kind": "member"
+		},
+		{
 			"title": "SIGNED_RED_GREEN_RGTC2_Format",
 			"kind": "member"
 		},
 		{
 			"title": "SIGNED_RED_RGTC1_Format",
+			"kind": "member"
+		},
+		{
+			"title": "SIGNED_RG11_EAC_Format",
 			"kind": "member"
 		},
 		{
@@ -27379,6 +27515,18 @@
 			"kind": "function"
 		},
 		{
+			"title": "packHalf2x16",
+			"kind": "function"
+		},
+		{
+			"title": "packSnorm2x16",
+			"kind": "function"
+		},
+		{
+			"title": "packUnorm2x16",
+			"kind": "function"
+		},
+		{
 			"title": "parabola",
 			"kind": "function"
 		},
@@ -27604,6 +27752,10 @@
 		},
 		{
 			"title": "rendererReference",
+			"kind": "function"
+		},
+		{
+			"title": "replaceDefaultUV",
 			"kind": "function"
 		},
 		{
@@ -28119,7 +28271,19 @@
 			"kind": "function"
 		},
 		{
+			"title": "unpackHalf2x16",
+			"kind": "function"
+		},
+		{
 			"title": "unpackNormal",
+			"kind": "function"
+		},
+		{
+			"title": "unpackSnorm2x16",
+			"kind": "function"
+		},
+		{
+			"title": "unpackUnorm2x16",
 			"kind": "function"
 		},
 		{

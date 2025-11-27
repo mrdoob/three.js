@@ -203,6 +203,61 @@ export const uniformFlow = ( node ) => context( node, { uniformFlow: true } );
 export const setName = ( node, name ) => context( node, { nodeName: name } );
 
 /**
+ * TSL function for defining a built-in shadow context for a given node.
+ *
+ * @tsl
+ * @function
+ * @param {ShadowNode} shadowNode - The shadow node representing the light's shadow.
+ * @param {Light} light - The light associated with the shadow.
+ * @param {Node} [node=null] - The node whose context should be modified.
+ * @returns {ContextNode}
+ */
+export function builtinShadowContext( shadowNode, light, node = null ) {
+
+	return context( node, {
+
+		getShadow: ( { light: shadowLight, shadowColorNode } ) => {
+
+			if ( light === shadowLight ) {
+
+				return shadowColorNode.mul( shadowNode );
+
+			}
+
+			return shadowColorNode;
+
+		}
+
+	} );
+
+}
+
+/**
+ * TSL function for defining a built-in ambient occlusion context for a given node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} aoNode - The ambient occlusion value node to apply.
+ * @param {Node} [node=null] - The node whose context should be modified.
+ * @returns {ContextNode}
+ */
+export function builtinAOContext( aoNode, node = null ) {
+
+	return context( node, {
+
+		getAO: ( inputNode, { material } ) => {
+
+			if ( material.transparent === true ) return inputNode;
+
+			return inputNode !== null ? inputNode.mul( aoNode ) : aoNode;
+
+		}
+
+	} );
+
+}
+
+/**
  * TSL function for defining a label context value for a given node.
  *
  * @tsl
@@ -224,3 +279,5 @@ addMethodChaining( 'context', context );
 addMethodChaining( 'label', label );
 addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
+addMethodChaining( 'builtinShadowContext', ( node, shadowNode, light ) => builtinShadowContext( shadowNode, light, node ) );
+addMethodChaining( 'builtinAOContext', ( node, aoValue ) => builtinAOContext( aoValue, node ) );

@@ -40,7 +40,7 @@
 
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer, controls;
@@ -56,8 +56,8 @@
 
 				// environment
 
-				const hdrLoader = new HDRLoader();
-				hdrLoader.load( './textures/equirectangular/royal_esplanade_1k.hdr', ( environmentMap ) => {
+				const hdrLoader = new UltraHDRLoader();
+				hdrLoader.load( 'textures/equirectangular/royal_esplanade_2k.hdr.jpg', ( environmentMap ) => {
 
 					environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 

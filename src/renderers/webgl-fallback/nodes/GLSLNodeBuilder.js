@@ -621,6 +621,13 @@ ${ flowData.code }
 
 		if ( shaderStage === 'fragment' ) {
 
+			// Cube shadow maps use vec4(direction, compareValue)
+			if ( texture.isCubeTexture ) {
+
+				return `texture( ${ textureProperty }, vec4( ${ uvSnippet }, ${ compareSnippet } ) )`;
+
+			}
+
 			if ( depthSnippet ) {
 
 				if ( offsetSnippet ) {
@@ -742,6 +749,10 @@ ${ flowData.code }
 			} else if ( uniform.type === 'cubeTexture' ) {
 
 				snippet = `samplerCube ${ uniform.name };`;
+
+			} else if ( uniform.type === 'cubeDepthTexture' ) {
+
+				snippet = `samplerCubeShadow ${ uniform.name };`;
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -1549,7 +1560,7 @@ void main() {
 				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node, group );
 				bindings.push( uniformGPU );
 
-			} else if ( type === 'cubeTexture' ) {
+			} else if ( type === 'cubeTexture' || type === 'cubeDepthTexture' ) {
 
 				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group );
 				bindings.push( uniformGPU );
