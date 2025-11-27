@@ -937,6 +937,50 @@ export class Style {
 
 }
 
+/* Selected state for hierarchy items */
+.list-item-row.selected {
+	background-color: rgba(0, 170, 255, 0.3) !important;
+	outline: 1px solid var(--accent-color);
+	outline-offset: -1px;
+}
+
+.list-item-row.selected:hover {
+	background-color: rgba(0, 170, 255, 0.4) !important;
+}
+
+/* Property panel styles for hierarchy tab */
+.hierarchy-property-panel {
+	background-color: var(--profiler-header-bg);
+	border-radius: 4px;
+	margin-top: 10px;
+}
+
+.hierarchy-property-panel input[type="number"],
+.hierarchy-property-panel input[type="text"] {
+	background: rgba(0, 0, 0, 0.2);
+	border: 1px solid var(--profiler-border);
+	border-radius: 3px;
+	color: var(--text-primary);
+	padding: 4px 6px;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	width: 100%;
+}
+
+.hierarchy-property-panel input[type="number"]:focus,
+.hierarchy-property-panel input[type="text"]:focus {
+	outline: none;
+	border-color: var(--accent-color);
+}
+
+.hierarchy-property-panel .param-control {
+	width: 100%;
+}
+
+.hierarchy-property-panel .param-control input {
+	width: 100%;
+}
+
 .list-item-cell {
 	white-space: pre;
 	display: flex;

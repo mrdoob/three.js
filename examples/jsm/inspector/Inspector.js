@@ -5,6 +5,7 @@ import { Performance } from './tabs/Performance.js';
 import { Console } from './tabs/Console.js';
 import { Parameters } from './tabs/Parameters.js';
 import { Viewer } from './tabs/Viewer.js';
+import { Hierarchy } from './tabs/Hierarchy.js';
 import { setText, splitPath, splitCamelCase } from './ui/utils.js';
 
 import { QuadMesh, NodeMaterial, CanvasTarget, setConsoleFunction, REVISION, NoToneMapping } from 'three/webgpu';
@@ -59,6 +60,9 @@ class Inspector extends RendererInspector {
 		const consoleTab = new Console();
 		profiler.addTab( consoleTab );
 
+		const hierarchy = new Hierarchy();
+		profiler.addTab( hierarchy );
+
 		profiler.loadLayout();
 
 		if ( ! profiler.activeTabId ) {
@@ -74,6 +78,7 @@ class Inspector extends RendererInspector {
 		this.console = consoleTab;
 		this.parameters = parameters;
 		this.viewer = viewer;
+		this.hierarchy = hierarchy;
 		this.once = {};
 
 		this.displayCycle = {
@@ -439,6 +444,27 @@ class Inspector extends RendererInspector {
 			setText( 'fps-counter', this.fps.toFixed() );
 
 			this.performance.updateText( this, frame );
+
+			// Update hierarchy with unique scenes from frame.renders
+			if ( this.hierarchy.isVisible ) {
+
+				const scenes = [];
+				const seenScenes = new Set();
+
+				for ( const renderStats of frame.renders ) {
+
+					if ( renderStats.scene && renderStats.scene.isScene && ! seenScenes.has( renderStats.scene.uuid ) ) {
+
+						scenes.push( renderStats.scene );
+						seenScenes.add( renderStats.scene.uuid );
+
+					}
+
+				}
+
+				this.hierarchy.updateFromScenes( scenes );
+
+			}
 
 		}
 
