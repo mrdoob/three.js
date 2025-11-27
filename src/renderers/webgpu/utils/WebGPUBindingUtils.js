@@ -1,9 +1,11 @@
 import {
-	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType, GPUBufferBindingType, GPUStorageTextureAccess
+	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType, GPUBufferBindingType, GPUStorageTextureAccess,
+	GPUSamplerBindingType, GPUShaderStage
 } from './WebGPUConstants.js';
 
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
+import { isTypedArray, error } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing bindings.
@@ -68,7 +70,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					if ( binding.visibility & 4 ) {
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 
 						// compute
 
@@ -92,26 +94,6 @@ class WebGPUBindingUtils {
 
 				bindingGPU.buffer = buffer;
 
-			} else if ( binding.isSampler ) {
-
-				const sampler = {}; // GPUSamplerBindingLayout
-
-				if ( binding.texture.isDepthTexture ) {
-
-					if ( binding.texture.compareFunction !== null ) {
-
-						sampler.type = 'comparison';
-
-					}
-
-				}
-
-				bindingGPU.sampler = sampler;
-
-			} else if ( binding.isSampledTexture && binding.texture.isVideoTexture ) {
-
-				bindingGPU.externalTexture = {}; // GPUExternalTextureBindingLayout
-
 			} else if ( binding.isSampledTexture && binding.store ) {
 
 				const storageTexture = {}; // GPUStorageTextureBindingLayout
@@ -130,6 +112,16 @@ class WebGPUBindingUtils {
 				} else {
 
 					storageTexture.access = GPUStorageTextureAccess.ReadOnly;
+
+				}
+
+				if ( binding.texture.isArrayTexture ) {
+
+					storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
+				} else if ( binding.texture.is3DTexture ) {
+
+					storageTexture.viewDimension = GPUTextureViewDimension.ThreeD;
 
 				}
 
@@ -155,7 +147,15 @@ class WebGPUBindingUtils {
 
 				if ( binding.texture.isDepthTexture ) {
 
-					texture.sampleType = GPUTextureSampleType.Depth;
+					if ( backend.compatibilityMode && binding.texture.compareFunction === null ) {
+
+						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+					} else {
+
+						texture.sampleType = GPUTextureSampleType.Depth;
+
+					}
 
 				} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture ) {
 
@@ -189,7 +189,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.Cube;
 
-				} else if ( binding.texture.isDataArrayTexture || binding.texture.isDepthArrayTexture || binding.texture.isCompressedArrayTexture ) {
+				} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
@@ -201,9 +201,29 @@ class WebGPUBindingUtils {
 
 				bindingGPU.texture = texture;
 
+			} else if ( binding.isSampler ) {
+
+				const sampler = {}; // GPUSamplerBindingLayout
+
+				if ( binding.texture.isDepthTexture ) {
+
+					if ( binding.texture.compareFunction !== null ) {
+
+						sampler.type = GPUSamplerBindingType.Comparison;
+
+					} else if ( backend.compatibilityMode ) {
+
+						sampler.type = GPUSamplerBindingType.NonFiltering;
+
+					}
+
+				}
+
+				bindingGPU.sampler = sampler;
+
 			} else {
 
-				console.error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
+				error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
 
 			}
 
@@ -286,10 +306,47 @@ class WebGPUBindingUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
-		const buffer = binding.buffer;
-		const bufferGPU = backend.get( binding ).buffer;
+		const array = binding.buffer; // cpu
+		const buffer = backend.get( binding ).buffer; // gpu
 
-		device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
+		const updateRanges = binding.updateRanges;
+
+		if ( updateRanges.length === 0 ) {
+
+			device.queue.writeBuffer(
+				buffer,
+				0,
+				array,
+				0
+			);
+
+		} else {
+
+			const isTyped = isTypedArray( array );
+			const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
+
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+				const range = updateRanges[ i ];
+
+				const dataOffset = range.start * byteOffsetFactor;
+				const size = range.count * byteOffsetFactor;
+
+				const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
+				device.queue.writeBuffer(
+					buffer,
+					bufferOffset,
+					array,
+					dataOffset,
+					size
+				);
+
+			}
+
+			binding.clearUpdateRanges();
+
+		}
 
 	}
 
@@ -353,8 +410,29 @@ class WebGPUBindingUtils {
 
 					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
+					const visibilities = [];
+					if ( binding.visibility & GPUShaderStage.VERTEX ) {
+
+						visibilities.push( 'vertex' );
+
+					}
+
+					if ( binding.visibility & GPUShaderStage.FRAGMENT ) {
+
+						visibilities.push( 'fragment' );
+
+					}
+
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+
+						visibilities.push( 'compute' );
+
+					}
+
+					const bufferVisibility = `(${visibilities.join( ',' )})`;
+
 					const bufferGPU = device.createBuffer( {
-						label: 'bindingBuffer_' + binding.name,
+						label: `bindingBuffer${binding.id}_${binding.name}_${bufferVisibility}`,
 						size: byteLength,
 						usage: usage
 					} );
@@ -382,12 +460,6 @@ class WebGPUBindingUtils {
 
 				entriesGPU.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
 
-			} else if ( binding.isSampler ) {
-
-				const textureGPU = backend.get( binding.texture );
-
-				entriesGPU.push( { binding: bindingPoint, resource: textureGPU.sampler } );
-
 			} else if ( binding.isSampledTexture ) {
 
 				const textureData = backend.get( binding.texture );
@@ -401,7 +473,16 @@ class WebGPUBindingUtils {
 				} else {
 
 					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
-					const propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }-${ mipLevelCount }`;
+					const baseMipLevel = binding.store ? binding.mipLevel : 0;
+					let propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }`;
+
+					if ( textureData.texture.depthOrArrayLayers > 1 ) {
+
+						propertyName += `-${ textureData.texture.depthOrArrayLayers }`;
+
+					}
+
+					propertyName += `-${ mipLevelCount }-${ baseMipLevel }`;
 
 					resourceGPU = textureData[ propertyName ];
 
@@ -419,7 +500,7 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 
-						} else if ( binding.texture.isDataArrayTexture || binding.texture.isDepthArrayTexture || binding.texture.isCompressedArrayTexture ) {
+						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
 
 							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 
@@ -429,13 +510,19 @@ class WebGPUBindingUtils {
 
 						}
 
-						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount } );
+						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount, baseMipLevel } );
 
 					}
 
 				}
 
 				entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
+
+			} else if ( binding.isSampler ) {
+
+				const textureGPU = backend.get( binding.texture );
+
+				entriesGPU.push( { binding: bindingPoint, resource: textureGPU.sampler } );
 
 			}
 

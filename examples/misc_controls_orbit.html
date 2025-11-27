@@ -79,17 +79,21 @@
 				const geometry = new THREE.ConeGeometry( 10, 30, 4, 1 );
 				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
+				const mesh = new THREE.InstancedMesh( geometry, material, 500 );
+				const dummy = new THREE.Object3D();
+
 				for ( let i = 0; i < 500; i ++ ) {
 
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 1600 - 800;
-					mesh.position.y = 0;
-					mesh.position.z = Math.random() * 1600 - 800;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
+					dummy.position.x = Math.random() * 1600 - 800;
+					dummy.position.y = 0;
+					dummy.position.z = Math.random() * 1600 - 800;
+
+					dummy.updateMatrix();
+					mesh.setMatrixAt( i, dummy.matrix );
 
 				}
+
+				scene.add( mesh );
 
 				// lights
 

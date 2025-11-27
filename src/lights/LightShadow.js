@@ -3,6 +3,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Frustum } from '../math/Frustum.js';
+import { UnsignedByteType } from '../constants.js';
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
@@ -68,9 +69,6 @@ class LightShadow {
 		 * map size will allow for a higher value to be used here before these effects
 		 * become visible.
 		 *
-		 * The property has no effect when the shadow map type is `PCFSoftShadowMap` and
-		 * and it is recommended to increase softness by decreasing the shadow map size instead.
-		 *
 		 * The property has no effect when the shadow map type is `BasicShadowMap`.
 		 *
 		 * @type {number}
@@ -94,6 +92,14 @@ class LightShadow {
 		 * @default (512,512)
 		 */
 		this.mapSize = new Vector2( 512, 512 );
+
+		/**
+		 * The type of shadow texture. The default is `UnsignedByteType`.
+		 *
+		 * @type {number}
+		 * @default UnsignedByteType
+		 */
+		this.mapType = UnsignedByteType;
 
 		/**
 		 * The depth map generated using the internal camera; a location beyond a
@@ -195,14 +201,27 @@ class LightShadow {
 		shadowCamera.updateMatrixWorld();
 
 		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
 
-		shadowMatrix.set(
-			0.5, 0.0, 0.0, 0.5,
-			0.0, 0.5, 0.0, 0.5,
-			0.0, 0.0, 0.5, 0.5,
-			0.0, 0.0, 0.0, 1.0
-		);
+		if ( shadowCamera.reversedDepth ) {
+
+			shadowMatrix.set(
+				0.5, 0.0, 0.0, 0.5,
+				0.0, 0.5, 0.0, 0.5,
+				0.0, 0.0, 1.0, 0.0,
+				0.0, 0.0, 0.0, 1.0
+			);
+
+		} else {
+
+			shadowMatrix.set(
+				0.5, 0.0, 0.0, 0.5,
+				0.0, 0.5, 0.0, 0.5,
+				0.0, 0.0, 0.5, 0.5,
+				0.0, 0.0, 0.0, 1.0
+			);
+
+		}
 
 		shadowMatrix.multiply( _projScreenMatrix );
 

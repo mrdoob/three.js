@@ -3,15 +3,22 @@
 		<title>three.js webgpu - texture gradient</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br />This example demonstrate texture gradient
-			<br /> Left canvas is using WebGPU Backend, right canvas is WebGL Backend.
-			<br /> The bottom half of the texture benefits from the gradient to achieve better blur quality.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Texture Gradient</span>
+			</div>
+
+			<small>
+				This example demonstrate texture gradient
+				<br /> Left canvas is using WebGPU Backend, right canvas is WebGL Backend.
+				<br /> The bottom half of the texture benefits from the gradient to achieve better blur quality.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -27,7 +34,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { If, vec4, float, time, cos, pow, vec2, uv, texture, Fn } from 'three/tsl';
 
 			// WebGPU Backend
@@ -93,6 +100,7 @@
 				const renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: forceWebGL } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 
 				document.body.appendChild( renderer.domElement );
 				renderer.domElement.style.position = 'absolute';
@@ -115,15 +123,11 @@
 
 				//
 
+				function animate() {
 
-				 const animate = async function () {
-
-					await renderer.renderAsync( scene, camera );
-
+					renderer.render( scene, camera );
 			
-				};
-
-				renderer.setAnimationLoop( animate );
+				}
 
 				window.addEventListener( 'resize', onWindowResize );
 

@@ -1749,7 +1749,7 @@ function createObject( loader, elements, elementSize, isConditionalSegments = fa
 /**
  * A loader for the LDraw format.
  *
- * [LDraw]{@link https://ldraw.org/} (LEGO Draw) is an [open format specification]{@link https://ldraw.org/article/218.html}
+ * [LDraw](https://ldraw.org/} (LEGO Draw) is an [open format specification](https://ldraw.org/article/218.html)
  * for describing LEGO and other construction set 3D models.
  *
  * An LDraw asset (a text file usually with extension .ldr, .dat or .txt) can describe just a single construction
@@ -1885,7 +1885,7 @@ class LDrawLoader extends Loader {
 
 		}
 
-		this.setMaterials( materials );
+		this.addMaterials( materials );
 
 	}
 
@@ -1907,7 +1907,7 @@ class LDrawLoader extends Loader {
 		fileLoader.load( url, text => {
 
 			// Initializes the materials library with default materials
-			this.setMaterials( [] );
+			this.addDefaultMaterials();
 
 			this.partsCache
 				.parseModel( text )
@@ -1948,15 +1948,60 @@ class LDrawLoader extends Loader {
 
 	}
 
+	/**
+	 * Sets the loader's material library. This method clears existing
+	 * material definitions.
+	 *
+	 * @param {Array<Material>} materials - The materials to set.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	setMaterials( materials ) {
+
+		this.clearMaterials();
+		this.addMaterials( materials );
+
+		return this;
+
+	}
+
+	/**
+	 * Clears the loader's material library.
+	 *
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
+	clearMaterials() {
 
 		this.materialLibrary = {};
 		this.materials = [];
+
+		return this;
+
+	}
+
+	/**
+	 * Adds a list of materials to the loader's material library.
+	 *
+	 * @param {Array<Material>} materials - The materials to add.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
+	addMaterials( materials ) {
+
 		for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
 			this.addMaterial( materials[ i ] );
 
 		}
+
+		return this;
+
+	}
+
+	/**
+	 * Initializes the loader with default materials.
+	 *
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
+	addDefaultMaterials() {
 
 		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
 		this.addMaterial( this.parseColorMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ) );
@@ -1982,6 +2027,12 @@ class LDrawLoader extends Loader {
 
 	}
 
+	/**
+	 * Adds a single material to the loader's material library.
+	 *
+	 * @param {Material} material - The material to add.
+	 * @return {LDrawLoader} A reference to this loader.
+	 */
 	addMaterial( material ) {
 
 		// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array
@@ -2081,7 +2132,7 @@ class LDrawLoader extends Loader {
 
 			} else if ( finalMaterialPass ) {
 
-				// see if we can get the final material from from the "getMaterial" function which will attempt to
+				// see if we can get the final material from the "getMaterial" function which will attempt to
 				// parse the "direct" colors
 				material = loader.getMaterial( colorCode );
 				if ( material === null ) {

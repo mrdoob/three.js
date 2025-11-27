@@ -284,7 +284,7 @@ class Matrix2Uniform extends Uniform {
 		 */
 		this.isMatrix2Uniform = true;
 
-		this.boundary = 16;
+		this.boundary = 8;
 		this.itemSize = 4;
 
 	}

@@ -1,5 +1,6 @@
 /* global QUnit */
 
+import { NearestFilter } from '../../../../src/constants.js';
 import { WebGLCubeRenderTarget } from '../../../../src/renderers/WebGLCubeRenderTarget.js';
 
 import { WebGLRenderTarget } from '../../../../src/renderers/WebGLRenderTarget.js';
@@ -16,6 +17,9 @@ export default QUnit.module( 'Renderers', () => {
 				object instanceof WebGLRenderTarget, true,
 				'WebGLCubeRenderTarget extends from WebGLRenderTarget'
 			);
+
+			const options = new WebGLCubeRenderTarget( 1, { magFilter: NearestFilter } );
+			assert.ok( options.width === 1 && options.height === 1 && options.texture.magFilter === NearestFilter, 'Can instantiate a WebGLCubeRenderTarget with texture options.' );
 
 		} );
 

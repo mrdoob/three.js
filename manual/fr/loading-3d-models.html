@@ -1,0 +1,160 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Chargement de modèles 3D</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Chargement de modèles 3D">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Chargement de modèles 3D</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          
+          <p>
+            Les modèles 3D sont disponibles dans des centaines de formats de fichiers, chacun ayant des objectifs différents, des fonctionnalités variées et une complexité variable. Bien que
+            <a href="https://github.com/mrdoob/three.js/tree/dev/examples/jsm/loaders" target="_blank" rel="noopener">
+            three.js propose de nombreux chargeurs</a>, choisir le bon format et le bon flux de travail vous fera gagner du temps et vous évitera des frustrations plus tard. Certains formats sont difficiles à manipuler, inefficaces pour les expériences en temps réel, ou simplement pas entièrement pris en charge à l'heure actuelle.
+          </p>
+        
+          <p>
+            Ce guide propose un flux de travail recommandé pour la plupart des utilisateurs, ainsi que des suggestions sur ce qu'il faut essayer si les choses ne se passent pas comme prévu.
+          </p>
+        
+          <h2>Avant de commencer</h2>
+        
+          <p>
+            Si vous débutez avec l'exécution d'un serveur local, commencez par
+            <a href="installation.html">Installation</a>
+            d'abord. De nombreuses erreurs courantes lors de la visualisation de modèles 3D peuvent être évitées en hébergeant correctement les fichiers.
+          </p>
+        
+          <h2>Flux de travail recommandé</h2>
+        
+          <p>
+            Dans la mesure du possible, nous recommandons l'utilisation de glTF (GL Transmission Format). Les versions
+            <small>.GLB</small> et <small>.GLTF</small> du format sont bien prises en charge. Étant donné que glTF est axé sur la diffusion d'assets en temps réel, il est compact à transmettre et rapide à charger. Les fonctionnalités incluent les maillages, les matériaux, les textures, les peaux, les squelettes, les cibles de déformation (morph targets), les animations, les lumières et les caméras.
+          </p>
+        
+          <p>
+            Des fichiers glTF du domaine public sont disponibles sur des sites comme
+            <a href="https://sketchfab.com/models?features=downloadable&sort_by=-likeCount&type=models" target="_blank" rel="noopener">
+            Sketchfab</a>, ou divers outils incluent l'exportation glTF :
+          </p>
+        
+          <ul>
+            <li><a href="https://www.blender.org/" target="_blank" rel="noopener">Blender</a> par la Blender Foundation</li>
+            <li><a href="https://www.allegorithmic.com/products/substance-painter" target="_blank" rel="noopener">Substance Painter</a> par Allegorithmic</li>
+            <li><a href="https://www.foundry.com/products/modo" target="_blank" rel="noopener">Modo</a> par Foundry</li>
+            <li><a href="https://www.marmoset.co/toolbag/" target="_blank" rel="noopener">Toolbag</a> par Marmoset</li>
+            <li><a href="https://www.sidefx.com/products/houdini/" target="_blank" rel="noopener">Houdini</a> par SideFX</li>
+            <li><a href="https://labs.maxon.net/?p=3360" target="_blank" rel="noopener">Cinema 4D</a> par MAXON</li>
+            <li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> par le Khronos Group</li>
+            <li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> par Facebook</li>
+            <li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> par Analytical Graphics Inc</li>
+            <li>&hellip;et <a href="http://github.khronos.org/glTF-Project-Explorer/" target="_blank" rel="noopener">bien d'autres encore</a></li>
+          </ul>
+        
+          <p>
+            Si vos outils préférés ne prennent pas en charge glTF, envisagez de demander l'exportation glTF aux auteurs, ou de poster sur
+            <a href="https://github.com/KhronosGroup/glTF/issues/1051" target="_blank" rel="noopener">le fil de discussion de la feuille de route glTF</a>.
+          </p>
+        
+          <p>
+            Lorsque glTF n'est pas une option, des formats populaires tels que FBX, OBJ ou COLLADA sont également disponibles et régulièrement mis à jour.
+          </p>
+        
+          <h2>Chargement</h2>
+        
+          <p>
+            Seuls quelques chargeurs (par exemple `ObjectLoader`) sont inclus par défaut avec three.js — les autres doivent être ajoutés individuellement à votre application.
+          </p>
+        
+<pre class="prettyprint notranslate lang-js" translate="no">
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+</pre>
+
+          <p>
+            Une fois qu'un chargeur a été importé, vous êtes prêt à ajouter un modèle à votre scène. La syntaxe varie selon les différents chargeurs — lorsque vous utilisez un autre format, consultez les exemples et la documentation de ce chargeur. Pour glTF, l'utilisation avec des scripts globaux serait :
+          </p>
+        
+<pre class="prettyprint notranslate lang-js" translate="no">
+const loader = new GLTFLoader();
+
+loader.load( 'path/to/model.glb', function ( gltf ) {
+
+  scene.add( gltf.scene );
+
+}, undefined, function ( error ) {
+
+  console.error( error );
+
+} );
+</pre>
+        
+          <h2>Dépannage</h2>
+        
+          <p>
+            Vous avez passé des heures à modéliser un chef-d'œuvre artisanal, vous le chargez dans la page web, et — oh non ! 😭 Il est déformé, mal coloré, ou manque entièrement. Commencez par ces étapes de dépannage :
+          </p>
+        
+          <ol>
+            <li>
+              Vérifiez la console JavaScript pour les erreurs, et assurez-vous d'avoir utilisé une fonction de rappel `onError` lors de l'appel à `.load()` pour journaliser le résultat.
+            </li>
+            <li>
+              Visualisez le modèle dans une autre application. Pour glTF, des visionneuses par glisser-déposer sont disponibles pour
+              <a href="https://gltf-viewer.donmccurdy.com/" target="_blank" rel="noopener">three.js</a> et
+              <a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>. Si le modèle
+              apparaît correctement dans une ou plusieurs applications,
+              <a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">signalez un bug à three.js</a>.
+              Si le modèle ne peut être affiché dans aucune application, nous vous encourageons fortement à signaler un bug à l'application utilisée pour créer le modèle.
+            </li>
+            <li>
+              Essayez de mettre à l'échelle le modèle vers le haut ou vers le bas par un facteur de 1000. De nombreux modèles sont mis à l'échelle différemment, et les grands modèles peuvent ne pas apparaître si la caméra est à l'intérieur du modèle.
+            </li>
+            <li>
+              Essayez d'ajouter et de positionner une source de lumière. Le modèle peut être caché dans l'obscurité.
+            </li>
+            <li>
+              Recherchez les demandes de texture échouées dans l'onglet réseau, comme
+              `"C:\\Path\To\Model\texture.jpg"`. Utilisez plutôt des chemins relatifs à votre
+              modèle, tels que `images/texture.jpg` — cela peut nécessiter d'éditer le fichier modèle dans un éditeur de texte.
+            </li>
+          </ol>
+        
+          <h2>Demander de l'aide</h2>
+        
+          <p>
+            Si vous avez suivi le processus de dépannage ci-dessus et que votre modèle ne fonctionne toujours pas, la bonne approche pour demander de l'aide vous permettra d'obtenir une solution plus rapidement. Posez une question sur le
+            <a href="https://discourse.threejs.org/" target="_blank" rel="noopener">forum three.js</a> et, dans la mesure du possible,
+            incluez votre modèle (ou un modèle plus simple présentant le même problème) dans tous les formats dont vous disposez. Incluez suffisamment d'informations pour que quelqu'un d'autre puisse reproduire le problème rapidement — idéalement, une démo en direct.
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

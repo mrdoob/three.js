@@ -402,7 +402,7 @@ class WebXRController {
 	 *
 	 * @private
 	 * @param {Group} hand - The group representing the hand space.
-	 * @param {XRHandJoint} inputjoint - The XR frame.
+	 * @param {XRJointSpace} inputjoint - The hand joint data.
 	 * @return {Group} A group representing the hand joint for the given input joint.
 	 */
 	_getHandJoint( hand, inputjoint ) {

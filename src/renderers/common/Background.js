@@ -1,11 +1,12 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
-import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection } from '../../nodes/TSL.js';
+import { vec4, normalWorldGeometry, backgroundBlurriness, backgroundIntensity, backgroundRotation, positionLocal, cameraProjectionMatrix, modelViewMatrix, div } from '../../nodes/TSL.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Mesh } from '../../objects/Mesh.js';
 import { SphereGeometry } from '../../geometries/SphereGeometry.js';
 import { BackSide } from '../../constants.js';
+import { error } from '../../utils.js';
 
 const _clearColor = /*@__PURE__*/ new Color4();
 
@@ -87,13 +88,27 @@ class Background extends DataMap {
 
 			if ( backgroundMesh === undefined ) {
 
-				const backgroundMeshNode = context( vec4( backgroundNode ).mul( backgroundIntensity ), {
+				const backgroundMeshNode = vec4( backgroundNode ).mul( backgroundIntensity ).context( {
 					// @TODO: Add Texture2D support using node context
-					getUV: () => backgroundRotation.mul( normalWorld ),
+					getUV: () => backgroundRotation.mul( normalWorldGeometry ),
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
-				let viewProj = modelViewProjection;
+				// when using orthographic cameras, we must scale the skybox sphere
+				// up to exceed the dimensions of the camera's viewing box.
+				const isOrtho = cameraProjectionMatrix.element( 3 ).element( 3 ).equal( 1.0 );
+
+				// calculate the orthographic scale
+				// projectionMatrix[1][1] is (1 / top). Invert it to get the height and multiply by 3.0
+				// (an arbitrary safety factor) to ensure the skybox is large enough to cover the corners
+				// of the rectangular screen
+				const orthoScale = div( 1.0, cameraProjectionMatrix.element( 1 ).element( 1 ) ).mul( 3.0 );
+
+				// compute vertex position
+				const modifiedPosition = isOrtho.select( positionLocal.mul( orthoScale ), positionLocal );
+				let viewProj = cameraProjectionMatrix.mul( modelViewMatrix.mul( vec4( modifiedPosition, 1.0 ) ) );
+
+				// force background to far plane so it does not occlude objects
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
@@ -118,6 +133,17 @@ class Background extends DataMap {
 
 				};
 
+				function onBackgroundDispose() {
+
+					background.removeEventListener( 'dispose', onBackgroundDispose );
+
+					backgroundMesh.material.dispose();
+					backgroundMesh.geometry.dispose();
+
+				}
+
+				background.addEventListener( 'dispose', onBackgroundDispose );
+
 			}
 
 			const backgroundCacheKey = backgroundNode.getCacheKey();
@@ -137,7 +163,7 @@ class Background extends DataMap {
 
 		} else {
 
-			console.error( 'THREE.Renderer: Unsupported background configuration.', background );
+			error( 'Renderer: Unsupported background configuration.', background );
 
 		}
 

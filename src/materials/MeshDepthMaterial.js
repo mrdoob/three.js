@@ -6,6 +6,7 @@ import { BasicDepthPacking } from '../constants.js';
  * near and far plane. White is nearest, black is farthest.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshDepthMaterial
  */
 class MeshDepthMaterial extends Material {
 

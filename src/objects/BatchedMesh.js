@@ -871,10 +871,9 @@ class BatchedMesh extends Mesh {
 	}
 
 	/**
-	 * Repacks the sub geometries in [name] to remove any unused space remaining from
+	 * Repacks the sub geometries in BatchedMesh to remove any unused space remaining from
 	 * previously deleted geometry, freeing up space to add new geometry.
 	 *
-	 * @param {number} instanceId - The ID of the instance to remove from the batch.
 	 * @return {BatchedMesh} A reference to this batched mesh.
 	 */
 	optimize() {
@@ -926,6 +925,7 @@ class BatchedMesh extends Mesh {
 
 					index.array.copyWithin( nextIndexStart, indexStart, indexStart + reservedIndexCount );
 					index.addUpdateRange( nextIndexStart, reservedIndexCount );
+					index.needsUpdate = true;
 
 					geometryInfo.indexStart = nextIndexStart;
 
@@ -946,6 +946,7 @@ class BatchedMesh extends Mesh {
 					const { array, itemSize } = attribute;
 					array.copyWithin( nextVertexStart * itemSize, vertexStart * itemSize, ( vertexStart + reservedVertexCount ) * itemSize );
 					attribute.addUpdateRange( nextVertexStart * itemSize, reservedVertexCount * itemSize );
+					attribute.needsUpdate = true;
 
 				}
 
@@ -962,6 +963,8 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		this._visibilityChanged = true;
+
 		return this;
 
 	}
@@ -971,7 +974,7 @@ class BatchedMesh extends Mesh {
 	 *
 	 * @param {number} geometryId - The ID of the geometry to return the bounding box for.
 	 * @param {Box3} target - The target object that is used to store the method's result.
-	 * @return {Box3|null} The geometry's bounding box. Returns `null` if no geometry has been found for the given ID.
+	 * @return {?Box3} The geometry's bounding box. Returns `null` if no geometry has been found for the given ID.
 	 */
 	getBoundingBoxAt( geometryId, target ) {
 
@@ -1016,7 +1019,7 @@ class BatchedMesh extends Mesh {
 	 *
 	 * @param {number} geometryId - The ID of the geometry to return the bounding sphere for.
 	 * @param {Sphere} target - The target object that is used to store the method's result.
-	 * @return {Sphere|null} The geometry's bounding sphere. Returns `null` if no geometry has been found for the given ID.
+	 * @return {?Sphere} The geometry's bounding sphere. Returns `null` if no geometry has been found for the given ID.
 	 */
 	getBoundingSphereAt( geometryId, target ) {
 
@@ -1251,7 +1254,7 @@ class BatchedMesh extends Mesh {
 		const availableInstanceIds = this._availableInstanceIds;
 		const instanceInfo = this._instanceInfo;
 		availableInstanceIds.sort( ascIdSort );
-		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === instanceInfo.length ) {
+		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === instanceInfo.length - 1 ) {
 
 			instanceInfo.pop();
 			availableInstanceIds.pop();
@@ -1443,14 +1446,23 @@ class BatchedMesh extends Mesh {
 		} ) );
 		this._instanceInfo = source._instanceInfo.map( info => ( { ...info } ) );
 
+		this._availableInstanceIds = source._availableInstanceIds.slice();
+		this._availableGeometryIds = source._availableGeometryIds.slice();
+
+		this._nextIndexStart = source._nextIndexStart;
+		this._nextVertexStart = source._nextVertexStart;
+		this._geometryCount = source._geometryCount;
+
 		this._maxInstanceCount = source._maxInstanceCount;
 		this._maxVertexCount = source._maxVertexCount;
 		this._maxIndexCount = source._maxIndexCount;
 
 		this._geometryInitialized = source._geometryInitialized;
-		this._geometryCount = source._geometryCount;
 		this._multiDrawCounts = source._multiDrawCounts.slice();
 		this._multiDrawStarts = source._multiDrawStarts.slice();
+
+		this._indirectTexture = source._indirectTexture.clone();
+		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
 
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.data.slice();
@@ -1520,9 +1532,11 @@ class BatchedMesh extends Mesh {
 			_matrix
 				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
 				.multiply( this.matrixWorld );
+
 			_frustum.setFromProjectionMatrix(
 				_matrix,
-				renderer.coordinateSystem
+				camera.coordinateSystem,
+				camera.reversedDepth
 			);
 
 		}

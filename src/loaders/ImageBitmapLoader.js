@@ -1,8 +1,11 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
+import { warn } from '../utils.js';
+
+const _errorMap = new WeakMap();
 
 /**
- * A loader for loading images as an [ImageBitmap]{@link https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap}.
+ * A loader for loading images as an [ImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap).
  * An `ImageBitmap` provides an asynchronous and resource efficient pathway to prepare
  * textures for rendering.
  *
@@ -11,7 +14,7 @@ import { Loader } from './Loader.js';
  *
  * You need to set the equivalent options via {@link ImageBitmapLoader#setOptions} instead.
  *
- * Also note that unlike {@link FileLoader}, this loader does not avoid multiple concurrent requests to the same URL.
+ * Also note that unlike {@link FileLoader}, this loader avoids multiple concurrent requests to the same URL only if `Cache` is enabled.
  *
  * ```js
  * const loader = new THREE.ImageBitmapLoader();
@@ -46,13 +49,13 @@ class ImageBitmapLoader extends Loader {
 
 		if ( typeof createImageBitmap === 'undefined' ) {
 
-			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+			warn( 'ImageBitmapLoader: createImageBitmap() not supported.' );
 
 		}
 
 		if ( typeof fetch === 'undefined' ) {
 
-			console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
+			warn( 'ImageBitmapLoader: fetch() not supported.' );
 
 		}
 
@@ -64,11 +67,19 @@ class ImageBitmapLoader extends Loader {
 		 */
 		this.options = { premultiplyAlpha: 'none' };
 
+		/**
+		 * Used for aborting requests.
+		 *
+		 * @private
+		 * @type {AbortController}
+		 */
+		this._abortController = new AbortController();
+
 	}
 
 	/**
 	 * Sets the given loader options. The structure of the object must match the `options` parameter of
-	 * [createImageBitmap]{@link https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap}.
+	 * [createImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap).
 	 *
 	 * @param {Object} options - The loader options to set.
 	 * @return {ImageBitmapLoader} A reference to this image bitmap loader.
@@ -100,7 +111,7 @@ class ImageBitmapLoader extends Loader {
 
 		const scope = this;
 
-		const cached = Cache.get( url );
+		const cached = Cache.get( `image-bitmap:${url}` );
 
 		if ( cached !== undefined ) {
 
@@ -111,15 +122,27 @@ class ImageBitmapLoader extends Loader {
 
 				cached.then( imageBitmap => {
 
-					if ( onLoad ) onLoad( imageBitmap );
+					// check if there is an error for the cached promise
 
-					scope.manager.itemEnd( url );
+					if ( _errorMap.has( cached ) === true ) {
 
-				} ).catch( e => {
+						if ( onError ) onError( _errorMap.get( cached ) );
 
-					if ( onError ) onError( e );
+						scope.manager.itemError( url );
+						scope.manager.itemEnd( url );
+
+					} else {
+
+						if ( onLoad ) onLoad( imageBitmap );
+
+						scope.manager.itemEnd( url );
+
+						return imageBitmap;
+
+					}
 
 				} );
+
 				return;
 
 			}
@@ -140,6 +163,7 @@ class ImageBitmapLoader extends Loader {
 		const fetchOptions = {};
 		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
 		fetchOptions.headers = this.requestHeader;
+		fetchOptions.signal = ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal;
 
 		const promise = fetch( url, fetchOptions ).then( function ( res ) {
 
@@ -151,7 +175,7 @@ class ImageBitmapLoader extends Loader {
 
 		} ).then( function ( imageBitmap ) {
 
-			Cache.add( url, imageBitmap );
+			Cache.add( `image-bitmap:${url}`, imageBitmap );
 
 			if ( onLoad ) onLoad( imageBitmap );
 
@@ -163,15 +187,31 @@ class ImageBitmapLoader extends Loader {
 
 			if ( onError ) onError( e );
 
-			Cache.remove( url );
+			_errorMap.set( promise, e );
+
+			Cache.remove( `image-bitmap:${url}` );
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
 
 		} );
 
-		Cache.add( url, promise );
+		Cache.add( `image-bitmap:${url}`, promise );
 		scope.manager.itemStart( url );
+
+	}
+
+	/**
+	 * Aborts ongoing fetch requests.
+	 *
+	 * @return {ImageBitmapLoader} A reference to this instance.
+	 */
+	abort() {
+
+		this._abortController.abort();
+		this._abortController = new AbortController();
+
+		return this;
 
 	}
 

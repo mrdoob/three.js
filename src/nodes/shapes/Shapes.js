@@ -1,4 +1,4 @@
-import { Fn, float } from '../tsl/TSLBase.js';
+import { Fn, float, select } from '../tsl/TSLBase.js';
 import { lengthSq, smoothstep } from '../math/MathNode.js';
 import { uv } from '../accessors/UV.js';
 
@@ -12,18 +12,19 @@ import { uv } from '../accessors/UV.js';
  */
 export const shapeCircle = Fn( ( [ coord = uv() ], { renderer, material } ) => {
 
-	const alpha = float( 1 ).toVar();
 	const len2 = lengthSq( coord.mul( 2 ).sub( 1 ) );
 
-	if ( material.alphaToCoverage && renderer.samples > 1 ) {
+	let alpha;
+
+	if ( material.alphaToCoverage && renderer.currentSamples > 0 ) {
 
 		const dlen = float( len2.fwidth() ).toVar();
 
-		alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
+		alpha = smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus();
 
 	} else {
 
-		len2.greaterThan( 1.0 ).discard();
+		alpha = select( len2.greaterThan( 1.0 ), 0, 1 );
 
 	}
 

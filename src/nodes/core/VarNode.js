@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
+import { error } from '../../utils.js';
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -72,6 +73,54 @@ class VarNode extends Node {
 		 */
 		this.readOnly = readOnly;
 
+		/**
+		 *
+		 * Add this flag to the node system to indicate that this node require parents.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.parents = true;
+
+		/**
+		 * This flag is used to indicate that this node is used for intent.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.intent = false;
+
+	}
+
+	/**
+	 * Sets the intent flag for this node.
+	 *
+	 * This flag is used to indicate that this node is used for intent
+	 * and should not be built directly. Instead, it is used to indicate that
+	 * the node should be treated as a variable intent.
+	 *
+	 * It's useful for assigning variables without needing creating a new variable node.
+	 *
+	 * @param {boolean} value - The value to set for the intent flag.
+	 * @returns {VarNode} This node.
+	 */
+	setIntent( value ) {
+
+		this.intent = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the intent flag of this node.
+	 *
+	 * @return {boolean} The intent flag.
+	 */
+	getIntent() {
+
+		return this.intent;
+
 	}
 
 	getMemberType( builder, name ) {
@@ -89,6 +138,70 @@ class VarNode extends Node {
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
+
+	}
+
+	getArrayCount( builder ) {
+
+		return this.node.getArrayCount( builder );
+
+	}
+
+	isAssign( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		let assign = properties.assign;
+
+		if ( assign !== true ) {
+
+			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
+
+				if ( builder.fnCall && builder.fnCall.shaderNode ) {
+
+					const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
+
+					if ( shaderNodeData.hasLoop ) {
+
+						assign = true;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return assign;
+
+	}
+
+	build( ...params ) {
+
+		const builder = params[ 0 ];
+
+		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
+
+			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+
+				builder.getBaseStack().addToStack( this );
+
+			}
+
+		}
+
+		if ( this.intent === true ) {
+
+			if ( this.isAssign( builder ) !== true ) {
+
+				return this.node.build( ...params );
+
+			}
+
+		}
+
+		return super.build( ...params );
 
 	}
 
@@ -110,7 +223,23 @@ class VarNode extends Node {
 
 		}
 
-		const vectorType = builder.getVectorType( this.getNodeType( builder ) );
+		const nodeType = this.getNodeType( builder );
+
+		if ( nodeType == 'void' ) {
+
+			if ( this.intent !== true ) {
+
+				error( 'TSL: ".toVar()" can not be used with void type.' );
+
+			}
+
+			const snippet = node.build( builder );
+
+			return snippet;
+
+		}
+
+		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
@@ -129,7 +258,7 @@ class VarNode extends Node {
 
 			} else {
 
-				const count = builder.getArrayCount( node );
+				const count = node.getArrayCount( builder );
 
 				declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
 
@@ -140,6 +269,14 @@ class VarNode extends Node {
 		builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
 
 		return propertyName;
+
+	}
+
+	_hasStack( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		return nodeData.stack !== undefined;
 
 	}
 
@@ -167,7 +304,7 @@ const createVar = /*@__PURE__*/ nodeProxy( VarNode );
  * @param {?string} name - The name of the variable in the shader.
  * @returns {VarNode}
  */
-export const Var = ( node, name = null ) => createVar( node, name ).append();
+export const Var = ( node, name = null ) => createVar( node, name ).toStack();
 
 /**
  * TSL function for creating a const node.
@@ -178,30 +315,28 @@ export const Var = ( node, name = null ) => createVar( node, name ).append();
  * @param {?string} name - The name of the constant in the shader.
  * @returns {VarNode}
  */
-export const Const = ( node, name = null ) => createVar( node, name, true ).append();
+export const Const = ( node, name = null ) => createVar( node, name, true ).toStack();
+
+//
+//
+
+/**
+ * TSL function for creating a var intent node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} node - The node for which a variable should be created.
+ * @param {?string} name - The name of the variable in the shader.
+ * @returns {VarNode}
+ */
+export const VarIntent = ( node ) => {
+
+	return createVar( node ).setIntent( true ).toStack();
+
+};
 
 // Method chaining
 
 addMethodChaining( 'toVar', Var );
 addMethodChaining( 'toConst', Const );
-
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r170. Use `Var( node )` or `node.toVar()` instead.
- *
- * @param {any} node
- * @returns {VarNode}
- */
-export const temp = ( node ) => { // @deprecated, r170
-
-	console.warn( 'TSL: "temp( node )" is deprecated. Use "Var( node )" or "node.toVar()" instead.' );
-
-	return createVar( node );
-
-};
-
-addMethodChaining( 'temp', temp );
-
+addMethodChaining( 'toVarIntent', VarIntent );

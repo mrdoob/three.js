@@ -8,6 +8,7 @@ import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
 import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
 import { generateUUID } from '../math/MathUtils.js';
 import { NormalAnimationBlendMode } from '../constants.js';
+import { warn, error } from '../utils.js';
 
 /**
  * A reusable set of keyframe tracks which represent an animation.
@@ -67,6 +68,14 @@ class AnimationClip {
 		 */
 		this.uuid = generateUUID();
 
+		/**
+		 * An object that can be used to store custom data about the animation clip.
+		 * It should not hold references to functions as these will not be cloned.
+		 *
+		 * @type {Object}
+		 */
+		this.userData = {};
+
 		// this means it should figure out its duration by scanning the tracks
 		if ( this.duration < 0 ) {
 
@@ -98,6 +107,8 @@ class AnimationClip {
 		const clip = new this( json.name, json.duration, tracks, json.blendMode );
 		clip.uuid = json.uuid;
 
+		clip.userData = JSON.parse( json.userData || '{}' );
+
 		return clip;
 
 	}
@@ -120,7 +131,8 @@ class AnimationClip {
 			'duration': clip.duration,
 			'tracks': tracks,
 			'uuid': clip.uuid,
-			'blendMode': clip.blendMode
+			'blendMode': clip.blendMode,
+			'userData': JSON.stringify( clip.userData ),
 
 		};
 
@@ -294,11 +306,11 @@ class AnimationClip {
 	 */
 	static parseAnimation( animation, bones ) {
 
-		console.warn( 'THREE.AnimationClip: parseAnimation() is deprecated and will be removed with r185' );
+		warn( 'AnimationClip: parseAnimation() is deprecated and will be removed with r185' );
 
 		if ( ! animation ) {
 
-			console.error( 'THREE.AnimationClip: No animation in JSONLoader data.' );
+			error( 'AnimationClip: No animation in JSONLoader data.' );
 			return null;
 
 		}
@@ -515,7 +527,11 @@ class AnimationClip {
 
 		}
 
-		return new this.constructor( this.name, this.duration, tracks, this.blendMode );
+		const clip = new this.constructor( this.name, this.duration, tracks, this.blendMode );
+
+		clip.userData = JSON.parse( JSON.stringify( this.userData ) );
+
+		return clip;
 
 	}
 

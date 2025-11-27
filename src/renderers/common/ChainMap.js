@@ -16,7 +16,7 @@ class ChainMap {
 		/**
 		 * The root Weak Map.
 		 *
-		 * @type {WeakMap}
+		 * @type {WeakMap<Object, WeakMap>}
 		 */
 		this.weakMap = new WeakMap();
 

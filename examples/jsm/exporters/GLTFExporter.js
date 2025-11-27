@@ -65,13 +65,13 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
 /**
  * An exporter for `glTF` 2.0.
  *
- * glTF (GL Transmission Format) is an [open format specification]{@link https://github.com/KhronosGroup/glTF/tree/master/specification/2.0}
+ * glTF (GL Transmission Format) is an [open format specification](https://github.com/KhronosGroup/glTF/tree/master/specification/2.0)
  * for efficient delivery and loading of 3D content. Assets may be provided either in JSON (.gltf)
  * or binary (.glb) format. External files store textures (.jpg, .png) and additional binary
  * data (.bin). A glTF asset may deliver one or more scenes, including meshes, materials,
  * textures, skins, skeletons, morph targets, animations, lights, and/or cameras.
  *
- * GLTFExporter supports the [glTF 2.0 extensions]{@link https://github.com/KhronosGroup/glTF/tree/master/extensions/}:
+ * GLTFExporter supports the [glTF 2.0 extensions](https://github.com/KhronosGroup/glTF/tree/master/extensions/):
  *
  * - KHR_lights_punctual
  * - KHR_materials_clearcoat
@@ -91,7 +91,7 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
  *
  * The following glTF 2.0 extension is supported by an external user plugin:
  *
- * - [KHR_materials_variants]{@link https://github.com/takahirox/three-gltf-extensions}
+ * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  *
  * ```js
  * const exporter = new GLTFExporter();
@@ -543,32 +543,36 @@ function getCanvas() {
 
 function getToBlobPromise( canvas, mimeType ) {
 
-	if ( canvas.toBlob !== undefined ) {
+	if ( typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas ) {
+
+		let quality;
+
+		// Blink's implementation of convertToBlob seems to default to a quality level of 100%
+		// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
+		if ( mimeType === 'image/jpeg' ) {
+
+			quality = 0.92;
+
+		} else if ( mimeType === 'image/webp' ) {
+
+			quality = 0.8;
+
+		}
+
+		return canvas.convertToBlob( {
+
+			type: mimeType,
+			quality: quality
+
+		} );
+
+	} else {
+
+		// HTMLCanvasElement code path
 
 		return new Promise( ( resolve ) => canvas.toBlob( resolve, mimeType ) );
 
 	}
-
-	let quality;
-
-	// Blink's implementation of convertToBlob seems to default to a quality level of 100%
-	// Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
-	if ( mimeType === 'image/jpeg' ) {
-
-		quality = 0.92;
-
-	} else if ( mimeType === 'image/webp' ) {
-
-		quality = 0.8;
-
-	}
-
-	return canvas.convertToBlob( {
-
-		type: mimeType,
-		quality: quality
-
-	} );
 
 }
 
@@ -757,7 +761,7 @@ class GLTFWriter {
 	/**
 	 * Serializes a userData.
 	 *
-	 * @param {THREE.Object3D|THREE.Material} object
+	 * @param {THREE.Object3D|THREE.Material|THREE.BufferGeometry|THREE.AnimationClip} object
 	 * @param {Object} objectDef
 	 */
 	serializeUserData( object, objectDef ) {
@@ -1555,7 +1559,7 @@ class GLTFWriter {
 	/**
 	 * Process material
 	 * @param {THREE.Material} material Material to process
-	 * @return {Promise<number|null>} Index of the processed material in the "materials" array
+	 * @return {Promise<?number>} Index of the processed material in the "materials" array
 	 */
 	async processMaterialAsync( material ) {
 
@@ -1731,7 +1735,7 @@ class GLTFWriter {
 	/**
 	 * Process mesh
 	 * @param {THREE.Mesh} mesh Mesh to process
-	 * @return {Promise<number|null>} Index of the processed mesh in the "meshes" array
+	 * @return {Promise<?number>} Index of the processed mesh in the "meshes" array
 	 */
 	async processMeshAsync( mesh ) {
 
@@ -2185,7 +2189,7 @@ class GLTFWriter {
 	 *
 	 * @param {THREE.AnimationClip} clip
 	 * @param {THREE.Object3D} root
-	 * @return {number|null}
+	 * @return {?number}
 	 */
 	processAnimation( clip, root ) {
 
@@ -2279,11 +2283,15 @@ class GLTFWriter {
 
 		}
 
-		json.animations.push( {
+		const animationDef = {
 			name: clip.name || 'clip_' + json.animations.length,
 			samplers: samplers,
 			channels: channels
-		} );
+		};
+
+		this.serializeUserData( clip, animationDef );
+
+		json.animations.push( animationDef );
 
 		return json.animations.length - 1;
 
@@ -2291,7 +2299,7 @@ class GLTFWriter {
 
 	/**
 	 * @param {THREE.Object3D} object
-	 * @return {number|null}
+	 * @return {?number}
 	 */
 	 processSkin( object ) {
 
@@ -2408,6 +2416,9 @@ class GLTFWriter {
 
 		if ( object.isSkinnedMesh ) this.skins.push( object );
 
+		const nodeIndex = json.nodes.push( nodeDef ) - 1;
+		nodeMap.set( object, nodeIndex );
+
 		if ( object.children.length > 0 ) {
 
 			const children = [];
@@ -2418,9 +2429,9 @@ class GLTFWriter {
 
 				if ( child.visible || options.onlyVisible === false ) {
 
-					const nodeIndex = await this.processNodeAsync( child );
+					const childNodeIndex = await this.processNodeAsync( child );
 
-					if ( nodeIndex !== null ) children.push( nodeIndex );
+					if ( childNodeIndex !== null ) children.push( childNodeIndex );
 
 				}
 
@@ -2436,8 +2447,6 @@ class GLTFWriter {
 
 		} );
 
-		const nodeIndex = json.nodes.push( nodeDef ) - 1;
-		nodeMap.set( object, nodeIndex );
 		return nodeIndex;
 
 	}

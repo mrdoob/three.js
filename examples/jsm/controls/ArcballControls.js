@@ -96,7 +96,7 @@ const _EPS = 0.000001;
  * Arcball controls allow the camera to be controlled by a virtual trackball with full touch support and advanced navigation functionality.
  * Cursor/finger positions and movements are mapped over a virtual trackball surface represented by a gizmo and mapped in intuitive and
  * consistent camera movements. Dragging cursor/fingers will cause camera to orbit around the center of the trackball in a conservative
- * way (returning to the starting point will make the camera to return to its starting orientation).
+ * way (returning to the starting point will make the camera return to its starting orientation).
  *
  * In addition to supporting pan, zoom and pinch gestures, Arcball controls provide focus< functionality with a double click/tap for intuitively
  * moving the object's point of interest in the center of the virtual trackball. Focus allows a much better inspection and navigation in complex
@@ -115,7 +115,7 @@ class ArcballControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Camera} camera - The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.
-	 * @param {?HTMLDOMElement} [domElement=null] - The HTML element used for event listeners.
+	 * @param {?HTMLElement} [domElement=null] - The HTML element used for event listeners.
 	 * @param {?Scene} [scene=null] The scene rendered by the camera. If not given, gizmos cannot be shown.
 	 */
 	constructor( camera, domElement = null, scene = null ) {
@@ -196,6 +196,7 @@ class ArcballControls extends Controls {
 		this._farPos0 = 0;
 		this._cameraMatrixState0 = new Matrix4();
 		this._gizmoMatrixState0 = new Matrix4();
+		this._target0 = new Vector3();
 
 		//pointers array
 		this._button = - 1;
@@ -456,7 +457,7 @@ class ArcballControls extends Controls {
 		this._devPxRatio = window.devicePixelRatio;
 
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
-		this.domElement.addEventListener( 'wheel', this._onWheel );
+		this.domElement.addEventListener( 'wheel', this._onWheel, { passive: false } );
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.addEventListener( 'pointercancel', this._onPointerCancel );
 
@@ -1314,7 +1315,7 @@ class ArcballControls extends Controls {
 	 *
 	 * @param {'PAN'|'ROTATE'|'ZOOM'|'FOV'} operation - The operation to be performed ('PAN', 'ROTATE', 'ZOOM', 'FOV').
 	 * @param {0|1|2|'WHEEL'} mouse - A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.
-	 * @param {'CTRL'|'SHIFT'|null} [key=null] - The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.
+	 * @param {?('CTRL'|'SHIFT')} [key=null] - The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.
 	 * @returns {boolean} `true` if the mouse action has been successfully added, `false` otherwise.
 	 */
 	setMouseAction( operation, mouse, key = null ) {
@@ -1395,7 +1396,7 @@ class ArcballControls extends Controls {
 	 * Remove a mouse action by specifying its mouse/key combination.
 	 *
 	 * @param {0|1|2|'WHEEL'} mouse - A mouse button (0, 1, 2) or 'WHEEL' for wheel notches.
-	 * @param {'CTRL'|'SHIFT'|null} key - The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.
+	 * @param {?('CTRL'|'SHIFT')} key - The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed.
 	 * @returns {boolean} `true` if the operation has been successfully removed, `false` otherwise.
 	 */
 	unsetMouseAction( mouse, key = null ) {
@@ -1420,8 +1421,8 @@ class ArcballControls extends Controls {
 	 *
 	 * @private
 	 * @param {0|1|2|'WHEEL'} mouse - Mouse button index (0, 1, 2) or 'WHEEL' for wheel notches.
-	 * @param {'CTRL'|'SHIFT'|null} key - Keyboard modifier.
-	 * @returns {'PAN'|'ROTATE'|'ZOOM'|'FOV'|null} The operation if it has been found, `null` otherwise.
+	 * @param {?('CTRL'|'SHIFT')} key - Keyboard modifier.
+	 * @returns {?('PAN'|'ROTATE'|'ZOOM'|'FOV')} The operation if it has been found, `null` otherwise.
 	 */
 	getOpFromAction( mouse, key ) {
 
@@ -1462,7 +1463,7 @@ class ArcballControls extends Controls {
 	 *
 	 * @private
 	 * @param {0|1|2} mouse - Mouse button index (0, 1, 2)
-	 * @param {'CTRL'|'SHIFT'|null} key - Keyboard modifier
+	 * @param {?('CTRL'|'SHIFT')} key - Keyboard modifier
 	 * @returns {?STATE} The FSA state obtained from the operation associated to mouse/keyboard combination.
 	 */
 	getOpStateFromAction( mouse, key ) {
@@ -2229,6 +2230,7 @@ class ArcballControls extends Controls {
 	 */
 	reset() {
 
+		this.target.copy( this._target0 );
 		this.object.zoom = this._zoom0;
 
 		if ( this.object.isPerspectiveCamera ) {
@@ -2301,7 +2303,8 @@ class ArcballControls extends Controls {
 					cameraNear: this.object.near,
 					cameraUp: this.object.up,
 					cameraZoom: this.object.zoom,
-					gizmoMatrix: this._gizmos.matrix
+					gizmoMatrix: this._gizmos.matrix,
+					target: this.target
 
 				}
 			} );
@@ -2316,7 +2319,8 @@ class ArcballControls extends Controls {
 					cameraNear: this.object.near,
 					cameraUp: this.object.up,
 					cameraZoom: this.object.zoom,
-					gizmoMatrix: this._gizmos.matrix
+					gizmoMatrix: this._gizmos.matrix,
+					target: this.target
 
 				}
 			} );
@@ -2347,6 +2351,10 @@ class ArcballControls extends Controls {
 	 */
 	saveState() {
 
+		this.object.updateMatrix();
+		this._gizmos.updateMatrix();
+
+		this._target0.copy( this.target );
 		this._cameraMatrixState0.copy( this.object.matrix );
 		this._gizmoMatrixState0.copy( this._gizmos.matrix );
 		this._nearPos = this.object.near;
@@ -2501,8 +2509,8 @@ class ArcballControls extends Controls {
 	 * Sets values in transformation object.
 	 *
 	 * @private
-	 * @param {Matrix4} [camera=null] - Transformation to be applied to the camera.
-	 * @param {Matrix4} [gizmos=null] - Transformation to be applied to gizmos.
+	 * @param {?Matrix4} [camera=null] - Transformation to be applied to the camera.
+	 * @param {?Matrix4} [gizmos=null] - Transformation to be applied to gizmos.
 	 */
 	setTransformationMatrices( camera = null, gizmos = null ) {
 
@@ -2946,6 +2954,8 @@ class ArcballControls extends Controls {
 		const state = JSON.parse( json );
 
 		if ( state.arcballState != undefined ) {
+
+			this.target.fromArray( state.arcballState.target );
 
 			this._cameraMatrixState.fromArray( state.arcballState.cameraMatrix.elements );
 			this._cameraMatrixState.decompose( this.object.position, this.object.quaternion, this.object.scale );

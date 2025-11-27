@@ -3141,7 +3141,7 @@ class VRMLLoader extends Loader {
 
 				color.fromBufferAttribute( attribute, i );
 
-				ColorManagement.toWorkingColorSpace( color, SRGBColorSpace );
+				ColorManagement.colorSpaceToWorking( color, SRGBColorSpace );
 
 				attribute.setXYZ( i, color.r, color.g, color.b );
 
@@ -3248,7 +3248,7 @@ class VRMLLoader extends Loader {
 
 				color.copy( colorA ).lerp( colorB, t );
 
-				ColorManagement.toWorkingColorSpace( color, SRGBColorSpace );
+				ColorManagement.colorSpaceToWorking( color, SRGBColorSpace );
 
 				colorAttribute.setXYZ( index, color.r, color.g, color.b );
 

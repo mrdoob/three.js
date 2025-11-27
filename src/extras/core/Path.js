@@ -190,11 +190,11 @@ class Path extends CurvePath {
 	 * Adds an arc as an instance of {@link EllipseCurve} to the path, positioned relative
 	 * to the current point.
 	 *
-	 * @param {number} aX - The x coordinate of the center of the arc offsetted from the previous curve.
-	 * @param {number} aY - The y coordinate of the center of the arc offsetted from the previous curve.
-	 * @param {number} aRadius - The radius of the arc.
-	 * @param {number} aStartAngle - The start angle in radians.
-	 * @param {number} aEndAngle - The end angle in radians.
+	 * @param {number} [aX=0] - The x coordinate of the center of the arc offsetted from the previous curve.
+	 * @param {number} [aY=0] - The y coordinate of the center of the arc offsetted from the previous curve.
+	 * @param {number} [aRadius=1] - The radius of the arc.
+	 * @param {number} [aStartAngle=0] - The start angle in radians.
+	 * @param {number} [aEndAngle=Math.PI*2] - The end angle in radians.
 	 * @param {boolean} [aClockwise=false] - Whether to sweep the arc clockwise or not.
 	 * @return {Path} A reference to this path.
 	 */
@@ -213,11 +213,11 @@ class Path extends CurvePath {
 	/**
 	 * Adds an absolutely positioned arc as an instance of {@link EllipseCurve} to the path.
 	 *
-	 * @param {number} aX - The x coordinate of the center of the arc.
-	 * @param {number} aY - The y coordinate of the center of the arc.
-	 * @param {number} aRadius - The radius of the arc.
-	 * @param {number} aStartAngle - The start angle in radians.
-	 * @param {number} aEndAngle - The end angle in radians.
+	 * @param {number} [aX=0] - The x coordinate of the center of the arc.
+	 * @param {number} [aY=0] - The y coordinate of the center of the arc.
+	 * @param {number} [aRadius=1] - The radius of the arc.
+	 * @param {number} [aStartAngle=0] - The start angle in radians.
+	 * @param {number} [aEndAngle=Math.PI*2] - The end angle in radians.
 	 * @param {boolean} [aClockwise=false] - Whether to sweep the arc clockwise or not.
 	 * @return {Path} A reference to this path.
 	 */
@@ -233,12 +233,12 @@ class Path extends CurvePath {
 	 * Adds an ellipse as an instance of {@link EllipseCurve} to the path, positioned relative
 	 * to the current point
 	 *
-	 * @param {number} aX - The x coordinate of the center of the ellipse offsetted from the previous curve.
-	 * @param {number} aY - The y coordinate of the center of the ellipse offsetted from the previous curve.
-	 * @param {number} xRadius - The radius of the ellipse in the x axis.
-	 * @param {number} yRadius - The radius of the ellipse in the y axis.
-	 * @param {number} aStartAngle - The start angle in radians.
-	 * @param {number} aEndAngle - The end angle in radians.
+	 * @param {number} [aX=0] - The x coordinate of the center of the ellipse offsetted from the previous curve.
+	 * @param {number} [aY=0] - The y coordinate of the center of the ellipse offsetted from the previous curve.
+	 * @param {number} [xRadius=1] - The radius of the ellipse in the x axis.
+	 * @param {number} [yRadius=1] - The radius of the ellipse in the y axis.
+	 * @param {number} [aStartAngle=0] - The start angle in radians.
+	 * @param {number} [aEndAngle=Math.PI*2] - The end angle in radians.
 	 * @param {boolean} [aClockwise=false] - Whether to sweep the ellipse clockwise or not.
 	 * @param {number} [aRotation=0] - The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.
 	 * @return {Path} A reference to this path.
@@ -257,12 +257,12 @@ class Path extends CurvePath {
 	/**
 	 * Adds an absolutely positioned ellipse as an instance of {@link EllipseCurve} to the path.
 	 *
-	 * @param {number} aX - The x coordinate of the absolute center of the ellipse.
-	 * @param {number} aY - The y coordinate of the absolute center of the ellipse.
-	 * @param {number} xRadius - The radius of the ellipse in the x axis.
-	 * @param {number} yRadius - The radius of the ellipse in the y axis.
-	 * @param {number} aStartAngle - The start angle in radians.
-	 * @param {number} aEndAngle - The end angle in radians.
+	 * @param {number} [aX=0] - The x coordinate of the absolute center of the ellipse.
+	 * @param {number} [aY=0] - The y coordinate of the absolute center of the ellipse.
+	 * @param {number} [xRadius=1] - The radius of the ellipse in the x axis.
+	 * @param {number} [yRadius=1] - The radius of the ellipse in the y axis.
+	 * @param {number} [aStartAngle=0] - The start angle in radians.
+	 * @param {number} [aEndAngle=Math.PI*2] - The end angle in radians.
 	 * @param {boolean} [aClockwise=false] - Whether to sweep the ellipse clockwise or not.
 	 * @param {number} [aRotation=0] - The rotation angle of the ellipse in radians, counterclockwise from the positive X axis.
 	 * @return {Path} A reference to this path.

@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
+import { warn } from '../../utils.js';
 
 /**
  * Base class for representing shader attributes as nodes.
@@ -125,7 +126,7 @@ class AttributeNode extends Node {
 
 		} else {
 
-			console.warn( `AttributeNode: Vertex attribute "${ attributeName }" not found on geometry.` );
+			warn( `AttributeNode: Vertex attribute "${ attributeName }" not found on geometry.` );
 
 			return builder.generateConst( nodeType );
 
@@ -161,7 +162,7 @@ export default AttributeNode;
  * @tsl
  * @function
  * @param {string} name - The name of the attribute.
- * @param {string} [nodeType] - The node type.
+ * @param {?string} [nodeType=null] - The node type.
  * @returns {AttributeNode}
  */
-export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
+export const attribute = ( name, nodeType = null ) => nodeObject( new AttributeNode( name, nodeType ) );

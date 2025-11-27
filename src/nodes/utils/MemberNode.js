@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import { warn } from '../../utils.js';
 
 /**
  * Base class for representing member access on an object-like
@@ -15,21 +16,21 @@ class MemberNode extends Node {
 	}
 
 	/**
-	 * Constructs an array element node.
+	 * Constructs a member node.
 	 *
-	 * @param {Node} node - The array-like node.
+	 * @param {Node} structNode - The struct node.
 	 * @param {string} property - The property name.
 	 */
-	constructor( node, property ) {
+	constructor( structNode, property ) {
 
 		super();
 
 		/**
-		 * The array-like node.
+		 * The struct node.
 		 *
 		 * @type {Node}
 		 */
-		this.node = node;
+		this.structNode = structNode;
 
 		/**
 		 * The property name.
@@ -49,15 +50,66 @@ class MemberNode extends Node {
 
 	}
 
+	hasMember( builder ) {
+
+		if ( this.structNode.isMemberNode ) {
+
+			if ( this.structNode.hasMember( builder ) === false ) {
+
+				return false;
+
+			}
+
+		}
+
+		return this.structNode.getMemberType( builder, this.property ) !== 'void';
+
+	}
+
 	getNodeType( builder ) {
 
-		return this.node.getMemberType( builder, this.property );
+		if ( this.hasMember( builder ) === false ) {
+
+			// default type if member does not exist
+
+			return 'float';
+
+		}
+
+		return this.structNode.getMemberType( builder, this.property );
+
+	}
+
+	getMemberType( builder, name ) {
+
+		if ( this.hasMember( builder ) === false ) {
+
+			// default type if member does not exist
+
+			return 'float';
+
+		}
+
+		const type = this.getNodeType( builder );
+		const struct = builder.getStructTypeNode( type );
+
+		return struct.getMemberType( builder, name );
 
 	}
 
 	generate( builder ) {
 
-		const propertyName = this.node.build( builder );
+		if ( this.hasMember( builder ) === false ) {
+
+			warn( `TSL: Member "${ this.property }" does not exist in struct.` );
+
+			const type = this.getNodeType( builder );
+
+			return builder.generateConst( type );
+
+		}
+
+		const propertyName = this.structNode.build( builder );
 
 		return propertyName + '.' + this.property;
 

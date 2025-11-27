@@ -4,13 +4,20 @@
 		<title>three.js webgpu - mrt mask</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - mrt mask
-			<br>The mask is applied followed by a gaussian blur only on some selected materials.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>MRT Mask</span>
+			</div>
+
+			<small>
+				The mask is applied followed by a gaussian blur only on some selected materials.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -26,7 +33,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { color, screenUV, mrt, output, pass, vec4 } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
@@ -132,7 +139,7 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputColorTransform = false;
-				postProcessing.outputNode = colorPass.add( gaussianBlur( maskPass, 1, 10 ).mul( .3 ) ).renderOutput();
+				postProcessing.outputNode = colorPass.add( gaussianBlur( maskPass, 1, 20 ).mul( .3 ) ).renderOutput();
 
 				// controls
 

@@ -2,7 +2,7 @@ import { DoubleSide, FloatType, HalfFloatType, Mesh, MeshBasicMaterial, MeshPhon
 import { potpack } from '../libs/potpack.module.js';
 
 /**
- * Progressive Light Map Accumulator, by [zalo]{@link https://github.com/zalo/}.
+ * Progressive Light Map Accumulator, by [zalo](https://github.com/zalo/).
  *
  * To use, simply construct a `ProgressiveLightMap` object,
  * `plmap.addObjectsToLightMap(object)` an array of semi-static
@@ -120,6 +120,12 @@ class ProgressiveLightMap {
 			if ( object.geometry.hasAttribute( 'uv' ) === false ) {
 
 				console.warn( 'THREE.ProgressiveLightMap: All lightmap objects need uvs.' ); continue;
+
+			}
+
+			if ( object.geometry.hasAttribute( 'normal' ) === false ) {
+
+				console.warn( 'THREE.ProgressiveLightMap: All lightmap objects need normals.' ); continue;
 
 			}
 
@@ -280,9 +286,9 @@ class ProgressiveLightMap {
 	 *
 	 * @private
 	 * @param {number} res - The square resolution of this object's lightMap.
-	 * @param {WebGLRenderTarget} [lightMap] - The lightmap to initialize the plane with.
+	 * @param {WebGLRenderTarget} lightMap - The lightmap to initialize the plane with.
 	 */
-	_initializeBlurPlane( res, lightMap = null ) {
+	_initializeBlurPlane( res, lightMap ) {
 
 		const blurMaterial = new MeshBasicMaterial();
 		blurMaterial.uniforms = { previousShadowMap: { value: null },

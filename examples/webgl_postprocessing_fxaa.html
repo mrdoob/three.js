@@ -48,9 +48,8 @@
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+			import { FXAAPass } from 'three/addons/postprocessing/FXAAPass.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer, controls, container;
@@ -83,23 +82,27 @@
 				const geometry = new THREE.TetrahedronGeometry( 10 );
 				const material = new THREE.MeshStandardMaterial( { color: 0xf73232, flatShading: true } );
 
+				const mesh = new THREE.InstancedMesh( geometry, material, 100 );
+				const dummy = new THREE.Object3D();
+
 				for ( let i = 0; i < 100; i ++ ) {
 
-					const mesh = new THREE.Mesh( geometry, material );
+					dummy.position.x = Math.random() * 500 - 250;
+					dummy.position.y = Math.random() * 500 - 250;
+					dummy.position.z = Math.random() * 500 - 250;
 
-					mesh.position.x = Math.random() * 500 - 250;
-					mesh.position.y = Math.random() * 500 - 250;
-					mesh.position.z = Math.random() * 500 - 250;
+					dummy.scale.setScalar( Math.random() * 2 + 1 );
 
-					mesh.scale.setScalar( Math.random() * 2 + 1 );
+					dummy.rotation.x = Math.random() * Math.PI;
+					dummy.rotation.y = Math.random() * Math.PI;
+					dummy.rotation.z = Math.random() * Math.PI;
 
-					mesh.rotation.x = Math.random() * Math.PI;
-					mesh.rotation.y = Math.random() * Math.PI;
-					mesh.rotation.z = Math.random() * Math.PI;
-
-					scene.add( mesh );
+					dummy.updateMatrix();
+					mesh.setMatrixAt( i, dummy.matrix );
 
 				}
+
+				scene.add( mesh );
 
 				//
 
@@ -119,7 +122,7 @@
 
 				//
 
-				fxaaPass = new ShaderPass( FXAAShader );
+				fxaaPass = new FXAAPass();
 
 				const outputPass = new OutputPass();
 
@@ -128,11 +131,6 @@
 				composer1.addPass( outputPass );
 
 				//
-
-				const pixelRatio = renderer.getPixelRatio();
-
-				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
-				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
 				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
@@ -156,11 +154,6 @@
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
 				composer1.setSize( container.offsetWidth, container.offsetHeight );
 				composer2.setSize( container.offsetWidth, container.offsetHeight );
-
-				const pixelRatio = renderer.getPixelRatio();
-
-				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
-				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
 			}
 

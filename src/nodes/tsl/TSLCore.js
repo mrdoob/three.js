@@ -8,16 +8,19 @@ import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
 import MemberNode from '../utils/MemberNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
+import { warn, error } from '../../utils.js';
 
 let currentStack = null;
 
 const NodeElements = new Map();
 
+// Extend Node Class for TSL using prototype
+
 export function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
 
-		console.warn( `THREE.TSL: Redefinition of method chaining '${ name }'.` );
+		warn( `TSL: Redefinition of method chaining '${ name }'.` );
 		return;
 
 	}
@@ -26,128 +29,265 @@ export function addMethodChaining( name, nodeElement ) {
 
 	NodeElements.set( name, nodeElement );
 
+	if ( name !== 'assign' ) {
+
+		// Changing Node prototype to add method chaining
+
+		Node.prototype[ name ] = function ( ...params ) {
+
+			//if ( name === 'toVarIntent' ) return this;
+
+			return this.isStackNode ? this.addToStack( nodeElement( ...params ) ) : nodeElement( this, ...params );
+
+		};
+
+		// Adding assign method chaining
+
+		Node.prototype[ name + 'Assign' ] = function ( ...params ) {
+
+			return this.isStackNode ? this.assign( params[ 0 ], nodeElement( ...params ) ) : this.assign( nodeElement( this, ...params ) );
+
+		};
+
+	}
+
 }
 
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
 const parseSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
 
-const shaderNodeHandler = {
+Node.prototype.assign = function ( ...params ) {
 
-	setup( NodeClosure, params ) {
+	if ( this.isStackNode !== true ) {
 
-		const inputs = params.shift();
+		if ( currentStack !== null ) {
 
-		return NodeClosure( nodeObjects( inputs ), ...params );
+			currentStack.assign( this, ...params );
 
-	},
+		} else {
 
-	get( node, prop, nodeObj ) {
-
-		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
-
-			if ( node.isStackNode !== true && prop === 'assign' ) {
-
-				return ( ...params ) => {
-
-					currentStack.assign( nodeObj, ...params );
-
-					return nodeObj;
-
-				};
-
-			} else if ( NodeElements.has( prop ) ) {
-
-				const nodeElement = NodeElements.get( prop );
-
-				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
-
-			} else if ( prop === 'self' ) {
-
-				return node;
-
-			} else if ( prop.endsWith( 'Assign' ) && NodeElements.has( prop.slice( 0, prop.length - 'Assign'.length ) ) ) {
-
-				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
-
-				return node.isStackNode ? ( ...params ) => nodeObj.assign( params[ 0 ], nodeElement( ...params ) ) : ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
-
-			} else if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
-
-				// accessing properties ( swizzle )
-
-				prop = parseSwizzle( prop );
-
-				return nodeObject( new SplitNode( nodeObj, prop ) );
-
-			} else if ( /^set[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
-
-				// set properties ( swizzle ) and sort to xyzw sequence
-
-				prop = parseSwizzleAndSort( prop.slice( 3 ).toLowerCase() );
-
-				return ( value ) => nodeObject( new SetNode( node, prop, value ) );
-
-			} else if ( /^flip[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
-
-				// set properties ( swizzle ) and sort to xyzw sequence
-
-				prop = parseSwizzleAndSort( prop.slice( 4 ).toLowerCase() );
-
-				return () => nodeObject( new FlipNode( nodeObject( node ), prop ) );
-
-			} else if ( prop === 'width' || prop === 'height' || prop === 'depth' ) {
-
-				// accessing property
-
-				if ( prop === 'width' ) prop = 'x';
-				else if ( prop === 'height' ) prop = 'y';
-				else if ( prop === 'depth' ) prop = 'z';
-
-				return nodeObject( new SplitNode( node, prop ) );
-
-			} else if ( /^\d+$/.test( prop ) === true ) {
-
-				// accessing array
-
-				return nodeObject( new ArrayElementNode( nodeObj, new ConstNode( Number( prop ), 'uint' ) ) );
-
-			} else if ( /^get$/.test( prop ) === true ) {
-
-				// accessing properties
-
-				return ( value ) => nodeObject( new MemberNode( nodeObj, value ) );
-
-			}
+			error( 'TSL: No stack defined for assign operation. Make sure the assign is inside a Fn().' );
 
 		}
 
-		return Reflect.get( node, prop, nodeObj );
+		return this;
 
-	},
+	} else {
 
-	set( node, prop, value, nodeObj ) {
+		const nodeElement = NodeElements.get( 'assign' );
 
-		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
-
-			// setting properties
-
-			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || prop === 'depth' || /^\d+$/.test( prop ) === true ) {
-
-				nodeObj[ prop ].assign( value );
-
-				return true;
-
-			}
-
-		}
-
-		return Reflect.set( node, prop, value, nodeObj );
+		return this.addToStack( nodeElement( ...params ) );
 
 	}
 
 };
 
-const nodeObjectsCacheMap = new WeakMap();
+Node.prototype.toVarIntent = function () {
+
+	return this;
+
+};
+
+Node.prototype.get = function ( value ) {
+
+	return new MemberNode( this, value );
+
+};
+
+// Cache prototype for TSL
+
+const proto = {};
+
+// Set swizzle properties for xyzw, rgba, and stpq.
+
+function setProtoSwizzle( property, altA, altB ) {
+
+	// swizzle properties
+
+	proto[ property ] = proto[ altA ] = proto[ altB ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let split = this._cache[ property ];
+
+			if ( split === undefined ) {
+
+				split = new SplitNode( this, property );
+
+				this._cache[ property ] = split;
+
+			}
+
+			return split;
+
+		},
+
+		set( value ) {
+
+			this[ property ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+	// set properties ( swizzle ) and sort to xyzw sequence
+
+	const propUpper = property.toUpperCase();
+	const altAUpper = altA.toUpperCase();
+	const altBUpper = altB.toUpperCase();
+
+	// Set methods for swizzle properties
+
+	Node.prototype[ 'set' + propUpper ] = Node.prototype[ 'set' + altAUpper ] = Node.prototype[ 'set' + altBUpper ] = function ( value ) {
+
+		const swizzle = parseSwizzleAndSort( property );
+
+		return new SetNode( this, swizzle, nodeObject( value ) );
+
+	};
+
+	// Set methods for flip properties
+
+	Node.prototype[ 'flip' + propUpper ] = Node.prototype[ 'flip' + altAUpper ] = Node.prototype[ 'flip' + altBUpper ] = function () {
+
+		const swizzle = parseSwizzleAndSort( property );
+
+		return new FlipNode( this, swizzle );
+
+	};
+
+}
+
+const swizzleA = [ 'x', 'y', 'z', 'w' ];
+const swizzleB = [ 'r', 'g', 'b', 'a' ];
+const swizzleC = [ 's', 't', 'p', 'q' ];
+
+for ( let a = 0; a < 4; a ++ ) {
+
+	let prop = swizzleA[ a ];
+	let altA = swizzleB[ a ];
+	let altB = swizzleC[ a ];
+
+	setProtoSwizzle( prop, altA, altB );
+
+	for ( let b = 0; b < 4; b ++ ) {
+
+		prop = swizzleA[ a ] + swizzleA[ b ];
+		altA = swizzleB[ a ] + swizzleB[ b ];
+		altB = swizzleC[ a ] + swizzleC[ b ];
+
+		setProtoSwizzle( prop, altA, altB );
+
+		for ( let c = 0; c < 4; c ++ ) {
+
+			prop = swizzleA[ a ] + swizzleA[ b ] + swizzleA[ c ];
+			altA = swizzleB[ a ] + swizzleB[ b ] + swizzleB[ c ];
+			altB = swizzleC[ a ] + swizzleC[ b ] + swizzleC[ c ];
+
+			setProtoSwizzle( prop, altA, altB );
+
+			for ( let d = 0; d < 4; d ++ ) {
+
+				prop = swizzleA[ a ] + swizzleA[ b ] + swizzleA[ c ] + swizzleA[ d ];
+				altA = swizzleB[ a ] + swizzleB[ b ] + swizzleB[ c ] + swizzleB[ d ];
+				altB = swizzleC[ a ] + swizzleC[ b ] + swizzleC[ c ] + swizzleC[ d ];
+
+				setProtoSwizzle( prop, altA, altB );
+
+			}
+
+		}
+
+	}
+
+}
+
+// Set/get static properties for array elements (0-31).
+
+for ( let i = 0; i < 32; i ++ ) {
+
+	proto[ i ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let element = this._cache[ i ];
+
+			if ( element === undefined ) {
+
+				element = new ArrayElementNode( this, new ConstNode( i, 'uint' ) );
+
+				this._cache[ i ] = element;
+
+			}
+
+			return element;
+
+		},
+
+		set( value ) {
+
+			this[ i ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+}
+
+/*
+// Set properties for width, height, and depth.
+
+function setProtoProperty( property, target ) {
+
+	proto[ property ] = {
+
+		get() {
+
+			this._cache = this._cache || {};
+
+			//
+
+			let split = this._cache[ target ];
+
+			if ( split === undefined ) {
+
+				split = new SplitNode( this, target );
+
+				this._cache[ target ] = split;
+
+			}
+
+			return split;
+
+		},
+
+		set( value ) {
+
+			this[ target ].assign( nodeObject( value ) );
+
+		}
+
+	};
+
+}
+
+setProtoProperty( 'width', 'x' );
+setProtoProperty( 'height', 'y' );
+setProtoProperty( 'depth', 'z' );
+*/
+
+Object.defineProperties( Node.prototype, proto );
+
+// --- FINISH ---
+
 const nodeBuilderFunctionsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj, altType = null ) {
@@ -156,18 +296,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	if ( type === 'node' ) {
 
-		let nodeObject = nodeObjectsCacheMap.get( obj );
-
-		if ( nodeObject === undefined ) {
-
-			nodeObject = new Proxy( obj, shaderNodeHandler );
-
-			nodeObjectsCacheMap.set( obj, nodeObject );
-			nodeObjectsCacheMap.set( nodeObject, nodeObject );
-
-		}
-
-		return nodeObject;
+		return obj;
 
 	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
@@ -175,7 +304,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( type === 'shader' ) {
 
-		return Fn( obj );
+		return obj.isFn ? obj : Fn( obj );
 
 	}
 
@@ -211,7 +340,28 @@ const ShaderNodeArray = function ( array, altType = null ) {
 
 const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, settings = null ) {
 
-	const assignNode = ( node ) => nodeObject( settings !== null ? Object.assign( node, settings ) : node );
+	function assignNode( node ) {
+
+		if ( settings !== null ) {
+
+			node = nodeObject( Object.assign( node, settings ) );
+
+			if ( settings.intent === true ) {
+
+				node = node.toVarIntent();
+
+			}
+
+		} else {
+
+			node = nodeObject( node );
+
+		}
+
+		return node;
+
+
+	}
 
 	let fn, name = scope, minParams, maxParams;
 
@@ -224,13 +374,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( minParams !== undefined && params.length < minParams ) {
 
-			console.error( `THREE.TSL: "${ tslName }" parameter length is less than minimum required.` );
+			error( `TSL: "${ tslName }" parameter length is less than minimum required.` );
 
 			return params.concat( new Array( minParams - params.length ).fill( 0 ) );
 
 		} else if ( maxParams !== undefined && params.length > maxParams ) {
 
-			console.error( `THREE.TSL: "${ tslName }" parameter length exceeds limit.` );
+			error( `TSL: "${ tslName }" parameter length exceeds limit.` );
 
 			return params.slice( 0, maxParams );
 
@@ -297,18 +447,26 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 class ShaderCallNodeInternal extends Node {
 
-	constructor( shaderNode, inputNodes ) {
+	constructor( shaderNode, rawInputs ) {
 
 		super();
 
 		this.shaderNode = shaderNode;
-		this.inputNodes = inputNodes;
+		this.rawInputs = rawInputs;
+
+		this.isShaderCallNodeInternal = true;
 
 	}
 
 	getNodeType( builder ) {
 
 		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
+
+	}
+
+	getElementType( builder ) {
+
+		return this.getOutputNode( builder ).getElementType( builder );
 
 	}
 
@@ -320,12 +478,26 @@ class ShaderCallNodeInternal extends Node {
 
 	call( builder ) {
 
-		const { shaderNode, inputNodes } = this;
+		const { shaderNode, rawInputs } = this;
 
 		const properties = builder.getNodeProperties( shaderNode );
-		if ( properties.onceOutput ) return properties.onceOutput;
+
+		const subBuild = builder.getClosestSubBuild( shaderNode.subBuilds ) || '';
+		const subBuildProperty = subBuild || 'default';
+
+		if ( properties[ subBuildProperty ] ) {
+
+			return properties[ subBuildProperty ];
+
+		}
 
 		//
+
+		const previousSubBuildFn = builder.subBuildFn;
+		const previousFnCall = builder.fnCall;
+
+		builder.subBuildFn = subBuild;
+		builder.fnCall = this;
 
 		let result = null;
 
@@ -353,44 +525,63 @@ class ShaderCallNodeInternal extends Node {
 
 			builder.addInclude( functionNode );
 
-			result = nodeObject( functionNode.call( inputNodes ) );
+			//
+
+			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
+
+			result = nodeObject( functionNode.call( inputs ) );
 
 		} else {
 
+			const secureNodeBuilder = new Proxy( builder, {
+
+				get: ( target, property, receiver ) => {
+
+					let value;
+
+					if ( Symbol.iterator === property ) {
+
+						value = function* () {
+
+							yield undefined;
+
+						};
+
+					} else {
+
+						value = Reflect.get( target, property, receiver );
+
+					}
+
+					return value;
+
+				}
+
+			} );
+
+			//
+
+			const inputs = rawInputs ? getProxyParameters( rawInputs ) : null;
+
+			const hasParameters = Array.isArray( rawInputs ) ? rawInputs.length > 0 : rawInputs !== null;
+
 			const jsFunc = shaderNode.jsFunc;
-			const outputNode = inputNodes !== null || jsFunc.length > 1 ? jsFunc( inputNodes || [], builder ) : jsFunc( builder );
+			const outputNode = hasParameters || jsFunc.length > 1 ? jsFunc( inputs, secureNodeBuilder ) : jsFunc( secureNodeBuilder );
 
 			result = nodeObject( outputNode );
 
 		}
 
+		builder.subBuildFn = previousSubBuildFn;
+		builder.fnCall = previousFnCall;
+
 		if ( shaderNode.once ) {
 
-			properties.onceOutput = result;
+			properties[ subBuildProperty ] = result;
 
 		}
 
 		return result;
-
-	}
-
-	getOutputNode( builder ) {
-
-		const properties = builder.getNodeProperties( this );
-
-		if ( properties.outputNode === null ) {
-
-			properties.outputNode = this.setupOutput( builder );
-
-		}
-
-		return properties.outputNode;
-
-	}
-
-	setup( builder ) {
-
-		return this.getOutputNode( builder );
 
 	}
 
@@ -404,13 +595,188 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	generate( builder, output ) {
+	getOutputNode( builder ) {
 
-		const outputNode = this.getOutputNode( builder );
+		const properties = builder.getNodeProperties( this );
+		const subBuildOutput = builder.getSubBuildOutput( this );
 
-		return outputNode.build( builder, output );
+		properties[ subBuildOutput ] = properties[ subBuildOutput ] || this.setupOutput( builder );
+		properties[ subBuildOutput ].subBuild = builder.getClosestSubBuild( this );
+
+		return properties[ subBuildOutput ];
 
 	}
+
+	build( builder, output = null ) {
+
+		let result = null;
+
+		const buildStage = builder.getBuildStage();
+		const properties = builder.getNodeProperties( this );
+
+		const subBuildOutput = builder.getSubBuildOutput( this );
+		const outputNode = this.getOutputNode( builder );
+
+		const previousFnCall = builder.fnCall;
+
+		builder.fnCall = this;
+
+		if ( buildStage === 'setup' ) {
+
+			const subBuildInitialized = builder.getSubBuildProperty( 'initialized', this );
+
+			if ( properties[ subBuildInitialized ] !== true ) {
+
+				properties[ subBuildInitialized ] = true;
+
+				properties[ subBuildOutput ] = this.getOutputNode( builder );
+				properties[ subBuildOutput ].build( builder );
+
+				// If the shaderNode has subBuilds, add them to the chaining nodes
+				// so they can be built later in the build process.
+
+				if ( this.shaderNode.subBuilds ) {
+
+					for ( const node of builder.chaining ) {
+
+						const nodeData = builder.getDataFromNode( node, 'any' );
+						nodeData.subBuilds = nodeData.subBuilds || new Set();
+
+						for ( const subBuild of this.shaderNode.subBuilds ) {
+
+							nodeData.subBuilds.add( subBuild );
+
+						}
+
+						//builder.getDataFromNode( node ).subBuilds = nodeData.subBuilds;
+
+					}
+
+				}
+
+			}
+
+			result = properties[ subBuildOutput ];
+
+		} else if ( buildStage === 'analyze' ) {
+
+			outputNode.build( builder, output );
+
+		} else if ( buildStage === 'generate' ) {
+
+			result = outputNode.build( builder, output ) || '';
+
+		}
+
+		builder.fnCall = previousFnCall;
+
+		return result;
+
+	}
+
+}
+
+function getLayoutParameters( params ) {
+
+	let output;
+
+	nodeObjects( params );
+
+	const isArrayAsParameter = params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
+
+	if ( isArrayAsParameter ) {
+
+		output = [ ...params ];
+
+	} else {
+
+		output = params[ 0 ];
+
+	}
+
+	return output;
+
+}
+
+function getProxyParameters( params ) {
+
+	let index = 0;
+
+	nodeObjects( params );
+
+	return new Proxy( params, {
+
+		get: ( target, property, receiver ) => {
+
+			let value;
+
+			if ( property === 'length' ) {
+
+				value = params.length;
+
+				return value;
+
+			}
+
+			if ( Symbol.iterator === property ) {
+
+				value = function* () {
+
+					for ( const inputNode of params ) {
+
+						yield nodeObject( inputNode );
+
+					}
+
+				};
+
+			} else {
+
+				if ( params.length > 0 ) {
+
+					if ( Object.getPrototypeOf( params[ 0 ] ) === Object.prototype ) {
+
+						const objectTarget = params[ 0 ];
+
+						if ( objectTarget[ property ] === undefined ) {
+
+							value = objectTarget[ index ++ ];
+
+						} else {
+
+							value = Reflect.get( objectTarget, property, receiver );
+
+						}
+
+					} else if ( params[ 0 ] instanceof Node ) {
+
+						if ( params[ property ] === undefined ) {
+
+							value = params[ index ++ ];
+
+						} else {
+
+							value = Reflect.get( params, property, receiver );
+
+						}
+
+					}
+
+				} else {
+
+					value = Reflect.get( target, property, receiver );
+
+				}
+
+				value = nodeObject( value );
+
+			}
+
+			return value;
+
+		}
+
+	} );
 
 }
 
@@ -437,11 +803,15 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	call( inputs = null ) {
+	getLayout() {
 
-		nodeObjects( inputs );
+		return this.layout;
 
-		return nodeObject( new ShaderCallNodeInternal( this, inputs ) );
+	}
+
+	call( rawInputs = null ) {
+
+		return new ShaderCallNodeInternal( this, rawInputs );
 
 	}
 
@@ -493,25 +863,29 @@ const getConstNode = ( value, type ) => {
 
 };
 
-const safeGetNodeType = ( node ) => {
-
-	try {
-
-		return node.getNodeType();
-
-	} catch ( _ ) {
-
-		return undefined;
-
-	}
-
-};
-
 const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
-		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => typeof param !== 'object' ) ) ) {
+		for ( const param of params ) {
+
+			if ( param === undefined ) {
+
+				error( `TSL: Invalid parameter for the type "${ type }".` );
+
+				return nodeObject( new ConstNode( 0, type ) );
+
+			}
+
+		}
+
+		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => {
+
+			const paramType = typeof param;
+
+			return paramType !== 'object' && paramType !== 'function';
+
+		} ) ) ) {
 
 			params = [ getValueFromType( type, ...params ) ];
 
@@ -519,20 +893,20 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-			return nodeObject( cacheMap.get( params[ 0 ] ) );
+			return nodeObjectIntent( cacheMap.get( params[ 0 ] ) );
 
 		}
 
 		if ( params.length === 1 ) {
 
 			const node = getConstNode( params[ 0 ], type );
-			if ( safeGetNodeType( node ) === type ) return nodeObject( node );
-			return nodeObject( new ConvertNode( node, type ) );
+			if ( node.nodeType === type ) return nodeObjectIntent( node );
+			return nodeObjectIntent( new ConvertNode( node, type ) );
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return nodeObject( new JoinNode( nodes, type ) );
+		return nodeObjectIntent( new JoinNode( nodes, type ) );
 
 	};
 
@@ -550,87 +924,67 @@ export const getConstNodeType = ( value ) => ( value !== undefined && value !== 
 
 export function ShaderNode( jsFunc, nodeType ) {
 
-	return new Proxy( new ShaderNodeInternal( jsFunc, nodeType ), shaderNodeHandler );
+	return new ShaderNodeInternal( jsFunc, nodeType );
 
 }
 
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
+export const nodeObjectIntent = ( val, altType = null ) => /* new */ nodeObject( val, altType ).toVarIntent();
 export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
-export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
-export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
+export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
+export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
+export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, intent: true } );
 
 let fnId = 0;
 
-export const Fn = ( jsFunc, layout = null ) => {
+class FnNode extends Node {
 
-	let nodeType = null;
+	constructor( jsFunc, layout = null ) {
 
-	if ( layout !== null ) {
+		super();
 
-		if ( typeof layout === 'object' ) {
+		let nodeType = null;
 
-			nodeType = layout.return;
+		if ( layout !== null ) {
 
-		} else {
+			if ( typeof layout === 'object' ) {
 
-			if ( typeof layout === 'string' ) {
-
-				nodeType = layout;
+				nodeType = layout.return;
 
 			} else {
 
-				console.error( 'THREE.TSL: Invalid layout type.' );
+				if ( typeof layout === 'string' ) {
+
+					nodeType = layout;
+
+				} else {
+
+					error( 'TSL: Invalid layout type.' );
+
+				}
+
+				layout = null;
 
 			}
 
-			layout = null;
+		}
+
+		this.shaderNode = new ShaderNode( jsFunc, nodeType );
+
+		if ( layout !== null ) {
+
+			this.setLayout( layout );
 
 		}
+
+		this.isFn = true;
 
 	}
 
-	const shaderNode = new ShaderNode( jsFunc, nodeType );
+	setLayout( layout ) {
 
-	const fn = ( ...params ) => {
-
-		let inputs;
-
-		nodeObjects( params );
-
-		if ( params[ 0 ] && params[ 0 ].isNode ) {
-
-			inputs = [ ...params ];
-
-		} else {
-
-			inputs = params[ 0 ];
-
-		}
-
-		return shaderNode.call( inputs );
-
-	};
-
-	fn.shaderNode = shaderNode;
-
-	fn.setLayout = ( layout ) => {
-
-		shaderNode.setLayout( layout );
-
-		return fn;
-
-	};
-
-	fn.once = () => {
-
-		shaderNode.once = true;
-
-		return fn;
-
-	};
-
-	if ( layout !== null ) {
+		const nodeType = this.shaderNode.nodeType;
 
 		if ( typeof layout.inputs !== 'object' ) {
 
@@ -655,38 +1009,76 @@ export const Fn = ( jsFunc, layout = null ) => {
 
 		}
 
-		fn.setLayout( layout );
+		this.shaderNode.setLayout( layout );
+
+		return this;
 
 	}
 
-	return fn;
+	getNodeType( builder ) {
 
-};
+		return this.shaderNode.getNodeType( builder ) || 'float';
 
-/**
- * @tsl
- * @function
- * @deprecated since r168. Use {@link Fn} instead.
- *
- * @param {...any} params
- * @returns {Function}
- */
-export const tslFn = ( ...params ) => { // @deprecated, r168
+	}
 
-	console.warn( 'THREE.TSL: tslFn() has been renamed to Fn().' );
-	return Fn( ...params );
+	call( ...params ) {
 
-};
+		const fnCall = this.shaderNode.call( params );
 
-//
+		if ( this.shaderNode.nodeType === 'void' ) fnCall.toStack();
 
-addMethodChaining( 'toGlobal', ( node ) => {
+		return fnCall.toVarIntent();
 
-	node.global = true;
+	}
 
-	return node;
+	once( subBuilds = null ) {
 
-} );
+		this.shaderNode.once = true;
+		this.shaderNode.subBuilds = subBuilds;
+
+		return this;
+
+	}
+
+	generate( builder ) {
+
+		const type = this.getNodeType( builder );
+
+		error( 'TSL: "Fn()" was declared but not invoked. Try calling it like "Fn()( ...params )".' );
+
+		return builder.generateConst( type );
+
+	}
+
+}
+
+export function Fn( jsFunc, layout = null ) {
+
+	const instance = new FnNode( jsFunc, layout );
+
+	return new Proxy( () => {}, {
+
+		apply( target, thisArg, params ) {
+
+			return instance.call( ...params );
+
+		},
+
+		get( target, prop, receiver ) {
+
+			return Reflect.get( instance, prop, receiver );
+
+		},
+
+		set( target, prop, value, receiver ) {
+
+			return Reflect.set( instance, prop, value, receiver );
+
+		}
+
+	} );
+
+}
 
 //
 
@@ -704,17 +1096,52 @@ export const setCurrentStack = ( stack ) => {
 
 export const getCurrentStack = () => currentStack;
 
+/**
+ * Represent a conditional node using if/else statements.
+ *
+ * ```js
+ * If( condition, function )
+ * 	.ElseIf( condition, function )
+ * 	.Else( function )
+ * ```
+ * @tsl
+ * @function
+ * @param {...any} params - The parameters for the conditional node.
+ * @returns {StackNode} The conditional node.
+ */
 export const If = ( ...params ) => currentStack.If( ...params );
 
-export function append( node ) {
+/**
+ * Represent a conditional node using switch/case statements.
+ *
+ * ```js
+ * Switch( value )
+ * 	.Case( 1, function )
+ * 	.Case( 2, 3, 4, function )
+ * 	.Default( function )
+ * ```
+ * @tsl
+ * @function
+ * @param {...any} params - The parameters for the conditional node.
+ * @returns {StackNode} The conditional node.
+ */
+export const Switch = ( ...params ) => currentStack.Switch( ...params );
 
-	if ( currentStack ) currentStack.add( node );
+/**
+ * Add the given node to the current stack.
+ *
+ * @param {Node} node - The node to add.
+ * @returns {Node} The node that was added to the stack.
+ */
+export function Stack( node ) {
+
+	if ( currentStack ) currentStack.addToStack( node );
 
 	return node;
 
 }
 
-addMethodChaining( 'append', append );
+addMethodChaining( 'toStack', Stack );
 
 // types
 
@@ -776,3 +1203,27 @@ export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject
 
 addMethodChaining( 'element', element );
 addMethodChaining( 'convert', convert );
+
+// deprecated
+
+/**
+ * @tsl
+ * @function
+ * @deprecated since r176. Use {@link Stack} instead.
+ *
+ * @param {Node} node - The node to add.
+ * @returns {Function}
+ */
+export const append = ( node ) => { // @deprecated, r176
+
+	warn( 'TSL: append() has been renamed to Stack().' );
+	return Stack( node );
+
+};
+
+addMethodChaining( 'append', ( node ) => { // @deprecated, r176
+
+	warn( 'TSL: .append() has been renamed to .toStack().' );
+	return Stack( node );
+
+} );

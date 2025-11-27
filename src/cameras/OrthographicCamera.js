@@ -1,7 +1,7 @@
 import { Camera } from './Camera.js';
 
 /**
- * Camera that uses [orthographic projection]{@link https://en.wikipedia.org/wiki/Orthographic_projection}.
+ * Camera that uses [orthographic projection](https://en.wikipedia.org/wiki/Orthographic_projection).
  *
  * In this projection mode, an object's size in the rendered image stays
  * constant regardless of its distance from the camera. This can be useful
@@ -216,7 +216,7 @@ class OrthographicCamera extends Camera {
 
 		}
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem );
+		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem, this.reversedDepth );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 

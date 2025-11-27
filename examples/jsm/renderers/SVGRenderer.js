@@ -8,12 +8,13 @@ import {
 	SRGBColorSpace,
 	Vector3
 } from 'three';
+
 import {
 	Projector,
 	RenderableFace,
 	RenderableLine,
 	RenderableSprite
-} from '../renderers/Projector.js';
+} from './Projector.js';
 
 /**
  * Can be used to wrap SVG elements into a 3D object.
@@ -87,6 +88,8 @@ class SVGRenderer {
 
 			_svgNode,
 			_pathCount = 0,
+			_svgObjectCount = 0,
+			_renderListCount = 0,
 
 			_precision = null,
 			_quality = 1,
@@ -113,6 +116,8 @@ class SVGRenderer {
 			_viewProjectionMatrix = new Matrix4(),
 
 			_svgPathPool = [],
+			_svgObjectsPool = [],
+			_renderListPool = [],
 
 			_projector = new Projector(),
 			_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
@@ -120,7 +125,7 @@ class SVGRenderer {
 		/**
 		 * The DOM where the renderer appends its child-elements.
 		 *
-		 * @type {DOMElement}
+		 * @type {SVGSVGElement}
 		 */
 		this.domElement = _svg;
 
@@ -275,6 +280,49 @@ class SVGRenderer {
 
 		}
 
+		function renderSort( a, b ) {
+
+			const aOrder = a.data.renderOrder !== undefined ? a.data.renderOrder : 0;
+			const bOrder = b.data.renderOrder !== undefined ? b.data.renderOrder : 0;
+
+			if ( aOrder !== bOrder ) {
+
+				return aOrder - bOrder;
+
+			} else {
+
+				const aZ = a.data.z !== undefined ? a.data.z : 0;
+				const bZ = b.data.z !== undefined ? b.data.z : 0;
+
+				return bZ - aZ; // Painter's algorithm: far to near
+
+			}
+
+		}
+
+		function arraySortStable( array, start, length ) {
+
+			// A stable insertion sort for sorting the render list
+			// This avoids the GC overhead of Array.prototype.sort()
+
+			for ( let i = start + 1; i < start + length; i ++ ) {
+
+				const item = array[ i ];
+				let j = i - 1;
+
+				while ( j >= start && renderSort( array[ j ], item ) > 0 ) {
+
+					array[ j + 1 ] = array[ j ];
+					j --;
+
+				}
+
+				array[ j + 1 ] = item;
+
+			}
+
+		}
+
 		/**
 		 * Performs a manual clear with the defined clear color.
 		 */
@@ -327,10 +375,7 @@ class SVGRenderer {
 
 			calculateLights( _lights );
 
-			 // reset accumulated path
-
-			_currentPath = '';
-			_currentStyle = '';
+			_renderListCount = 0;
 
 			for ( let e = 0, el = _elements.length; e < el; e ++ ) {
 
@@ -339,71 +384,15 @@ class SVGRenderer {
 
 				if ( material === undefined || material.opacity === 0 ) continue;
 
-				_elemBox.makeEmpty();
-
-				if ( element instanceof RenderableSprite ) {
-
-					_v1 = element;
-					_v1.x *= _svgWidthHalf; _v1.y *= - _svgHeightHalf;
-
-					renderSprite( _v1, element, material );
-
-				} else if ( element instanceof RenderableLine ) {
-
-					_v1 = element.v1; _v2 = element.v2;
-
-					_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
-					_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
-
-					_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
-
-					if ( _clipBox.intersectsBox( _elemBox ) === true ) {
-
-						renderLine( _v1, _v2, material );
-
-					}
-
-				} else if ( element instanceof RenderableFace ) {
-
-					_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
-
-					if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
-					if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
-					if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
-
-					_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
-					_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
-					_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
-
-					if ( this.overdraw > 0 ) {
-
-						expand( _v1.positionScreen, _v2.positionScreen, this.overdraw );
-						expand( _v2.positionScreen, _v3.positionScreen, this.overdraw );
-						expand( _v3.positionScreen, _v1.positionScreen, this.overdraw );
-
-					}
-
-					_elemBox.setFromPoints( [
-						_v1.positionScreen,
-						_v2.positionScreen,
-						_v3.positionScreen
-					] );
-
-					if ( _clipBox.intersectsBox( _elemBox ) === true ) {
-
-						renderFace3( _v1, _v2, _v3, element, material );
-
-					}
-
-				}
+				getRenderItem( _renderListCount ++, 'element', element, material );
 
 			}
 
-			flushPath(); // just to flush last svg:path
+			_svgObjectCount = 0;
 
 			scene.traverseVisible( function ( object ) {
 
-				 if ( object.isSVGObject ) {
+				if ( object.isSVGObject ) {
 
 					_vector3.setFromMatrixPosition( object.matrixWorld );
 					_vector3.applyMatrix4( _viewProjectionMatrix );
@@ -413,14 +402,108 @@ class SVGRenderer {
 					const x = _vector3.x * _svgWidthHalf;
 					const y = - _vector3.y * _svgHeightHalf;
 
-					const node = object.node;
-					node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
+					const svgObject = getSVGObjectData( _svgObjectCount ++ );
 
-					_svg.appendChild( node );
+					svgObject.node = object.node;
+					svgObject.x = x;
+					svgObject.y = y;
+					svgObject.z = _vector3.z;
+					svgObject.renderOrder = object.renderOrder;
+
+					getRenderItem( _renderListCount ++, 'svgObject', svgObject, null );
 
 				}
 
 			} );
+
+			if ( this.sortElements ) {
+
+				arraySortStable( _renderListPool, 0, _renderListCount );
+
+			}
+
+			// Reset accumulated path
+			_currentPath = '';
+			_currentStyle = '';
+
+			// Render in sorted order
+			for ( let i = 0; i < _renderListCount; i ++ ) {
+
+				const item = _renderListPool[ i ];
+
+				if ( item.type === 'svgObject' ) {
+
+					flushPath(); // Flush any accumulated paths before inserting SVG node
+
+					const svgObject = item.data;
+					const node = svgObject.node;
+					node.setAttribute( 'transform', 'translate(' + svgObject.x + ',' + svgObject.y + ')' );
+					_svg.appendChild( node );
+
+				} else {
+
+					const element = item.data;
+					const material = item.material;
+
+					_elemBox.makeEmpty();
+
+					if ( element instanceof RenderableSprite ) {
+
+						_v1 = element;
+						_v1.x *= _svgWidthHalf; _v1.y *= - _svgHeightHalf;
+
+						renderSprite( _v1, element, material );
+
+					} else if ( element instanceof RenderableLine ) {
+
+						_v1 = element.v1; _v2 = element.v2;
+
+						_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
+						_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
+
+						_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
+
+						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+
+							renderLine( _v1, _v2, material );
+
+						}
+
+					} else if ( element instanceof RenderableFace ) {
+
+						_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
+
+						_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
+						_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
+						_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
+
+						if ( this.overdraw > 0 ) {
+
+							expand( _v1.positionScreen, _v2.positionScreen, this.overdraw );
+							expand( _v2.positionScreen, _v3.positionScreen, this.overdraw );
+							expand( _v3.positionScreen, _v1.positionScreen, this.overdraw );
+
+						}
+
+						_elemBox.setFromPoints( [
+							_v1.positionScreen,
+							_v2.positionScreen,
+							_v3.positionScreen
+						] );
+
+						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+
+							renderFace3( _v1, _v2, _v3, element, material );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			flushPath(); // Flush any remaining paths
 
 		};
 
@@ -660,21 +743,71 @@ class SVGRenderer {
 
 		function getPathNode( id ) {
 
-			if ( _svgPathPool[ id ] == null ) {
+			let path = _svgPathPool[ id ];
 
-				_svgPathPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+			if ( path === undefined ) {
+
+				path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 
 				if ( _quality == 0 ) {
 
-					_svgPathPool[ id ].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
+					path.setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
 
 				}
 
-				return _svgPathPool[ id ];
+				_svgPathPool[ id ] = path;
 
 			}
 
-			return _svgPathPool[ id ];
+			return path;
+
+		}
+
+		function getSVGObjectData( id ) {
+
+			let svgObject = _svgObjectsPool[ id ];
+
+			if ( svgObject === undefined ) {
+
+				svgObject = {
+					node: null,
+					x: 0,
+					y: 0,
+					z: 0,
+					renderOrder: 0
+				};
+
+				_svgObjectsPool[ id ] = svgObject;
+
+			}
+
+			return svgObject;
+
+		}
+
+		function getRenderItem( id, type, data, material ) {
+
+			let item = _renderListPool[ id ];
+
+			if ( item === undefined ) {
+
+				item = {
+					type: type,
+					data: data,
+					material: material
+				};
+
+				_renderListPool[ id ] = item;
+
+				return item;
+
+			}
+
+			item.type = type;
+			item.data = data;
+			item.material = material;
+
+			return item;
 
 		}
 

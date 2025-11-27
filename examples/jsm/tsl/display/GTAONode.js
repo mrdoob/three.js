@@ -1,8 +1,11 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils } from 'three/webgpu';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getScreenPosition, getViewPosition, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
+
+// From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
+const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
 
 let _rendererState;
 
@@ -26,7 +29,7 @@ let _rendererState;
  * postProcessing.outputNod = aoPass.getTextureNode().mul( scenePassColor );
  * ```
  *
- * Reference: {@link https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf}.
+ * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
  *
  * @augments TempNode
  * @three_import import { ao } from 'three/addons/tsl/display/GTAONode.js';
@@ -48,7 +51,7 @@ class GTAONode extends TempNode {
 	 */
 	constructor( depthNode, normalNode, camera ) {
 
-		super( 'vec4' );
+		super( 'float' );
 
 		/**
 		 * A node that represents the scene's depth.
@@ -90,7 +93,7 @@ class GTAONode extends TempNode {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
+		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		// uniforms
@@ -151,6 +154,20 @@ class GTAONode extends TempNode {
 		this.samples = uniform( 16 );
 
 		/**
+		 * Whether to use temporal filtering or not. Setting this property to
+		 * `true` requires the usage of `TRAANode`. This will help to reduce noise
+		 * although it introduces typical TAA artifacts like ghosting and temporal
+		 * instabilities.
+		 *
+		 * If setting this property to `false`, a manual denoise via `DenoiseNode`
+		 * might be required.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.useTemporalFiltering = false;
+
+		/**
 		 * The node represents the internal noise texture used by the AO.
 		 *
 		 * @private
@@ -189,6 +206,14 @@ class GTAONode extends TempNode {
 		 * @type {ReferenceNode<float>}
 		 */
 		this._cameraFar = reference( 'far', 'float', camera );
+
+		/**
+		 * Temporal direction that influences the rotation angle for each slice.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._temporalDirection = uniform( 0 );
 
 		/**
 		 * The material that is used to render the effect.
@@ -247,12 +272,27 @@ class GTAONode extends TempNode {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
+		// update temporal uniforms
+
+		if ( this.useTemporalFiltering === true ) {
+
+			const frameId = frame.frameId;
+
+			this._temporalDirection.value = _temporalRotations[ frameId % 6 ] / 360;
+
+		} else {
+
+			this._temporalDirection.value = 0;
+
+		}
+
 		//
 
 		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
 
 		_quadMesh.material = this._material;
+		_quadMesh.name = 'AO';
 
 		// clear
 
@@ -312,6 +352,7 @@ class GTAONode extends TempNode {
 			const noiseResolution = textureSize( this._noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
 			noiseUv = noiseUv.mul( this.resolution.div( noiseResolution ) );
+
 			const noiseTexel = sampleNoise( noiseUv );
 			const randomVec = noiseTexel.xyz.mul( 2.0 ).sub( 1.0 );
 			const tangent = vec3( randomVec.xy, 0.0 ).normalize();
@@ -323,9 +364,11 @@ class GTAONode extends TempNode {
 
 			const ao = float( 0 ).toVar();
 
+			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
+
 			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
-				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).toVar();
+				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI ).add( this._temporalDirection ).toVar();
 				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
 				sampleDir.xyz = normalize( kernelMatrix.mul( sampleDir.xyz ) );
 
@@ -337,9 +380,13 @@ class GTAONode extends TempNode {
 				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent ).toVar();
 				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
 
+				// For each slice, the inner loop performs ray marching to find the horizons.
+
 				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
 					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
+
+					// The loop marches in two opposite directions (x and y) along the slice's line to find the horizon on both sides.
 
 					// x
 
@@ -371,6 +418,8 @@ class GTAONode extends TempNode {
 
 				} );
 
+				// After the horizons are found for a given slice, their contribution to the total occlusion is calculated.
+
 				const sinHorizons = sqrt( sub( 1.0, cosHorizons.mul( cosHorizons ) ) ).toVar();
 				const nx = dot( normalInSlice, sliceTangent );
 				const ny = dot( normalInSlice, viewDir );
@@ -384,7 +433,7 @@ class GTAONode extends TempNode {
 			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
 			ao.assign( pow( ao, this.scale ) );
 
-			return vec4( vec3( ao ), 1.0 );
+			return ao;
 
 		} );
 
@@ -519,4 +568,4 @@ function generateMagicSquare( size ) {
  * @param {Camera} camera - The camera the scene is rendered with.
  * @returns {GTAONode}
  */
-export const ao = ( depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
+export const ao = ( depthNode, normalNode, camera ) => new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera );

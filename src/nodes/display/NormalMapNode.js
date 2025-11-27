@@ -1,41 +1,13 @@
 import TempNode from '../core/TempNode.js';
-import { add } from '../math/OperatorNode.js';
 
 import { normalView, transformNormalToView } from '../accessors/Normal.js';
-import { positionView } from '../accessors/Position.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
-import { uv } from '../accessors/UV.js';
-import { faceDirection } from './FrontFacingNode.js';
-import { Fn, nodeProxy, vec3 } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
-import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../../constants.js';
-
-// Normal Mapping Without Precomputed Tangents
-// http://www.thetenthplanet.de/archives/1180
-
-const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
-
-	const { eye_pos, surf_norm, mapN, uv } = inputs;
-
-	const q0 = eye_pos.dFdx();
-	const q1 = eye_pos.dFdy();
-	const st0 = uv.dFdx();
-	const st1 = uv.dFdy();
-
-	const N = surf_norm; // normalized
-
-	const q1perp = q1.cross( N );
-	const q0perp = N.cross( q0 );
-
-	const T = q1perp.mul( st0.x ).add( q0perp.mul( st1.x ) );
-	const B = q1perp.mul( st0.y ).add( q0perp.mul( st1.y ) );
-
-	const det = T.dot( T ).max( B.dot( B ) );
-	const scale = faceDirection.mul( det.inverseSqrt() );
-
-	return add( T.mul( mapN.x, scale ), B.mul( mapN.y, scale ), N.mul( mapN.z ) ).normalize();
-
-} );
+import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
+import { directionToFaceDirection } from './FrontFacingNode.js';
+import { unpackNormal } from '../utils/Packing.js';
+import { error } from '../../utils.js';
 
 /**
  * This class can be used for applying normals maps to materials.
@@ -87,48 +59,81 @@ class NormalMapNode extends TempNode {
 		 */
 		this.normalMapType = TangentSpaceNormalMap;
 
+		/**
+		 * Controls how to unpack the sampled normal map values.
+		 *
+		 * @type {string}
+		 * @default NoNormalPacking
+		 */
+		this.unpackNormalMode = NoNormalPacking;
+
 	}
 
-	setup( builder ) {
+	setup( { material } ) {
 
-		const { normalMapType, scaleNode } = this;
+		const { normalMapType, scaleNode, unpackNormalMode } = this;
 
 		let normalMap = this.node.mul( 2.0 ).sub( 1.0 );
 
-		if ( scaleNode !== null ) {
+		if ( normalMapType === TangentSpaceNormalMap ) {
 
-			normalMap = vec3( normalMap.xy.mul( scaleNode ), normalMap.z );
+			if ( unpackNormalMode === NormalRGPacking ) {
 
-		}
+				normalMap = unpackNormal( normalMap.xy );
 
-		let outputNode = null;
+			} else if ( unpackNormalMode === NormalGAPacking ) {
 
-		if ( normalMapType === ObjectSpaceNormalMap ) {
+				normalMap = unpackNormal( normalMap.yw );
 
-			outputNode = transformNormalToView( normalMap );
+			} else if ( unpackNormalMode !== NoNormalPacking ) {
 
-		} else if ( normalMapType === TangentSpaceNormalMap ) {
+				console.error( `THREE.NodeMaterial: Unexpected unpack normal mode: ${ unpackNormalMode }` );
 
-			const tangent = builder.hasGeometryAttribute( 'tangent' );
+			}
 
-			if ( tangent === true ) {
+		} else {
 
-				outputNode = TBNViewMatrix.mul( normalMap ).normalize();
+			if ( unpackNormalMode !== NoNormalPacking ) {
 
-			} else {
-
-				outputNode = perturbNormal2Arb( {
-					eye_pos: positionView,
-					surf_norm: normalView,
-					mapN: normalMap,
-					uv: uv()
-				} );
+				console.error( `THREE.NodeMaterial: Normal map type '${ normalMapType }' is not compatible with unpack normal mode '${ unpackNormalMode }'` );
 
 			}
 
 		}
 
-		return outputNode;
+		if ( scaleNode !== null ) {
+
+			let scale = scaleNode;
+
+			if ( material.flatShading === true ) {
+
+				scale = directionToFaceDirection( scale );
+
+			}
+
+			normalMap = vec3( normalMap.xy.mul( scale ), normalMap.z );
+
+		}
+
+		let output = null;
+
+		if ( normalMapType === ObjectSpaceNormalMap ) {
+
+			output = transformNormalToView( normalMap );
+
+		} else if ( normalMapType === TangentSpaceNormalMap ) {
+
+			output = TBNViewMatrix.mul( normalMap ).normalize();
+
+		} else {
+
+			error( `NodeMaterial: Unsupported normal map type: ${ normalMapType }` );
+
+			output = normalView; // Fallback to default normal view
+
+		}
+
+		return output;
 
 	}
 

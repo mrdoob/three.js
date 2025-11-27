@@ -1,8 +1,8 @@
-import { varying } from '../core/VaryingNode.js';
 import { Fn } from '../tsl/TSLCore.js';
-import { cameraViewMatrix } from './Camera.js';
-import { normalGeometry, normalLocal, normalView, normalWorld, transformedNormalView } from './Normal.js';
-import { tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTangentView } from './Tangent.js';
+import { normalGeometry, normalLocal, normalView, normalWorld } from './Normal.js';
+import { tangentGeometry, tangentLocal, tangentView, tangentWorld } from './Tangent.js';
+import { bitangentViewFrame } from './TangentUtils.js';
+import { directionToFaceDirection } from '../display/FrontFacingNode.js';
 
 /**
  * Returns the bitangent node and assigns it to a varying if the material is not flat shaded.
@@ -13,19 +13,19 @@ import { tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTa
  * @param {string} varyingName - The name of the varying to assign the bitangent to.
  * @returns {Node<vec3>} The bitangent node.
  */
-const getBitangent = /*@__PURE__*/ Fn( ( [ crossNormalTangent, varyingName ], builder ) => {
+const getBitangent = /*@__PURE__*/ Fn( ( [ crossNormalTangent, varyingName ], { subBuildFn, material } ) => {
 
 	let bitangent = crossNormalTangent.mul( tangentGeometry.w ).xyz;
 
-	if ( builder.material.flatShading !== true ) {
+	if ( subBuildFn === 'NORMAL' && material.flatShading !== true ) {
 
-		bitangent = varying( crossNormalTangent, varyingName );
+		bitangent = bitangent.toVarying( varyingName );
 
 	}
 
 	return bitangent;
 
-} ).once();
+} ).once( [ 'NORMAL' ] );
 
 /**
  * TSL object that represents the bitangent attribute of the current rendered object.
@@ -49,7 +49,29 @@ export const bitangentLocal = /*@__PURE__*/ getBitangent( normalLocal.cross( tan
  * @tsl
  * @type {Node<vec3>}
  */
-export const bitangentView = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize().toVar( 'bitangentView' );
+export const bitangentView = /*@__PURE__*/ ( Fn( ( { subBuildFn, geometry, material } ) => {
+
+	let node;
+
+	if ( subBuildFn === 'VERTEX' || geometry.hasAttribute( 'tangent' ) ) {
+
+		node = getBitangent( normalView.cross( tangentView ), 'v_bitangentView' ).normalize();
+
+	} else {
+
+		node = bitangentViewFrame;
+
+	}
+
+	if ( material.flatShading !== true ) {
+
+		node = directionToFaceDirection( node );
+
+	}
+
+	return node;
+
+}, 'vec3' ).once( [ 'NORMAL', 'VERTEX' ] ) )().toVar( 'bitangentView' );
 
 /**
  * TSL object that represents the vertex bitangent in world space of the current rendered object.
@@ -58,19 +80,3 @@ export const bitangentView = getBitangent( normalView.cross( tangentView ), 'v_b
  * @type {Node<vec3>}
  */
 export const bitangentWorld = /*@__PURE__*/ getBitangent( normalWorld.cross( tangentWorld ), 'v_bitangentWorld' ).normalize().toVar( 'bitangentWorld' );
-
-/**
- * TSL object that represents the transformed vertex bitangent in view space of the current rendered object.
- *
- * @tsl
- * @type {Node<vec3>}
- */
-export const transformedBitangentView = /*@__PURE__*/ getBitangent( transformedNormalView.cross( transformedTangentView ), 'v_transformedBitangentView' ).normalize().toVar( 'transformedBitangentView' );
-
-/**
- * TSL object that represents the transformed vertex bitangent in world space of the current rendered object.
- *
- * @tsl
- * @type {Node<vec4>}
- */
-export const transformedBitangentWorld = /*@__PURE__*/ transformedBitangentView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedBitangentWorld' );

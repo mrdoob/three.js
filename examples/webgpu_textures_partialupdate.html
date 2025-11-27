@@ -4,13 +4,20 @@
 		<title>three.js webgl - webgpu partial texture update</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - partial webgpu texture update<br/>
-			replace parts of an existing texture with all data of another texture
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Partial Texture Update</span>
+			</div>
+
+			<small>
+				Replace parts of an existing texture with all data of another texture.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -26,7 +33,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			let camera, scene, renderer, clock, dataTexture, diffuseMap;
 
@@ -46,7 +53,7 @@
 				clock = new THREE.Clock();
 
 				const loader = new THREE.TextureLoader();
-				diffuseMap = loader.load( 'textures/carbon/Carbon.png', animate );
+				diffuseMap = loader.load( 'textures/carbon/Carbon.png' );
 				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
@@ -70,7 +77,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -88,14 +95,12 @@
 
 			}
 
-			async function animate() {
-
-				requestAnimationFrame( animate );
+			function animate() {
 
 				const elapsedTime = clock.getElapsedTime();
 
 
-				await renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 
 				if ( elapsedTime - last > 0.1 ) {

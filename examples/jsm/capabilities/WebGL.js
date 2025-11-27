@@ -108,33 +108,6 @@ class WebGL {
 
 	}
 
-	// @deprecated, r168
-
-	static isWebGLAvailable() {
-
-		console.warn( 'isWebGLAvailable() has been deprecated and will be removed in r178. Use isWebGL2Available() instead.' );
-
-		try {
-
-			const canvas = document.createElement( 'canvas' );
-			return !! ( window.WebGLRenderingContext && ( canvas.getContext( 'webgl' ) || canvas.getContext( 'experimental-webgl' ) ) );
-
-		} catch ( e ) {
-
-			return false;
-
-		}
-
-	}
-
-	static getWebGLErrorMessage() {
-
-		console.warn( 'getWebGLErrorMessage() has been deprecated and will be removed in r178. Use getWebGL2ErrorMessage() instead.' );
-
-		return this._getErrorMessage( 1 );
-
-	}
-
 }
 
 export default WebGL;

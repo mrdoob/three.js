@@ -121,6 +121,56 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
+		QUnit.test( 'abortController - lazy instantiation', ( assert ) => {
+
+			const loadingManager = new LoadingManager();
+
+			assert.equal( loadingManager._abortController, null, '_abortController is initially null.' );
+
+			const controller = loadingManager.abortController;
+
+			assert.ok( controller instanceof AbortController, 'abortController returns an AbortController instance.' );
+			assert.equal( loadingManager._abortController, controller, '_abortController is set after first access.' );
+
+			const controller2 = loadingManager.abortController;
+			assert.equal( controller, controller2, 'Subsequent accesses return the same AbortController instance.' );
+
+		} );
+
+		QUnit.test( 'abort() - aborts controller and resets', ( assert ) => {
+
+			const loadingManager = new LoadingManager();
+
+			const controller = loadingManager.abortController;
+
+			assert.ok( ! controller.signal.aborted, 'Controller signal is not aborted initially.' );
+
+			loadingManager.abort();
+
+			assert.ok( controller.signal.aborted, 'Controller signal is aborted after calling abort().' );
+			assert.equal( loadingManager._abortController, null, '_abortController is reset to null after abort().' );
+
+		} );
+
+		QUnit.test( 'abortController - recreation after abort', ( assert ) => {
+
+			const loadingManager = new LoadingManager();
+
+			const controller1 = loadingManager.abortController;
+
+			loadingManager.abort();
+
+			assert.ok( controller1.signal.aborted, 'First controller is aborted.' );
+			assert.equal( loadingManager._abortController, null, '_abortController is null after abort.' );
+
+			const controller2 = loadingManager.abortController;
+
+			assert.ok( controller2 instanceof AbortController, 'New AbortController is created.' );
+			assert.notEqual( controller1, controller2, 'New controller is a different instance from the aborted one.' );
+			assert.ok( ! controller2.signal.aborted, 'New controller signal is not aborted.' );
+
+		} );
+
 	} );
 
 } );

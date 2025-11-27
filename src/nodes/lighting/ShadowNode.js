@@ -1,8 +1,9 @@
 import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
 import { float, vec2, vec3, int, Fn, nodeObject } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { transformedNormalWorld } from '../accessors/Normal.js';
+import { texture, textureLoad } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
+import { normalWorld } from '../accessors/Normal.js';
 import { mix, sqrt } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
@@ -17,52 +18,74 @@ import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
 import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
+import ChainMap from '../../renderers/common/ChainMap.js';
+import { warn } from '../../utils.js';
+import { textureSize } from '../accessors/TextureSizeNode.js';
+import { uv } from '../accessors/UV.js';
+
+//
+
+const _shadowRenderObjectLibrary = /*@__PURE__*/ new ChainMap();
+const _shadowRenderObjectKeys = [];
 
 /**
  * Creates a function to render shadow objects in a scene.
  *
+ * @tsl
+ * @function
  * @param {Renderer} renderer - The renderer.
  * @param {LightShadow} shadow - The light shadow object containing shadow properties.
  * @param {number} shadowType - The type of shadow map (e.g., BasicShadowMap).
  * @param {boolean} useVelocity - Whether to use velocity data for rendering.
- * @return {Function} A function that renders shadow objects.
- *
- * The returned function has the following parameters:
- * @param {Object3D} object - The 3D object to render.
- * @param {Scene} scene - The scene containing the object.
- * @param {Camera} _camera - The camera used for rendering.
- * @param {BufferGeometry} geometry - The geometry of the object.
- * @param {Material} material - The material of the object.
- * @param {Group} group - The group the object belongs to.
- * @param {...any} params - Additional parameters for rendering.
+ * @return {shadowRenderObjectFunction} A function that renders shadow objects.
  */
 export const getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
 
-	return ( object, scene, _camera, geometry, material, group, ...params ) => {
+	_shadowRenderObjectKeys[ 0 ] = renderer;
+	_shadowRenderObjectKeys[ 1 ] = shadow;
 
-		if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+	let renderObjectFunction = _shadowRenderObjectLibrary.get( _shadowRenderObjectKeys );
 
-			if ( useVelocity ) {
+	if ( renderObjectFunction === undefined || ( renderObjectFunction.shadowType !== shadowType || renderObjectFunction.useVelocity !== useVelocity ) ) {
 
-				getDataFromObject( object ).useVelocity = true;
+		renderObjectFunction = ( object, scene, _camera, geometry, material, group, ...params ) => {
+
+			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+
+				if ( useVelocity ) {
+
+					getDataFromObject( object ).useVelocity = true;
+
+				}
+
+				object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+
+				renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+
+				object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
 			}
 
-			object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+		};
 
-			renderer.renderObject( object, scene, _camera, geometry, material, group, ...params );
+		renderObjectFunction.shadowType = shadowType;
+		renderObjectFunction.useVelocity = useVelocity;
 
-			object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+		_shadowRenderObjectLibrary.set( _shadowRenderObjectKeys, renderObjectFunction );
 
-		}
+	}
 
-	};
+	_shadowRenderObjectKeys[ 0 ] = null;
+	_shadowRenderObjectKeys[ 1 ] = null;
+
+	return renderObjectFunction;
 
 };
 
 /**
  * Represents the shader code for the first VSM render pass.
  *
+ * @private
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
@@ -85,7 +108,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 
 		let depth = shadowPass.sample( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) );
 
-		if ( shadowPass.value.isDepthArrayTexture || shadowPass.value.isDataArrayTexture ) {
+		if ( shadowPass.value.isArrayTexture ) {
 
 			depth = depth.depth( depthLayer );
 
@@ -101,7 +124,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
 
-	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ) );
+	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ).max( 0 ) );
 	return vec2( mean, std_dev );
 
 } );
@@ -109,6 +132,7 @@ const VSMPassVertical = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPass,
 /**
  * Represents the shader code for the second VSM render pass.
  *
+ * @private
  * @method
  * @param {Object} inputs - The input parameter object.
  * @param {Node<float>} inputs.samples - The number of samples
@@ -131,7 +155,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 
 		let distribution = shadowPass.sample( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
 
-		if ( shadowPass.value.isDepthArrayTexture || shadowPass.value.isDataArrayTexture ) {
+		if ( shadowPass.value.isArrayTexture ) {
 
 			distribution = distribution.depth( depthLayer );
 
@@ -145,7 +169,7 @@ const VSMPassHorizontal = /*@__PURE__*/ Fn( ( { samples, radius, size, shadowPas
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
 
-	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ) );
+	const std_dev = sqrt( squaredMean.sub( mean.mul( mean ) ).max( 0 ) );
 	return vec2( mean, std_dev );
 
 } );
@@ -243,6 +267,22 @@ class ShadowNode extends ShadowBaseNode {
 		 */
 		this._node = null;
 
+		/**
+		 * The current shadow map type of this shadow node.
+		 *
+		 * @type {?number}
+		 * @private
+		 * @default null
+		 */
+		this._currentShadowType = null;
+
+		/**
+		 * A Weak Map holding the current frame ID per camera. Used
+		 * to control the update of shadow maps.
+		 *
+		 * @type {WeakMap<Camera,number>}
+		 * @private
+		 */
 		this._cameraFrameId = new WeakMap();
 
 		/**
@@ -365,6 +405,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';
+		shadowMap.texture.type = shadow.mapType;
 		shadowMap.depthTexture = depthTexture;
 
 		return { shadowMap, depthTexture };
@@ -379,7 +420,7 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	setupShadow( builder ) {
 
-		const { renderer } = builder;
+		const { renderer, camera } = builder;
 
 		const { light, shadow } = this;
 
@@ -387,19 +428,20 @@ class ShadowNode extends ShadowBaseNode {
 
 		const { depthTexture, shadowMap } = this.setupRenderTarget( shadow, builder );
 
+		shadow.camera.coordinateSystem = camera.coordinateSystem;
 		shadow.camera.updateProjectionMatrix();
 
 		// VSM
 
-		if ( shadowMapType === VSMShadowMap ) {
+		if ( shadowMapType === VSMShadowMap && shadow.isPointLightShadow !== true ) {
 
 			depthTexture.compareFunction = null; // VSM does not use textureSampleCompare()/texture2DCompare()
 
-			if ( shadowMap.isRenderTargetArray ) {
+			if ( shadowMap.depth > 1 ) {
 
 				if ( ! shadowMap._vsmShadowMapVertical ) {
 
-					shadowMap._vsmShadowMapVertical = builder.createRenderTargetArray( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth, { format: RGFormat, type: HalfFloatType, depthBuffer: false } );
+					shadowMap._vsmShadowMapVertical = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, { format: RGFormat, type: HalfFloatType, depth: shadowMap.depth, depthBuffer: false } );
 					shadowMap._vsmShadowMapVertical.texture.name = 'VSMVertical';
 
 				}
@@ -408,7 +450,7 @@ class ShadowNode extends ShadowBaseNode {
 
 				if ( ! shadowMap._vsmShadowMapHorizontal ) {
 
-					shadowMap._vsmShadowMapHorizontal = builder.createRenderTargetArray( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth, { format: RGFormat, type: HalfFloatType, depthBuffer: false } );
+					shadowMap._vsmShadowMapHorizontal = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, { format: RGFormat, type: HalfFloatType, depth: shadowMap.depth, depthBuffer: false } );
 					shadowMap._vsmShadowMapHorizontal.texture.name = 'VSMHorizontal';
 
 				}
@@ -425,7 +467,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			let shadowPassVertical = texture( depthTexture );
 
-			if ( depthTexture.isDepthArrayTexture ) {
+			if ( depthTexture.isArrayTexture ) {
 
 				shadowPassVertical = shadowPassVertical.depth( this.depthLayer );
 
@@ -433,7 +475,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			let shadowPassHorizontal = texture( this.vsmShadowMapVertical.texture );
 
-			if ( depthTexture.isDepthArrayTexture ) {
+			if ( depthTexture.isArrayTexture ) {
 
 				shadowPassHorizontal = shadowPassHorizontal.depth( this.depthLayer );
 
@@ -458,7 +500,7 @@ class ShadowNode extends ShadowBaseNode {
 		const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 		const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
-		const shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( transformedNormalWorld.mul( normalBias ) ) );
+		const shadowPosition = lightShadowMatrix( light ).mul( shadowPositionWorld.add( normalWorld.mul( normalBias ) ) );
 		const shadowCoord = this.setupShadowCoord( builder, shadowPosition );
 
 		//
@@ -471,15 +513,26 @@ class ShadowNode extends ShadowBaseNode {
 
 		}
 
-		const shadowDepthTexture = ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture;
+		const shadowDepthTexture = ( shadowMapType === VSMShadowMap && shadow.isPointLightShadow !== true ) ? this.vsmShadowMapHorizontal.texture : depthTexture;
 
 		const shadowNode = this.setupShadowFilter( builder, { filterFn, shadowTexture: shadowMap.texture, depthTexture: shadowDepthTexture, shadowCoord, shadow, depthLayer: this.depthLayer } );
 
-		let shadowColor = texture( shadowMap.texture, shadowCoord );
+		let shadowColor;
 
-		if ( depthTexture.isDepthArrayTexture ) {
+		if ( shadowMap.texture.isCubeTexture ) {
 
-			shadowColor = shadowColor.depth( this.depthLayer );
+			// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
+			shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
+
+		} else {
+
+			shadowColor = texture( shadowMap.texture, shadowCoord );
+
+			if ( depthTexture.isArrayTexture ) {
+
+				shadowColor = shadowColor.depth( this.depthLayer );
+
+			}
 
 		}
 
@@ -488,7 +541,25 @@ class ShadowNode extends ShadowBaseNode {
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
 
-		return shadowOutput;
+		// Shadow Output + Inspector
+
+		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
+
+		return shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+
+			if ( this.shadowMap.texture.isCubeTexture ) {
+
+				return cubeTexture( this.shadowMap.texture );
+
+			}
+
+			return texture( this.shadowMap.texture );
+
+		} ).toInspector( `${ inspectName } / Depth`, () => {
+
+			return textureLoad( this.shadowMap.depthTexture, uv().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).x.oneMinus();
+
+		} );
 
 	}
 
@@ -505,6 +576,15 @@ class ShadowNode extends ShadowBaseNode {
 
 		return Fn( () => {
 
+			const currentShadowType = builder.renderer.shadowMap.type;
+
+			if ( this._currentShadowType !== currentShadowType ) {
+
+				this._reset();
+				this._node = null;
+
+			}
+
 			let node = this._node;
 
 			this.setupShadowPosition( builder );
@@ -512,12 +592,13 @@ class ShadowNode extends ShadowBaseNode {
 			if ( node === null ) {
 
 				this._node = node = this.setupShadow( builder );
+				this._currentShadowType = currentShadowType;
 
 			}
 
 			if ( builder.material.shadowNode ) { // @deprecated, r171
 
-				console.warn( 'THREE.NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
+				warn( 'NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
 
 			}
 
@@ -550,7 +631,13 @@ class ShadowNode extends ShadowBaseNode {
 
 		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
 
+		const currentSceneName = scene.name;
+
+		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
+
 		renderer.render( scene, shadow.camera );
+
+		scene.name = currentSceneName;
 
 	}
 
@@ -569,7 +656,13 @@ class ShadowNode extends ShadowBaseNode {
 		const depthVersion = shadowMap.depthTexture.version;
 		this._depthVersionCached = depthVersion;
 
-		shadow.camera.layers.mask = camera.layers.mask;
+		const _shadowCameraLayer = shadow.camera.layers.mask;
+
+		if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) === 0 ) {
+
+			shadow.camera.layers.mask = camera.layers.mask;
+
+		}
 
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
@@ -582,6 +675,8 @@ class ShadowNode extends ShadowBaseNode {
 
 		renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
 
+		renderer.setClearColor( 0x000000, 0 );
+
 		renderer.setRenderTarget( shadowMap );
 
 		this.renderShadow( frame );
@@ -590,11 +685,13 @@ class ShadowNode extends ShadowBaseNode {
 
 		// vsm blur pass
 
-		if ( light.isPointLight !== true && shadowType === VSMShadowMap ) {
+		if ( shadowType === VSMShadowMap && shadow.isPointLightShadow !== true ) {
 
 			this.vsmPass( renderer );
 
 		}
+
+		shadow.camera.layers.mask = _shadowCameraLayer;
 
 		restoreRendererAndSceneState( renderer, scene, _rendererState );
 
@@ -628,8 +725,27 @@ class ShadowNode extends ShadowBaseNode {
 	 */
 	dispose() {
 
-		this.shadowMap.dispose();
-		this.shadowMap = null;
+		this._reset();
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Resets the resouce state of this shadow node.
+	 *
+	 * @private
+	 */
+	_reset() {
+
+		this._currentShadowType = null;
+
+		if ( this.shadowMap ) {
+
+			this.shadowMap.dispose();
+			this.shadowMap = null;
+
+		}
 
 		if ( this.vsmShadowMapVertical !== null ) {
 
@@ -650,8 +766,6 @@ class ShadowNode extends ShadowBaseNode {
 			this.vsmMaterialHorizontal = null;
 
 		}
-
-		super.dispose();
 
 	}
 
@@ -695,6 +809,19 @@ class ShadowNode extends ShadowBaseNode {
 }
 
 export default ShadowNode;
+
+/**
+ * Shadow Render Object Function.
+ *
+ * @function shadowRenderObjectFunction
+ * @param {Object3D} object - The 3D object to render.
+ * @param {Scene} scene - The scene containing the object.
+ * @param {Camera} _camera - The camera used for rendering.
+ * @param {BufferGeometry} geometry - The geometry of the object.
+ * @param {Material} material - The material of the object.
+ * @param {Group} group - The group the object belongs to.
+ * @param {...any} params - Additional parameters for rendering.
+ */
 
 /**
  * TSL function for creating an instance of `ShadowNode`.

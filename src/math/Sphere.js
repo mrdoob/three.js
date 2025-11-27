@@ -387,6 +387,34 @@ class Sphere {
 
 	}
 
+	/**
+	 * Returns a serialized structure of the bounding sphere.
+	 *
+	 * @return {Object} Serialized structure with fields representing the object state.
+	 */
+	toJSON() {
+
+		return {
+			radius: this.radius,
+			center: this.center.toArray()
+		};
+
+	}
+
+	/**
+	 * Returns a serialized structure of the bounding sphere.
+	 *
+	 * @param {Object} json - The serialized json to set the sphere from.
+	 * @return {Box3} A reference to this bounding sphere.
+	 */
+	fromJSON( json ) {
+
+		this.radius = json.radius;
+		this.center.fromArray( json.center );
+		return this;
+
+	}
+
 }
 
 export { Sphere };

@@ -1,6 +1,7 @@
 import { clamp, euclideanModulo, lerp } from './MathUtils.js';
 import { ColorManagement, SRGBToLinear, LinearToSRGB } from './ColorManagement.js';
 import { SRGBColorSpace } from '../constants.js';
+import { warn } from '../utils.js';
 
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -208,7 +209,7 @@ class Color {
 		this.g = ( hex >> 8 & 255 ) / 255;
 		this.b = ( hex & 255 ) / 255;
 
-		ColorManagement.toWorkingColorSpace( this, colorSpace );
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
 
 		return this;
 
@@ -229,7 +230,7 @@ class Color {
 		this.g = g;
 		this.b = b;
 
-		ColorManagement.toWorkingColorSpace( this, colorSpace );
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
 
 		return this;
 
@@ -266,7 +267,7 @@ class Color {
 
 		}
 
-		ColorManagement.toWorkingColorSpace( this, colorSpace );
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
 
 		return this;
 
@@ -275,7 +276,7 @@ class Color {
 	/**
 	 * Sets this color from a CSS-style string. For example, `rgb(250, 0,0)`,
 	 * `rgb(100%, 0%, 0%)`, `hsl(0, 100%, 50%)`, `#ff0000`, `#f00`, or `red` ( or
-	 * any [X11 color name]{@link https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart} -
+	 * any [X11 color name](https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart) -
 	 * all 140 color names are supported).
 	 *
 	 * @param {string} style - Color as a CSS-style string.
@@ -290,7 +291,7 @@ class Color {
 
 			if ( parseFloat( string ) < 1 ) {
 
-				console.warn( 'THREE.Color: Alpha component of ' + style + ' will be ignored.' );
+				warn( 'Color: Alpha component of ' + style + ' will be ignored.' );
 
 			}
 
@@ -366,7 +367,7 @@ class Color {
 
 				default:
 
-					console.warn( 'THREE.Color: Unknown color model ' + style );
+					warn( 'Color: Unknown color model ' + style );
 
 			}
 
@@ -394,7 +395,7 @@ class Color {
 
 			} else {
 
-				console.warn( 'THREE.Color: Invalid hex color ' + style );
+				warn( 'Color: Invalid hex color ' + style );
 
 			}
 
@@ -434,7 +435,7 @@ class Color {
 		} else {
 
 			// unknown color
-			console.warn( 'THREE.Color: Unknown color ' + style );
+			warn( 'Color: Unknown color ' + style );
 
 		}
 
@@ -537,7 +538,7 @@ class Color {
 	 */
 	getHex( colorSpace = SRGBColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
 		return Math.round( clamp( _color.r * 255, 0, 255 ) ) * 65536 + Math.round( clamp( _color.g * 255, 0, 255 ) ) * 256 + Math.round( clamp( _color.b * 255, 0, 255 ) );
 
@@ -567,7 +568,7 @@ class Color {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
 		const r = _color.r, g = _color.g, b = _color.b;
 
@@ -617,7 +618,7 @@ class Color {
 	 */
 	getRGB( target, colorSpace = ColorManagement.workingColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
 		target.r = _color.r;
 		target.g = _color.g;
@@ -635,7 +636,7 @@ class Color {
 	 */
 	getStyle( colorSpace = SRGBColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
 		const r = _color.r, g = _color.g, b = _color.b;
 

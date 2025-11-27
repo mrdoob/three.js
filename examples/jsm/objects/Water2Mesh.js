@@ -37,6 +37,7 @@ class WaterMesh extends Mesh {
 	constructor( geometry, options = {} ) {
 
 		const material = new NodeMaterial();
+		material.transparent = true;
 
 		super( geometry, material );
 
@@ -49,7 +50,7 @@ class WaterMesh extends Mesh {
 		 */
 		this.isWater = true;
 
-		material.fragmentNode = new WaterNode( options, this );
+		material.colorNode = new WaterNode( options, this );
 
 	}
 

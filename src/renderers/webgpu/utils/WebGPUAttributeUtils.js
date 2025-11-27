@@ -1,6 +1,7 @@
 import { GPUInputStepMode } from './WebGPUConstants.js';
 
 import { Float16BufferAttribute } from '../../../core/BufferAttribute.js';
+import { isTypedArray, error } from '../../../utils.js';
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],
@@ -11,6 +12,12 @@ const typedArraysToVertexFormatPrefix = new Map( [
 	[ Uint32Array, [ 'uint32', 'unorm32' ]],
 	[ Float32Array, [ 'float32', ]],
 ] );
+
+if ( typeof Float16Array !== 'undefined' ) {
+
+	typedArraysToVertexFormatPrefix.set( Float16Array, [ 'float16' ] );
+
+}
 
 const typedAttributeToVertexFormatPrefix = new Map( [
 	[ Float16BufferAttribute, [ 'float16', ]],
@@ -113,7 +120,9 @@ class WebGPUAttributeUtils {
 
 			}
 
-			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
+			// ensure 4 byte alignment
+			const byteLength = array.byteLength;
+			const size = byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
 
 			buffer = device.createBuffer( {
 				label: bufferAttribute.name,
@@ -165,7 +174,6 @@ class WebGPUAttributeUtils {
 		}
 
 
-		const isTypedArray = this._isTypedArray( array );
 		const updateRanges = bufferAttribute.updateRanges;
 
 		if ( updateRanges.length === 0 ) {
@@ -181,7 +189,8 @@ class WebGPUAttributeUtils {
 
 		} else {
 
-			const byteOffsetFactor = isTypedArray ? 1 : array.BYTES_PER_ELEMENT;
+			const isTyped = isTypedArray( array );
+			const byteOffsetFactor = isTyped ? 1 : array.BYTES_PER_ELEMENT;
 
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
@@ -202,7 +211,7 @@ class WebGPUAttributeUtils {
 
 				}
 
-				const bufferOffset = dataOffset * ( isTypedArray ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+				const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
 
 				device.queue.writeBuffer(
 					buffer,
@@ -398,24 +407,11 @@ class WebGPUAttributeUtils {
 
 		if ( ! format ) {
 
-			console.error( 'THREE.WebGPUAttributeUtils: Vertex format not supported yet.' );
+			error( 'WebGPUAttributeUtils: Vertex format not supported yet.' );
 
 		}
 
 		return format;
-
-	}
-
-	/**
-	 * Returns `true` if the given array is a typed array.
-	 *
-	 * @private
-	 * @param {any} array - The array.
-	 * @return {boolean} Whether the given array is a typed array or not.
-	 */
-	_isTypedArray( array ) {
-
-		return ArrayBuffer.isView( array ) && ! ( array instanceof DataView );
 
 	}
 

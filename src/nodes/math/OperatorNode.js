@@ -1,6 +1,17 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import TempNode from '../core/TempNode.js';
-import { addMethodChaining, int, nodeProxy } from '../tsl/TSLCore.js';
+import { addMethodChaining, Fn, int, nodeProxyIntent } from '../tsl/TSLCore.js';
+import { warn } from '../../utils.js';
+
+const _vectorOperators = {
+	'==': 'equal',
+	'!=': 'notEqual',
+	'<': 'lessThan',
+	'>': 'greaterThan',
+	'<=': 'lessThanEqual',
+	'>=': 'greaterThanEqual',
+	'%': 'mod'
+};
 
 /**
  * This node represents basic mathematical and logical operations like addition,
@@ -76,14 +87,27 @@ class OperatorNode extends TempNode {
 	}
 
 	/**
+	 * Returns the operator method name.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} output - The output type.
+	 * @returns {string} The operator method name.
+	 */
+	getOperatorMethod( builder, output ) {
+
+		return builder.getMethod( _vectorOperators[ this.op ], output );
+
+	}
+
+	/**
 	 * This method is overwritten since the node type is inferred from the operator
 	 * and the input node types.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {string} output - The current output string.
+	 * @param {?string} [output=null] - The output type.
 	 * @return {string} The node type.
 	 */
-	getNodeType( builder, output ) {
+	getNodeType( builder, output = null ) {
 
 		const op = this.op;
 
@@ -91,11 +115,11 @@ class OperatorNode extends TempNode {
 		const bNode = this.bNode;
 
 		const typeA = aNode.getNodeType( builder );
-		const typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
+		const typeB = bNode ? bNode.getNodeType( builder ) : null;
 
 		if ( typeA === 'void' || typeB === 'void' ) {
 
-			return 'void';
+			return output || 'void';
 
 		} else if ( op === '%' ) {
 
@@ -105,13 +129,13 @@ class OperatorNode extends TempNode {
 
 			return builder.getIntegerType( typeA );
 
-		} else if ( op === '!' || op === '==' || op === '!=' || op === '&&' || op === '||' || op === '^^' ) {
+		} else if ( op === '!' || op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
 
-		} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+		} else if ( op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
-			const typeLength = output ? builder.getTypeLength( output ) : Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
+			const typeLength = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
 			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
@@ -169,8 +193,7 @@ class OperatorNode extends TempNode {
 
 		const op = this.op;
 
-		const aNode = this.aNode;
-		const bNode = this.bNode;
+		const { aNode, bNode } = this;
 
 		const type = this.getNodeType( builder, output );
 
@@ -180,13 +203,17 @@ class OperatorNode extends TempNode {
 		if ( type !== 'void' ) {
 
 			typeA = aNode.getNodeType( builder );
-			typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
+			typeB = bNode ? bNode.getNodeType( builder ) : null;
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
 				if ( builder.isVector( typeA ) ) {
 
 					typeB = typeA;
+
+				} else if ( builder.isVector( typeB ) ) {
+
+					typeA = typeB;
 
 				} else if ( typeA !== typeB ) {
 
@@ -262,22 +289,21 @@ class OperatorNode extends TempNode {
 		}
 
 		const a = aNode.build( builder, typeA );
-		const b = typeof bNode !== 'undefined' ? bNode.build( builder, typeB ) : null;
+		const b = bNode ? bNode.build( builder, typeB ) : null;
 
-		const outputLength = builder.getTypeLength( output );
 		const fnOpSnippet = builder.getFunctionOperator( op );
 
 		if ( output !== 'void' ) {
 
 			const isGLSL = builder.renderer.coordinateSystem === WebGLCoordinateSystem;
 
-			if ( op === '==' ) {
+			if ( op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
 				if ( isGLSL ) {
 
-					if ( outputLength > 1 ) {
+					if ( builder.isVector( typeA ) ) {
 
-						return builder.format( `${ builder.getMethod( 'equal', output ) }( ${ a }, ${ b } )`, type, output );
+						return builder.format( `${ this.getOperatorMethod( builder, output ) }( ${ a }, ${ b } )`, type, output );
 
 					} else {
 
@@ -289,71 +315,7 @@ class OperatorNode extends TempNode {
 
 					// WGSL
 
-					if ( outputLength > 1 || ! builder.isVector( typeA ) ) {
-
-						return builder.format( `( ${ a } == ${ b } )`, type, output );
-
-					} else {
-
-						return builder.format( `all( ${ a } == ${ b } )`, type, output );
-
-					}
-
-				}
-
-			} else if ( op === '<' && outputLength > 1 ) {
-
-				if ( isGLSL ) {
-
-					return builder.format( `${ builder.getMethod( 'lessThan', output ) }( ${ a }, ${ b } )`, type, output );
-
-				} else {
-
-					// WGSL
-
-					return builder.format( `( ${ a } < ${ b } )`, type, output );
-
-				}
-
-			} else if ( op === '<=' && outputLength > 1 ) {
-
-				if ( isGLSL ) {
-
-					return builder.format( `${ builder.getMethod( 'lessThanEqual', output ) }( ${ a }, ${ b } )`, type, output );
-
-				} else {
-
-					// WGSL
-
-					return builder.format( `( ${ a } <= ${ b } )`, type, output );
-
-				}
-
-			} else if ( op === '>' && outputLength > 1 ) {
-
-				if ( isGLSL ) {
-
-					return builder.format( `${ builder.getMethod( 'greaterThan', output ) }( ${ a }, ${ b } )`, type, output );
-
-				} else {
-
-					// WGSL
-
-					return builder.format( `( ${ a } > ${ b } )`, type, output );
-
-				}
-
-			} else if ( op === '>=' && outputLength > 1 ) {
-
-				if ( isGLSL ) {
-
-					return builder.format( `${ builder.getMethod( 'greaterThanEqual', output ) }( ${ a }, ${ b } )`, type, output );
-
-				} else {
-
-					// WGSL
-
-					return builder.format( `( ${ a } >= ${ b } )`, type, output );
+					return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
 
 				}
 
@@ -365,7 +327,7 @@ class OperatorNode extends TempNode {
 
 				} else {
 
-					return builder.format( `${ builder.getMethod( 'mod', type ) }( ${ a }, ${ b } )`, type, output );
+					return builder.format( `${ this.getOperatorMethod( builder, type ) }( ${ a }, ${ b } )`, type, output );
 
 				}
 
@@ -459,7 +421,7 @@ export default OperatorNode;
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' ).setParameterLength( 2, Infinity ).setName( 'add' );
+export const add = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '+' ).setParameterLength( 2, Infinity ).setName( 'add' );
 
 /**
  * Returns the subtraction of two or more value.
@@ -471,7 +433,7 @@ export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' ).setParameterLeng
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' ).setParameterLength( 2, Infinity ).setName( 'sub' );
+export const sub = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '-' ).setParameterLength( 2, Infinity ).setName( 'sub' );
 
 /**
  * Returns the multiplication of two or more value.
@@ -483,7 +445,7 @@ export const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' ).setParameterLeng
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' ).setParameterLength( 2, Infinity ).setName( 'mul' );
+export const mul = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '*' ).setParameterLength( 2, Infinity ).setName( 'mul' );
 
 /**
  * Returns the division of two or more value.
@@ -495,7 +457,7 @@ export const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' ).setParameterLeng
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
+export const div = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
 
 /**
  * Computes the remainder of dividing the first node by the second one.
@@ -506,7 +468,7 @@ export const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' ).setParameterLeng
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const mod = /*@__PURE__*/ nodeProxy( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'mod' );
+export const mod = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'mod' );
 
 /**
  * Checks if two nodes are equal.
@@ -517,7 +479,7 @@ export const mod = /*@__PURE__*/ nodeProxy( OperatorNode, '%' ).setParameterLeng
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' ).setParameterLength( 2 ).setName( 'equal' );
+export const equal = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '==' ).setParameterLength( 2 ).setName( 'equal' );
 
 /**
  * Checks if two nodes are not equal.
@@ -528,7 +490,7 @@ export const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' ).setParameterL
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' ).setParameterLength( 2 ).setName( 'notEqual' );
+export const notEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '!=' ).setParameterLength( 2 ).setName( 'notEqual' );
 
 /**
  * Checks if the first node is less than the second.
@@ -539,7 +501,7 @@ export const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' ).setParamet
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' ).setParameterLength( 2 ).setName( 'lessThan' );
+export const lessThan = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<' ).setParameterLength( 2 ).setName( 'lessThan' );
 
 /**
  * Checks if the first node is greater than the second.
@@ -550,7 +512,7 @@ export const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' ).setParamete
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' ).setParameterLength( 2 ).setName( 'greaterThan' );
+export const greaterThan = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>' ).setParameterLength( 2 ).setName( 'greaterThan' );
 
 /**
  * Checks if the first node is less than or equal to the second.
@@ -561,7 +523,7 @@ export const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' ).setParam
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' ).setParameterLength( 2 ).setName( 'lessThanEqual' );
+export const lessThanEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<=' ).setParameterLength( 2 ).setName( 'lessThanEqual' );
 
 /**
  * Checks if the first node is greater than or equal to the second.
@@ -572,7 +534,7 @@ export const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' ).setPa
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' ).setParameterLength( 2 ).setName( 'greaterThanEqual' );
+export const greaterThanEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>=' ).setParameterLength( 2 ).setName( 'greaterThanEqual' );
 
 /**
  * Performs a logical AND operation on multiple nodes.
@@ -582,7 +544,7 @@ export const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' ).se
  * @param {...Node} nodes - The input nodes to be combined using AND.
  * @returns {OperatorNode}
  */
-export const and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' ).setParameterLength( 2, Infinity ).setName( 'and' );
+export const and = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&&' ).setParameterLength( 2, Infinity ).setName( 'and' );
 
 /**
  * Performs a logical OR operation on multiple nodes.
@@ -592,7 +554,7 @@ export const and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' ).setParameterLen
  * @param {...Node} nodes - The input nodes to be combined using OR.
  * @returns {OperatorNode}
  */
-export const or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' ).setParameterLength( 2, Infinity ).setName( 'or' );
+export const or = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '||' ).setParameterLength( 2, Infinity ).setName( 'or' );
 
 /**
  * Performs logical NOT on a node.
@@ -602,7 +564,7 @@ export const or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' ).setParameterLeng
  * @param {Node} value - The value.
  * @returns {OperatorNode}
  */
-export const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' ).setParameterLength( 1 ).setName( 'not' );
+export const not = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '!' ).setParameterLength( 1 ).setName( 'not' );
 
 /**
  * Performs logical XOR on two nodes.
@@ -613,7 +575,7 @@ export const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' ).setParameterLeng
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' ).setParameterLength( 2 ).setName( 'xor' );
+export const xor = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '^^' ).setParameterLength( 2 ).setName( 'xor' );
 
 /**
  * Performs bitwise AND on two nodes.
@@ -624,7 +586,7 @@ export const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' ).setParameterLen
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' ).setParameterLength( 2 ).setName( 'bitAnd' );
+export const bitAnd = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&' ).setParameterLength( 2 ).setName( 'bitAnd' );
 
 /**
  * Performs bitwise NOT on a node.
@@ -635,7 +597,7 @@ export const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' ).setParameterL
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' ).setParameterLength( 2 ).setName( 'bitNot' );
+export const bitNot = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '~' ).setParameterLength( 1 ).setName( 'bitNot' );
 
 /**
  * Performs bitwise OR on two nodes.
@@ -646,7 +608,7 @@ export const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' ).setParameterL
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' ).setParameterLength( 2 ).setName( 'bitOr' );
+export const bitOr = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '|' ).setParameterLength( 2 ).setName( 'bitOr' );
 
 /**
  * Performs bitwise XOR on two nodes.
@@ -657,7 +619,7 @@ export const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' ).setParameterLe
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' ).setParameterLength( 2 ).setName( 'bitXor' );
+export const bitXor = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '^' ).setParameterLength( 2 ).setName( 'bitXor' );
 
 /**
  * Shifts a node to the left.
@@ -668,7 +630,7 @@ export const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' ).setParameterL
  * @param {Node} b - The value to shift.
  * @returns {OperatorNode}
  */
-export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' ).setParameterLength( 2 ).setName( 'shiftLeft' );
+export const shiftLeft = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<<' ).setParameterLength( 2 ).setName( 'shiftLeft' );
 
 /**
  * Shifts a node to the right.
@@ -679,7 +641,69 @@ export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' ).setParame
  * @param {Node} b - The value to shift.
  * @returns {OperatorNode}
  */
-export const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
+export const shiftRight = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
+
+/**
+ * Increments a node by 1.
+ *
+ * @tsl
+ * @function
+ * @param {Node} a - The node to increment.
+ * @returns {OperatorNode}
+ */
+export const incrementBefore = Fn( ( [ a ] ) => {
+
+	a.addAssign( 1 );
+	return a;
+
+} );
+
+/**
+ * Decrements a node by 1.
+ *
+ * @tsl
+ * @function
+ * @param {Node} a - The node to decrement.
+ * @returns {OperatorNode}
+ */
+export const decrementBefore = Fn( ( [ a ] ) => {
+
+	a.subAssign( 1 );
+	return a;
+
+} );
+
+/**
+ * Increments a node by 1 and returns the previous value.
+ *
+ * @tsl
+ * @function
+ * @param {Node} a - The node to increment.
+ * @returns {OperatorNode}
+ */
+export const increment = /*@__PURE__*/ Fn( ( [ a ] ) => {
+
+	const temp = int( a ).toConst();
+	a.addAssign( 1 );
+	return temp;
+
+} );
+
+/**
+ * Decrements a node by 1 and returns the previous value.
+ *
+ * @tsl
+ * @function
+ * @param {Node} a - The node to decrement.
+ * @returns {OperatorNode}
+ */
+export const decrement = /*@__PURE__*/ Fn( ( [ a ] ) => {
+
+	const temp = int( a ).toConst();
+	a.subAssign( 1 );
+	return temp;
+
+} );
 
 addMethodChaining( 'add', add );
 addMethodChaining( 'sub', sub );
@@ -703,21 +727,10 @@ addMethodChaining( 'bitXor', bitXor );
 addMethodChaining( 'shiftLeft', shiftLeft );
 addMethodChaining( 'shiftRight', shiftRight );
 
-/**
- * @tsl
- * @function
- * @deprecated since r168. Use {@link mod} instead.
- *
- * @param {Node} a - The first input.
- * @param {Node} b - The second input.
- * @returns {OperatorNode}
- */
-export const remainder = ( a, b ) => { // @deprecated, r168
-
-	console.warn( 'THREE.TSL: "remainder()" is deprecated. Use "mod( int( ... ) )" instead.' );
-	return mod( a, b );
-
-};
+addMethodChaining( 'incrementBefore', incrementBefore );
+addMethodChaining( 'decrementBefore', decrementBefore );
+addMethodChaining( 'increment', increment );
+addMethodChaining( 'decrement', decrement );
 
 /**
  * @tsl
@@ -730,10 +743,9 @@ export const remainder = ( a, b ) => { // @deprecated, r168
  */
 export const modInt = ( a, b ) => { // @deprecated, r175
 
-	console.warn( 'THREE.TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
+	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.' );
 	return mod( int( a ), int( b ) );
 
 };
 
-addMethodChaining( 'remainder', remainder );
 addMethodChaining( 'modInt', modInt );

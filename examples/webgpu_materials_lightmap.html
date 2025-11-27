@@ -4,10 +4,11 @@
 		<title>three.js webgpu - lightmap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -21,15 +22,19 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { vec4, color, positionLocal, mix } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let container, stats;
+			let container;
 			let camera, scene, renderer;
+
+			const params = {
+				intensity: 1
+			};
 
 			init();
 
@@ -85,6 +90,7 @@
 				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( innerWidth, innerHeight );
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
 				// CONTROLS
@@ -93,10 +99,19 @@
 				controls.maxPolarAngle = 0.9 * Math.PI / 2;
 				controls.enableZoom = false;
 
-				// STATS
+				// GUI
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				const gui = renderer.inspector.createParameters( 'Parameters' );
+
+				gui.add( params, 'intensity', 0, 1 ).name( 'Light Map Intensity' ).onChange( ( value ) => {
+
+					for ( const material of object.material ) {
+
+						material.lightMapIntensity = value;
+
+					}
+
+				} );
 
 				//
 
@@ -118,7 +133,6 @@
 			function animate() {
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

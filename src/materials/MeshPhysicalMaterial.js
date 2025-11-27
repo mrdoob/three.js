@@ -27,6 +27,7 @@ import { clamp } from '../math/MathUtils.js';
  * best results, always specify an environment map when using this material.
  *
  * @augments MeshStandardMaterial
+ * @demo scenes/material-browser.html#MeshPhysicalMaterial
  */
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
@@ -323,7 +324,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	}
 
 	/**
-	 * The anisotropy strength.
+	 * The anisotropy strength, from `0.0` to `1.0`.
 	 *
 	 * @type {number}
 	 * @default 0

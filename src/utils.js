@@ -62,6 +62,18 @@ function getTypedArray( type, buffer ) {
 
 }
 
+/**
+ * Returns `true` if the given object is a typed array.
+ *
+ * @param {any} array - The object to check.
+ * @return {boolean} Whether the given object is a typed array.
+ */
+function isTypedArray( array ) {
+
+	return ArrayBuffer.isView( array ) && ! ( array instanceof DataView );
+
+}
+
 function createElementNS( name ) {
 
 	return document.createElementNS( 'http://www.w3.org/1999/xhtml', name );
@@ -78,13 +90,77 @@ function createCanvasElement() {
 
 const _cache = {};
 
-function warnOnce( message ) {
+let _setConsoleFunction = null;
+
+function setConsoleFunction( fn ) {
+
+	_setConsoleFunction = fn;
+
+}
+
+function getConsoleFunction() {
+
+	return _setConsoleFunction;
+
+}
+
+function log( ...params ) {
+
+	const message = 'THREE.' + params.shift();
+
+	if ( _setConsoleFunction ) {
+
+		_setConsoleFunction( 'log', message, ...params );
+
+	} else {
+
+		console.log( message, ...params );
+
+	}
+
+}
+
+function warn( ...params ) {
+
+	const message = 'THREE.' + params.shift();
+
+	if ( _setConsoleFunction ) {
+
+		_setConsoleFunction( 'warn', message, ...params );
+
+	} else {
+
+		console.warn( message, ...params );
+
+	}
+
+}
+
+function error( ...params ) {
+
+	const message = 'THREE.' + params.shift();
+
+	if ( _setConsoleFunction ) {
+
+		_setConsoleFunction( 'error', message, ...params );
+
+	} else {
+
+		console.error( message, ...params );
+
+	}
+
+}
+
+function warnOnce( ...params ) {
+
+	const message = params.join( ' ' );
 
 	if ( message in _cache ) return;
 
 	_cache[ message ] = true;
 
-	console.warn( message );
+	warn( ...params );
 
 }
 
@@ -149,4 +225,4 @@ function toReversedProjectionMatrix( projectionMatrix ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, warnOnce, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix };
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, setConsoleFunction, getConsoleFunction, log, warn, error, warnOnce, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, isTypedArray };

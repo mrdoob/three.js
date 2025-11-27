@@ -61,6 +61,14 @@ class StorageTextureNode extends TextureNode {
 		this.storeNode = storeNode;
 
 		/**
+		 * The mip level to write to for storage textures.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.mipLevel = 0;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -98,6 +106,8 @@ class StorageTextureNode extends TextureNode {
 		const properties = builder.getNodeProperties( this );
 		properties.storeNode = this.storeNode;
 
+		return properties;
+
 	}
 
 	/**
@@ -109,6 +119,19 @@ class StorageTextureNode extends TextureNode {
 	setAccess( value ) {
 
 		this.access = value;
+		return this;
+
+	}
+
+	/**
+	 * Sets the mip level to write to.
+	 *
+	 * @param {number} level - The mip level.
+	 * @return {StorageTextureNode} A reference to this node.
+	 */
+	setMipLevel( level ) {
+
+		this.mipLevel = level;
 		return this;
 
 	}
@@ -181,15 +204,25 @@ class StorageTextureNode extends TextureNode {
 
 		const properties = builder.getNodeProperties( this );
 
-		const { uvNode, storeNode } = properties;
+		const { uvNode, storeNode, depthNode } = properties;
 
 		const textureProperty = super.generate( builder, 'property' );
-		const uvSnippet = uvNode.build( builder, 'uvec2' );
+		const uvSnippet = uvNode.build( builder, this.value.is3DTexture === true ? 'uvec3' : 'uvec2' );
 		const storeSnippet = storeNode.build( builder, 'vec4' );
+		const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 
-		const snippet = builder.generateTextureStore( builder, textureProperty, uvSnippet, storeSnippet );
+		const snippet = builder.generateTextureStore( builder, textureProperty, uvSnippet, depthSnippet, storeSnippet );
 
 		builder.addLineFlowCode( snippet, this );
+
+	}
+
+	clone() {
+
+		const newNode = super.clone();
+		newNode.storeNode = this.storeNode;
+		newNode.mipLevel = this.mipLevel;
+		return newNode;
 
 	}
 
@@ -224,7 +257,7 @@ export const textureStore = ( value, uvNode, storeNode ) => {
 
 	const node = storageTexture( value, uvNode, storeNode );
 
-	if ( storeNode !== null ) node.append();
+	if ( storeNode !== null ) node.toStack();
 
 	return node;
 

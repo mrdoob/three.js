@@ -37,6 +37,7 @@ class RenderTarget3D extends RenderTarget {
 		 * @type {Data3DTexture}
 		 */
 		this.texture = new Data3DTexture( null, width, height, depth );
+		this._setTextureOptions( options );
 
 		this.texture.isRenderTargetTexture = true;
 

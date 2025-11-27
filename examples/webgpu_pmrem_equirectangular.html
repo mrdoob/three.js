@@ -4,7 +4,7 @@
 		<title>three.js webgpu - pmrem equirectangular</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
@@ -21,14 +21,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-			import { normalWorld, uniform, normalView, positionViewDirection, cameraViewMatrix, pmremTexture } from 'three/tsl';
+			import * as THREE from 'three/webgpu';
+			import { normalWorldGeometry, uniform, pmremTexture } from 'three/tsl';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
 
@@ -40,7 +38,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 1.8, 0.6, 2.7 );
+				camera.position.set( 0, 0, 8 );
 
 				scene = new THREE.Scene();
 
@@ -49,6 +47,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 				await renderer.init();
@@ -56,32 +55,38 @@
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
 				controls.update();
 
-				new RGBELoader()
+				new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( map ) {
+					.load( 'royal_esplanade_2k.hdr.jpg', function ( map ) {
 
 						map.mapping = THREE.EquirectangularReflectionMapping;
 
-						const reflectVec = positionViewDirection.negate().reflect( normalView ).transformDirection( cameraViewMatrix );
+						scene.backgroundNode = pmremTexture( map, normalWorldGeometry, uniform( 0.5 ) );
 
-						const pmremRoughness = uniform( .5 );
-						const pmremNode = pmremTexture( map, reflectVec, pmremRoughness );
+						const geometry = new THREE.SphereGeometry( 0.4, 64, 64 );
 
-						scene.backgroundNode = pmremTexture( map, normalWorld, pmremRoughness );
+						for ( let i = 0; i < 6; i ++ ) {
 
-						scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new THREE.MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
+							for ( let j = 0; j < 5; j ++ ) {
 
-						// gui
+								const material = new THREE.MeshPhysicalNodeMaterial( {
+									roughness: i / 5,
+									metalness: j / 4,
+									envMap: map
+								} );
 
-						const gui = new GUI();
-						gui.add( pmremRoughness, 'value', 0, 1, 0.001 ).name( 'roughness' ).onChange( () => render() );
+								const mesh = new THREE.Mesh( geometry, material );
+								mesh.position.x = i - 2.5;
+								mesh.position.y = j - 2;
+								scene.add( mesh );
 
-						render();
+							}
+
+						}
 
 					} );
 
@@ -95,8 +100,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
 
 			}
 

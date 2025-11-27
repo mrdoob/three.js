@@ -91,7 +91,7 @@ class OrbitControls extends Controls {
 	 * Constructs a new controls instance.
 	 *
 	 * @param {Object3D} object - The object that is managed by the controls.
-	 * @param {?HTMLDOMElement} domElement - The HTML element used for event listeners.
+	 * @param {?HTMLElement} domElement - The HTML element used for event listeners.
 	 */
 	constructor( object, domElement = null ) {
 
@@ -482,8 +482,8 @@ class OrbitControls extends Controls {
 	disconnect() {
 
 		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
-		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
-		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
+		this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
+		this.domElement.ownerDocument.removeEventListener( 'pointerup', this._onPointerUp );
 		this.domElement.removeEventListener( 'pointercancel', this._onPointerUp );
 
 		this.domElement.removeEventListener( 'wheel', this._onMouseWheel );
@@ -541,7 +541,7 @@ class OrbitControls extends Controls {
 	 * Adds key event listeners to the given DOM element.
 	 * `window` is a recommended argument for using this method.
 	 *
-	 * @param {HTMLDOMElement} domElement - The DOM element
+	 * @param {HTMLElement} domElement - The DOM element
 	 */
 	listenToKeyEvents( domElement ) {
 
@@ -1458,8 +1458,8 @@ function onPointerDown( event ) {
 
 		this.domElement.setPointerCapture( event.pointerId );
 
-		this.domElement.addEventListener( 'pointermove', this._onPointerMove );
-		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
+		this.domElement.ownerDocument.addEventListener( 'pointermove', this._onPointerMove );
+		this.domElement.ownerDocument.addEventListener( 'pointerup', this._onPointerUp );
 
 	}
 
@@ -1509,8 +1509,8 @@ function onPointerUp( event ) {
 
 			this.domElement.releasePointerCapture( event.pointerId );
 
-			this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
-			this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
+			this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
+			this.domElement.ownerDocument.removeEventListener( 'pointerup', this._onPointerUp );
 
 			this.dispatchEvent( _endEvent );
 

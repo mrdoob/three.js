@@ -4,12 +4,18 @@
 		<title>three.js webgpu - compute geometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - compute geometry
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Compute Geometry</span>
+			</div>
+
+			<small>Jelly deformation with compute shaders. Move pointer to interact.</small>
 		</div>
 
 		<script type="importmap">
@@ -25,20 +31,17 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { vec4, storage, Fn, If, uniform, instanceIndex, objectWorldMatrix, color, screenUV, attribute } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 			let raycaster, pointer;
-			let stats;
 
 			let mesh;
 
@@ -117,7 +120,7 @@
 
 					currentPosition.addAssign( currentSpeed );
 
-				} )().compute( count );
+				} )().compute( count ).setName( 'Update Jelly' );
 
 				// initialize the storage buffer with the base position
 
@@ -172,20 +175,18 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = .7;
 				controls.maxDistance = 2;
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( elasticity, 'value', 0, .5 ).name( 'elasticity' );
 				gui.add( damping, 'value', .9, .98 ).name( 'damping' );
 				gui.add( brushSize, 'value', .1, .5 ).name( 'brush size' );
 				gui.add( brushStrength, 'value', .1, .3 ).name( 'brush strength' );
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 				window.addEventListener( 'pointermove', onPointerMove );
@@ -225,8 +226,6 @@
 			}
 
 			async function animate() {
-
-				stats.update();
 
 				renderer.render( scene, camera );
 

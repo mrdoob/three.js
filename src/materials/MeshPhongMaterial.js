@@ -7,7 +7,7 @@ import { Euler } from '../math/Euler.js';
 /**
  * A material for shiny surfaces with specular highlights.
  *
- * The material uses a non-physically based [Blinn-Phong]{@link https://en.wikipedia.org/wiki/Blinn-Phong_shading_model}
+ * The material uses a non-physically based [Blinn-Phong](https://en.wikipedia.org/wiki/Blinn-Phong_shading_model)
  * model for calculating reflectance. Unlike the Lambertian model used in the
  * {@link MeshLambertMaterial} this can simulate shiny surfaces with specular
  * highlights (such as varnished wood). `MeshPhongMaterial` uses per-fragment shading.
@@ -17,6 +17,7 @@ import { Euler } from '../math/Euler.js';
  * some graphical accuracy.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshPhongMaterial
  */
 class MeshPhongMaterial extends Material {
 

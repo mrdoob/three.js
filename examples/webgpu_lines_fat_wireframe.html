@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - lines - fat - wireframe</title>
+		<title>three.js webgpu - fat wireframe</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
 
 		<div id="container"></div>
 
-		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Fat Lines</span>
+			</div>
+
+			<small>
+				Wireframe rendering of fat lines.
+			</small>
+		</div>
 
 		<script type="importmap">
 			{
@@ -26,12 +36,11 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { color } from 'three/tsl';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Wireframe } from 'three/addons/lines/webgpu/Wireframe.js';
 			import { WireframeGeometry2 } from 'three/addons/lines/WireframeGeometry2.js';
@@ -39,7 +48,6 @@
 			let wireframe, renderer, scene, camera, camera2, controls, backgroundNode;
 			let wireframe1;
 			let matLine, matLineBasic, matLineDashed;
-			let stats;
 			let gui;
 
 			// viewport
@@ -55,6 +63,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000, 0.0 );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -107,9 +116,6 @@
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				initGui();
 
 			}
@@ -140,6 +146,9 @@
 				renderer.autoClear = true;
 
 				scene.backgroundNode = null;
+
+				scene.name = 'Scene';
+
 				renderer.render( scene, camera );
 
 				// inset scene
@@ -160,11 +169,12 @@
 				renderer.autoClear = false;
 
 				scene.backgroundNode = backgroundNode;
+
+				scene.name = 'Scene [ Scissor ]';
+
 				renderer.render( scene, camera2 );
 
 				renderer.setScissorTest( false );
-
-				stats.update();
 
 			}
 
@@ -172,7 +182,7 @@
 
 			function initGui() {
 
-				gui = new GUI();
+				gui = renderer.inspector.createParameters( 'Settings' );
 
 				const param = {
 					'line type': 0,
@@ -220,7 +230,7 @@
 
 				gui.add( param, 'dash scale', 0.5, 1, 0.1 ).onChange( function ( val ) {
 
-					matLine.dashScale = val;
+					matLine.scale = val;
 					matLineDashed.scale = val;
 
 				} );

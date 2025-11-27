@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - material - basic</title>
+		<title>three.js webgpu - basic material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Basic Material</span>
+			</div>
+
+			<small>
+				Basic Material example.
+			</small>
+		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -20,9 +33,9 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 
@@ -91,11 +104,12 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				const gui = new GUI( { width: 300 } );
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.addColor( params, 'color' ).onChange( ( value ) => material.color.set( value ) );
 				gui.add( params, 'mapping', mappings ).onChange( ( value ) => {
@@ -104,15 +118,14 @@
 					material.needsUpdate = true;
 			
 				} );
-				gui.add( params, 'refractionRatio' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( ( value ) => material.refractionRatio = value );
+				gui.add( params, 'refractionRatio', 0, 1, 0.01 ).onChange( ( value ) => material.refractionRatio = value );
 				gui.add( params, 'transparent' ).onChange( ( value ) => {
 			
 					material.transparent = value;
 					material.needsUpdate = true;
 
 				} );
-				gui.add( params, 'opacity' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( ( value ) => material.opacity = value );
-				gui.open();
+				gui.add( params, 'opacity', 0, 1, 0.01 ).onChange( ( value ) => material.opacity = value );
 
 				//
 

@@ -1,9 +1,10 @@
-import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { WebGLShader } from './WebGLShader.js';
-import { WebGLUniforms } from './WebGLUniforms.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { error, warn } from '../../utils.js';
+import { ShaderChunk } from '../shaders/ShaderChunk.js';
+import { WebGLShader } from './WebGLShader.js';
+import { WebGLUniforms } from './WebGLUniforms.js';
 
 import {
 	ACESFilmicToneMapping,
@@ -24,7 +25,6 @@ import {
 	NeutralToneMapping,
 	NoToneMapping,
 	PCFShadowMap,
-	PCFSoftShadowMap,
 	RedFormat,
 	RedIntegerFormat,
 	ReinhardToneMapping,
@@ -78,7 +78,7 @@ function getEncodingComponents( colorSpace ) {
 			return [ encodingMatrix, 'sRGBTransferOETF' ];
 
 		default:
-			console.warn( 'THREE.WebGLProgram: Unsupported color space: ', colorSpace );
+			warn( 'WebGLProgram: Unsupported color space: ', colorSpace );
 			return [ encodingMatrix, 'LinearTransferOETF' ];
 
 	}
@@ -88,7 +88,9 @@ function getEncodingComponents( colorSpace ) {
 function getShaderErrors( gl, shader, type ) {
 
 	const status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
-	const errors = gl.getShaderInfoLog( shader ).trim();
+
+	const shaderInfoLog = gl.getShaderInfoLog( shader ) || '';
+	const errors = shaderInfoLog.trim();
 
 	if ( status && errors === '' ) return '';
 
@@ -96,7 +98,7 @@ function getShaderErrors( gl, shader, type ) {
 	if ( errorMatches ) {
 
 		// --enable-privileged-webgl-extension
-		// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
+		// log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
 
 		const errorLine = parseInt( errorMatches[ 1 ] );
 		return type.toUpperCase() + '\n\n' + errors + '\n\n' + handleSource( gl.getShaderSource( shader ), errorLine );
@@ -160,7 +162,7 @@ function getToneMappingFunction( functionName, toneMapping ) {
 			break;
 
 		default:
-			console.warn( 'THREE.WebGLProgram: Unsupported toneMapping:', toneMapping );
+			warn( 'WebGLProgram: Unsupported toneMapping:', toneMapping );
 			toneMappingName = 'Linear';
 
 	}
@@ -238,7 +240,7 @@ function fetchAttributeLocations( gl, program ) {
 		if ( info.type === gl.FLOAT_MAT3 ) locationSize = 3;
 		if ( info.type === gl.FLOAT_MAT4 ) locationSize = 4;
 
-		// console.log( 'THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:', name, i );
+		// log( 'WebGLProgram: ACTIVE VERTEX ATTRIBUTE:', name, i );
 
 		attributes[ name ] = {
 			type: info.type,
@@ -308,7 +310,7 @@ function includeReplacer( match, include ) {
 		if ( newInclude !== undefined ) {
 
 			string = ShaderChunk[ newInclude ];
-			console.warn( 'THREE.WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
+			warn( 'WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
 
 		} else {
 
@@ -396,10 +398,6 @@ function generateShadowMapTypeDefine( parameters ) {
 	if ( parameters.shadowMapType === PCFShadowMap ) {
 
 		shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF';
-
-	} else if ( parameters.shadowMapType === PCFSoftShadowMap ) {
-
-		shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF_SOFT';
 
 	} else if ( parameters.shadowMapType === VSMShadowMap ) {
 
@@ -586,7 +584,7 @@ function generateOutputDefinitions( renderTarget ) {
 function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	// TODO Send this event to Three.js DevTools
-	// console.log( 'WebGLProgram', cacheKey );
+	// log( 'WebGLProgram', cacheKey );
 
 	const gl = renderer.getContext();
 
@@ -764,8 +762,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
 
-			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
+			parameters.logarithmicDepthBuffer ? '#define USE_LOGARITHMIC_DEPTH_BUFFER' : '',
+			parameters.reversedDepthBuffer ? '#define USE_REVERSED_DEPTH_BUFFER' : '',
 
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
@@ -931,8 +929,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
 			parameters.decodeVideoTextureEmissive ? '#define DECODE_VIDEO_TEXTURE_EMISSIVE' : '',
 
-			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
+			parameters.logarithmicDepthBuffer ? '#define USE_LOGARITHMIC_DEPTH_BUFFER' : '',
+			parameters.reversedDepthBuffer ? '#define USE_REVERSED_DEPTH_BUFFER' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
@@ -1003,8 +1001,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	const vertexGlsl = versionString + prefixVertex + vertexShader;
 	const fragmentGlsl = versionString + prefixFragment + fragmentShader;
 
-	// console.log( '*VERTEX*', vertexGlsl );
-	// console.log( '*FRAGMENT*', fragmentGlsl );
+	// log( '*VERTEX*', vertexGlsl );
+	// log( '*FRAGMENT*', fragmentGlsl );
 
 	const glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 	const glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
@@ -1032,9 +1030,13 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		// check for link errors
 		if ( renderer.debug.checkShaderErrors ) {
 
-			const programLog = gl.getProgramInfoLog( program ).trim();
-			const vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-			const fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+			const programInfoLog = gl.getProgramInfoLog( program ) || '';
+			const vertexShaderInfoLog = gl.getShaderInfoLog( glVertexShader ) || '';
+			const fragmentShaderInfoLog = gl.getShaderInfoLog( glFragmentShader ) || '';
+
+			const programLog = programInfoLog.trim();
+			const vertexLog = vertexShaderInfoLog.trim();
+			const fragmentLog = fragmentShaderInfoLog.trim();
 
 			let runnable = true;
 			let haveDiagnostics = true;
@@ -1054,7 +1056,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 					const vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
 					const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
 
-					console.error(
+					error(
 						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
 						'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
 						'Material Name: ' + self.name + '\n' +
@@ -1068,7 +1070,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			} else if ( programLog !== '' ) {
 
-				console.warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
+				warn( 'WebGLProgram: Program Info Log:', programLog );
 
 			} else if ( vertexLog === '' || fragmentLog === '' ) {
 

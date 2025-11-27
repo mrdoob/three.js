@@ -4,12 +4,19 @@
 		<title>three.js webgpu - clipping planes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - clipping
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Clipping Planes</span>
+			</div>
+
+			<small>Clipping 3D objects via Clipping Planes.</small>
 		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -23,15 +30,13 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let camera, scene, renderer, startTime, object, stats;
+			let camera, scene, renderer, startTime, object;
 
 			init();
 
@@ -119,11 +124,6 @@
 				ground.receiveShadow = true;
 				globalClippingGroup.add( ground );
 
-				// Stats
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				// Renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
@@ -131,6 +131,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				window.addEventListener( 'resize', onWindowResize );
 				document.body.appendChild( renderer.domElement );
 
@@ -142,86 +143,87 @@
 
 				// GUI
 
-				const gui = new GUI(),
-					props = {
-						alphaToCoverage: true,
+				const gui = renderer.inspector.createParameters( 'Clipping settings' );
+				const props = {
+					alphaToCoverage: true,
+				};
+			
+				const folderKnot = gui.addFolder( 'Knot Clipping Group' );
+				const propsKnot = {
+
+					get 'Enabled'() {
+
+						return knotClippingGroup.enabled;
+
 					},
-					folderKnot = gui.addFolder( 'Knot Clipping Group' ),
-					propsKnot = {
+					set 'Enabled'( v ) {
 
-						get 'Enabled'() {
-
-							return knotClippingGroup.enabled;
-
-						},
-						set 'Enabled'( v ) {
-
-							knotClippingGroup.enabled = v;
-
-						},
-
-						get 'Shadows'() {
-
-							return knotClippingGroup.clipShadows;
-
-						},
-						set 'Shadows'( v ) {
-
-							knotClippingGroup.clipShadows = v;
-
-						},
-
-						get 'Intersection'() {
-
-							return knotClippingGroup.clipIntersection;
-
-						},
-
-						set 'Intersection'( v ) {
-
-							knotClippingGroup.clipIntersection = v;
-
-						},
-
-						get 'Plane'() {
-
-							return localPlane1.constant;
-
-						},
-						set 'Plane'( v ) {
-
-							localPlane1.constant = v;
-
-						}
+						knotClippingGroup.enabled = v;
 
 					},
 
-					folderGlobal = gui.addFolder( 'Global Clipping Group' ),
-					propsGlobal = {
+					get 'Shadows'() {
 
-						get 'Enabled'() {
+						return knotClippingGroup.clipShadows;
 
-							return globalClippingGroup.enabled;
+					},
+					set 'Shadows'( v ) {
 
-						},
-						set 'Enabled'( v ) {
+						knotClippingGroup.clipShadows = v;
 
-							globalClippingGroup.enabled = v;
+					},
 
-						},
+					get 'Intersection'() {
 
-						get 'Plane'() {
+						return knotClippingGroup.clipIntersection;
 
-							return globalPlane.constant;
+					},
 
-						},
-						set 'Plane'( v ) {
+					set 'Intersection'( v ) {
 
-							globalPlane.constant = v;
+						knotClippingGroup.clipIntersection = v;
 
-						}
+					},
 
-					};
+					get 'Plane'() {
+
+						return localPlane1.constant;
+
+					},
+					set 'Plane'( v ) {
+
+						localPlane1.constant = v;
+
+					}
+
+				};
+
+				const folderGlobal = gui.addFolder( 'Global Clipping Group' );
+				const propsGlobal = {
+
+					get 'Enabled'() {
+
+						return globalClippingGroup.enabled;
+
+					},
+					set 'Enabled'( v ) {
+
+						globalClippingGroup.enabled = v;
+
+					},
+
+					get 'Plane'() {
+
+						return globalPlane.constant;
+
+					},
+					set 'Plane'( v ) {
+
+						globalPlane.constant = v;
+
+					}
+
+				};
 
 				gui.add( props, 'alphaToCoverage' ).onChange( function ( value ) {
 
@@ -265,9 +267,7 @@
 				object.rotation.y = time * 0.2;
 				object.scale.setScalar( Math.cos( time ) * 0.125 + 0.875 );
 
-				stats.begin();
 				renderer.render( scene, camera );
-				stats.end();
 
 			}
 

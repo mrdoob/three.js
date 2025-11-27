@@ -8,7 +8,7 @@ import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
-import { viewport } from '../../nodes/display/ScreenNode.js';
+import { screenDPR, viewport } from '../../nodes/display/ScreenNode.js';
 import { viewportSharedTexture } from '../../nodes/display/ViewportSharedTextureNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';
@@ -65,14 +65,6 @@ class Line2NodeMaterial extends NodeMaterial {
 		 * @default 0
 		 */
 		this.dashOffset = 0;
-
-		/**
-		 * The line width.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.lineWidth = 1;
 
 		/**
 		 * Defines the lines color.
@@ -308,7 +300,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				offset.assign( offset.mul( materialLineWidth ) );
 
 				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-				offset.assign( offset.div( viewport.w ) );
+				offset.assign( offset.div( viewport.w.div( screenDPR ) ) );
 
 				// select end
 				clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
@@ -386,7 +378,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				if ( ! useDash ) {
 
-					if ( useAlphaToCoverage && renderer.samples > 1 ) {
+					if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
 
 						const dnorm = norm.fwidth();
 						alpha.assign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
@@ -403,7 +395,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				// round endcaps
 
-				if ( useAlphaToCoverage && renderer.samples > 1 ) {
+				if ( useAlphaToCoverage && renderer.currentSamples > 0 ) {
 
 					const a = vUv.x;
 					const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );

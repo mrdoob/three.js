@@ -1,6 +1,7 @@
 import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor, ConstantColorFactor, OneMinusConstantColorFactor, ConstantAlphaFactor, OneMinusConstantAlphaFactor } from '../../constants.js';
 import { Color } from '../../math/Color.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { error } from '../../utils.js';
 
 const reversedFuncs = {
 	[ NeverDepth ]: AlwaysDepth,
@@ -667,11 +668,11 @@ function WebGLState( gl, extensions ) {
 							break;
 
 						case MultiplyBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
+							gl.blendFuncSeparate( gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
 							break;
 
 						default:
-							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -685,19 +686,19 @@ function WebGLState( gl, extensions ) {
 							break;
 
 						case AdditiveBlending:
-							gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE );
 							break;
 
 						case SubtractiveBlending:
-							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
+							error( 'WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						case MultiplyBlending:
-							gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+							error( 'WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
 							break;
 
 						default:
-							console.error( 'THREE.WebGLState: Invalid blending: ', blending );
+							error( 'WebGLState: Invalid blending: ', blending );
 							break;
 
 					}
@@ -982,9 +983,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.compressedTexImage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -996,9 +997,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.compressedTexImage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -1010,9 +1011,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texSubImage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -1024,9 +1025,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texSubImage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -1038,9 +1039,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.compressedTexSubImage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -1052,9 +1053,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.compressedTexSubImage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -1066,9 +1067,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texStorage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -1080,9 +1081,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texStorage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -1094,9 +1095,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texImage2D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 
@@ -1108,9 +1109,9 @@ function WebGLState( gl, extensions ) {
 
 			gl.texImage3D( ...arguments );
 
-		} catch ( error ) {
+		} catch ( e ) {
 
-			console.error( 'THREE.WebGLState:', error );
+			error( 'WebGLState:', e );
 
 		}
 

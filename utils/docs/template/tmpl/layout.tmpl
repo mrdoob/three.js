@@ -1,68 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title><?js= title || 'Home' ?> - three.js docs</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)" />
-    <link rel="stylesheet" type="text/css" href="/files/main.css">
-
-    <script src="scripts/fuse/fuse.js"></script>
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
-
-    <link type="text/css" rel="stylesheet" href="styles/prettify-three.css">
-    <link type="text/css" rel="stylesheet" href="styles/page.css">
-
-    <!-- console sandbox -->
-    <script type="module">
-        import * as THREE from '/build/three.module.js';
-        window.THREE = THREE;
-    </script>
+	<meta charset="utf-8">
+	<title><?js= title || 'Home' ?> - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 
 <body>
+	<?js if (augments && augments.length) {
+		var self = this;
+	?>
+		<p class="inheritance" translate="no"><?js augments.forEach(function(a, i) { ?><?js= self.linkto(a, a) ?><?js if (i < augments.length - 1) { ?> → <?js } ?><?js }); ?> → </p>
+	<?js } ?>
+	<h1 translate="no"><?js= title ?></h1>
+	<?js= content ?>
 
-<div id="panel">
-
-    <div id="header">
-        <h1><a href="https://threejs.org">three.js</a></h1>
-
-        <div id="sections">
-            <span class="selected">docs</span>
-            <a href="/examples/#webgl_animation_keyframes">examples</a>
-        </div>
-        <div id="expandButton"></div>
-    </div>
-
-    <div id="panelScrim"></div>
-
-    <div id="contentWrapper">
-        <div id="inputWrapper">
-            <input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
-            <div id="clearSearchButton"></div>
-        </div>
-        <div id="content">
-            <nav>
-                <?js= this.nav ?>
-            </nav>
-        </div>
-    </div>
-</div>
-
-<div id="viewer">
-    <div id="page">
-        <div id="page-content">
-            <h1><?js= title ?></h1>
-            <?js= content ?>
-        </div>
-        <?js= this.partial('search.tmpl')?>
-    </div>
-</div>
-
-<script src="scripts/page.js"></script>
-<script src="scripts/linenumber.js"></script>
-<script src="scripts/search.js"></script>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
 </body>
 </html>

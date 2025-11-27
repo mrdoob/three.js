@@ -17,6 +17,7 @@ let view;
 
 const outdir = path.normalize( env.opts.destination );
 const themeOpts = ( env.opts.themeOpts ) || {};
+const categoryMap = {}; // Maps class names to their categories (Core, Addons, TSL)
 
 function mkdirSync( filepath ) {
 
@@ -106,7 +107,20 @@ function updateItemName( item ) {
 
 function addParamAttributes( params ) {
 
-	return params.filter( ( { name } ) => name && ! name.includes( '.' ) ).map( updateItemName );
+	return params.filter( ( { name } ) => name && ! name.includes( '.' ) ).map( param => {
+
+		let itemName = updateItemName( param );
+
+		if ( param.type && param.type.names && param.type.names.length ) {
+
+			const escapedTypes = param.type.names.map( name => linkto( name, htmlsafe( name ) ) );
+			itemName += ' : <span class="param-type">' + escapedTypes.join( ' | ' ) + '</span>';
+
+		}
+
+		return itemName;
+
+	} );
 
 }
 
@@ -130,23 +144,84 @@ function buildItemTypeStrings( item ) {
 
 function buildSearchListForData() {
 
-	const searchList = [];
+	const categories = {
+		'Core': [],
+		'Addons': [],
+		'Global': [],
+		'TSL': []
+	};
 
 	data().each( ( item ) => {
 
 		if ( item.kind !== 'package' && item.kind !== 'typedef' && ! item.inherited ) {
 
-			searchList.push( {
-				title: item.longname,
-				link: linkto( item.longname, item.name ),
-				description: item.description,
-			} );
+			// Extract the class name from the longname (e.g., "Animation#getAnimationLoop" -> "Animation")
+			const parts = item.longname.split( /[#~]/ );
+			const className = parts[ 0 ];
+
+			// If this item is a member/method of a class, check if the parent class exists
+			if ( parts.length > 1 ) {
+
+				// Find the parent class/module
+				const parentClass = find( { longname: className, kind: [ 'class', 'module' ] } );
+
+				// Only include if parent exists and is not private
+				if ( parentClass && parentClass.length > 0 && parentClass[ 0 ].access !== 'private' ) {
+
+					const category = categoryMap[ className ];
+					const entry = {
+						title: item.longname,
+						kind: item.kind
+					};
+
+					if ( category ) {
+
+						categories[ category ].push( entry );
+
+					}
+
+				}
+
+			} else {
+
+				// This is a top-level class/module/function - include if not private
+				if ( item.access !== 'private' ) {
+
+					let category = categoryMap[ className ];
+
+					// If not in categoryMap, determine category from @tsl tag
+					if ( ! category ) {
+
+						const hasTslTag = Array.isArray( item.tags ) && item.tags.some( tag => tag.title === 'tsl' );
+
+						if ( hasTslTag ) {
+
+							category = 'TSL';
+
+						} else {
+
+							category = 'Global';
+
+						}
+
+					}
+
+					const entry = {
+						title: item.longname,
+						kind: item.kind
+					};
+
+					categories[ category ].push( entry );
+
+				}
+
+			}
 
 		}
 
 	} );
 
-	return searchList;
+	return categories;
 
 }
 
@@ -181,41 +256,17 @@ function addNonParamAttributes( items ) {
 function addSignatureParams( f ) {
 
 	const params = f.params ? addParamAttributes( f.params ) : [];
+	const paramsString = params.join( ', ' );
 
-	f.signature = util.format( '%s(%s)', ( f.signature || '' ), params.join( ', ' ) );
+	f.signature = util.format( '%s(%s)', ( f.signature || '' ), paramsString ? ' ' + paramsString + ' ' : '' );
 
 }
 
 function addSignatureReturns( f ) {
 
-	const attribs = [];
-	let attribsString = '';
 	let returnTypes = [];
 	let returnTypesString = '';
 	const source = f.yields || f.returns;
-
-	// jam all the return-type attributes into an array. this could create odd results (for example,
-	// if there are both nullable and non-nullable return types), but let's assume that most people
-	// who use multiple @return tags aren't using Closure Compiler type annotations, and vice-versa.
-	if ( source ) {
-
-		source.forEach( item => {
-
-			helper.getAttribs( item ).forEach( attrib => {
-
-				if ( ! attribs.includes( attrib ) ) {
-
-					attribs.push( attrib );
-
-				}
-
-			} );
-
-		} );
-
-		attribsString = buildAttribsString( attribs );
-
-	}
 
 	if ( source ) {
 
@@ -225,11 +276,11 @@ function addSignatureReturns( f ) {
 
 	if ( returnTypes.length ) {
 
-		returnTypesString = util.format( ' &rarr; %s{%s}', attribsString, returnTypes.join( '|' ) );
+		returnTypesString = util.format( ' : %s', returnTypes.join( ' | ' ) );
 
 	}
 
-	f.signature = `<span class="signature">${f.signature || ''}</span><span class="type-signature">${returnTypesString}</span>`;
+	f.signature = `<span class="signature">${f.signature || ''}</span>${returnTypesString ? `<span class="type-signature">${returnTypesString}</span>` : ''}`;
 
 }
 
@@ -237,16 +288,16 @@ function addSignatureTypes( f ) {
 
 	const types = f.type ? buildItemTypeStrings( f ) : [];
 
-	f.signature = `${f.signature || ''}<span class="type-signature">${types.length ? ` :${types.join( '|' )}` : ''}</span>`;
+	f.signature = `${f.signature || ''}${types.length ? `<span class="type-signature"> : ${types.join( ' | ' )}</span>` : ''}`;
 
 }
 
 function addAttribs( f ) {
 
-	const attribs = helper.getAttribs( f );
+	const attribs = helper.getAttribs( f ).filter( attrib => attrib !== 'static' && attrib !== 'nullable' );
 	const attribsString = buildAttribsString( attribs );
 
-	f.attribs = util.format( '<span class="type-signature">%s</span>', attribsString );
+	f.attribs = attribsString ? util.format( '<span class="type-signature">%s</span>', attribsString ) : '';
 
 }
 
@@ -278,6 +329,34 @@ function getPathFromDoclet( { meta } ) {
 
 }
 
+function getFullAugmentsChain( doclet ) {
+
+	const chain = [];
+
+	if ( ! doclet || ! doclet.augments || ! doclet.augments.length ) {
+
+		return chain;
+
+	}
+
+	// Start with the immediate parent
+	const parentName = doclet.augments[0];
+	chain.push( parentName );
+
+	// Recursively find the parent's ancestors
+	const parentDoclet = find( { longname: parentName } );
+
+	if ( parentDoclet && parentDoclet.length > 0 ) {
+
+		const parentChain = getFullAugmentsChain( parentDoclet[0] );
+		chain.unshift( ...parentChain );
+
+	}
+
+	return chain;
+
+}
+
 function generate( title, docs, filename, resolveLinks ) {
 
 	let html;
@@ -287,10 +366,14 @@ function generate( title, docs, filename, resolveLinks ) {
 	const docData = {
 		env: env,
 		title: title,
-		docs: docs
+		docs: docs,
+		augments: docs && docs[0] ? getFullAugmentsChain( docs[0] ) : null
 	};
 
-	const outpath = path.join( outdir, filename );
+	// Put HTML files in pages/ subdirectory
+	const pagesDir = path.join( outdir, 'pages' );
+	mkdirSync( pagesDir );
+	const outpath = path.join( pagesDir, filename );
 	html = view.render( 'container.tmpl', docData );
 
 	if ( resolveLinks ) {
@@ -298,6 +381,17 @@ function generate( title, docs, filename, resolveLinks ) {
 		html = helper.resolveLinks( html ); // turn {@link foo} into <a href="foodoc.html">foo</a>
 
 	}
+
+	// Convert Prettify classes to Highlight.js format
+	html = html.replace( /<pre class="prettyprint source linenums"><code>/g, '<pre><code>' );
+	html = html.replace( /<pre class="prettyprint source lang-(\w+)"[^>]*><code>/g, '<pre><code class="language-$1">' );
+	html = html.replace( /<pre class="prettyprint"><code>/g, '<pre><code>' );
+
+	// Add target="_blank" to external links
+	html = html.replace( /<a\s+([^>]*href=["'](https?:\/\/[^"']+)["'][^>]*)>/gi, '<a $1 target="_blank" rel="noopener">' );
+
+	// Remove lines that only contain whitespace
+	html = html.replace( /^\s*\n/gm, '' );
 
 	fs.writeFileSync( outpath, html, 'utf8' );
 
@@ -363,7 +457,7 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 
 				}
 
-				itemNav += `<li data-name="${item.name}">${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>`;
+				itemNav += `<li>${linktoFn( item.longname, displayName.replace( /\b(module|event):/g, '' ) )}</li>\n`;
 
 				itemsSeen[ item.longname ] = true;
 
@@ -374,12 +468,14 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 					const subCategory = path.split( '/' )[ 1 ];
 
 					pushNavItem( hierarchy, 'Core', subCategory, itemNav );
+					categoryMap[ item.longname ] = 'Core';
 
 				} else if ( path.startsWith( addonsDirectory ) ) {
 
 					const subCategory = path.split( '/' )[ 2 ];
 
 					pushNavItem( hierarchy, 'Addons', subCategory, itemNav );
+					categoryMap[ item.longname ] = 'Addons';
 
 				}
 
@@ -389,25 +485,24 @@ function buildMainNav( items, itemsSeen, linktoFn ) {
 
 		for ( const [ mainCategory, map ] of hierarchy ) {
 
-			nav += `<h2>${mainCategory}</h2>`;
+			nav += `\t\t\t\t\t<h2>${mainCategory}</h2>\n`;
 
 			const sortedMap = new Map( [ ...map.entries() ].sort() ); // sort sub categories
 
 			for ( const [ subCategory, links ] of sortedMap ) {
 
-				nav += `<h3>${subCategory}</h3>`;
-
-				let navItems = '';
+				nav += `\t\t\t\t\t<h3>${subCategory}</h3>\n`;
+				nav += '\t\t\t\t\t<ul>\n';
 
 				links.sort();
 
 				for ( const link of links ) {
 
-					navItems += link;
+					nav += '\t\t\t\t\t\t' + link;
 
 				}
 
-				nav += `<ul>${navItems}</ul>`;
+				nav += '\t\t\t\t\t</ul>\n';
 
 			}
 
@@ -432,13 +527,13 @@ function buildGlobalsNav( globals, seen ) {
 
 		globals.forEach( ( { kind, longname, name, tags } ) => {
 
-			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) && Array.isArray( tags ) ) {
+			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) ) {
 
-				const tslTag = tags.find( tag => tag.title === 'tsl' );
+				const hasTslTag = Array.isArray( tags ) && tags.some( tag => tag.title === 'tsl' );
 
-				if ( tslTag !== undefined ) {
+				if ( hasTslTag ) {
 
-					tslNav += `<li data-name="${longname}">${linkto( longname, name )}</li>`;
+					tslNav += `\t\t\t\t\t\t<li>${linkto( longname, name )}</li>\n`;
 
 					seen[ longname ] = true;
 
@@ -448,7 +543,10 @@ function buildGlobalsNav( globals, seen ) {
 
 		} );
 
-		nav += `<h2>TSL</h2><ul>${tslNav}</ul>`;
+		nav += '\t\t\t\t\t<h2>TSL</h2>\n';
+		nav += '\t\t\t\t\t<ul>\n';
+		nav += tslNav;
+		nav += '\t\t\t\t\t</ul>\n';
 
 		// Globals
 
@@ -458,7 +556,7 @@ function buildGlobalsNav( globals, seen ) {
 
 			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) ) {
 
-				globalNav += `<li data-name="${longname}">${linkto( longname, name )}</li>`;
+				globalNav += `\t\t\t\t\t\t<li>${linkto( longname, name )}</li>\n`;
 
 			}
 
@@ -469,11 +567,14 @@ function buildGlobalsNav( globals, seen ) {
 		if ( ! globalNav ) {
 
 			// turn the heading into a link so you can actually get to the global page
-			nav += `<h3>${linkto( 'global', 'Global' )}</h3>`;
+			nav += `\t\t\t\t\t<h3>${linkto( 'global', 'Global' )}</h3>\n`;
 
 		} else {
 
-			nav += `<h2>Global</h2><ul>${globalNav}</ul>`;
+			nav += '\t\t\t\t\t<h2>Global</h2>\n';
+			nav += '\t\t\t\t\t<ul>\n';
+			nav += globalNav;
+			nav += '\t\t\t\t\t</ul>\n';
 
 		}
 
@@ -485,7 +586,16 @@ function buildGlobalsNav( globals, seen ) {
 
 function pushNavItem( hierarchy, mainCategory, subCategory, itemNav ) {
 
-	subCategory = subCategory[ 0 ].toUpperCase() + subCategory.slice( 1 ); // capitalize
+	// Special case for TSL - keep it all uppercase
+	if ( subCategory.toLowerCase() === 'tsl' ) {
+
+		subCategory = 'TSL';
+
+	} else {
+
+		subCategory = subCategory[ 0 ].toUpperCase() + subCategory.slice( 1 ); // capitalize
+
+	}
 
 	if ( hierarchy.get( mainCategory ).get( subCategory ) === undefined ) {
 
@@ -506,7 +616,7 @@ function pushNavItem( hierarchy, mainCategory, subCategory, itemNav ) {
  */
 function buildNav( members ) {
 
-	let nav = '';
+	let nav = '\n';
 	const seen = {};
 
 	nav += buildMainNav( [ ...members.classes, ...members.modules ], seen, linkto );
@@ -711,7 +821,7 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	} );
 
-	// prepare import statements
+	// prepare import statements, demo tags, and extract code examples
 	data().each( doclet => {
 
 		if ( doclet.kind === 'class' || doclet.kind === 'module' ) {
@@ -722,6 +832,25 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 				const importTag = tags.find( tag => tag.title === 'three_import' );
 				doclet.import = ( importTag !== undefined ) ? importTag.text : null;
+
+				const demoTag = tags.find( tag => tag.title === 'demo' );
+				doclet.demo = ( demoTag !== undefined ) ? demoTag.text : null;
+
+			}
+
+			// Extract code example from classdesc
+			if ( doclet.classdesc ) {
+
+				const codeBlockRegex = /<pre class="prettyprint source[^"]*"><code>([\s\S]*?)<\/code><\/pre>/;
+				const match = doclet.classdesc.match( codeBlockRegex );
+
+				if ( match ) {
+
+					doclet.codeExample = match[ 0 ];
+					// Remove the code example from classdesc
+					doclet.classdesc = doclet.classdesc.replace( codeBlockRegex, '' ).trim();
+
+				}
 
 			}
 
@@ -743,8 +872,8 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 	view.outputSourceFiles = outputSourceFiles;
 	view.ignoreInheritedSymbols = themeOpts.ignoreInheritedSymbols;
 
-	// once for all
-	view.nav = buildNav( members );
+	// Empty nav in templates - will be loaded from nav.html client-side
+	view.nav = '';
 
 	// generate the pretty-printed source files first so other pages can link to them
 	if ( outputSourceFiles ) {
@@ -755,7 +884,43 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	if ( members.globals.length ) {
 
-		generate( 'Global', [ { kind: 'globalobj' } ], globalUrl );
+		// Split globals into TSL and non-TSL
+		const tslGlobals = [];
+		const nonTslGlobals = [];
+		const originalGlobals = members.globals;
+
+		originalGlobals.forEach( item => {
+
+			const hasTslTag = Array.isArray( item.tags ) && item.tags.some( tag => tag.title === 'tsl' );
+
+			if ( hasTslTag ) {
+
+				tslGlobals.push( item );
+
+				// Register each TSL item to link to TSL.html
+				helper.registerLink( item.longname, 'TSL.html#' + item.name );
+
+			} else {
+
+				nonTslGlobals.push( item );
+
+			}
+
+		} );
+
+		// Generate TSL.html for TSL functions
+		if ( tslGlobals.length ) {
+
+			generate( 'TSL', [ { kind: 'globalobj', isTSL: true } ], 'TSL.html' );
+
+		}
+
+		// Generate global.html for remaining globals
+		if ( nonTslGlobals.length ) {
+
+			generate( 'Global', [ { kind: 'globalobj' } ], globalUrl );
+
+		}
 
 	}
 
@@ -795,17 +960,29 @@ exports.publish = ( taffyData, opts, tutorials ) => {
 
 	} );
 
+	// Build navigation HTML
+	const navHtml = buildNav( members );
+
+	// Generate index.html with embedded navigation
+	const indexTemplatePath = path.join( templatePath, 'static', 'index.html' );
+	let indexHtml = fs.readFileSync( indexTemplatePath, 'utf8' );
+
+	// Replace placeholder with actual navigation
+	indexHtml = indexHtml.replace( '<!--NAV_PLACEHOLDER-->', navHtml );
+
+	fs.writeFileSync(
+		path.join( outdir, 'index.html' ),
+		indexHtml,
+		'utf8'
+	);
+
 	// search
 
 	const searchList = buildSearchListForData();
 
-	mkdirSync( path.join( outdir, 'data' ) );
-
 	fs.writeFileSync(
-		path.join( outdir, 'data', 'search.json' ),
-		JSON.stringify( {
-			list: searchList,
-		} )
+		path.join( outdir, 'search.json' ),
+		JSON.stringify( searchList, null, '\t' )
 	);
 
 };

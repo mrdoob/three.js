@@ -2,6 +2,7 @@ import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../../core/BufferAttribute.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
+import { warnOnce } from '../../utils.js';
 
 const _camera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
@@ -81,12 +82,17 @@ class QuadMesh extends Mesh {
 	 * Async version of `render()`.
 	 *
 	 * @async
+	 * @deprecated
 	 * @param {Renderer} renderer - The renderer.
 	 * @return {Promise} A Promise that resolves when the render has been finished.
 	 */
 	async renderAsync( renderer ) {
 
-		return renderer.renderAsync( this, _camera );
+		warnOnce( 'QuadMesh: "renderAsync()" has been deprecated. Use "render()" and "await renderer.init();" when creating the renderer.' ); // @deprecated r181
+
+		await renderer.init();
+
+		renderer.render( this, _camera );
 
 	}
 

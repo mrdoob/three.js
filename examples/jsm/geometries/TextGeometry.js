@@ -8,7 +8,7 @@ import {
  *
  * See the {@link FontLoader} page for additional details.
  *
- * `TextGeometry` uses [typeface.json]{@link http://gero3.github.io/facetype.js/} generated fonts.
+ * `TextGeometry` uses [typeface.json](http://gero3.github.io/facetype.js/) generated fonts.
  * Some existing fonts can be found located in `/examples/fonts`.
  *
  * ```js
@@ -43,7 +43,7 @@ class TextGeometry extends ExtrudeGeometry {
 
 		} else {
 
-			const shapes = font.generateShapes( text, parameters.size );
+			const shapes = font.generateShapes( text, parameters.size, parameters.direction );
 
 			// defaults
 
@@ -76,6 +76,7 @@ class TextGeometry extends ExtrudeGeometry {
  * @property {number} [bevelSize=8] - Distance from the shape outline that the bevel extends.
  * @property {number} [bevelOffset=0] - Distance from the shape outline that the bevel starts.
  * @property {number} [bevelSegments=3] - Number of bevel layers.
+ * @property {string} [direction='ltr'] - Char direction: ltr(left to right), rtl(right to left) & tb(top bottom).
  * @property {?Curve} [extrudePath=null] - A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.
  * @property {Object} [UVGenerator] - An object that provides UV generator functions for custom UV generation.
  **/

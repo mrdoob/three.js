@@ -9,6 +9,7 @@ import { Euler } from '../math/Euler.js';
  * This material is not affected by lights.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshBasicMaterial
  */
 class MeshBasicMaterial extends Material {
 
@@ -42,7 +43,7 @@ class MeshBasicMaterial extends Material {
 		 * @type {Color}
 		 * @default (1,1,1)
 		 */
-		this.color = new Color( 0xffffff ); // emissive
+		this.color = new Color( 0xffffff ); // diffuse
 
 		/**
 		 * The color map. May optionally include an alpha channel, typically combined

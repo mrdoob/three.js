@@ -7,6 +7,8 @@ import { uniform } from '../core/UniformNode.js';
 import { normalMap } from '../display/NormalMapNode.js';
 import { bumpMap } from '../display/BumpMapNode.js';
 import { Vector2 } from '../../math/Vector2.js';
+import { RGFormat, RED_GREEN_RGTC2_Format, RG11_EAC_Format, NormalRGPacking } from '../../constants.js';
+
 
 const _propertyCache = new Map();
 
@@ -235,6 +237,12 @@ class MaterialNode extends Node {
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
 				node.normalMapType = material.normalMapType;
 
+				if ( material.normalMap.format == RGFormat || material.normalMap.format == RED_GREEN_RGTC2_Format || material.normalMap.format == RG11_EAC_Format ) {
+
+					node.unpackNormalMode = NormalRGPacking;
+
+				}
+
 			} else if ( material.bumpMap ) {
 
 				node = bumpMap( this.getTexture( 'bump' ).r, this.getFloat( 'bumpScale' ) );
@@ -313,7 +321,7 @@ class MaterialNode extends Node {
 
 			}
 
-			node = node.clamp( 0.07, 1.0 );
+			node = node.clamp( 0.0001, 1.0 );
 
 		} else if ( scope === MaterialNode.ANISOTROPY ) {
 
@@ -385,6 +393,10 @@ class MaterialNode extends Node {
 		} else if ( scope === MaterialNode.AO ) {
 
 			node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
+
+		} else if ( scope === MaterialNode.LINE_DASH_OFFSET ) {
+
+			node = ( material.dashOffset ) ? this.getFloat( scope ) : float( 0 );
 
 		} else {
 

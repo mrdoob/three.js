@@ -64,17 +64,16 @@ class Object3DNode extends Node {
 		/**
 		 * Holds the value of the node as a uniform.
 		 *
-		 * @private
 		 * @type {UniformNode}
 		 */
-		this._uniformNode = new UniformNode( null );
+		this.uniformNode = new UniformNode( null );
 
 	}
 
 	/**
 	 * Overwritten since the node type is inferred from the scope.
 	 *
-	 * @return {string} The node type.
+	 * @return {('mat4'|'vec3'|'float')} The node type.
 	 */
 	getNodeType() {
 
@@ -104,7 +103,7 @@ class Object3DNode extends Node {
 	update( frame ) {
 
 		const object = this.object3d;
-		const uniformNode = this._uniformNode;
+		const uniformNode = this.uniformNode;
 		const scope = this.scope;
 
 		if ( scope === Object3DNode.WORLD_MATRIX ) {
@@ -165,19 +164,19 @@ class Object3DNode extends Node {
 
 		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
-			this._uniformNode.nodeType = 'mat4';
+			this.uniformNode.nodeType = 'mat4';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
-			this._uniformNode.nodeType = 'vec3';
+			this.uniformNode.nodeType = 'vec3';
 
 		} else if ( scope === Object3DNode.RADIUS ) {
 
-			this._uniformNode.nodeType = 'float';
+			this.uniformNode.nodeType = 'float';
 
 		}
 
-		return this._uniformNode.build( builder );
+		return this.uniformNode.build( builder );
 
 	}
 
@@ -264,6 +263,6 @@ export const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3
  * @tsl
  * @function
  * @param {?Object3D} [object3d] - The 3D object.
- * @returns {Object3DNode<vec3>}
+ * @returns {Object3DNode<float>}
  */
 export const objectRadius = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.RADIUS ).setParameterLength( 1 );

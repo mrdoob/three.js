@@ -24,14 +24,18 @@ import ChainMap from '../../renderers/common/ChainMap.js';
 
 import BindGroup from '../../renderers/common/BindGroup.js';
 
-import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
+import { REVISION, IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, NormalBlending } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { RenderTargetArray } from '../../core/RenderTargetArray.js';
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
+import { warn, error } from '../../utils.js';
+
+let _id = 0;
+
+const sharedNodeData = new WeakMap();
 
 const rendererCache = new WeakMap();
 
@@ -197,7 +201,7 @@ class NodeBuilder {
 		/**
 		 * A reference to the current fog node.
 		 *
-		 * @type {?FogNode}
+		 * @type {?Node}
 		 * @default null
 		 */
 		this.fogNode = null;
@@ -259,6 +263,13 @@ class NodeBuilder {
 		 * @type {Object}
 		 */
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
+
+		/**
+		 * This dictionary holds the types of the builder.
+		 *
+		 * @type {Object}
+		 */
+		this.types = { vertex: [], fragment: [], compute: [], index: 0 };
 
 		/**
 		 * This dictionary holds the bindings for each shader stage.
@@ -420,6 +431,53 @@ class NodeBuilder {
 		 */
 		this.buildStage = null;
 
+		/**
+		 * The sub-build layers.
+		 *
+		 * @type {Array<SubBuildNode>}
+		 * @default []
+		 */
+		this.subBuildLayers = [];
+
+
+		/**
+		 * The active stack nodes.
+		 *
+		 * @type {Array<StackNode>}
+		 */
+		this.activeStacks = [];
+
+		/**
+		 * The current sub-build TSL function(Fn).
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.subBuildFn = null;
+
+		/**
+		 * The current TSL function(Fn) call node.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.fnCall = null;
+
+		Object.defineProperty( this, 'id', { value: _id ++ } );
+
+	}
+
+	/**
+	 * Whether the material is opaque or not.
+	 *
+	 * @return {boolean} Whether the material is opaque or not.
+	 */
+	isOpaque() {
+
+		const material = this.material;
+
+		return material.transparent === false && material.blending === NormalBlending && material.alphaToCoverage === false;
+
 	}
 
 	/**
@@ -455,22 +513,6 @@ class NodeBuilder {
 	createRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
-
-	}
-
-	/**
-	 * Factory method for creating an instance of {@link RenderTargetArray} with the given
-	 * dimensions and options.
-	 *
-	 * @param {number} width - The width of the render target.
-	 * @param {number} height - The height of the render target.
-	 * @param {number} depth - The depth of the render target.
-	 * @param {Object} options - The options of the render target.
-	 * @return {RenderTargetArray} The render target.
-	 */
-	createRenderTargetArray( width, height, depth, options ) {
-
-		return new RenderTargetArray( width, height, depth, options );
 
 	}
 
@@ -715,7 +757,7 @@ class NodeBuilder {
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
-				this.updateNodes.push( node.getSelf() );
+				this.updateNodes.push( node );
 
 			}
 
@@ -728,13 +770,13 @@ class NodeBuilder {
 
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
-				this.updateBeforeNodes.push( node.getSelf() );
+				this.updateBeforeNodes.push( node );
 
 			}
 
 			if ( updateAfterType !== NodeUpdateType.NONE ) {
 
-				this.updateAfterNodes.push( node.getSelf() );
+				this.updateAfterNodes.push( node );
 
 			}
 
@@ -778,7 +820,7 @@ class NodeBuilder {
 		/*
 		if ( this.chaining.indexOf( node ) !== - 1 ) {
 
-			console.warn( 'Recursive node: ', node );
+			warn( 'Recursive node: ', node );
 
 		}
 		*/
@@ -816,6 +858,22 @@ class NodeBuilder {
 	getMethod( method ) {
 
 		return method;
+
+	}
+
+	/**
+	 * Returns the native snippet for a ternary operation. E.g. GLSL would output
+	 * a ternary op as `cond ? x : y` whereas WGSL would output it as `select(y, x, cond)`
+	 *
+	 * @abstract
+	 * @param {string} condSnippet - The condition determining which expression gets resolved.
+	 * @param {string} ifSnippet - The expression to resolve to if the condition is true.
+	 * @param {string} elseSnippet - The expression to resolve to if the condition is false.
+	 * @return {string} The resolved method name.
+	 */
+	getTernary( /* condSnippet, ifSnippet, elseSnippet*/ ) {
+
+		return null;
 
 	}
 
@@ -865,6 +923,22 @@ class NodeBuilder {
 	getContext() {
 
 		return this.context;
+
+	}
+
+	/**
+	 * Adds context data to the builder's current context.
+	 *
+	 * @param {Object} context - The context to add.
+	 * @return {Object} The previous context.
+	 */
+	addContext( context ) {
+
+		const previousContext = this.getContext();
+
+		this.setContext( { ...this.context, ...context } );
+
+		return previousContext;
 
 	}
 
@@ -943,19 +1017,20 @@ class NodeBuilder {
 	 */
 	getVertexIndex() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
 	/**
-	 * Returns the instanceIndex input variable as a native shader string.
+	 * Contextually returns either the vertex stage instance index builtin
+	 * or the linearized index of an compute invocation within a grid of workgroups.
 	 *
 	 * @abstract
 	 * @return {string} The instanceIndex shader string.
 	 */
 	getInstanceIndex() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -968,7 +1043,7 @@ class NodeBuilder {
 	 */
 	getDrawIndex() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -980,7 +1055,7 @@ class NodeBuilder {
 	 */
 	getFrontFacing() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -992,7 +1067,7 @@ class NodeBuilder {
 	 */
 	getFragCoord() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -1035,7 +1110,7 @@ class NodeBuilder {
 	 */
 	generateTexture( /* texture, textureProperty, uvSnippet */ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -1052,7 +1127,7 @@ class NodeBuilder {
 	 */
 	generateTextureLod( /* texture, textureProperty, uvSnippet, depthSnippet, levelSnippet */ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -1137,7 +1212,6 @@ class NodeBuilder {
 
 	}
 
-
 	/**
 	 * Generates the shader string for the given type and value.
 	 *
@@ -1152,9 +1226,9 @@ class NodeBuilder {
 			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
 			else if ( type === 'bool' ) value = false;
 			else if ( type === 'color' ) value = new Color();
-			else if ( type === 'vec2' ) value = new Vector2();
-			else if ( type === 'vec3' ) value = new Vector3();
-			else if ( type === 'vec4' ) value = new Vector4();
+			else if ( type === 'vec2' || type === 'uvec2' || type === 'ivec2' ) value = new Vector2();
+			else if ( type === 'vec3' || type === 'uvec3' || type === 'ivec3' ) value = new Vector3();
+			else if ( type === 'vec4' || type === 'uvec4' || type === 'ivec4' ) value = new Vector4();
 
 		}
 
@@ -1538,6 +1612,58 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Adds an active stack to the internal stack.
+	 *
+	 * @param {StackNode} stack - The stack node to add.
+	 */
+	setActiveStack( stack ) {
+
+		this.activeStacks.push( stack );
+
+	}
+
+	/**
+	 * Removes the active stack from the internal stack.
+	 *
+	 * @param {StackNode} stack - The stack node to remove.
+	 */
+	removeActiveStack( stack ) {
+
+		if ( this.activeStacks[ this.activeStacks.length - 1 ] === stack ) {
+
+			this.activeStacks.pop();
+
+		} else {
+
+			throw new Error( 'NodeBuilder: Invalid active stack removal.' );
+
+		}
+
+	}
+
+	/**
+	 * Returns the active stack.
+	 *
+	 * @return {StackNode} The active stack.
+	 */
+	getActiveStack() {
+
+		return this.activeStacks[ this.activeStacks.length - 1 ];
+
+	}
+
+	/**
+	 * Returns the base stack.
+	 *
+	 * @return {StackNode} The base stack.
+	 */
+	getBaseStack() {
+
+		return this.activeStacks[ 0 ];
+
+	}
+
+	/**
 	 * Adds a stack node to the internal stack.
 	 *
 	 * @return {StackNode} The added stack node.
@@ -1546,7 +1672,9 @@ class NodeBuilder {
 
 		this.stack = stack( this.stack );
 
-		this.stacks.push( getCurrentStack() || this.stack );
+		const previousStack = getCurrentStack();
+
+		this.stacks.push( previousStack );
 		setCurrentStack( this.stack );
 
 		return this.stack;
@@ -1561,6 +1689,14 @@ class NodeBuilder {
 	removeStack() {
 
 		const lastStack = this.stack;
+
+		for ( const node of lastStack.nodes ) {
+
+			const nodeData = this.getDataFromNode( node );
+			nodeData.stack = lastStack;
+
+		}
+
 		this.stack = lastStack.parent;
 
 		setCurrentStack( this.stacks.pop() );
@@ -1594,12 +1730,33 @@ class NodeBuilder {
 
 		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = {};
 
-		return nodeData[ shaderStage ];
+		//
+
+		let data = nodeData[ shaderStage ];
+
+		const subBuilds = nodeData.any ? nodeData.any.subBuilds : null;
+		const subBuild = this.getClosestSubBuild( subBuilds );
+
+		if ( subBuild ) {
+
+			if ( data.subBuildsCache === undefined ) data.subBuildsCache = {};
+
+			data = data.subBuildsCache[ subBuild ] || ( data.subBuildsCache[ subBuild ] = {} );
+			data.subBuilds = subBuilds;
+
+		}
+
+		return data;
 
 	}
 
 	/**
 	 * Returns the properties for the given node and shader stage.
+	 *
+	 * Properties are typically used within a build stage to reference a node's
+	 * child node or nodes manually assigned to the properties in a separate build stage.
+	 * A typical usage pattern for defining nodes manually would be assigning dependency nodes
+	 * to the current node's properties in the setup stage and building those properties in the generate stage.
 	 *
 	 * @param {Node} node - The node to get the properties for.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage='any'] - The shader stage.
@@ -1622,7 +1779,7 @@ class NodeBuilder {
 	 */
 	getBufferAttributeFromNode( node, type ) {
 
-		const nodeData = this.getDataFromNode( node );
+		const nodeData = this.getDataFromNode( node, 'vertex' );
 
 		let bufferAttribute = nodeData.bufferAttribute;
 
@@ -1639,6 +1796,20 @@ class NodeBuilder {
 		}
 
 		return bufferAttribute;
+
+	}
+
+	/**
+	 * Returns an instance of {@link StructType} for the given struct name and shader stage
+	 * or null if not found.
+	 *
+	 * @param {string} name - The name of the struct.
+	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
+	 * @return {?StructType} The struct type or null if not found.
+	 */
+	getStructTypeNode( name, shaderStage = this.shaderStage ) {
+
+		return this.types[ shaderStage ][ name ] || null;
 
 	}
 
@@ -1666,6 +1837,7 @@ class NodeBuilder {
 			structType = new StructType( name, membersLayout );
 
 			this.structs[ shaderStage ].push( structType );
+			this.types[ shaderStage ][ name ] = node;
 
 			nodeData.structType = structType;
 
@@ -1725,23 +1897,6 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the array length.
-	 *
-	 * @param {Node} node - The node.
-	 * @return {?number} The array length.
-	 */
-	getArrayCount( node ) {
-
-		let count = null;
-
-		if ( node.isArrayNode ) count = node.count;
-		else if ( node.isVarNode && node.node.isArrayNode ) count = node.node.count;
-
-		return count;
-
-	}
-
-	/**
 	 * Returns an instance of {@link NodeVar} for the given variable node.
 	 *
 	 * @param {VarNode} node - The variable node.
@@ -1755,8 +1910,9 @@ class NodeBuilder {
 	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
+		const subBuildVariable = this.getSubBuildProperty( 'variable', nodeData.subBuilds );
 
-		let nodeVar = nodeData.variable;
+		let nodeVar = nodeData[ subBuildVariable ];
 
 		if ( nodeVar === undefined ) {
 
@@ -1775,7 +1931,15 @@ class NodeBuilder {
 
 			//
 
-			const count = this.getArrayCount( node );
+			if ( subBuildVariable !== 'variable' ) {
+
+				name = this.getSubBuildProperty( name, nodeData.subBuilds );
+
+			}
+
+			//
+
+			const count = node.getArrayCount( this );
 
 			nodeVar = new NodeVar( name, type, readOnly, count );
 
@@ -1787,7 +1951,7 @@ class NodeBuilder {
 
 			this.registerDeclaration( nodeVar );
 
-			nodeData.variable = nodeVar;
+			nodeData[ subBuildVariable ] = nodeVar;
 
 		}
 
@@ -1855,8 +2019,9 @@ class NodeBuilder {
 	getVaryingFromNode( node, name = null, type = node.getNodeType( this ), interpolationType = null, interpolationSampling = null ) {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
+		const subBuildVarying = this.getSubBuildProperty( 'varying', nodeData.subBuilds );
 
-		let nodeVarying = nodeData.varying;
+		let nodeVarying = nodeData[ subBuildVarying ];
 
 		if ( nodeVarying === undefined ) {
 
@@ -1865,13 +2030,23 @@ class NodeBuilder {
 
 			if ( name === null ) name = 'nodeVarying' + index;
 
+			//
+
+			if ( subBuildVarying !== 'varying' ) {
+
+				name = this.getSubBuildProperty( name, nodeData.subBuilds );
+
+			}
+
+			//
+
 			nodeVarying = new NodeVarying( name, type, interpolationType, interpolationSampling );
 
 			varyings.push( nodeVarying );
 
 			this.registerDeclaration( nodeVarying );
 
-			nodeData.varying = nodeVarying;
+			nodeData[ subBuildVarying ] = nodeVarying;
 
 		}
 
@@ -1902,15 +2077,13 @@ class NodeBuilder {
 
 		}
 
-
 		if ( index > 1 ) {
 
 			node.name = name;
 
-			console.warn( `THREE.TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
+			warn( `TSL: Declaration name '${ property }' of '${ node.type }' already in use. Renamed to '${ name }'.` );
 
 		}
-
 
 		declarations[ name ] = node;
 
@@ -2193,6 +2366,34 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Executes the node in a specific build stage.
+	 *
+	 * This function can be used to arbitrarily execute the specified build stage
+	 * outside of the standard build process. For instance, if a node's type depends
+	 * on properties created by the 'setup' stage, then flowBuildStage(node, 'setup')
+	 * can be used to execute the setup build stage and access its generated nodes
+	 * before the standard build process begins.
+	 *
+	 * @param {Node} node - The node to execute.
+	 * @param {string} buildStage - The build stage to execute the node in.
+	 * @param {?(Node|string)} [output=null] - Expected output type. For example 'vec3'.
+	 * @return {?(Node|string)} The result of the node build.
+	 */
+	flowBuildStage( node, buildStage, output = null ) {
+
+		const previousBuildStage = this.getBuildStage();
+
+		this.setBuildStage( buildStage );
+
+		const result = node.build( this, output );
+
+		this.setBuildStage( previousBuildStage );
+
+		return result;
+
+	}
+
+	/**
 	 * Runs the node flow through all the steps of creation, 'setup', 'analyze', 'generate'.
 	 *
 	 * @param {Node} node - The node to execute.
@@ -2263,7 +2464,7 @@ class NodeBuilder {
 	 */
 	buildFunctionCode( /* shaderNode */ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -2302,27 +2503,53 @@ class NodeBuilder {
 	 * @param {Node} node - The node to execute.
 	 * @param {?string} output - Expected output type. For example 'vec3'.
 	 * @param {?string} propertyName - The property name to assign the result.
-	 * @return {Object}
+	 * @return {?(Object|Node)} The code flow or node.build() result.
 	 */
 	flowNodeFromShaderStage( shaderStage, node, output = null, propertyName = null ) {
 
+		const previousTab = this.tab;
+		const previousCache = this.cache;
 		const previousShaderStage = this.shaderStage;
+		const previousContext = this.context;
 
 		this.setShaderStage( shaderStage );
 
-		const flowData = this.flowChildNode( node, output );
+		const context = { ...this.context };
+		delete context.nodeBlock;
 
-		if ( propertyName !== null ) {
+		this.cache = this.globalCache;
+		this.tab = '\t';
+		this.context = context;
 
-			flowData.code += `${ this.tab + propertyName } = ${ flowData.result };\n`;
+		let result = null;
+
+		if ( this.buildStage === 'generate' ) {
+
+			const flowData = this.flowChildNode( node, output );
+
+			if ( propertyName !== null ) {
+
+				flowData.code += `${ this.tab + propertyName } = ${ flowData.result };\n`;
+
+			}
+
+			this.flowCode[ shaderStage ] = this.flowCode[ shaderStage ] + flowData.code;
+
+			result = flowData;
+
+		} else {
+
+			result = node.build( this );
 
 		}
 
-		this.flowCode[ shaderStage ] = this.flowCode[ shaderStage ] + flowData.code;
-
 		this.setShaderStage( previousShaderStage );
 
-		return flowData;
+		this.cache = previousCache;
+		this.tab = previousTab;
+		this.context = previousContext;
+
+		return result;
 
 	}
 
@@ -2346,7 +2573,7 @@ class NodeBuilder {
 	 */
 	getAttributes( /*shaderStage*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -2359,7 +2586,7 @@ class NodeBuilder {
 	 */
 	getVaryings( /*shaderStage*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -2412,7 +2639,7 @@ class NodeBuilder {
 	 */
 	getUniforms( /*shaderStage*/ ) {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
 
 	}
 
@@ -2504,7 +2731,146 @@ class NodeBuilder {
 	 */
 	buildCode() {
 
-		console.warn( 'Abstract function.' );
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
+	 * Returns the current sub-build layer.
+	 *
+	 * @return {SubBuildNode} The current sub-build layers.
+	 */
+	get subBuild() {
+
+		return this.subBuildLayers[ this.subBuildLayers.length - 1 ] || null;
+
+	}
+
+	/**
+	 * Adds a sub-build layer to the node builder.
+	 *
+	 * @param {SubBuildNode} subBuild - The sub-build layer to add.
+	 */
+	addSubBuild( subBuild ) {
+
+		this.subBuildLayers.push( subBuild );
+
+	}
+
+	/**
+	 * Removes the last sub-build layer from the node builder.
+	 *
+	 * @return {SubBuildNode} The removed sub-build layer.
+	 */
+	removeSubBuild() {
+
+		return this.subBuildLayers.pop();
+
+	}
+
+	/**
+	 * Returns the closest sub-build layer for the given data.
+	 *
+	 * @param {Node|Set<string>|Array<string>} data - The data to get the closest sub-build layer from.
+	 * @return {?string} The closest sub-build name or null if none found.
+	 */
+	getClosestSubBuild( data ) {
+
+		let subBuilds;
+
+		if ( data && data.isNode ) {
+
+			if ( data.isShaderCallNodeInternal ) {
+
+				subBuilds = data.shaderNode.subBuilds;
+
+			} else if ( data.isStackNode ) {
+
+				subBuilds = [ data.subBuild ];
+
+			} else {
+
+				subBuilds = this.getDataFromNode( data, 'any' ).subBuilds;
+
+			}
+
+		} else if ( data instanceof Set ) {
+
+			subBuilds = [ ...data ];
+
+		} else {
+
+			subBuilds = data;
+
+		}
+
+		if ( ! subBuilds ) return null;
+
+		const subBuildLayers = this.subBuildLayers;
+
+		for ( let i = subBuilds.length - 1; i >= 0; i -- ) {
+
+			const subBuild = subBuilds[ i ];
+
+			if ( subBuildLayers.includes( subBuild ) ) {
+
+				return subBuild;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+
+	/**
+	 * Returns the output node of a sub-build layer.
+	 *
+	 * @param {Node} node - The node to get the output from.
+	 * @return {string} The output node name.
+	 */
+	getSubBuildOutput( node ) {
+
+		return this.getSubBuildProperty( 'outputNode', node );
+
+	}
+
+	/**
+	 * Returns the sub-build property name for the given property and node.
+	 *
+	 * @param {string} [property=''] - The property name.
+	 * @param {?Node} [node=null] - The node to get the sub-build from.
+	 * @return {string} The sub-build property name.
+	 */
+	getSubBuildProperty( property = '', node = null ) {
+
+		let subBuild;
+
+		if ( node !== null ) {
+
+			subBuild = this.getClosestSubBuild( node );
+
+		} else {
+
+			subBuild = this.subBuildFn;
+
+		}
+
+		let result;
+
+		if ( subBuild ) {
+
+			result = property ? ( subBuild + '_' + property ) : subBuild;
+
+		} else {
+
+			result = property;
+
+		}
+
+		return result;
 
 	}
 
@@ -2523,7 +2889,7 @@ class NodeBuilder {
 
 			if ( nodeMaterial === null ) {
 
-				console.error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
+				error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
 
 				nodeMaterial = new NodeMaterial();
 
@@ -2537,7 +2903,7 @@ class NodeBuilder {
 
 		}
 
-		// setup() -> stage 1: create possible new nodes and returns an output reference node
+		// setup() -> stage 1: create possible new nodes and/or return an output reference node
 		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
 		// generate()  -> stage 3: generate shader
 
@@ -2588,6 +2954,26 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns shared data object for the given node.
+	 *
+	 * @param {Node} node - The node to get shared data from.
+	 * @return {Object} The shared data.
+	 */
+	getSharedDataFromNode( node ) {
+
+		let data = sharedNodeData.get( node );
+
+		if ( data === undefined ) {
+
+			data = {};
+
+		}
+
+		return data;
+
+	}
+
+	/**
 	 * Returns a uniform representation which is later used for UBO generation and rendering.
 	 *
 	 * @param {NodeUniform} uniformNode - The uniform node.
@@ -2596,16 +2982,31 @@ class NodeBuilder {
 	 */
 	getNodeUniform( uniformNode, type ) {
 
-		if ( type === 'float' || type === 'int' || type === 'uint' ) return new NumberNodeUniform( uniformNode );
-		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return new Vector2NodeUniform( uniformNode );
-		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return new Vector3NodeUniform( uniformNode );
-		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return new Vector4NodeUniform( uniformNode );
-		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
-		if ( type === 'mat2' ) return new Matrix2NodeUniform( uniformNode );
-		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
-		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
+		const nodeData = this.getSharedDataFromNode( uniformNode );
 
-		throw new Error( `Uniform "${type}" not declared.` );
+		let node = nodeData.cache;
+
+		if ( node === undefined ) {
+
+			if ( type === 'float' || type === 'int' || type === 'uint' ) node = new NumberNodeUniform( uniformNode );
+			else if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) node = new Vector2NodeUniform( uniformNode );
+			else if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) node = new Vector3NodeUniform( uniformNode );
+			else if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) node = new Vector4NodeUniform( uniformNode );
+			else if ( type === 'color' ) node = new ColorNodeUniform( uniformNode );
+			else if ( type === 'mat2' ) node = new Matrix2NodeUniform( uniformNode );
+			else if ( type === 'mat3' ) node = new Matrix3NodeUniform( uniformNode );
+			else if ( type === 'mat4' ) node = new Matrix4NodeUniform( uniformNode );
+			else {
+
+				throw new Error( `Uniform "${ type }" not implemented.` );
+
+			}
+
+			nodeData.cache = node;
+
+		}
+
+		return node;
 
 	}
 
@@ -2670,7 +3071,9 @@ class NodeBuilder {
 
 		if ( fromTypeLength > toTypeLength ) {
 
-			return this.format( `${ snippet }.${ 'xyz'.slice( 0, toTypeLength ) }`, this.getTypeFromLength( toTypeLength, this.getComponentType( fromType ) ), toType );
+			snippet = toType === 'bool' ? `all( ${ snippet } )` : `${ snippet }.${ 'xyz'.slice( 0, toTypeLength ) }`;
+
+			return this.format( snippet, this.getTypeFromLength( toTypeLength, this.getComponentType( fromType ) ), toType );
 
 		}
 
@@ -2707,21 +3110,6 @@ class NodeBuilder {
 	getSignature() {
 
 		return `// Three.js r${ REVISION } - Node System\n`;
-
-	}
-
-	// Deprecated
-
-	/**
-	 * @function
-	 * @deprecated since r168. Use `new NodeMaterial()` instead, with targeted node material name.
-	 *
-	 * @param {string} [type='NodeMaterial'] - The node material type.
-	 * @throws {Error}
-	 */
-	createNodeMaterial( type = 'NodeMaterial' ) { // @deprecated, r168
-
-		throw new Error( `THREE.NodeBuilder: createNodeMaterial() was deprecated. Use new ${ type }() instead.` );
 
 	}
 

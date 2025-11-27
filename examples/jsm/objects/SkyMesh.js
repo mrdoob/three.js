@@ -6,14 +6,14 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
+import { Fn, float, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
 
 /**
- * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight]{@link https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight}
+ * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
  * aka The Preetham Model, the de facto standard for analytical skydomes.
  *
- * Note that this class can only be used with {@link WebGLRenderer}.
- * When using {@link WebGPURenderer}, use {@link SkyMesh}.
+ * Note that this class can only be used with {@link WebGPURenderer}.
+ * When using {@link WebGLRenderer}, use {@link Sky}.
  *
  * More references:
  *
@@ -88,8 +88,26 @@ class SkyMesh extends Mesh {
 		 * @type {boolean}
 		 * @readonly
 		 * @default true
+		 * @deprecated Use isSkyMesh instead.
 		 */
-		this.isSky = true;
+		this.isSky = true; // @deprecated, r182
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isSkyMesh = true;
+
+		// Varyings
+
+		const vSunDirection = varyingProperty( 'vec3' );
+		const vSunE = varyingProperty( 'float' );
+		const vSunfade = varyingProperty( 'float' );
+		const vBetaR = varyingProperty( 'vec3' );
+		const vBetaM = varyingProperty( 'vec3' );
 
 		const vertexNode = /*@__PURE__*/ Fn( () => {
 
@@ -118,35 +136,35 @@ class SkyMesh extends Mesh {
 
 			// varying sun position
 
-			const vSunDirection = normalize( this.sunPosition );
-			varyingProperty( 'vec3', 'vSunDirection' ).assign( vSunDirection );
+			const sunDirection = normalize( this.sunPosition );
+			vSunDirection.assign( sunDirection );
 
 			// varying sun intensity
 
-			const angle = dot( vSunDirection, this.upUniform );
+			const angle = dot( sunDirection, this.upUniform );
 			const zenithAngleCos = clamp( angle, - 1, 1 );
 			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( pow( e, cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
-			varyingProperty( 'float', 'vSunE' ).assign( sunIntensity );
+			vSunE.assign( sunIntensity );
 
 			// varying sun fade
 
-			const vSunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( this.sunPosition.y.div( 450000.0 ) ) ), 0, 1 ) );
-			varyingProperty( 'float', 'vSunfade' ).assign( vSunfade );
+			const sunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( this.sunPosition.y.div( 450000.0 ) ) ), 0, 1 ) );
+			vSunfade.assign( sunfade );
 
 			// varying vBetaR
 
-			const rayleighCoefficient = this.rayleigh.sub( float( 1.0 ).mul( float( 1.0 ).sub( vSunfade ) ) );
+			const rayleighCoefficient = this.rayleigh.sub( float( 1.0 ).mul( float( 1.0 ).sub( sunfade ) ) );
 
 			// extinction (absorption + out scattering)
 			// rayleigh coefficients
-			varyingProperty( 'vec3', 'vBetaR' ).assign( totalRayleigh.mul( rayleighCoefficient ) );
+			vBetaR.assign( totalRayleigh.mul( rayleighCoefficient ) );
 
 			// varying vBetaM
 
 			const c = float( 0.2 ).mul( this.turbidity ).mul( 10E-18 );
 			const totalMie = float( 0.434 ).mul( c ).mul( MieConst );
 
-			varyingProperty( 'vec3', 'vBetaM' ).assign( totalMie.mul( this.mieCoefficient ) );
+			vBetaM.assign( totalMie.mul( this.mieCoefficient ) );
 
 			// position
 
@@ -157,13 +175,7 @@ class SkyMesh extends Mesh {
 
 		} )();
 
-		const fragmentNode = /*@__PURE__*/ Fn( () => {
-
-			const vSunDirection = varying( vec3(), 'vSunDirection' );
-			const vSunE = varying( float(), 'vSunE' );
-			const vSunfade = varying( float(), 'vSunfade' );
-			const vBetaR = varying( vec3(), 'vBetaR' );
-			const vBetaM = varying( vec3(), 'vBetaM' );
+		const colorNode = /*@__PURE__*/ Fn( () => {
 
 			// constants for atmospheric scattering
 			const pi = float( 3.141592653589793238462643383279502884197169 );
@@ -232,7 +244,7 @@ class SkyMesh extends Mesh {
 		material.depthWrite = false;
 
 		material.vertexNode = vertexNode;
-		material.fragmentNode = fragmentNode;
+		material.colorNode = colorNode;
 
 	}
 

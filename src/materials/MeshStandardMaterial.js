@@ -8,9 +8,9 @@ import { Euler } from '../math/Euler.js';
  * A standard physically based material, using Metallic-Roughness workflow.
  *
  * Physically based rendering (PBR) has recently become the standard in many
- * 3D applications, such as [Unity]{@link https://blogs.unity3d.com/2014/10/29/physically-based-shading-in-unity-5-a-primer/},
- * [Unreal]{@link https://docs.unrealengine.com/latest/INT/Engine/Rendering/Materials/PhysicallyBased/} and
- * [3D Studio Max]{@link http://area.autodesk.com/blogs/the-3ds-max-blog/what039s-new-for-rendering-in-3ds-max-2017}.
+ * 3D applications, such as [Unity](https://blogs.unity3d.com/2014/10/29/physically-based-shading-in-unity-5-a-primer/),
+ * [Unreal](https://docs.unrealengine.com/latest/INT/Engine/Rendering/Materials/PhysicallyBased/) and
+ * [3D Studio Max](http://area.autodesk.com/blogs/the-3ds-max-blog/what039s-new-for-rendering-in-3ds-max-2017).
  *
  * This approach differs from older approaches in that instead of using
  * approximations for the way in which light interacts with a surface, a
@@ -26,16 +26,17 @@ import { Euler } from '../math/Euler.js';
  * Note that for best results you should always specify an environment map when using this material.
  *
  * For a non-technical introduction to the concept of PBR and how to set up a
- * PBR material, check out these articles by the people at [marmoset]{@link https://www.marmoset.co}:
+ * PBR material, check out these articles by the people at [marmoset](https://www.marmoset.co):
  *
- * - [Basic Theory of Physically Based Rendering]{@link https://www.marmoset.co/posts/basic-theory-of-physically-based-rendering/}
- * - [Physically Based Rendering and You Can Too]{@link https://www.marmoset.co/posts/physically-based-rendering-and-you-can-too/}
+ * - [Basic Theory of Physically Based Rendering](https://www.marmoset.co/posts/basic-theory-of-physically-based-rendering/)
+ * - [Physically Based Rendering and You Can Too](https://www.marmoset.co/posts/physically-based-rendering-and-you-can-too/)
  *
  * Technical details of the approach used in three.js (and most other PBR systems) can be found is this
- * [paper from Disney]{@link https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf}
+ * [paper from Disney](https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf)
  * (pdf), by Brent Burley.
  *
  * @augments Material
+ * @demo scenes/material-browser.html#MeshStandardMaterial
  */
 class MeshStandardMaterial extends Material {
 

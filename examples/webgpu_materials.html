@@ -4,12 +4,20 @@
 		<title>three.js webgpu - materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - materials
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Materials</span>
+			</div>
+
+			<small>
+				Examples of built-in materials and NodeMaterials.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -25,7 +33,7 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import * as TSL from 'three/tsl';
 
 			import { Fn, wgslFn, positionLocal, scriptable, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, screenUV, js, string, Loop, cameraProjectionMatrix, ScriptableNodeResources } from 'three/tsl';
@@ -33,9 +41,7 @@
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			let stats;
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer;
 
@@ -373,12 +379,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
-
-				//
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				//
 
@@ -429,20 +431,22 @@
 
 				const json = mesh.toJSON();
 				const loader = new THREE.NodeObjectLoader().setNodes( moduleToLib( THREE ) ).setNodeMaterials( moduleToLib( THREE ) );
-				const serializedMesh = loader.parse( json );
+				const serializedMesh = loader.parse( json, () => {
 
-				serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;
-				serializedMesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+					serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;
+					serializedMesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
 
-				const scriptableNode = serializedMesh.material.colorNode;
+					const scriptableNode = serializedMesh.material.colorNode;
 
-				// it's because local.get( 'material' ) is used in the example ( local/global is unserializable )
-				scriptableNode.setLocal( 'material', serializedMesh.material );
-				scriptableNode.setParameter( 'execFrom', 'serialized' );
+					// it's because local.get( 'material' ) is used in the example ( local/global is unserializable )
+					scriptableNode.setLocal( 'material', serializedMesh.material );
+					scriptableNode.setParameter( 'execFrom', 'serialized' );
 
-				objects.push( serializedMesh );
+					objects.push( serializedMesh );
 
-				scene.add( serializedMesh );
+					scene.add( serializedMesh );
+
+				} );
 
 			}
 
@@ -476,8 +480,6 @@
 				}
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

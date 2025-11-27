@@ -4,6 +4,7 @@ import { nodeObject, varying } from '../tsl/TSLBase.js';
 import { storageElement } from '../utils/StorageArrayElementNode.js';
 import { NodeAccess } from '../core/constants.js';
 import { getTypeFromLength } from '../core/NodeUtils.js';
+import { warn } from '../../utils.js';
 
 /**
  * This node is used in context of compute shaders and allows to define a
@@ -125,6 +126,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * A reference to the internal buffer attribute node.
 		 *
+		 * @private
 		 * @type {?BufferAttributeNode}
 		 * @default null
 		 */
@@ -133,6 +135,7 @@ class StorageBufferNode extends BufferNode {
 		/**
 		 * A reference to the internal varying node.
 		 *
+		 * @private
 		 * @type {?VaryingNode}
 		 * @default null
 		 */
@@ -336,6 +339,25 @@ class StorageBufferNode extends BufferNode {
 	}
 
 	/**
+	 * Returns the type of a member of the struct.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} name - The name of the member.
+	 * @return {string} The type of the member.
+	 */
+	getMemberType( builder, name ) {
+
+		if ( this.structTypeNode !== null ) {
+
+			return this.structTypeNode.getMemberType( builder, name );
+
+		}
+
+		return 'void';
+
+	}
+
+	/**
 	 * Generates the code snippet of the storage buffer node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -389,7 +411,7 @@ export const storage = ( value, type = null, count = 0 ) => nodeObject( new Stor
  */
 export const storageObject = ( value, type, count ) => { // @deprecated, r171
 
-	console.warn( 'THREE.TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
+	warn( 'TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
 
 	return storage( value, type, count ).setPBO( true );
 

@@ -1,14 +1,16 @@
 import TempNode from '../core/TempNode.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeObject } from '../tsl/TSLBase.js';
+import { nodeObject, context } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
 import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
+import { Vector4 } from '../../math/Vector4.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { warn } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -48,7 +50,7 @@ class PassTextureNode extends TextureNode {
 
 	setup( builder ) {
 
-		if ( builder.object.isQuadMesh ) this.passNode.build( builder );
+		this.passNode.build( builder );
 
 		return super.setup( builder );
 
@@ -126,7 +128,17 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.textureName, this.previousTexture );
+		const newNode = new this.constructor( this.passNode, this.textureName, this.previousTexture );
+		newNode.uvNode = this.uvNode;
+		newNode.levelNode = this.levelNode;
+		newNode.biasNode = this.biasNode;
+		newNode.sampler = this.sampler;
+		newNode.depthNode = this.depthNode;
+		newNode.compareNode = this.compareNode;
+		newNode.gradNode = this.gradNode;
+		newNode.offsetNode = this.offsetNode;
+
+		return newNode;
 
 	}
 
@@ -237,6 +249,45 @@ class PassNode extends TempNode {
 		this.renderTarget = renderTarget;
 
 		/**
+		 * An optional override material for the pass.
+		 *
+		 * @type {Material|null}
+		 */
+		this.overrideMaterial = null;
+
+		/**
+		 * Whether the pass is transparent.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.transparent = true;
+
+		/**
+		 * Whether the pass is opaque.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.opaque = true;
+
+		/**
+		 * An optional global context for the pass.
+		 *
+		 * @type {ContextNode|null}
+		 */
+		this.contextNode = null;
+
+		/**
+		 * A cache for the context node.
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._contextNodeCache = null;
+
+		/**
 		 * A dictionary holding the internal result textures.
 		 *
 		 * @private
@@ -314,9 +365,42 @@ class PassNode extends TempNode {
 		 */
 		this._mrt = null;
 
+		/**
+		 * Layer object for configuring the camera that is used
+		 * to produce the pass.
+		 *
+		 * @private
+		 * @type {?Layers}
+		 * @default null
+		 */
 		this._layers = null;
 
-		this._resolution = 1;
+		/**
+		 * Scales the resolution of the internal render target.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 1
+		 */
+		this._resolutionScale = 1;
+
+		/**
+		 * Custom viewport definition.
+		 *
+		 * @private
+		 * @type {?Vector4}
+		 * @default null
+		 */
+		this._viewport = null;
+
+		/**
+		 * Custom scissor definition.
+		 *
+		 * @private
+		 * @type {?Vector4}
+		 * @default null
+		 */
+		this._scissor = null;
 
 		/**
 		 * This flag can be used for type testing.
@@ -336,6 +420,40 @@ class PassNode extends TempNode {
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
+		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
+	}
+
+	/**
+	 * Sets the resolution scale for the pass.
+	 * The resolution scale is a factor that is multiplied with the renderer's width and height.
+	 *
+	 * @param {number} resolutionScale - The resolution scale to set. A value of `1` means full resolution.
+	 * @return {PassNode} A reference to this pass.
+	 */
+	setResolutionScale( resolutionScale ) {
+
+		this._resolutionScale = resolutionScale;
+
+		return this;
+
+	}
+
+	/**
+	 * Gets the current resolution scale of the pass.
+	 *
+	 * @return {number} The current resolution scale. A value of `1` means full resolution.
+	 */
+	getResolutionScale() {
+
+		return this._resolutionScale;
+
 	}
 
 	/**
@@ -344,12 +462,13 @@ class PassNode extends TempNode {
 	 *
 	 * @param {number} resolution - The resolution to set. A value of `1` means full resolution.
 	 * @return {PassNode} A reference to this pass.
+	 * @deprecated since r181. Use {@link PassNode#setResolutionScale `setResolutionScale()`} instead.
 	 */
-	setResolution( resolution ) {
+	setResolution( resolution ) { // @deprecated, r181
 
-		this._resolution = resolution;
+		warn( 'PassNode: .setResolution() is deprecated. Use .setResolutionScale() instead.' );
 
-		return this;
+		return this.setResolutionScale( resolution );
 
 	}
 
@@ -357,14 +476,22 @@ class PassNode extends TempNode {
 	 * Gets the current resolution of the pass.
 	 *
 	 * @return {number} The current resolution. A value of `1` means full resolution.
-	 * @default 1
+	 * @deprecated since r181. Use {@link PassNode#getResolutionScale `getResolutionScale()`} instead.
 	 */
-	getResolution() {
+	getResolution() { // @deprecated, r181
 
-		return this._resolution;
+		warn( 'PassNode: .getResolution() is deprecated. Use .getResolutionScale() instead.' );
+
+		return this.getResolutionScale();
 
 	}
 
+	/**
+	 * Sets the layer configuration that should be used when rendering the pass.
+	 *
+	 * @param {Layers} layers - The layers object to set.
+	 * @return {PassNode} A reference to this pass.
+	 */
 	setLayers( layers ) {
 
 		this._layers = layers;
@@ -373,6 +500,11 @@ class PassNode extends TempNode {
 
 	}
 
+	/**
+	 * Gets the current layer configuration of the pass.
+	 *
+	 * @return {?Layers} .
+	 */
 	getLayers() {
 
 		return this._layers;
@@ -401,17 +533,6 @@ class PassNode extends TempNode {
 	getMRT() {
 
 		return this._mrt;
-
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal() {
-
-		return true;
 
 	}
 
@@ -585,16 +706,35 @@ class PassNode extends TempNode {
 
 	}
 
+	/**
+	 * Precompiles the pass.
+	 *
+	 * Note that this method must be called after the pass configuration is complete.
+	 * So calls like `setMRT()` and `getTextureNode()` must proceed the precompilation.
+	 *
+	 * @async
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the compile has been finished.
+	 * @see {@link Renderer#compileAsync}
+	 */
+	async compileAsync( renderer ) {
+
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
+
+		renderer.setRenderTarget( this.renderTarget );
+		renderer.setMRT( this._mrt );
+
+		await renderer.compileAsync( this.scene, this.camera );
+
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
+
+	}
+
 	setup( { renderer } ) {
 
 		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
-
-		// TODO: Disable MSAA for WebGL backend for now
-		if ( renderer.backend.isWebGLBackend === true ) {
-
-			this.renderTarget.samples = 0;
-
-		}
 
 		this.renderTarget.texture.type = renderer.getColorBufferType();
 
@@ -636,7 +776,12 @@ class PassNode extends TempNode {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
+		const currentAutoClear = renderer.autoClear;
+		const currentTransparent = renderer.transparent;
+		const currentOpaque = renderer.opaque;
 		const currentMask = camera.layers.mask;
+		const currentContextNode = renderer.contextNode;
+		const currentOverrideMaterial = scene.overrideMaterial;
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
@@ -653,13 +798,48 @@ class PassNode extends TempNode {
 
 		}
 
+		if ( this.overrideMaterial !== null ) {
+
+			scene.overrideMaterial = this.overrideMaterial;
+
+		}
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
+		renderer.autoClear = true;
+		renderer.transparent = this.transparent;
+		renderer.opaque = this.opaque;
+
+		if ( this.contextNode !== null ) {
+
+			if ( this._contextNodeCache === null || this._contextNodeCache.version !== this.version ) {
+
+				this._contextNodeCache = {
+					version: this.version,
+					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
+				};
+
+			}
+
+			renderer.contextNode = this._contextNodeCache.context;
+
+		}
+
+		const currentSceneName = scene.name;
+
+		scene.name = this.name ? this.name : scene.name;
 
 		renderer.render( scene, camera );
 
+		scene.name = currentSceneName;
+		scene.overrideMaterial = currentOverrideMaterial;
+
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
+		renderer.autoClear = currentAutoClear;
+		renderer.transparent = currentTransparent;
+		renderer.opaque = currentOpaque;
+		renderer.contextNode = currentContextNode;
 
 		camera.layers.mask = currentMask;
 
@@ -676,10 +856,86 @@ class PassNode extends TempNode {
 		this._width = width;
 		this._height = height;
 
-		const effectiveWidth = this._width * this._pixelRatio * this._resolution;
-		const effectiveHeight = this._height * this._pixelRatio * this._resolution;
+		const effectiveWidth = Math.floor( this._width * this._pixelRatio * this._resolutionScale );
+		const effectiveHeight = Math.floor( this._height * this._pixelRatio * this._resolutionScale );
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
+
+		if ( this._scissor !== null ) this.renderTarget.scissor.copy( this._scissor );
+		if ( this._viewport !== null ) this.renderTarget.viewport.copy( this._viewport );
+
+	}
+
+	/**
+	 * This method allows to define the pass's scissor rectangle. By default, the scissor rectangle is kept
+	 * in sync with the pass's dimensions. To reverse the process and use auto-sizing again, call the method
+	 * with `null` as the single argument.
+	 *
+	 * @param {?(number | Vector4)} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
+	 * @param {number} y - The vertical coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number} width - The width of the scissor box in logical pixel unit.
+	 * @param {number} height - The height of the scissor box in logical pixel unit.
+	 */
+	setScissor( x, y, width, height ) {
+
+		if ( x === null ) {
+
+			this._scissor = null;
+
+		} else {
+
+			if ( this._scissor === null ) this._scissor = new Vector4();
+
+			if ( x.isVector4 ) {
+
+				this._scissor.copy( x );
+
+			} else {
+
+				this._scissor.set( x, y, width, height );
+
+			}
+
+			this._scissor.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
+
+		}
+
+	}
+
+	/**
+	 * This method allows to define the pass's viewport. By default, the viewport is kept in sync
+	 * with the pass's dimensions. To reverse the process and use auto-sizing again, call the method
+	 * with `null` as the single argument.
+	 *
+	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+	 * @param {number} width - The width of the viewport in logical pixel unit.
+	 * @param {number} height - The height of the viewport in logical pixel unit.
+	 */
+	setViewport( x, y, width, height ) {
+
+		if ( x === null ) {
+
+			this._viewport = null;
+
+		} else {
+
+			if ( this._viewport === null ) this._viewport = new Vector4();
+
+			if ( x.isVector4 ) {
+
+				this._viewport.copy( x );
+
+			} else {
+
+				this._viewport.set( x, y, width, height );
+
+			}
+
+			this._viewport.multiplyScalar( this._pixelRatio * this._resolutionScale ).floor();
+
+		}
 
 	}
 

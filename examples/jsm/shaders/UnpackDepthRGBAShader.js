@@ -4,7 +4,7 @@
  */
 
 /**
- * Unpack RGBA depth shader that shows RGBA encoded depth as monochrome color.
+ * Depth visualization shader that shows depth values as monochrome color.
  *
  * @constant
  * @type {ShaderMaterial~Shader}
@@ -39,12 +39,19 @@ const UnpackDepthRGBAShader = {
 
 		varying vec2 vUv;
 
-		#include <packing>
-
 		void main() {
 
-			float depth = 1.0 - unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );
-			gl_FragColor = vec4( vec3( depth ), opacity );
+			float depth = texture2D( tDiffuse, vUv ).r;
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				gl_FragColor = vec4( vec3( depth ), opacity );
+
+			#else
+
+				gl_FragColor = vec4( vec3( 1.0 - depth ), opacity );
+
+			#endif
 
 		}`
 

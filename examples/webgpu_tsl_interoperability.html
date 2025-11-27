@@ -1,16 +1,24 @@
 <html lang="en">
 	<head>
-		<title>three.js - wgsl/tsl node interoperability</title>
+		<title>three.js - wgsl/tsl interoperability</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - wgsl/tsl node interoperability
-			<br />CRT Shader adapted from <a href="https://mini.gmshaders.com/p/gm-shaders-mini-crt" target="_blank" rel="noopener"> Xor</a>.
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>WGSL/TSL Interoperability</span>
+			</div>
+
+			<small>
+				CRT Shader adapted from <a href="https://mini.gmshaders.com/p/gm-shaders-mini-crt" target="_blank" rel="noopener"> Xor</a>.
+			</small>
 		</div>
+
 		<div id="container">
 			<canvas id="c"></canvas>
 		</div>
@@ -28,12 +36,12 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { Fn, attribute, varyingProperty, time, uniform, wgslFn, texture, sampler, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let renderer, camera, scene;
 			const dpr = window.devicePixelRatio;
@@ -275,11 +283,12 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Parameters' );
 
 				gui.add( cellSizeUniform, 'value', 6, 50, 1 ).name( 'Cell Size' );
 				gui.add( cellOffsetUniform, 'value', 0, 1, 0.1 ).name( 'Cell Offset' );

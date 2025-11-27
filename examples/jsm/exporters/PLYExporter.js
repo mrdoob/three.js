@@ -31,7 +31,7 @@ class PLYExporter {
 	 * @param {Object3D} object - The 3D object to export.
 	 * @param {PLYExporter~OnDone} onDone - A callback function that is executed when the export has finished.
 	 * @param {PLYExporter~Options} options - The export options.
-	 * @return {?string|ArrayBuffer} The exported PLY.
+	 * @return {?(string|ArrayBuffer)} The exported PLY.
 	 */
 	parse( object, onDone, options = {} ) {
 
@@ -320,7 +320,7 @@ class PLYExporter {
 
 							tempColor.fromBufferAttribute( colors, i );
 
-							ColorManagement.fromWorkingColorSpace( tempColor, SRGBColorSpace );
+							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
 
 							output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 							vOffset += 1;
@@ -479,7 +479,7 @@ class PLYExporter {
 
 							tempColor.fromBufferAttribute( colors, i );
 
-							ColorManagement.fromWorkingColorSpace( tempColor, SRGBColorSpace );
+							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
 
 							line += ' ' +
 								Math.floor( tempColor.r * 255 ) + ' ' +

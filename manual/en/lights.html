@@ -42,14 +42,14 @@ const near = 0.1;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
-<p>Next let's add <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> let the user spin
-or <em>orbit</em> the camera around some point. The <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> are
+<p>Next let's add <a href="/docs/#examples/en/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a>. <a href="/docs/#examples/en/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a> let the user spin
+or <em>orbit</em> the camera around some point. The <a href="/docs/#examples/en/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a> are
 an optional feature of three.js so first we need to include them
 in our page</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
-<p>Then we can use them. We pass the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> a camera to
+<p>Then we can use them. We pass the <a href="/docs/#examples/en/controls/OrbitControls" target="_blank"><code class="notranslate" translate="no">OrbitControls</code></a> a camera to
 control and the DOM element to use to get input events</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);

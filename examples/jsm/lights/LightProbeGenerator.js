@@ -8,7 +8,8 @@ import {
 	NoColorSpace,
 	HalfFloatType,
 	DataUtils,
-	WebGLCoordinateSystem
+	WebGLCoordinateSystem,
+	FloatType
 } from 'three';
 
 /**
@@ -178,7 +179,11 @@ class LightProbeGenerator {
 
 		if ( renderer.isWebGLRenderer ) {
 
-			if ( dataType === HalfFloatType ) {
+			if ( dataType === FloatType ) {
+
+				data = new Float32Array( imageWidth * imageWidth * 4 );
+
+			} else if ( dataType === HalfFloatType ) {
 
 				data = new Uint16Array( imageWidth * imageWidth * 4 );
 
@@ -210,7 +215,13 @@ class LightProbeGenerator {
 
 				let r, g, b;
 
-				if ( dataType === HalfFloatType ) {
+				if ( dataType === FloatType ) {
+
+					r = data[ i ];
+					g = data[ i + 1 ];
+					b = data[ i + 2 ];
+
+				} else if ( dataType === HalfFloatType ) {
 
 					r = DataUtils.fromHalfFloat( data[ i ] );
 					g = DataUtils.fromHalfFloat( data[ i + 1 ] );

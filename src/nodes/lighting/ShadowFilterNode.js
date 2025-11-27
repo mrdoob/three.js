@@ -7,6 +7,8 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { positionWorld } from '../accessors/Position.js';
+import { screenCoordinate } from '../display/ScreenNode.js';
+import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
 
 const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 
@@ -22,9 +24,9 @@ const shadowMaterialLib = /*@__PURE__*/ new WeakMap();
  */
 export const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
 
-	let basic = texture( depthTexture, shadowCoord.xy ).label( 't_basic' );
+	let basic = texture( depthTexture, shadowCoord.xy ).setName( 't_basic' );
 
-	if ( depthTexture.isDepthArrayTexture ) {
+	if ( depthTexture.isArrayTexture ) {
 
 		basic = basic.depth( depthLayer );
 
@@ -35,7 +37,11 @@ export const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord
 } );
 
 /**
- * A shadow filtering function performing PCF filtering.
+ * A shadow filtering function performing PCF filtering with Vogel disk sampling and IGN.
+ *
+ * Uses 5 samples distributed via Vogel disk pattern, rotated per-pixel using Interleaved
+ * Gradient Noise (IGN) to break up banding artifacts. Combined with hardware PCF (4-tap
+ * filtering per sample), this effectively provides 20 filtered taps with better distribution.
  *
  * @method
  * @param {Object} inputs - The input parameter object.
@@ -50,7 +56,7 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 
 		let depth = texture( depthTexture, uv );
 
-		if ( depthTexture.isDepthArrayTexture ) {
+		if ( depthTexture.isArrayTexture ) {
 
 			depth = depth.depth( depthLayer );
 
@@ -64,34 +70,19 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 
 	const texelSize = vec2( 1 ).div( mapSize );
-	const dx0 = texelSize.x.negate().mul( radius );
-	const dy0 = texelSize.y.negate().mul( radius );
-	const dx1 = texelSize.x.mul( radius );
-	const dy1 = texelSize.y.mul( radius );
-	const dx2 = dx0.div( 2 );
-	const dy2 = dy0.div( 2 );
-	const dx3 = dx1.div( 2 );
-	const dy3 = dy1.div( 2 );
+	const radiusScaled = radius.mul( texelSize.x );
 
+	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
+	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
+
+	// 5 samples using Vogel disk distribution
 	return add(
-		depthCompare( shadowCoord.xy.add( vec2( dx0, dy0 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( 0, dy0 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx1, dy0 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx2, dy2 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( 0, dy2 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx3, dy2 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx0, 0 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx2, 0 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy, shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx3, 0 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx1, 0 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx2, dy3 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( 0, dy3 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx3, dy3 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx0, dy1 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( 0, dy1 ) ), shadowCoord.z ),
-		depthCompare( shadowCoord.xy.add( vec2( dx1, dy1 ) ), shadowCoord.z )
-	).mul( 1 / 17 );
+		depthCompare( shadowCoord.xy.add( vogelDiskSample( 0, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
+		depthCompare( shadowCoord.xy.add( vogelDiskSample( 1, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
+		depthCompare( shadowCoord.xy.add( vogelDiskSample( 2, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
+		depthCompare( shadowCoord.xy.add( vogelDiskSample( 3, 5, phi ).mul( radiusScaled ) ), shadowCoord.z ),
+		depthCompare( shadowCoord.xy.add( vogelDiskSample( 4, 5, phi ).mul( radiusScaled ) ), shadowCoord.z )
+	).mul( 1 / 5 );
 
 } );
 
@@ -111,7 +102,7 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
 
 		let depth = texture( depthTexture, uv );
 
-		if ( depthTexture.isDepthArrayTexture ) {
+		if ( depthTexture.isArrayTexture ) {
 
 			depth = depth.depth( depthLayer );
 
@@ -185,11 +176,9 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
  */
 export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, depthLayer } ) => {
 
-	const occlusion = float( 1 ).toVar();
-
 	let distribution = texture( depthTexture ).sample( shadowCoord.xy );
 
-	if ( depthTexture.isDepthArrayTexture || depthTexture.isDataArrayTexture ) {
+	if ( depthTexture.isArrayTexture ) {
 
 		distribution = distribution.depth( depthLayer );
 
@@ -197,19 +186,28 @@ export const VSMShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 
 	distribution = distribution.rg;
 
-	const hardShadow = step( shadowCoord.z, distribution.x );
+	const mean = distribution.x;
+	const variance = max( 0.0000001, distribution.y.mul( distribution.y ) );
 
-	If( hardShadow.notEqual( float( 1.0 ) ), () => {
+	const hardShadow = step( shadowCoord.z, mean );
 
-		const distance = shadowCoord.z.sub( distribution.x );
-		const variance = max( 0, distribution.y.mul( distribution.y ) );
-		let softnessProbability = variance.div( variance.add( distance.mul( distance ) ) ); // Chebeyshevs inequality
-		softnessProbability = clamp( sub( softnessProbability, 0.3 ).div( 0.95 - 0.3 ) );
-		occlusion.assign( clamp( max( hardShadow, softnessProbability ) ) );
+	// Early return if fully lit
+	If( hardShadow.equal( 1.0 ), () => {
+
+		return float( 1.0 );
 
 	} );
 
-	return occlusion;
+	// Distance from mean
+	const d = shadowCoord.z.sub( mean );
+
+	// Chebyshev's inequality for upper bound on probability
+	let p_max = variance.div( variance.add( d.mul( d ) ) );
+
+	// Reduce light bleeding by remapping [amount, 1] to [0, 1]
+	p_max = clamp( sub( p_max, 0.3 ).div( 0.65 ) );
+
+	return max( hardShadow, p_max );
 
 } );
 
@@ -245,6 +243,8 @@ const linearShadowDistance = ( light ) => {
  * If not, it creates a new `NodeMaterial` configured for shadow rendering and stores it
  * in the `shadowMaterialLib` for future use.
  *
+ * @tsl
+ * @function
  * @param {Light} light - The light source for which the shadow material is needed.
  *                         If the light is a point light, a depth node is calculated
  *                         using the linear shadow distance.

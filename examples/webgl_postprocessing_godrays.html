@@ -149,10 +149,6 @@
 
 				postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight, { type: THREE.HalfFloatType } );
 
-				// Switching the depth formats to luminance from rgb doesn't seem to work. I didn't
-				// investigate further for now.
-				// pars.format = LuminanceFormat;
-
 				// I would have this quarter size and use it as one of the ping-pong render
 				// targets but the aliasing causes some temporal flickering
 

@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - GLTFloader</title>
+		<title>three.js webgpu - performance</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU Performance<br />
-			Dungeon - Low Poly Game Level Challenge by
-			<a href="https://sketchfab.com/warkarma" target="_blank" rel="noopener">Warkarma</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Performance</span>
+			</div>
+
+			<small>
+				Dungeon - Low Poly Game Level Challenge by
+				<a href="https://sketchfab.com/warkarma" target="_blank" rel="noopener">Warkarma</a><br />
+				<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>.
+			</small>
 		</div>
 
 		<script type="importmap">
@@ -20,8 +28,8 @@
 				"imports": {
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
-					"three/addons/": "./jsm/",
-					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@3.6.0/dist/main.js"
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
 
 				}
 			}
@@ -29,19 +37,17 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
-			import Stats from 'stats-gl';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
-			let camera, scene, renderer, stats;
+			let camera, scene, renderer;
 			let model;
 
 			const options = { static: true };
@@ -78,24 +84,15 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
-
+				renderer.inspector = new Inspector();
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				stats = new Stats( {
-					precision: 3,
-					horizontal: false,
-					trackGPU: true,
-				} );
-				stats.init( renderer );
-
-				document.body.appendChild( stats.dom );
-
-				new RGBELoader()
+				new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+					.load( 'royal_esplanade_2k.hdr.jpg', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -135,7 +132,7 @@
 
 				// gui
 
-				const gui = new GUI();
+				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( options, 'static' ).onChange( () => {
 
 					setStatic( model, options.static );
@@ -157,12 +154,9 @@
 
 			//
 
-			async function render() {
+			function render() {
 
-				await renderer.renderAsync( scene, camera );
-				renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
-
-				stats.update();
+				renderer.render( scene, camera );
 
 			}
 

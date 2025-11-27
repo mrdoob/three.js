@@ -59,12 +59,12 @@ import { BufferGeometryLoader } from './BufferGeometryLoader.js';
 import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
-import { getTypedArray } from '../utils.js';
+import { getTypedArray, error, warn } from '../utils.js';
 import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 
 /**
- * A loader for loading a JSON resource in the [JSON Object/Scene format]{@link https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4}.
+ * A loader for loading a JSON resource in the [JSON Object/Scene format](https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4).
  * The files are internally loaded via {@link FileLoader}.
  *
  * ```js
@@ -123,7 +123,7 @@ class ObjectLoader extends Loader {
 
 				if ( onError !== undefined ) onError( error );
 
-				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+				error( 'ObjectLoader: Can\'t parse ' + url + '.', error.message );
 
 				return;
 
@@ -135,7 +135,7 @@ class ObjectLoader extends Loader {
 
 				if ( onError !== undefined ) onError( new Error( 'THREE.ObjectLoader: Can\'t load ' + url ) );
 
-				console.error( 'THREE.ObjectLoader: Can\'t load ' + url );
+				error( 'ObjectLoader: Can\'t load ' + url );
 				return;
 
 			}
@@ -345,7 +345,7 @@ class ObjectLoader extends Loader {
 
 						} else {
 
-							console.warn( `THREE.ObjectLoader: Unsupported geometry type "${ data.type }"` );
+							warn( `ObjectLoader: Unsupported geometry type "${ data.type }"` );
 
 						}
 
@@ -636,7 +636,7 @@ class ObjectLoader extends Loader {
 
 			if ( typeof value === 'number' ) return value;
 
-			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
+			warn( 'ObjectLoader.parseTexture: Constant should be in numeric form.', value );
 
 			return type[ value ];
 
@@ -652,13 +652,13 @@ class ObjectLoader extends Loader {
 
 				if ( data.image === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: No "image" specified for', data.uuid );
+					warn( 'ObjectLoader: No "image" specified for', data.uuid );
 
 				}
 
 				if ( images[ data.image ] === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
+					warn( 'ObjectLoader: Undefined image', data.image );
 
 				}
 
@@ -746,7 +746,7 @@ class ObjectLoader extends Loader {
 
 			if ( geometries[ name ] === undefined ) {
 
-				console.warn( 'THREE.ObjectLoader: Undefined geometry', name );
+				warn( 'ObjectLoader: Undefined geometry', name );
 
 			}
 
@@ -768,7 +768,7 @@ class ObjectLoader extends Loader {
 
 					if ( materials[ uuid ] === undefined ) {
 
-						console.warn( 'THREE.ObjectLoader: Undefined material', uuid );
+						warn( 'ObjectLoader: Undefined material', uuid );
 
 					}
 
@@ -782,7 +782,7 @@ class ObjectLoader extends Loader {
 
 			if ( materials[ name ] === undefined ) {
 
-				console.warn( 'THREE.ObjectLoader: Undefined material', name );
+				warn( 'ObjectLoader: Undefined material', name );
 
 			}
 
@@ -794,7 +794,7 @@ class ObjectLoader extends Loader {
 
 			if ( textures[ uuid ] === undefined ) {
 
-				console.warn( 'THREE.ObjectLoader: Undefined texture', uuid );
+				warn( 'ObjectLoader: Undefined texture', uuid );
 
 			}
 
@@ -973,37 +973,65 @@ class ObjectLoader extends Loader {
 				object._drawRanges = data.drawRanges;
 				object._reservedRanges = data.reservedRanges;
 
-				object._visibility = data.visibility;
-				object._active = data.active;
-				object._bounds = data.bounds.map( bound => {
+				object._geometryInfo = data.geometryInfo.map( info => {
 
-					const box = new Box3();
-					box.min.fromArray( bound.boxMin );
-					box.max.fromArray( bound.boxMax );
+					let box = null;
+					let sphere = null;
+					if ( info.boundingBox !== undefined ) {
 
-					const sphere = new Sphere();
-					sphere.radius = bound.sphereRadius;
-					sphere.center.fromArray( bound.sphereCenter );
+						box = new Box3().fromJSON( info.boundingBox );
+
+					}
+
+					if ( info.boundingSphere !== undefined ) {
+
+						sphere = new Sphere().fromJSON( info.boundingSphere );
+
+					}
 
 					return {
-						boxInitialized: bound.boxInitialized,
-						box: box,
-
-						sphereInitialized: bound.sphereInitialized,
-						sphere: sphere
+						...info,
+						boundingBox: box,
+						boundingSphere: sphere
 					};
 
 				} );
+				object._instanceInfo = data.instanceInfo;
+
+				object._availableInstanceIds = data._availableInstanceIds;
+				object._availableGeometryIds = data._availableGeometryIds;
+
+				object._nextIndexStart = data.nextIndexStart;
+				object._nextVertexStart = data.nextVertexStart;
+				object._geometryCount = data.geometryCount;
 
 				object._maxInstanceCount = data.maxInstanceCount;
 				object._maxVertexCount = data.maxVertexCount;
 				object._maxIndexCount = data.maxIndexCount;
 
 				object._geometryInitialized = data.geometryInitialized;
-				object._geometryCount = data.geometryCount;
 
 				object._matricesTexture = getTexture( data.matricesTexture.uuid );
-				if ( data.colorsTexture !== undefined ) object._colorsTexture = getTexture( data.colorsTexture.uuid );
+
+				object._indirectTexture = getTexture( data.indirectTexture.uuid );
+
+				if ( data.colorsTexture !== undefined ) {
+
+					object._colorsTexture = getTexture( data.colorsTexture.uuid );
+
+				}
+
+				if ( data.boundingSphere !== undefined ) {
+
+					object.boundingSphere = new Sphere().fromJSON( data.boundingSphere );
+
+				}
+
+				if ( data.boundingBox !== undefined ) {
+
+					object.boundingBox = new Box3().fromJSON( data.boundingBox );
+
+				}
 
 				break;
 
@@ -1167,7 +1195,7 @@ class ObjectLoader extends Loader {
 
 				if ( skeleton === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: No skeleton found with UUID:', child.skeleton );
+					warn( 'ObjectLoader: No skeleton found with UUID:', child.skeleton );
 
 				} else {
 

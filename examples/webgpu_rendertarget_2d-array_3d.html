@@ -4,7 +4,7 @@
 		<title>three.js webgpu - RenderTargetArray and RenderTarget3D</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 			.viewport-label {
 				position: absolute;
@@ -21,9 +21,19 @@
 	</head>
 
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - RenderTargetArray and RenderTarget3D<br />
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>RenderTarget Array/3D</span>
+			</div>
+
+			<small>
+				RenderTargetArray and RenderTarget3D examples.
+			</small>
 		</div>
+
 		<div class="viewport-label" style="bottom: 2%; left: 2%;">DataArrayTexture</div>
 		<div class="viewport-label" style="bottom: 2%; left: 52%;">Data3DTexture</div>
 		<div class="viewport-label" style="bottom: 52%; left: 52%;">RenderTarget3D</div>
@@ -42,14 +52,14 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 			import { vec2, uniform, screenUV, color, texture, diffuseColor, attribute, vec3, vec4 } from 'three/tsl';
-			import Stats from 'three/addons/libs/stats.module.js';
+
 			import { TextureHelper } from 'three/addons/helpers/TextureHelperGPU.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { unzipSync } from 'three/addons/libs/fflate.module.js';
 
-			let renderer, stats;
+			let renderer;
 			let views = [];
 
 			class View {
@@ -211,8 +221,9 @@
 						materialQuad.depthTest = false;
 						materialQuad.outputNode = vec4( texture( mapArray ).depth( uZCoord ).rgb, 1 );
 
-						const fboArray = new THREE.RenderTargetArray( size.width, size.height, size.depth, {
+						const fboArray = new THREE.RenderTarget( size.width, size.height, {
 							depthBuffer: false,
+							depth: size.depth
 						} );
 						fboArray.texture.name = 'RenderTargetArray';
 
@@ -281,9 +292,6 @@
 
 					} );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -327,8 +335,6 @@
 					renderer.render( view.scene, view.camera );
 
 				} );
-
-				stats.update();
 
 			}
 

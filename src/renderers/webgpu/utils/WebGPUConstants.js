@@ -6,6 +6,8 @@ export const GPUPrimitiveTopology = {
 	TriangleStrip: 'triangle-strip',
 };
 
+export const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+
 export const GPUCompareFunction = {
 	Never: 'never',
 	Less: 'less',
@@ -113,7 +115,7 @@ export const GPUTextureFormat = {
 	// Packed 32-bit formats
 	RGB9E5UFloat: 'rgb9e5ufloat',
 	RGB10A2Unorm: 'rgb10a2unorm',
-	RG11B10UFloat: 'rgb10a2unorm',
+	RG11B10UFloat: 'rg11b10ufloat',
 
 	// 64-bit formats
 
@@ -158,7 +160,7 @@ export const GPUTextureFormat = {
 	BC6HRGBUFloat: 'bc6h-rgb-ufloat',
 	BC6HRGBFloat: 'bc6h-rgb-float',
 	BC7RGBAUnorm: 'bc7-rgba-unorm',
-	BC7RGBAUnormSRGB: 'bc7-rgba-srgb',
+	BC7RGBAUnormSRGB: 'bc7-rgba-unorm-srgb',
 
 	// ETC2 compressed formats usable if 'texture-compression-etc2' is both
 	// supported by the device/user agent and enabled in requestDevice.
@@ -227,7 +229,7 @@ export const GPUBlendFactor = {
 	SrcAlpha: 'src-alpha',
 	OneMinusSrcAlpha: 'one-minus-src-alpha',
 	Dst: 'dst',
-	OneMinusDstColor: 'one-minus-dst',
+	OneMinusDst: 'one-minus-dst',
 	DstAlpha: 'dst-alpha',
 	OneMinusDstAlpha: 'one-minus-dst-alpha',
 	SrcAlphaSaturated: 'src-alpha-saturated',
@@ -316,18 +318,29 @@ export const GPUInputStepMode = {
 };
 
 export const GPUFeatureName = {
+	CoreFeaturesAndLimits: 'core-features-and-limits',
 	DepthClipControl: 'depth-clip-control',
 	Depth32FloatStencil8: 'depth32float-stencil8',
 	TextureCompressionBC: 'texture-compression-bc',
+	TextureCompressionBCSliced3D: 'texture-compression-bc-sliced-3d',
 	TextureCompressionETC2: 'texture-compression-etc2',
 	TextureCompressionASTC: 'texture-compression-astc',
+	TextureCompressionASTCSliced3D: 'texture-compression-astc-sliced-3d',
 	TimestampQuery: 'timestamp-query',
 	IndirectFirstInstance: 'indirect-first-instance',
 	ShaderF16: 'shader-f16',
 	RG11B10UFloat: 'rg11b10ufloat-renderable',
 	BGRA8UNormStorage: 'bgra8unorm-storage',
 	Float32Filterable: 'float32-filterable',
+	Float32Blendable: 'float32-blendable',
 	ClipDistances: 'clip-distances',
 	DualSourceBlending: 'dual-source-blending',
-	Subgroups: 'subgroups'
+	Subgroups: 'subgroups',
+	TextureFormatsTier1: 'texture-formats-tier1',
+	TextureFormatsTier2: 'texture-formats-tier2'
+};
+
+export const GPUFeatureMap = {
+	'texture-compression-s3tc': 'texture-compression-bc',
+	'texture-compression-etc1': 'texture-compression-etc2'
 };

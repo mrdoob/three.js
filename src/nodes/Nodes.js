@@ -6,7 +6,7 @@ export { default as ArrayNode } from './core/ArrayNode.js';
 export { default as AssignNode } from './core/AssignNode.js';
 export { default as AttributeNode } from './core/AttributeNode.js';
 export { default as BypassNode } from './core/BypassNode.js';
-export { default as CacheNode } from './core/CacheNode.js';
+export { default as IsolateNode } from './core/IsolateNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode } from './core/ContextNode.js';
 export { default as IndexNode } from './core/IndexNode.js';
@@ -33,6 +33,7 @@ export { default as StructNode } from './core/StructNode.js';
 export { default as StructTypeNode } from './core/StructTypeNode.js';
 export { default as OutputStructNode } from './core/OutputStructNode.js';
 export { default as MRTNode } from './core/MRTNode.js';
+export { default as SubBuildNode } from './core/SubBuildNode.js';
 
 import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
@@ -40,11 +41,9 @@ export { NodeUtils };
 // utils
 export { default as ArrayElementNode } from './utils/ArrayElementNode.js';
 export { default as ConvertNode } from './utils/ConvertNode.js';
-export { default as EquirectUVNode } from './utils/EquirectUVNode.js';
 export { default as FunctionOverloadingNode } from './utils/FunctionOverloadingNode.js';
 export { default as JoinNode } from './utils/JoinNode.js';
 export { default as LoopNode } from './utils/LoopNode.js';
-export { default as MatcapUVNode } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode } from './utils/MaxMipLevelNode.js';
 export { default as RemapNode } from './utils/RemapNode.js';
 export { default as RotateNode } from './utils/RotateNode.js';
@@ -52,11 +51,14 @@ export { default as SetNode } from './utils/SetNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
 export { default as SpriteSheetUVNode } from './utils/SpriteSheetUVNode.js';
 export { default as StorageArrayElementNode } from './utils/StorageArrayElementNode.js';
-export { default as TriplanarTexturesNode } from './utils/TriplanarTexturesNode.js';
 export { default as ReflectorNode } from './utils/ReflectorNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
 export { default as MemberNode } from './utils/MemberNode.js';
 export { default as DebugNode } from './utils/DebugNode.js';
+export { default as EventNode } from './utils/EventNode.js';
+
+// math
+export { default as BitcastNode } from './math/BitcastNode.js';
 
 // accessors
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';
@@ -120,6 +122,7 @@ export { default as DirectionalLightNode } from './lighting/DirectionalLightNode
 export { default as RectAreaLightNode } from './lighting/RectAreaLightNode.js';
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
+export { default as ProjectorLightNode } from './lighting/ProjectorLightNode.js';
 export { default as AmbientLightNode } from './lighting/AmbientLightNode.js';
 export { default as LightsNode } from './lighting/LightsNode.js';
 export { default as LightingNode } from './lighting/LightingNode.js';

@@ -7,15 +7,25 @@
 		<title>three.js webgpu - postprocessing - Screen Space Reflections (SSR)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
 <body>
-	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - postprocessing - screen space reflections<br />
-		<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by 
-		<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
-	</div>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSR</span>
+			</div>
+
+			<small>
+				Screen Space Reflections.<br />
+				<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by
+				<a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.
+			</small>
+		</div>
+
 	<script type="importmap">
 		{
 			"imports": {
@@ -28,8 +38,9 @@
 	</script>
 
 	<script type="module">
-		import * as THREE from 'three';
-		import { pass, mrt, output, transformedNormalView, metalness, blendColor, screenUV, color } from 'three/tsl';
+
+		import * as THREE from 'three/webgpu';
+		import { pass, mrt, output, normalView, metalness, roughness, blendColor, screenUV, color, sample, directionToColor, colorToDirection, vec2, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -37,18 +48,20 @@
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-		import Stats from 'three/addons/libs/stats.module.js';
+		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
+			quality: 0.5,
+			blurQuality: 2,
 			maxDistance: 0.5,
 			opacity: 1,
 			thickness: 0.015,
+			roughness: 1,
 			enabled: true
 		};
 
-		let camera, scene, renderer, postProcessing, ssrPass;
-		let gui, stats, controls;
+		let camera, scene, model, renderer, postProcessing, ssrPass;
+		let controls;
 
 		init();
 
@@ -63,24 +76,32 @@
 			const dracoLoader = new DRACOLoader();
 			dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
 			dracoLoader.setDecoderConfig( { type: 'js' } );
-		
+
 			const loader = new GLTFLoader();
 			loader.setDRACOLoader( dracoLoader );
 			loader.load( 'models/gltf/steampunk_camera.glb', function ( gltf ) {
 
-				gltf.scene.traverse( function ( object ) {
+				model = gltf.scene;
+
+				model.traverse( function ( object ) {
 
 					if ( object.material ) {
 
+						if ( object.material.name === 'Lense_Casing' ) {
+
+							object.material.transparent = true;
+
+						}
+
 						// Avoid overdrawing
 						object.material.side = THREE.FrontSide;
-		
+
 					}
-		
+
 				} );
-		
-				gltf.scene.position.y = 0.1;
-				scene.add( gltf.scene );
+
+				model.position.y = 0.1;
+				scene.add( model );
 
 			} );
 
@@ -91,6 +112,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.inspector = new Inspector();
 			document.body.appendChild( renderer.domElement );
 
 			await renderer.init();
@@ -106,23 +128,46 @@
 
 			postProcessing = new THREE.PostProcessing( renderer );
 
-			const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
+			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
 				output: output,
-				normal: transformedNormalView,
-				metalness: metalness
+				normal: directionToColor( normalView ),
+				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
 			} ) );
 
-			const scenePassColor = scenePass.getTextureNode( 'output' );
-			const scenePassNormal = scenePass.getTextureNode( 'normal' );
-			const scenePassDepth = scenePass.getTextureNode( 'depth' );
-			const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
+			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
+			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, scenePassMetalness, camera );
-			ssrPass.resolutionScale = 1.0;
+				return colorSpaceToWorking( node, THREE.SRGBColorSpace );
+
+			} );
+			const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
+
+				return scenePass.getLinearDepthNode();
+
+			} );
+			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
+
+			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
+
+			const normalTexture = scenePass.getTexture( 'normal' );
+			normalTexture.type = THREE.UnsignedByteType;
+
+			const metalRoughTexture = scenePass.getTexture( 'metalrough' );
+			metalRoughTexture.type = THREE.UnsignedByteType;
+
+			const sceneNormal = sample( ( uv ) => {
+
+				return colorToDirection( scenePassNormal.sample( uv ) );
+
+			} );
+
+			//
+
+			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, scenePassMetalRough.r, scenePassMetalRough.g ).toInspector( 'SSR' );
 
 			// blend SSR over beauty
-		
+
 			const outputNode = smaa( blendColor( scenePassColor, ssrPass ) );
 
 			postProcessing.outputNode = outputNode;
@@ -133,20 +178,18 @@
 			controls.enableDamping = true;
 			controls.update();
 
-			// stats
-
-			stats = new Stats();
-			document.body.appendChild( stats.dom );
-
 			window.addEventListener( 'resize', onWindowResize );
 
 			// GUI
 
-			gui = new GUI();
-			gui.add( params, 'maxDistance' ).min( 0 ).max( 1 ).onChange( updateParameters );
-			gui.add( params, 'opacity' ).min( 0 ).max( 1 ).onChange( updateParameters );
-			gui.add( params, 'thickness' ).min( 0 ).max( 0.05 ).onChange( updateParameters );
-			gui.add( params, 'enabled' ).onChange( () => {
+			const gui = renderer.inspector.createParameters( 'Settings' );
+			const ssrFolder = gui.addFolder( 'SSR' );
+			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'blurQuality', 1, 3, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'maxDistance', 0, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'opacity', 0, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
+			ssrFolder.add( params, 'enabled' ).onChange( () => {
 
 				if ( params.enabled === true ) {
 
@@ -161,17 +204,32 @@
 				postProcessing.needsUpdate = true;
 
 			} );
-		
+			const modelFolder = gui.addFolder( 'Model' );
+			modelFolder.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {
+
+				model.traverse( function ( object ) {
+
+					if ( object.material ) {
+
+						object.material.roughness = value;
+
+					}
+
+				} );
+
+			} );
+
 			updateParameters();
 
 		}
 
 		function updateParameters() {
 
+			ssrPass.quality.value = params.quality;
+			ssrPass.blurQuality.value = params.blurQuality;
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrPass.opacity.value = params.opacity;
 			ssrPass.thickness.value = params.thickness;
-
 
 		}
 
@@ -186,14 +244,10 @@
 
 		function animate() {
 
-			stats.begin();
-
 			controls.update();
 
 			postProcessing.render();
-
-			stats.end();
-
+		
 		}
 
 	</script>

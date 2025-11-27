@@ -17,7 +17,7 @@ import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.
  * - You can use the directive `#pragma unroll_loop_start` and `#pragma unroll_loop_end`
  * in order to unroll a `for` loop in GLSL by the shader preprocessor. The directive has
  * to be placed right above the loop. The loop formatting has to correspond to a defined standard.
- *   - The loop has to be [normalized]{@link https://en.wikipedia.org/wiki/Normalized_loop}.
+ *   - The loop has to be [normalized](https://en.wikipedia.org/wiki/Normalized_loop).
  *   - The loop variable has to be *i*.
  *   - The value `UNROLLED_LOOP_INDEX` will be replaced with the explicitly
  * value of *i* for the given iteration and can be used in preprocessor
@@ -158,8 +158,21 @@ class ShaderMaterial extends Material {
 		this.wireframeLinewidth = 1;
 
 		/**
-		 * Define whether the material color is affected by global fog settings; `true`
+		 * Defines whether the material color is affected by global fog settings; `true`
 		 * to pass fog uniforms to the shader.
+		 *
+		 * Setting this property to `true` requires the definition of fog uniforms. It is
+		 * recommended to use `UniformsUtils.merge()` to combine the custom shader uniforms
+		 * with predefined fog uniforms.
+		 *
+		 * ```js
+		 * const material = new ShaderMaterial( {
+		 *     uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] );
+		 *     vertexShader: vertexShader,
+		 *     fragmentShader: fragmentShader,
+		 *     fog: true
+		 * } );
+		 * ```
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -223,7 +236,7 @@ class ShaderMaterial extends Material {
 		};
 
 		/**
-		 * If set, this calls [gl.bindAttribLocation]{@link https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation}
+		 * If set, this calls [gl.bindAttribLocation](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation)
 		 * to bind a generic vertex index to an attribute variable.
 		 *
 		 * @type {string|undefined}
@@ -278,6 +291,12 @@ class ShaderMaterial extends Material {
 		this.extensions = Object.assign( {}, source.extensions );
 
 		this.glslVersion = source.glslVersion;
+
+		this.defaultAttributeValues = Object.assign( {}, source.defaultAttributeValues );
+
+		this.index0AttributeName = source.index0AttributeName;
+
+		this.uniformsNeedUpdate = source.uniformsNeedUpdate;
 
 		return this;
 

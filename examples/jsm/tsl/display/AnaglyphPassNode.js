@@ -40,6 +40,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		/**
 		 * Color matrix node for the left eye.
 		 *
+		 * @private
 		 * @type {UniformNode<mat3>}
 		 */
 		this._colorMatrixLeft = uniform( new Matrix3().fromArray( [
@@ -51,6 +52,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 		/**
 		 * Color matrix node for the right eye.
 		 *
+		 * @private
 		 * @type {UniformNode<mat3>}
 		 */
 		this._colorMatrixRight = uniform( new Matrix3().fromArray( [

@@ -38,7 +38,7 @@ class NodeObjectLoader extends ObjectLoader {
 		 * A reference to hold the `nodes` JSON property.
 		 *
 		 * @private
-		 * @type {?Object}
+		 * @type {?Object[]}
 		 */
 		this._nodesJSON = null;
 
@@ -92,7 +92,7 @@ class NodeObjectLoader extends ObjectLoader {
 	/**
 	 * Parses the node objects from the given JSON and textures.
 	 *
-	 * @param {Object} json - The JSON definition
+	 * @param {Object[]} json - The JSON definition
 	 * @param {Object<string,Texture>} textures - The texture library.
 	 * @return {Object<string,Node>}. The parsed nodes.
 	 */

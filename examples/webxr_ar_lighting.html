@@ -9,8 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - Lighting Estimation<br/>
-			(Chrome Android 90+)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - lighting estimation<br/>
 		</div>
 
 		<script type="importmap">
@@ -25,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import { ARButton } from 'three/addons/webxr/ARButton.js';
 			import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';
 
@@ -64,7 +63,7 @@
 
 				xrLight.addEventListener( 'estimationstart', () => {
 
-					// Swap the default light out for the estimated one one we start getting some estimated values.
+					// Swap the default light out for the estimated one once we start getting some estimated values.
 					scene.add( xrLight );
 					scene.remove( defaultLight );
 
@@ -90,9 +89,9 @@
 
 				//
 
-				new RGBELoader()
+				new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+					.load( 'royal_esplanade_2k.hdr.jpg', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 

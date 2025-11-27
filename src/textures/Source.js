@@ -1,5 +1,6 @@
 import { ImageUtils } from '../extras/ImageUtils.js';
 import { generateUUID } from '../math/MathUtils.js';
+import { warn } from '../utils.js';
 
 let _sourceId = 0;
 
@@ -70,6 +71,38 @@ class Source {
 		 * @default 0
 		 */
 		this.version = 0;
+
+	}
+
+	/**
+	 * Returns the dimensions of the source into the given target vector.
+	 *
+	 * @param {(Vector2|Vector3)} target - The target object the result is written into.
+	 * @return {(Vector2|Vector3)} The dimensions of the source.
+	 */
+	getSize( target ) {
+
+		const data = this.data;
+
+		if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( data instanceof HTMLVideoElement ) ) {
+
+			target.set( data.videoWidth, data.videoHeight, 0 );
+
+		} else if ( ( typeof VideoFrame !== 'undefined' ) && ( data instanceof VideoFrame ) ) {
+
+			target.set( data.displayHeight, data.displayWidth, 0 );
+
+		} else if ( data !== null ) {
+
+			target.set( data.width, data.height, data.depth || 0 );
+
+		} else {
+
+			target.set( 0, 0, 0 );
+
+		}
+
+		return target;
 
 	}
 
@@ -185,7 +218,7 @@ function serializeImage( image ) {
 
 		} else {
 
-			console.warn( 'THREE.Texture: Unable to serialize Texture.' );
+			warn( 'Texture: Unable to serialize Texture.' );
 			return {};
 
 		}

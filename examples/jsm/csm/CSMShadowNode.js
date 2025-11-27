@@ -163,7 +163,6 @@ class CSMShadowNode extends ShadowBaseNode {
 		this.mainFrustum = new CSMFrustum( data );
 
 		const light = this.light;
-		const parent = light.parent;
 
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
@@ -174,9 +173,6 @@ class CSMShadowNode extends ShadowBaseNode {
 			lShadow.bias = lShadow.bias * ( i + 1 );
 
 			this.lights.push( lwLight );
-
-			parent.add( lwLight );
-			parent.add( lwLight.target );
 
 			lwLight.shadow = lShadow;
 
@@ -378,9 +374,9 @@ class CSMShadowNode extends ShadowBaseNode {
 	_setupFade() {
 
 		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
-		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cascades' );
+		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).setName( 'cascades' );
 
-		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
+		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).setName( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
 		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'linearDepth' );
@@ -460,9 +456,9 @@ class CSMShadowNode extends ShadowBaseNode {
 	_setupStandard() {
 
 		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup );
-		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cascades' );
+		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).setName( 'cascades' );
 
-		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
+		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).setName( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
 		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'linearDepth' );
@@ -503,8 +499,25 @@ class CSMShadowNode extends ShadowBaseNode {
 	updateBefore( /*builder*/ ) {
 
 		const light = this.light;
+		const parent = light.parent;
 		const camera = this.camera;
 		const frustums = this.frustums;
+
+		// make sure the placeholder light objects which represent the
+		// multiple cascade shadow casters are part of the scene graph
+
+		for ( let i = 0; i < this.lights.length; i ++ ) {
+
+			const lwLight = this.lights[ i ];
+
+			if ( lwLight.parent === null ) {
+
+				parent.add( lwLight.target );
+				parent.add( lwLight );
+
+			}
+
+		}
 
 		_lightDirection.subVectors( light.target.position, light.position ).normalize();
 

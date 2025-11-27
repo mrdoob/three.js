@@ -32,7 +32,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			let camera, scene, renderer, stats;
 
@@ -63,9 +63,9 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				new RGBELoader()
+				new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+					.load( 'royal_esplanade_2k.hdr.jpg', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 

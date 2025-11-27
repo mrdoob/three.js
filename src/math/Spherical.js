@@ -2,7 +2,7 @@ import { clamp } from './MathUtils.js';
 
 /**
  * This class can be used to represent points in 3D space as
- * [Spherical coordinates]{@link https://en.wikipedia.org/wiki/Spherical_coordinate_system}.
+ * [Spherical coordinates](https://en.wikipedia.org/wiki/Spherical_coordinate_system).
  */
 class Spherical {
 
@@ -107,8 +107,8 @@ class Spherical {
 	 * Sets the spherical components from the given Cartesian coordinates.
 	 *
 	 * @param {number} x - The x value.
-	 * @param {number} y - The x value.
-	 * @param {number} z - The x value.
+	 * @param {number} y - The y value.
+	 * @param {number} z - The z value.
 	 * @return {Spherical} A reference to this spherical.
 	 */
 	setFromCartesianCoords( x, y, z ) {

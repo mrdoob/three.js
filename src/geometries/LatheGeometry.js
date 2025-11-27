@@ -19,6 +19,7 @@ import { clamp } from '../math/MathUtils.js';
  * ```
  *
  * @augments BufferGeometry
+ * @demo scenes/geometry-browser.html#LatheGeometry
  */
 class LatheGeometry extends BufferGeometry {
 

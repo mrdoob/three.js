@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
+import { hashString } from './NodeUtils.js';
 
 /**
  * This class represents a shader property. It can be used
@@ -58,23 +59,25 @@ class PropertyNode extends Node {
 		 */
 		this.isPropertyNode = true;
 
+		/**
+		 * This flag is used for global cache.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
+	}
+
+	customCacheKey() {
+
+		return hashString( this.type + ':' + ( this.name || '' ) + ':' + ( this.varying ? '1' : '0' ) );
+
 	}
 
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
-
-	}
-
-	/**
-	 * The method is overwritten so it always returns `true`.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether this node is global or not.
-	 */
-	isGlobal( /*builder*/ ) {
-
-		return true;
 
 	}
 
@@ -130,6 +133,14 @@ export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( t
  * @type {PropertyNode<vec4>}
  */
 export const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
+
+/**
+ * TSL object that represents the shader variable `DiffuseContribution`.
+ *
+ * @tsl
+ * @type {PropertyNode<vec3>}
+ */
+export const diffuseContribution = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'DiffuseContribution' );
 
 /**
  * TSL object that represents the shader variable `EmissiveColor`.
@@ -250,6 +261,14 @@ export const anisotropyB = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'A
  * @type {PropertyNode<color>}
  */
 export const specularColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
+
+/**
+ * TSL object that represents the shader variable `SpecularColorBlended`.
+ *
+ * @tsl
+ * @type {PropertyNode<color>}
+ */
+export const specularColorBlended = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColorBlended' );
 
 /**
  * TSL object that represents the shader variable `SpecularF90`.
