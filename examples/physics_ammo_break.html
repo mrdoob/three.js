@@ -338,9 +338,10 @@
 			physicsShape.calculateLocalInertia( mass, localInertia );
 
 			const rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
-			const body = new Ammo.btRigidBody( rbInfo );
+			rbInfo.set_m_restitution( 0.5 );
+			rbInfo.set_m_friction( 0.5 );
 
-			body.setFriction( 0.5 );
+			const body = new Ammo.btRigidBody( rbInfo );
 
 			if ( vel ) {
 

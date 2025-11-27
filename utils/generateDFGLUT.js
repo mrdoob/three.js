@@ -1,16 +1,15 @@
 /**
- * DFG LUT Generator (32x32)
+ * DFG LUT Generator
  *
  * Generates a precomputed lookup table for the split-sum approximation
- * used in Image-Based Lighting. The 32x32 resolution provides a minimal
- * memory footprint for DataTexture usage.
+ * used in Image-Based Lighting.
  *
  * Reference: "Real Shading in Unreal Engine 4" by Brian Karis
  */
 
 import * as fs from 'fs';
 
-const LUT_SIZE = 32;
+const LUT_SIZE = 16;
 const SAMPLE_COUNT = 4096;
 
 // Van der Corput sequence
@@ -264,6 +263,7 @@ export function getDFGLUT() {
 	if ( lut === null ) {
 
 		lut = new DataTexture( DATA, ${LUT_SIZE}, ${LUT_SIZE}, RGFormat, HalfFloatType );
+		lut.name = 'DFG_LUT';
 		lut.minFilter = LinearFilter;
 		lut.magFilter = LinearFilter;
 		lut.wrapS = ClampToEdgeWrapping;
@@ -302,6 +302,7 @@ const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 	if ( lut === null ) {
 
 		lut = new DataTexture( DATA, ${LUT_SIZE}, ${LUT_SIZE}, RGFormat, HalfFloatType );
+		lut.name = 'DFG_LUT';
 		lut.minFilter = LinearFilter;
 		lut.magFilter = LinearFilter;
 		lut.wrapS = ClampToEdgeWrapping;
