@@ -1070,11 +1070,7 @@ class NodeMaterial extends Material {
 
 		if ( builder.context.getAO ) {
 
-			aoNode = builder.context.getAO( aoNode, { material: builder.material } );
-
-		} else {
-
-			aoNode = null;
+			aoNode = builder.context.getAO( aoNode, builder );
 
 		}
 
