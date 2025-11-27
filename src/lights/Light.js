@@ -69,6 +69,24 @@ class Light extends Object3D {
 
 	}
 
+	fromJSON( json ) {
+
+		this.color.setHex( json.color );
+		this.intensity = json.intensity;
+
+		if ( json.groundColor !== undefined ) this.groundColor.setHex( json.groundColor );
+
+		if ( json.distance !== undefined ) this.distance = json.distance;
+		if ( json.angle !== undefined ) this.angle = json.angle;
+		if ( json.decay !== undefined ) this.decay = json.decay;
+		if ( json.penumbra !== undefined ) this.penumbra = json.penumbra;
+
+		if ( json.shadow !== undefined ) this.shadow.fromJSON( json.shadow );
+
+		return this;
+
+	}
+
 	toJSON( meta ) {
 
 		const data = super.toJSON( meta );

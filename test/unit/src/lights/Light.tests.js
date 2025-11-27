@@ -5,12 +5,12 @@ import { Light } from '../../../../src/lights/Light.js';
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { runStdLightTests } from '../../utils/qunit-utils.js';
 
-export default QUnit.module( 'Lights', () => {
+export default QUnit.module('Lights', () => {
 
-	QUnit.module( 'Light', ( hooks ) => {
+	QUnit.module('Light', (hooks) => {
 
 		let lights = undefined;
-		hooks.beforeEach( function () {
+		hooks.beforeEach(function () {
 
 			const parameters = {
 				color: 0xaaaaaa,
@@ -19,14 +19,14 @@ export default QUnit.module( 'Lights', () => {
 
 			lights = [
 				new Light(),
-				new Light( parameters.color ),
-				new Light( parameters.color, parameters.intensity )
+				new Light(parameters.color),
+				new Light(parameters.color, parameters.intensity)
 			];
 
-		} );
+		});
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test('Extending', (assert) => {
 
 			const object = new Light();
 			assert.strictEqual(
@@ -34,18 +34,18 @@ export default QUnit.module( 'Lights', () => {
 				'Light extends from Object3D'
 			);
 
-		} );
+		});
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test('Instancing', (assert) => {
 
 			const object = new Light();
-			assert.ok( object, 'Can instantiate a Light.' );
+			assert.ok(object, 'Can instantiate a Light.');
 
-		} );
+		});
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test('type', (assert) => {
 
 			const object = new Light();
 			assert.ok(
@@ -53,22 +53,22 @@ export default QUnit.module( 'Lights', () => {
 				'Light.type should be Light'
 			);
 
-		} );
+		});
 
-		QUnit.todo( 'color', ( assert ) => {
+		QUnit.todo('color', (assert) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.ok(false, 'everything\'s gonna be alright');
 
-		} );
+		});
 
-		QUnit.todo( 'intensity', ( assert ) => {
+		QUnit.todo('intensity', (assert) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.ok(false, 'everything\'s gonna be alright');
 
-		} );
+		});
 
 		// PUBLIC
-		QUnit.test( 'isLight', ( assert ) => {
+		QUnit.test('isLight', (assert) => {
 
 			const object = new Light();
 			assert.ok(
@@ -76,37 +76,42 @@ export default QUnit.module( 'Lights', () => {
 				'Light.isLight should be true'
 			);
 
-		} );
+		});
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test('dispose', (assert) => {
 
-			assert.expect( 0 );
+			assert.expect(0);
 
 			// empty, test exists
 			const object = new Light();
 			object.dispose();
 
-		} );
+		});
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo('copy', (assert) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.ok(false, 'everything\'s gonna be alright');
 
-		} );
+		});
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.test('toJSON', (assert) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const light = new Light(0xffc0d1, 2);
+			const json = light.toJSON();
+			const newLight = new Light().fromJSON(json.object);
 
-		} );
+			assert.strictEqual(newLight.color.getHex(), 0xffc0d1, 'Check color');
+			assert.strictEqual(newLight.intensity, 2, 'Check intensity');
+
+		});
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		QUnit.test('Standard light tests', (assert) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests(assert, lights);
 
-		} );
+		});
 
-	} );
+	});
 
-} );
+});
