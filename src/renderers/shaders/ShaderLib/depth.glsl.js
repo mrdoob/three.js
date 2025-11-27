@@ -104,16 +104,16 @@ void main() {
 	#elif DEPTH_PACKING == 3202
 
 		// TODO Deprecate
-		gl_FragColor.rgb = packDepthToRGB( fragCoordZ );
+		gl_FragColor = packDepthToRGB( fragCoordZ );
 
 	#elif DEPTH_PACKING == 3203
 
 		// TODO Deprecate
-		gl_FragColor.rg = packDepthToRG( fragCoordZ );
+		gl_FragColor = packDepthToRG( fragCoordZ );
 
 	#elif DEPTH_PACKING == 3204
 
-		gl_FragColor.rg = vec2( fragCoordZ );
+		gl_FragColor = vec2( fragCoordZ );
 
 	#endif
 
