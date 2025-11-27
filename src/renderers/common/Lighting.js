@@ -23,6 +23,8 @@ class Lighting extends ChainMap {
 
 		super();
 
+		this._lightsNodes = new Set();
+
 	}
 
 	/**
@@ -33,7 +35,10 @@ class Lighting extends ChainMap {
 	 */
 	createNode( lights = [] ) {
 
-		return new LightsNode().setLights( lights );
+		const node = new LightsNode().setLights( lights );
+		this._lightsNodes.add( node );
+
+		return node;
 
 	}
 
@@ -65,6 +70,21 @@ class Lighting extends ChainMap {
 		_chainKeys.length = 0;
 
 		return node;
+
+	}
+
+	/**
+	 * Frees lights nodes stored in this manager.
+	 */
+	dispose() {
+
+		for ( const node of this._lightsNodes ) {
+
+			node.dispose();
+
+		}
+
+		this._lightsNodes.clear();
 
 	}
 
