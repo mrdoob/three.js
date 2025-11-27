@@ -28,9 +28,9 @@ class LightProbe extends Light {
 	 * @param {SphericalHarmonics3} sh - The spherical harmonics which represents encoded lighting information.
 	 * @param {number} [intensity=1] - The light's strength/intensity.
 	 */
-	constructor(sh = new SphericalHarmonics3(), intensity = 1) {
+	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
-		super(undefined, intensity);
+		super( undefined, intensity );
 
 		/**
 		 * This flag can be used for type testing.
@@ -50,11 +50,11 @@ class LightProbe extends Light {
 
 	}
 
-	copy(source) {
+	copy( source ) {
 
-		super.copy(source);
+		super.copy( source );
 
-		this.sh.copy(source.sh);
+		this.sh.copy( source.sh );
 
 		return this;
 
@@ -66,19 +66,19 @@ class LightProbe extends Light {
 	 * @param {Object} json - The JSON holding the serialized light probe.
 	 * @return {LightProbe} A reference to this light probe.
 	 */
-	fromJSON(json) {
+	fromJSON( json ) {
 
-		super.fromJSON(json);
+		super.fromJSON( json );
 
-		this.sh.fromArray(json.sh);
+		this.sh.fromArray( json.sh );
 
 		return this;
 
 	}
 
-	toJSON(meta) {
+	toJSON( meta ) {
 
-		const data = super.toJSON(meta);
+		const data = super.toJSON( meta );
 
 		data.object.sh = this.sh.toArray();
 
