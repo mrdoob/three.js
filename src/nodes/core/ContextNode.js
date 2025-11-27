@@ -237,11 +237,11 @@ export function builtinShadowContext( shadowNode, light, node = null ) {
  *
  * @tsl
  * @function
- * @param {Node} aoValue - The ambient occlusion value node to apply.
+ * @param {Node} aoNode - The ambient occlusion value node to apply.
  * @param {Node} [node=null] - The node whose context should be modified.
  * @returns {ContextNode}
  */
-export function builtinAOContext( aoValue, node = null ) {
+export function builtinAOContext( aoNode, node = null ) {
 
 	return context( node, {
 
@@ -249,7 +249,7 @@ export function builtinAOContext( aoValue, node = null ) {
 
 			if ( material.transparent === true ) return inputNode;
 
-			return inputNode !== null ? inputNode.mul( aoValue ) : aoValue;
+			return inputNode !== null ? inputNode.mul( aoNode ) : aoNode;
 
 		}
 
