@@ -1600,8 +1600,9 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
+					const indirectOffset = renderObject.getIndirectOffset();
 
-					passEncoderGPU.drawIndexedIndirect( buffer, 0 );
+					passEncoderGPU.drawIndexedIndirect( buffer, indirectOffset );
 
 				} else {
 
@@ -1620,8 +1621,9 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
+					const indirectOffset = renderObject.getIndirectOffset();
 
-					passEncoderGPU.drawIndirect( buffer, 0 );
+					passEncoderGPU.drawIndirect( buffer, indirectOffset );
 
 				} else {
 
