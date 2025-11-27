@@ -73,6 +73,8 @@ function getShape( geometry ) {
 
 	}
 
+	console.error( 'RapierPhysics: Unsupported geometry type:', geometry.type );
+
 	return null;
 
 }
