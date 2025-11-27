@@ -66,8 +66,6 @@ async function AmmoPhysics() {
 
 		}
 
-		console.error( 'AmmoPhysics: Unsupported geometry type:', geometry.type );
-
 		return null;
 
 	}
