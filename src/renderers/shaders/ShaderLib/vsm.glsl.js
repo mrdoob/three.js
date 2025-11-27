@@ -45,7 +45,7 @@ void main() {
 
 	float std_dev = sqrt( squared_mean - mean * mean );
 
-	gl_FragColor = vec4( mean, std_dev, 0.0, 1.0 );
+	gl_FragColor.rg = vec2( mean, std_dev );
 
 }
 `;
