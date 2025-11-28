@@ -43,7 +43,7 @@ if ( typeof hljs !== 'undefined' ) {
 
 					element.scrollIntoView();
 
-				}, 100 );
+				}, 250 );
 
 			} else {
 
