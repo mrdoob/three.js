@@ -200,6 +200,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			instancingMorph: IS_INSTANCEDMESH && object.morphTexture !== null,
 
 			supportsVertexTextures: SUPPORTS_VERTEX_TEXTURES,
+			renderTarget: currentRenderTarget,
 			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace ),
 			alphaToCoverage: !! material.alphaToCoverage,
 
@@ -406,6 +407,19 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			getProgramCacheKeyParameters( array, parameters );
 			getProgramCacheKeyBooleans( array, parameters );
 			array.push( renderer.outputColorSpace );
+
+			// Shader outputs depend on the current render target
+			const currentRenderTarget = renderer.getRenderTarget();
+
+			if ( currentRenderTarget !== null ) {
+
+				for ( let i = 0, l = currentRenderTarget.textures.length; i < l; i ++ ) {
+
+					array.push( currentRenderTarget.textures[ i ].uuid );
+
+				}
+
+			}
 
 		}
 
