@@ -4,7 +4,7 @@ function WebGLBindingStates( gl, attributes ) {
 
 	const maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
 
-	const bindingStates = {};
+	const bindingStates = new Map();
 
 	const defaultState = createBindingState( null );
 	let currentState = defaultState;
@@ -71,30 +71,30 @@ function WebGLBindingStates( gl, attributes ) {
 
 		const wireframe = ( material.wireframe === true );
 
-		let programMap = bindingStates[ geometry.id ];
+		let programMap = bindingStates.get( geometry.id );
 
 		if ( programMap === undefined ) {
 
-			programMap = {};
-			bindingStates[ geometry.id ] = programMap;
+			programMap = new Map();
+			bindingStates.set( geometry.id, programMap );
 
 		}
 
-		let stateMap = programMap[ program.id ];
+		let stateMap = programMap.get( program.id );
 
 		if ( stateMap === undefined ) {
 
-			stateMap = {};
-			programMap[ program.id ] = stateMap;
+			stateMap = new Map();
+			programMap.set( program.id, stateMap );
 
 		}
 
-		let state = stateMap[ wireframe ];
+		let state = stateMap.get( wireframe );
 
 		if ( state === undefined ) {
 
 			state = createBindingState( createVertexArrayObject() );
-			stateMap[ wireframe ] = state;
+			stateMap.set( wireframe, state );
 
 		}
 
@@ -475,77 +475,59 @@ function WebGLBindingStates( gl, attributes ) {
 
 		reset();
 
-		for ( const geometryId in bindingStates ) {
+		for ( const programMap of bindingStates.values() ) {
 
-			const programMap = bindingStates[ geometryId ];
+			for ( const stateMap of programMap.values() ) {
 
-			for ( const programId in programMap ) {
+				for ( const state of stateMap.values() ) {
 
-				const stateMap = programMap[ programId ];
-
-				for ( const wireframe in stateMap ) {
-
-					deleteVertexArrayObject( stateMap[ wireframe ].object );
-
-					delete stateMap[ wireframe ];
+					deleteVertexArrayObject( state.object );
 
 				}
 
-				delete programMap[ programId ];
-
 			}
 
-			delete bindingStates[ geometryId ];
-
 		}
+
+		bindingStates.clear();
 
 	}
 
 	function releaseStatesOfGeometry( geometry ) {
 
-		if ( bindingStates[ geometry.id ] === undefined ) return;
+		if ( bindingStates.get( geometry.id ) === undefined ) return;
 
-		const programMap = bindingStates[ geometry.id ];
+		const programMap = bindingStates.get( geometry.id );
 
-		for ( const programId in programMap ) {
+		for ( const stateMap of programMap.values() ) {
 
-			const stateMap = programMap[ programId ];
+			for ( const state of stateMap.values() ) {
 
-			for ( const wireframe in stateMap ) {
-
-				deleteVertexArrayObject( stateMap[ wireframe ].object );
-
-				delete stateMap[ wireframe ];
+				deleteVertexArrayObject( state.object );
 
 			}
 
-			delete programMap[ programId ];
-
 		}
 
-		delete bindingStates[ geometry.id ];
+		bindingStates.delete( geometry.id );
 
 	}
 
 	function releaseStatesOfProgram( program ) {
 
-		for ( const geometryId in bindingStates ) {
+		for ( const programMap of bindingStates.values() ) {
 
-			const programMap = bindingStates[ geometryId ];
+			if ( programMap.get( program.id ) === undefined ) continue;
 
-			if ( programMap[ program.id ] === undefined ) continue;
+			const stateMap = programMap.get( program.id );
 
-			const stateMap = programMap[ program.id ];
+			for ( const state of stateMap.values() ) {
 
-			for ( const wireframe in stateMap ) {
-
-				deleteVertexArrayObject( stateMap[ wireframe ].object );
-
-				delete stateMap[ wireframe ];
+				deleteVertexArrayObject( state.object );
 
 			}
 
-			delete programMap[ program.id ];
+			programMap.delete( program.id );
 
 		}
 
