@@ -112,9 +112,9 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				// SETUP TNB variables
 
-				const closed = extrudePath.isCatmullRomCurve3 ? extrudePath.closed : false;
+				const isClosed = extrudePath.isCatmullRomCurve3 ? extrudePath.closed : false;
 
-				splineTube = extrudePath.computeFrenetFrames( steps, closed );
+				splineTube = extrudePath.computeFrenetFrames( steps, isClosed );
 
 				// log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
