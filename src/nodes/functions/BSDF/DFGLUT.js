@@ -32,7 +32,7 @@ const DATA = new Uint16Array( [
 
 let lut = null;
 
-const DFG = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
+const DFGLUT = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 	if ( lut === null ) {
 
@@ -53,4 +53,4 @@ const DFG = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 } );
 
-export default DFG;
+export default DFGLUT;
