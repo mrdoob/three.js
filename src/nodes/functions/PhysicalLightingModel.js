@@ -12,7 +12,7 @@ import { diffuseColor, diffuseContribution, specularColor, specularColorBlended,
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
-import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep, inverseSqrt } from '../math/MathNode.js';
+import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
 import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/Camera.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
@@ -313,21 +313,14 @@ const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinF
 
 // This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF".
-// The low roughness fit (< 0.25) uses an inversesqrt/log model to accurately capture the sharp peak.
 const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	const dotNV = normal.dot( viewDir ).saturate();
 	const r2 = roughness.mul( roughness );
+	const rInv = roughness.add( 0.1 ).reciprocal();
 
-	const a = roughness.lessThan( 0.25 ).select(
-		inverseSqrt( roughness ).mul( - 1.57 ),
-		r2.mul( - 3.33 ).add( roughness.mul( 6.27 ) ).sub( 4.40 )
-	);
-
-	const b = roughness.lessThan( 0.25 ).select(
-		log( roughness ).mul( - 0.46 ).sub( 0.64 ),
-		r2.mul( 0.92 ).sub( roughness.mul( 1.79 ) ).add( 0.35 )
-	);
+	const a = float( - 1.9362 ).add( roughness.mul( 1.0678 ) ).add( r2.mul( 0.4573 ) ).sub( rInv.mul( 0.8469 ) );
+	const b = float( - 0.6014 ).add( roughness.mul( 0.5538 ) ).sub( r2.mul( 0.4670 ) ).sub( rInv.mul( 0.1255 ) );
 
 	const DG = a.mul( dotNV ).add( b ).exp();
 
