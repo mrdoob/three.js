@@ -268,10 +268,10 @@ class Line3 {
 				// of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1)= (t*b - c) / a
 				// and clamp s to [0, 1]
 
-				if ( t < 0 ) {
+			if ( t < 0 ) {
 
-					t = 0.;
-					s = clamp( - c / a, 0, 1 );
+				t = 0;
+				s = clamp( - c / a, 0, 1 );
 
 				} else if ( t > 1 ) {
 
