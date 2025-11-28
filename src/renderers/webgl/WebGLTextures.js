@@ -672,9 +672,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		let forceUpload = false;
 
-		if ( textureProperties.__init === undefined ) {
+		if ( textureProperties.__webglInit === undefined ) {
 
-			textureProperties.__init = true;
+			textureProperties.__webglInit = true;
 
 			texture.addEventListener( 'dispose', onTextureDispose );
 
@@ -1671,9 +1671,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( isCube ) {
 
 			// For cube depth textures, initialize and bind without uploading image data
-			if ( textureProperties.__init === undefined ) {
+			if ( textureProperties.__webglInit === undefined ) {
 
-				textureProperties.__init = true;
+				textureProperties.__webglInit = true;
 				renderTarget.depthTexture.addEventListener( 'dispose', onTextureDispose );
 
 			}
@@ -1907,9 +1907,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const texture = renderTarget.texture;
 
 		const renderTargetProperties = properties.get( renderTarget );
-
-
-
 		const textureProperties = properties.get( texture );
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
