@@ -2040,11 +2040,54 @@ class WebGLRenderer {
 
 		}
 
+		function initMaterialProperties( materialProperties ) {
+
+			materialProperties.outputColorSpace = undefined;
+			materialProperties.batching = undefined;
+			materialProperties.batchingColor = undefined;
+			materialProperties.instancing = undefined;
+			materialProperties.instancingColor = undefined;
+			materialProperties.instancingMorph = undefined;
+			materialProperties.skinning = undefined;
+			materialProperties.morphTargets = undefined;
+			materialProperties.morphNormals = undefined;
+			materialProperties.morphColors = undefined;
+			materialProperties.morphTargetsCount = undefined;
+			materialProperties.numClippingPlanes = undefined;
+			materialProperties.numIntersection = undefined;
+			materialProperties.vertexAlphas = undefined;
+			materialProperties.vertexTangents = undefined;
+			materialProperties.toneMapping = undefined;
+
+			materialProperties.fog = undefined;
+			materialProperties.environment = undefined;
+			materialProperties.envMap = undefined;
+			materialProperties.envMapRotation = undefined;
+
+			materialProperties.programs = undefined;
+			materialProperties.currentProgram = undefined;
+			materialProperties.uniforms = undefined;
+			materialProperties.uniformsList = undefined;
+
+			materialProperties.needsLights = undefined;
+			materialProperties.lightsStateVersion = undefined;
+
+			materialProperties.receiveShadow = undefined;
+			materialProperties.__version = undefined;
+
+		}
+
 		function getProgram( material, scene, object ) {
 
 			if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
 
 			const materialProperties = properties.get( material );
+
+			if ( materialProperties.programs === undefined ) {
+
+				initMaterialProperties( materialProperties );
+
+			}
 
 			const lights = currentRenderState.state.lights;
 			const shadowsArray = currentRenderState.state.shadowsArray;
