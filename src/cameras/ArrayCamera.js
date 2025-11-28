@@ -41,6 +41,15 @@ class ArrayCamera extends PerspectiveCamera {
 		this.isMultiViewCamera = false;
 
 		/**
+		 * Whether to perform view-frustum culling during rendering
+		 * on a per-camera basis, or to use the `ArrayCamera`'s own projection matrix.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.perCameraCulling = true;
+
+		/**
 		 * An array of perspective sub cameras.
 		 *
 		 * @type {Array<PerspectiveCamera>}
