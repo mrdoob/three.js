@@ -18,17 +18,39 @@ class Selector {
 
 			if ( intersects.length > 0 ) {
 
-				const object = intersects[ 0 ].object;
+				// Resolve helpers to their actual objects
 
-				if ( object.userData.object !== undefined ) {
+				const objects = [];
 
-					// helper
+				for ( let i = 0; i < intersects.length; i ++ ) {
 
-					this.select( object.userData.object );
+					let object = intersects[ i ].object;
+
+					if ( object.userData.object !== undefined ) {
+
+						object = object.userData.object;
+
+					}
+
+					if ( objects.indexOf( object ) === - 1 ) {
+
+						objects.push( object );
+
+					}
+
+				}
+
+				// Cycle through objects if the first one is already selected
+
+				let index = objects.indexOf( editor.selected );
+
+				if ( index !== - 1 && index < objects.length - 1 ) {
+
+					this.select( objects[ index + 1 ] );
 
 				} else {
 
-					this.select( object );
+					this.select( objects[ 0 ] );
 
 				}
 
