@@ -211,6 +211,16 @@ function buildSearchListForData() {
 						kind: item.kind
 					};
 
+					// Add sub-category for TSL items to improve search
+					if ( category === 'TSL' && item.meta && item.meta.filename ) {
+
+						const filename = item.meta.filename.replace( /\.js$/, '' );
+						// Remove "Node" suffix if present
+						const subCategory = filename.replace( /Node$/, '' );
+						entry.subCategory = subCategory;
+
+					}
+
 					categories[ category ].push( entry );
 
 				}
@@ -521,11 +531,13 @@ function buildGlobalsNav( globals, seen ) {
 
 	if ( globals.length ) {
 
-		// TSL
+		// TSL - organize by sub-category based on file name
 
-		let tslNav = '';
+		const tslBySubCategory = new Map();
 
-		globals.forEach( ( { kind, longname, name, tags } ) => {
+		globals.forEach( ( item ) => {
+
+			const { kind, longname, name, tags, meta } = item;
 
 			if ( kind !== 'typedef' && ! hasOwnProp.call( seen, longname ) ) {
 
@@ -533,7 +545,24 @@ function buildGlobalsNav( globals, seen ) {
 
 				if ( hasTslTag ) {
 
-					tslNav += `\t\t\t\t\t\t<li>${linkto( longname, name )}</li>\n`;
+					// Extract sub-category from file name
+					let subCategory = 'Other';
+
+					if ( meta && meta.filename ) {
+
+						const filename = meta.filename.replace( /\.js$/, '' );
+						// Remove "Node" suffix if present
+						subCategory = filename.replace( /Node$/, '' );
+
+					}
+
+					if ( ! tslBySubCategory.has( subCategory ) ) {
+
+						tslBySubCategory.set( subCategory, [] );
+
+					}
+
+					tslBySubCategory.get( subCategory ).push( { longname, name } );
 
 					seen[ longname ] = true;
 
@@ -543,10 +572,32 @@ function buildGlobalsNav( globals, seen ) {
 
 		} );
 
-		nav += '\t\t\t\t\t<h2>TSL</h2>\n';
-		nav += '\t\t\t\t\t<ul>\n';
-		nav += tslNav;
-		nav += '\t\t\t\t\t</ul>\n';
+		if ( tslBySubCategory.size > 0 ) {
+
+			nav += '\t\t\t\t\t<h2>TSL</h2>\n';
+
+			// Sort sub-categories alphabetically
+			const sortedSubCategories = new Map( [ ...tslBySubCategory.entries() ].sort() );
+
+			for ( const [ subCategory, items ] of sortedSubCategories ) {
+
+				nav += `\t\t\t\t\t<h3>${subCategory}</h3>\n`;
+				nav += '\t\t\t\t\t<ul>\n';
+
+				// Sort items within each sub-category
+				items.sort( ( a, b ) => a.name.localeCompare( b.name ) );
+
+				items.forEach( ( { longname, name } ) => {
+
+					nav += `\t\t\t\t\t\t<li>${linkto( longname, name )}</li>\n`;
+
+				} );
+
+				nav += '\t\t\t\t\t</ul>\n';
+
+			}
+
+		}
 
 		// Globals
 
