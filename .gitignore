@@ -7,6 +7,7 @@ npm-debug.log
 .jshintrc
 .vs/
 .puppeteer_profile/
+.claude/
 
 test/unit/build
 test/treeshake/index.bundle.js
