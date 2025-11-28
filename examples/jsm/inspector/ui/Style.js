@@ -1270,6 +1270,7 @@ export class Style {
 .mini-panel-content .param-control select,
 .mini-panel-content .param-control button {
 	background-color: #1e1e24c2;
+	line-height: 1.0;
 }
 
 .mini-panel-content .param-control select {
