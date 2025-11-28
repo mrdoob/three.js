@@ -360,15 +360,15 @@ vec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 no
 
 // This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF".
-// The low roughness fit (< 0.25) uses an inversesqrt/log model to accurately capture the sharp peak.
 float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {
 
 	float dotNV = saturate( dot( normal, viewDir ) );
 
 	float r2 = roughness * roughness;
+	float rInv = 1.0 / ( roughness + 0.1 );
 
-	float a = roughness < 0.25 ? - 1.57 * inversesqrt( roughness ) : - 3.33 * r2 + 6.27 * roughness - 4.40;
-	float b = roughness < 0.25 ? - 0.46 * log( roughness ) - 0.64 : 0.92 * r2 - 1.79 * roughness + 0.35;
+	float a = -1.9362 + 1.0678 * roughness + 0.4573 * r2 - 0.8469 * rInv;
+	float b = -0.6014 + 0.5538 * roughness - 0.4670 * r2 - 0.1255 * rInv;
 
 	float DG = exp( a * dotNV + b );
 
