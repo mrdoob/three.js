@@ -1669,6 +1669,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "BufferGeometry#indirectOffset",
+			"kind": "member"
+		},
+		{
 			"title": "BufferGeometry#isBufferGeometry",
 			"kind": "member"
 		},
@@ -10226,6 +10230,10 @@
 		},
 		{
 			"title": "PointShadowNode#renderShadow",
+			"kind": "function"
+		},
+		{
+			"title": "PointShadowNode#setupRenderTarget",
 			"kind": "function"
 		},
 		{
@@ -25301,6 +25309,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "PointShadowFilter",
+			"kind": "function"
+		},
+		{
 			"title": "PolyhedronGeometry.fromJSON",
 			"kind": "function"
 		},
@@ -26480,6 +26492,14 @@
 		},
 		{
 			"title": "builtin",
+			"kind": "function"
+		},
+		{
+			"title": "builtinAOContext",
+			"kind": "function"
+		},
+		{
+			"title": "builtinShadowContext",
 			"kind": "function"
 		},
 		{
@@ -28377,6 +28397,10 @@
 		{
 			"title": "viewportUV",
 			"kind": "member"
+		},
+		{
+			"title": "vogelDiskSample",
+			"kind": "function"
 		},
 		{
 			"title": "wgsl",
