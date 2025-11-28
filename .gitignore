@@ -1,22 +1,23 @@
-.DS_Store
-*.swp
-.project
-.idea/
-.vscode/
-npm-debug.log
-.jshintrc
-.vs/
-.puppeteer_profile/
 .claude/
+.DS_Store
+.idea/
+.jshintrc
+.project
+.puppeteer_profile/
+.vs/
+.vscode/
 
-test/unit/build
+*.swp
+npm-debug.log
+
+test/e2e/chromium
+test/e2e/output-screenshots
 test/treeshake/index.bundle.js
 test/treeshake/index.bundle.min.js
 test/treeshake/index.webgpu.bundle.js
 test/treeshake/index.webgpu.bundle.min.js
 test/treeshake/index.webgpu.nodes.bundle.js
 test/treeshake/index.webgpu.nodes.bundle.min.js
-test/e2e/chromium
-test/e2e/output-screenshots
+test/unit/build
 
 **/node_modules
