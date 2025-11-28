@@ -647,6 +647,12 @@ Editor.prototype = {
 		delete this.cameras[ existingUuid ]; // remove old entry [existingUuid, this.camera]
 		this.cameras[ incomingUuid ] = this.camera; // add new entry [incomingUuid, this.camera]
 
+		if ( json.controls !== undefined ) {
+
+			this.controls.fromJSON( json.controls );
+
+		}
+
 		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
@@ -705,6 +711,7 @@ Editor.prototype = {
 				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
 			camera: this.viewportCamera.toJSON(),
+			controls: this.controls.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON(),
