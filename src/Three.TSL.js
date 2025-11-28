@@ -145,7 +145,6 @@ export const cos = TSL.cos;
 export const cross = TSL.cross;
 export const cubeTexture = TSL.cubeTexture;
 export const cubeTextureBase = TSL.cubeTextureBase;
-export const cubeToUV = TSL.cubeToUV;
 export const dFdx = TSL.dFdx;
 export const dFdy = TSL.dFdy;
 export const dashSize = TSL.dashSize;
