@@ -2040,15 +2040,11 @@ class WebGLRenderer {
 
 		}
 
-
-
 		function getProgram( material, scene, object ) {
 
 			if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
 
 			const materialProperties = properties.get( material );
-
-
 
 			const lights = currentRenderState.state.lights;
 			const shadowsArray = currentRenderState.state.shadowsArray;
