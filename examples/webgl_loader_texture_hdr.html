@@ -61,6 +61,8 @@
 						//console.log( textureData );
 						//console.log( texture );
 
+						texture.colorSpace = THREE.LinearSRGBColorSpace;
+
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 						const quad = new THREE.PlaneGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
