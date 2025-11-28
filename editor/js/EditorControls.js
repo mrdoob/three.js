@@ -445,6 +445,20 @@ class EditorControls extends THREE.EventDispatcher {
 
 	}
 
+	fromJSON( json ) {
+
+		if ( json.center !== undefined ) this.center.fromArray( json.center );
+
+	}
+
+	toJSON() {
+
+		return {
+			center: this.center.toArray()
+		};
+
+	}
+
 }
 
 export { EditorControls };

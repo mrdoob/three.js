@@ -283,6 +283,8 @@ function Viewport( editor ) {
 	} );
 	viewHelper.center = controls.center;
 
+	editor.controls = controls;
+
 	// signals
 
 	signals.editorCleared.add( function () {
