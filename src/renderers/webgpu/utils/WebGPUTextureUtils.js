@@ -88,6 +88,14 @@ class WebGPUTextureUtils {
 		this.defaultVideoFrame = null;
 
 		/**
+		 * Tracks whether a video frame upload warning was already logged to avoid spam.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._videoFrameCopyWarningIssued = false;
+
+		/**
 		 * A cache of shared texture samplers.
 		 *
 		 * @type {Map<string, Object>}
@@ -771,21 +779,48 @@ class WebGPUTextureUtils {
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
-		device.queue.copyExternalImageToTexture(
-			{
-				source: image,
-				flipY: flipY
-			}, {
-				texture: textureGPU,
-				mipLevel: mipLevel,
-				origin: { x: 0, y: 0, z: originDepth },
-				premultipliedAlpha: premultiplyAlpha
-			}, {
-				width: width,
-				height: height,
-				depthOrArrayLayers: 1
+		const isVideoSource =
+			( typeof HTMLVideoElement !== 'undefined' && image instanceof HTMLVideoElement ) ||
+			( typeof VideoFrame !== 'undefined' && image instanceof VideoFrame );
+
+		try {
+
+			device.queue.copyExternalImageToTexture(
+				{
+					source: image,
+					flipY: flipY
+				}, {
+					texture: textureGPU,
+					mipLevel: mipLevel,
+					origin: { x: 0, y: 0, z: originDepth },
+					premultipliedAlpha: premultiplyAlpha
+				}, {
+					width: width,
+					height: height,
+					depthOrArrayLayers: 1
+				}
+			);
+
+			if ( isVideoSource ) this._videoFrameCopyWarningIssued = false;
+
+		} catch ( error ) {
+
+			if ( isVideoSource ) {
+
+				if ( this._videoFrameCopyWarningIssued === false ) {
+
+					warn( 'WebGPUTextureUtils: Skipping a corrupted video frame upload.', error );
+					this._videoFrameCopyWarningIssued = true;
+
+				}
+
+				return;
+
 			}
-		);
+
+			throw error;
+
+		}
 
 	}
 
