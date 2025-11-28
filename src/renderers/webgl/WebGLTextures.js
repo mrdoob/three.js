@@ -1931,6 +1931,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			renderTargetProperties.__useDefaultFramebuffer = undefined;
 
 		}
+
 		const textureProperties = properties.get( texture );
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
