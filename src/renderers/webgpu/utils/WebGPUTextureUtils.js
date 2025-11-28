@@ -19,7 +19,7 @@ import {
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
 import { Texture } from '../../../textures/Texture.js';
-import { warn, error } from '../../../utils.js';
+import { warn, warnOnce, error } from '../../../utils.js';
 
 const _compareToWebGPU = {
 	[ NeverCompare ]: 'never',
@@ -86,14 +86,6 @@ class WebGPUTextureUtils {
 		 * @default null
 		 */
 		this.defaultVideoFrame = null;
-
-		/**
-		 * Tracks whether a video frame upload warning was already logged to avoid spam.
-		 *
-		 * @type {boolean}
-		 * @default false
-		 */
-		this._videoFrameCopyWarningIssued = false;
 
 		/**
 		 * A cache of shared texture samplers.
@@ -801,18 +793,11 @@ class WebGPUTextureUtils {
 				}
 			);
 
-			if ( isVideoSource ) this._videoFrameCopyWarningIssued = false;
-
 		} catch ( error ) {
 
 			if ( isVideoSource ) {
 
-				if ( this._videoFrameCopyWarningIssued === false ) {
-
-					warn( 'WebGPUTextureUtils: Skipping a corrupted video frame upload.', error );
-					this._videoFrameCopyWarningIssued = true;
-
-				}
+				warnOnce( 'WebGPUTextureUtils: Skipping a corrupted video frame upload.', error );
 
 				return;
 
