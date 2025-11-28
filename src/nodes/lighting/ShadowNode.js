@@ -17,7 +17,7 @@ import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
-import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
+import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
 import { warn } from '../../utils.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
@@ -739,6 +739,8 @@ class ShadowNode extends ShadowBaseNode {
 	_reset() {
 
 		this._currentShadowType = null;
+
+		disposeShadowMaterial( this.light );
 
 		if ( this.shadowMap ) {
 

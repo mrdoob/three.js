@@ -281,3 +281,21 @@ export const getShadowMaterial = ( light ) => {
 	return material;
 
 };
+
+/**
+ * Disposes the shadow material for the given light source.
+ *
+ * @param {Light} light - The light source.
+ */
+export const disposeShadowMaterial = ( light ) => {
+
+	const material = shadowMaterialLib.get( light );
+
+	if ( material !== undefined ) {
+
+		material.dispose();
+		shadowMaterialLib.delete( light );
+
+	}
+
+};

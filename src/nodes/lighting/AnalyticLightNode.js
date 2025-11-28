@@ -96,6 +96,36 @@ class AnalyticLightNode extends LightingNode {
 		 */
 		this.updateType = NodeUpdateType.FRAME;
 
+		if ( light && light.shadow ) {
+
+			light.shadow.addEventListener( 'dispose', () => {
+
+				this.disposeShadow();
+
+			} );
+
+		}
+
+	}
+
+	disposeShadow() {
+
+		if ( this.shadowNode !== null ) {
+
+			this.shadowNode.dispose();
+			this.shadowNode = null;
+
+		}
+
+		this.shadowColorNode = null;
+
+		if ( this.baseColorNode !== null ) {
+
+			this.colorNode = this.baseColorNode;
+			this.baseColorNode = null;
+
+		}
+
 	}
 
 	getHash() {
