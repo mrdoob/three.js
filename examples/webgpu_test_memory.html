@@ -224,9 +224,9 @@
 				canvas.width = 256;
 				canvas.height = 256;
 
-				const context = canvas.getContext( '2d' );
-				context.fillStyle = 'rgb(' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ')';
-				context.fillRect( 0, 0, 256, 256 );
+				const canvas2DContext = canvas.getContext( '2d' );
+				canvas2DContext.fillStyle = 'rgb(' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ')';
+				canvas2DContext.fillRect( 0, 0, 256, 256 );
 
 				return canvas;
 
