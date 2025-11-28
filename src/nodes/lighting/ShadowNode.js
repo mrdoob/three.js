@@ -557,6 +557,8 @@ class ShadowNode extends ShadowBaseNode {
 
 		} ).toInspector( `${ inspectName } / Depth`, () => {
 
+			// TODO: Use linear depth
+
 			if ( this.shadowMap.texture.isCubeTexture ) {
 
 				return cubeTexture( this.shadowMap.texture ).r.oneMinus();
