@@ -676,12 +676,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			textureProperties.__init = true;
 
-			textureProperties.__webglTexture = undefined;
-			textureProperties.__cacheKey = undefined;
-			textureProperties.__version = undefined;
-			textureProperties.__currentAnisotropy = undefined;
-			textureProperties.__renderTarget = undefined;
-
 			texture.addEventListener( 'dispose', onTextureDispose );
 
 		}
@@ -1914,23 +1908,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const renderTargetProperties = properties.get( renderTarget );
 
-		if ( renderTargetProperties.__init === undefined ) {
 
-			renderTargetProperties.__init = true;
-
-			renderTargetProperties.__webglFramebuffer = undefined;
-			renderTargetProperties.__webglDepthbuffer = undefined;
-			renderTargetProperties.__webglMultisampledFramebuffer = undefined;
-			renderTargetProperties.__webglColorRenderbuffer = undefined;
-			renderTargetProperties.__webglDepthRenderbuffer = undefined;
-			renderTargetProperties.__hasExternalTextures = undefined;
-			renderTargetProperties.__boundDepthTexture = undefined;
-			renderTargetProperties.__depthDisposeCallback = undefined;
-			renderTargetProperties.__autoAllocateDepthBuffer = undefined;
-			renderTargetProperties.__useRenderToTexture = undefined;
-			renderTargetProperties.__useDefaultFramebuffer = undefined;
-
-		}
 
 		const textureProperties = properties.get( texture );
 

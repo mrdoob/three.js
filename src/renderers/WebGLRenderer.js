@@ -2048,47 +2048,7 @@ class WebGLRenderer {
 
 			const materialProperties = properties.get( material );
 
-			if ( materialProperties.init === undefined ) {
 
-				materialProperties.init = true;
-
-				materialProperties.outputColorSpace = undefined;
-
-				materialProperties.batching = undefined;
-				materialProperties.batchingColor = undefined;
-				materialProperties.instancing = undefined;
-				materialProperties.instancingColor = undefined;
-				materialProperties.instancingMorph = undefined;
-				materialProperties.skinning = undefined;
-				materialProperties.morphTargets = undefined;
-				materialProperties.morphNormals = undefined;
-				materialProperties.morphColors = undefined;
-				materialProperties.morphTargetsCount = undefined;
-				materialProperties.numClippingPlanes = undefined;
-				materialProperties.numIntersection = undefined;
-				materialProperties.vertexAlphas = undefined;
-				materialProperties.vertexTangents = undefined;
-				materialProperties.toneMapping = undefined;
-
-				materialProperties.fog = undefined;
-				materialProperties.environment = undefined;
-				materialProperties.envMap = undefined;
-				materialProperties.envMapRotation = undefined;
-
-				materialProperties.programs = undefined;
-				materialProperties.currentProgram = undefined;
-				materialProperties.uniforms = undefined;
-				materialProperties.uniformsList = undefined;
-
-				materialProperties.needsLights = undefined;
-				materialProperties.lightsStateVersion = undefined;
-
-				materialProperties.receiveShadow = undefined;
-				materialProperties.light = undefined;
-				materialProperties.clippingState = undefined;
-				materialProperties.__version = undefined;
-
-			}
 
 			const lights = currentRenderState.state.lights;
 			const shadowsArray = currentRenderState.state.shadowsArray;
