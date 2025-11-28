@@ -251,18 +251,6 @@ class LightsNode extends Node {
 
 		}
 
-		if ( previousLightNodes !== null ) {
-
-			const reusedNodes = new Set( lightNodes );
-
-			for ( const lightNode of previousLightNodes ) {
-
-				if ( reusedNodes.has( lightNode ) === false ) lightNode.dispose();
-
-			}
-
-		}
-
 		this._lightNodes = lightNodes;
 
 	}
@@ -320,14 +308,6 @@ class LightsNode extends Node {
 		if ( this._lightNodes === null ) this.setupLightsNode( builder );
 
 		return this._lightNodes;
-
-	}
-
-	dispose() {
-
-		this.setLights( [] );
-
-		super.dispose();
 
 	}
 
@@ -427,16 +407,6 @@ class LightsNode extends Node {
 	setLights( lights ) {
 
 		this._lights = lights;
-
-		if ( this._lightNodes !== null ) {
-
-			for ( const lightNode of this._lightNodes ) {
-
-				lightNode.dispose();
-
-			}
-
-		}
 
 		this._lightNodes = null;
 		this._lightNodesHash = null;

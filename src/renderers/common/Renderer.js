@@ -2256,7 +2256,6 @@ class Renderer {
 
 			this.info.dispose();
 			this.backend.dispose();
-			this.lighting.dispose();
 
 			this._animation.dispose();
 			this._objects.dispose();
