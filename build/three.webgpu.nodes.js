@@ -267,7 +267,7 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.ao || builder.context.getShadow )
+		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow )
 			return true;
 
 		return false;
@@ -8096,6 +8096,31 @@ function builtinShadowContext( shadowNode, light, node = null ) {
 }
 
 /**
+ * TSL function for defining a built-in ambient occlusion context for a given node.
+ *
+ * @tsl
+ * @function
+ * @param {Node} aoNode - The ambient occlusion value node to apply.
+ * @param {Node} [node=null] - The node whose context should be modified.
+ * @returns {ContextNode}
+ */
+function builtinAOContext( aoNode, node = null ) {
+
+	return context( node, {
+
+		getAO: ( inputNode, { material } ) => {
+
+			if ( material.transparent === true ) return inputNode;
+
+			return inputNode !== null ? inputNode.mul( aoNode ) : aoNode;
+
+		}
+
+	} );
+
+}
+
+/**
  * TSL function for defining a label context value for a given node.
  *
  * @tsl
@@ -8118,6 +8143,7 @@ addMethodChaining( 'label', label );
 addMethodChaining( 'uniformFlow', uniformFlow );
 addMethodChaining( 'setName', setName );
 addMethodChaining( 'builtinShadowContext', ( node, shadowNode, light ) => builtinShadowContext( shadowNode, light, node ) );
+addMethodChaining( 'builtinAOContext', ( node, aoValue ) => builtinAOContext( aoValue, node ) );
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -20970,17 +20996,21 @@ class NodeMaterial extends Material {
 
 		}
 
-		let aoNode = builder.context.ao || null;
+		let aoNode = this.aoNode;
 
-		if ( this.aoNode !== null || builder.material.aoMap ) {
+		if ( aoNode === null && builder.material.aoMap ) {
 
-			const mtlAO = this.aoNode !== null ? this.aoNode : materialAO;
-
-			aoNode = aoNode !== null ? aoNode.mul( mtlAO ) : mtlAO;
+			aoNode = materialAO;
 
 		}
 
-		if ( aoNode !== null ) {
+		if ( builder.context.getAO ) {
+
+			aoNode = builder.context.getAO( aoNode, builder );
+
+		}
+
+		if ( aoNode ) {
 
 			materialLightsNode.push( new AONode( aoNode ) );
 
@@ -24000,21 +24030,14 @@ const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinF
 
 // This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF".
-// The low roughness fit (< 0.25) uses an inversesqrt/log model to accurately capture the sharp peak.
 const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	const dotNV = normal.dot( viewDir ).saturate();
 	const r2 = roughness.mul( roughness );
+	const rInv = roughness.add( 0.1 ).reciprocal();
 
-	const a = roughness.lessThan( 0.25 ).select(
-		inverseSqrt( roughness ).mul( -1.57 ),
-		r2.mul( -3.33 ).add( roughness.mul( 6.27 ) ).sub( 4.40 )
-	);
-
-	const b = roughness.lessThan( 0.25 ).select(
-		log( roughness ).mul( -0.46 ).sub( 0.64 ),
-		r2.mul( 0.92 ).sub( roughness.mul( 1.79 ) ).add( 0.35 )
-	);
+	const a = float( -1.9362 ).add( roughness.mul( 1.0678 ) ).add( r2.mul( 0.4573 ) ).sub( rInv.mul( 0.8469 ) );
+	const b = float( -0.6014 ).add( roughness.mul( 0.5538 ) ).sub( r2.mul( 0.4670 ) ).sub( rInv.mul( 0.1255 ) );
 
 	const DG = a.mul( dotNV ).add( b ).exp();
 
@@ -29067,6 +29090,17 @@ class RenderObject {
 	}
 
 	/**
+	 * Returns the byte offset into the indirect attribute buffer.
+	 *
+	 * @return {number} The byte offset into the indirect attribute buffer.
+	 */
+	getIndirectOffset() {
+
+		return this._geometries.getIndirectOffset( this );
+
+	}
+
+	/**
 	 * Returns an array that acts as a key for identifying the render object in a chain map.
 	 *
 	 * @return {Array<Object>} An array with object references.
@@ -30242,6 +30276,18 @@ class Geometries extends DataMap {
 	getIndirect( renderObject ) {
 
 		return renderObject.geometry.indirect;
+
+	}
+
+	/**
+	 * Returns the byte offset into the indirect attribute buffer of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {number} The byte offset into the indirect attribute buffer.
+	 */
+	getIndirectOffset( renderObject ) {
+
+		return renderObject.geometry.indirectOffset;
 
 	}
 
@@ -46913,6 +46959,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	buffer: buffer,
 	bufferAttribute: bufferAttribute,
 	builtin: builtin,
+	builtinAOContext: builtinAOContext,
 	builtinShadowContext: builtinShadowContext,
 	bumpMap: bumpMap,
 	burn: burn,
@@ -79129,8 +79176,9 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
+					const indirectOffset = renderObject.getIndirectOffset();
 
-					passEncoderGPU.drawIndexedIndirect( buffer, 0 );
+					passEncoderGPU.drawIndexedIndirect( buffer, indirectOffset );
 
 				} else {
 
@@ -79149,8 +79197,9 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
+					const indirectOffset = renderObject.getIndirectOffset();
 
-					passEncoderGPU.drawIndirect( buffer, 0 );
+					passEncoderGPU.drawIndirect( buffer, indirectOffset );
 
 				} else {
 
