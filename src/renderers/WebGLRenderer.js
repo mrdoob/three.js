@@ -2444,6 +2444,30 @@ class WebGLRenderer {
 
 			}
 
+			// Pre-allocate texture units for shadow samplers before setting data textures
+			if ( materialProperties.needsLights ) {
+
+				// Set shadow map uniforms first to ensure they get the first texture units
+				if ( lights.state.directionalShadowMap.length > 0 ) {
+
+					p_uniforms.setValue( _gl, 'directionalShadowMap', lights.state.directionalShadowMap, textures );
+
+				}
+
+				if ( lights.state.spotShadowMap.length > 0 ) {
+
+					p_uniforms.setValue( _gl, 'spotShadowMap', lights.state.spotShadowMap, textures );
+
+				}
+
+				if ( lights.state.pointShadowMap.length > 0 ) {
+
+					p_uniforms.setValue( _gl, 'pointShadowMap', lights.state.pointShadowMap, textures );
+
+				}
+
+			}
+
 			// skinning and morph target uniforms must be set even if material didn't change
 			// auto-setting of texture unit for bone and morph texture must go before other textures
 			// otherwise textures used for skinning and morphing can take over texture units reserved for other material textures
@@ -3508,7 +3532,7 @@ class WebGLRenderer {
  * If you do not require dynamic lighting / shadows, you may set this to `false`.
  * @property {boolean} [needsUpdate=false] - When set to `true`, shadow maps in the scene
  * will be updated in the next `render` call.
- * @property {(BasicShadowMap|PCFShadowMap|PCFSoftShadowMap|VSMShadowMap)} [type=PCFShadowMap] - Defines the shadow map type.
+ * @property {(BasicShadowMap|PCFShadowMap|VSMShadowMap)} [type=PCFShadowMap] - Defines the shadow map type.
  **/
 
 export { WebGLRenderer };

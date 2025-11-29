@@ -73,6 +73,8 @@ function getShape( geometry ) {
 
 	}
 
+	console.error( 'RapierPhysics: Unsupported geometry type:', geometry.type );
+
 	return null;
 
 }
@@ -372,7 +374,7 @@ async function RapierPhysics() {
 		 * @name RapierPhysics#addMesh
 		 * @param {Mesh} mesh The mesh to add.
 		 * @param {number} [mass=0] The mass in kg of the mesh.
-		 * @param {number} [restitution=0] The restitution/friction of the mesh.
+		 * @param {number} [restitution=0] The restitution of the mesh, usually from 0 to 1. Represents how "bouncy" objects are when they collide with each other.
 		 */
 		addMesh: addMesh,
 

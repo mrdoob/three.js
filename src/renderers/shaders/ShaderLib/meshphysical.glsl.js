@@ -130,7 +130,6 @@ uniform float opacity;
 varying vec3 vViewPosition;
 
 #include <common>
-#include <packing>
 #include <dithering_pars_fragment>
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
@@ -199,14 +198,10 @@ void main() {
 	vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
 
 	#ifdef USE_SHEEN
-
-		// Sheen energy compensation approximation calculation can be found at the end of
-		// https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
-		float sheenEnergyComp = 1.0 - 0.157 * max3( material.sheenColor );
-
-		outgoingLight = outgoingLight * sheenEnergyComp + sheenSpecularDirect + sheenSpecularIndirect;
-
-	#endif
+ 
+		outgoingLight = outgoingLight + sheenSpecularDirect + sheenSpecularIndirect;
+ 
+ 	#endif
 
 	#ifdef USE_CLEARCOAT
 

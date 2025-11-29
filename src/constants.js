@@ -1223,7 +1223,7 @@ export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
 
 /**
- * Basic depth packing.
+ * The depth value is inverted (1.0 - z) for visualization purposes.
  *
  * @type {number}
  * @constant
@@ -1231,7 +1231,7 @@ export const TriangleFanDrawMode = 2;
 export const BasicDepthPacking = 3200;
 
 /**
- * A depth value is packed into 32 bit RGBA.
+ * The depth value is packed into 32 bit RGBA.
  *
  * @type {number}
  * @constant
@@ -1239,7 +1239,7 @@ export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 
 /**
- * A depth value is packed into 24 bit RGB.
+ * The depth value is packed into 24 bit RGB.
  *
  * @type {number}
  * @constant
@@ -1247,12 +1247,20 @@ export const RGBADepthPacking = 3201;
 export const RGBDepthPacking = 3202;
 
 /**
- * A depth value is packed into 16 bit RG.
+ * The depth value is packed into 16 bit RG.
  *
  * @type {number}
  * @constant
  */
 export const RGDepthPacking = 3203;
+
+/**
+ * The depth value is not packed.
+ *
+ * @type {number}
+ * @constant
+ */
+export const IdentityDepthPacking = 3204;
 
 /**
  * Normal information is relative to the underlying surface.

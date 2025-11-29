@@ -54,7 +54,6 @@
 				scene = new THREE.Scene();
 
 				const loader = new UltraHDRLoader();
-				loader.setDataType( THREE.HalfFloatType );
 				loader.load( 'textures/equirectangular/spruit_sunrise_2k.hdr.jpg', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;

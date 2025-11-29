@@ -111,6 +111,14 @@ now defines indirect draw calls.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="indirectOffset" translate="no">.<a href="#indirectOffset">indirectOffset</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The offset, in bytes, into the indirect drawing buffer where the value data begins.</p>
+<p>Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a> and a WebGPU backend.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="isBufferGeometry" translate="no">.<a href="#isBufferGeometry">isBufferGeometry</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
@@ -644,7 +652,7 @@ data from the array. The length of the array must match the vertex count.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setIndirect" translate="no">.<a href="#setIndirect">setIndirect</a><span class="signature">( indirect : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<h3 class="name name-method" id="setIndirect" translate="no">.<a href="#setIndirect">setIndirect</a><span class="signature">( indirect : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, indirectOffset : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given indirect attribute to this geometry.</p>
@@ -657,6 +665,15 @@ data from the array. The length of the array must match the vertex count.</p>
 									</td>
 									<td class="description last">
 										<p>The attribute holding indirect draw calls.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>indirectOffset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset, in bytes, into the indirect drawing buffer where the value data begins.</p>
+										<p>Default is <code>0</code>.</p>
 									</td>
 								</tr>
 							</tbody>

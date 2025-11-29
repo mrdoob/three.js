@@ -362,6 +362,7 @@
 						<li><a href="OperatorNode.html">OperatorNode</a></li>
 						<li><a href="OutputStructNode.html">OutputStructNode</a></li>
 						<li><a href="PMREMNode.html">PMREMNode</a></li>
+						<li><a href="PackFloatNode.html">PackFloatNode</a></li>
 						<li><a href="ParameterNode.html">ParameterNode</a></li>
 						<li><a href="PassMultipleTextureNode.html">PassMultipleTextureNode</a></li>
 						<li><a href="PassNode.html">PassNode</a></li>
@@ -418,6 +419,7 @@
 						<li><a href="UniformArrayNode.html">UniformArrayNode</a></li>
 						<li><a href="UniformGroupNode.html">UniformGroupNode</a></li>
 						<li><a href="UniformNode.html">UniformNode</a></li>
+						<li><a href="UnpackFloatNode.html">UnpackFloatNode</a></li>
 						<li><a href="UserDataNode.html">UserDataNode</a></li>
 						<li><a href="VarNode.html">VarNode</a></li>
 						<li><a href="VaryingNode.html">VaryingNode</a></li>
@@ -494,6 +496,7 @@
 						<li><a href="CompressedArrayTexture.html">CompressedArrayTexture</a></li>
 						<li><a href="CompressedCubeTexture.html">CompressedCubeTexture</a></li>
 						<li><a href="CompressedTexture.html">CompressedTexture</a></li>
+						<li><a href="CubeDepthTexture.html">CubeDepthTexture</a></li>
 						<li><a href="CubeTexture.html">CubeTexture</a></li>
 						<li><a href="Data3DTexture.html">Data3DTexture</a></li>
 						<li><a href="DataArrayTexture.html">DataArrayTexture</a></li>
@@ -1024,6 +1027,8 @@
 						<li><a href="TSL.html#buffer">buffer</a></li>
 						<li><a href="TSL.html#bufferAttribute">bufferAttribute</a></li>
 						<li><a href="TSL.html#builtin">builtin</a></li>
+						<li><a href="TSL.html#builtinAOContext">builtinAOContext</a></li>
+						<li><a href="TSL.html#builtinShadowContext">builtinShadowContext</a></li>
 						<li><a href="TSL.html#bumpMap">bumpMap</a></li>
 						<li><a href="TSL.html#burn">burn</a></li>
 						<li><a href="TSL.html#bypass">bypass</a></li>
@@ -1280,6 +1285,9 @@
 						<li><a href="TSL.html#outputStruct">outputStruct</a></li>
 						<li><a href="TSL.html#overlay">overlay</a></li>
 						<li><a href="TSL.html#overloadingFn">overloadingFn</a></li>
+						<li><a href="TSL.html#packHalf2x16">packHalf2x16</a></li>
+						<li><a href="TSL.html#packSnorm2x16">packSnorm2x16</a></li>
+						<li><a href="TSL.html#packUnorm2x16">packUnorm2x16</a></li>
 						<li><a href="TSL.html#parabola">parabola</a></li>
 						<li><a href="TSL.html#parallaxBarrierPass">parallaxBarrierPass</a></li>
 						<li><a href="TSL.html#parallaxDirection">parallaxDirection</a></li>
@@ -1335,6 +1343,7 @@
 						<li><a href="TSL.html#renderGroup">renderGroup</a></li>
 						<li><a href="TSL.html#renderOutput">renderOutput</a></li>
 						<li><a href="TSL.html#rendererReference">rendererReference</a></li>
+						<li><a href="TSL.html#replaceDefaultUV">replaceDefaultUV</a></li>
 						<li><a href="TSL.html#rgbShift">rgbShift</a></li>
 						<li><a href="TSL.html#rotate">rotate</a></li>
 						<li><a href="TSL.html#rotateUV">rotateUV</a></li>
@@ -1463,7 +1472,10 @@
 						<li><a href="TSL.html#uniformFlow">uniformFlow</a></li>
 						<li><a href="TSL.html#uniformGroup">uniformGroup</a></li>
 						<li><a href="TSL.html#uniformTexture">uniformTexture</a></li>
+						<li><a href="TSL.html#unpackHalf2x16">unpackHalf2x16</a></li>
 						<li><a href="TSL.html#unpackNormal">unpackNormal</a></li>
+						<li><a href="TSL.html#unpackSnorm2x16">unpackSnorm2x16</a></li>
+						<li><a href="TSL.html#unpackUnorm2x16">unpackUnorm2x16</a></li>
 						<li><a href="TSL.html#unpremultiplyAlpha">unpremultiplyAlpha</a></li>
 						<li><a href="TSL.html#userData">userData</a></li>
 						<li><a href="TSL.html#uv">uv</a></li>
@@ -1487,6 +1499,7 @@
 						<li><a href="TSL.html#viewportSize">viewportSize</a></li>
 						<li><a href="TSL.html#viewportTexture">viewportTexture</a></li>
 						<li><a href="TSL.html#viewportUV">viewportUV</a></li>
+						<li><a href="TSL.html#vogelDiskSample">vogelDiskSample</a></li>
 						<li><a href="TSL.html#wgsl">wgsl</a></li>
 						<li><a href="TSL.html#workgroupArray">workgroupArray</a></li>
 						<li><a href="TSL.html#workgroupBarrier">workgroupBarrier</a></li>
@@ -1554,6 +1567,7 @@
 						<li><a href="global.html#GreaterEqualStencilFunc">GreaterEqualStencilFunc</a></li>
 						<li><a href="global.html#GreaterStencilFunc">GreaterStencilFunc</a></li>
 						<li><a href="global.html#HalfFloatType">HalfFloatType</a></li>
+						<li><a href="global.html#IdentityDepthPacking">IdentityDepthPacking</a></li>
 						<li><a href="global.html#IncrementStencilOp">IncrementStencilOp</a></li>
 						<li><a href="global.html#IncrementWrapStencilOp">IncrementWrapStencilOp</a></li>
 						<li><a href="global.html#IntType">IntType</a></li>
@@ -1625,8 +1639,11 @@
 						<li><a href="global.html#PCFShadowMap">PCFShadowMap</a></li>
 						<li><a href="global.html#PCFSoftShadowFilter">PCFSoftShadowFilter</a></li>
 						<li><a href="global.html#PCFSoftShadowMap">PCFSoftShadowMap</a></li>
+						<li><a href="global.html#PointShadowFilter">PointShadowFilter</a></li>
+						<li><a href="global.html#R11_EAC_Format">R11_EAC_Format</a></li>
 						<li><a href="global.html#RED_GREEN_RGTC2_Format">RED_GREEN_RGTC2_Format</a></li>
 						<li><a href="global.html#RED_RGTC1_Format">RED_RGTC1_Format</a></li>
+						<li><a href="global.html#RG11_EAC_Format">RG11_EAC_Format</a></li>
 						<li><a href="global.html#RGBADepthPacking">RGBADepthPacking</a></li>
 						<li><a href="global.html#RGBAFormat">RGBAFormat</a></li>
 						<li><a href="global.html#RGBAIntegerFormat">RGBAIntegerFormat</a></li>
@@ -1670,8 +1687,10 @@
 						<li><a href="global.html#RepeatWrapping">RepeatWrapping</a></li>
 						<li><a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a></li>
 						<li><a href="global.html#ReverseSubtractEquation">ReverseSubtractEquation</a></li>
+						<li><a href="global.html#SIGNED_R11_EAC_Format">SIGNED_R11_EAC_Format</a></li>
 						<li><a href="global.html#SIGNED_RED_GREEN_RGTC2_Format">SIGNED_RED_GREEN_RGTC2_Format</a></li>
 						<li><a href="global.html#SIGNED_RED_RGTC1_Format">SIGNED_RED_RGTC1_Format</a></li>
+						<li><a href="global.html#SIGNED_RG11_EAC_Format">SIGNED_RG11_EAC_Format</a></li>
 						<li><a href="global.html#SRGBColorSpace">SRGBColorSpace</a></li>
 						<li><a href="global.html#SRGBTransfer">SRGBTransfer</a></li>
 						<li><a href="global.html#SRGB_TO_LINEAR">SRGB_TO_LINEAR</a></li>

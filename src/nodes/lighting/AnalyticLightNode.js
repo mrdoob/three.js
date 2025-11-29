@@ -188,6 +188,12 @@ class AnalyticLightNode extends LightingNode {
 
 		//
 
+		if ( builder.context.getShadow ) {
+
+			shadowColorNode = builder.context.getShadow( this, builder );
+
+		}
+
 		this.colorNode = shadowColorNode;
 
 	}
