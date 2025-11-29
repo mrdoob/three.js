@@ -87,9 +87,9 @@ class WebGPUBindingUtils {
 		const bindingsData = backend.get( bindGroup );
 
 		// When current bind group has already been assigned a layout
-		if ( bindingsData.layoutKey !== undefined ) {
+		if ( bindingsData.bindGroupLayout !== undefined ) {
 
-			return this.bindGroupLayoutCache.get( bindingsData.layoutKey ).layoutGPU;
+			return bindingsData.bindGroupLayout.layoutGPU;
 
 		}
 
