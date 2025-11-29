@@ -1600,7 +1600,8 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
-					const indirectOffsets = Array.isArray( indirect.indirectOffset ) ? indirect.indirectOffset : [ indirect.indirectOffset ];
+					const indirectOffset = renderObject.getIndirectOffset();
+					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
 
 					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
 
@@ -1625,7 +1626,8 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
-					const indirectOffsets = Array.isArray( indirect.indirectOffset ) ? indirect.indirectOffset : [ indirect.indirectOffset ];
+					const indirectOffset = renderObject.getIndirectOffset();
+					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
 
 					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
 
