@@ -1600,12 +1600,11 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
-					const stride = indirect.itemSize * 4;
-					const drawCount = indirect.count;
+					const indirectOffsets = Array.isArray( indirect.indirectOffset ) ? indirect.indirectOffset : [ indirect.indirectOffset ];
 
-					for ( let i = 0; i < drawCount; i ++ ) {
+					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
 
-						passEncoderGPU.drawIndexedIndirect( buffer, i * stride );
+						passEncoderGPU.drawIndexedIndirect( buffer, indirectOffsets[ i ] );
 
 					}
 
@@ -1626,12 +1625,11 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
-					const stride = indirect.itemSize * 4;
-					const drawCount = indirect.count;
+					const indirectOffsets = Array.isArray( indirect.indirectOffset ) ? indirect.indirectOffset : [ indirect.indirectOffset ];
 
-					for ( let i = 0; i < drawCount; i ++ ) {
+					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
 
-						passEncoderGPU.drawIndirect( buffer, i * stride );
+						passEncoderGPU.drawIndirect( buffer, indirectOffsets[ i ] );
 
 					}
 
