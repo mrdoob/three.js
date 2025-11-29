@@ -112,7 +112,7 @@ class AnalyticLightNode extends LightingNode {
 
 	dispose() {
 
-		if ( this.light && this.light.shadow && this._shadowDisposeListener ) {
+		if ( this._shadowDisposeListener ) {
 
 			this.light.shadow.removeEventListener( 'dispose', this._shadowDisposeListener );
 
@@ -122,6 +122,9 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
+	/**
+	 * Frees internal resources related to shadows.
+	 */
 	disposeShadow() {
 
 		if ( this.shadowNode !== null ) {
