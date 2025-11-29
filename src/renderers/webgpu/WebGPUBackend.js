@@ -1600,8 +1600,14 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
+					const stride = indirect.itemSize * 4;
+					const drawCount = indirect.count;
 
-					passEncoderGPU.drawIndexedIndirect( buffer, 0 );
+					for ( let i = 0; i < drawCount; i ++ ) {
+
+						passEncoderGPU.drawIndexedIndirect( buffer, i * stride );
+
+					}
 
 				} else {
 
@@ -1620,8 +1626,15 @@ class WebGPUBackend extends Backend {
 				if ( indirect !== null ) {
 
 					const buffer = this.get( indirect ).buffer;
+					const stride = indirect.itemSize * 4;
+					const drawCount = indirect.count;
 
-					passEncoderGPU.drawIndirect( buffer, 0 );
+					for ( let i = 0; i < drawCount; i ++ ) {
+
+						passEncoderGPU.drawIndirect( buffer, i * stride );
+
+					}
+
 
 				} else {
 
