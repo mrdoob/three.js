@@ -311,18 +311,6 @@ class Geometries extends DataMap {
 	}
 
 	/**
-	 * Returns the byte offset into the indirect attribute buffer of the given render object.
-	 *
-	 * @param {RenderObject} renderObject - The render object.
-	 * @return {number} The byte offset into the indirect attribute buffer.
-	 */
-	getIndirectOffset( renderObject ) {
-
-		return renderObject.geometry.indirectOffset;
-
-	}
-
-	/**
 	 * Returns the index of the given render object's geometry. This is implemented
 	 * in a method to return a wireframe index if necessary.
 	 *

@@ -112,16 +112,6 @@ class BufferGeometry extends EventDispatcher {
 		this.indirect = null;
 
 		/**
-		 * The offset, in bytes, into the indirect drawing buffer where the value data begins.
-		 *
-		 * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.indirectOffset = 0;
-
-		/**
 		 * This dictionary has as id the name of the attribute to be set and as value
 		 * the buffer attribute to set it to. Rather than accessing this property directly,
 		 * use `setAttribute()` and `getAttribute()` to access attributes of this geometry.
@@ -234,13 +224,11 @@ class BufferGeometry extends EventDispatcher {
 	 * Sets the given indirect attribute to this geometry.
 	 *
 	 * @param {BufferAttribute} indirect - The attribute holding indirect draw calls.
-	 * @param {number} [indirectOffset=0] - The offset, in bytes, into the indirect drawing buffer where the value data begins.
 	 * @return {BufferGeometry} A reference to this instance.
 	 */
-	setIndirect( indirect, indirectOffset = 0 ) {
+	setIndirect( indirect ) {
 
 		this.indirect = indirect;
-		this.indirectOffset = indirectOffset;
 
 		return this;
 
