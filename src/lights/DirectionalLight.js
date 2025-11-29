@@ -95,6 +95,17 @@ class DirectionalLight extends Light {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.shadow = this.shadow.toJSON();
+		data.object.target = this.target.uuid;
+
+		return data;
+
+	}
+
 }
 
 export { DirectionalLight };

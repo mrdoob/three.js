@@ -111,6 +111,19 @@ class PointLight extends Light {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.distance = this.distance;
+		data.object.decay = this.decay;
+
+		data.object.shadow = this.shadow.toJSON();
+
+		return data;
+
+	}
+
 }
 
 export { PointLight };
