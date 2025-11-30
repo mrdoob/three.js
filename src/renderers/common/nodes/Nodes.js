@@ -525,8 +525,8 @@ class Nodes extends DataMap {
 
 		} else if ( sceneData.backgroundNode ) {
 
-			delete sceneData.backgroundNode;
-			delete sceneData.background;
+			sceneData.backgroundNode = undefined;
+			sceneData.background = undefined;
 
 		}
 
@@ -606,8 +606,8 @@ class Nodes extends DataMap {
 
 		} else {
 
-			delete sceneData.fogNode;
-			delete sceneData.fog;
+			sceneData.fogNode = undefined;
+			sceneData.fog = undefined;
 
 		}
 
@@ -653,8 +653,8 @@ class Nodes extends DataMap {
 
 		} else if ( sceneData.environmentNode ) {
 
-			delete sceneData.environmentNode;
-			delete sceneData.environment;
+			sceneData.environmentNode = undefined;
+			sceneData.environment = undefined;
 
 		}
 

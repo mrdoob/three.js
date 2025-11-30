@@ -952,7 +952,7 @@ class NodeBuilder {
 
 		const context = { ...this.context };
 
-		delete context.material;
+		context.material = undefined;
 
 		return this.context;
 
@@ -2515,7 +2515,7 @@ class NodeBuilder {
 		this.setShaderStage( shaderStage );
 
 		const context = { ...this.context };
-		delete context.nodeBlock;
+		context.nodeBlock = undefined;
 
 		this.cache = this.globalCache;
 		this.tab = '\t';

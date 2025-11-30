@@ -2,35 +2,49 @@ import { hash, hashString } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
 
+const prototypeKeys = new WeakMap();
+
 function getKeys( obj ) {
 
 	const keys = Object.keys( obj );
 
-	let proto = Object.getPrototypeOf( obj );
+	const proto = Object.getPrototypeOf( obj );
+	let cachedKeys = prototypeKeys.get( proto );
 
-	while ( proto ) {
+	if ( cachedKeys === undefined ) {
 
-		const descriptors = Object.getOwnPropertyDescriptors( proto );
+		cachedKeys = [];
+		let p = proto;
 
-		for ( const key in descriptors ) {
+		while ( p ) {
 
-			if ( descriptors[ key ] !== undefined ) {
+			const descriptors = Object.getOwnPropertyDescriptors( p );
 
-				const descriptor = descriptors[ key ];
+			for ( const key in descriptors ) {
 
-				if ( descriptor && typeof descriptor.get === 'function' ) {
+				if ( descriptors[ key ] !== undefined ) {
 
-					keys.push( key );
+					const descriptor = descriptors[ key ];
+
+					if ( descriptor && typeof descriptor.get === 'function' ) {
+
+						cachedKeys.push( key );
+
+					}
 
 				}
 
 			}
 
+			p = Object.getPrototypeOf( p );
+
 		}
 
-		proto = Object.getPrototypeOf( proto );
+		prototypeKeys.set( proto, cachedKeys );
 
 	}
+
+	keys.push( ...cachedKeys );
 
 	return keys;
 
