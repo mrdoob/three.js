@@ -976,7 +976,8 @@ class WebGPUBackend extends Backend {
 					if ( renderContext.scissor ) {
 
 						const { x, y, width, height } = renderContext.scissorValue;
-						renderPass.setScissorRect( x, y, width, height );
+						const flippedY = renderContext.height - y - height;
+						renderPass.setScissorRect( x, flippedY, width, height );
 
 					}
 
@@ -1147,7 +1148,8 @@ class WebGPUBackend extends Backend {
 		const { currentPass } = this.get( renderContext );
 		const { x, y, width, height } = renderContext.scissorValue;
 
-		currentPass.setScissorRect( x, y, width, height );
+		const flippedY = renderContext.height - y - height;
+		currentPass.setScissorRect( x, flippedY, width, height );
 
 	}
 
