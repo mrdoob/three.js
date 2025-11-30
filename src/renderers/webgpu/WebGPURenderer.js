@@ -1,22 +1,16 @@
-import Renderer from '../common/Renderer.js';
-import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
-import WebGPUBackend from './WebGPUBackend.js';
-import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
-import { warn } from '../../utils.js';
-/*
+import Renderer from "../common/Renderer.js";
+import WebGLBackend from "../webgl-fallback/WebGLBackend.js";
+import WebGPUBackend from "./WebGPUBackend.js";
+import StandardNodeLibrary from "./nodes/StandardNodeLibrary.js";
+import { warn } from "../../utils.js";
 const debugHandler = {
+	get: function (target, name) {
+		if (/^(create|destroy|update)/.test(name))
+			console.info("WebGPUBackend." + name);
 
-	get: function ( target, name ) {
-
-		// Add |update
-		if ( /^(create|destroy)/.test( name ) ) log( 'WebGPUBackend.' + name );
-
-		return target[ name ];
-
-	}
-
+		return target[name];
+	},
 };
-*/
 
 /**
  * This renderer is the new alternative of `WebGLRenderer`. `WebGPURenderer` has the ability
@@ -26,7 +20,6 @@ const debugHandler = {
  * @augments Renderer
  */
 class WebGPURenderer extends Renderer {
-
 	/**
 	 * WebGPURenderer options.
 	 *
@@ -49,32 +42,27 @@ class WebGPURenderer extends Renderer {
 	 *
 	 * @param {WebGPURenderer~Options} [parameters] - The configuration parameter.
 	 */
-	constructor( parameters = {} ) {
-
+	constructor(parameters = {}) {
 		let BackendClass;
 
-		if ( parameters.forceWebGL ) {
-
+		if (parameters.forceWebGL) {
 			BackendClass = WebGLBackend;
-
 		} else {
-
 			BackendClass = WebGPUBackend;
 
 			parameters.getFallback = () => {
+				warn(
+					"WebGPURenderer: WebGPU is not available, running under WebGL2 backend."
+				);
 
-				warn( 'WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
-
-				return new WebGLBackend( parameters );
-
+				return new WebGLBackend(parameters);
 			};
-
 		}
 
-		const backend = new BackendClass( parameters );
+		const backend = new BackendClass(parameters);
 
 		//super( new Proxy( backend, debugHandler ) );
-		super( backend, parameters );
+		super(new Proxy(backend, debugHandler), parameters);
 
 		/**
 		 * The generic default value is overwritten with the
@@ -93,14 +81,12 @@ class WebGPURenderer extends Renderer {
 		 */
 		this.isWebGPURenderer = true;
 
-		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
-
-			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
-
+		if (typeof __THREE_DEVTOOLS__ !== "undefined") {
+			__THREE_DEVTOOLS__.dispatchEvent(
+				new CustomEvent("observe", { detail: this })
+			);
 		}
-
 	}
-
 }
 
 export default WebGPURenderer;
