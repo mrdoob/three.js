@@ -45,7 +45,7 @@
 			let generateMeshes = true;
 			let mesh;
 			let postProcessing;
-			let aoNode, outlineNode;
+			let aoNode, outlineNode, scenePass, prePass;
 			const selectedObjects = [];
 
 			const params = {
@@ -85,7 +85,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -103,6 +103,8 @@
 				renderer.setAnimationLoop( animate );
 				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 0, 100, 0 );
@@ -148,6 +150,20 @@
 
 				}
 
+				if ( scenePass ) {
+
+					scenePass.dispose();
+					scenePass = null;
+
+				}
+
+				if ( prePass ) {
+
+					prePass.dispose();
+					prePass = null;
+
+				}
+
 				if ( aoNode ) {
 
 					aoNode.dispose();
@@ -166,12 +182,12 @@
 
 					postProcessing = new THREE.PostProcessing( renderer );
 
-					const scenePass = pass( scene, camera );
+					scenePass = pass( scene, camera );
 					let colorNode = scenePass;
 
 					if ( params.enableAO ) {
 
-						const prePass = pass( scene, camera );
+						prePass = pass( scene, camera );
 						prePass.setMRT( mrt( {
 							output: directionToColor( normalView )
 						} ) );
