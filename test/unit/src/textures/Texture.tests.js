@@ -3,6 +3,7 @@
 import { Texture } from '../../../../src/textures/Texture.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
+import { Source } from '../../../../src/textures/Source.js';
 
 export default QUnit.module( 'Textures', () => {
 
@@ -29,33 +30,39 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'image', ( assert ) => {
+		QUnit.test( 'image', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'id', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Texture();
+			assert.strictEqual( object.image, null, 'Texture.image is null by default.' );
 
 		} );
 
-		QUnit.todo( 'uuid', ( assert ) => {
+		QUnit.test( 'id', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'name', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Texture();
+			assert.strictEqual( typeof object.id, 'number', 'Texture.id is a number.' );
 
 		} );
 
-		QUnit.todo( 'source', ( assert ) => {
+		QUnit.test( 'uuid', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Texture();
+			assert.strictEqual( typeof object.uuid, 'string', 'Texture.uuid is a string.' );
+			assert.strictEqual( object.uuid.length, 36, 'Texture.uuid is 36 chars long.' );
+
+		} );
+
+		QUnit.test( 'name', ( assert ) => {
+
+			const object = new Texture();
+			assert.strictEqual( object.name, '', 'Texture.name is empty string by default.' );
+
+		} );
+
+		QUnit.test( 'source', ( assert ) => {
+
+			const object = new Texture();
+			assert.ok( object.source instanceof Source, 'Texture.source is instance of Source.' );
 
 		} );
 
