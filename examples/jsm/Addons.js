@@ -9,6 +9,7 @@ export * from './controls/FirstPersonControls.js';
 export * from './controls/FlyControls.js';
 export * from './controls/MapControls.js';
 export * from './controls/OrbitControls.js';
+export * from './controls/ThirdPersonControls.js';
 export * from './controls/PointerLockControls.js';
 export * from './controls/TrackballControls.js';
 export * from './controls/TransformControls.js';
