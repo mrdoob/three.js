@@ -24,7 +24,7 @@ class Background extends DataMap {
 	 * @param {Renderer} renderer - The renderer.
 	 * @param {Nodes} nodes - Renderer component for managing nodes related logic.
 	 */
-	constructor(renderer, nodes) {
+	constructor( renderer, nodes ) {
 
 		super();
 
@@ -54,18 +54,18 @@ class Background extends DataMap {
 	 * @param {RenderList} renderList - The current render list.
 	 * @param {RenderContext} renderContext - The current render context.
 	 */
-	update(scene, renderList, renderContext) {
+	update( scene, renderList, renderContext ) {
 
 		const renderer = this.renderer;
-		const background = this.nodes.getBackgroundNode(scene) || scene.background;
+		const background = this.nodes.getBackgroundNode( scene ) || scene.background;
 
 		let forceClear = false;
 
-		if (background === null) {
+		if ( background === null ) {
 
 			// no background settings, use clear color configuration from the renderer
 
-			renderer._clearColor.getRGB(_clearColor);
+			renderer._clearColor.getRGB( _clearColor );
 			_clearColor.a = renderer._clearColor.a;
 
 		} else if (background.isColor === true) {
