@@ -1205,8 +1205,8 @@ export class Style {
 
 .custom-checkbox .checkmark::after {
 	content: '';
-	width: 8px;
-	height: 8px;
+	width: 6px;
+	height: 6px;
 	background-color: var(--accent-color);
 	border-radius: 1px;
 	display: block;
@@ -1307,11 +1307,6 @@ export class Style {
 	height: 12px;
 	margin-bottom: 2px;
 	will-change: transform;
-}
-
-.mini-panel-content .custom-checkbox .checkmark::after {
-	width: 7px;
-	height: 7px;
 }
 
 .mini-panel-content .list-container.parameters .list-item-row:not(.collapsible) {
