@@ -55,12 +55,12 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.5;
+				renderer.toneMappingExposure = 0.0025;
 				renderer.inspector = new Inspector();
 				container.appendChild( renderer.domElement );
 
@@ -104,12 +104,12 @@
 				scene.add( sky );
 
 				sky.turbidity.value = 10;
-				sky.rayleigh.value = 2;
+				sky.rayleigh.value = 1;
 				sky.mieCoefficient.value = 0.005;
 				sky.mieDirectionalG.value = 0.8;
 
 				const parameters = {
-					elevation: 2,
+					elevation: 15,
 					azimuth: 180
 				};
 

@@ -93,16 +93,11 @@ Sky.SkyShader = {
 		const float e = 2.71828182845904523536028747135266249775724709369995957;
 		const float pi = 3.141592653589793238462643383279502884197169;
 
-		// wavelength of used primaries, according to preetham
-		const vec3 lambda = vec3( 680E-9, 550E-9, 450E-9 );
 		// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
 		// (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn))
 		const vec3 totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );
 
 		// mie stuff
-		// K coefficient for the primaries
-		const float v = 4.0;
-		const vec3 K = vec3( 0.686, 0.678, 0.666 );
 		// MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K
 		const vec3 MieConst = vec3( 1.8399918514433978E14, 2.7798023919660528E14, 4.0790479543861094E14 );
 
@@ -134,7 +129,7 @@ Sky.SkyShader = {
 
 			vSunE = sunIntensity( dot( vSunDirection, up ) );
 
-			vSunfade = 1.0 - clamp( 1.0 - exp( ( sunPosition.y / 450000.0 ) ), 0.0, 1.0 );
+			vSunfade = 1.0 - clamp( 1.0 - exp( dot( vSunDirection, up ) ), 0.0, 1.0 );
 
 			float rayleighCoefficient = rayleigh - ( 1.0 * ( 1.0 - vSunfade ) );
 
@@ -160,9 +155,6 @@ Sky.SkyShader = {
 
 		// constants for atmospheric scattering
 		const float pi = 3.141592653589793238462643383279502884197169;
-
-		const float n = 1.0003; // refractive index of air
-		const float N = 2.545E25; // number of molecules per unit volume for air at 288.15K and 1013mb (sea level -45 celsius)
 
 		// optical length at zenith for molecules
 		const float rayleighZenithLength = 8.4E3;
@@ -221,11 +213,9 @@ Sky.SkyShader = {
 			float sundisk = smoothstep( sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta );
 			L0 += ( vSunE * 19000.0 * Fex ) * sundisk;
 
-			vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
+			vec3 texColor = ( Lin + L0 );
 
-			vec3 retColor = pow( texColor, vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );
-
-			gl_FragColor = vec4( retColor, 1.0 );
+			gl_FragColor = vec4( texColor, 1.0 );
 
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>
