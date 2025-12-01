@@ -1041,9 +1041,9 @@ class Matrix4 {
 		// scale the rotation part
 		_m1.copy( this );
 
-		const invSX = 1 / sx;
-		const invSY = 1 / sy;
-		const invSZ = 1 / sz;
+		const invSX = 1 / ( sx || 1 );
+		const invSY = 1 / ( sy || 1 );
+		const invSZ = 1 / ( sz || 1 );
 
 		_m1.elements[ 0 ] *= invSX;
 		_m1.elements[ 1 ] *= invSX;
