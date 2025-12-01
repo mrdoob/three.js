@@ -5445,8 +5445,8 @@ class AssignNode extends TempNode {
 
 		const scope = targetNode.getScope();
 
-		const targetProperties = builder.getNodeProperties( scope );
-		targetProperties.assign = true;
+		const scopeData = builder.getDataFromNode( scope );
+		scopeData.assign = true;
 
 		const properties = builder.getNodeProperties( this );
 		properties.sourceNode = sourceNode;
@@ -8256,6 +8256,22 @@ class VarNode extends Node {
 	}
 
 	/**
+	 * Checks if this node is used for intent.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @returns {boolean} Whether this node is used for intent.
+	 */
+	isIntent( builder ) {
+
+		const data = builder.getDataFromNode( this );
+
+		if ( data.forceDeclaration === true ) return false;
+
+		return this.intent;
+
+	}
+
+	/**
 	 * Returns the intent flag of this node.
 	 *
 	 * @return {boolean} The intent flag.
@@ -8292,31 +8308,9 @@ class VarNode extends Node {
 
 	isAssign( builder ) {
 
-		const properties = builder.getNodeProperties( this );
+		const data = builder.getDataFromNode( this );
 
-		let assign = properties.assign;
-
-		if ( assign !== true ) {
-
-			if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
-
-				if ( builder.fnCall && builder.fnCall.shaderNode ) {
-
-					const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-					if ( shaderNodeData.hasLoop ) {
-
-						assign = true;
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return assign;
+		return data.assign;
 
 	}
 
@@ -8328,13 +8322,44 @@ class VarNode extends Node {
 
 			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
 
-				builder.getBaseStack().addToStack( this );
+				let addBefore = false;
+
+				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
+
+					if ( builder.fnCall && builder.fnCall.shaderNode ) {
+
+						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
+
+						if ( shaderNodeData.hasLoop ) {
+
+							const data = builder.getDataFromNode( this );
+							data.forceDeclaration = true;
+
+							addBefore = true;
+
+						}
+
+					}
+
+				}
+
+				const baseStack = builder.getBaseStack();
+
+				if ( addBefore ) {
+
+					baseStack.addToStackBefore( this );
+
+				} else {
+
+					baseStack.addToStack( this );
+
+				}
 
 			}
 
 		}
 
-		if ( this.intent === true ) {
+		if ( this.isIntent( builder ) ) {
 
 			if ( this.isAssign( builder ) !== true ) {
 
@@ -8370,7 +8395,7 @@ class VarNode extends Node {
 
 		if ( nodeType == 'void' ) {
 
-			if ( this.intent !== true ) {
+			if ( this.isIntent( builder ) !== true ) {
 
 				error( 'TSL: ".toVar()" can not be used with void type.' );
 
@@ -8994,7 +9019,7 @@ const convertColorSpace = ( node, sourceColorSpace, targetColorSpace ) => nodeOb
 addMethodChaining( 'workingToColorSpace', workingToColorSpace );
 addMethodChaining( 'colorSpaceToWorking', colorSpaceToWorking );
 
-// TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
+// TODO: Avoid duplicated code and use only ReferenceBaseNode or ReferenceNode
 
 /**
  * This class is only relevant if the referenced property is array-like.
@@ -14630,7 +14655,7 @@ const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = null, bia
  */
 const uniformCubeTexture = ( value = EmptyTexture ) => cubeTextureBase( value );
 
-// TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
+// TODO: Avoid duplicated code and use only ReferenceBaseNode or ReferenceNode
 
 /**
  * This class is only relevant if the referenced property is array-like.
@@ -17848,7 +17873,20 @@ class SkinningNode extends Node {
 
 		_frameId.set( skeleton, frame.frameId );
 
-		if ( this.previousBoneMatricesNode !== null ) skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
+		if ( this.previousBoneMatricesNode !== null ) {
+
+			if ( skeleton.previousBoneMatrices === null ) {
+
+				// cloned skeletons miss "previousBoneMatrices" in their first updated
+
+				skeleton.previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
+
+			}
+
+			skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
+
+
+		}
 
 		skeleton.update();
 
@@ -23337,7 +23375,7 @@ const DATA = new Uint16Array( [
 
 let lut = null;
 
-const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
+const DFGLUT = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 	if ( lut === null ) {
 
@@ -23372,8 +23410,8 @@ const BRDF_GGX_Multiscatter = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, rou
 	const dotNV = normalView.dot( positionViewDirection ).clamp();
 
 	// Precomputed DFG values for view and light directions
-	const dfgV = DFGApprox( { roughness: _roughness, dotNV } );
-	const dfgL = DFGApprox( { roughness: _roughness, dotNV: dotNL } );
+	const dfgV = DFGLUT( { roughness: _roughness, dotNV } );
+	const dfgL = DFGLUT( { roughness: _roughness, dotNV: dotNL } );
 
 	// Single-scattering energy for view and light
 	const FssEss_V = f0.mul( dfgV.x ).add( f90.mul( dfgV.y ) );
@@ -23406,7 +23444,7 @@ const EnvironmentBRDF = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { dotNV, specularColor, specularF90, roughness } = inputs;
 
-	const fab = DFGApprox( { dotNV, roughness } );
+	const fab = DFGLUT( { dotNV, roughness } );
 	return specularColor.mul( fab.x ).add( specularF90.mul( fab.y ) );
 
 } );
@@ -24288,7 +24326,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
-		const fab = DFGApprox( { roughness, dotNV } );
+		const fab = DFGLUT( { roughness, dotNV } );
 
 		const Fr = iridescenceF0 ? iridescence.mix( f0, iridescenceF0 ) : f0;
 
@@ -29092,7 +29130,7 @@ class RenderObject {
 	/**
 	 * Returns the byte offset into the indirect attribute buffer.
 	 *
-	 * @return {number} The byte offset into the indirect attribute buffer.
+	 * @return {number|Array<number>} The byte offset into the indirect attribute buffer.
 	 */
 	getIndirectOffset() {
 
@@ -31324,6 +31362,7 @@ class Bindings extends DataMap {
 
 		for ( const bindGroup of bindings ) {
 
+			this.backend.deleteBindGroupData( bindGroup );
 			this.delete( bindGroup );
 
 		}
@@ -31341,6 +31380,7 @@ class Bindings extends DataMap {
 
 		for ( const bindGroup of bindings ) {
 
+			this.backend.deleteBindGroupData( bindGroup );
 			this.delete( bindGroup );
 
 		}
@@ -33155,6 +33195,15 @@ class StackNode extends Node {
 		this._expressionNode = null;
 
 		/**
+		 * The current node being processed.
+		 *
+		 * @private
+		 * @type {Node}
+		 * @default null
+		 */
+		this._currentNode = null;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -33187,9 +33236,10 @@ class StackNode extends Node {
 	 * Adds a node to this stack.
 	 *
 	 * @param {Node} node - The node to add.
+	 * @param {number} [index=this.nodes.length] - The index where the node should be added.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	addToStack( node ) {
+	addToStack( node, index = this.nodes.length ) {
 
 		if ( node.isNode !== true ) {
 
@@ -33198,9 +33248,23 @@ class StackNode extends Node {
 
 		}
 
-		this.nodes.push( node );
+		this.nodes.splice( index, 0, node );
 
 		return this;
+
+	}
+
+	/**
+	 * Adds a node to the stack before the current node.
+	 *
+	 * @param {Node} node - The node to add.
+	 * @return {StackNode} A reference to this stack node.
+	 */
+	addToStackBefore( node ) {
+
+		const index = this._currentNode ? this.nodes.indexOf( this._currentNode ) : 0;
+
+		return this.addToStack( node, index );
 
 	}
 
@@ -33353,7 +33417,7 @@ class StackNode extends Node {
 
 		for ( const childNode of this.getChildren() ) {
 
-			if ( childNode.isVarNode && childNode.intent === true ) {
+			if ( childNode.isVarNode && childNode.isIntent( builder ) ) {
 
 				if ( childNode.isAssign( builder ) !== true ) {
 
@@ -33383,19 +33447,23 @@ class StackNode extends Node {
 
 		const previousStack = getCurrentStack();
 
+		const buildStage = builder.buildStage;
+
 		setCurrentStack( this );
 
 		builder.setActiveStack( this );
 
-		const buildStage = builder.buildStage;
+		//
 
-		for ( const node of this.nodes ) {
+		const buildNode = ( node ) => {
 
-			if ( node.isVarNode && node.intent === true ) {
+			this._currentNode = node;
+
+			if ( node.isVarNode && node.isIntent( builder ) ) {
 
 				if ( node.isAssign( builder ) !== true ) {
 
-					continue;
+					return;
 
 				}
 
@@ -33416,13 +33484,33 @@ class StackNode extends Node {
 
 				if ( node.isVarNode && parents && parents.length === 1 && parents[ 0 ] && parents[ 0 ].isStackNode ) {
 
-					continue; // skip var nodes that are only used in .toVarying()
+					return; // skip var nodes that are only used in .toVarying()
 
 				}
 
 				node.build( builder, 'void' );
 
 			}
+
+		};
+
+		//
+
+		const nodes = [ ...this.nodes ];
+
+		for ( const node of nodes ) {
+
+			buildNode( node );
+
+		}
+
+		this._currentNode = null;
+
+		const newNodes = this.nodes.filter( ( node ) => nodes.indexOf( node ) === -1 );
+
+		for ( const node of newNodes ) {
+
+			buildNode( node );
 
 		}
 
@@ -43991,7 +44079,15 @@ class ShadowNode extends ShadowBaseNode {
 
 		} ).toInspector( `${ inspectName } / Depth`, () => {
 
-			return textureLoad( this.shadowMap.depthTexture, uv$1().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).x.oneMinus();
+			// TODO: Use linear depth
+
+			if ( this.shadowMap.texture.isCubeTexture ) {
+
+				return cubeTexture( this.shadowMap.texture ).r.oneMinus();
+
+			}
+
+			return textureLoad( this.shadowMap.depthTexture, uv$1().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).r.oneMinus();
 
 		} );
 
@@ -46864,7 +46960,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	Break: Break,
 	Const: Const,
 	Continue: Continue,
-	DFGApprox: DFGApprox,
+	DFGLUT: DFGLUT,
 	D_GGX: D_GGX,
 	Discard: Discard,
 	EPSILON: EPSILON,
@@ -63743,6 +63839,14 @@ class Backend {
 	}
 
 	/**
+	 * Delete GPU data associated with a bind group.
+	 *
+	 * @abstract
+	 * @param {BindGroup} bindGroup - The bind group.
+	 */
+	deleteBindGroupData( /*bindGroup*/ ) { }
+
+	/**
 	 * Deletes an object from the internal data structure.
 	 *
 	 * @param {Object} object - The object to delete.
@@ -71899,7 +72003,7 @@ class WebGPUTextureUtils {
 	 */
 	_getDefaultCubeTextureGPU( format ) {
 
-		let defaultCubeTexture = this.defaultTexture[ format ];
+		let defaultCubeTexture = this.defaultCubeTexture[ format ];
 
 		if ( defaultCubeTexture === undefined ) {
 
@@ -75951,6 +76055,37 @@ class WebGPUAttributeUtils {
 }
 
 /**
+* Class representing a WebGPU bind group layout.
+*
+*/
+class BindGroupLayout {
+
+	/**
+	 * Constructs a new BindGroupLayout.
+	 *
+	 * @param {GPUBindGroupLayout} layoutGPU - A GPU Bind Group Layout.
+	 */
+	constructor( layoutGPU ) {
+
+		/**
+		 * The current GPUBindGroupLayout
+		 *
+		 * @type {GPUBindGroupLayout}
+		 */
+		this.layoutGPU = layoutGPU;
+
+		/**
+		 * The number of bind groups that use the current GPUBindGroupLayout
+		 *
+		 * @type {number}
+		 */
+		this.usedTimes = 0;
+
+	}
+
+}
+
+/**
  * A WebGPU backend utility module for managing bindings.
  *
  * When reading the documentation it's helpful to keep in mind that
@@ -75977,11 +76112,11 @@ class WebGPUBindingUtils {
 		this.backend = backend;
 
 		/**
-		 * A cache for managing bind group layouts.
+		 * A cache that maps combinations of layout entries to existing bind group layouts.
 		 *
-		 * @type {WeakMap<Array<Binding>,GPUBindGroupLayout>}
+		 * @type {Map<string, BindGroupLayout>}
 		 */
-		this.bindGroupLayoutCache = new WeakMap();
+		this.bindGroupLayoutCache = new Map();
 
 	}
 
@@ -75996,185 +76131,33 @@ class WebGPUBindingUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
-		const entries = [];
+		const bindingsData = backend.get( bindGroup );
 
-		let index = 0;
+		// When current bind group has already been assigned a layout
+		if ( bindingsData.bindGroupLayout !== undefined ) {
 
-		for ( const binding of bindGroup.bindings ) {
-
-			const bindingGPU = {
-				binding: index ++,
-				visibility: binding.visibility
-			};
-
-			if ( binding.isUniformBuffer || binding.isStorageBuffer ) {
-
-				const buffer = {}; // GPUBufferBindingLayout
-
-				if ( binding.isStorageBuffer ) {
-
-					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
-
-						// compute
-
-						if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
-
-							buffer.type = GPUBufferBindingType.Storage;
-
-						} else {
-
-							buffer.type = GPUBufferBindingType.ReadOnlyStorage;
-
-						}
-
-					} else {
-
-						buffer.type = GPUBufferBindingType.ReadOnlyStorage;
-
-					}
-
-				}
-
-				bindingGPU.buffer = buffer;
-
-			} else if ( binding.isSampledTexture && binding.store ) {
-
-				const storageTexture = {}; // GPUStorageTextureBindingLayout
-				storageTexture.format = this.backend.get( binding.texture ).texture.format;
-
-				const access = binding.access;
-
-				if ( access === NodeAccess.READ_WRITE ) {
-
-					storageTexture.access = GPUStorageTextureAccess.ReadWrite;
-
-				} else if ( access === NodeAccess.WRITE_ONLY ) {
-
-					storageTexture.access = GPUStorageTextureAccess.WriteOnly;
-
-				} else {
-
-					storageTexture.access = GPUStorageTextureAccess.ReadOnly;
-
-				}
-
-				if ( binding.texture.isArrayTexture ) {
-
-					storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
-
-				} else if ( binding.texture.is3DTexture ) {
-
-					storageTexture.viewDimension = GPUTextureViewDimension.ThreeD;
-
-				}
-
-				bindingGPU.storageTexture = storageTexture;
-
-			} else if ( binding.isSampledTexture ) {
-
-				const texture = {}; // GPUTextureBindingLayout
-
-				const { primarySamples } = backend.utils.getTextureSampleData( binding.texture );
-
-				if ( primarySamples > 1 ) {
-
-					texture.multisampled = true;
-
-					if ( ! binding.texture.isDepthTexture ) {
-
-						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
-
-					}
-
-				}
-
-				if ( binding.texture.isDepthTexture ) {
-
-					if ( backend.compatibilityMode && binding.texture.compareFunction === null ) {
-
-						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
-
-					} else {
-
-						texture.sampleType = GPUTextureSampleType.Depth;
-
-					}
-
-				} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture ) {
-
-					const type = binding.texture.type;
-
-					if ( type === IntType ) {
-
-						texture.sampleType = GPUTextureSampleType.SInt;
-
-					} else if ( type === UnsignedIntType ) {
-
-						texture.sampleType = GPUTextureSampleType.UInt;
-
-					} else if ( type === FloatType ) {
-
-						if ( this.backend.hasFeature( 'float32-filterable' ) ) {
-
-							texture.sampleType = GPUTextureSampleType.Float;
-
-						} else {
-
-							texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
-
-						}
-
-					}
-
-				}
-
-				if ( binding.isSampledCubeTexture ) {
-
-					texture.viewDimension = GPUTextureViewDimension.Cube;
-
-				} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
-
-					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
-
-				} else if ( binding.isSampledTexture3D ) {
-
-					texture.viewDimension = GPUTextureViewDimension.ThreeD;
-
-				}
-
-				bindingGPU.texture = texture;
-
-			} else if ( binding.isSampler ) {
-
-				const sampler = {}; // GPUSamplerBindingLayout
-
-				if ( binding.texture.isDepthTexture ) {
-
-					if ( binding.texture.compareFunction !== null ) {
-
-						sampler.type = GPUSamplerBindingType.Comparison;
-
-					} else if ( backend.compatibilityMode ) {
-
-						sampler.type = GPUSamplerBindingType.NonFiltering;
-
-					}
-
-				}
-
-				bindingGPU.sampler = sampler;
-
-			} else {
-
-				error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
-
-			}
-
-			entries.push( bindingGPU );
+			return bindingsData.bindGroupLayout.layoutGPU;
 
 		}
 
-		return device.createBindGroupLayout( { entries } );
+		const entries = this._createBindingsLayoutEntries( bindGroup );
+
+		const bindGroupLayoutKey = JSON.stringify( entries );
+
+		let bindGroupLayout = this.bindGroupLayoutCache.get( bindGroupLayoutKey );
+
+		if ( bindGroupLayout === undefined ) {
+
+			bindGroupLayout = new BindGroupLayout( device.createBindGroupLayout( { entries } ) );
+			this.bindGroupLayoutCache.set( bindGroupLayoutKey, bindGroupLayout );
+
+		}
+
+		bindingsData.layout = bindGroupLayout;
+		bindingsData.layout.usedTimes ++;
+		bindingsData.layoutKey = bindGroupLayoutKey;
+
+		return bindGroupLayout.layoutGPU;
 
 	}
 
@@ -76188,19 +76171,12 @@ class WebGPUBindingUtils {
 	 */
 	createBindings( bindGroup, bindings, cacheIndex, version = 0 ) {
 
-		const { backend, bindGroupLayoutCache } = this;
+		const { backend } = this;
 		const bindingsData = backend.get( bindGroup );
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		let bindLayoutGPU = bindGroupLayoutCache.get( bindGroup.bindingsReference );
-
-		if ( bindLayoutGPU === undefined ) {
-
-			bindLayoutGPU = this.createBindingsLayout( bindGroup );
-			bindGroupLayoutCache.set( bindGroup.bindingsReference, bindLayoutGPU );
-
-		}
+		const bindLayoutGPU = this.createBindingsLayout( bindGroup );
 
 		let bindGroupGPU;
 
@@ -76235,7 +76211,6 @@ class WebGPUBindingUtils {
 		}
 
 		bindingsData.group = bindGroupGPU;
-		bindingsData.layout = bindLayoutGPU;
 
 	}
 
@@ -76297,10 +76272,10 @@ class WebGPUBindingUtils {
 	 * Creates a GPU bind group for the camera index.
 	 *
 	 * @param {Uint32Array} data - The index data.
-	 * @param {GPUBindGroupLayout} layout - The GPU bind group layout.
+	 * @param {GPUBindGroupLayout} layoutGPU - The GPU bind group layout.
 	 * @return {GPUBindGroup} The GPU bind group.
 	 */
-	createBindGroupIndex( data, layout ) {
+	createBindGroupIndex( data, layoutGPU ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -76320,7 +76295,7 @@ class WebGPUBindingUtils {
 
 		return device.createBindGroup( {
 			label: 'bindGroupCameraIndex_' + index,
-			layout,
+			layout: layoutGPU,
 			entries
 		} );
 
@@ -76481,6 +76456,242 @@ class WebGPUBindingUtils {
 
 	}
 
+	/**
+	 * Creates a bind group layout entry for the given binding.
+	 *
+	 * @param {Binding} binding - The binding.
+	 * @param {number} index - The index of the bind group layout entry in the bind group layout.
+	 * @return {GPUBindGroupLayoutEntry} The bind group layout entry.
+	 */
+	_createBindingLayoutEntry( binding, index ) {
+
+		const backend = this.backend;
+
+		const bindingGPU = {
+			binding: index,
+			visibility: binding.visibility
+		};
+
+		if ( binding.isUniformBuffer || binding.isStorageBuffer ) {
+
+			const buffer = {}; // GPUBufferBindingLayout
+
+			if ( binding.isStorageBuffer ) {
+
+				if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+
+					// compute
+
+					if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
+
+						buffer.type = GPUBufferBindingType.Storage;
+
+					} else {
+
+						buffer.type = GPUBufferBindingType.ReadOnlyStorage;
+
+					}
+
+				} else {
+
+					buffer.type = GPUBufferBindingType.ReadOnlyStorage;
+
+				}
+
+			}
+
+			bindingGPU.buffer = buffer;
+
+		} else if ( binding.isSampledTexture && binding.store ) {
+
+			const storageTexture = {}; // GPUStorageTextureBindingLayout
+			storageTexture.format = this.backend.get( binding.texture ).texture.format;
+
+			const access = binding.access;
+
+			if ( access === NodeAccess.READ_WRITE ) {
+
+				storageTexture.access = GPUStorageTextureAccess.ReadWrite;
+
+			} else if ( access === NodeAccess.WRITE_ONLY ) {
+
+				storageTexture.access = GPUStorageTextureAccess.WriteOnly;
+
+			} else {
+
+				storageTexture.access = GPUStorageTextureAccess.ReadOnly;
+
+			}
+
+			if ( binding.texture.isArrayTexture ) {
+
+				storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
+			} else if ( binding.texture.is3DTexture ) {
+
+				storageTexture.viewDimension = GPUTextureViewDimension.ThreeD;
+
+			}
+
+			bindingGPU.storageTexture = storageTexture;
+
+		} else if ( binding.isSampledTexture ) {
+
+			const texture = {}; // GPUTextureBindingLayout
+
+			const { primarySamples } = backend.utils.getTextureSampleData( binding.texture );
+
+			if ( primarySamples > 1 ) {
+
+				texture.multisampled = true;
+
+				if ( ! binding.texture.isDepthTexture ) {
+
+					texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+				}
+
+			}
+
+			if ( binding.texture.isDepthTexture ) {
+
+				if ( backend.compatibilityMode && binding.texture.compareFunction === null ) {
+
+					texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+				} else {
+
+					texture.sampleType = GPUTextureSampleType.Depth;
+
+				}
+
+			} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture ) {
+
+				const type = binding.texture.type;
+
+				if ( type === IntType ) {
+
+					texture.sampleType = GPUTextureSampleType.SInt;
+
+				} else if ( type === UnsignedIntType ) {
+
+					texture.sampleType = GPUTextureSampleType.UInt;
+
+				} else if ( type === FloatType ) {
+
+					if ( this.backend.hasFeature( 'float32-filterable' ) ) {
+
+						texture.sampleType = GPUTextureSampleType.Float;
+
+					} else {
+
+						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+					}
+
+				}
+
+			}
+
+			if ( binding.isSampledCubeTexture ) {
+
+				texture.viewDimension = GPUTextureViewDimension.Cube;
+
+			} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+
+				texture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
+			} else if ( binding.isSampledTexture3D ) {
+
+				texture.viewDimension = GPUTextureViewDimension.ThreeD;
+
+			}
+
+			bindingGPU.texture = texture;
+
+		} else if ( binding.isSampler ) {
+
+			const sampler = {}; // GPUSamplerBindingLayout
+
+			if ( binding.texture.isDepthTexture ) {
+
+				if ( binding.texture.compareFunction !== null ) {
+
+					sampler.type = GPUSamplerBindingType.Comparison;
+
+				} else if ( backend.compatibilityMode ) {
+
+					sampler.type = GPUSamplerBindingType.NonFiltering;
+
+				}
+
+			}
+
+			bindingGPU.sampler = sampler;
+
+		} else {
+
+			error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
+
+		}
+
+		return bindingGPU;
+
+	}
+
+	/**
+	 * Creates a GPU bind group layout entries for the given bind group.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @return {Array<GPUBindGroupLayoutEntry>} The GPU bind group layout entries.
+	 */
+	_createBindingsLayoutEntries( bindGroup ) {
+
+		const entries = [];
+		let index = 0;
+
+		for ( const binding of bindGroup.bindings ) {
+
+			entries.push( this._createBindingLayoutEntry( binding, index ) );
+			index ++;
+
+		}
+
+		return entries;
+
+	}
+
+	/**
+	 * Delete the data associated with a bind group.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 */
+	deleteBindGroupData( bindGroup ) {
+
+		const { backend } = this;
+
+		const bindingsData = backend.get( bindGroup );
+
+		// Decrement the layout reference's usedTimes attribute
+		bindingsData.layout.usedTimes --;
+
+		// Remove reference from map
+		if ( bindingsData.layout.usedTimes === 0 ) {
+
+			this.bindGroupLayoutCache.delete( bindingsData.layoutKey );
+
+		}
+
+		bindingsData.layout = null;
+
+	}
+
+	dispose() {
+
+		this.bindGroupLayoutCache.clear();
+
+	}
+
 }
 
 /**
@@ -76572,8 +76783,9 @@ class WebGPUPipelineUtils {
 		for ( const bindGroup of renderObject.getBindings() ) {
 
 			const bindingsData = backend.get( bindGroup );
+			const { layoutGPU } = bindingsData.layout;
 
-			bindGroupLayouts.push( bindingsData.layout );
+			bindGroupLayouts.push( layoutGPU );
 
 		}
 
@@ -76807,8 +77019,9 @@ class WebGPUPipelineUtils {
 		for ( const bindingsGroup of bindings ) {
 
 			const bindingsData = backend.get( bindingsGroup );
+			const { layoutGPU } = bindingsData.layout;
 
-			bindGroupLayouts.push( bindingsData.layout );
+			bindGroupLayouts.push( layoutGPU );
 
 		}
 
@@ -79177,8 +79390,13 @@ class WebGPUBackend extends Backend {
 
 					const buffer = this.get( indirect ).buffer;
 					const indirectOffset = renderObject.getIndirectOffset();
+					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
 
-					passEncoderGPU.drawIndexedIndirect( buffer, indirectOffset );
+					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
+
+						passEncoderGPU.drawIndexedIndirect( buffer, indirectOffsets[ i ] );
+
+					}
 
 				} else {
 
@@ -79198,8 +79416,14 @@ class WebGPUBackend extends Backend {
 
 					const buffer = this.get( indirect ).buffer;
 					const indirectOffset = renderObject.getIndirectOffset();
+					const indirectOffsets = Array.isArray( indirectOffset ) ? indirectOffset : [ indirectOffset ];
 
-					passEncoderGPU.drawIndirect( buffer, indirectOffset );
+					for ( let i = 0; i < indirectOffsets.length; i ++ ) {
+
+						passEncoderGPU.drawIndirect( buffer, indirectOffsets[ i ] );
+
+					}
+
 
 				} else {
 
@@ -79230,7 +79454,9 @@ class WebGPUBackend extends Backend {
 
 					data[ 0 ] = i;
 
-					const bindGroupIndex = this.bindingUtils.createBindGroupIndex( data, bindingsData.layout );
+					const { layoutGPU } = bindingsData.layout;
+
+					const bindGroupIndex = this.bindingUtils.createBindGroupIndex( data, layoutGPU );
 
 					indexesGPU.push( bindGroupIndex );
 
@@ -79698,6 +79924,17 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
+	 * Delete data associated with the current bind group.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 */
+	deleteBindGroupData( bindGroup ) {
+
+		this.bindingUtils.deleteBindGroupData( bindGroup );
+
+	}
+
+	/**
 	 * Updates the given bind group definition.
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
@@ -80052,6 +80289,7 @@ class WebGPUBackend extends Backend {
 	dispose() {
 
 		this.textureUtils.dispose();
+		this.bindingUtils.dispose();
 
 	}
 

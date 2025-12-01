@@ -18979,11 +18979,11 @@ class BufferGeometry extends EventDispatcher {
 		this.indirect = null;
 
 		/**
-		 * The offset, in bytes, into the indirect drawing buffer where the value data begins.
+		 * The offset, in bytes, into the indirect drawing buffer where the value data begins. If an array is provided, multiple indirect draw calls will be made for each offset.
 		 *
 		 * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
 		 *
-		 * @type {number}
+		 * @type {number|Array<number>}
 		 * @default 0
 		 */
 		this.indirectOffset = 0;
@@ -19101,7 +19101,7 @@ class BufferGeometry extends EventDispatcher {
 	 * Sets the given indirect attribute to this geometry.
 	 *
 	 * @param {BufferAttribute} indirect - The attribute holding indirect draw calls.
-	 * @param {number} [indirectOffset=0] - The offset, in bytes, into the indirect drawing buffer where the value data begins.
+	 * @param {number|Array<number>} [indirectOffset=0] - The offset, in bytes, into the indirect drawing buffer where the value data begins. If an array is provided, multiple indirect draw calls will be made for each offset.
 	 * @return {BufferGeometry} A reference to this instance.
 	 */
 	setIndirect( indirect, indirectOffset = 0 ) {
@@ -25398,6 +25398,15 @@ class Skeleton {
 		 * @default null
 		 */
 		this.boneMatrices = null;
+
+		/**
+		 * An array buffer holding the bone data of the previous frame.
+		 * Required for computing velocity. Maintained in {@link SkinningNode}.
+		 *
+		 * @type {?Float32Array}
+		 * @default null
+		 */
+		this.previousBoneMatrices = null;
 
 		/**
 		 * A texture holding the bone data for use
@@ -35474,9 +35483,9 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				// SETUP TNB variables
 
-				// TODO1 - have a .isClosed in spline?
+				const isClosed = extrudePath.isCatmullRomCurve3 ? extrudePath.closed : false;
 
-				splineTube = extrudePath.computeFrenetFrames( steps, false );
+				splineTube = extrudePath.computeFrenetFrames( steps, isClosed );
 
 				// log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
@@ -45377,16 +45386,6 @@ class Light extends Object3D {
 		data.object.color = this.color.getHex();
 		data.object.intensity = this.intensity;
 
-		if ( this.groundColor !== undefined ) data.object.groundColor = this.groundColor.getHex();
-
-		if ( this.distance !== undefined ) data.object.distance = this.distance;
-		if ( this.angle !== undefined ) data.object.angle = this.angle;
-		if ( this.decay !== undefined ) data.object.decay = this.decay;
-		if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
-
-		if ( this.shadow !== undefined ) data.object.shadow = this.shadow.toJSON();
-		if ( this.target !== undefined ) data.object.target = this.target.uuid;
-
 		return data;
 
 	}
@@ -45449,6 +45448,16 @@ class HemisphereLight extends Light {
 		this.groundColor.copy( source.groundColor );
 
 		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.groundColor = this.groundColor.getHex();
+
+		return data;
 
 	}
 
@@ -46015,10 +46024,29 @@ class SpotLight extends Light {
 		this.decay = source.decay;
 
 		this.target = source.target.clone();
-
+		this.map = source.map;
 		this.shadow = source.shadow.clone();
 
 		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.distance = this.distance;
+		data.object.angle = this.angle;
+		data.object.decay = this.decay;
+		data.object.penumbra = this.penumbra;
+
+		data.object.target = this.target.uuid;
+
+		if ( this.map && this.map.isTexture ) data.object.map = this.map.toJSON( meta ).uuid;
+
+		data.object.shadow = this.shadow.toJSON();
+
+		return data;
 
 	}
 
@@ -46208,6 +46236,19 @@ class PointLight extends Light {
 		this.shadow = source.shadow.clone();
 
 		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.distance = this.distance;
+		data.object.decay = this.decay;
+
+		data.object.shadow = this.shadow.toJSON();
+
+		return data;
 
 	}
 
@@ -46572,6 +46613,17 @@ class DirectionalLight extends Light {
 		this.shadow = source.shadow.clone();
 
 		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.shadow = this.shadow.toJSON();
+		data.object.target = this.target.uuid;
+
+		return data;
 
 	}
 
@@ -47120,21 +47172,6 @@ class LightProbe extends Light {
 		super.copy( source );
 
 		this.sh.copy( source.sh );
-
-		return this;
-
-	}
-
-	/**
-	 * Deserializes the light prove from the given JSON.
-	 *
-	 * @param {Object} json - The JSON holding the serialized light probe.
-	 * @return {LightProbe} A reference to this light probe.
-	 */
-	fromJSON( json ) {
-
-		this.intensity = json.intensity; // TODO: Move this bit to Light.fromJSON();
-		this.sh.fromArray( json.sh );
 
 		return this;
 
@@ -48762,7 +48799,8 @@ class ObjectLoader extends Loader {
 
 			case 'LightProbe':
 
-				object = new LightProbe().fromJSON( data );
+				const sh = new SphericalHarmonics3().fromArray( data.sh );
+				object = new LightProbe( sh, data.intensity );
 
 				break;
 
@@ -56850,7 +56888,7 @@ class PointLightHelper extends Mesh {
 		/**
 		 * The light being visualized.
 		 *
-		 * @type {HemisphereLight}
+		 * @type {PointLight}
 		 */
 		this.light = light;
 
