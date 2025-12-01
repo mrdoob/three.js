@@ -108,6 +108,7 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 	const vertexTextures = maxVertexTextures > 0;
 
 	const maxSamples = gl.getParameter( gl.MAX_SAMPLES );
+	const samples = gl.getParameter( gl.SAMPLES );
 
 	return {
 
@@ -135,7 +136,9 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 		vertexTextures: vertexTextures,
 
-		maxSamples: maxSamples
+		maxSamples: maxSamples,
+
+		samples: samples
 
 	};
 
