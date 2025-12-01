@@ -7,5 +7,13 @@ diffuseColor.a = 1.0;
 diffuseColor.a *= material.transmissionAlpha;
 #endif
 
-gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+#ifdef BLENDING_ADDITIVE
+
+	gl_FragColor = vec4( outgoingLight * diffuseColor.a, 1.0 );
+
+#else
+
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+
+#endif
 `;
