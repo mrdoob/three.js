@@ -1665,9 +1665,7 @@ class WebGPUBackend extends Backend {
 
 					data[ 0 ] = i;
 
-					const { layoutGPU } = bindingsData.layout;
-
-					const bindGroupIndex = this.bindingUtils.createBindGroupIndex( data, layoutGPU );
+					const bindGroupIndex = this.bindingUtils.createBindGroupIndex( data, bindingsData.layout );
 
 					indexesGPU.push( bindGroupIndex );
 
@@ -2135,17 +2133,6 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Delete data associated with the current bind group.
-	 *
-	 * @param {BindGroup} bindGroup - The bind group.
-	 */
-	deleteBindGroupData( bindGroup ) {
-
-		this.bindingUtils.deleteBindGroupData( bindGroup );
-
-	}
-
-	/**
 	 * Updates the given bind group definition.
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
@@ -2500,7 +2487,6 @@ class WebGPUBackend extends Backend {
 	dispose() {
 
 		this.textureUtils.dispose();
-		this.bindingUtils.dispose();
 
 	}
 
