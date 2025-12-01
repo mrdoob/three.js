@@ -2321,6 +2321,14 @@
 
 					iframe.style.display = 'unset';
 
+					// Scroll to the anchor
+					if ( iframeAnchor ) {
+
+						const element = iframe.contentDocument.getElementById( iframeAnchor.substring( 1 ) );
+						if ( element ) element.scrollIntoView();
+
+					}
+
 					// Intercept clicks on internal documentation links in the iframe
 					setupIframeLinks();
 

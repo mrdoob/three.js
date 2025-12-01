@@ -1,108 +1,112 @@
-if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
+if (!window.frameElement && window.location.protocol !== 'file:') {
 
 	// navigates to docs home if direct access, e.g.
 	//   https://threejs.org/docs/pages/BoxGeometry.html
 	// ->https://threejs.org/docs/#BoxGeometry
 
-	const url = new URL( window.location.href );
+	const url = new URL(window.location.href);
 
 	// hash route, e.g. #BoxGeometry
-	url.hash = url.pathname.replace( /\/docs\/pages\/(.*?)(?:\.html)?$/, '$1' );
+	url.hash = url.pathname.replace(/\/docs\/pages\/(.*?)(?:\.html)?$/, '$1');
 
 	// docs home, e.g. https://threejs.org/docs/
-	url.pathname = url.pathname.replace( /(\/docs\/).*$/, '$1' );
+	url.pathname = url.pathname.replace(/(\/docs\/).*$/, '$1');
 
-	window.location.replace( url );
+	window.location.replace(url);
 
 }
 
 // Initialize Highlight.js for syntax highlighting
-if ( typeof hljs !== 'undefined' ) {
+if (typeof hljs !== 'undefined') {
 
 	hljs.highlightAll();
 
 }
 
 // Scroll to hash on page load
-( function () {
+(function () {
 
-	const hash = window.location.hash.substring( 1 );
+	const hash = window.location.hash.substring(1);
 
-	if ( hash ) {
+	if (hash) {
 
-		const element = document.getElementById( hash );
+		const element = document.getElementById(hash);
 
-		if ( element ) element.scrollIntoView();
+		if (element) element.scrollIntoView();
 
 	}
 
-} )();
+})();
 
 // Update URL hash when clicking on method/property links
-( function () {
+(function () {
 
-	const h1 = document.querySelector( 'h1' );
+	const h1 = document.querySelector('h1');
 	const className = h1 ? h1.textContent.trim() : null;
 
-	if ( ! className ) return;
+	if (!className) return;
 
-	document.addEventListener( 'click', function ( event ) {
+	document.addEventListener('click', function (event) {
 
-		const target = event.target.closest( 'a' );
+		const target = event.target.closest('a');
 
-		if ( ! target || ! target.hash ) return;
+		if (!target || !target.hash) return;
 
 		// Check if it's a same-page link (either starting with # or pointing to current page)
-		const href = target.getAttribute( 'href' );
-		const isSamePageLink = href.startsWith( '#' ) || ( target.hostname === window.location.hostname && target.pathname === window.location.pathname );
+		const href = target.getAttribute('href');
+		const isSamePageLink = href.startsWith('#') || (target.hostname === window.location.hostname && target.pathname === window.location.pathname);
 
-		if ( ! isSamePageLink ) return;
+		if (!isSamePageLink) return;
 
-		const hash = target.hash.substring( 1 );
-		const newHash = ( hash !== className ) ? `#${className}.${hash}` : `#${hash}`;
-		const targetWindow = ( window.parent !== window ) ? window.parent : window;
+		const hash = target.hash.substring(1);
+		const newHash = (hash !== className) ? `#${className}.${hash}` : `#${hash}`;
+		const targetWindow = (window.parent !== window) ? window.parent : window;
 
-		targetWindow.history.pushState( null, '', newHash );
+		targetWindow.history.pushState(null, '', newHash);
 
-	} );
+		// Manually scroll to the element
+		const element = document.getElementById(hash);
+		if (element) element.scrollIntoView();
 
-} )();
+	});
+
+})();
 
 // Add code copy buttons
-( function addCopyButtons() {
+(function addCopyButtons() {
 
-	const elements = document.getElementsByTagName( 'pre' );
+	const elements = document.getElementsByTagName('pre');
 
-	for ( let i = 0; i < elements.length; i ++ ) {
+	for (let i = 0; i < elements.length; i++) {
 
-		const element = elements[ i ];
+		const element = elements[i];
 
-		if ( element.classList.contains( 'linenums' ) === false ) {
+		if (element.classList.contains('linenums') === false) {
 
-			const copyButton = document.createElement( 'button' );
+			const copyButton = document.createElement('button');
 			copyButton.className = 'copy-btn';
 
-			element.appendChild( copyButton );
+			element.appendChild(copyButton);
 
-			copyButton.addEventListener( 'click', function () {
+			copyButton.addEventListener('click', function () {
 
 				const codeContent = element.textContent;
-				navigator.clipboard.writeText( codeContent ).then( () => {
+				navigator.clipboard.writeText(codeContent).then(() => {
 
-					copyButton.classList.add( 'copied' );
+					copyButton.classList.add('copied');
 
-					setTimeout( () => {
+					setTimeout(() => {
 
-						copyButton.classList.remove( 'copied' );
+						copyButton.classList.remove('copied');
 
-					}, 1000 );
+					}, 1000);
 
-				} );
+				});
 
-			} );
+			});
 
 		}
 
 	}
 
-} )();
+})();
