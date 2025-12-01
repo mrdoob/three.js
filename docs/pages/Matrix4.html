@@ -1315,6 +1315,105 @@ without affecting the rest of the matrix.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="setScale" translate="no">.<a href="#setScale">setScale</a><span class="signature">( x : <span class="param-type">number | <a href="Vector3.html">Vector3</a></span>, y : <span class="param-type">number</span>, z : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the scale of this matrix from the given vector,
+								without affecting the rest of the matrix.  This method in effect sets the length of each basis vector to match the given vector.</p>
+						</div>
+						<table class="params">
+							<tbody>
+							<tr>
+								<td class="name">
+									<strong>x</strong>
+								</td>
+								<td class="description last">
+									<p>The x component of the vector or alternatively the vector object.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>y</strong>
+								</td>
+								<td class="description last">
+									<p>The y component of the vector.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>z</strong>
+								</td>
+								<td class="description last">
+									<p>The z component of the vector.</p>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setColumn" translate="no">.<a href="#setColumn">setColumn</a>
+						<span class="signature">(
+							index: number,
+							x : <span class="param-type">number | <a href="Vector3.html">Vector3</a>| <a href="Vector4.html">Vector4</a></span>,
+							y : <span class="param-type">number</span>,
+							z : <span class="param-type">number</span> )</span>,
+							w : <span class="param-type">number</span> )</span>
+						<span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the column of this matrix to the given vector,
+								without affecting the rest of the matrix.  </p>
+						</div>
+						<table class="params">
+							<tbody>
+							<tr>
+								<td class="name">
+									<strong>index</strong>
+								</td>
+								<td class="description last">
+									<p>The index of the column being set.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>x</strong>
+								</td>
+								<td class="description last">
+									<p>The x component of the vector or alternatively the vector object.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>y</strong>
+								</td>
+								<td class="description last">
+									<p>The y component of the vector.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>z</strong>
+								</td>
+								<td class="description last">
+									<p>The z component of the vector.</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="name">
+									<strong>w</strong>
+								</td>
+								<td class="description last">
+									<p>The w component of the vector. If this argument is omitted the final component of the column will not be modified.</p>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="toArray" translate="no">.<a href="#toArray">toArray</a><span class="signature">( array : <span class="param-type">Array.&lt;number></span>, offset : <span class="param-type">number</span> )</span><span class="type-signature"> : Array.&lt;number></span> </h3>
 					<div class="method">
 						<div class="description">

@@ -708,16 +708,28 @@ class Matrix4 {
 	/**
 	 * Set the matrix column at `index` to the given vector
 	 * @param {number} index column index
-	 * @param {number|Vector3} x The x component of the vector or alternatively the vector object.
+	 * @param {number|Vector3|Vector4} x The x component of the vector or alternatively the vector object.
 	 * @param {number} y - The y component of the vector.
 	 * @param {number} z - The z component of the vector.
+	 * @param {number} w - The w component of the vector.  If not provided, this final element of the column will not be modified.
 	 * @returns {Matrix4} - A reference to this matrix.
 	 */
-	setColumn( index, x, y, z ) {
+	setColumn( index, x, y, z, w ) {
 
-		const column = x.isVector3 ? x.toArray() : [ x, y, z ];
+		let column;
+		if ( x.isVector3 || x.isVector4 ) {
+
+			column = x.toArray();
+
+		} else {
+
+			column = [ x, y, z ];
+			if ( ! Number.isNaN( w ) ) column.push( w );
+
+		}
+
 		const te = this.elements;
-		for ( let i = 0; i < 3; i ++ ) {
+		for ( let i = 0; i < column.length; i ++ ) {
 
 			te[ ( index * 4 ) + i ] = column[ i ];
 

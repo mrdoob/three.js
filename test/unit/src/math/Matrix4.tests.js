@@ -7,6 +7,7 @@ import { Euler } from '../../../../src/math/Euler.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import * as MathUtils from '../../../../src/math/MathUtils.js';
 import { eps } from '../../utils/math-constants.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
 
 function vectorEquals( a, b, tolerance ) {
 
@@ -546,21 +547,51 @@ export default QUnit.module( 'Maths', () => {
 
 			const v2 = new Vector3().setFromMatrixScale( a );
 			assert.ok( vectorEquals( v2, scale ), 'setScale(number, number, number) Passed!' );
+
 		} );
 
 		QUnit.test( 'setColumn', ( assert ) => {
 
-			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
-			const b = new Vector3( - 1, - 2, - 3 );
-			const c = new Matrix4().set( - 1, 1, 2, 3, - 2, 5, 6, 7, - 3, 9, 10, 11, 12, 13, 14, 15 );
 
-			a.setColumn( 0, b );
-			assert.ok( matrixEquals4( a, c ), 'setColumn(Vector3) Passed' );
+			const baseMat = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 
-			const d = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );			a.setColumn( 0, b );
+			{
 
-			d.setColumn( 0, - 1, - 2, - 3 );
-			assert.ok( matrixEquals4( d, c ), 'setColumn(number, number, number) Passed!' );
+				// number args
+				const mat = baseMat.clone();
+				const v3 = new Vector3( - 1, - 2, - 3 );
+				const expected = new Matrix4().set( - 1, 1, 2, 3, - 2, 5, 6, 7, - 3, 9, 10, 11, 12, 13, 14, 15 );
+
+				mat.setColumn( 0, v3.x, v3.y, v3.z );
+				assert.ok( matrixEquals4( mat, expected ), 'setColumn(number, number, number) Passed' );
+
+			}
+
+			{
+
+				// vector3 arg
+				const mat = baseMat.clone();
+				const expected = new Matrix4().set( - 1, 1, 2, 3, - 2, 5, 6, 7, - 3, 9, 10, 11, 12, 13, 14, 15 );
+
+				const v3 = new Vector3( - 1, - 2, - 3 );
+
+				mat.setColumn( 0, v3 );
+				assert.ok( matrixEquals4( mat, expected ), 'setColumn(Vector3) Passed' );
+
+			}
+
+
+			{
+
+				// vector4 arg
+				const v4 = new Vector4( - 1, - 2, - 3, - 4 );
+				const mat = baseMat.clone();
+				const expected = new Matrix4().set( - 1, 1, 2, 3, - 2, 5, 6, 7, - 3, 9, 10, 11, - 4, 13, 14, 15 );
+				mat.setColumn( 0, v4 );
+				assert.ok( matrixEquals4( mat, expected ), 'setColumn(Vector4) Passed!' );
+
+			}
+
 
 		} );
 
