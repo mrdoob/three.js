@@ -81,7 +81,6 @@ import clearcoat_pars_fragment from './ShaderChunk/clearcoat_pars_fragment.glsl.
 import iridescence_pars_fragment from './ShaderChunk/iridescence_pars_fragment.glsl.js';
 import opaque_fragment from './ShaderChunk/opaque_fragment.glsl.js';
 import packing from './ShaderChunk/packing.glsl.js';
-import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl.js';
 import project_vertex from './ShaderChunk/project_vertex.glsl.js';
 import dithering_fragment from './ShaderChunk/dithering_fragment.glsl.js';
 import dithering_pars_fragment from './ShaderChunk/dithering_pars_fragment.glsl.js';
@@ -208,7 +207,6 @@ export const ShaderChunk = {
 	iridescence_pars_fragment: iridescence_pars_fragment,
 	opaque_fragment: opaque_fragment,
 	packing: packing,
-	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
 	project_vertex: project_vertex,
 	dithering_fragment: dithering_fragment,
 	dithering_pars_fragment: dithering_pars_fragment,
