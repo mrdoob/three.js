@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, EventDispatcher, MathUtils, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, Texture, UnsignedIntType, IntType, NearestFilter, Sphere, BackSide, DoubleSide, Euler, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RGFormat, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedInterleavedBuffer, InstancedBufferAttribute, DataArrayTexture, FloatType, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, WebGLCubeRenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, DataTexture, HalfFloatType, ClampToEdgeWrapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, RenderTarget, LinearSRGBColorSpace, RGBAFormat, CubeUVReflectionMapping, BufferAttribute, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Camera, DepthStencilFormat, DepthFormat, UnsignedInt248Type, UnsignedByteType, Plane, Object3D, LinearMipMapLinearFilter, Float32BufferAttribute, UVMapping, VSMShadowMap, LessCompare, BasicShadowMap, CubeDepthTexture, SphereGeometry, NormalBlending, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, REVISION, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFShadowMap, FrustumArray, Frustum, RedIntegerFormat, RedFormat, ShortType, ByteType, UnsignedShortType, RGIntegerFormat, RGBIntegerFormat, RGBFormat, RGBAIntegerFormat, TimestampQuery, createCanvasElement, ReverseSubtractEquation, SubtractEquation, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, AlphaFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, MaxEquation, MinEquation, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
-export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, IdentityDepthPacking, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
+export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, ConstantAlphaFactor, ConstantColorFactor, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, PCFSoftShadowMap, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -32750,7 +32750,7 @@ class Textures extends DataMap {
 
 			//
 
-			if ( texture.isVideoTexture && ColorManagement.getTransfer( texture.colorSpace ) !== SRGBTransfer ) {
+			if ( texture.isVideoTexture && ColorManagement.enabled === true && ColorManagement.getTransfer( texture.colorSpace ) !== SRGBTransfer ) {
 
 				warn( 'WebGPURenderer: Video textures must use a color space with a sRGB transfer function, e.g. SRGBColorSpace.' );
 
@@ -43545,6 +43545,24 @@ const getShadowMaterial = ( light ) => {
 
 };
 
+/**
+ * Disposes the shadow material for the given light source.
+ *
+ * @param {Light} light - The light source.
+ */
+const disposeShadowMaterial = ( light ) => {
+
+	const material = shadowMaterialLib.get( light );
+
+	if ( material !== undefined ) {
+
+		material.dispose();
+		shadowMaterialLib.delete( light );
+
+	}
+
+};
+
 //
 
 const _shadowRenderObjectLibrary = /*@__PURE__*/ new ChainMap();
@@ -44270,6 +44288,8 @@ class ShadowNode extends ShadowBaseNode {
 
 		this._currentShadowType = null;
 
+		disposeShadowMaterial( this.light );
+
 		if ( this.shadowMap ) {
 
 			this.shadowMap.dispose();
@@ -44746,6 +44766,53 @@ class AnalyticLightNode extends LightingNode {
 		 * @default 'frame'
 		 */
 		this.updateType = NodeUpdateType.FRAME;
+
+		if ( light && light.shadow ) {
+
+			this._shadowDisposeListener = () => {
+
+				this.disposeShadow();
+
+			};
+
+			light.addEventListener( 'dispose', this._shadowDisposeListener );
+
+		}
+
+	}
+
+	dispose() {
+
+		if ( this._shadowDisposeListener ) {
+
+			this.light.removeEventListener( 'dispose', this._shadowDisposeListener );
+
+		}
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Frees internal resources related to shadows.
+	 */
+	disposeShadow() {
+
+		if ( this.shadowNode !== null ) {
+
+			this.shadowNode.dispose();
+			this.shadowNode = null;
+
+		}
+
+		this.shadowColorNode = null;
+
+		if ( this.baseColorNode !== null ) {
+
+			this.colorNode = this.baseColorNode;
+			this.baseColorNode = null;
+
+		}
 
 	}
 
@@ -47125,6 +47192,7 @@ var TSL = /*#__PURE__*/Object.freeze({
 	directionToColor: directionToColor,
 	directionToFaceDirection: directionToFaceDirection,
 	dispersion: dispersion,
+	disposeShadowMaterial: disposeShadowMaterial,
 	distance: distance,
 	div: div,
 	dodge: dodge,
@@ -58831,9 +58899,9 @@ class Renderer {
 	/**
 	 * Defines the scissor rectangle.
 	 *
-	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the box in logical pixel unit.
 	 * Instead of passing four arguments, the method also works with a single four-dimensional vector.
-	 * @param {number} y - The vertical coordinate for the lower left corner of the box in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the box in logical pixel unit.
 	 * @param {number} width - The width of the scissor box in logical pixel unit.
 	 * @param {number} height - The height of the scissor box in logical pixel unit.
 	 */
@@ -58884,8 +58952,8 @@ class Renderer {
 	/**
 	 * Defines the viewport.
 	 *
-	 * @param {number | Vector4} x - The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.
-	 * @param {number} y - The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.
+	 * @param {number | Vector4} x - The horizontal coordinate for the upper left corner of the viewport origin in logical pixel unit.
+	 * @param {number} y - The vertical coordinate for the upper left corner of the viewport origin  in logical pixel unit.
 	 * @param {number} width - The width of the viewport in logical pixel unit.
 	 * @param {number} height - The height of the viewport in logical pixel unit.
 	 * @param {number} minDepth - The minimum depth value of the viewport. WebGPU only.
@@ -63839,14 +63907,6 @@ class Backend {
 	}
 
 	/**
-	 * Delete GPU data associated with a bind group.
-	 *
-	 * @abstract
-	 * @param {BindGroup} bindGroup - The bind group.
-	 */
-	deleteBindGroupData( /*bindGroup*/ ) { }
-
-	/**
 	 * Deletes an object from the internal data structure.
 	 *
 	 * @param {Object} object - The object to delete.
@@ -63856,6 +63916,14 @@ class Backend {
 		this.data.delete( object );
 
 	}
+
+	/**
+	 * Delete GPU data associated with a bind group.
+	 *
+	 * @abstract
+	 * @param {BindGroup} bindGroup - The bind group.
+	 */
+	deleteBindGroupData( /*bindGroup*/ ) { }
 
 	/**
 	 * Frees internal resources.
@@ -72091,21 +72159,25 @@ class WebGPUTextureUtils {
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
-		device.queue.copyExternalImageToTexture(
-			{
-				source: image,
-				flipY: flipY
-			}, {
-				texture: textureGPU,
-				mipLevel: mipLevel,
-				origin: { x: 0, y: 0, z: originDepth },
-				premultipliedAlpha: premultiplyAlpha
-			}, {
-				width: width,
-				height: height,
-				depthOrArrayLayers: 1
-			}
-		);
+		try {
+
+			device.queue.copyExternalImageToTexture(
+				{
+					source: image,
+					flipY: flipY
+				}, {
+					texture: textureGPU,
+					mipLevel: mipLevel,
+					origin: { x: 0, y: 0, z: originDepth },
+					premultipliedAlpha: premultiplyAlpha
+				}, {
+					width: width,
+					height: height,
+					depthOrArrayLayers: 1
+				}
+			);
+
+		} catch ( _ ) {} // try/catch has been added to fix bad video frame data on certain devices, see #32391
 
 	}
 
@@ -76055,27 +76127,28 @@ class WebGPUAttributeUtils {
 }
 
 /**
-* Class representing a WebGPU bind group layout.
-*
-*/
+ * Class representing a WebGPU bind group layout.
+ *
+ * @private
+ */
 class BindGroupLayout {
 
 	/**
-	 * Constructs a new BindGroupLayout.
+	 * Constructs a new layout.
 	 *
 	 * @param {GPUBindGroupLayout} layoutGPU - A GPU Bind Group Layout.
 	 */
 	constructor( layoutGPU ) {
 
 		/**
-		 * The current GPUBindGroupLayout
+		 * The current GPUBindGroupLayout.
 		 *
 		 * @type {GPUBindGroupLayout}
 		 */
 		this.layoutGPU = layoutGPU;
 
 		/**
-		 * The number of bind groups that use the current GPUBindGroupLayout
+		 * The number of bind groups that use this layout.
 		 *
 		 * @type {number}
 		 */
@@ -76114,9 +76187,10 @@ class WebGPUBindingUtils {
 		/**
 		 * A cache that maps combinations of layout entries to existing bind group layouts.
 		 *
+		 * @private
 		 * @type {Map<string, BindGroupLayout>}
 		 */
-		this.bindGroupLayoutCache = new Map();
+		this._bindGroupLayoutCache = new Map();
 
 	}
 
@@ -76133,28 +76207,35 @@ class WebGPUBindingUtils {
 
 		const bindingsData = backend.get( bindGroup );
 
-		// When current bind group has already been assigned a layout
-		if ( bindingsData.bindGroupLayout !== undefined ) {
+		// check if the the bind group already has a layout
 
-			return bindingsData.bindGroupLayout.layoutGPU;
+		if ( bindingsData.layout ) {
+
+			return bindingsData.layout.layoutGPU;
 
 		}
 
-		const entries = this._createBindingsLayoutEntries( bindGroup );
+		// if not, assing one
 
+		const entries = this._createLayoutEntries( bindGroup );
 		const bindGroupLayoutKey = JSON.stringify( entries );
 
-		let bindGroupLayout = this.bindGroupLayoutCache.get( bindGroupLayoutKey );
+		// try to find an existing layout in the cache
+
+		let bindGroupLayout = this._bindGroupLayoutCache.get( bindGroupLayoutKey );
+
+		// if not create a new one
 
 		if ( bindGroupLayout === undefined ) {
 
 			bindGroupLayout = new BindGroupLayout( device.createBindGroupLayout( { entries } ) );
-			this.bindGroupLayoutCache.set( bindGroupLayoutKey, bindGroupLayout );
+			this._bindGroupLayoutCache.set( bindGroupLayoutKey, bindGroupLayout );
 
 		}
 
+		bindGroupLayout.usedTimes ++;
+
 		bindingsData.layout = bindGroupLayout;
-		bindingsData.layout.usedTimes ++;
 		bindingsData.layoutKey = bindGroupLayoutKey;
 
 		return bindGroupLayout.layoutGPU;
@@ -76457,34 +76538,45 @@ class WebGPUBindingUtils {
 	}
 
 	/**
-	 * Creates a bind group layout entry for the given binding.
+	 * Creates a GPU bind group layout entries for the given bind group.
 	 *
-	 * @param {Binding} binding - The binding.
-	 * @param {number} index - The index of the bind group layout entry in the bind group layout.
-	 * @return {GPUBindGroupLayoutEntry} The bind group layout entry.
+	 * @private
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @return {Array<GPUBindGroupLayoutEntry>} The GPU bind group layout entries.
 	 */
-	_createBindingLayoutEntry( binding, index ) {
+	_createLayoutEntries( bindGroup ) {
 
-		const backend = this.backend;
+		const entries = [];
+		let index = 0;
 
-		const bindingGPU = {
-			binding: index,
-			visibility: binding.visibility
-		};
+		for ( const binding of bindGroup.bindings ) {
 
-		if ( binding.isUniformBuffer || binding.isStorageBuffer ) {
+			const backend = this.backend;
 
-			const buffer = {}; // GPUBufferBindingLayout
+			const bindingGPU = {
+				binding: index,
+				visibility: binding.visibility
+			};
 
-			if ( binding.isStorageBuffer ) {
+			if ( binding.isUniformBuffer || binding.isStorageBuffer ) {
 
-				if ( binding.visibility & GPUShaderStage.COMPUTE ) {
+				const buffer = {}; // GPUBufferBindingLayout
 
-					// compute
+				if ( binding.isStorageBuffer ) {
 
-					if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
+					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 
-						buffer.type = GPUBufferBindingType.Storage;
+						// compute
+
+						if ( binding.access === NodeAccess.READ_WRITE || binding.access === NodeAccess.WRITE_ONLY ) {
+
+							buffer.type = GPUBufferBindingType.Storage;
+
+						} else {
+
+							buffer.type = GPUBufferBindingType.ReadOnlyStorage;
+
+						}
 
 					} else {
 
@@ -76492,98 +76584,54 @@ class WebGPUBindingUtils {
 
 					}
 
-				} else {
-
-					buffer.type = GPUBufferBindingType.ReadOnlyStorage;
-
 				}
 
-			}
+				bindingGPU.buffer = buffer;
 
-			bindingGPU.buffer = buffer;
+			} else if ( binding.isSampledTexture && binding.store ) {
 
-		} else if ( binding.isSampledTexture && binding.store ) {
+				const storageTexture = {}; // GPUStorageTextureBindingLayout
+				storageTexture.format = this.backend.get( binding.texture ).texture.format;
 
-			const storageTexture = {}; // GPUStorageTextureBindingLayout
-			storageTexture.format = this.backend.get( binding.texture ).texture.format;
+				const access = binding.access;
 
-			const access = binding.access;
+				if ( access === NodeAccess.READ_WRITE ) {
 
-			if ( access === NodeAccess.READ_WRITE ) {
+					storageTexture.access = GPUStorageTextureAccess.ReadWrite;
 
-				storageTexture.access = GPUStorageTextureAccess.ReadWrite;
+				} else if ( access === NodeAccess.WRITE_ONLY ) {
 
-			} else if ( access === NodeAccess.WRITE_ONLY ) {
-
-				storageTexture.access = GPUStorageTextureAccess.WriteOnly;
-
-			} else {
-
-				storageTexture.access = GPUStorageTextureAccess.ReadOnly;
-
-			}
-
-			if ( binding.texture.isArrayTexture ) {
-
-				storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
-
-			} else if ( binding.texture.is3DTexture ) {
-
-				storageTexture.viewDimension = GPUTextureViewDimension.ThreeD;
-
-			}
-
-			bindingGPU.storageTexture = storageTexture;
-
-		} else if ( binding.isSampledTexture ) {
-
-			const texture = {}; // GPUTextureBindingLayout
-
-			const { primarySamples } = backend.utils.getTextureSampleData( binding.texture );
-
-			if ( primarySamples > 1 ) {
-
-				texture.multisampled = true;
-
-				if ( ! binding.texture.isDepthTexture ) {
-
-					texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
-
-				}
-
-			}
-
-			if ( binding.texture.isDepthTexture ) {
-
-				if ( backend.compatibilityMode && binding.texture.compareFunction === null ) {
-
-					texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+					storageTexture.access = GPUStorageTextureAccess.WriteOnly;
 
 				} else {
 
-					texture.sampleType = GPUTextureSampleType.Depth;
+					storageTexture.access = GPUStorageTextureAccess.ReadOnly;
 
 				}
 
-			} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture ) {
+				if ( binding.texture.isArrayTexture ) {
 
-				const type = binding.texture.type;
+					storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
-				if ( type === IntType ) {
+				} else if ( binding.texture.is3DTexture ) {
 
-					texture.sampleType = GPUTextureSampleType.SInt;
+					storageTexture.viewDimension = GPUTextureViewDimension.ThreeD;
 
-				} else if ( type === UnsignedIntType ) {
+				}
 
-					texture.sampleType = GPUTextureSampleType.UInt;
+				bindingGPU.storageTexture = storageTexture;
 
-				} else if ( type === FloatType ) {
+			} else if ( binding.isSampledTexture ) {
 
-					if ( this.backend.hasFeature( 'float32-filterable' ) ) {
+				const texture = {}; // GPUTextureBindingLayout
 
-						texture.sampleType = GPUTextureSampleType.Float;
+				const { primarySamples } = backend.utils.getTextureSampleData( binding.texture );
 
-					} else {
+				if ( primarySamples > 1 ) {
+
+					texture.multisampled = true;
+
+					if ( ! binding.texture.isDepthTexture ) {
 
 						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
 
@@ -76591,68 +76639,89 @@ class WebGPUBindingUtils {
 
 				}
 
-			}
+				if ( binding.texture.isDepthTexture ) {
 
-			if ( binding.isSampledCubeTexture ) {
+					if ( backend.compatibilityMode && binding.texture.compareFunction === null ) {
 
-				texture.viewDimension = GPUTextureViewDimension.Cube;
+						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
 
-			} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+					} else {
 
-				texture.viewDimension = GPUTextureViewDimension.TwoDArray;
+						texture.sampleType = GPUTextureSampleType.Depth;
 
-			} else if ( binding.isSampledTexture3D ) {
+					}
 
-				texture.viewDimension = GPUTextureViewDimension.ThreeD;
+				} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture ) {
 
-			}
+					const type = binding.texture.type;
 
-			bindingGPU.texture = texture;
+					if ( type === IntType ) {
 
-		} else if ( binding.isSampler ) {
+						texture.sampleType = GPUTextureSampleType.SInt;
 
-			const sampler = {}; // GPUSamplerBindingLayout
+					} else if ( type === UnsignedIntType ) {
 
-			if ( binding.texture.isDepthTexture ) {
+						texture.sampleType = GPUTextureSampleType.UInt;
 
-				if ( binding.texture.compareFunction !== null ) {
+					} else if ( type === FloatType ) {
 
-					sampler.type = GPUSamplerBindingType.Comparison;
+						if ( this.backend.hasFeature( 'float32-filterable' ) ) {
 
-				} else if ( backend.compatibilityMode ) {
+							texture.sampleType = GPUTextureSampleType.Float;
 
-					sampler.type = GPUSamplerBindingType.NonFiltering;
+						} else {
+
+							texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+						}
+
+					}
 
 				}
 
+				if ( binding.isSampledCubeTexture ) {
+
+					texture.viewDimension = GPUTextureViewDimension.Cube;
+
+				} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+
+					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
+				} else if ( binding.isSampledTexture3D ) {
+
+					texture.viewDimension = GPUTextureViewDimension.ThreeD;
+
+				}
+
+				bindingGPU.texture = texture;
+
+			} else if ( binding.isSampler ) {
+
+				const sampler = {}; // GPUSamplerBindingLayout
+
+				if ( binding.texture.isDepthTexture ) {
+
+					if ( binding.texture.compareFunction !== null ) {
+
+						sampler.type = GPUSamplerBindingType.Comparison;
+
+					} else if ( backend.compatibilityMode ) {
+
+						sampler.type = GPUSamplerBindingType.NonFiltering;
+
+					}
+
+				}
+
+				bindingGPU.sampler = sampler;
+
+			} else {
+
+				error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
+
 			}
 
-			bindingGPU.sampler = sampler;
-
-		} else {
-
-			error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
-
-		}
-
-		return bindingGPU;
-
-	}
-
-	/**
-	 * Creates a GPU bind group layout entries for the given bind group.
-	 *
-	 * @param {BindGroup} bindGroup - The bind group.
-	 * @return {Array<GPUBindGroupLayoutEntry>} The GPU bind group layout entries.
-	 */
-	_createBindingsLayoutEntries( bindGroup ) {
-
-		const entries = [];
-		let index = 0;
-
-		for ( const binding of bindGroup.bindings ) {
-
-			entries.push( this._createBindingLayoutEntry( binding, index ) );
+			entries.push( bindingGPU );
 			index ++;
 
 		}
@@ -76672,23 +76741,29 @@ class WebGPUBindingUtils {
 
 		const bindingsData = backend.get( bindGroup );
 
-		// Decrement the layout reference's usedTimes attribute
-		bindingsData.layout.usedTimes --;
+		if ( bindingsData.layout ) {
 
-		// Remove reference from map
-		if ( bindingsData.layout.usedTimes === 0 ) {
+			bindingsData.layout.usedTimes --;
 
-			this.bindGroupLayoutCache.delete( bindingsData.layoutKey );
+			if ( bindingsData.layout.usedTimes === 0 ) {
+
+				this._bindGroupLayoutCache.delete( bindingsData.layoutKey );
+
+			}
+
+			bindingsData.layout = undefined;
+			bindingsData.layoutKey = undefined;
 
 		}
 
-		bindingsData.layout = null;
-
 	}
 
+	/**
+	 * Frees internal resources.
+	 */
 	dispose() {
 
-		this.bindGroupLayoutCache.clear();
+		this._bindGroupLayoutCache.clear();
 
 	}
 
@@ -77992,6 +78067,8 @@ class WebGPUBackend extends Backend {
 		}
 
 		device.lost.then( ( info ) => {
+
+			if ( info.reason === 'destroyed' ) return;
 
 			const deviceLossInfo = {
 				api: 'WebGPU',
@@ -79924,17 +80001,6 @@ class WebGPUBackend extends Backend {
 	}
 
 	/**
-	 * Delete data associated with the current bind group.
-	 *
-	 * @param {BindGroup} bindGroup - The bind group.
-	 */
-	deleteBindGroupData( bindGroup ) {
-
-		this.bindingUtils.deleteBindGroupData( bindGroup );
-
-	}
-
-	/**
 	 * Updates the given bind group definition.
 	 *
 	 * @param {BindGroup} bindGroup - The bind group.
@@ -79956,6 +80022,17 @@ class WebGPUBackend extends Backend {
 	updateBinding( binding ) {
 
 		this.bindingUtils.updateBinding( binding );
+
+	}
+
+	/**
+	 * Delete data associated with the current bind group.
+	 *
+	 * @param {BindGroup} bindGroup - The bind group.
+	 */
+	deleteBindGroupData( bindGroup ) {
+
+		this.bindingUtils.deleteBindGroupData( bindGroup );
 
 	}
 
@@ -80288,8 +80365,36 @@ class WebGPUBackend extends Backend {
 
 	dispose() {
 
-		this.textureUtils.dispose();
 		this.bindingUtils.dispose();
+		this.textureUtils.dispose();
+
+		if ( this.occludedResolveCache ) {
+
+			for ( const buffer of this.occludedResolveCache.values() ) {
+
+				buffer.destroy();
+
+			}
+
+			this.occludedResolveCache.clear();
+
+		}
+
+		if ( this.timestampQueryPool ) {
+
+			for ( const queryPool of Object.values( this.timestampQueryPool ) ) {
+
+				if ( queryPool !== null ) queryPool.dispose();
+
+			}
+
+		}
+
+		if ( this.parameters.device === undefined && this.device !== null ) {
+
+			this.device.destroy();
+
+		}
 
 	}
 
