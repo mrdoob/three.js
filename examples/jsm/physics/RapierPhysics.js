@@ -412,7 +412,7 @@ async function RapierPhysics() {
 
 		/**
 		 * Adds a heightfield terrain to the physics simulation.
-		 * 
+		 *
 		 * @method
 		 * @name RapierPhysics#addHeightfield
 		 * @param {Mesh} mesh - The Three.js mesh representing the terrain.
