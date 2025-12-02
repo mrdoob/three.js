@@ -3,7 +3,6 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Frustum } from '../math/Frustum.js';
-import { EventDispatcher } from '../core/EventDispatcher.js';
 import { UnsignedByteType } from '../constants.js';
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
@@ -16,7 +15,7 @@ const _lookTarget = /*@__PURE__*/ new Vector3();
  *
  * @abstract
  */
-class LightShadow extends EventDispatcher {
+class LightShadow {
 
 	/**
 	 * Constructs a new light shadow.
@@ -24,8 +23,6 @@ class LightShadow extends EventDispatcher {
 	 * @param {Camera} camera - The light's view of the world.
 	 */
 	constructor( camera ) {
-
-		super();
 
 		/**
 		 * The light's view of the world.
@@ -270,8 +267,6 @@ class LightShadow extends EventDispatcher {
 			this.mapPass.dispose();
 
 		}
-
-		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

@@ -54,7 +54,7 @@ class Light extends Object3D {
 	 */
 	dispose() {
 
-		// Empty here in base class; some subclasses override.
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

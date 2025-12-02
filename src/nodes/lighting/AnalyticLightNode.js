@@ -104,7 +104,7 @@ class AnalyticLightNode extends LightingNode {
 
 			};
 
-			light.shadow.addEventListener( 'dispose', this._shadowDisposeListener );
+			light.addEventListener( 'dispose', this._shadowDisposeListener );
 
 		}
 
@@ -114,7 +114,7 @@ class AnalyticLightNode extends LightingNode {
 
 		if ( this._shadowDisposeListener ) {
 
-			this.light.shadow.removeEventListener( 'dispose', this._shadowDisposeListener );
+			this.light.removeEventListener( 'dispose', this._shadowDisposeListener );
 
 		}
 
