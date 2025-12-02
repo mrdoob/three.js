@@ -1353,6 +1353,28 @@ without affecting the rest of the matrix.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="setRotation" translate="no">.<a href="#setRotation">setRotation</a><span class="signature">( q : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span> )</span><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Rotates the three basis vectors of this matrix to match the given quaternion,
+								while preserving their current lengths (scale). Does not modify the matrix position. Note that this method will always yield orthogonal basis vectors, and will not preserve shear or skew.</p>
+						</div>
+						<table class="params">
+							<tbody>
+							<tr>
+								<td class="name">
+									<strong>q</strong>
+								</td>
+								<td class="description last">
+									<p>The quaternion representing the desired rotation.</p>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this matrix.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="setColumn" translate="no">.<a href="#setColumn">setColumn</a>
 						<span class="signature">(
 							index: number,
