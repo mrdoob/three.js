@@ -771,21 +771,25 @@ class WebGPUTextureUtils {
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
 
-		device.queue.copyExternalImageToTexture(
-			{
-				source: image,
-				flipY: flipY
-			}, {
-				texture: textureGPU,
-				mipLevel: mipLevel,
-				origin: { x: 0, y: 0, z: originDepth },
-				premultipliedAlpha: premultiplyAlpha
-			}, {
-				width: width,
-				height: height,
-				depthOrArrayLayers: 1
-			}
-		);
+		try {
+
+			device.queue.copyExternalImageToTexture(
+				{
+					source: image,
+					flipY: flipY
+				}, {
+					texture: textureGPU,
+					mipLevel: mipLevel,
+					origin: { x: 0, y: 0, z: originDepth },
+					premultipliedAlpha: premultiplyAlpha
+				}, {
+					width: width,
+					height: height,
+					depthOrArrayLayers: 1
+				}
+			);
+
+		} catch ( _ ) {} // try/catch has been added to fix bad video frame data on certain devices, see #32391
 
 	}
 
