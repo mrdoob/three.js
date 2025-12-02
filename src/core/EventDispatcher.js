@@ -9,15 +9,25 @@
  * 	start() {
  *		this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
  *	}
- *};
+ *
+ *	stop() {
+ *		this.dispatchEvent( { type: 'stop', message: 'screech!' } );
+ *	}
+ * };
  *
  * // Using events with the custom object
  * const car = new Car();
+ *
  * car.addEventListener( 'start', function ( event ) {
- * 	alert( event.message );
+ * 	console.log( event.message );
+ * } );
+ *
+ * car.addEventListener( 'stop', function ( event ) {
+ * 	console.log( event.message );
  * } );
  *
  * car.start();
+ * car.stop();
  * ```
  */
 class EventDispatcher {
@@ -28,21 +38,21 @@ class EventDispatcher {
 	 * @param {string} type - The type of event to listen to.
 	 * @param {Function} listener - The function that gets called when the event is fired.
 	 */
-	addEventListener( type, listener ) {
+	addEventListener(type, listener) {
 
-		if ( this._listeners === undefined ) this._listeners = {};
+		if (this._listeners === undefined) this._listeners = {};
 
 		const listeners = this._listeners;
 
-		if ( listeners[ type ] === undefined ) {
+		if (listeners[type] === undefined) {
 
-			listeners[ type ] = [];
+			listeners[type] = [];
 
 		}
 
-		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
+		if (listeners[type].indexOf(listener) === - 1) {
 
-			listeners[ type ].push( listener );
+			listeners[type].push(listener);
 
 		}
 
@@ -55,13 +65,13 @@ class EventDispatcher {
 	 * @param {Function} listener - The listener to check.
 	 * @return {boolean} Whether the given event listener has been added to the given event type.
 	 */
-	hasEventListener( type, listener ) {
+	hasEventListener(type, listener) {
 
 		const listeners = this._listeners;
 
-		if ( listeners === undefined ) return false;
+		if (listeners === undefined) return false;
 
-		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
+		return listeners[type] !== undefined && listeners[type].indexOf(listener) !== - 1;
 
 	}
 
@@ -71,21 +81,21 @@ class EventDispatcher {
 	 * @param {string} type - The type of event.
 	 * @param {Function} listener - The listener to remove.
 	 */
-	removeEventListener( type, listener ) {
+	removeEventListener(type, listener) {
 
 		const listeners = this._listeners;
 
-		if ( listeners === undefined ) return;
+		if (listeners === undefined) return;
 
-		const listenerArray = listeners[ type ];
+		const listenerArray = listeners[type];
 
-		if ( listenerArray !== undefined ) {
+		if (listenerArray !== undefined) {
 
-			const index = listenerArray.indexOf( listener );
+			const index = listenerArray.indexOf(listener);
 
-			if ( index !== - 1 ) {
+			if (index !== - 1) {
 
-				listenerArray.splice( index, 1 );
+				listenerArray.splice(index, 1);
 
 			}
 
@@ -98,24 +108,24 @@ class EventDispatcher {
 	 *
 	 * @param {Object} event - The event that gets fired.
 	 */
-	dispatchEvent( event ) {
+	dispatchEvent(event) {
 
 		const listeners = this._listeners;
 
-		if ( listeners === undefined ) return;
+		if (listeners === undefined) return;
 
-		const listenerArray = listeners[ event.type ];
+		const listenerArray = listeners[event.type];
 
-		if ( listenerArray !== undefined ) {
+		if (listenerArray !== undefined) {
 
 			event.target = this;
 
 			// Make a copy, in case listeners are removed while iterating.
-			const array = listenerArray.slice( 0 );
+			const array = listenerArray.slice(0);
 
-			for ( let i = 0, l = array.length; i < l; i ++ ) {
+			for (let i = 0, l = array.length; i < l; i++) {
 
-				array[ i ].call( this, event );
+				array[i].call(this, event);
 
 			}
 
