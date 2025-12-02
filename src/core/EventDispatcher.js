@@ -14,7 +14,7 @@
  * // Using events with the custom object
  * const car = new Car();
  * car.addEventListener( 'start', function ( event ) {
- * 	alert( event.message );
+ * 	console.log( event.message );
  * } );
  *
  * car.start();
