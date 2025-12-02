@@ -77,7 +77,7 @@ class BloomNode extends TempNode {
 		this.strength = uniform( strength );
 
 		/**
-		 * The radius of the bloom.
+		 * The radius of the bloom. Must be in the range `[0,1]`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
