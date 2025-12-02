@@ -770,6 +770,7 @@ class WebGPUTextureUtils {
 
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
+
 		try {
 
 			device.queue.copyExternalImageToTexture(
@@ -788,7 +789,7 @@ class WebGPUTextureUtils {
 				}
 			);
 
-		} catch ( _ ) {}// Just skip bad texture frame to avoid broken pipeline.
+		} catch ( _ ) {} // try/catch has been added to fix bad video frame data on certain devices, see #32391
 
 	}
 
