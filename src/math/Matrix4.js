@@ -683,7 +683,7 @@ class Matrix4 {
 	}
 
 	/**
-	 * Set the scale (length) of the three basis vectors of this matrix.
+	 * Set the scale (lengths) of the three basis vectors of this matrix.
 	 * @param {number|Vector3} x The x component of the scale vector or alternatively the vector object.
 	 * @param {number} y - The y component of the vector.
 	 * @param {number} z - The z component of the vector.
@@ -697,6 +697,43 @@ class Matrix4 {
 		_y.setLength( scale.y );
 		_z.setLength( scale.z );
 
+		this.setColumn( 0, _x );
+		this.setColumn( 1, _y );
+		this.setColumn( 2, _z );
+
+		return this;
+
+	}
+
+	/**
+	 * Rotates the three basis vectors of this matrix to match the given quaternion,
+	 * while preserving their current lengths (scale).  Does not modify position.
+	 *
+	 * @param {Quaternion} q - The quaternion representing the desired rotation.
+	 * @returns {Matrix4} - A reference to this matrix.
+	 */
+	setRotation( q ) {
+
+		// Extract current basis vectors (including scale)
+		this.extractBasis( _x, _y, _z );
+
+		// Get current scales
+		const sx = _x.length();
+		const sy = _y.length();
+		const sz = _z.length();
+
+		// Create rotation matrix from quaternion
+		_m1.makeRotationFromQuaternion( q );
+
+		// Extract rotated basis vectors (unit length)
+		_m1.extractBasis( _x, _y, _z );
+
+		// Scale to original lengths
+		_x.multiplyScalar( sx );
+		_y.multiplyScalar( sy );
+		_z.multiplyScalar( sz );
+
+		// Set the columns back
 		this.setColumn( 0, _x );
 		this.setColumn( 1, _y );
 		this.setColumn( 2, _z );
