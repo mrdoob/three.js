@@ -204,6 +204,8 @@ class WebGPUBackend extends Backend {
 
 		device.lost.then( ( info ) => {
 
+			if ( info.reason === 'destroyed' ) return;
+
 			const deviceLossInfo = {
 				api: 'WebGPU',
 				message: info.message || 'Unknown reason',
@@ -2474,6 +2476,34 @@ class WebGPUBackend extends Backend {
 	dispose() {
 
 		this.textureUtils.dispose();
+
+		if ( this.occludedResolveCache ) {
+
+			for ( const buffer of this.occludedResolveCache.values() ) {
+
+				buffer.destroy();
+
+			}
+
+			this.occludedResolveCache.clear();
+
+		}
+
+		if ( this.timestampQueryPool ) {
+
+			for ( const key in this.timestampQueryPool ) {
+
+				if ( this.timestampQueryPool[ key ] !== null ) this.timestampQueryPool[ key ].dispose();
+
+			}
+
+		}
+
+		if ( this.parameters.device === undefined && this.device !== null ) {
+
+			this.device.destroy();
+
+		}
 
 	}
 
