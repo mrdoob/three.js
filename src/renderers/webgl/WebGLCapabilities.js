@@ -105,8 +105,6 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 	const maxVaryings = gl.getParameter( gl.MAX_VARYING_VECTORS );
 	const maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
-	const vertexTextures = maxVertexTextures > 0;
-
 	const maxSamples = gl.getParameter( gl.MAX_SAMPLES );
 	const samples = gl.getParameter( gl.SAMPLES );
 
@@ -133,8 +131,6 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 		maxVertexUniforms: maxVertexUniforms,
 		maxVaryings: maxVaryings,
 		maxFragmentUniforms: maxFragmentUniforms,
-
-		vertexTextures: vertexTextures,
 
 		maxSamples: maxSamples,
 

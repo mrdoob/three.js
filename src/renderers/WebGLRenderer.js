@@ -3490,7 +3490,6 @@ class WebGLRenderer {
  * @property {string} precision - The shader precision currently being used by the renderer.
  * @property {boolean} reversedDepthBuffer - `true` if `reversedDepthBuffer` was set to `true` in the constructor
  * and the rendering context supports `EXT_clip_control`.
- * @property {boolean} vertexTextures - `true` if vertex textures can be used.
  **/
 
 /**
