@@ -770,8 +770,8 @@ class WebGPUTextureUtils {
 
 		const width = ( mipLevel > 0 ) ? image.width : textureDescriptorGPU.size.width;
 		const height = ( mipLevel > 0 ) ? image.height : textureDescriptorGPU.size.height;
-		try
-		{
+		try {
+
 			device.queue.copyExternalImageToTexture(
 				{
 					source: image,
@@ -787,7 +787,8 @@ class WebGPUTextureUtils {
 					depthOrArrayLayers: 1
 				}
 			);
-		} catch(_) {}// Just skip bad texture frame to avoid broken pipeline.
+
+		} catch ( _ ) {}// Just skip bad texture frame to avoid broken pipeline.
 
 	}
 
