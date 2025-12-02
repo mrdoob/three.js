@@ -443,6 +443,15 @@ class BloomNode extends TempNode {
 
 		this._renderTargetBright.dispose();
 
+		if ( this._highPassFilterMaterial !== null ) this._highPassFilterMaterial.dispose();
+		if ( this._compositeMaterial !== null ) this._compositeMaterial.dispose();
+
+		for ( let i = 0; i < this._separableBlurMaterials.length; i ++ ) {
+
+			this._separableBlurMaterials[ i ].dispose();
+
+		}
+
 	}
 
 	/**
