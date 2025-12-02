@@ -2491,9 +2491,9 @@ class WebGPUBackend extends Backend {
 
 		if ( this.timestampQueryPool ) {
 
-			for ( const key in this.timestampQueryPool ) {
+			for ( const queryPool of Object.values( this.timestampQueryPool ) ) {
 
-				if ( this.timestampQueryPool[ key ] !== null ) this.timestampQueryPool[ key ].dispose();
+				if ( queryPool !== null ) queryPool.dispose();
 
 			}
 
