@@ -541,8 +541,6 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( vectorEquals( v, scale ), 'setScale(Vector3) Passed!' );
 
-			const b = new Matrix4().identity();
-
 			a.setScale( 2, 4, 8 );
 
 			const v2 = new Vector3().setFromMatrixScale( a );
