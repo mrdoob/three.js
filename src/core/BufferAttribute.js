@@ -296,6 +296,13 @@ class BufferAttribute {
 	 */
 	applyMatrix4( m ) {
 
+		if ( this.itemSize !== 3 ) {
+
+			console.warn( 'THREE.BufferAttribute.applyMatrix4(): itemSize is not 3, which is required.' );
+			return this;
+
+		}
+
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
 			_vector.fromBufferAttribute( this, i );
@@ -319,6 +326,13 @@ class BufferAttribute {
 	 */
 	applyNormalMatrix( m ) {
 
+		if ( this.itemSize !== 3 ) {
+
+			console.warn( 'THREE.BufferAttribute.applyNormalMatrix(): itemSize is not 3, which is required.' );
+			return this;
+
+		}
+
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
 			_vector.fromBufferAttribute( this, i );
@@ -341,6 +355,13 @@ class BufferAttribute {
 	 * @return {BufferAttribute} A reference to this instance.
 	 */
 	transformDirection( m ) {
+
+		if ( this.itemSize !== 3 ) {
+
+			console.warn( 'THREE.BufferAttribute.transformDirection(): itemSize is not 3, which is required.' );
+			return this;
+
+		}
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
