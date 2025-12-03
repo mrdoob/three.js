@@ -33,7 +33,8 @@ import {
 const SRGB_TO_LINEAR = new Float64Array( 1024 );
 for ( let i = 0; i < 1024; i ++ ) {
 
-	SRGB_TO_LINEAR[ i ] = Math.pow( ( i / 255 ) * 0.9478672986 + 0.0521327014, 2.4 );
+	// (1/255) * 0.9478672986 = 0.003717127
+	SRGB_TO_LINEAR[ i ] = Math.pow( i * 0.003717127 + 0.0521327014, 2.4 );
 
 }
 
@@ -529,13 +530,8 @@ class UltraHDRLoader extends Loader {
 
 				/* HDR Recovery formula - https://developer.android.com/media/platform/hdr-image-format#use_the_gain_map_to_create_adapted_HDR_rendition */
 
-				const maxDisplayBoost = Math.sqrt(
-					Math.pow(
-						/* 1.8 instead of 2 near-perfectly rectifies approximations introduced by precalculated SRGB_TO_LINEAR values */
-						1.8,
-						xmpMetadata.hdrCapacityMax
-					)
-				);
+				/* 1.8 instead of 2 near-perfectly rectifies approximations introduced by precalculated SRGB_TO_LINEAR values */
+				const maxDisplayBoost = 1.8 ** ( xmpMetadata.hdrCapacityMax * 0.5 );
 				const unclampedWeightFactor =
 					( Math.log2( maxDisplayBoost ) - xmpMetadata.hdrCapacityMin ) /
 					( xmpMetadata.hdrCapacityMax - xmpMetadata.hdrCapacityMin );
