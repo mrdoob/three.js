@@ -277,24 +277,69 @@ class Matrix4 {
 		const te = this.elements;
 		const me = m.elements;
 
-		const scaleX = 1 / ( _v1.setFromMatrixColumn( m, 0 ).length() || 1 );
-		const scaleY = 1 / ( _v1.setFromMatrixColumn( m, 1 ).length() || 1 );
-		const scaleZ = 1 / ( _v1.setFromMatrixColumn( m, 2 ).length() || 1 );
+		const lengthX = _v1.setFromMatrixColumn( m, 0 ).length();
+		const lengthY = _v1.setFromMatrixColumn( m, 1 ).length();
+		const lengthZ = _v1.setFromMatrixColumn( m, 2 ).length();
 
-		te[ 0 ] = me[ 0 ] * scaleX;
-		te[ 1 ] = me[ 1 ] * scaleX;
-		te[ 2 ] = me[ 2 ] * scaleX;
-		te[ 3 ] = 0;
+		// x
 
-		te[ 4 ] = me[ 4 ] * scaleY;
-		te[ 5 ] = me[ 5 ] * scaleY;
-		te[ 6 ] = me[ 6 ] * scaleY;
-		te[ 7 ] = 0;
+		if ( lengthX === 0 ) {
 
-		te[ 8 ] = me[ 8 ] * scaleZ;
-		te[ 9 ] = me[ 9 ] * scaleZ;
-		te[ 10 ] = me[ 10 ] * scaleZ;
-		te[ 11 ] = 0;
+			te[ 0 ] = 1;
+			te[ 1 ] = 0;
+			te[ 2 ] = 0;
+			te[ 3 ] = 0;
+
+		} else {
+
+			const scaleX = 1 / lengthX;
+
+			te[ 0 ] = me[ 0 ] * scaleX;
+			te[ 1 ] = me[ 1 ] * scaleX;
+			te[ 2 ] = me[ 2 ] * scaleX;
+			te[ 3 ] = 0;
+
+		}
+
+		// y
+
+		if ( lengthY === 0 ) {
+
+			te[ 4 ] = 0;
+			te[ 5 ] = 1;
+			te[ 6 ] = 0;
+			te[ 7 ] = 0;
+
+		} else {
+
+			const scaleY = 1 / lengthY;
+
+			te[ 4 ] = me[ 4 ] * scaleY;
+			te[ 5 ] = me[ 5 ] * scaleY;
+			te[ 6 ] = me[ 6 ] * scaleY;
+			te[ 7 ] = 0;
+
+		}
+
+		// z
+
+		if ( lengthZ === 0 ) {
+
+			te[ 8 ] = 0;
+			te[ 9 ] = 0;
+			te[ 10 ] = 1;
+			te[ 11 ] = 0;
+
+		} else {
+
+			const scaleZ = 1 / lengthZ;
+
+			te[ 8 ] = me[ 8 ] * scaleZ;
+			te[ 9 ] = me[ 9 ] * scaleZ;
+			te[ 10 ] = me[ 10 ] * scaleZ;
+			te[ 11 ] = 0;
+
+		}
 
 		te[ 12 ] = 0;
 		te[ 13 ] = 0;
@@ -1041,9 +1086,9 @@ class Matrix4 {
 		// scale the rotation part
 		_m1.copy( this );
 
-		const invSX = 1 / ( sx || 1 );
-		const invSY = 1 / ( sy || 1 );
-		const invSZ = 1 / ( sz || 1 );
+		const invSX = 1 / sx;
+		const invSY = 1 / sy;
+		const invSZ = 1 / sz;
 
 		_m1.elements[ 0 ] *= invSX;
 		_m1.elements[ 1 ] *= invSX;
