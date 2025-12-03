@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js xr - cubes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - interactive cubes
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
+			import { XRButton } from 'three/addons/webxr/XRButton.js';
+			import { XRControllerManager } from 'three/addons/webxr/RControllerManager';
+
+			const clock = new THREE.Clock();
+
+			let container, selectedController;
+			let camera, scene, raycaster, renderer;
+
+			let room;
+
+			const controllers = new Map();
+			let INTERSECTED;
+
+			init();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.set( 0, 1.6, 3 );
+				scene.add( camera );
+
+				room = new THREE.LineSegments(
+					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
+					new THREE.LineBasicMaterial( { color: 0xbcbcbc } )
+				);
+				scene.add( room );
+
+				scene.add( new THREE.HemisphereLight( 0xa5a5a5, 0x898989, 3 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
+				light.position.set( 1, 1, 1 ).normalize();
+				scene.add( light );
+
+				const geometry = new THREE.BoxGeometry( 0.15, 0.15, 0.15 );
+
+				for ( let i = 0; i < 200; i ++ ) {
+
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+
+					object.position.x = Math.random() * 4 - 2;
+					object.position.y = Math.random() * 4;
+					object.position.z = Math.random() * 4 - 2;
+
+					object.rotation.x = Math.random() * 2 * Math.PI;
+					object.rotation.y = Math.random() * 2 * Math.PI;
+					object.rotation.z = Math.random() * 2 * Math.PI;
+
+					object.scale.x = Math.random() + 0.5;
+					object.scale.y = Math.random() + 0.5;
+					object.scale.z = Math.random() + 0.5;
+
+					object.userData.velocity = new THREE.Vector3();
+					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
+					object.userData.velocity.z = Math.random() * 0.01 - 0.005;
+
+					room.add( object );
+
+				}
+
+
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType, multiview: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.xr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				function onSelectStart() {
+
+					this.userData.isSelecting = true;
+
+				}
+
+				function onSelectEnd() {
+
+					this.userData.isSelecting = false;
+
+				}
+
+				const events = [
+					'connected',
+					'disconnected',
+					'reconnected',
+					'selected',
+					'unselected',
+					'selectend',
+					'hovered',
+					'hoverout',
+					'move',
+					'pressed',
+					'pressedend',
+					'movechanged',
+					'hand-connected',
+					'pinchstart',
+					'pinchend'
+				];
+
+				[ 0, 1 ].forEach( ( index ) => {
+			
+					const controller = new XRControllerManager( index, scene, renderer.xr, room.children, true );
+
+					events.forEach( eventName => {
+
+						controller.addEventListener( eventName, ( event ) => {
+
+							console.log( event.type, event );
+
+						} );
+
+					} );
+
+					controller.addEventListener( 'selected', () => {
+
+						selectedController = controller;
+			
+					} );
+
+					controller.addEventListener( 'unselected', () => {
+
+						selectedController = null;
+
+					} );
+
+					controller.addEventListener( 'selectend', () => {
+			
+						selectedController = null;
+
+					} );
+
+					controller.addEventListener( 'hovered', ( event ) => {
+			
+
+						if ( INTERSECTED != event.intersectObject ) {
+
+							if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+							//the current intersectObject
+							INTERSECTED = event.intersectObject;
+							INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+							INTERSECTED.material.emissive.setHex( 0xff0000 );
+
+						}
+
+					} );
+
+					controller.addEventListener( 'hoverout', () => {
+			
+						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+						INTERSECTED = undefined;
+
+					} );
+
+					controllers.set( index, controller );
+
+				} );
+
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				//
+
+				document.body.appendChild( XRButton.createButton( renderer ) );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				const delta = clock.getDelta() * 60;
+
+				if ( selectedController ) {
+
+					const cube = room.children[ 0 ];
+					room.remove( cube );
+
+					cube.position.copy( selectedController.controllerPosition );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
+					cube.userData.velocity.applyQuaternion( selectedController.controllerQuaternion );
+					room.add( cube );
+
+				}
+
+				// Keep cubes inside room
+
+				for ( let i = 0; i < room.children.length; i ++ ) {
+
+					const cube = room.children[ i ];
+
+					cube.userData.velocity.multiplyScalar( 1 - ( 0.001 * delta ) );
+
+					cube.position.add( cube.userData.velocity );
+
+					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
+
+						cube.position.x = THREE.MathUtils.clamp( cube.position.x, - 3, 3 );
+						cube.userData.velocity.x = - cube.userData.velocity.x;
+
+					}
+
+					if ( cube.position.y < 0 || cube.position.y > 6 ) {
+
+						cube.position.y = THREE.MathUtils.clamp( cube.position.y, 0, 6 );
+						cube.userData.velocity.y = - cube.userData.velocity.y;
+
+					}
+
+					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
+
+						cube.position.z = THREE.MathUtils.clamp( cube.position.z, - 3, 3 );
+						cube.userData.velocity.z = - cube.userData.velocity.z;
+
+					}
+
+					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
+					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
+					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
