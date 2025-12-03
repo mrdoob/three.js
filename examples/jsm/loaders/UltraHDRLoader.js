@@ -542,11 +542,11 @@ class UltraHDRLoader extends Loader {
 
 				if ( this.type === HalfFloatType ) {
 
-					hdrBuffer = new Uint16Array( sdrImageData.data.length ).fill( 23544 );
+					hdrBuffer = new Uint16Array( sdrImageData.data.length ).fill( 15360 );
 
 				} else {
 
-					hdrBuffer = new Float32Array( sdrImageData.data.length ).fill( 255 );
+					hdrBuffer = new Float32Array( sdrImageData.data.length ).fill( 1.0 );
 
 				}
 
