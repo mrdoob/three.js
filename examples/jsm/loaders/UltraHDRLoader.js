@@ -442,19 +442,22 @@ class UltraHDRLoader extends Loader {
 
 	_srgbToLinear( value ) {
 
-		if ( value / 255 < 0.04045 ) {
+		// 0.04045 * 255 = 10.31475
+		if ( value < 10.31475 ) {
 
-			return ( value / 255 ) * 0.0773993808;
+			// (1/255) * 0.0773993808
+			return value * 0.000303527;
 
 		}
 
 		if ( value < 1024 ) {
 
-			return SRGB_TO_LINEAR[ ~ ~ value ];
+			return SRGB_TO_LINEAR[ value | 0 ];
 
 		}
 
-		return Math.pow( ( value / 255 ) * 0.9478672986 + 0.0521327014, 2.4 );
+		// (1/255) * 0.9478672986 = 0.003717127
+		return Math.pow( value * 0.003717127 + 0.0521327014, 2.4 );
 
 	}
 
@@ -552,6 +555,7 @@ class UltraHDRLoader extends Loader {
 				const useGammaOne = xmpMetadata.gamma === 1.0;
 				const isHalfFloat = this.type === HalfFloatType;
 				const toHalfFloat = DataUtils.toHalfFloat;
+				const srgbToLinear = this._srgbToLinear;
 
 				const hdrBuffer = isHalfFloat
 					? new Uint16Array( dataLength ).fill( 15360 )
@@ -579,7 +583,7 @@ class UltraHDRLoader extends Loader {
 							offsetHDR;
 
 						const linearHDRValue = Math.min(
-							Math.max( this._srgbToLinear( hdrValue ), 0 ),
+							Math.max( srgbToLinear( hdrValue ), 0 ),
 							65504
 						);
 
@@ -594,11 +598,9 @@ class UltraHDRLoader extends Loader {
 				onSuccess( hdrBuffer, sdrWidth, sdrHeight );
 
 			} )
-			.catch( () => {
+			.catch( ( e ) => {
 
-				throw new Error(
-					'THREE.UltraHDRLoader Error: Could not parse UltraHDR images'
-				);
+				onError( e );
 
 			} );
 
