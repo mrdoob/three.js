@@ -748,7 +748,7 @@ class Matrix4 {
 	 * @param {number|Vector3|Vector4} x The x component of the vector or alternatively the vector object.
 	 * @param {number} y - The y component of the vector.
 	 * @param {number} z - The z component of the vector.
-	 * @param {number} w - The w component of the vector.  If not provided, this final element of the column will not be modified.
+	 * @param {number} w - The w component of the vector.  If not provided, the final element of the column will not be modified.
 	 * @returns {Matrix4} - A reference to this matrix.
 	 */
 	setColumn( index, x, y, z, w ) {
