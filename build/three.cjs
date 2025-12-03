@@ -66100,6 +66100,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	const _customShaders = new WebGLShaderCache();
 	const _activeChannels = new Set();
 	const programs = [];
+	const programsMap = new Map();
 
 	const logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
 
@@ -66676,28 +66677,18 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	function acquireProgram( parameters, cacheKey ) {
 
-		let program;
+		let program = programsMap.get( cacheKey );
 
-		// Check if code has been already compiled
-		for ( let p = 0, pl = programs.length; p < pl; p ++ ) {
+		if ( program !== undefined ) {
 
-			const preexistingProgram = programs[ p ];
+			++ program.usedTimes;
 
-			if ( preexistingProgram.cacheKey === cacheKey ) {
-
-				program = preexistingProgram;
-				++ program.usedTimes;
-
-				break;
-
-			}
-
-		}
-
-		if ( program === undefined ) {
+		} else {
 
 			program = new WebGLProgram( renderer, cacheKey, parameters, bindingStates );
 			programs.push( program );
+
+			programsMap.set( cacheKey, program );
 
 		}
 
@@ -66713,6 +66704,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			const i = programs.indexOf( program );
 			programs[ i ] = programs[ programs.length - 1 ];
 			programs.pop();
+
+			// Remove from map
+			programsMap.delete( program.cacheKey );
 
 			// Free WebGL resources
 			program.destroy();
