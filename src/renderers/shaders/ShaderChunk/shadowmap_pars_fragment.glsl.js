@@ -104,7 +104,7 @@ export default /* glsl */`
 		vec2 vogelDiskSample( int sampleIndex, int samplesCount, float phi ) {
 
 			const float goldenAngle = 2.399963229728653;
-			float r = sqrt( float( sampleIndex ) + 0.5 ) / sqrt( float( samplesCount ) );
+			float r = sqrt( ( float( sampleIndex ) + 0.5 ) / float( samplesCount ) );
 			float theta = float( sampleIndex ) * goldenAngle + phi;
 			return vec2( cos( theta ), sin( theta ) ) * r;
 

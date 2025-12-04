@@ -61,6 +61,16 @@ class HemisphereLight extends Light {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.groundColor = this.groundColor.getHex();
+
+		return data;
+
+	}
+
 }
 
 export { HemisphereLight };

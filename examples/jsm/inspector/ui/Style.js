@@ -879,7 +879,14 @@ export class Style {
 	border-bottom: none;
 	user-select: none;
 	-webkit-user-select: none;
+}
+
+.parameters .list-item-row {
 	min-height: 31px;
+}
+
+.mini-panel-content .parameters .list-item-row {
+	min-height: 21px;
 }
 
 .list-item-wrapper {
@@ -1178,6 +1185,7 @@ export class Style {
 	align-items: center;
 	cursor: pointer;
 	gap: 8px;
+	will-change: transform;
 }
 
 .custom-checkbox input {
@@ -1187,7 +1195,7 @@ export class Style {
 .custom-checkbox .checkmark {
 	width: 14px;
 	height: 14px;
-	border: 1px solid var(--profiler-border);
+	border: 1px solid var(--accent-color);
 	border-radius: 3px;
 	display: inline-flex;
 	justify-content: center;
@@ -1197,8 +1205,8 @@ export class Style {
 
 .custom-checkbox .checkmark::after {
 	content: '';
-	width: 8px;
-	height: 8px;
+	width: 6px;
+	height: 6px;
 	background-color: var(--accent-color);
 	border-radius: 1px;
 	display: block;
@@ -1270,6 +1278,7 @@ export class Style {
 .mini-panel-content .param-control select,
 .mini-panel-content .param-control button {
 	background-color: #1e1e24c2;
+	line-height: 1.0;
 }
 
 .mini-panel-content .param-control select {
@@ -1297,11 +1306,7 @@ export class Style {
 	width: 12px;
 	height: 12px;
 	margin-bottom: 2px;
-}
-
-.mini-panel-content .custom-checkbox .checkmark::after {
-	width: 8px;
-	height: 8px;
+	will-change: transform;
 }
 
 .mini-panel-content .list-container.parameters .list-item-row:not(.collapsible) {

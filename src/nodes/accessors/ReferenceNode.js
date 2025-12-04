@@ -9,7 +9,7 @@ import { uniformArray } from './UniformArrayNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import { warn } from '../../utils.js';
 
-// TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
+// TODO: Avoid duplicated code and use only ReferenceBaseNode or ReferenceNode
 
 /**
  * This class is only relevant if the referenced property is array-like.

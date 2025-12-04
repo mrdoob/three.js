@@ -139,7 +139,7 @@ export const interleavedGradientNoise = Fn( ( [ position ] ) => {
 export const vogelDiskSample = Fn( ( [ sampleIndex, samplesCount, phi ] ) => {
 
 	const goldenAngle = float( 2.399963229728653 ); // 2π * (2 - φ) where φ is golden ratio
-	const r = sqrt( float( sampleIndex ).add( 0.5 ) ).div( sqrt( float( samplesCount ) ) );
+	const r = sqrt( float( sampleIndex ).add( 0.5 ).div( float( samplesCount ) ) );
 	const theta = float( sampleIndex ).mul( goldenAngle ).add( phi );
 	return vec2( cos( theta ), sin( theta ) ).mul( r );
 

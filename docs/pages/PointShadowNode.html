@@ -94,6 +94,35 @@ rendering code.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowNode.html#renderShadow">ShadowNode#renderShadow</a></dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="setupRenderTarget" translate="no">.<a href="#setupRenderTarget">setupRenderTarget</a><span class="signature">( shadow : <span class="param-type"><a href="LightShadow.html">LightShadow</a></span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation to create a CubeRenderTarget with CubeDepthTexture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shadow</strong>
+									</td>
+									<td class="description last">
+										<p>The light shadow object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object containing the shadow map and depth texture.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="setupShadowCoord" translate="no">.<a href="#setupShadowCoord">setupShadowCoord</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, shadowPosition : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -160,18 +189,10 @@ shadow filter functions.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong>shadowTexture</strong>
-									</td>
-									<td class="description last">
-										<p>A reference to the shadow map's texture.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
 										<strong>depthTexture</strong>
 									</td>
 									<td class="description last">
-										<p>A reference to the shadow map's texture data.</p>
+										<p>A reference to the shadow map's depth texture.</p>
 									</td>
 								</tr>
 								<tr>

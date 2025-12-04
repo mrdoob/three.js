@@ -1876,7 +1876,7 @@ class WebGLRenderer {
 					generateMipmaps: true,
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
-					samples: 4,
+					samples: capabilities.samples,
 					stencilBuffer: stencil,
 					resolveDepthBuffer: false,
 					resolveStencilBuffer: false,
@@ -3490,7 +3490,6 @@ class WebGLRenderer {
  * @property {string} precision - The shader precision currently being used by the renderer.
  * @property {boolean} reversedDepthBuffer - `true` if `reversedDepthBuffer` was set to `true` in the constructor
  * and the rendering context supports `EXT_clip_control`.
- * @property {boolean} vertexTextures - `true` if vertex textures can be used.
  **/
 
 /**

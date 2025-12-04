@@ -1,5 +1,5 @@
 import BRDF_GGX from './BRDF_GGX.js';
-import DFGApprox from './DFGApprox.js';
+import DFGLUT from './DFGLUT.js';
 import { normalView } from '../../accessors/Normal.js';
 import { positionViewDirection } from '../../accessors/Position.js';
 import { EPSILON } from '../../math/MathNode.js';
@@ -19,8 +19,8 @@ const BRDF_GGX_Multiscatter = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, rou
 	const dotNV = normalView.dot( positionViewDirection ).clamp();
 
 	// Precomputed DFG values for view and light directions
-	const dfgV = DFGApprox( { roughness: _roughness, dotNV } );
-	const dfgL = DFGApprox( { roughness: _roughness, dotNV: dotNL } );
+	const dfgV = DFGLUT( { roughness: _roughness, dotNV } );
+	const dfgL = DFGLUT( { roughness: _roughness, dotNV: dotNL } );
 
 	// Single-scattering energy for view and light
 	const FssEss_V = f0.mul( dfgV.x ).add( f90.mul( dfgV.y ) );

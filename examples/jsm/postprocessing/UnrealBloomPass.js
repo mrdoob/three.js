@@ -56,7 +56,7 @@ class UnrealBloomPass extends Pass {
 		this.strength = strength;
 
 		/**
-		 * The Bloom radius.
+		 * The Bloom radius. Must be in the range `[0,1]`.
 		 *
 		 * @type {number}
 		 */

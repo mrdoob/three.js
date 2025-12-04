@@ -4,7 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
-// TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
+// TODO: Avoid duplicated code and use only ReferenceBaseNode or ReferenceNode
 
 /**
  * This class is only relevant if the referenced property is array-like.

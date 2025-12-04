@@ -38,7 +38,7 @@ class PointLightHelper extends Mesh {
 		/**
 		 * The light being visualized.
 		 *
-		 * @type {HemisphereLight}
+		 * @type {PointLight}
 		 */
 		this.light = light;
 
