@@ -516,7 +516,11 @@ class Texture extends EventDispatcher {
 	 */
 	setValues( values ) {
 
+	    if ( values === undefined || values === null || typeof values !== 'object' ) return;
+
 		for ( const key in values ) {
+			// Skip prototype properties and dangerous keys
+			if ( !values.hasOwnProperty( key ) || key === '__proto__' || key === 'constructor' ) continue;
 
 			const newValue = values[ key ];
 
