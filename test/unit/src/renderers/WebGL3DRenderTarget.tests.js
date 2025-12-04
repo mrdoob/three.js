@@ -32,23 +32,34 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'depth', ( assert ) => {
+		QUnit.test( 'depth', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const target = new WebGL3DRenderTarget( 4, 2, 8 );
+
+			assert.strictEqual( target.depth, 8, 'WebGL3DRenderTarget.depth should match the constructor argument.' );
 
 		} );
 
-		QUnit.todo( 'texture', ( assert ) => {
+		QUnit.test( 'texture', ( assert ) => {
 
-			// must be Data3DTexture
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const width = 4;
+			const height = 2;
+			const depth = 8;
+			const target = new WebGL3DRenderTarget( width, height, depth );
+
+			assert.ok( target.texture.isData3DTexture, 'texture is a Data3DTexture.' );
+			assert.strictEqual( target.texture.image.width, width, 'texture width matches the render target width.' );
+			assert.strictEqual( target.texture.image.height, height, 'texture height matches the render target height.' );
+			assert.strictEqual( target.texture.image.depth, depth, 'texture depth matches the render target depth.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isWebGL3DRenderTarget', ( assert ) => {
+		QUnit.test( 'isWebGL3DRenderTarget', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const target = new WebGL3DRenderTarget();
+
+			assert.ok( target.isWebGL3DRenderTarget, 'isWebGL3DRenderTarget should be true.' );
 
 		} );
 

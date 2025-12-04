@@ -2,6 +2,7 @@
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Sprite } from '../../../../src/objects/Sprite.js';
+import { SpriteMaterial } from '../../../../src/materials/SpriteMaterial.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -37,21 +38,32 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'geometry', ( assert ) => {
+		QUnit.test( 'geometry', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const sprite = new Sprite();
+
+			assert.ok( sprite.geometry, 'Sprite has a geometry instance.' );
+			assert.ok( sprite.geometry.isBufferGeometry, 'geometry is a BufferGeometry.' );
+			assert.ok( sprite.geometry.getAttribute( 'position' ), 'geometry has a position attribute.' );
+			assert.ok( sprite.geometry.getAttribute( 'uv' ), 'geometry has a uv attribute.' );
 
 		} );
 
-		QUnit.todo( 'material', ( assert ) => {
+		QUnit.test( 'material', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const material = new SpriteMaterial();
+			const sprite = new Sprite( material );
+
+			assert.strictEqual( sprite.material, material, 'Sprite.material should reference the material passed to the constructor.' );
 
 		} );
 
-		QUnit.todo( 'center', ( assert ) => {
+		QUnit.test( 'center', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const sprite = new Sprite();
+
+			assert.strictEqual( sprite.center.x, 0.5, 'Sprite.center.x defaults to 0.5.' );
+			assert.strictEqual( sprite.center.y, 0.5, 'Sprite.center.y defaults to 0.5.' );
 
 		} );
 
@@ -72,9 +84,18 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const material = new SpriteMaterial();
+			const source = new Sprite( material );
+			source.center.set( 0.25, 0.75 );
+
+			const target = new Sprite();
+			target.copy( source );
+
+			assert.strictEqual( target.material, source.material, 'copy() should copy the material reference.' );
+			assert.strictEqual( target.center.x, source.center.x, 'copy() should copy the center x component.' );
+			assert.strictEqual( target.center.y, source.center.y, 'copy() should copy the center y component.' );
 
 		} );
 

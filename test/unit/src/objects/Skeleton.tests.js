@@ -1,6 +1,8 @@
 /* global QUnit */
 
 import { Skeleton } from '../../../../src/objects/Skeleton.js';
+import { Bone } from '../../../../src/objects/Bone.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -15,33 +17,59 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'uuid', ( assert ) => {
+		QUnit.test( 'uuid', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const skeleton = new Skeleton();
 
-		} );
-
-		QUnit.todo( 'bones', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.ok( typeof skeleton.uuid === 'string' && skeleton.uuid.length > 0, 'uuid is a non-empty string.' );
 
 		} );
 
-		QUnit.todo( 'boneInverses', ( assert ) => {
+		QUnit.test( 'bones', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const bones = [ new Bone(), new Bone() ];
+			const skeleton = new Skeleton( bones );
+
+			assert.strictEqual( skeleton.bones.length, bones.length, 'bones length matches constructor argument.' );
+			assert.strictEqual( skeleton.bones[ 0 ], bones[ 0 ], 'first bone is preserved.' );
+			assert.notStrictEqual( skeleton.bones, bones, 'bones array is cloned, not reused.' );
 
 		} );
 
-		QUnit.todo( 'boneMatrices', ( assert ) => {
+		QUnit.test( 'boneInverses', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const bones = [ new Bone(), new Bone() ];
+			const skeleton = new Skeleton( bones );
+
+			assert.strictEqual( skeleton.boneInverses.length, bones.length, 'boneInverses has one entry per bone.' );
+			skeleton.boneInverses.forEach( ( inverse ) => {
+
+				assert.ok( inverse instanceof Matrix4, 'boneInverse entry is a Matrix4.' );
+
+			} );
 
 		} );
 
-		QUnit.todo( 'boneTexture', ( assert ) => {
+		QUnit.test( 'boneMatrices', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const bones = [ new Bone(), new Bone(), new Bone() ];
+			const skeleton = new Skeleton( bones );
+
+			assert.ok( skeleton.boneMatrices instanceof Float32Array, 'boneMatrices is a Float32Array.' );
+			assert.strictEqual( skeleton.boneMatrices.length, bones.length * 16, 'boneMatrices has 16 floats per bone.' );
+
+		} );
+
+		QUnit.test( 'boneTexture', ( assert ) => {
+
+			const bones = [ new Bone(), new Bone() ];
+			const skeleton = new Skeleton( bones );
+
+			assert.strictEqual( skeleton.boneTexture, null, 'boneTexture is null before computeBoneTexture().' );
+
+			skeleton.computeBoneTexture();
+
+			assert.ok( skeleton.boneTexture && skeleton.boneTexture.isDataTexture, 'boneTexture is a DataTexture after computeBoneTexture().' );
 
 		} );
 
@@ -52,15 +80,14 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'init', ( assert ) => {
+		QUnit.test( 'init / calculateInverses', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const bone = new Bone();
+			bone.updateMatrixWorld( true );
 
-		} );
+			const skeleton = new Skeleton( [ bone ] );
 
-		QUnit.todo( 'calculateInverses', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.strictEqual( skeleton.boneInverses.length, 1, 'calculateInverses() created one inverse matrix.' );
 
 		} );
 
@@ -76,21 +103,43 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.test( 'clone', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const bones = [ new Bone(), new Bone() ];
+			const skeleton = new Skeleton( bones );
+
+			const clone = skeleton.clone();
+
+			assert.notStrictEqual( clone, skeleton, 'clone() creates a new Skeleton instance.' );
+			assert.deepEqual( clone.bones, skeleton.bones, 'clone() reuses the same bones.' );
+			assert.deepEqual( clone.boneInverses, skeleton.boneInverses, 'clone() reuses boneInverses.' );
 
 		} );
 
-		QUnit.todo( 'computeBoneTexture', ( assert ) => {
+		QUnit.test( 'computeBoneTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const bones = [ new Bone(), new Bone() ];
+			const skeleton = new Skeleton( bones );
+			const originalLength = skeleton.boneMatrices.length;
+
+			skeleton.computeBoneTexture();
+
+			assert.ok( skeleton.boneMatrices.length >= originalLength, 'computeBoneTexture() expands boneMatrices buffer as needed.' );
+			assert.ok( skeleton.boneTexture && skeleton.boneTexture.isDataTexture, 'computeBoneTexture() creates a DataTexture.' );
 
 		} );
 
-		QUnit.todo( 'getBoneByName', ( assert ) => {
+		QUnit.test( 'getBoneByName', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const boneA = new Bone();
+			boneA.name = 'a';
+			const boneB = new Bone();
+			boneB.name = 'b';
+
+			const skeleton = new Skeleton( [ boneA, boneB ] );
+
+			assert.strictEqual( skeleton.getBoneByName( 'b' ), boneB, 'getBoneByName() returns the matching bone.' );
+			assert.strictEqual( skeleton.getBoneByName( 'missing' ), undefined, 'getBoneByName() returns undefined if no bone matches.' );
 
 		} );
 
@@ -103,15 +152,27 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'fromJSON', ( assert ) => {
+		QUnit.test( 'fromJSON / toJSON', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const boneA = new Bone();
+			const boneB = new Bone();
 
-		} );
+			const skeleton = new Skeleton( [ boneA, boneB ] );
+			skeleton.calculateInverses();
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+			const json = skeleton.toJSON();
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const bonesMap = {};
+			bonesMap[ boneA.uuid ] = boneA;
+			bonesMap[ boneB.uuid ] = boneB;
+
+			const restored = new Skeleton().fromJSON( json, bonesMap );
+
+			assert.strictEqual( restored.uuid, skeleton.uuid, 'fromJSON() restores uuid.' );
+			assert.strictEqual( restored.bones.length, skeleton.bones.length, 'fromJSON() restores bones length.' );
+			assert.strictEqual( restored.bones[ 0 ], boneA, 'fromJSON() restores bone references.' );
+			assert.strictEqual( restored.bones[ 1 ], boneB, 'fromJSON() restores bone references.' );
+			assert.strictEqual( restored.boneInverses.length, skeleton.boneInverses.length, 'fromJSON() restores boneInverses length.' );
 
 		} );
 

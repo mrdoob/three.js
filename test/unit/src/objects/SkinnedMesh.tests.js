@@ -3,7 +3,12 @@
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';
-import { AttachedBindMode } from '../../../../src/constants.js';
+import { AttachedBindMode, DetachedBindMode } from '../../../../src/constants.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Box3 } from '../../../../src/math/Box3.js';
+import { Sphere } from '../../../../src/math/Sphere.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Skeleton } from '../../../../src/objects/Skeleton.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -41,22 +46,31 @@ export default QUnit.module( 'Objects', () => {
 		QUnit.test( 'bindMode', ( assert ) => {
 
 			const object = new SkinnedMesh();
-			assert.ok(
-				object.bindMode === AttachedBindMode,
+			assert.strictEqual(
+				object.bindMode,
+				AttachedBindMode,
 				'SkinnedMesh.bindMode should be AttachedBindMode'
 			);
 
 		} );
 
-		QUnit.todo( 'bindMatrix', ( assert ) => {
+		QUnit.test( 'bindMatrix', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new SkinnedMesh();
+			const identity = new Matrix4();
+
+			assert.ok( object.bindMatrix instanceof Matrix4, 'bindMatrix is a Matrix4.' );
+			assert.deepEqual( object.bindMatrix, identity, 'bindMatrix is identity by default.' );
 
 		} );
 
-		QUnit.todo( 'bindMatrixInverse', ( assert ) => {
+		QUnit.test( 'bindMatrixInverse', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new SkinnedMesh();
+			const identity = new Matrix4();
+
+			assert.ok( object.bindMatrixInverse instanceof Matrix4, 'bindMatrixInverse is a Matrix4.' );
+			assert.deepEqual( object.bindMatrixInverse, identity, 'bindMatrixInverse is identity by default.' );
 
 		} );
 
@@ -71,9 +85,28 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const source = new SkinnedMesh();
+			const skeleton = new Skeleton();
+
+			source.bindMode = DetachedBindMode;
+			source.bindMatrix.makeTranslation( 1, 2, 3 );
+			source.bindMatrixInverse.copy( source.bindMatrix ).invert();
+
+			source.skeleton = skeleton;
+			source.boundingBox = new Box3( new Vector3( - 1, - 2, - 3 ), new Vector3( 1, 2, 3 ) );
+			source.boundingSphere = new Sphere( new Vector3( 1, 2, 3 ), 5 );
+
+			const target = new SkinnedMesh();
+			target.copy( source );
+
+			assert.strictEqual( target.bindMode, source.bindMode, 'copy() should copy bindMode.' );
+			assert.deepEqual( target.bindMatrix, source.bindMatrix, 'copy() should copy bindMatrix.' );
+			assert.deepEqual( target.bindMatrixInverse, source.bindMatrixInverse, 'copy() should copy bindMatrixInverse.' );
+			assert.strictEqual( target.skeleton, skeleton, 'copy() should copy skeleton reference.' );
+			assert.deepEqual( target.boundingBox, source.boundingBox, 'copy() should clone boundingBox.' );
+			assert.deepEqual( target.boundingSphere, source.boundingSphere, 'copy() should clone boundingSphere.' );
 
 		} );
 
