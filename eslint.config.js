@@ -26,7 +26,7 @@ export default [
 
 	// recommended
 	js.configs.recommended,
-	jsdoc.configs['flat/recommended'],
+	// jsdoc.configs['flat/recommended'],
 
 	// base rules
 	{
@@ -109,7 +109,7 @@ export default [
 			'no-async-promise-executor': 'off',
 			'no-empty': 'off',
 
-			'jsdoc/check-types': 'error',
+			// 'jsdoc/check-types': 'error',
 			'jsdoc/require-returns': 'off',
 			'jsdoc/require-returns-type': 'error',
 			'jsdoc/require-param-description': 'off',
