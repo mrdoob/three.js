@@ -44,7 +44,7 @@ class Vector3 {
 		 * @readonly
 		 * @default true
 		 */
-		Vector3.prototype.isVector3 = true;
+		this.isVector3 = true;
 
 		/**
 		 * The x value of this vector.
