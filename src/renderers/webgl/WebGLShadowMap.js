@@ -1,4 +1,4 @@
-import { FrontSide, BackSide, DoubleSide, NearestFilter, LinearFilter, PCFShadowMap, VSMShadowMap, NoBlending, LessEqualCompare, GreaterEqualCompare, DepthFormat, UnsignedIntType, RGFormat, HalfFloatType, PCFSoftShadowMap, IdentityDepthPacking } from '../../constants.js';
+import { FrontSide, BackSide, DoubleSide, NearestFilter, LinearFilter, PCFShadowMap, VSMShadowMap, NoBlending, LessEqualCompare, GreaterEqualCompare, DepthFormat, UnsignedIntType, RGFormat, HalfFloatType, FloatType, PCFSoftShadowMap } from '../../constants.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebGLCubeRenderTarget } from '../WebGLCubeRenderTarget.js';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
@@ -26,7 +26,6 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		_viewport = new Vector4(),
 
 		_depthMaterial = new MeshDepthMaterial(),
-		_depthMaterialVSM = new MeshDepthMaterial( { depthPacking: IdentityDepthPacking } ),
 		_distanceMaterial = new MeshDistanceMaterial(),
 
 		_materialCache = {},
@@ -215,6 +214,14 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 					} );
 					shadow.map.texture.name = light.name + '.shadowMap';
 
+					// Native depth texture for VSM - depth is captured here, then blurred into the color texture
+					shadow.map.depthTexture = new DepthTexture( _shadowMapSize.x, _shadowMapSize.y, FloatType );
+					shadow.map.depthTexture.name = light.name + '.shadowMapDepth';
+					shadow.map.depthTexture.format = DepthFormat;
+					shadow.map.depthTexture.compareFunction = null; // For regular sampling (not shadow comparison)
+					shadow.map.depthTexture.minFilter = NearestFilter;
+					shadow.map.depthTexture.magFilter = NearestFilter;
+
 				} else {
 
 					if ( light.isPointLight ) {
@@ -339,9 +346,9 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		}
 
-		// vertical pass
+		// vertical pass - read from native depth texture
 
-		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.texture;
+		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.depthTexture;
 		shadowMaterialVertical.uniforms.resolution.value = shadow.mapSize;
 		shadowMaterialVertical.uniforms.radius.value = shadow.radius;
 		renderer.setRenderTarget( shadow.mapPass );
@@ -371,15 +378,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		} else {
 
-			if ( type === VSMShadowMap ) {
-
-				result = _depthMaterialVSM;
-
-			} else {
-
-				result = ( light.isPointLight === true ) ? _distanceMaterial : _depthMaterial;
-
-			}
+			result = ( light.isPointLight === true ) ? _distanceMaterial : _depthMaterial;
 
 			if ( ( renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
 				( material.displacementMap && material.displacementScale !== 0 ) ||

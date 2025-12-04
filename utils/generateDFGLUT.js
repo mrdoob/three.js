@@ -297,7 +297,7 @@ ${rows.join( ',\n' )}
 
 let lut = null;
 
-const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
+const DFG = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 	if ( lut === null ) {
 
@@ -318,14 +318,14 @@ const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 } );
 
-export default DFGApprox;
+export default DFG;
 `;
 
 	fs.writeFileSync( './src/renderers/shaders/DFGLUTData.js', webgl );
 	console.log( 'Saved WebGL version to ./src/renderers/shaders/DFGLUTData.js' );
 
-	fs.writeFileSync( './src/nodes/functions/BSDF/DFGApprox.js', webgpu );
-	console.log( 'Saved WebGPU version to ./src/nodes/functions/BSDF/DFGApprox.js' );
+	fs.writeFileSync( './src/nodes/functions/BSDF/DFG.js', webgpu );
+	console.log( 'Saved WebGPU version to ./src/nodes/functions/BSDF/DFG.js' );
 
 }
 

@@ -35,6 +35,7 @@ const exceptionList = [
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
 	'webgpu_reflection',
+	'webgpu_test_memory',
 	'webgpu_texturegrad',
 	'webgpu_tsl_vfx_flames',
 

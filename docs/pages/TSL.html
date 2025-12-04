@@ -2734,6 +2734,68 @@ kernels won't perform well. Use Gaussian instead if you need a more high-quality
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="builtinAOContext" translate="no">.<a href="#builtinAOContext">builtinAOContext</a><span class="signature">( aoNode : <span class="param-type"><a href="Node.html">Node</a></span>, node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for defining a built-in ambient occlusion context for a given node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aoNode</strong>
+									</td>
+									<td class="description last">
+										<p>The ambient occlusion value node to apply.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node whose context should be modified.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="builtinShadowContext" translate="no">.<a href="#builtinShadowContext">builtinShadowContext</a><span class="signature">( shadowNode : <span class="param-type"><a href="ShadowNode.html">ShadowNode</a></span>, light : <span class="param-type"><a href="Light.html">Light</a></span>, node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for defining a built-in shadow context for a given node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shadowNode</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow node representing the light's shadow.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The light associated with the shadow.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node whose context should be modified.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="bumpMap" translate="no">.<a href="#bumpMap">bumpMap</a><span class="signature">( textureNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, scaleNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="BumpMapNode.html">BumpMapNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -11723,6 +11785,46 @@ which is incorrect.</p>
 								</tr>
 							</tbody>
 						</table>
+					</div>
+					<h3 class="name name-method" id="vogelDiskSample" translate="no">.<a href="#vogelDiskSample">vogelDiskSample</a><span class="signature">( sampleIndex : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>, samplesCount : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>, phi : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Vogel disk sampling for uniform circular distribution.</p>
+<p>This function generates sample points distributed uniformly on a disk using the golden angle,
+resulting in an efficient low-discrepancy sequence for sampling. The rotation parameter (phi)
+allows randomizing the pattern per-pixel when combined with IGN.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sampleIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the current sample (0-based).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>samplesCount</strong>
+									</td>
+									<td class="description last">
+										<p>The total number of samples.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>phi</strong>
+									</td>
+									<td class="description last">
+										<p>Rotation angle in radians (typically from IGN * 2π).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A 2D point on the unit disk.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="wgsl" translate="no">.<a href="#wgsl">wgsl</a><span class="signature">( src : <span class="param-type">string</span>, includes : <span class="param-type">Array.&lt;<a href="Node.html">Node</a>></span> )</span><span class="type-signature"> : <a href="CodeNode.html">CodeNode</a></span> </h3>
 					<div class="method">

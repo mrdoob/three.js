@@ -88,12 +88,6 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.todo( 'vertexTextures', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 			QUnit.todo( 'floatFragmentTextures', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );

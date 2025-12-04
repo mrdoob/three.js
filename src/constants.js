@@ -1255,14 +1255,6 @@ export const RGBDepthPacking = 3202;
 export const RGDepthPacking = 3203;
 
 /**
- * The depth value is not packed.
- *
- * @type {number}
- * @constant
- */
-export const IdentityDepthPacking = 3204;
-
-/**
  * Normal information is relative to the underlying surface.
  *
  * @type {number}
