@@ -84,7 +84,6 @@ export default [
 				},
 				tagNamePreference: {
 					returns: 'return',
-					augments: 'augments',
 					extends: 'augments'
 				},
 			},
