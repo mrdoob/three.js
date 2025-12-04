@@ -410,9 +410,9 @@ class Material extends EventDispatcher {
 		 * Whether to premultiply the alpha (transparency) value.
 		 *
 		 * @type {boolean}
-		 * @default false
+		 * @default true
 		 */
-		this.premultipliedAlpha = false;
+		this.premultipliedAlpha = true;
 
 		/**
 		 * Whether double-sided, transparent objects should be rendered with a single pass or not.
