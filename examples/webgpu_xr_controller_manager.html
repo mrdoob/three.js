@@ -9,13 +9,13 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - interactive cubes
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - controller manager
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
+					"three": "../build/three.module.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/"
@@ -25,16 +25,16 @@
 
 		<script type="module">
 
-			import * as THREE from 'three/webgpu';
+			import * as THREE from 'three';
 
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
-			import { XRControllerManager } from 'three/addons/webxr/RControllerManager';
+			import { XRControllerManager } from 'three/addons/webxr/XRControllerManager.js';
 
 			const clock = new THREE.Clock();
 
 			let container, selectedController;
-			let camera, scene, raycaster, renderer;
+			let camera, scene, renderer;
 
 			let room;
 
@@ -95,7 +95,8 @@
 				}
 
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType, multiview: true } );
+				//renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType, multiview: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -125,13 +126,14 @@
 					'selectend',
 					'hovered',
 					'hoverout',
-					'move',
+					//'move',
 					'pressed',
 					'pressedend',
 					'movechanged',
 					'hand-connected',
 					'pinchstart',
-					'pinchend'
+					'pinchend',
+					'grip-reconnected'
 				];
 
 				[ 0, 1 ].forEach( ( index ) => {
@@ -148,9 +150,11 @@
 
 					} );
 
-					controller.addEventListener( 'selected', () => {
+					controller.addEventListener( 'selected', ( event ) => {
 
 						selectedController = controller;
+
+						console.log( event );
 			
 					} );
 
@@ -160,9 +164,11 @@
 
 					} );
 
-					controller.addEventListener( 'selectend', () => {
+					controller.addEventListener( 'selectend', ( event ) => {
 			
 						selectedController = null;
+
+						console.log( event );
 
 					} );
 
@@ -199,7 +205,11 @@
 
 				//
 
-				document.body.appendChild( XRButton.createButton( renderer ) );
+				const sessionInit = {
+					optionalFeatures: [ 'hand-tracking' ]
+				};
+
+				document.body.appendChild( XRButton.createButton( renderer, sessionInit ) );
 
 			}
 

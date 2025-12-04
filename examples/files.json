@@ -487,7 +487,8 @@
 		"webgpu_xr_rollercoaster",
 		"webgpu_xr_cubes",
 		"webgpu_xr_native_layers",
-		"webgpu_xr_gamepad"
+		"webgpu_xr_gamepad",
+		"webgpu_xr_controller_manager"
 	],
 	"webaudio": [
 		"webaudio_orientation",

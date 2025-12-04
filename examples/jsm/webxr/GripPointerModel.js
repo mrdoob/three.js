@@ -15,6 +15,7 @@ import {
 
 
 const POINTER_COLOR = 0xffffff;
+const POINTER_ACTIVE_COLOR = 0x0081FB;
 const POINTER_LINE_DISTANCE = 1.0;
 
 const CURSOR_RADIUS = 0.02;
@@ -33,8 +34,17 @@ class GripPointerModel extends Object3D {
 	 * Constructs a new Grip pointer model.
 	 *
 	 * @param {Group} controller - The WebXR controller in target ray space.
+	 * @param {number} lineDistance - The default line distance.
+	 * @param {number} lineColor = The default line color.
+	 * @param {number} activeLineColor = The active line color.
+	 * @param {number} cursorDistance = The default cursor distance.
 	 */
-	constructor( controller ) {
+	constructor( controller,
+		lineDistance = POINTER_LINE_DISTANCE,
+		lineColor = POINTER_COLOR,
+		activeLineColor = POINTER_ACTIVE_COLOR,
+		cursorDistance = CURSOR_MAX_DISTANCE
+	 ) {
 
 		super();
 
@@ -72,10 +82,17 @@ class GripPointerModel extends Object3D {
 		 */
 		this._raycaster = null;
 
+		this._lineColor = lineColor;
+		this._activeLineColor = activeLineColor;
+		this._lineDistance = lineDistance;
+		this._cursorDistance = cursorDistance;
+
 		this._onConnected = this._onConnected.bind( this );
 		this._onDisconnected = this._onDisconnected.bind( this );
 		this._controller.addEventListener( 'connected', this._onConnected );
 		this._controller.addEventListener( 'disconnected', this._onDisconnected );
+
+		this.createPointer();
 
 	}
 
@@ -137,8 +154,6 @@ class GripPointerModel extends Object3D {
 			pointerLine.geometry.attributes.color.array[ 2 ] = lineColor.b;
 			pointerLine.geometry.attributes.color.needsUpdate = true;
 
-			if ( ! this._active ) this._currentLineColor = lineColor;
-
 		}
 
 	}
@@ -151,7 +166,7 @@ class GripPointerModel extends Object3D {
 	set active( value ) {
 
 		this._active = value;
-		this.lineColor = value ? this._activeLineColor : this._currentLineColor;
+		this.lineColor = value ? this._activeLineColor : this._lineColor;
 
 	}
 
@@ -163,6 +178,7 @@ class GripPointerModel extends Object3D {
 	_onConnected( event ) {
 
 		const xrInputSource = event.data;
+
 		if ( ! xrInputSource.hand ) {
 
 			this.visible = true;
@@ -183,7 +199,7 @@ class GripPointerModel extends Object3D {
 		this.visible = false;
 		this.xrInputSource = null;
 
-		if ( this._pointerLine && this._pointerLine.material ) this.pointerLine.material.dispose();
+		if ( this._pointerLine && this._pointerLine.material ) this._pointerLine.material.dispose();
 		if ( this._pointerLine && this._pointerLine.geometry ) this._pointerLine.geometry.dispose();
 
 		this.clear();
@@ -201,13 +217,11 @@ class GripPointerModel extends Object3D {
 				linewidth: 8 } ),
 			pointerLine = this._pointerLine = new Line( new BufferGeometry(), lineMaterial ),
 			lineColor = new Color( POINTER_COLOR );
-		pointerLine.geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, - POINTER_LINE_DISTANCE ], 3 ) );
+		pointerLine.geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, - this._lineDistance ], 3 ) );
 		pointerLine.geometry.setAttribute( 'color', new Float32BufferAttribute( [ lineColor.r, lineColor.g, lineColor.b, 0, 0, 0 ], 3 ) );
-
 
 		pointerLine.name = 'line';
 		//pointerLine.visible = false;
-
 
 		this._pointerObject = new Object3D();
 		this._pointerObject.add( pointerLine );
@@ -221,6 +235,8 @@ class GripPointerModel extends Object3D {
 
 		this._cursorObject = new Mesh( cursorGeometry, cursorMaterial );
 		this._pointerObject.add( this._cursorObject );
+
+		this.setCursor(this._cursorDistance);
 
 		this.add( this._pointerObject );
 

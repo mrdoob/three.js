@@ -75,10 +75,19 @@ class XRIntersections extends EventDispatcher {
          */
 		this._onTransientPointerSelectEndRef = ( event ) => this._onTransientPointerSelectEnd( event );
 
+		/**
+         * The controller intersections on move events to capture hovering of objects.
+         *
+         * @private
+         * @param {Object} event
+         * @returns {void}
+         */
+		this._onIntersectionsRef = ( event ) => this._onIntersections( event );
+
 		//set the collisions list
 		this.collisions = collisions;
 
-		controller.addEventListener( 'connected', () => this.onControllerConnected() );
+		controller.addEventListener( 'connected', ( event ) => this._onControllerConnected( event ) );
 
 	}
 
@@ -114,6 +123,17 @@ class XRIntersections extends EventDispatcher {
 	}
 
 	/**
+	 * Set the current pointer model
+	 *
+	 * @param {Object3D} pointerModel - The current pointer model
+	 */
+	set currentPointer( pointerModel ) {
+
+		this._controller.userData.currentPointer = pointerModel;
+
+	}
+
+	/**
      * Get the selected object.
      * @param {Object} - The selected intersected object.
      */
@@ -140,16 +160,6 @@ class XRIntersections extends EventDispatcher {
 	get hasHand() {
 
 		return this._controller.userData.hasHand;
-
-	}
-
-	/**
-     * Set the controller has hand input.
-     * @param {boolean} hand - Has hand input or not.
-     */
-	set hasHand( hand ) {
-
-		this._controller.userData.hasHand = hand;
 
 	}
 
@@ -198,7 +208,8 @@ class XRIntersections extends EventDispatcher {
      */
 	_onControllerConnected( event ) {
 
-		const controller = event.target;
+		const controller = event.target,
+			data = event.data;
 
 		//transient-pointer controller is reconnecting.
 		if ( controller.userData.isTransientPointer ) {
@@ -208,15 +219,15 @@ class XRIntersections extends EventDispatcher {
 		}
 
 		//set has hand input.
-		this.hasHand = !! event.hand;
+		//this.hasHand = !! event.hand;
 
 
-		switch ( event.data.targetRayMode ) {
+		switch ( data.targetRayMode ) {
 
 			case 'tracked-pointer':
 
 				//set the grip pointer as the current pointer.
-				controller.userData.currentPointer = this._controller.userData.gripPointer;
+				this.currentPointer = controller.userData.gripPointer;
 				controller.addEventListener( 'selectstart', this._onControllerSelectRef );
 				controller.addEventListener( 'selectend', this._onControllerSelectEndRef );
 
@@ -224,9 +235,8 @@ class XRIntersections extends EventDispatcher {
 			case 'gaze':
 
 				//set the gaze pointer as the current pointer.
-				controller.userData.currentPointer = controller.userData.gazePointer;
+				this.currentPointer = controller.userData.gazePointer;
 				controller.userData.isGaze = true;
-				controller.addEventListener( 'move', this._onGazeIntersectionsRef );
 
 				break;
 			case 'transient-pointer':
@@ -247,10 +257,13 @@ class XRIntersections extends EventDispatcher {
 		controller.removeEventListener( 'move', this._onIntersectionsRef );
 		controller.addEventListener( 'move', this._onIntersectionsRef );
 
+		if ( this.hasHand ) {
 
-		if ( event.hand ) {
 			//hand controller
-		} else if ( this._controller.hand ) {
+			this.currentPointer = controller.userData.handPointer;
+
+		} else if ( this._controller.userData.hand ) {
+
 			//returning back to grip controller
 
 		}

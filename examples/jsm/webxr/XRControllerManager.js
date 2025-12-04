@@ -1,11 +1,11 @@
 import { EventDispatcher } from 'three';
-import { XRControllerModelFactory } from './XRControllerModelFactory';
-import { OculusHandModel } from './OculusHandModel';
-import { OculusHandPointerModel } from './OculusHandPointerModel';
-import { GripPointerModel } from './GripPointerModel';
-import { GazePointerModel } from './GazePointerModel';
-import { XRGamepad } from './XRGamepad';
-import { XRIntersections } from './XRintersections';
+import { XRControllerModelFactory } from './XRControllerModelFactory.js';
+import { OculusHandModel } from './OculusHandModel.js';
+import { OculusHandPointerModel } from './OculusHandPointerModel.js';
+import { GripPointerModel } from './GripPointerModel.js';
+import { GazePointerModel } from './GazePointerModel.js';
+import { XRGamepad } from './XRGamepad.js';
+import { XRIntersections } from './XRintersections.js';
 
 /**
  * This class provides a common XR controller manager for grip, hand, transient-pointer and gaze target ray controllers.
@@ -72,8 +72,8 @@ class XRControllerManager extends EventDispatcher {
 		this._useXRButtons = useXRButtons;
 
 		//setup controller connext events.
-		this._controller.addEventListener( 'connected', () => this._onControllerConnected() );
-		this._controller.addEventListener( 'disconnected', () => this._onControllerDisconnected() );
+		this._controller.addEventListener( 'connected', ( event ) => this._onControllerConnected( event ) );
+		this._controller.addEventListener( 'disconnected', ( event ) => this._onControllerDisconnected( event ) );
 
 		/**
          * The event emitter callback reference.
@@ -346,24 +346,25 @@ class XRControllerManager extends EventDispatcher {
      */
 	_onControllerConnected( event ) {
 
-		const controller = event.target;
+		const controller = event.target,
+			data = event.data;
 
 		//transient pointer is reconnecting.
 		if ( controller.userData.isTransientPointer ) {
 
 			//console.log('Transient Pointer Setup');
-			this.dispatchEvent( { type: 'reconnected', controller: this._controller } );
+			this.dispatchEvent( { type: 'reconnected', controller: this._controller, data: data } );
 			return;
 
 		}
 
 		//only emit connected once
-		if ( ! controller.userData.controllerConnected ) this.dispatchEvent( { type: 'connected', controller: controller } );
+		if ( ! controller.userData.controllerConnected ) this.dispatchEvent( { type: 'connected', controller: controller, data: data } );
 
 		//has hand input
-		this.hasHand = !! event.hand;
+		this.hasHand = !! data.hand;
 
-		switch ( event.data.targetRayMode ) {
+		switch ( data.targetRayMode ) {
 
 			case 'tracked-pointer':
 				const controllerModelFactory = new XRControllerModelFactory(),
@@ -440,13 +441,15 @@ class XRControllerManager extends EventDispatcher {
 
 		}
 
+		console.log( 'controller connected', event );
+
 	}
 
 	_onControllerDisconnected( event ) {
 
 		const controller = event.target;
 
-		if ( ! event.userData.isTransientPointer ) controller.remove( controller.children[ 0 ] );
+		if ( ! controller.userData.isTransientPointer ) controller.remove( controller.children[ 0 ] );
 
 	}
 

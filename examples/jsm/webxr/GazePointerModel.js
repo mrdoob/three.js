@@ -68,6 +68,8 @@ class GazePointerModel extends Object3D {
 		this.controller.addEventListener( 'connected', this._onConnected );
 		this.controller.addEventListener( 'disconnected', this._onDisconnected );
 
+		this.createPointer();
+
 	}
 
 	/**
