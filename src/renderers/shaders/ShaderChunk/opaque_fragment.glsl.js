@@ -9,7 +9,11 @@ diffuseColor.a *= material.transmissionAlpha;
 
 #ifdef PREMULTIPLIED_ALPHA
 
-gl_FragColor = vec4( outgoingLight * diffuseColor.a, diffuseColor.a );
+// Convert to sRGB, apply premultiplied alpha, convert back to linear.
+// This ensures correct blending in sRGB framebuffers.
+vec3 srgb = sRGBTransferOETF( vec4( outgoingLight, 1.0 ) ).rgb;
+srgb *= diffuseColor.a;
+gl_FragColor = vec4( sRGBTransferEOTF( vec4( srgb, 1.0 ) ).rgb, diffuseColor.a );
 
 #else
 
