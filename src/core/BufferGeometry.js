@@ -1084,6 +1084,13 @@ class BufferGeometry extends EventDispatcher {
 
 		const normals = this.attributes.normal;
 
+		if ( normals === undefined ) {
+
+			warn( 'BufferGeometry.normalizeNormals(): No normals attribute found. Skipping normalization.' );
+			return;
+
+		}
+
 		for ( let i = 0, il = normals.count; i < il; i ++ ) {
 
 			_vector.fromBufferAttribute( normals, i );

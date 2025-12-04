@@ -215,7 +215,13 @@ class Raycaster {
 
 		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-			intersect( objects[ i ], this, intersects, recursive );
+			const object = objects[ i ];
+
+			if ( object !== null && object !== undefined ) {
+
+				intersect( object, this, intersects, recursive );
+
+			}
 
 		}
 
@@ -234,6 +240,8 @@ function ascSort( a, b ) {
 }
 
 function intersect( object, raycaster, intersects, recursive ) {
+
+	if ( object === null || object === undefined ) return;
 
 	let propagate = true;
 
