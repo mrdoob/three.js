@@ -20,12 +20,13 @@ export default [
 			'**/3rdparty/**',
 			'**/shapefile.js',
 			'**/vendor/**',
-			'**/fuse/**',
-		],
+			'**/fuse/**'
+		]
 	},
 
 	// recommended
 	js.configs.recommended,
+	jsdoc.configs['flat/recommended'],
 
 	// base rules
 	{
@@ -35,7 +36,7 @@ export default [
 			html,
 			import: importPlugin,
 			compat,
-			jsdoc,
+			jsdoc
 		},
 		languageOptions: {
 			ecmaVersion: 2018,
@@ -65,28 +66,29 @@ export default [
 				VideoFrame: 'readonly',
 				VideoDecoder: 'readonly',
 				Float16Array: 'readonly',
+				BigInt: 'readonly',
+				BigUint64Array: 'readonly'
 			},
 		},
 		settings: {
 			polyfills: [
-				'WebGL2RenderingContext',
+				'WebGL2RenderingContext'
 			],
 			jsdoc: {
 				preferredTypes: {
-					"Any": "any",
-					"Boolean": "boolean",
-					"Number": "number",
-					"object": "Object",
-					"String": "string",
+					Any: 'any',
+					Boolean: 'boolean',
+					Number: 'number',
+					object: 'Object',
+					String: 'string'
 				},
 				tagNamePreference: {
 					returns: 'return',
 					augments: 'augments',
-					extends: 'augments',
+					extends: 'augments'
 				},
 			},
 		},
-
 		rules: {
 			...mdcs.rules,
 			...compat.configs.recommended.rules,
@@ -94,7 +96,7 @@ export default [
 			'quotes': [ 'error', 'single' ],
 			'prefer-const': [ 'error', {
 				destructuring: 'any',
-				ignoreReadBeforeAssign: false,
+				ignoreReadBeforeAssign: false
 			} ],
 			'no-irregular-whitespace': 'error',
 			'no-duplicate-imports': 'error',
@@ -106,6 +108,13 @@ export default [
 			'getter-return': 'off',
 			'no-async-promise-executor': 'off',
 			'no-empty': 'off',
-		},
-	},
+
+			'jsdoc/check-types': 'error',
+			'jsdoc/require-returns': 'off',
+			'jsdoc/require-returns-type': 'error',
+			'jsdoc/require-param-description': 'off',
+			'jsdoc/require-returns-description': 'off',
+			'jsdoc/require-param-type': 'error'
+		}
+	}
 ];
