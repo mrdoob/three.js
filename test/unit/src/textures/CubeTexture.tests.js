@@ -27,19 +27,6 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'images', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'flipY', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isCubeTexture', ( assert ) => {
 

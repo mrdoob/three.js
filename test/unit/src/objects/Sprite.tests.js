@@ -37,24 +37,6 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'geometry', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'material', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'center', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isSprite', ( assert ) => {
 
@@ -63,18 +45,6 @@ export default QUnit.module( 'Objects', () => {
 				object.isSprite,
 				'Sprite.isSprite should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'raycast', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

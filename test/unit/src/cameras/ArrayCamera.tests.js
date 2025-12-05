@@ -27,14 +27,6 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'cameras', ( assert ) => {
-
-			// array
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isArrayCamera', ( assert ) => {
 

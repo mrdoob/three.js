@@ -27,32 +27,6 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'image', ( assert ) => {
-
-			// { width: width, height: height }
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'mipmaps', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'flipY', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'generateMipmaps', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isCompressedTexture', ( assert ) => {
 

@@ -51,36 +51,6 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.todo( 'light', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'color', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'cone', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'dispose', ( assert ) => {
 
@@ -89,12 +59,6 @@ export default QUnit.module( 'Helpers', () => {
 			const light = new SpotLight( parameters.color );
 			const object = new SpotLightHelper( light, parameters.color );
 			object.dispose();
-
-		} );
-
-		QUnit.todo( 'update', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

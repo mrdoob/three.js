@@ -27,20 +27,6 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'image.depth', ( assert ) => {
-
-			// { width: width, height: height, depth: depth }
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'wrapR', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isCompressedArrayTexture', ( assert ) => {
 
