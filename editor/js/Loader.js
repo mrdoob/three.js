@@ -675,23 +675,13 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const { VOXLoader, VOXMesh } = await import( 'three/addons/loaders/VOXLoader.js' );
+					const { VOXLoader } = await import( 'three/addons/loaders/VOXLoader.js' );
 
-					const chunks = new VOXLoader().parse( contents );
+					const { scene } = new VOXLoader().parse( contents );
 
-					const group = new THREE.Group();
-					group.name = filename;
+					scene.name = filename;
 
-					for ( let i = 0; i < chunks.length; i ++ ) {
-
-						const chunk = chunks[ i ];
-
-						const mesh = new VOXMesh( chunk );
-						group.add( mesh );
-
-					}
-
-					editor.execute( new AddObjectCommand( editor, group ) );
+					editor.execute( new AddObjectCommand( editor, scene ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
