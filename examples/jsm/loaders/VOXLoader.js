@@ -306,7 +306,7 @@ class VOXLoader extends Loader {
 
 		}
 
-		if ( version !== 150 ) {
+		if ( version !== 150 && version !== 200 ) {
 
 			console.error( 'THREE.VOXLoader: Invalid VOX file. Unsupported version:', version );
 			return;
