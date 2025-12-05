@@ -35,13 +35,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'meshPerAttribute', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isInstancedBufferAttribute', ( assert ) => {
 
@@ -69,12 +62,6 @@ export default QUnit.module( 'Core', () => {
 				assert.ok( copiedInstance.array[ i ] === array[ i ], 'array was copied' );
 
 			}
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

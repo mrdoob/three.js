@@ -8,20 +8,6 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module( 'WebGLShadowMap', () => {
 
-			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			// PUBLIC STUFF
-			QUnit.todo( 'render', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 		} );
 
 	} );

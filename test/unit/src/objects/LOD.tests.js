@@ -96,12 +96,6 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'getCurrentLevel', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'getObjectForDistance', ( assert ) => {
 
 			const lod = new LOD();
@@ -137,18 +131,6 @@ export default QUnit.module( 'Objects', () => {
 			lod.raycast( raycaster, intersections );
 
 			assert.strictEqual( intersections.length, 0, 'Does not fail if raycasting is used with a LOD object without levels.' );
-
-		} );
-
-		QUnit.todo( 'update', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

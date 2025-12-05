@@ -24,19 +24,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'texture', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'depthTexture', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'setSize', ( assert ) => {
 

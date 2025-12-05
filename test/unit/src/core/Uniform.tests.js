@@ -26,13 +26,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'value', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'clone', ( assert ) => {
 

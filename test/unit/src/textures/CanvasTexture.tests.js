@@ -27,13 +27,6 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'needsUpdate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isCanvasTexture', ( assert ) => {
 

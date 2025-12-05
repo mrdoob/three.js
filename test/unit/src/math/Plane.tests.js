@@ -59,7 +59,6 @@ export default QUnit.module( 'Maths', () => {
 			const b = new Vector3();
 			assert.ok( ! b.isPlane, 'Passed!' );
 
-
 		} );
 
 		QUnit.test( 'set', ( assert ) => {
@@ -126,7 +125,6 @@ export default QUnit.module( 'Maths', () => {
 			const b = a.clone();
 
 			assert.ok( a.equals( b ), 'clones are equal' );
-
 
 		} );
 
@@ -232,13 +230,6 @@ export default QUnit.module( 'Maths', () => {
 			a = new Plane( new Vector3( 1, 0, 0 ), - 3 );
 			a.intersectLine( l1, point );
 			assert.ok( point.equals( new Vector3( 3, 0, 0 ) ), 'Passed!' );
-
-		} );
-
-		QUnit.todo( 'intersectsLine', ( assert ) => {
-
-			// intersectsLine( line ) // - boolean variant of above
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

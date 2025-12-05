@@ -72,20 +72,6 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'setOptions', ( assert ) => {
-
-			// setOptions( options )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'load', ( assert ) => {
-
-			// load( url, onLoad, onProgress, onError )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 	} );
 
 } );

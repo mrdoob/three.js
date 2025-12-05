@@ -8,7 +8,6 @@ import { Quaternion } from '../../../../src/math/Quaternion.js';
 import * as MathUtils from '../../../../src/math/MathUtils.js';
 import { eps } from '../../utils/math-constants.js';
 
-
 function matrixEquals4( a, b, tolerance ) {
 
 	tolerance = tolerance || 0.0001;
@@ -287,13 +286,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'makeRotationFromQuaternion', ( assert ) => {
-
-			// makeRotationFromQuaternion( q )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'lookAt', ( assert ) => {
 
 			const a = new Matrix4();
@@ -374,7 +366,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( rhs.elements[ 13 ] == 6246 );
 			assert.ok( rhs.elements[ 14 ] == 12378 );
 			assert.ok( rhs.elements[ 15 ] == 18710 );
-
 
 		} );
 
@@ -520,7 +511,6 @@ export default QUnit.module( 'Maths', () => {
 			a.copy( b ).invert();
 			assert.ok( matrixEquals4( a, zero ), 'Passed!' );
 
-
 			const testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
 				new Matrix4().makeRotationX( - 0.3 ),
@@ -606,7 +596,6 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'makeRotationY', ( assert ) => {
 
-
 			const a = new Matrix4();
 			const b = Math.sqrt( 3 ) / 2;
 			const c = new Matrix4().set( b, 0, 0.5, 0, 0, 1, 0, 0, - 0.5, 0, b, 0, 0, 0, 0, 1 );
@@ -617,7 +606,6 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'makeRotationZ', ( assert ) => {
-
 
 			const a = new Matrix4();
 			const b = Math.sqrt( 3 ) / 2;

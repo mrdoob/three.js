@@ -25,19 +25,6 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			// LEGACY
-			QUnit.todo( 'UniformsUtils.clone', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'UniformsUtils.merge', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 			// PUBLIC
 			QUnit.test( 'cloneUniforms copies values', ( assert ) => {
 
@@ -142,25 +129,6 @@ export default QUnit.module( 'Renderers', () => {
 				console.level = CONSOLE_LEVEL.DEFAULT;
 
 				assert.ok( uniformClones.textureValue.value === null );
-
-			} );
-
-
-			QUnit.todo( 'mergeUniforms', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'cloneUniformsGroups', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'getUnlitUniformColorSpace', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

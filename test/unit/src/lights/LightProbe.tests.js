@@ -19,21 +19,6 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'sh', ( assert ) => {
-
-			// SphericalHarmonics3 if not supplied
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isLightProbe', ( assert ) => {
 
@@ -42,24 +27,6 @@ export default QUnit.module( 'Lights', () => {
 				object.isLightProbe,
 				'LightProbe.isLightProbe should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

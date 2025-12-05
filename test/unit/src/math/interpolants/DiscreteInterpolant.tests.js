@@ -31,13 +31,6 @@ export default QUnit.module( 'Maths', () => {
 			} );
 
 			// PRIVATE - TEMPLATE METHODS
-			QUnit.todo( 'interpolate_', ( assert ) => {
-
-				// interpolate_( i1 /*, t0, t, t1 */ )
-				// return equal to base class Interpolant.resultBuffer after call
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
 
 		} );
 
