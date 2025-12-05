@@ -615,59 +615,13 @@ class VOXMesh extends Mesh {
 		const size = chunk.size;
 		const palette = chunk.palette;
 
-		//
+		const sx = size.x;
+		const sy = size.y;
+		const sz = size.z;
 
-		const vertices = [];
-		const colors = [];
+		// Build volume with color indices
 
-		const nx = [ 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1 ];
-		const px = [ 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0 ];
-		const py = [ 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1 ];
-		const ny = [ 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0 ];
-		const nz = [ 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0 ];
-		const pz = [ 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 ];
-
-		const _color = new Color();
-
-		function add( tile, x, y, z, r, g, b ) {
-
-			x -= size.x / 2;
-			y -= size.z / 2;
-			z += size.y / 2;
-
-			for ( let i = 0; i < 18; i += 3 ) {
-
-				_color.setRGB( r, g, b, SRGBColorSpace );
-
-				vertices.push( tile[ i + 0 ] + x, tile[ i + 1 ] + y, tile[ i + 2 ] + z );
-				colors.push( _color.r, _color.g, _color.b );
-
-			}
-
-		}
-
-		// Store data in a volume for sampling
-
-		const offsety = size.x;
-		const offsetz = size.x * size.y;
-
-		const array = new Uint8Array( size.x * size.y * size.z );
-
-		for ( let j = 0; j < data.length; j += 4 ) {
-
-			const x = data[ j + 0 ];
-			const y = data[ j + 1 ];
-			const z = data[ j + 2 ];
-
-			const index = x + ( y * offsety ) + ( z * offsetz );
-
-			array[ index ] = 255;
-
-		}
-
-		// Construct geometry
-
-		let hasColors = false;
+		const volume = new Uint8Array( sx * sy * sz );
 
 		for ( let j = 0; j < data.length; j += 4 ) {
 
@@ -676,26 +630,209 @@ class VOXMesh extends Mesh {
 			const z = data[ j + 2 ];
 			const c = data[ j + 3 ];
 
-			const hex = palette[ c ];
-			const r = ( hex >> 0 & 0xff ) / 0xff;
-			const g = ( hex >> 8 & 0xff ) / 0xff;
-			const b = ( hex >> 16 & 0xff ) / 0xff;
+			volume[ x + y * sx + z * sx * sy ] = c;
 
-			if ( r > 0 || g > 0 || b > 0 ) hasColors = true;
+		}
 
-			const index = x + ( y * offsety ) + ( z * offsetz );
+		// Greedy meshing
 
-			if ( array[ index + 1 ] === 0 || x === size.x - 1 ) add( px, x, z, - y, r, g, b );
-			if ( array[ index - 1 ] === 0 || x === 0 ) add( nx, x, z, - y, r, g, b );
-			if ( array[ index + offsety ] === 0 || y === size.y - 1 ) add( ny, x, z, - y, r, g, b );
-			if ( array[ index - offsety ] === 0 || y === 0 ) add( py, x, z, - y, r, g, b );
-			if ( array[ index + offsetz ] === 0 || z === size.z - 1 ) add( pz, x, z, - y, r, g, b );
-			if ( array[ index - offsetz ] === 0 || z === 0 ) add( nz, x, z, - y, r, g, b );
+		const vertices = [];
+		const indices = [];
+		const colors = [];
+
+		const _color = new Color();
+		let hasColors = false;
+
+		// Process each of the 6 face directions
+		// dims: the 3 axis sizes, d: which axis is normal to the face
+		const dims = [ sx, sy, sz ];
+
+		for ( let d = 0; d < 3; d ++ ) {
+
+			const u = ( d + 1 ) % 3;
+			const v = ( d + 2 ) % 3;
+
+			const dimsD = dims[ d ];
+			const dimsU = dims[ u ];
+			const dimsV = dims[ v ];
+
+			const q = [ 0, 0, 0 ];
+			const mask = new Int16Array( dimsU * dimsV );
+
+			q[ d ] = 1;
+
+			// Sweep through slices
+			for ( let slice = 0; slice <= dimsD; slice ++ ) {
+
+				// Build mask for this slice
+				let n = 0;
+
+				for ( let vv = 0; vv < dimsV; vv ++ ) {
+
+					for ( let uu = 0; uu < dimsU; uu ++ ) {
+
+						const pos = [ 0, 0, 0 ];
+						pos[ d ] = slice;
+						pos[ u ] = uu;
+						pos[ v ] = vv;
+
+						const x0 = pos[ 0 ], y0 = pos[ 1 ], z0 = pos[ 2 ];
+
+						// Get voxel behind and in front of this face
+						const behind = ( slice > 0 ) ? volume[ ( x0 - q[ 0 ] ) + ( y0 - q[ 1 ] ) * sx + ( z0 - q[ 2 ] ) * sx * sy ] : 0;
+						const infront = ( slice < dimsD ) ? volume[ x0 + y0 * sx + z0 * sx * sy ] : 0;
+
+						// Face exists if exactly one side is solid
+						if ( behind > 0 && infront === 0 ) {
+
+							mask[ n ] = behind; // positive face
+
+						} else if ( infront > 0 && behind === 0 ) {
+
+							mask[ n ] = - infront; // negative face
+
+						} else {
+
+							mask[ n ] = 0;
+
+						}
+
+						n ++;
+
+					}
+
+				}
+
+				// Greedy merge mask into quads
+				n = 0;
+
+				for ( let vv = 0; vv < dimsV; vv ++ ) {
+
+					for ( let uu = 0; uu < dimsU; ) {
+
+						const c = mask[ n ];
+
+						if ( c !== 0 ) {
+
+							// Find width
+							let w = 1;
+
+							while ( uu + w < dimsU && mask[ n + w ] === c ) {
+
+								w ++;
+
+							}
+
+							// Find height
+							let h = 1;
+							let done = false;
+
+							while ( vv + h < dimsV && ! done ) {
+
+								for ( let k = 0; k < w; k ++ ) {
+
+									if ( mask[ n + k + h * dimsU ] !== c ) {
+
+										done = true;
+										break;
+
+									}
+
+								}
+
+								if ( ! done ) h ++;
+
+							}
+
+							// Add quad
+							const pos = [ 0, 0, 0 ];
+							pos[ d ] = slice;
+							pos[ u ] = uu;
+							pos[ v ] = vv;
+
+							const du = [ 0, 0, 0 ];
+							const dv = [ 0, 0, 0 ];
+							du[ u ] = w;
+							dv[ v ] = h;
+
+							// Get color
+							const colorIndex = Math.abs( c );
+							const hex = palette[ colorIndex ];
+							const r = ( hex >> 0 & 0xff ) / 0xff;
+							const g = ( hex >> 8 & 0xff ) / 0xff;
+							const b = ( hex >> 16 & 0xff ) / 0xff;
+
+							if ( r > 0 || g > 0 || b > 0 ) hasColors = true;
+
+							_color.setRGB( r, g, b, SRGBColorSpace );
+
+							// Convert VOX coords to Three.js coords (Y-up)
+							// VOX: X right, Y forward, Z up -> Three.js: X right, Y up, Z back
+							const toThree = ( p ) => [
+								p[ 0 ] - sx / 2,
+								p[ 2 ] - sz / 2,
+								- p[ 1 ] + sy / 2
+							];
+
+							const v0 = toThree( pos );
+							const v1 = toThree( [ pos[ 0 ] + du[ 0 ], pos[ 1 ] + du[ 1 ], pos[ 2 ] + du[ 2 ] ] );
+							const v2 = toThree( [ pos[ 0 ] + du[ 0 ] + dv[ 0 ], pos[ 1 ] + du[ 1 ] + dv[ 1 ], pos[ 2 ] + du[ 2 ] + dv[ 2 ] ] );
+							const v3 = toThree( [ pos[ 0 ] + dv[ 0 ], pos[ 1 ] + dv[ 1 ], pos[ 2 ] + dv[ 2 ] ] );
+
+							const idx = vertices.length / 3;
+
+							// Winding order depends on face direction
+							if ( c > 0 ) {
+
+								vertices.push( ...v0, ...v1, ...v2, ...v3 );
+								indices.push( idx, idx + 1, idx + 2, idx, idx + 2, idx + 3 );
+
+							} else {
+
+								vertices.push( ...v0, ...v3, ...v2, ...v1 );
+								indices.push( idx, idx + 1, idx + 2, idx, idx + 2, idx + 3 );
+
+							}
+
+							colors.push(
+								_color.r, _color.g, _color.b,
+								_color.r, _color.g, _color.b,
+								_color.r, _color.g, _color.b,
+								_color.r, _color.g, _color.b
+							);
+
+							// Clear mask
+							for ( let hh = 0; hh < h; hh ++ ) {
+
+								for ( let ww = 0; ww < w; ww ++ ) {
+
+									mask[ n + ww + hh * dimsU ] = 0;
+
+								}
+
+							}
+
+							uu += w;
+							n += w;
+
+						} else {
+
+							uu ++;
+							n ++;
+
+						}
+
+					}
+
+				}
+
+			}
 
 		}
 
 		const geometry = new BufferGeometry();
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.setIndex( indices );
 		geometry.computeVertexNormals();
 
 		const material = new MeshStandardMaterial();
