@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 手势粒子雕塑</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111; font-family: 'Segoe UI', sans-serif; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        
+        /* 摄像头预览 (为了调试，可隐藏) */
+        #video-preview {
+            position: absolute; bottom: 20px; left: 20px; width: 200px; height: 150px;
+            border-radius: 12px; border: 2px solid rgba(255,255,255,0.3);
+            transform: scaleX(-1); z-index: 2; object-fit: cover;
+        }
+
+        /* UI 面板 */
+        #ui-container {
+            position: absolute; top: 20px; right: 20px; z-index: 10;
+        }
+
+        /* 全屏按钮 */
+        #fullscreen-btn {
+            position: absolute; bottom: 20px; right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white; border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            backdrop-filter: blur(5px); transition: 0.3s; z-index: 10;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 12px;
+        }
+        #fullscreen-btn:hover { background: white; color: black; }
+
+        /* 加载提示 */
+        #loader {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; font-size: 24px; z-index: 20; pointer-events: none;
+            text-align: center;
+        }
+        .instruction { font-size: 14px; opacity: 0.7; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div>正在初始化 AI 视觉引擎...</div>
+        <div class="instruction">请允许摄像头权限 • 确保光线充足</div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <video id="video-preview" playsinline></video>
+
+    <div id="ui-container"></div>
+
+    <button id="fullscreen-btn">进入全屏</button>
+
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js"></script> <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://unpkg.com/lil-gui@0.19.1/dist/lil-gui.umd.min.js"></script>
+
+    <script type="module">
+        import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+        // --- 配置 ---
+        const IMAGE_URL = './model.jpg'; // 请确保此处有你上传的图片
+        const PARTICLE_SIZE = 2.5;
+        const THRESHOLD = 30; // 像素亮度阈值，越小粒子越多
+
+        // --- 全局变量 ---
+        let scene, camera, renderer, controls, material, points;
+        let handDistance = 0; // 0 = 合拢, 1 = 张开
+        let targetColor = new THREE.Color(0xffffff);
+
+        // --- Shader (着色器) ---
+        // 核心魔法：GPU根据 mixFactor 在"原始位置"和"随机扩散位置"之间插值
+        const vertexShader = `
+            uniform float uTime;
+            uniform float uMixFactor; // 控制聚散 0.0 - 1.0
+            uniform float uSize;
+            
+            attribute vec3 aRandomPos; // 扩散后的随机位置
+            attribute vec3 aColor;
+            
+            varying vec3 vColor;
+
+            void main() {
+                vColor = aColor;
+                
+                // 计算当前位置：在原始位置(position)和随机位置(aRandomPos)之间混合
+                vec3 finalPos = mix(position, aRandomPos, uMixFactor);
+                
+                // 添加一点波动噪点，让粒子看起来像是在"呼吸"
+                if(uMixFactor < 0.1) {
+                    finalPos.x += sin(uTime * 2.0 + position.y) * 0.5;
+                    finalPos.z += cos(uTime * 1.5 + position.x) * 0.5;
+                }
+
+                vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
+                gl_PointSize = uSize * (300.0 / -mvPosition.z);
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `;
+
+        const fragmentShader = `
+            uniform vec3 uBaseColor;
+            uniform float uColorMix; // 0 = 使用原图色, 1 = 使用UI选择的颜色
+            
+            varying vec3 vColor;
+
+            void main() {
+                // 圆形粒子裁切
+                float r = distance(gl_PointCoord, vec2(0.5, 0.5));
+                if (r > 0.5) discard;
+                
+                // 颜色混合
+                vec3 finalColor = mix(vColor, uBaseColor, uColorMix);
+                
+                // 边缘发光效果
+                float glow = 1.0 - (r * 2.0);
+                glow = pow(glow, 1.5);
+                
+                gl_FragColor = vec4(finalColor * glow, 1.0);
+            }
+        `;
+
+        // --- 1. 初始化 Three.js ---
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            // 添加一点雾效增加深邃感
+            scene.fog = new THREE.FogExp2(0x000000, 0.002);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 0, 400);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
+
+            // 加载图片并生成粒子
+            loadParticlesFromImage(IMAGE_URL);
+
+            // 监听窗口调整
+            window.addEventListener('resize', onWindowResize);
+            
+            // 全屏按钮
+            document.getElementById('fullscreen-btn').addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+
+            // 动画循环
+            animate();
+        }
+
+        // --- 2. 图片处理与粒子生成 ---
+        function loadParticlesFromImage(url) {
+            const img = new Image();
+            img.crossOrigin = "Anonymous"; // 如果使用外部图片需要此设置
+            img.src = url;
+            
+            img.onload = () => {
+                // 创建一个 Canvas 读取像素
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                // 适当缩小尺寸以提升性能，保持比例
+                const scale = 300 / Math.max(img.width, img.height);
+                const w = Math.floor(img.width * scale);
+                const h = Math.floor(img.height * scale);
+                
+                canvas.width = w;
+                canvas.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+                
+                const imgData = ctx.getImageData(0, 0, w, h);
+                const data = imgData.data;
+
+                const positions = [];
+                const randomPos = [];
+                const colors = [];
+
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        const i = (y * w + x) * 4;
+                        const r = data[i] / 255;
+                        const g = data[i + 1] / 255;
+                        const b = data[i + 2] / 255;
+                        const a = data[i + 3];
+
+                        // 简单的过滤：忽略太暗或完全透明的像素
+                        if (a > 50 && (r + g + b) > 0.2) {
+                            // 原始位置 (居中)
+                            const px = x - w / 2;
+                            const py = -(y - h / 2); // Y轴翻转
+                            const pz = (Math.random() - 0.5) * 50; // Z轴给一点厚度
+
+                            positions.push(px * 1.5, py * 1.5, pz);
+                            colors.push(r, g, b);
+
+                            // 扩散后的随机位置 (炸开到屏幕边缘)
+                            const rx = (Math.random() - 0.5) * 800;
+                            const ry = (Math.random() - 0.5) * 800;
+                            const rz = (Math.random() - 0.5) * 800;
+                            randomPos.push(rx, ry, rz);
+                        }
+                    }
+                }
+
+                // 创建 Geometry
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                geometry.setAttribute('aRandomPos', new THREE.Float32BufferAttribute(randomPos, 3));
+                geometry.setAttribute('aColor', new THREE.Float32BufferAttribute(colors, 3));
+
+                // 创建 ShaderMaterial
+                material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        uTime: { value: 0 },
+                        uMixFactor: { value: 1.0 }, // 初始分散
+                        uSize: { value: PARTICLE_SIZE },
+                        uBaseColor: { value: new THREE.Color(0xffffff) },
+                        uColorMix: { value: 0.0 }
+                    },
+                    vertexShader: vertexShader,
+                    fragmentShader: fragmentShader,
+                    transparent: true,
+                    depthWrite: false,
+                    blending: THREE.AdditiveBlending
+                });
+
+                points = new THREE.Points(geometry, material);
+                scene.add(points);
+                
+                document.querySelector('#loader div').innerText = "系统就绪 - 请展示双手";
+                initGUI();
+            };
+            
+            img.onerror = () => {
+                document.querySelector('#loader div').innerText = "错误：找不到 model.jpg 图片";
+            };
+        }
+
+        // --- 3. MediaPipe 手势识别 ---
+        function initMediaPipe() {
+            const videoElement = document.getElementById('video-preview');
+            
+            const hands = new Hands({locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+            }});
+
+            hands.setOptions({
+                maxNumHands: 2,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+
+            hands.onResults(onHandsResults);
+
+            const cameraUtils = new Camera(videoElement, {
+                onFrame: async () => {
+                    await hands.send({image: videoElement});
+                },
+                width: 640,
+                height: 480
+            });
+            cameraUtils.start();
+        }
+
+        function onHandsResults(results) {
+            // 逻辑：检测两只手之间的距离
+            // 如果检测到两只手
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length === 2) {
+                const hand1 = results.multiHandLandmarks[0][0]; // 手腕点
+                const hand2 = results.multiHandLandmarks[1][0]; // 手腕点
+                
+                // 计算简单距离 (x, y)
+                const dx = hand1.x - hand2.x;
+                const dy = hand1.y - hand2.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                // 映射距离到 0-1 之间
+                // 通常双手靠近距离约为 0.1，张开约为 0.6
+                // 我们希望：靠近(dist小) -> mixFactor = 0 (聚拢)
+                //           张开(dist大) -> mixFactor = 1 (扩散)
+                
+                const minRange = 0.2;
+                const maxRange = 0.6;
+                let normalized = (dist - minRange) / (maxRange - minRange);
+                normalized = Math.max(0, Math.min(1, normalized));
+                
+                // 平滑过渡
+                handDistance += (normalized - handDistance) * 0.1;
+                
+                document.querySelector('#loader div').style.display = 'none'; // 隐藏提示
+            } 
+            // 如果只检测到一只手或没有手，稍微自动聚拢一点或者保持状态
+            else {
+                // 可选：无手势时自动慢速呼吸
+                // handDistance = 0.5 + Math.sin(Date.now() * 0.001) * 0.2;
+            }
+        }
+
+        // --- 4. UI 界面 ---
+        function initGUI() {
+            const gui = new lil.GUI({ container: document.getElementById('ui-container') });
+            gui.title('粒子控制器
