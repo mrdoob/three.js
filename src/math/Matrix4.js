@@ -235,8 +235,19 @@ class Matrix4 {
 	extractBasis( xAxis, yAxis, zAxis ) {
 
 		xAxis.setFromMatrixColumn( this, 0 );
+		if ( xAxis.lengthSq() === 0 ) {
+			xAxis.set( 1, 0, 0 );
+		}
+
 		yAxis.setFromMatrixColumn( this, 1 );
+		if ( yAxis.lengthSq() === 0 ) {
+			yAxis.set( 0, 1, 0 );
+		}
+
 		zAxis.setFromMatrixColumn( this, 2 );
+		if ( zAxis.lengthSq() === 0 ) {
+			zAxis.set( 0, 0, 1 );
+		}
 
 		return this;
 
