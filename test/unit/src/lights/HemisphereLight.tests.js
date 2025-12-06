@@ -57,18 +57,6 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'position', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'groundColor', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isHemisphereLight', ( assert ) => {
 
@@ -77,13 +65,6 @@ export default QUnit.module( 'Lights', () => {
 				object.isHemisphereLight,
 				'HemisphereLight.isHemisphereLight should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			// copy( source, recursive )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

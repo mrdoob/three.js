@@ -37,6 +37,10 @@
 			"kind": "member"
 		},
 		{
+			"title": "AnalyticLightNode#disposeShadow",
+			"kind": "function"
+		},
+		{
 			"title": "AnalyticLightNode#getLightVector",
 			"kind": "function"
 		},
@@ -4875,10 +4879,6 @@
 		{
 			"title": "LightProbe",
 			"kind": "class"
-		},
-		{
-			"title": "LightProbe#fromJSON",
-			"kind": "function"
 		},
 		{
 			"title": "LightProbe#isLightProbe",
@@ -10217,10 +10217,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "PointLightShadow#updateMatrices",
-			"kind": "function"
-		},
-		{
 			"title": "PointShadowNode",
 			"kind": "class"
 		},
@@ -12489,6 +12485,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Skeleton#previousBoneMatrices",
+			"kind": "member"
+		},
+		{
 			"title": "Skeleton#toJSON",
 			"kind": "function"
 		},
@@ -13190,6 +13190,10 @@
 		},
 		{
 			"title": "StackNode#addToStack",
+			"kind": "function"
+		},
+		{
+			"title": "StackNode#addToStackBefore",
 			"kind": "function"
 		},
 		{
@@ -14607,6 +14611,10 @@
 		{
 			"title": "VarNode#intent",
 			"kind": "member"
+		},
+		{
+			"title": "VarNode#isIntent",
+			"kind": "function"
 		},
 		{
 			"title": "VarNode#isVarNode",
@@ -23103,10 +23111,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "VOXData3DTexture",
-			"kind": "class"
-		},
-		{
 			"title": "VOXLoader",
 			"kind": "class"
 		},
@@ -23117,10 +23121,6 @@
 		{
 			"title": "VOXLoader#parse",
 			"kind": "function"
-		},
-		{
-			"title": "VOXMesh",
-			"kind": "class"
 		},
 		{
 			"title": "VRButton",
@@ -24857,10 +24857,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "IdentityDepthPacking",
-			"kind": "member"
-		},
-		{
 			"title": "ImageUtils.getDataURL",
 			"kind": "function"
 		},
@@ -25897,6 +25893,14 @@
 			"kind": "member"
 		},
 		{
+			"title": "buildData3DTexture",
+			"kind": "function"
+		},
+		{
+			"title": "buildMesh",
+			"kind": "function"
+		},
+		{
 			"title": "ceilPowerOfTwo",
 			"kind": "function"
 		},
@@ -25931,6 +25935,10 @@
 		{
 			"title": "denormalize",
 			"kind": "function"
+		},
+		{
+			"title": "disposeShadowMaterial",
+			"kind": "member"
 		},
 		{
 			"title": "euclideanModulo",

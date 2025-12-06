@@ -1,11 +1,5 @@
 import { LightShadow } from './LightShadow.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Vector3 } from '../math/Vector3.js';
-
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _lightPositionWorld = /*@__PURE__*/ new Vector3();
-const _lookTarget = /*@__PURE__*/ new Vector3();
 
 /**
  * Represents the shadow configuration of point lights.
@@ -29,52 +23,6 @@ class PointLightShadow extends LightShadow {
 		 * @default true
 		 */
 		this.isPointLightShadow = true;
-
-		this._cubeDirections = [
-			new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 1, 0 ),
-			new Vector3( 0, - 1, 0 ), new Vector3( 0, 0, 1 ), new Vector3( 0, 0, - 1 )
-		];
-
-		this._cubeUps = [
-			new Vector3( 0, - 1, 0 ), new Vector3( 0, - 1, 0 ), new Vector3( 0, 0, 1 ),
-			new Vector3( 0, 0, - 1 ), new Vector3( 0, - 1, 0 ), new Vector3( 0, - 1, 0 )
-		];
-
-	}
-
-	/**
-	 * Update the matrices for the camera and shadow, used internally by the renderer.
-	 *
-	 * @param {Light} light - The light for which the shadow is being rendered.
-	 * @param {number} [faceIndex=0] - The cube face index (0-5).
-	 */
-	updateMatrices( light, faceIndex = 0 ) {
-
-		const camera = this.camera;
-		const shadowMatrix = this.matrix;
-
-		const far = light.distance || camera.far;
-
-		if ( far !== camera.far ) {
-
-			camera.far = far;
-			camera.updateProjectionMatrix();
-
-		}
-
-		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-		camera.position.copy( _lightPositionWorld );
-
-		_lookTarget.copy( camera.position );
-		_lookTarget.add( this._cubeDirections[ faceIndex ] );
-		camera.up.copy( this._cubeUps[ faceIndex ] );
-		camera.lookAt( _lookTarget );
-		camera.updateMatrixWorld();
-
-		shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
-
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 	}
 

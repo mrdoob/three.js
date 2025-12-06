@@ -30,19 +30,6 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'parse', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// OTHERS
 		QUnit.test( 'parser - attributes - circlable', ( assert ) => {
 

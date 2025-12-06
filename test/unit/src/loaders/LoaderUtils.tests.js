@@ -16,13 +16,6 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'resolveURL', ( assert ) => {
-
-			// static resolveURL( url, path )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 	} );
 
 } );

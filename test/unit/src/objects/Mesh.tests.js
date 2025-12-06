@@ -45,18 +45,6 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'geometry', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'material', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isMesh', ( assert ) => {
 
@@ -65,12 +53,6 @@ export default QUnit.module( 'Objects', () => {
 				object.isMesh,
 				'Mesh.isMesh should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -88,18 +70,6 @@ export default QUnit.module( 'Objects', () => {
 			mesh1.material = new Material();
 			const copy2 = mesh2.clone();
 			assert.strictEqual( mesh2.material, copy2.material );
-
-		} );
-
-		QUnit.todo( 'updateMorphTargets', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getVertexPosition', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

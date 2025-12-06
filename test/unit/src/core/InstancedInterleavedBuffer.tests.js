@@ -29,13 +29,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'meshPerAttribute', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isInstancedInterleavedBuffer', ( assert ) => {
 
@@ -54,18 +47,6 @@ export default QUnit.module( 'Core', () => {
 			const copiedInstance = instance.copy( instance );
 
 			assert.ok( copiedInstance.meshPerAttribute === 1, 'additional attribute was copied' );
-
-		} );
-
-		QUnit.todo( 'clone', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

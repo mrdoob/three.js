@@ -91,13 +91,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'setFromCartesianCoords', ( assert ) => {
-
-			// setFromCartesianCoords( x, y, z )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 	} );
 
 } );

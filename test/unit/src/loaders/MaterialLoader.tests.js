@@ -36,33 +36,6 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'parse', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setTextures', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'createMaterialFromType', ( assert ) => {
-
-			// static createMaterialFromType( type )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 	} );
 
 } );

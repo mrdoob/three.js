@@ -38,12 +38,6 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'updateMatrices', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 	} );
 
 } );

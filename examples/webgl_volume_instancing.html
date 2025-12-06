@@ -24,7 +24,7 @@
 		<script type="module">
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { VOXLoader, VOXData3DTexture } from 'three/addons/loaders/VOXLoader.js';
+			import { VOXLoader, buildData3DTexture } from 'three/addons/loaders/VOXLoader.js';
 
 			let renderer, scene, camera, controls, clock;
 
@@ -199,7 +199,7 @@
 						const material = new THREE.RawShaderMaterial( {
 							glslVersion: THREE.GLSL3,
 							uniforms: {
-								map: { value: new VOXData3DTexture( chunk ) },
+								map: { value: buildData3DTexture( chunk ) },
 								cameraPos: { value: new THREE.Vector3() }
 							},
 							vertexShader,

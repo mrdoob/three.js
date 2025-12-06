@@ -86,12 +86,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'copy', ( assert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
