@@ -2,7 +2,7 @@ import {
 	Mesh,
 	NodeMaterial,
 	SphereGeometry
-} from 'three';
+} from 'three/webgpu';
 import { float, Fn, getShIrradianceAt, normalWorld, uniformArray, uniform, vec4 } from 'three/tsl';
 
 /**
