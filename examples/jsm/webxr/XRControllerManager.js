@@ -92,9 +92,9 @@ class XRControllerManager extends EventDispatcher {
          * @param {Object} event
          * @returns {void}
          */
-		this._eventCallbackRef = ( event ) => {
+		this._eventVisibleCallbackRef = ( event ) => {
 
-			if ( this.visible ) this.emit( event );
+			if ( this.visible ) this._eventCallbackRef( event );
 
 		};
 
@@ -105,7 +105,7 @@ class XRControllerManager extends EventDispatcher {
          * @param {Object} event
          * @returns {void}
          */
-		this._eventUnselectedCallbackRef = ( event ) => this.emit( event );
+		this._eventCallbackRef = ( event ) => this.emit( event );
 
 		/**
          * Create an XR intersections for this controller.
@@ -113,17 +113,17 @@ class XRControllerManager extends EventDispatcher {
          */
 		this._xrIntersections = new XRIntersections( this._controller, collisions );
 
-		this._xrIntersections.addEventListener( 'selected', this._eventCallbackRef );
+		this._xrIntersections.addEventListener( 'selected', this._eventVisibleCallbackRef );
 
-		this._xrIntersections.addEventListener( 'unselected', this._eventUnselectedCallbackRef );
+		this._xrIntersections.addEventListener( 'unselected', this._eventCallbackRef );
 
-		this._xrIntersections.addEventListener( 'selectend', this._eventCallbackRef );
+		this._xrIntersections.addEventListener( 'selectend', this._eventVisibleCallbackRef );
 
-		this._xrIntersections.addEventListener( 'hovered', this._eventCallbackRef );
+		this._xrIntersections.addEventListener( 'hovered', this._eventVisibleCallbackRef );
 
-		this._xrIntersections.addEventListener( 'hoverout', this._eventCallbackRef );
+		this._xrIntersections.addEventListener( 'hoverout', this._eventVisibleCallbackRef );
 
-		this._xrIntersections.addEventListener( 'move', this._eventCallbackRef );
+		this._xrIntersections.addEventListener( 'move', this._eventVisibleCallbackRef );
 
 		scene.add( this._controller );
 
@@ -384,6 +384,7 @@ class XRControllerManager extends EventDispatcher {
      */
 	emit( event ) {
 
+		event.target = this;
 		this.dispatchEvent( event );
 
 	}
@@ -402,13 +403,13 @@ class XRControllerManager extends EventDispatcher {
 		//transient pointer is reconnecting.
 		if ( controller.userData.isTransientPointer ) {
 
-			this.dispatchEvent( { type: 'reconnected', controller: this._controller, data: data } );
+			this.emit( { type: 'reconnected', controller: this._controller, data: data } );
 			return;
 
 		}
 
 		//only emit connected once
-		if ( ! controller.userData.controllerConnected ) this.dispatchEvent( { type: 'connected', controller: controller, data: data } );
+		if ( ! controller.userData.controllerConnected ) this.emit( { type: 'connected', controller: controller, data: data } );
 
 		//has hand input
 		this.hasHand = !! data.hand;
@@ -437,16 +438,16 @@ class XRControllerManager extends EventDispatcher {
 
 				gripPointer.visible = this._visible;
 
-				this.dispatchEvent( { type: 'controllerGrip', controllerGrip: controllerGrip } );
+				this.emit( { type: 'controllerGrip', controllerGrip: controllerGrip } );
 
 				//setup the gamepad controls events.
 				if ( this._useXRButtons ) {
 
 					const xrGamepad = this._xrGamepad = controller.userData.xrGamePad = new XRGamepad( controllerGrip );
 
-					xrGamepad.addEventListener( 'pressed', this._eventCallbackRef );
-					xrGamepad.addEventListener( 'pressedend', this._eventCallbackRef );
-					xrGamepad.addEventListener( 'movechanged', this._eventCallbackRef );
+					xrGamepad.addEventListener( 'pressed', this._eventVisibleCallbackRef );
+					xrGamepad.addEventListener( 'pressedend', this._eventVisibleCallbackRef );
+					xrGamepad.addEventListener( 'movechanged', this._eventVisibleCallbackRef );
 
 				}
 
@@ -487,24 +488,24 @@ class XRControllerManager extends EventDispatcher {
 				hand.addEventListener( 'connected', ( event ) => {
 
 					event.type = 'hand-connected';
-					this._eventCallbackRef( event );
+					this.emit( event );
 
 				} );
 
-				hand.addEventListener( 'pinchstart', this._eventCallbackRef );
+				hand.addEventListener( 'pinchstart', this._eventVisibleCallbackRef );
 
-				hand.addEventListener( 'pinchend', this._eventCallbackRef );
+				hand.addEventListener( 'pinchend', this._eventVisibleCallbackRef );
 
 				this._scene.add( hand );
 
-				this.dispatchEvent( { type: 'hand', hand: hand } );
+				this.emit( { type: 'hand', hand: hand } );
 
 			}
 
 		} else if ( controller.hand ) {
 
 			//set back up grip controller
-			this.dispatchEvent( { type: 'grip-reconnected' } );
+			this.emit( { type: 'grip-reconnected' } );
 
 		}
 
