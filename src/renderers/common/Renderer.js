@@ -1037,8 +1037,8 @@ class Renderer {
 
 		} else if ( this.highPrecision ) {
 
-			delete contextNodeData.modelViewMatrix;
-			delete contextNodeData.modelNormalViewMatrix;
+			contextNodeData.modelViewMatrix = undefined;
+			contextNodeData.modelNormalViewMatrix = undefined;
 
 		}
 
