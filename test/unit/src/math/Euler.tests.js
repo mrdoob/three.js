@@ -63,7 +63,6 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.equal( Euler.DEFAULT_ORDER, 'XYZ', 'Passed!' );
 
-
 		} );
 
 		// PROPERTIES STUFF
@@ -97,7 +96,6 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'y', ( assert ) => {
 
-
 			let a = new Euler();
 			assert.ok( a.y === 0, 'Passed!' );
 
@@ -125,7 +123,6 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'z', ( assert ) => {
-
 
 			let a = new Euler();
 			assert.ok( a.z === 0, 'Passed!' );
@@ -155,7 +152,6 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'order', ( assert ) => {
 
-
 			let a = new Euler();
 			assert.ok( a.order === Euler.DEFAULT_ORDER, 'Passed!' );
 
@@ -180,7 +176,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b, 'Passed!' );
 			assert.ok( a.order === 'ZXY', 'Passed!' );
 
-
 		} );
 
 		// PUBLIC STUFF
@@ -190,7 +185,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.isEuler, 'Passed!' );
 			const b = new Vector3();
 			assert.ok( ! b.isEuler, 'Passed!' );
-
 
 		} );
 
@@ -237,13 +231,6 @@ export default QUnit.module( 'Maths', () => {
 				assert.ok( matrixEquals4( m, m2, 0.0001 ), 'Passed!' );
 
 			}
-
-		} );
-
-		QUnit.todo( 'Euler.setFromVector3', ( assert ) => {
-
-			// setFromVector3( v, order = this._order )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -407,7 +394,6 @@ export default QUnit.module( 'Maths', () => {
 
 			a._onChangeCallback = f;
 			assert.ok( a._onChangeCallback === f, 'Passed!' );
-
 
 			a._onChangeCallback();
 			assert.ok( b, 'Passed!' );

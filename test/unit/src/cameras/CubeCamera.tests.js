@@ -38,20 +38,6 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.todo( 'renderTarget', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'update', ( assert ) => {
-
-			// update( renderer, scene )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 	} );
 
 } );

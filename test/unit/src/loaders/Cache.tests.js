@@ -23,34 +23,6 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		// PUBLIC
-		QUnit.todo( 'add', ( assert ) => {
-
-			// function ( key, file )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'get', ( assert ) => {
-
-			// function ( key )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'remove', ( assert ) => {
-
-			// function ( key )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clear', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 	} );
 
 } );

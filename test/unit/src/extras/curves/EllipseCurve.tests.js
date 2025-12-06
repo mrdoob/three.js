@@ -54,54 +54,6 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.todo( 'aX', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'aY', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'xRadius', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'yRadius', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'aStartAngle', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'aEndAngle', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'aClockwise', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'aRotation', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 			// PUBLIC
 			QUnit.test( 'isEllipseCurve', ( assert ) => {
 
@@ -110,30 +62,6 @@ export default QUnit.module( 'Extras', () => {
 					object.isEllipseCurve,
 					'EllipseCurve.isEllipseCurve should be true'
 				);
-
-			} );
-
-			QUnit.todo( 'getPoint', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'copy', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'toJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'fromJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

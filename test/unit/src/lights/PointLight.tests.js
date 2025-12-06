@@ -59,24 +59,6 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'distance', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'decay', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'shadow', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'power', ( assert ) => {
 
 			const a = new PointLight( 0xaaaaaa );
@@ -111,12 +93,6 @@ export default QUnit.module( 'Lights', () => {
 			object.dispose();
 
 			// ensure calls dispose() on shadow
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

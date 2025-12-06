@@ -371,12 +371,6 @@ many times by the application.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="IdentityDepthPacking" translate="no">.<a href="#IdentityDepthPacking">IdentityDepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
-					<div class="description">
-						<p>The depth value is not packed.</p>
-					</div>
-				</div>
-				<div class="member">
 					<h3 class="name" id="IncrementStencilOp" translate="no">.<a href="#IncrementStencilOp">IncrementStencilOp</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Increments the current stencil buffer value. Clamps to the maximum representable unsigned value.</p>
@@ -1586,6 +1580,12 @@ When using VSMShadowMap all shadow receivers will also cast shadows.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="disposeShadowMaterial" translate="no">.<a href="#disposeShadowMaterial">disposeShadowMaterial</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Disposes the shadow material for the given light source.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="viewportResolution" translate="no">.<a href="#viewportResolution">viewportResolution</a> <span class="type-signature">(constant) </span></h3>
 						<dl class="details">
 							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r169. Use <a href="TSL.html#screenSize">screenSize</a> instead.</dt>
@@ -1854,6 +1854,48 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The filtering result.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="buildData3DTexture" translate="no">.<a href="#buildData3DTexture">buildData3DTexture</a><span class="signature">( chunk : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Data3DTexture.html">Data3DTexture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Builds a 3D texture from a VOX chunk.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>chunk</strong>
+									</td>
+									<td class="description last">
+										<p>A VOX chunk loaded via <a href="VOXLoader.html">VOXLoader</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated 3D texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="buildMesh" translate="no">.<a href="#buildMesh">buildMesh</a><span class="signature">( chunk : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Builds a mesh from a VOX chunk.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>chunk</strong>
+									</td>
+									<td class="description last">
+										<p>A VOX chunk loaded via <a href="VOXLoader.html">VOXLoader</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated mesh.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="ceilPowerOfTwo" translate="no">.<a href="#ceilPowerOfTwo">ceilPowerOfTwo</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>

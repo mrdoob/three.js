@@ -31,27 +31,6 @@ export default QUnit.module( 'Renderers', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'depth', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'texture', ( assert ) => {
-
-			// must be DataArrayTexture
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'isWebGLArrayRenderTarget', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 	} );
 
 } );

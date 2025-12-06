@@ -38,42 +38,6 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.todo( 'color', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'map', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'alphaMap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'size', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'sizeAttenuation', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'fog', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isPointsMaterial', ( assert ) => {
 
@@ -82,12 +46,6 @@ export default QUnit.module( 'Materials', () => {
 				object.isPointsMaterial,
 				'PointsMaterial.isPointsMaterial should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

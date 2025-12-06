@@ -39,11 +39,6 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'setColors', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
 
 		QUnit.test( 'dispose', ( assert ) => {
 

@@ -8,26 +8,6 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module( 'WebGLLights', () => {
 
-			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			// PUBLIC STUFF
-			QUnit.todo( 'setup', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'state', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 		} );
 
 	} );

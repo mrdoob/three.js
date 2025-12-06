@@ -29,13 +29,6 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'focus', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isSpotLightShadow', ( assert ) => {
 
@@ -44,18 +37,6 @@ export default QUnit.module( 'Lights', () => {
 				object.isSpotLightShadow,
 				'SpotLightShadow.isSpotLightShadow should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'updateMatrices', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'copy', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -18993,7 +18993,7 @@ class BufferGeometry extends EventDispatcher {
 		 * This dictionary holds the morph targets of the geometry.
 		 *
 		 * Note: Once the geometry has been rendered, the morph attribute data cannot
-		 * be changed. You will have to call `dispose()?, and create a new geometry instance.
+		 * be changed. You will have to call `dispose()`, and create a new geometry instance.
 		 *
 		 * @type {Object}
 		 */
@@ -31416,7 +31416,7 @@ class PolyhedronGeometry extends BufferGeometry {
 	 */
 	static fromJSON( data ) {
 
-		return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.details );
+		return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.detail );
 
 	}
 
@@ -46046,10 +46046,6 @@ class SpotLight extends Light {
 
 }
 
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _lightPositionWorld = /*@__PURE__*/ new Vector3();
-const _lookTarget = /*@__PURE__*/ new Vector3();
-
 /**
  * Represents the shadow configuration of point lights.
  *
@@ -46072,52 +46068,6 @@ class PointLightShadow extends LightShadow {
 		 * @default true
 		 */
 		this.isPointLightShadow = true;
-
-		this._cubeDirections = [
-			new Vector3( 1, 0, 0 ), new Vector3( -1, 0, 0 ), new Vector3( 0, 1, 0 ),
-			new Vector3( 0, -1, 0 ), new Vector3( 0, 0, 1 ), new Vector3( 0, 0, -1 )
-		];
-
-		this._cubeUps = [
-			new Vector3( 0, -1, 0 ), new Vector3( 0, -1, 0 ), new Vector3( 0, 0, 1 ),
-			new Vector3( 0, 0, -1 ), new Vector3( 0, -1, 0 ), new Vector3( 0, -1, 0 )
-		];
-
-	}
-
-	/**
-	 * Update the matrices for the camera and shadow, used internally by the renderer.
-	 *
-	 * @param {Light} light - The light for which the shadow is being rendered.
-	 * @param {number} [faceIndex=0] - The cube face index (0-5).
-	 */
-	updateMatrices( light, faceIndex = 0 ) {
-
-		const camera = this.camera;
-		const shadowMatrix = this.matrix;
-
-		const far = light.distance || camera.far;
-
-		if ( far !== camera.far ) {
-
-			camera.far = far;
-			camera.updateProjectionMatrix();
-
-		}
-
-		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-		camera.position.copy( _lightPositionWorld );
-
-		_lookTarget.copy( camera.position );
-		_lookTarget.add( this._cubeDirections[ faceIndex ] );
-		camera.up.copy( this._cubeUps[ faceIndex ] );
-		camera.lookAt( _lookTarget );
-		camera.updateMatrixWorld();
-
-		shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
-
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 	}
 
@@ -67718,6 +67668,20 @@ const vertex = "void main() {\n\tgl_Position = vec4( position, 1.0 );\n}";
 
 const fragment = "uniform sampler2D shadow_pass;\nuniform vec2 resolution;\nuniform float radius;\nvoid main() {\n\tconst float samples = float( VSM_SAMPLES );\n\tfloat mean = 0.0;\n\tfloat squared_mean = 0.0;\n\tfloat uvStride = samples <= 1.0 ? 0.0 : 2.0 / ( samples - 1.0 );\n\tfloat uvStart = samples <= 1.0 ? 0.0 : - 1.0;\n\tfor ( float i = 0.0; i < samples; i ++ ) {\n\t\tfloat uvOffset = uvStart + i * uvStride;\n\t\t#ifdef HORIZONTAL_PASS\n\t\t\tvec2 distribution = texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( uvOffset, 0.0 ) * radius ) / resolution ).rg;\n\t\t\tmean += distribution.x;\n\t\t\tsquared_mean += distribution.y * distribution.y + distribution.x * distribution.x;\n\t\t#else\n\t\t\tfloat depth = texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ).r;\n\t\t\tmean += depth;\n\t\t\tsquared_mean += depth * depth;\n\t\t#endif\n\t}\n\tmean = mean / samples;\n\tsquared_mean = squared_mean / samples;\n\tfloat std_dev = sqrt( max( 0.0, squared_mean - mean * mean ) );\n\tgl_FragColor = vec4( mean, std_dev, 0.0, 1.0 );\n}";
 
+const _cubeDirections = [
+	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
+	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
+];
+
+const _cubeUps = [
+	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
+	/*@__PURE__*/ new Vector3( 0, 0, -1 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 )
+];
+
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _lightPositionWorld = /*@__PURE__*/ new Vector3();
+const _lookTarget = /*@__PURE__*/ new Vector3();
+
 function WebGLShadowMap( renderer, objects, capabilities ) {
 
 	let _frustum = new Frustum();
@@ -67997,7 +67961,39 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 				}
 
-				shadow.updateMatrices( light, face );
+				if ( light.isPointLight ) {
+
+					const camera = shadow.camera;
+					const shadowMatrix = shadow.matrix;
+
+					const far = light.distance || camera.far;
+
+					if ( far !== camera.far ) {
+
+						camera.far = far;
+						camera.updateProjectionMatrix();
+
+					}
+
+					_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+					camera.position.copy( _lightPositionWorld );
+
+					_lookTarget.copy( camera.position );
+					_lookTarget.add( _cubeDirections[ face ] );
+					camera.up.copy( _cubeUps[ face ] );
+					camera.lookAt( _lookTarget );
+					camera.updateMatrixWorld();
+
+					shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+
+					_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+					shadow._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
+				} else {
+
+					shadow.updateMatrices( light );
+
+				}
 
 				_frustum = shadow.getFrustum();
 

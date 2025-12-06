@@ -134,7 +134,7 @@ class BufferGeometry extends EventDispatcher {
 		 * This dictionary holds the morph targets of the geometry.
 		 *
 		 * Note: Once the geometry has been rendered, the morph attribute data cannot
-		 * be changed. You will have to call `dispose()?, and create a new geometry instance.
+		 * be changed. You will have to call `dispose()`, and create a new geometry instance.
 		 *
 		 * @type {Object}
 		 */

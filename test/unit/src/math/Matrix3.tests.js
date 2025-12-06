@@ -161,15 +161,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'extractBasis', ( assert ) => {
-
-			// extractBasis( xAxis, yAxis, zAxis )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'setFromMatrix4', ( assert ) => {
-
 
 			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			const b = new Matrix3();
@@ -460,20 +452,6 @@ export default QUnit.module( 'Maths', () => {
 
 			a.makeTranslation( b );
 			assert.ok( matrixEquals3( a, c ), 'Check translation result' );
-
-		} );
-
-		QUnit.todo( 'makeRotation', ( assert ) => {
-
-			// makeRotation( theta ) // counterclockwise
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'makeScale', ( assert ) => {
-
-			// makeScale( x, y )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

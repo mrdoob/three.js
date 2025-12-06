@@ -14,13 +14,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'mask', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'set', ( assert ) => {
 
@@ -54,12 +47,6 @@ export default QUnit.module( 'Core', () => {
 			a.set( 1 );
 			a.enable( 1 );
 			assert.strictEqual( a.mask, 2, 'Enable channel 1 with mask 1' );
-
-		} );
-
-		QUnit.todo( 'enableAll', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -104,12 +91,6 @@ export default QUnit.module( 'Core', () => {
 			a.set( 1 );
 			a.disable( 1 );
 			assert.strictEqual( a.mask, 0, 'Disable channel 1 with mask 1' );
-
-		} );
-
-		QUnit.todo( 'disableAll', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
