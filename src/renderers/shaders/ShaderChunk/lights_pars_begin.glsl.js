@@ -186,6 +186,12 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 	uniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];
 
+	#if NUM_RECT_AREA_LIGHT_MAPS > 0
+
+		uniform sampler2D rectAreaLightMap[ NUM_RECT_AREA_LIGHT_MAPS ];
+
+	#endif
+
 #endif
 
 

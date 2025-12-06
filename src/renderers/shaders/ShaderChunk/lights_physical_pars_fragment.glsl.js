@@ -315,7 +315,154 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 
 }
 
-// End Rect Area Light
+// Textured Rect Area Light support functions
+// These enable sampling a texture on the light surface for both specular and diffuse
+
+// Möller–Trumbore ray-triangle intersection, returns barycentric coords
+bool LTC_RayTriangle( const in vec3 orig, const in vec3 dir, const in vec3 v0, const in vec3 v1, const in vec3 v2, out vec2 bary ) {
+
+	vec3 v0v1 = v1 - v0;
+	vec3 v0v2 = v2 - v0;
+	vec3 pvec = cross( dir, v0v2 );
+	float det = dot( v0v1, pvec );
+	float invDet = 1.0 / det;
+
+	vec3 tvec = orig - v0;
+	bary.x = dot( tvec, pvec ) * invDet;
+
+	vec3 qvec = cross( tvec, v0v1 );
+	bary.y = dot( dir, qvec ) * invDet;
+
+	return bary.x >= 0.0;
+
+}
+
+// Specular UV: intersect reflection ray with light plane for stable UVs across roughness
+vec2 LTC_TextureUVReflection( const in vec3 P, const in vec3 R, const in vec3 rectCoords[ 4 ] ) {
+
+	// Light plane from first three vertices
+	vec3 E1 = rectCoords[ 1 ] - rectCoords[ 0 ];
+	vec3 E2 = rectCoords[ 3 ] - rectCoords[ 0 ];
+	vec3 lightNormal = cross( E1, E2 );
+
+	// Ray-plane intersection: find t where P + t*R hits the plane
+	float denom = dot( lightNormal, R );
+
+	// If ray is parallel to plane, use center UV
+	if ( abs( denom ) < 0.0001 ) return vec2( 0.5 );
+
+	float t = dot( lightNormal, rectCoords[ 0 ] - P ) / denom;
+
+	// If intersection is behind the ray origin, use center UV
+	if ( t < 0.0 ) return vec2( 0.5 );
+
+	// Intersection point on the light plane
+	vec3 hitPoint = P + t * R;
+
+	// Convert hit point to UV using local coordinates
+	// rectCoords[0] is corner, E1 and E2 are edges
+	vec3 localHit = hitPoint - rectCoords[ 0 ];
+
+	// Project onto edge vectors (E1 goes from [0] to [1], E2 goes from [0] to [3])
+	float u = dot( localHit, E1 ) / dot( E1, E1 );
+	float v = dot( localHit, E2 ) / dot( E2, E2 );
+
+	return vec2( u, v );
+
+}
+
+// Diffuse UV: raycast from origin to light quad in transformed space
+vec2 LTC_TextureUV( const in vec3 L[ 4 ], out vec3 planeNormal ) {
+
+	// Calculate perpendicular vector to plane defined by area light
+	vec3 E1 = L[ 1 ] - L[ 0 ];
+	vec3 E2 = L[ 3 ] - L[ 0 ];
+	planeNormal = cross( E1, E2 );
+
+	// Raycast from origin against the two triangles formed by the quad
+	// The ray direction is the plane normal (perpendicular to the light)
+	vec2 bary;
+	bool hit0 = LTC_RayTriangle( vec3( 0.0 ), planeNormal, L[ 0 ], L[ 2 ], L[ 3 ], bary );
+
+	if ( ! hit0 ) {
+
+		LTC_RayTriangle( vec3( 0.0 ), planeNormal, L[ 0 ], L[ 1 ], L[ 2 ], bary );
+
+	}
+
+	// Convert barycentric to UV coordinates
+	// UV mapping: L[0]→(0,0), L[1]→(1,0), L[2]→(1,1), L[3]→(0,1)
+	vec3 bary3 = vec3( bary, 1.0 - bary.x - bary.y );
+
+	vec2 uv;
+
+	if ( hit0 ) {
+
+		// Triangle L[0], L[2], L[3]: v0=L[0]→(0,0), v1=L[2]→(1,1), v2=L[3]→(0,1)
+		uv = vec2( 1.0, 1.0 ) * bary3.x + vec2( 0.0, 1.0 ) * bary3.y + vec2( 0.0, 0.0 ) * bary3.z;
+
+	} else {
+
+		// Triangle L[0], L[1], L[2]: v0=L[0]→(0,0), v1=L[1]→(1,0), v2=L[2]→(1,1)
+		uv = vec2( 1.0, 0.0 ) * bary3.x + vec2( 1.0, 1.0 ) * bary3.y + vec2( 0.0, 0.0 ) * bary3.z;
+
+	}
+
+	return uv;
+
+}
+
+vec3 LTC_SRGBToLinear( const in vec3 srgb ) {
+
+	return pow( srgb, vec3( 2.2 ) );
+
+}
+
+// Randomized blur using 8 samples in a circular pattern (clamped to edges)
+vec3 LTC_TextureHashBlur( const in sampler2D tex, const in vec2 uv, const in float radius, const in float lod ) {
+
+	float hash = fract( sin( dot( gl_FragCoord.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
+	vec3 result = vec3( 0.0 );
+
+	for ( int i = 0; i < 8; i ++ ) {
+
+		float angle = ( float( i ) + hash ) * 0.785398;
+		float r = radius * ( 0.5 + 0.5 * fract( hash * float( i + 1 ) * 7.3 ) );
+		vec2 sampleUV = clamp( uv + vec2( cos( angle ), sin( angle ) ) * r, vec2( 0.001 ), vec2( 0.999 ) );
+		result += LTC_SRGBToLinear( textureLod( tex, sampleUV, lod ).rgb );
+
+	}
+
+	return result * 0.125;
+
+}
+
+// Hash blur with CLAMP_TO_BORDER emulation - ignores samples outside [0,1]
+vec3 LTC_TextureHashBlurBorder( const in sampler2D tex, const in vec2 uv, const in float radius, const in float lod ) {
+
+	float hash = fract( sin( dot( gl_FragCoord.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
+	vec3 result = vec3( 0.0 );
+	float validSamples = 0.0;
+
+	for ( int i = 0; i < 8; i ++ ) {
+
+		float angle = ( float( i ) + hash ) * 0.785398;
+		float r = radius * ( 0.5 + 0.5 * fract( hash * float( i + 1 ) * 7.3 ) );
+		vec2 sampleUV = uv + vec2( cos( angle ), sin( angle ) ) * r;
+
+		if ( sampleUV.x >= 0.0 && sampleUV.x <= 1.0 && sampleUV.y >= 0.0 && sampleUV.y <= 1.0 ) {
+
+			result += LTC_SRGBToLinear( textureLod( tex, sampleUV, lod ).rgb );
+			validSamples += 1.0;
+
+		}
+
+	}
+
+	// Average only valid samples; return black if all samples were outside
+	return validSamples > 0.0 ? result / validSamples : vec3( 0.0 );
+
+}
 
 #if defined( USE_SHEEN )
 
@@ -464,6 +611,89 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 
 #if NUM_RECT_AREA_LIGHTS > 0
 
+	#if NUM_RECT_AREA_LIGHT_MAPS > 0
+
+		// Compute mipmap LOD based on distance to light and roughness
+		float LTC_TextureLOD( const in vec3 planeNormal, const in vec3 L0, const in float roughness ) {
+
+			float planeAreaSquared = dot( planeNormal, planeNormal );
+			float planeDistxPlaneArea = dot( planeNormal, L0 );
+
+			float d = abs( planeDistxPlaneArea ) / planeAreaSquared;
+			d = log2( d * 2.0 ) / log2( 3.0 ) * 2.5;
+
+			return max( d, roughness * 7.0 );
+
+		}
+
+		void RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in sampler2D rectAreaLightTexture, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
+
+			vec3 normal = geometryNormal;
+			vec3 viewDir = geometryViewDir;
+			vec3 position = geometryPosition;
+			vec3 lightPos = rectAreaLight.position;
+			vec3 halfWidth = rectAreaLight.halfWidth;
+			vec3 halfHeight = rectAreaLight.halfHeight;
+			vec3 lightColor = rectAreaLight.color;
+			float roughness = material.roughness;
+
+			vec3 rectCoords[ 4 ];
+			rectCoords[ 0 ] = lightPos + halfWidth - halfHeight;
+			rectCoords[ 1 ] = lightPos - halfWidth - halfHeight;
+			rectCoords[ 2 ] = lightPos - halfWidth + halfHeight;
+			rectCoords[ 3 ] = lightPos + halfWidth + halfHeight;
+
+			vec2 uv = LTC_Uv( normal, viewDir, roughness );
+
+			vec4 t1 = texture2D( ltc_1, uv );
+			vec4 t2 = texture2D( ltc_2, uv );
+
+			mat3 mInv = mat3(
+				vec3( t1.x, 0, t1.y ),
+				vec3(    0, 1,    0 ),
+				vec3( t1.z, 0, t1.w )
+			);
+
+			vec3 fresnel = ( material.specularColorBlended * t2.x + ( vec3( 1.0 ) - material.specularColorBlended ) * t2.y );
+
+			vec3 T1 = normalize( viewDir - normal * dot( viewDir, normal ) );
+			vec3 T2 = - cross( normal, T1 );
+
+			// Specular: use reflection ray intersection for stable UV across roughness
+			vec3 reflectDir = reflect( - viewDir, normal );
+			vec2 texUVSpec = LTC_TextureUVReflection( position, reflectDir, rectCoords );
+
+			vec3 lightCenter = ( rectCoords[ 0 ] + rectCoords[ 2 ] ) * 0.5;
+			float distToLight = length( lightCenter - position );
+			float lightSize = length( rectCoords[ 1 ] - rectCoords[ 0 ] );
+			float specLod = roughness * 6.0 + max( 0.0, log2( distToLight / lightSize ) );
+			float specBlurRadius = roughness * 0.3;
+
+			// Diffuse: transform light to tangent space for UV calculation
+			mat3 matDiff = transpose( mat3( T1, T2, normal ) );
+			vec3 Ldiff[ 4 ];
+			Ldiff[ 0 ] = matDiff * ( rectCoords[ 0 ] - position );
+			Ldiff[ 1 ] = matDiff * ( rectCoords[ 1 ] - position );
+			Ldiff[ 2 ] = matDiff * ( rectCoords[ 2 ] - position );
+			Ldiff[ 3 ] = matDiff * ( rectCoords[ 3 ] - position );
+
+			vec3 planeNormalDiff;
+			vec2 texUVDiff = LTC_TextureUV( Ldiff, planeNormalDiff );
+			texUVDiff = clamp( texUVDiff, vec2( 0.001 ), vec2( 0.999 ) );
+			float diffLod = LTC_TextureLOD( planeNormalDiff, Ldiff[ 0 ], 1.0 );
+
+			vec3 texColorSpec = LTC_TextureHashBlurBorder( rectAreaLightTexture, texUVSpec, specBlurRadius, specLod );
+
+			float diffBlurRadius = 0.02 + distToLight / lightSize;
+			vec3 texColorDiff = LTC_TextureHashBlur( rectAreaLightTexture, texUVDiff, diffBlurRadius, max( diffLod - 1.0, 0.0 ) );
+
+			reflectedLight.directSpecular += lightColor * texColorSpec * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );
+			reflectedLight.directDiffuse += lightColor * texColorDiff * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );
+
+		}
+
+	#endif
+
 	void RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
 		vec3 normal = geometryNormal;
@@ -497,7 +727,6 @@ vec3 BRDF_GGX_Multiscatter( const in vec3 lightDir, const in vec3 viewDir, const
 		vec3 fresnel = ( material.specularColorBlended * t2.x + ( vec3( 1.0 ) - material.specularColorBlended ) * t2.y );
 
 		reflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );
-
 		reflectedLight.directDiffuse += lightColor * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );
 
 	}

@@ -66,6 +66,15 @@ class RectAreaLight extends Light {
 		 */
 		this.height = height;
 
+		/**
+		 * A texture that modulates the light color. The texture is
+		 * projected onto the light's surface and sampled during shading.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.map = null;
+
 	}
 
 	/**
@@ -94,6 +103,7 @@ class RectAreaLight extends Light {
 
 		this.width = source.width;
 		this.height = source.height;
+		this.map = source.map;
 
 		return this;
 
@@ -105,6 +115,8 @@ class RectAreaLight extends Light {
 
 		data.object.width = this.width;
 		data.object.height = this.height;
+
+		if ( this.map && this.map.isTexture ) data.object.map = this.map.toJSON( meta ).uuid;
 
 		return data;
 

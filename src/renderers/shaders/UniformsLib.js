@@ -195,7 +195,9 @@ const UniformsLib = {
 		} },
 
 		ltc_1: { value: null },
-		ltc_2: { value: null }
+		ltc_2: { value: null },
+
+		rectAreaLightMap: { value: [] }
 
 	},
 
