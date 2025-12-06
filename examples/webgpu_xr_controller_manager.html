@@ -25,8 +25,8 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
-
+			import * as THREE from 'three/webgpu';
+			//import * as THREE from 'three';
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerManager } from 'three/addons/webxr/XRControllerManager.js';
@@ -95,27 +95,14 @@
 				}
 
 
-				//renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType, multiview: true } );
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, colorBufferType: THREE.UnsignedByteType, multiview: true } );
+				//renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				//
-
-				function onSelectStart() {
-
-					this.userData.isSelecting = true;
-
-				}
-
-				function onSelectEnd() {
-
-					this.userData.isSelecting = false;
-
-				}
 
 				const events = [
 					'connected',
@@ -174,7 +161,6 @@
 
 					controller.addEventListener( 'hovered', ( event ) => {
 			
-
 						if ( INTERSECTED != event.intersectObject ) {
 
 							if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );

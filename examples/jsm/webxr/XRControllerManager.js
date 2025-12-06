@@ -26,8 +26,9 @@ class XRControllerManager extends EventDispatcher {
      * @param {XRManager|WebXRManager} xrManager - The webxr manager object.
      * @param {Array} collisions - The intersections collision list.
      * @param {boolean} useXRButtons - Enable gamepad controls update events.
+	 * @param {Object} gripModelConfig - Add configs for the grip model pointer.
 	 */
-	constructor( controllerIndex, scene, xrManager, collisions = [], useXRButtons = false ) {
+	constructor( controllerIndex, scene, xrManager, collisions = [], useXRButtons = false, gripModelConfig = {} ) {
 
 		super();
 
@@ -71,17 +72,40 @@ class XRControllerManager extends EventDispatcher {
          */
 		this._useXRButtons = useXRButtons;
 
+		this._gripModelConfig = gripModelConfig;
+
+		/**
+		 * Initial visibility of controller models.
+		 * @private
+		 * @type {Boolean}
+		 */
+		this._visible = true;
+
 		//setup controller connext events.
 		this._controller.addEventListener( 'connected', ( event ) => this._onControllerConnected( event ) );
 		this._controller.addEventListener( 'disconnected', ( event ) => this._onControllerDisconnected( event ) );
 
 		/**
          * The event emitter callback reference.
+		 * Only emit when the controller is visible.
          *
          * @param {Object} event
          * @returns {void}
          */
-		this._eventCallbackRef = ( event ) => this.emit( event );
+		this._eventCallbackRef = ( event ) => {
+
+			if ( this.visible ) this.emit( event );
+
+		};
+
+		/**
+         * The unselected event emitter callback reference.
+		 * Used for toggling the controller visibility and unsetting intersections.
+         *
+         * @param {Object} event
+         * @returns {void}
+         */
+		this._eventUnselectedCallbackRef = ( event ) => this.emit( event );
 
 		/**
          * Create an XR intersections for this controller.
@@ -91,7 +115,7 @@ class XRControllerManager extends EventDispatcher {
 
 		this._xrIntersections.addEventListener( 'selected', this._eventCallbackRef );
 
-		this._xrIntersections.addEventListener( 'unselected', this._eventCallbackRef );
+		this._xrIntersections.addEventListener( 'unselected', this._eventUnselectedCallbackRef );
 
 		this._xrIntersections.addEventListener( 'selectend', this._eventCallbackRef );
 
@@ -191,6 +215,17 @@ class XRControllerManager extends EventDispatcher {
 	}
 
 	/**
+	 * Get the index tip joins of the hand object.
+	 *
+	 * @returns {Object3D}
+	 */
+	get indexTip() {
+
+		return this.hand.joints[ 'index-finger-tip' ];
+
+	}
+
+	/**
      * Get the hand pointer model;
      * @returns {Object3D} - The hand pointer model.
      */
@@ -205,7 +240,7 @@ class XRControllerManager extends EventDispatcher {
      */
 	get handModel() {
 
-		return this._controller.userData.hand.children[ 0 ];
+		return this._controller.userData.handModel;
 
 	}
 
@@ -223,7 +258,7 @@ class XRControllerManager extends EventDispatcher {
      */
 	get gripModel() {
 
-		return this.controllerGrip && this.controllerGrip.children[ 0 ];
+		return this._controller.userData.gripModel;
 
 	}
 
@@ -234,7 +269,9 @@ class XRControllerManager extends EventDispatcher {
 	 */
 	get visible() {
 
-		return this._controller.visible;
+		const controllerModel = ( this.gripModel || this.handModel );
+
+		return controllerModel && controllerModel.visible || this._visible;
 
 	}
 
@@ -245,11 +282,24 @@ class XRControllerManager extends EventDispatcher {
 	 */
 	set visible( value ) {
 
-		this._controller.visible = value;
+		this._visible = value;
 
-		if ( this.controllerGrip ) this.gripModel.visible = value;
-		if ( this.hand ) this.handModel.visible = value;
-		if ( this._xrIntersections.currentPointer ) this._xrIntersections.currentPointer.visible = value;
+		if ( this.controllerGrip ) {
+
+			this.gripModel.visible = value;
+			this.gripPointer.visible = value;
+
+		}
+
+		if ( this.hand ) {
+
+			this.handModel.visible = value;
+			this.handPointer.visible = value;
+
+		}
+
+		if ( ! value ) this._xrIntersections.resetSelectedObject();
+
 
 	}
 
@@ -352,7 +402,6 @@ class XRControllerManager extends EventDispatcher {
 		//transient pointer is reconnecting.
 		if ( controller.userData.isTransientPointer ) {
 
-			//console.log('Transient Pointer Setup');
 			this.dispatchEvent( { type: 'reconnected', controller: this._controller, data: data } );
 			return;
 
@@ -368,14 +417,25 @@ class XRControllerManager extends EventDispatcher {
 
 			case 'tracked-pointer':
 				const controllerModelFactory = new XRControllerModelFactory(),
-					controllerGrip = controller.userData.controllerGrip = this._xrManager.getControllerGrip( this._controllerIndex );
+					controllerGrip = controller.userData.controllerGrip = this._xrManager.getControllerGrip( this._controllerIndex ),
+					gripModel = controller.userData.gripModel = controllerModelFactory.createControllerModel( controllerGrip );
 
-				controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
+				controllerGrip.add( gripModel );
 				this._scene.add( controllerGrip );
 
-				const gripPointer = controller.userData.gripPointer = new GripPointerModel( controller );
+				//set visibility the same as the controller
+				gripModel.visible = this._visible;
 
-				controllerGrip.add( gripPointer );
+				const gripPointer = controller.userData.gripPointer = new GripPointerModel( controller,
+					this._gripModelConfig.lineDistance,
+					this._gripModelConfig.lineWidth,
+					this._gripModelConfig.activeLineColor,
+					this._gripModelConfig.cursorDistance
+				 );
+
+				controller.add( gripPointer );
+
+				gripPointer.visible = this._visible;
 
 				this.dispatchEvent( { type: 'controllerGrip', controllerGrip: controllerGrip } );
 
@@ -412,10 +472,17 @@ class XRControllerManager extends EventDispatcher {
 
 			if ( ! controller.userData.hand ) {
 
-				const hand = controller.userData.hand = this._xrManager.getHand( this._controllerIndex );
-				hand.add( new OculusHandModel( hand ) );
+				const hand = controller.userData.hand = this._xrManager.getHand( this._controllerIndex ),
+					handModel = controller.userData.handModel = new OculusHandModel( hand );
+				hand.add( handModel );
+
+				//set visibility the same as the controller
+				handModel.visible = this._visible;
+
 				const handPointer = controller.userData.handPointer = new OculusHandPointerModel( hand, controller );
 				hand.add( handPointer );
+
+				handPointer.visible = this._visible;
 
 				hand.addEventListener( 'connected', ( event ) => {
 
@@ -440,8 +507,6 @@ class XRControllerManager extends EventDispatcher {
 			this.dispatchEvent( { type: 'grip-reconnected' } );
 
 		}
-
-		console.log( 'controller connected', event );
 
 	}
 

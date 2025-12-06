@@ -17,6 +17,7 @@ import {
 const POINTER_COLOR = 0xffffff;
 const POINTER_ACTIVE_COLOR = 0x0081FB;
 const POINTER_LINE_DISTANCE = 1.0;
+const POINTER_LINE_WIDTH = 3;
 
 const CURSOR_RADIUS = 0.02;
 const CURSOR_MAX_DISTANCE = 1.5;
@@ -35,12 +36,14 @@ class GripPointerModel extends Object3D {
 	 *
 	 * @param {Group} controller - The WebXR controller in target ray space.
 	 * @param {number} lineDistance - The default line distance.
+	 * @param {mumber} lineWidth - The line width.
 	 * @param {number} lineColor = The default line color.
 	 * @param {number} activeLineColor = The active line color.
 	 * @param {number} cursorDistance = The default cursor distance.
 	 */
 	constructor( controller,
 		lineDistance = POINTER_LINE_DISTANCE,
+		lineWidth = POINTER_LINE_WIDTH,
 		lineColor = POINTER_COLOR,
 		activeLineColor = POINTER_ACTIVE_COLOR,
 		cursorDistance = CURSOR_MAX_DISTANCE
@@ -85,6 +88,7 @@ class GripPointerModel extends Object3D {
 		this._lineColor = lineColor;
 		this._activeLineColor = activeLineColor;
 		this._lineDistance = lineDistance;
+		this._lineWidth = lineWidth;
 		this._cursorDistance = cursorDistance;
 
 		this._onConnected = this._onConnected.bind( this );
@@ -124,17 +128,6 @@ class GripPointerModel extends Object3D {
 			this._pointerLine.geometry.attributes.position.needsUpdate = true;
 
 		}
-
-	}
-
-	/**
-	 * Set the active line color.
-	 *
-	 * @param {number} color = The active line color.
-	 */
-	set activeLineColor( color ) {
-
-		this._activeLineColor = color;
 
 	}
 
@@ -214,7 +207,7 @@ class GripPointerModel extends Object3D {
 		const lineMaterial = new LineBasicMaterial( {
 				vertexColors: true,
 				blending: AdditiveBlending,
-				linewidth: 8 } ),
+				linewidth: this._lineWidth } ),
 			pointerLine = this._pointerLine = new Line( new BufferGeometry(), lineMaterial ),
 			lineColor = new Color( POINTER_COLOR );
 		pointerLine.geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, - this._lineDistance ], 3 ) );
@@ -236,7 +229,7 @@ class GripPointerModel extends Object3D {
 		this._cursorObject = new Mesh( cursorGeometry, cursorMaterial );
 		this._pointerObject.add( this._cursorObject );
 
-		this.setCursor(this._cursorDistance);
+		this.setCursor( this._cursorDistance );
 
 		this.add( this._pointerObject );
 
