@@ -62,6 +62,10 @@ class ParametersGroup {
 
 	_addParameter( object, property, editor, subItem ) {
 
+		// Expose the object and key for external tools like chrome extensions
+		editor.object = object;
+		editor.key = property;
+
 		editor.name = ( name ) => {
 
 			subItem.data[ 0 ].textContent = name;
@@ -281,7 +285,9 @@ class ParametersGroup {
 		const itemRow = subItem.domElement.firstChild;
 		itemRow.classList.add( 'actionable' );
 
-		// extend object property
+		// Expose the object and key for external tools like chrome extensions
+		editor.object = object;
+		editor.key = property;
 
 		editor.name = ( name ) => {
 
