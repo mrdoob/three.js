@@ -18991,7 +18991,7 @@ class BufferGeometry extends EventDispatcher {
 		 * This dictionary holds the morph targets of the geometry.
 		 *
 		 * Note: Once the geometry has been rendered, the morph attribute data cannot
-		 * be changed. You will have to call `dispose()?, and create a new geometry instance.
+		 * be changed. You will have to call `dispose()`, and create a new geometry instance.
 		 *
 		 * @type {Object}
 		 */
@@ -26799,7 +26799,7 @@ class Frustum {
 
 }
 
-const _projScreenMatrix$2 = /*@__PURE__*/ new Matrix4();
+const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
 const _frustum$1 = /*@__PURE__*/ new Frustum();
 
 /**
@@ -26844,13 +26844,13 @@ class FrustumArray {
 
 			const camera = cameraArray.cameras[ i ];
 
-			_projScreenMatrix$2.multiplyMatrices(
+			_projScreenMatrix$1.multiplyMatrices(
 				camera.projectionMatrix,
 				camera.matrixWorldInverse
 			);
 
 			_frustum$1.setFromProjectionMatrix(
-				_projScreenMatrix$2,
+				_projScreenMatrix$1,
 				camera.coordinateSystem,
 				camera.reversedDepth
 			);
@@ -26887,13 +26887,13 @@ class FrustumArray {
 
 			const camera = cameraArray.cameras[ i ];
 
-			_projScreenMatrix$2.multiplyMatrices(
+			_projScreenMatrix$1.multiplyMatrices(
 				camera.projectionMatrix,
 				camera.matrixWorldInverse
 			);
 
 			_frustum$1.setFromProjectionMatrix(
-				_projScreenMatrix$2,
+				_projScreenMatrix$1,
 				camera.coordinateSystem,
 				camera.reversedDepth
 			);
@@ -26930,13 +26930,13 @@ class FrustumArray {
 
 			const camera = cameraArray.cameras[ i ];
 
-			_projScreenMatrix$2.multiplyMatrices(
+			_projScreenMatrix$1.multiplyMatrices(
 				camera.projectionMatrix,
 				camera.matrixWorldInverse
 			);
 
 			_frustum$1.setFromProjectionMatrix(
-				_projScreenMatrix$2,
+				_projScreenMatrix$1,
 				camera.coordinateSystem,
 				camera.reversedDepth
 			);
@@ -26973,13 +26973,13 @@ class FrustumArray {
 
 			const camera = cameraArray.cameras[ i ];
 
-			_projScreenMatrix$2.multiplyMatrices(
+			_projScreenMatrix$1.multiplyMatrices(
 				camera.projectionMatrix,
 				camera.matrixWorldInverse
 			);
 
 			_frustum$1.setFromProjectionMatrix(
-				_projScreenMatrix$2,
+				_projScreenMatrix$1,
 				camera.coordinateSystem,
 				camera.reversedDepth
 			);
@@ -27016,13 +27016,13 @@ class FrustumArray {
 
 			const camera = cameraArray.cameras[ i ];
 
-			_projScreenMatrix$2.multiplyMatrices(
+			_projScreenMatrix$1.multiplyMatrices(
 				camera.projectionMatrix,
 				camera.matrixWorldInverse
 			);
 
 			_frustum$1.setFromProjectionMatrix(
-				_projScreenMatrix$2,
+				_projScreenMatrix$1,
 				camera.coordinateSystem,
 				camera.reversedDepth
 			);
@@ -31414,7 +31414,7 @@ class PolyhedronGeometry extends BufferGeometry {
 	 */
 	static fromJSON( data ) {
 
-		return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.details );
+		return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.detail );
 
 	}
 
@@ -45453,9 +45453,9 @@ class HemisphereLight extends Light {
 
 }
 
-const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
-const _lightPositionWorld$1 = /*@__PURE__*/ new Vector3();
-const _lookTarget$1 = /*@__PURE__*/ new Vector3();
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _lightPositionWorld = /*@__PURE__*/ new Vector3();
+const _lookTarget = /*@__PURE__*/ new Vector3();
 
 /**
  * Abstract base class for light shadow classes. These classes
@@ -45641,15 +45641,15 @@ class LightShadow {
 		const shadowCamera = this.camera;
 		const shadowMatrix = this.matrix;
 
-		_lightPositionWorld$1.setFromMatrixPosition( light.matrixWorld );
-		shadowCamera.position.copy( _lightPositionWorld$1 );
+		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+		shadowCamera.position.copy( _lightPositionWorld );
 
-		_lookTarget$1.setFromMatrixPosition( light.target.matrixWorld );
-		shadowCamera.lookAt( _lookTarget$1 );
+		_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+		shadowCamera.lookAt( _lookTarget );
 		shadowCamera.updateMatrixWorld();
 
-		_projScreenMatrix$1.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix$1, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
+		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
 
 		if ( shadowCamera.reversedDepth ) {
 
@@ -45671,7 +45671,7 @@ class LightShadow {
 
 		}
 
-		shadowMatrix.multiply( _projScreenMatrix$1 );
+		shadowMatrix.multiply( _projScreenMatrix );
 
 	}
 
@@ -46044,10 +46044,6 @@ class SpotLight extends Light {
 
 }
 
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _lightPositionWorld = /*@__PURE__*/ new Vector3();
-const _lookTarget = /*@__PURE__*/ new Vector3();
-
 /**
  * Represents the shadow configuration of point lights.
  *
@@ -46070,52 +46066,6 @@ class PointLightShadow extends LightShadow {
 		 * @default true
 		 */
 		this.isPointLightShadow = true;
-
-		this._cubeDirections = [
-			new Vector3( 1, 0, 0 ), new Vector3( -1, 0, 0 ), new Vector3( 0, 1, 0 ),
-			new Vector3( 0, -1, 0 ), new Vector3( 0, 0, 1 ), new Vector3( 0, 0, -1 )
-		];
-
-		this._cubeUps = [
-			new Vector3( 0, -1, 0 ), new Vector3( 0, -1, 0 ), new Vector3( 0, 0, 1 ),
-			new Vector3( 0, 0, -1 ), new Vector3( 0, -1, 0 ), new Vector3( 0, -1, 0 )
-		];
-
-	}
-
-	/**
-	 * Update the matrices for the camera and shadow, used internally by the renderer.
-	 *
-	 * @param {Light} light - The light for which the shadow is being rendered.
-	 * @param {number} [faceIndex=0] - The cube face index (0-5).
-	 */
-	updateMatrices( light, faceIndex = 0 ) {
-
-		const camera = this.camera;
-		const shadowMatrix = this.matrix;
-
-		const far = light.distance || camera.far;
-
-		if ( far !== camera.far ) {
-
-			camera.far = far;
-			camera.updateProjectionMatrix();
-
-		}
-
-		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-		camera.position.copy( _lightPositionWorld );
-
-		_lookTarget.copy( camera.position );
-		_lookTarget.add( this._cubeDirections[ faceIndex ] );
-		camera.up.copy( this._cubeUps[ faceIndex ] );
-		camera.lookAt( _lookTarget );
-		camera.updateMatrixWorld();
-
-		shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
-
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 	}
 
