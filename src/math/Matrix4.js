@@ -293,13 +293,9 @@ class Matrix4 {
 		const te = this.elements;
 		const me = m.elements;
 
-		const lengthX = _v1.setFromMatrixColumn( m, 0 ).length();
-		const lengthY = _v1.setFromMatrixColumn( m, 1 ).length();
-		const lengthZ = _v1.setFromMatrixColumn( m, 2 ).length();
-
-		const scaleX = 1 / lengthX;
-		const scaleY = 1 / lengthY;
-		const scaleZ = 1 / lengthZ;
+		const scaleX = 1 / _v1.setFromMatrixColumn( m, 0 ).length();
+		const scaleY = 1 / _v1.setFromMatrixColumn( m, 1 ).length();
+		const scaleZ = 1 / _v1.setFromMatrixColumn( m, 2 ).length();
 
 		te[ 0 ] = me[ 0 ] * scaleX;
 		te[ 1 ] = me[ 1 ] * scaleX;
