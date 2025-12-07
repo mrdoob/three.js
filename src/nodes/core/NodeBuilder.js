@@ -2881,6 +2881,14 @@ class NodeBuilder {
 
 	}
 
+	getCount() {
+
+		const count = this.instances.length;
+
+		return Math.ceil( count / 8 ) * 8;
+
+	}
+
 	/**
 	 * Central build method which controls the build for the given object.
 	 *
