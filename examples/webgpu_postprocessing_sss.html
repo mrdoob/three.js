@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, vec3, vec4, mrt, output, velocity } from 'three/tsl';
+			import { pass, vec3, vec4, mrt, screenUV, velocity, builtinShadowContext } from 'three/tsl';
 			import { sss } from 'three/addons/tsl/display/SSSNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -128,33 +128,43 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
+				// post-processing
+
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
-					output: output,
-					velocity: velocity
+				// pre-pass
+
+				const prePass = pass( scene, camera );
+				prePass.name = 'Pre-Pass';
+				prePass.transparent = false;
+
+				prePass.setMRT( mrt( {
+					output: velocity
 				} ) );
 
-				const scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				const prePassDepth = prePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => prePass.getLinearDepthNode() );
+				const prePassVelocity = prePass.getTextureNode( 'output' ).toInspector( 'Velocity' );
+
+				// scene pass
+
+				const scenePass = pass( scene, camera ).toInspector( 'Color' );
 
 				// sss
 
-				const sssPass = sss( scenePassDepth, camera, dirLight );
-				sssPass.shadowIntensity.value = 0.3;
+				const sssPass = sss( prePassDepth, camera, dirLight );
 				sssPass.maxDistance.value = 0.2;
 				sssPass.useTemporalFiltering = true;
 
-				// composite
+				// scene context
 
-				const compositePass = vec4( scenePassColor.rgb.mul( sssPass.r ), scenePassColor.a );
-				compositePass.name = 'Composite';
-			
+				const sssSample = sssPass.getTextureNode().sample( screenUV ).r;
+				const sssContext = builtinShadowContext( sssSample, dirLight );
+
+				scenePass.contextNode = sssContext;
+
 				// traa
 
-				const traaPass = traa( compositePass, scenePassDepth, scenePassVelocity, camera );
+				const traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
 				postProcessing.outputNode = traaPass;
 
 				//
@@ -184,17 +194,15 @@
 
 				function updatePostprocessing() {
 
-					if ( params.output === 1 ) {
+					scenePass.contextNode = params.output !== 1 ? sssContext : null;
 
-						postProcessing.outputNode = scenePassColor;
-
-					} else if ( params.output === 2 ) {
+					if ( params.output === 2 ) {
 
 						postProcessing.outputNode = vec4( vec3( sssPass.r ), 1 );
 
 					} else {
 
-						postProcessing.outputNode = sssPass.useTemporalFiltering ? traaPass : compositePass;
+						postProcessing.outputNode = sssPass.useTemporalFiltering ? traaPass : scenePass;
 
 					}
 

@@ -1,4 +1,4 @@
-import { Color } from 'three';
+import { Color } from 'three/webgpu';
 import { attribute, cameraProjectionMatrix, dot, float, Fn, modelViewMatrix, modelViewProjection, NodeMaterial, normalize, positionGeometry, sign, uniform, varyingProperty, vec2, vec4 } from 'three/tsl';
 
 /**

@@ -1,5 +1,5 @@
 
-import { InspectorBase, TimestampQuery } from 'three/webgpu';
+import { InspectorBase, TimestampQuery, warnOnce } from 'three/webgpu';
 
 class ObjectStats {
 
@@ -330,7 +330,17 @@ export class RendererInspector extends InspectorBase {
 
 	inspect( node ) {
 
-		this.currentNodes.push( node );
+		const currentNodes = this.currentNodes;
+
+		if ( currentNodes !== null ) {
+
+			currentNodes.push( node );
+
+		} else {
+
+			warnOnce( 'RendererInspector: Unable to inspect node outside of frame scope. Use "renderer.setAnimationLoop()".' );
+
+		}
 
 	}
 

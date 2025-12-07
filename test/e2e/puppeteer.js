@@ -35,6 +35,7 @@ const exceptionList = [
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
 	'webgpu_reflection',
+	'webgpu_test_memory',
 	'webgpu_texturegrad',
 	'webgpu_tsl_vfx_flames',
 
@@ -120,7 +121,24 @@ const app = express();
 app.use( express.static( path.resolve() ) );
 const server = app.listen( port, main );
 
-process.on( 'SIGINT', () => close() );
+process.on( 'SIGINT', async () => {
+
+	console.log( '\nInterrupted, cleaning up...' );
+
+	if ( browser ) {
+
+		try {
+
+			await browser.close();
+
+		} catch {}
+
+	}
+
+	server.close();
+	process.exit( 1 );
+
+} );
 
 async function main() {
 

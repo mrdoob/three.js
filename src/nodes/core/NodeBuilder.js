@@ -960,8 +960,13 @@ class NodeBuilder {
 		const context = { ...this.context };
 
 		delete context.material;
+		delete context.getUV;
+		delete context.getOutput;
+		delete context.getTextureLevel;
+		delete context.getAO;
+		delete context.getShadow;
 
-		return this.context;
+		return context;
 
 	}
 

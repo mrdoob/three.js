@@ -130,13 +130,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'seededRandom', ( assert ) => {
-
-			// seededRandom( s ) // interval [ 0, 1 ]
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'degToRad', ( assert ) => {
 
 			assert.strictEqual( MathUtils.degToRad( 0 ), 0, '0 degrees' );
@@ -178,27 +171,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 1 ), 1, 'Closest lower PoT to 1 is 1' );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 3 ), 2, 'Closest lower PoT to 3 is 2' );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 4 ), 4, 'Closest lower PoT to 4 is 4' );
-
-		} );
-
-		QUnit.todo( 'setQuaternionFromProperEuler', ( assert ) => {
-
-			// setQuaternionFromProperEuler( q, a, b, c, order )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'denormalize', ( assert ) => {
-
-			// denormalize( value, array )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'normalize', ( assert ) => {
-
-			// normalize( value, array )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

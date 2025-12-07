@@ -92,6 +92,27 @@ should clear the stencil buffer.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="contextNode" translate="no">.<a href="#contextNode">contextNode</a><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a></span> </h3>
+					<div class="description">
+						<p>A global context node that stores override nodes for specific transformations or calculations.
+These nodes can be used to replace default behavior in the rendering pipeline.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>value</strong>
+						<br>
+<span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>The context value object.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
 					<h3 class="name" id="coordinateSystem" translate="no">.<a href="#coordinateSystem">coordinateSystem</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>The coordinate system of the renderer. The value of this property
@@ -238,37 +259,6 @@ If this is the case, the renderer allocates an internal render target for that p
 						<p>Defines the output color space of the renderer.</p>
 						<p>Default is <code>SRGBColorSpace</code>.</p>
 					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="overrideNodes" translate="no">.<a href="#overrideNodes">overrideNodes</a><span class="type-signature"> : Object</span> </h3>
-					<div class="description">
-						<p>Stores override nodes for specific transformations or calculations.
-These nodes can be used to replace default behavior in the rendering pipeline.</p>
-					</div>
-<table class="props">
-	<tbody>
-		<tr>
-				<td class="name">
-					<strong>modelViewMatrix</strong>
-						<br>
-<span class="param-type"><a href="Node.html">Node</a></span>
-				</td>
-			<td class="description last">
-				<p>An override node for the model-view matrix.</p>
-			</td>
-		</tr>
-		<tr>
-				<td class="name">
-					<strong>modelNormalViewMatrix</strong>
-						<br>
-<span class="param-type"><a href="Node.html">Node</a></span>
-				</td>
-			<td class="description last">
-				<p>An override node for the model normal view matrix.</p>
-			</td>
-		</tr>
-	</tbody>
-</table>
 				</div>
 				<div class="member">
 					<h3 class="name" id="samples" translate="no">.<a href="#samples">samples</a><span class="type-signature"> : number</span> </h3>
@@ -1644,7 +1634,7 @@ Use <code>null</code> as the first argument to reset the state.</p>
 										<strong>x</strong>
 									</td>
 									<td class="description last">
-										<p>The horizontal coordinate for the lower left corner of the box in logical pixel unit.
+										<p>The horizontal coordinate for the upper left corner of the box in logical pixel unit.
 Instead of passing four arguments, the method also works with a single four-dimensional vector.</p>
 									</td>
 								</tr>
@@ -1653,7 +1643,7 @@ Instead of passing four arguments, the method also works with a single four-dime
 										<strong>y</strong>
 									</td>
 									<td class="description last">
-										<p>The vertical coordinate for the lower left corner of the box in logical pixel unit.</p>
+										<p>The vertical coordinate for the upper left corner of the box in logical pixel unit.</p>
 									</td>
 								</tr>
 								<tr>
@@ -1759,7 +1749,7 @@ Pass <code>null</code> to use the default sort.</p>
 										<strong>x</strong>
 									</td>
 									<td class="description last">
-										<p>The horizontal coordinate for the lower left corner of the viewport origin in logical pixel unit.</p>
+										<p>The horizontal coordinate for the upper left corner of the viewport origin in logical pixel unit.</p>
 									</td>
 								</tr>
 								<tr>
@@ -1767,7 +1757,7 @@ Pass <code>null</code> to use the default sort.</p>
 										<strong>y</strong>
 									</td>
 									<td class="description last">
-										<p>The vertical coordinate for the lower left corner of the viewport origin  in logical pixel unit.</p>
+										<p>The vertical coordinate for the upper left corner of the viewport origin  in logical pixel unit.</p>
 									</td>
 								</tr>
 								<tr>

@@ -53,34 +53,6 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.todo( 'v0', ( assert ) => {
-
-				// Vector3 exists
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'v1', ( assert ) => {
-
-				// Vector3 exists
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'v2', ( assert ) => {
-
-				// Vector3 exists
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'v3', ( assert ) => {
-
-				// Vector3 exists
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
 			// PUBLIC
 			QUnit.test( 'isCubicBezierCurve3', ( assert ) => {
 
@@ -89,31 +61,6 @@ export default QUnit.module( 'Extras', () => {
 					object.isCubicBezierCurve3,
 					'CubicBezierCurve3.isCubicBezierCurve3 should be true'
 				);
-
-			} );
-
-			QUnit.todo( 'getPoint', ( assert ) => {
-
-				// getPoint( t, optionalTarget = new Vector3() )
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'copy', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'toJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'fromJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

@@ -2734,6 +2734,68 @@ kernels won't perform well. Use Gaussian instead if you need a more high-quality
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="builtinAOContext" translate="no">.<a href="#builtinAOContext">builtinAOContext</a><span class="signature">( aoNode : <span class="param-type"><a href="Node.html">Node</a></span>, node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for defining a built-in ambient occlusion context for a given node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>aoNode</strong>
+									</td>
+									<td class="description last">
+										<p>The ambient occlusion value node to apply.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node whose context should be modified.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="builtinShadowContext" translate="no">.<a href="#builtinShadowContext">builtinShadowContext</a><span class="signature">( shadowNode : <span class="param-type"><a href="ShadowNode.html">ShadowNode</a></span>, light : <span class="param-type"><a href="Light.html">Light</a></span>, node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>TSL function for defining a built-in shadow context for a given node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>shadowNode</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow node representing the light's shadow.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>light</strong>
+									</td>
+									<td class="description last">
+										<p>The light associated with the shadow.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>The node whose context should be modified.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="bumpMap" translate="no">.<a href="#bumpMap">bumpMap</a><span class="signature">( textureNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, scaleNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="BumpMapNode.html">BumpMapNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -3327,7 +3389,7 @@ or AgX Log), and will return output in the same space. Output may require clampi
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="context" translate="no">.<a href="#context">context</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, value : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a></span> </h3>
+					<h3 class="name name-method" id="context" translate="no">.<a href="#context">context</a><span class="signature">( nodeOrValue : <span class="param-type"><a href="Node.html">Node</a> | Object</span>, value : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>TSL function for creating a context node.</p>
@@ -3336,10 +3398,11 @@ or AgX Log), and will return output in the same space. Output may require clampi
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>node</strong>
+										<strong>nodeOrValue</strong>
 									</td>
 									<td class="description last">
-										<p>The node whose context should be modified.</p>
+										<p>The node whose context should be modified or the modified context data.</p>
+										<p>Default is <code>{}</code>.</p>
 									</td>
 								</tr>
 								<tr>
@@ -6870,6 +6933,62 @@ When no material is set, the node refers to the material of the current rendered
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="packHalf2x16" translate="no">.<a href="#packHalf2x16">packHalf2x16</a><span class="signature">( value : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts each component of the vec2 to 16-bit floating-point values. The results are packed into a single unsigned integer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The 2-component vector to be packed</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="packSnorm2x16" translate="no">.<a href="#packSnorm2x16">packSnorm2x16</a><span class="signature">( value : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts each component of the normalized float to 16-bit integer values. The results are packed into a single unsigned integer.
+round(clamp(c, -1, +1) * 32767.0)</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The 2-component vector to be packed</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="packUnorm2x16" translate="no">.<a href="#packUnorm2x16">packUnorm2x16</a><span class="signature">( value : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Converts each component of the normalized float to 16-bit integer values. The results are packed into a single unsigned integer.
+round(clamp(c, 0, +1) * 65535.0)</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The 2-component vector to be packed</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="parabola" translate="no">.<a href="#parabola">parabola</a><span class="signature">( x : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, k : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -8246,6 +8365,42 @@ the node refers to the renderer of the current state.</p>
 								</tr>
 							</tbody>
 						</table>
+					</div>
+					<h3 class="name name-method" id="replaceDefaultUV" translate="no">.<a href="#replaceDefaultUV">replaceDefaultUV</a><span class="signature">( callback : <span class="param-type">function</span>, node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Replaces the default UV coordinates used in texture lookups.</p>
+<pre><code class="language-js">material.contextNode = replaceDefaultUV( ( textureNode ) => {
+	// ...
+	return customUVCoordinates;
+} );
+</code></pre>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>callback</strong>
+									</td>
+									<td class="description last">
+										<p>A callback that receives the texture node
+and must return the new uv coordinates.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>node</strong>
+									</td>
+									<td class="description last">
+										<p>An optional node to which the context will be applied.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A context node that replaces the default UV coordinates.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="rgbShift" translate="no">.<a href="#rgbShift">rgbShift</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span>, amount : <span class="param-type">number</span>, angle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="RGBShiftNode.html">RGBShiftNode</a></span> </h3>
 					<div class="method">
@@ -11094,6 +11249,24 @@ to complete before the barrier can be passed.</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="unpackHalf2x16" translate="no">.<a href="#unpackHalf2x16">unpackHalf2x16</a><span class="signature">( value : <span class="param-type"><a href="Node.html">Node</a>.&lt;uint></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted as 16-bit floating-point numbers. Returns a vec2 with both values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The unsigned integer to be unpacked</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="unpackNormal" translate="no">.<a href="#unpackNormal">unpackNormal</a><span class="signature">( xy : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -11115,6 +11288,42 @@ The X,Y coordinates are expected to be in the [-1, 1] range.</p>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The resulting normal.</dt>
 						</dl>
+					</div>
+					<h3 class="name name-method" id="unpackSnorm2x16" translate="no">.<a href="#unpackSnorm2x16">unpackSnorm2x16</a><span class="signature">( value : <span class="param-type"><a href="Node.html">Node</a>.&lt;uint></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted as normalized signed integers. Returns a vec2 with both values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The unsigned integer to be unpacked</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="unpackUnorm2x16" translate="no">.<a href="#unpackUnorm2x16">unpackUnorm2x16</a><span class="signature">( value : <span class="param-type"><a href="Node.html">Node</a>.&lt;uint></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Unpacks a 32-bit unsigned integer into two 16-bit values, interpreted as normalized unsigned integers. Returns a vec2 with both values.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>value</strong>
+									</td>
+									<td class="description last">
+										<p>The unsigned integer to be unpacked</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 					<h3 class="name name-method" id="unpremultiplyAlpha" translate="no">.<a href="#unpremultiplyAlpha">unpremultiplyAlpha</a><span class="signature">( color : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
 					<div class="method">
@@ -11576,6 +11785,46 @@ which is incorrect.</p>
 								</tr>
 							</tbody>
 						</table>
+					</div>
+					<h3 class="name name-method" id="vogelDiskSample" translate="no">.<a href="#vogelDiskSample">vogelDiskSample</a><span class="signature">( sampleIndex : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>, samplesCount : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>, phi : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Vogel disk sampling for uniform circular distribution.</p>
+<p>This function generates sample points distributed uniformly on a disk using the golden angle,
+resulting in an efficient low-discrepancy sequence for sampling. The rotation parameter (phi)
+allows randomizing the pattern per-pixel when combined with IGN.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>sampleIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The index of the current sample (0-based).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>samplesCount</strong>
+									</td>
+									<td class="description last">
+										<p>The total number of samples.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>phi</strong>
+									</td>
+									<td class="description last">
+										<p>Rotation angle in radians (typically from IGN * 2π).</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A 2D point on the unit disk.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="wgsl" translate="no">.<a href="#wgsl">wgsl</a><span class="signature">( src : <span class="param-type">string</span>, includes : <span class="param-type">Array.&lt;<a href="Node.html">Node</a>></span> )</span><span class="type-signature"> : <a href="CodeNode.html">CodeNode</a></span> </h3>
 					<div class="method">

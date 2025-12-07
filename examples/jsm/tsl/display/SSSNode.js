@@ -90,9 +90,9 @@ class SSSNode extends TempNode {
 		 * Shadow intensity. Must be in the range `[0, 1]`.
 		 *
 		 * @type {UniformNode<float>}
-		 * @default 0.5
+		 * @default 1.0
 		 */
-		this.shadowIntensity = uniform( 0.5, 'float' );
+		this.shadowIntensity = uniform( 1.0, 'float' );
 
 		/**
 		 * This parameter controls how detailed the raymarching process works.

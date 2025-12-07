@@ -34,70 +34,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'name', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'array', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'itemSize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'count', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'normalized', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'usage', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'updateRanges', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'version', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'onUploadCallback', ( assert ) => {
-
-			// onUploadCallback() {}
-			// defined as member function but set property. refactor req
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'needsUpdate', ( assert ) => {
-
-			// set needsUpdate( value )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isBufferAttribute', ( assert ) => {
 
@@ -160,34 +96,6 @@ export default QUnit.module( 'Core', () => {
 			a.copyArray( f32a );
 
 			assert.deepEqual( a.array, f32a, 'Check array has new values' );
-
-		} );
-
-		QUnit.todo( 'applyMatrix3', ( assert ) => {
-
-			// applyMatrix3( m )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'applyMatrix4', ( assert ) => {
-
-			// applyMatrix4( m )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'applyNormalMatrix', ( assert ) => {
-
-			// applyNormalMatrix( m )
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'transformDirection', ( assert ) => {
-
-			// transformDirection( m )
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
