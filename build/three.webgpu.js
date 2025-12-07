@@ -50160,9 +50160,16 @@ class NodeBuilder {
 	 */
 	getSharedContext() {
 
-		({ ...this.context });
+		const context = { ...this.context };
 
-		return this.context;
+		delete context.material;
+		delete context.getUV;
+		delete context.getOutput;
+		delete context.getTextureLevel;
+		delete context.getAO;
+		delete context.getShadow;
+
+		return context;
 
 	}
 

@@ -22,7 +22,7 @@
 		</script>
 
 		<!-- Include Polyslice from CDN -->
-		<script src="https://unpkg.com/@jgphilpott/polyslice/dist/index.browser.min.js"></script>
+		<script src="https://unpkg.com/@jgphilpott/polyslice/dist/index.browser.min.js" integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb" crossorigin="anonymous"></script>
 
 		<script type="module">
 
@@ -115,7 +115,7 @@
 					// Check if Polyslice is loaded
 					if ( typeof Polyslice === 'undefined' ) {
 
-						alert( 'Polyslice library not loaded. Please check your internet connection.' );
+						alert( 'Polyslice library not loaded. Please check that the library is accessible.' );
 						return;
 
 					}
@@ -143,7 +143,8 @@
 				} catch ( error ) {
 
 					console.error( 'Error exporting to G-code:', error );
-					alert( 'Error exporting to G-code. Check console for details.\n\nNote: Polyslice is an external library. Please ensure it is loaded correctly.' );
+					alert( 'Error exporting to G-code. Check console for details.' );
+					alert( 'Note: Polyslice is an external library. Please ensure it is loaded correctly.' );
 
 				}
 
