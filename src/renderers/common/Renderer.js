@@ -2487,7 +2487,7 @@ class Renderer {
 
 			} else {
 
-				map.renderItem.instances = map.renderItem.instances || [];
+				map.renderItem.instances = map.renderItem.instances || [ map.renderItem.object ];
 				map.renderItem.instances.push( renderItem.object );
 
 			}
