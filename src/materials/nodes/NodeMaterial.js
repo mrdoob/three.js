@@ -845,7 +845,7 @@ class NodeMaterial extends Material {
 
 		} else if ( builder.instances !== null ) {
 
-			console.log( '>>', builder.instances );
+			console.log( '>>', builder.instances.length );
 
 		}
 
