@@ -397,7 +397,7 @@ export default StorageBufferNode;
  * @param {number} [count=0] - The buffer count.
  * @returns {StorageBufferNode}
  */
-export const storage = ( value, type = null, count = 0 ) => nodeObject( new StorageBufferNode( value, type, count ) );
+export const storage = ( value, type = null, count = 0 ) => new StorageBufferNode( value, type, count );
 
 /**
  * @tsl
