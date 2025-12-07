@@ -8,6 +8,9 @@ import { buffer } from './BufferNode.js';
 import { OnObjectUpdate } from '../utils/EventNode.js';
 import { cameraViewMatrix } from './Camera.js';
 import { objectIndex } from '../core/IndexNode.js';
+import { instancedDynamicBufferAttribute } from '../accessors/BufferAttributeNode.js';
+import { instancedArray } from '../accessors/Arrays.js';
+import { DynamicDrawUsage } from '../../constants.js';
 
 /**
  * This type of node is a specialized version of `Object3DNode`
@@ -82,8 +85,20 @@ export const modelWorldMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	const count = builder.getCount();
 
+	let worldMatrix;
+
 	const matrixArray = new Float32Array( count * 16 );
-	const worldMatrix = buffer( matrixArray, 'mat4', count );
+
+	if ( count < 1000 ) {
+
+		worldMatrix = buffer( matrixArray, 'mat4', count );
+
+	} else {
+
+		worldMatrix = instancedArray( matrixArray, 'mat4' );
+		worldMatrix.value.setUsage( DynamicDrawUsage );
+
+	}
 
 	const updateObjects = ( objects ) => {
 
