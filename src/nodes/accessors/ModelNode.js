@@ -1,10 +1,13 @@
 import Object3DNode from './Object3DNode.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+import { Matrix3 } from '../../math/Matrix3.js';
+
 import { Fn, nodeImmutable } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
-
-import { Matrix4 } from '../../math/Matrix4.js';
+import { buffer } from './BufferNode.js';
+import { OnObjectUpdate } from '../utils/EventNode.js';
 import { cameraViewMatrix } from './Camera.js';
-import { Matrix3 } from '../../math/Matrix3.js';
+import { objectIndex } from '../core/IndexNode.js';
 
 /**
  * This type of node is a specialized version of `Object3DNode`
@@ -60,12 +63,52 @@ export default ModelNode;
 export const modelDirection = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.DIRECTION );
 
 /**
+ * TSL object that represents the object's world matrix in `mediump` precision.
+ *
+ * @tsl
+ * @type {ModelNode<mat4>}
+ */
+export const mediumpModelWorldMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
+
+/**
  * TSL object that represents the object's world matrix.
  *
  * @tsl
  * @type {ModelNode<mat4>}
  */
-export const modelWorldMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
+export const modelWorldMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( ! builder.instances ) return mediumpModelWorldMatrix;
+
+	const count = builder.getCount();
+
+	const matrixArray = new Float32Array( count * 16 );
+	const worldMatrix = buffer( matrixArray, 'mat4', count );
+
+	const updateObjects = ( objects ) => {
+
+		for ( let i = 0; i < objects.length; i ++ ) {
+
+			const object = objects[ i ];
+
+			object.matrixWorld.toArray( matrixArray, i * 16 );
+
+		}
+
+	};
+
+	// initial update - just for test purposes
+	updateObjects( builder.instances );
+
+	//
+
+	OnObjectUpdate( ( frame ) => updateObjects( frame.instances ) );
+
+	//
+
+	return worldMatrix.element( objectIndex );
+
+} ).once() )().toVar( 'modelWorldMatrix' );
 
 /**
  * TSL object that represents the object's position in world space.
