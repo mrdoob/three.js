@@ -129,6 +129,13 @@ class RenderObject {
 		this.instances = instances;
 
 		/**
+		 * The count of instances.
+		 *
+		 * @type {number}
+		 */
+		this.count = instances !== null ? instances.length : 1;
+
+		/**
 		 * The draw range of the geometry.
 		 *
 		 * @type {?Object}
@@ -703,7 +710,7 @@ class RenderObject {
 
 		}
 
-		if ( this.instances !== null ) {
+		if ( this.instances !== null && this.instances.length > this.count ) {
 
 			const base = Math.ceil( this.instances.length / 8 );
 
