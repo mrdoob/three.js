@@ -1593,7 +1593,7 @@ class WebGPUBackend extends Backend {
 
 			} else if ( hasIndex === true ) {
 
-				const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
+				const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex, firstInstance } = drawParams;
 
 				const indirect = renderObject.getIndirect();
 
@@ -1605,7 +1605,7 @@ class WebGPUBackend extends Backend {
 
 				} else {
 
-					passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+					passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, firstInstance );
 
 				}
 
@@ -1747,7 +1747,22 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				draw( renderContextData.currentPass, renderContextData.currentSets );
+				if ( renderObject.instances ) {
+
+					for ( let i = 0; i < renderObject.instances.length; i ++ ) {
+
+						drawParams.instanceCount = 1;
+						drawParams.firstInstance = i;
+
+						draw( renderContextData.currentPass, renderContextData.currentSets );
+
+					}
+
+				} else {
+
+					draw( renderContextData.currentPass, renderContextData.currentSets );
+
+				}
 
 			}
 
