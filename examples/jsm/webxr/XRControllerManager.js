@@ -432,7 +432,8 @@ class XRControllerManager extends EventDispatcher {
 					this._gripModelConfig.lineWidth,
 					this._gripModelConfig.lineColor,
 					this._gripModelConfig.activeLineColor,
-					this._gripModelConfig.cursorDistance
+					this._gripModelConfig.cursorDistance,
+					this._gripModelConfig.cursorRadius,
 				 );
 
 				controller.add( gripPointer );
