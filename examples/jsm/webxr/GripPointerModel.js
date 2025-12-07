@@ -40,13 +40,15 @@ class GripPointerModel extends Object3D {
 	 * @param {number} lineColor = The default line color.
 	 * @param {number} activeLineColor = The active line color.
 	 * @param {number} cursorDistance = The default cursor distance.
+	 * @param {number} cursorRadius - The default cursor radius.
 	 */
 	constructor( controller,
 		lineDistance = POINTER_LINE_DISTANCE,
 		lineWidth = POINTER_LINE_WIDTH,
 		lineColor = POINTER_COLOR,
 		activeLineColor = POINTER_ACTIVE_COLOR,
-		cursorDistance = CURSOR_MAX_DISTANCE
+		cursorDistance = CURSOR_MAX_DISTANCE,
+		cursorRadius = CURSOR_RADIUS
 	 ) {
 
 		super();
@@ -90,6 +92,7 @@ class GripPointerModel extends Object3D {
 		this._lineDistance = lineDistance;
 		this._lineWidth = lineWidth;
 		this._cursorDistance = cursorDistance;
+		this._cursorRadius = cursorRadius;
 
 		this._onConnected = this._onConnected.bind( this );
 		this._onDisconnected = this._onDisconnected.bind( this );
@@ -223,7 +226,7 @@ class GripPointerModel extends Object3D {
 
 
 		// create cursor
-		const cursorGeometry = new SphereGeometry( CURSOR_RADIUS, 10, 10 );
+		const cursorGeometry = new SphereGeometry( this._cursorRadius, 10, 10 );
 		const cursorMaterial = new MeshBasicMaterial( { color: POINTER_COLOR, opacity: 1, transparent: true, depthTest: false } );
 
 		this._cursorObject = new Mesh( cursorGeometry, cursorMaterial );
