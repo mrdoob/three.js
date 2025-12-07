@@ -35,12 +35,10 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
 
-			let composer, camera, scene, renderer;
+			let camera, scene, renderer;
 			let gui, dirLight, pointLight, controls, bloomPass, taaPass;
 			let ready = false;
 
@@ -69,7 +67,7 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, colorBufferType: THREE.HalfFloatType } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -213,32 +211,27 @@
 
 				if ( b ) {
 
-					if ( composer ) return;
+					if ( bloomPass ) return;
+
+					taaPass = new TAARenderPass( scene, camera );
+					taaPass.sampleLevel = 2;
 
 					bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 					bloomPass.threshold = setting.threshold;
 					bloomPass.strength = setting.strength;
 					bloomPass.radius = setting.radius;
 
-					taaPass = new TAARenderPass( scene, camera );
-					taaPass.sampleLevel = 2;
-					taaPass.unbiased = false;
-
-					composer = new EffectComposer( renderer );
-					composer.setPixelRatio( window.devicePixelRatio );
-					composer.setSize( window.innerWidth, window.innerHeight );
-
-					composer.addPass( taaPass );
-					composer.addPass( bloomPass );
-					composer.addPass( new OutputPass() );
+					renderer.setEffects( [ taaPass, bloomPass ] );
 
 				} else {
 
-					if ( ! composer ) return;
-					composer.dispose();
-					composer = null;
-					bloomPass = null;
+					if ( ! bloomPass ) return;
+					taaPass.dispose();
 					taaPass = null;
+					bloomPass.dispose();
+					bloomPass = null;
+
+					renderer.setEffects( null );
 
 				}
 
@@ -306,9 +299,11 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 				renderer.setSize( width, height );
-				if ( composer ) {
 
-					composer.setSize( width, height );
+				if ( taaPass ) {
+
+					taaPass.setSize( width, height );
+					bloomPass.setSize( width, height );
 
 				}
 
@@ -322,8 +317,7 @@
 
 				TWEEN.update();
 
-				if ( composer ) composer.render();
-				else renderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 				if ( ready ) getTime();
 
