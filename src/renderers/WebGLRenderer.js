@@ -1930,11 +1930,10 @@ class WebGLRenderer {
 			if ( currentRenderState.state.transmissionRenderTarget[ camera.id ] === undefined ) {
 
 				const hasHalfFloatSupport = extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' );
-				const useHalfFloat = _colorBufferType === HalfFloatType && hasHalfFloatSupport;
 
 				currentRenderState.state.transmissionRenderTarget[ camera.id ] = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
-					type: useHalfFloat ? HalfFloatType : UnsignedByteType,
+					type: hasHalfFloatSupport ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: capabilities.samples,
 					stencilBuffer: stencil,
