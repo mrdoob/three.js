@@ -39,6 +39,7 @@ import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.j
 import { WebGLInfo } from './webgl/WebGLInfo.js';
 import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
 import { WebGLObjects } from './webgl/WebGLObjects.js';
+import { WebGLOutputBuffer } from './webgl/WebGLOutputBuffer.js';
 import { WebGLPrograms } from './webgl/WebGLPrograms.js';
 import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
@@ -82,6 +83,7 @@ class WebGLRenderer {
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
 			reversedDepthBuffer = false,
+			colorBufferType = UnsignedByteType,
 		} = parameters;
 
 		/**
@@ -111,6 +113,8 @@ class WebGLRenderer {
 
 		}
 
+		const _colorBufferType = colorBufferType;
+
 		const INTEGER_FORMATS = new Set( [
 			RGBAIntegerFormat,
 			RGIntegerFormat,
@@ -137,6 +141,10 @@ class WebGLRenderer {
 
 		const renderListStack = [];
 		const renderStateStack = [];
+
+		// internal render target for non-UnsignedByteType color buffer
+
+		let outputBuffer = null;
 
 		// public properties
 
@@ -533,6 +541,14 @@ class WebGLRenderer {
 
 		initGLContext();
 
+		// initialize internal render target for non-UnsignedByteType color buffer
+
+		if ( _colorBufferType !== UnsignedByteType ) {
+
+			outputBuffer = new WebGLOutputBuffer( _colorBufferType, canvas.width, canvas.height, depth, stencil );
+
+		}
+
 		// xr
 
 		const xr = new WebXRManager( _this, _gl );
@@ -655,6 +671,12 @@ class WebGLRenderer {
 
 			}
 
+			if ( outputBuffer !== null ) {
+
+				outputBuffer.setSize( canvas.width, canvas.height );
+
+			}
+
 			this.setViewport( 0, 0, width, height );
 
 		};
@@ -695,6 +717,23 @@ class WebGLRenderer {
 			canvas.height = Math.floor( height * pixelRatio );
 
 			this.setViewport( 0, 0, width, height );
+
+		};
+
+		/**
+		 * Sets the post-processing effects to be applied after rendering.
+		 *
+		 * @param {Array} effects - An array of post-processing effects.
+		 */
+		this.setEffects = function ( effects ) {
+
+			if ( outputBuffer === null ) {
+
+				outputBuffer = new WebGLOutputBuffer( _colorBufferType, canvas.width, canvas.height, depth, stencil );
+
+			}
+
+			outputBuffer.setPasses( effects || [] );
 
 		};
 
@@ -1547,6 +1586,10 @@ class WebGLRenderer {
 
 			if ( _isContextLost === true ) return;
 
+			// use internal render target for HalfFloatType color buffer (only when tone mapping is enabled)
+
+			const useOutputBuffer = outputBuffer !== null && _currentRenderTarget === null && outputBuffer.isCopying() === false && outputBuffer.activate( _this );
+
 			// update scene graph
 
 			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
@@ -1627,46 +1670,52 @@ class WebGLRenderer {
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
-			// render scene
+			// render scene (skip if first effect is a render pass - it will render the scene itself)
 
-			const opaqueObjects = currentRenderList.opaque;
-			const transmissiveObjects = currentRenderList.transmissive;
+			const skipSceneRender = useOutputBuffer && outputBuffer.hasRenderPass();
 
-			currentRenderState.setupLights();
+			if ( skipSceneRender === false ) {
 
-			if ( camera.isArrayCamera ) {
+				const opaqueObjects = currentRenderList.opaque;
+				const transmissiveObjects = currentRenderList.transmissive;
 
-				const cameras = camera.cameras;
+				currentRenderState.setupLights();
 
-				if ( transmissiveObjects.length > 0 ) {
+				if ( camera.isArrayCamera ) {
+
+					const cameras = camera.cameras;
+
+					if ( transmissiveObjects.length > 0 ) {
+
+						for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+
+							const camera2 = cameras[ i ];
+
+							renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera2 );
+
+						}
+
+					}
+
+					if ( _renderBackground ) background.render( scene );
 
 					for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
 						const camera2 = cameras[ i ];
 
-						renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera2 );
+						renderScene( currentRenderList, scene, camera2, camera2.viewport );
 
 					}
 
-				}
+				} else {
 
-				if ( _renderBackground ) background.render( scene );
+					if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
 
-				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+					if ( _renderBackground ) background.render( scene );
 
-					const camera2 = cameras[ i ];
-
-					renderScene( currentRenderList, scene, camera2, camera2.viewport );
+					renderScene( currentRenderList, scene, camera );
 
 				}
-
-			} else {
-
-				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
-
-				if ( _renderBackground ) background.render( scene );
-
-				renderScene( currentRenderList, scene, camera );
 
 			}
 
@@ -1681,6 +1730,14 @@ class WebGLRenderer {
 				// Generate mipmap if we're using any kind of mipmap filtering
 
 				textures.updateRenderTargetMipmap( _currentRenderTarget );
+
+			}
+
+			// copy from internal render target to canvas using fullscreen quad
+
+			if ( useOutputBuffer ) {
+
+				outputBuffer.render( _this );
 
 			}
 
@@ -1872,9 +1929,12 @@ class WebGLRenderer {
 
 			if ( currentRenderState.state.transmissionRenderTarget[ camera.id ] === undefined ) {
 
+				const hasHalfFloatSupport = extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' );
+				const useHalfFloat = _colorBufferType === HalfFloatType && hasHalfFloatSupport;
+
 				currentRenderState.state.transmissionRenderTarget[ camera.id ] = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
-					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
+					type: useHalfFloat ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: capabilities.samples,
 					stencilBuffer: stencil,
