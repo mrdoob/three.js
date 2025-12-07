@@ -132,6 +132,14 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
 export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );
 
 /**
+ * TSL object that represents the index of either a mesh instance or an invocation of a compute shader.
+ *
+ * @tsl
+ * @type {IndexNode}
+ */
+export const objectIndex = instanceIndex;
+
+/**
  * TSL object that represents the index of the subgroup the current compute invocation belongs to.
  *
  * @tsl
