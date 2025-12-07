@@ -351,6 +351,20 @@ class RenderObject {
 
 	}
 
+	getDrawInstances() {
+
+		const builderInstances = this.getNodeBuilderState().instances;
+
+		if ( builderInstances !== null && this.instances === null ) {
+
+			this.instances = [ this.object ];
+
+		}
+
+		return this.instances;
+
+	}
+
 	/**
 	 * Returns the node builder state of this render object.
 	 *

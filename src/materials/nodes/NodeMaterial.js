@@ -847,6 +847,10 @@ class NodeMaterial extends Material {
 
 			console.log( '>>', builder.instances.length );
 
+		} else {
+
+			console.log( '>> no instances' );
+
 		}
 
 		if ( this.positionNode !== null ) {

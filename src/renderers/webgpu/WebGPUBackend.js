@@ -1764,9 +1764,11 @@ class WebGPUBackend extends Backend {
 
 				}
 
-				if ( renderObject.instances ) {
+				const drawInstances = renderObject.getDrawInstances();
 
-					for ( let i = 0; i < renderObject.instances.length; i ++ ) {
+				if ( drawInstances ) {
+
+					for ( let i = 0; i < drawInstances.length; i ++ ) {
 
 						drawParams.instanceCount = 1;
 						drawParams.firstInstance = i;

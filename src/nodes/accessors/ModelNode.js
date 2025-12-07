@@ -112,12 +112,30 @@ export const modelWorldMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	};
 
-	// initial update - just for test purposes
-	updateObjects( builder.instances );
-
 	//
 
-	OnObjectUpdate( ( frame ) => updateObjects( frame.instances ) );
+	OnObjectUpdate( ( frame ) => {
+
+		const objects = frame.instances;
+
+		if ( objects ) {
+
+			for ( let i = 0; i < objects.length; i ++ ) {
+
+				const object = objects[ i ];
+
+				object.matrixWorld.toArray( matrixArray, i * 16 );
+
+			}
+
+		} else {
+
+			frame.object.matrixWorld.toArray( matrixArray, 0 );
+
+		}
+
+
+	} );
 
 	//
 

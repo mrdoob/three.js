@@ -3265,7 +3265,6 @@ class Renderer {
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId, instances = null ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId, instances );
-		renderObject.instances = instances;
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 

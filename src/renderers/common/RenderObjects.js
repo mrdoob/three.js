@@ -134,6 +134,13 @@ class RenderObjects {
 
 		}
 
+		//
+
+		renderObject.object = object;
+		renderObject.instances = instances;
+
+		//
+
 		_chainKeys.length = 0;
 
 		return renderObject;
