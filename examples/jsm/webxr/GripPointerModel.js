@@ -227,6 +227,10 @@ class GripPointerModel extends Object3D {
 		const cursorMaterial = new MeshBasicMaterial( { color: POINTER_COLOR, opacity: 1, transparent: true, depthTest: false } );
 
 		this._cursorObject = new Mesh( cursorGeometry, cursorMaterial );
+
+		//set the render order on top.
+		this._cursorObject.renderOrder = 100;
+
 		this._pointerObject.add( this._cursorObject );
 
 		this.setCursor( this._cursorDistance );

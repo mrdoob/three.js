@@ -430,6 +430,7 @@ class XRControllerManager extends EventDispatcher {
 				const gripPointer = controller.userData.gripPointer = new GripPointerModel( controller,
 					this._gripModelConfig.lineDistance,
 					this._gripModelConfig.lineWidth,
+					this._gripModelConfig.lineColor,
 					this._gripModelConfig.activeLineColor,
 					this._gripModelConfig.cursorDistance
 				 );
