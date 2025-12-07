@@ -18,6 +18,16 @@ import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
+const toneMappingMap = {
+	[ LinearToneMapping ]: 'LINEAR_TONE_MAPPING',
+	[ ReinhardToneMapping ]: 'REINHARD_TONE_MAPPING',
+	[ CineonToneMapping ]: 'CINEON_TONE_MAPPING',
+	[ ACESFilmicToneMapping ]: 'ACES_FILMIC_TONE_MAPPING',
+	[ AgXToneMapping ]: 'AGX_TONE_MAPPING',
+	[ NeutralToneMapping ]: 'NEUTRAL_TONE_MAPPING',
+	[ CustomToneMapping ]: 'CUSTOM_TONE_MAPPING'
+};
+
 function WebGLOutputBuffer( type, width, height, depth, stencil ) {
 
 	// render targets for scene and post-processing
@@ -203,13 +213,8 @@ function WebGLOutputBuffer( type, width, height, depth, stencil ) {
 
 			if ( ColorManagement.getTransfer( _outputColorSpace ) === SRGBTransfer ) outputMaterial.defines.SRGB_TRANSFER = '';
 
-			if ( _outputToneMapping === LinearToneMapping ) outputMaterial.defines.LINEAR_TONE_MAPPING = '';
-			else if ( _outputToneMapping === ReinhardToneMapping ) outputMaterial.defines.REINHARD_TONE_MAPPING = '';
-			else if ( _outputToneMapping === CineonToneMapping ) outputMaterial.defines.CINEON_TONE_MAPPING = '';
-			else if ( _outputToneMapping === ACESFilmicToneMapping ) outputMaterial.defines.ACES_FILMIC_TONE_MAPPING = '';
-			else if ( _outputToneMapping === AgXToneMapping ) outputMaterial.defines.AGX_TONE_MAPPING = '';
-			else if ( _outputToneMapping === NeutralToneMapping ) outputMaterial.defines.NEUTRAL_TONE_MAPPING = '';
-			else if ( _outputToneMapping === CustomToneMapping ) outputMaterial.defines.CUSTOM_TONE_MAPPING = '';
+			const toneMapping = toneMappingMap[ _outputToneMapping ];
+			if ( toneMapping ) outputMaterial.defines[ toneMapping ] = '';
 
 			outputMaterial.needsUpdate = true;
 
