@@ -192,12 +192,13 @@ class XRIntersections extends EventDispatcher {
 	/**
      *
      * @param {string} eventName - The event name.
-     * @param {*} object - The intersected object.
-     * @param {*} point  - The intersected object point.
+     * @param {Object3D} object - The intersected object.
+     * @param {Vector3} point  - The intersected object point.
+	 * @param {number} distance - The intersected distance.
      */
-	emit( eventName, object, point ) {
+	emit( eventName, object, point, distance ) {
 
-		this.dispatchEvent( { type: eventName, intersectObject: object, intersectPoint: point } );
+		this.dispatchEvent( { type: eventName, intersectObject: object, intersectPoint: point, intersectDistance: distance } );
 
 	}
 
@@ -211,15 +212,7 @@ class XRIntersections extends EventDispatcher {
 		const controller = event.target,
 			data = event.data;
 
-		//transient-pointer controller is reconnecting.
-		if ( controller.userData.isTransientPointer ) {
-
-			return;
-
-		}
-
-		//set has hand input.
-		//this.hasHand = !! event.hand;
+		this.dispose();
 
 
 		switch ( data.targetRayMode ) {
@@ -242,19 +235,19 @@ class XRIntersections extends EventDispatcher {
 			case 'transient-pointer':
 				//build the Apple Vision transient pointer controller
 				//the controller is activated and deactivated between pinching and releasing a pinch
+				this.currentPointer = controller.userData.gazePointer;
 
 				controller.userData.isGaze = false;
 				controller.userData.isTransientPointer = true;
 
 				//setup selection on selectend events.
-				controller.addEventListener( 'selectend', this.onTransientPointerSelectEndRef );
+				controller.addEventListener( 'selectend', this._onTransientPointerSelectEndRef );
 
 				break;
 
 		}
 
 		//setup move events for intersection detection.
-		controller.removeEventListener( 'move', this._onIntersectionsRef );
 		controller.addEventListener( 'move', this._onIntersectionsRef );
 
 		if ( this.hasHand ) {
@@ -270,6 +263,25 @@ class XRIntersections extends EventDispatcher {
 
 	}
 
+	/**
+	 * Dispose events.
+	 */
+	dispose() {
+
+		const controller = this._controller;
+
+		controller.removeEventListener( 'move', this._onIntersectionsRef );
+		controller.removeEventListener( 'selectend', this.onTransientPointerSelectEndRef );
+		controller.removeEventListener( 'selectstart', this._onControllerSelectRef );
+		controller.removeEventListener( 'selectend', this._onControllerSelectEndRef );
+
+	}
+
+	/**
+	 * Intersect single object on the current pointer model.
+	 * @param {Object3D} object
+	 * @return {Array} - intersections list.
+	 */
 	intersectObject( object ) {
 
 		return this.currentPointer.intersectObject( object, false );
@@ -315,12 +327,19 @@ class XRIntersections extends EventDispatcher {
      * on Transient pointer select end event.
      * @param {Object} event
      */
-	onTransientPointerSelectEnd( event ) {
+	_onTransientPointerSelectEnd( event ) {
 
 		//Get and emit intersections
 		this._onControllerSelect( event );
-		//Reset the selection.
-		this._onControllerSelectEnd( event );
+
+		setTimeout( () => {
+
+			//Reset the selection.
+			this._onControllerSelectEnd( event );
+			this.resetSelectedObject();
+
+		}, 100 );
+
 
 	}
 
@@ -335,9 +354,7 @@ class XRIntersections extends EventDispatcher {
 		if ( intersections.length > 0 ) {
 
 			const intersection = intersections[ 0 ],
-				object = intersection.object,
-				point = object.point || intersection.point;
-			// object.material.emissive.b = 1;
+				object = intersection.object;
 			this.selectedObject = object;
 
 			if ( object.visible ) {
@@ -345,7 +362,7 @@ class XRIntersections extends EventDispatcher {
 				//set the current pointer active.
 				//for GripPointer this will highlight the line.
 				this.currentPointer.active = true;
-				this.emit( 'selected', object, point );
+				this.emit( 'selected', object, intersection.point, intersection.distance );
 
 			} else {
 
@@ -379,11 +396,10 @@ class XRIntersections extends EventDispatcher {
 
 				const intersection = intersections[ 0 ],
 					object = intersection.object;
-				object.point = intersection.point;
 				this.selectedObject = object;
 				controller.userData.hitTime = performance.now() / 1000;
 
-				this.emit( 'hovered', object );
+				this.emit( 'hovered', object, intersection.point, intersection.distance );
 
 				//update the pointer cursor to the intersection position.
 				this.currentPointer.setCursor( intersection.distance );

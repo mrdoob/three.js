@@ -125,7 +125,11 @@
 
 				[ 0, 1 ].forEach( ( index ) => {
 			
-					const controller = new XRControllerManager( index, scene, renderer.xr, room.children, true );
+					const controller = new XRControllerManager( index, scene, renderer.xr, room.children, true, {
+						handPointerLine: false
+					} );
+
+					//controller.visible = false;
 
 					events.forEach( eventName => {
 

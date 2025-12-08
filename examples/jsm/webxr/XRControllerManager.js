@@ -417,15 +417,22 @@ class XRControllerManager extends EventDispatcher {
 		switch ( data.targetRayMode ) {
 
 			case 'tracked-pointer':
-				const controllerModelFactory = new XRControllerModelFactory(),
-					controllerGrip = controller.userData.controllerGrip = this._xrManager.getControllerGrip( this._controllerIndex ),
-					gripModel = controller.userData.gripModel = controllerModelFactory.createControllerModel( controllerGrip );
 
-				controllerGrip.add( gripModel );
-				this._scene.add( controllerGrip );
+				if ( ! controller.userData.gripModel ) {
 
-				//set visibility the same as the controller
-				gripModel.visible = this._visible;
+					const controllerModelFactory = new XRControllerModelFactory(),
+						controllerGrip = controller.userData.controllerGrip = this._xrManager.getControllerGrip( this._controllerIndex ),
+						gripModel = controller.userData.gripModel = controllerModelFactory.createControllerModel( controllerGrip );
+
+					controllerGrip.add( gripModel );
+					this._scene.add( controllerGrip );
+
+					//set visibility the same as the controller
+					gripModel.visible = this._visible;
+
+					this.emit( { type: 'controllerGrip', controllerGrip: controllerGrip } );
+
+				}
 
 				const gripPointer = controller.userData.gripPointer = new GripPointerModel( controller,
 					this._gripModelConfig.lineDistance,
@@ -433,19 +440,32 @@ class XRControllerManager extends EventDispatcher {
 					this._gripModelConfig.lineColor,
 					this._gripModelConfig.activeLineColor,
 					this._gripModelConfig.cursorDistance,
-					this._gripModelConfig.cursorRadius,
-				 );
+					this._gripModelConfig.cursorRadius
+				);
 
 				controller.add( gripPointer );
 
 				gripPointer.visible = this._visible;
 
-				this.emit( { type: 'controllerGrip', controllerGrip: controllerGrip } );
+				//if has hand and use pointer line. disable the cursor or disable grip pointer.
+				if ( this.hasHand ) {
+
+					 if ( this._gripModelConfig.handPointerLine ) {
+
+						gripPointer.children[ 0 ].remove( gripPointer._cursorObject );
+
+					 } else {
+
+						controller.remove( gripPointer );
+
+					 }
+
+				}
 
 				//setup the gamepad controls events.
-				if ( this._useXRButtons ) {
+				if ( this._useXRButtons && ! this.hasHand ) {
 
-					const xrGamepad = this._xrGamepad = controller.userData.xrGamePad = new XRGamepad( controllerGrip );
+					const xrGamepad = this._xrGamepad = controller.userData.xrGamePad = new XRGamepad( controller.userData.controllerGrip );
 
 					xrGamepad.addEventListener( 'pressed', this._eventVisibleCallbackRef );
 					xrGamepad.addEventListener( 'pressedend', this._eventVisibleCallbackRef );
@@ -465,6 +485,9 @@ class XRControllerManager extends EventDispatcher {
 				//the controller is activated and deactivated between pinching and releasing a pinch
 				controller.userData.isGaze = false;
 				controller.userData.isTransientPointer = true;
+
+				const transientGazePointer = controller.userData.gazePointer = new GazePointerModel( controller );
+				controller.add( transientGazePointer );
 
 				break;
 
@@ -518,6 +541,15 @@ class XRControllerManager extends EventDispatcher {
 		const controller = event.target;
 
 		if ( ! controller.userData.isTransientPointer ) controller.remove( controller.children[ 0 ] );
+
+		if ( this._xrGamepad ) {
+
+			this._xrGamepad.removeEventListener( 'pressed', this._eventVisibleCallbackRef );
+			this._xrGamepad.removeEventListener( 'pressedend', this._eventVisibleCallbackRef );
+			this._xrGamepad.removeEventListener( 'movechanged', this._eventVisibleCallbackRef );
+			this._xrGamepad = null;
+
+		}
 
 	}
 
