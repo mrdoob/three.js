@@ -736,7 +736,7 @@ class PassNode extends TempNode {
 
 		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
 
-		this.renderTarget.texture.type = renderer.getOutputBufferType();
+		this.renderTarget.texture.type = renderer.getWorkingBufferType();
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 

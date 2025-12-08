@@ -39,8 +39,9 @@ class WebGPURenderer extends Renderer {
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. Set this parameter to any other integer value than 0 to overwrite the default.
 	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
 	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if supported.
-	 * @property {number} [outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
-	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
+	 * @property {number} [outputType=undefined] - Defines the device output type.
+	 * @property {number} [outputBufferType=undefined] - Defines the type of output buffers. By default, device's preferred format is used; if outputType is defined, it will be used as default.
+	 * @property {number} [workingBufferType=HalfFloatType] - Defines the type of working buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 	 */
 
