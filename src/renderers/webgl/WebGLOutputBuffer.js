@@ -112,6 +112,7 @@ function WebGLOutputBuffer( type, width, height, depth, stencil ) {
 	let _outputToneMapping = null;
 	let _copyingToCanvas = false;
 	let _savedToneMapping;
+	let _savedRenderTarget = null;
 	let _passes = [];
 	let _hasRenderPass = false;
 
@@ -143,6 +144,31 @@ function WebGLOutputBuffer( type, width, height, depth, stencil ) {
 
 			const pass = _passes[ i ];
 			if ( pass.setSize ) pass.setSize( width, height );
+
+		}
+
+	};
+
+	this.setRenderTarget = function ( renderTarget, isXRPresenting ) {
+
+		// Don't update saved render target during copying phase
+		// (post-processing passes call render() which would overwrite this)
+		if ( _copyingToCanvas ) return;
+
+		_savedRenderTarget = renderTarget;
+
+		// resize internal buffers to match render target (e.g. XR resolution)
+		// Only resize when entering XR, not on every frame
+		if ( isXRPresenting && renderTarget !== null ) {
+
+			const width = renderTarget.width;
+			const height = renderTarget.height;
+
+			if ( renderTargetA.width !== width || renderTargetA.height !== height ) {
+
+				this.setSize( width, height );
+
+			}
 
 		}
 
@@ -220,11 +246,12 @@ function WebGLOutputBuffer( type, width, height, depth, stencil ) {
 
 		}
 
-		// final output to canvas
+		// final output to canvas (or XR render target)
 		outputMaterial.uniforms.tDiffuse.value = readBuffer.texture;
-		renderer.setRenderTarget( null );
+		renderer.setRenderTarget( _savedRenderTarget );
 		renderer.render( outputMesh, outputCamera );
 
+		_savedRenderTarget = null;
 		_copyingToCanvas = false;
 
 	};

@@ -1588,7 +1588,11 @@ class WebGLRenderer {
 
 			// use internal render target for HalfFloatType color buffer (only when tone mapping is enabled)
 
-			const useOutputBuffer = outputBuffer !== null && _currentRenderTarget === null && outputBuffer.isCopying() === false && outputBuffer.activate( _this );
+			const isXRPresenting = xr.enabled === true && xr.isPresenting === true;
+
+			if ( outputBuffer !== null ) outputBuffer.setRenderTarget( _currentRenderTarget, isXRPresenting );
+
+			const useOutputBuffer = outputBuffer !== null && ( _currentRenderTarget === null || isXRPresenting ) && outputBuffer.isCopying() === false && outputBuffer.activate( _this );
 
 			// update scene graph
 
@@ -1598,7 +1602,7 @@ class WebGLRenderer {
 
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-			if ( xr.enabled === true && xr.isPresenting === true ) {
+			if ( xr.enabled === true && xr.isPresenting === true && ( outputBuffer === null || outputBuffer.isCopying() === false ) ) {
 
 				if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 
@@ -2781,7 +2785,7 @@ class WebGLRenderer {
 			_currentActiveCubeFace = activeCubeFace;
 			_currentActiveMipmapLevel = activeMipmapLevel;
 
-			let useDefaultFramebuffer = true;
+			const useDefaultFramebuffer = true;
 			let framebuffer = null;
 			let isCube = false;
 			let isRenderTarget3D = false;
@@ -2792,9 +2796,21 @@ class WebGLRenderer {
 
 				if ( renderTargetProperties.__useDefaultFramebuffer !== undefined ) {
 
-					// We need to make sure to rebind the framebuffer.
-					state.bindFramebuffer( _gl.FRAMEBUFFER, null );
-					useDefaultFramebuffer = false;
+					// Externally-managed framebuffer (e.g. XR)
+					// Bind to the stored framebuffer (may be null for default, or a WebGLFramebuffer)
+					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+
+					_currentViewport.copy( renderTarget.viewport );
+					_currentScissor.copy( renderTarget.scissor );
+					_currentScissorTest = renderTarget.scissorTest;
+
+					state.viewport( _currentViewport );
+					state.scissor( _currentScissor );
+					state.setScissorTest( _currentScissorTest );
+
+					_currentMaterialId = - 1;
+
+					return;
 
 				} else if ( renderTargetProperties.__webglFramebuffer === undefined ) {
 
