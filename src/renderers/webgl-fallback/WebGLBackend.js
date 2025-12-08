@@ -939,7 +939,7 @@ class WebGLBackend extends Backend {
 	 */
 	draw( renderObject/*, info*/ ) {
 
-		const { object, pipeline, material, context, hardwareClippingPlanes } = renderObject;
+		const { object, pipeline, material, context, hardwareClippingPlanes, instances } = renderObject;
 		const { programGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
@@ -1094,7 +1094,15 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				renderer.render( firstVertex, vertexCount );
+				if ( instances !== null ) {
+
+					renderer.renderInstances( firstVertex, vertexCount, instances.length );
+
+				} else {
+
+					renderer.render( firstVertex, vertexCount );
+
+				}
 
 			}
 
