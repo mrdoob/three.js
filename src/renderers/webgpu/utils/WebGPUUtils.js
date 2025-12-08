@@ -244,7 +244,7 @@ class WebGPUUtils {
 
 		} else {
 
-			throw new Error( 'Unsupported buffer type' );
+			throw new Error( 'Unsupported output buffer type.' );
 
 		}
 
