@@ -625,11 +625,11 @@ class WebGLState {
 
 		if ( boolean ) {
 
-			gl.enable( gl.SCISSOR_TEST );
+			this.enable( gl.SCISSOR_TEST );
 
 		} else {
 
-			gl.disable( gl.SCISSOR_TEST );
+			this.disable( gl.SCISSOR_TEST );
 
 		}
 
