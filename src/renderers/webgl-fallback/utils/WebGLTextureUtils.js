@@ -488,7 +488,7 @@ class WebGLTextureUtils {
 		backend.state.unbindTexture();
 		// debug
 		// const framebuffer = gl.createFramebuffer();
-		// gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
+		// backend.state.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
 		// gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, glTextureType, textureGPU, 0 );
 
 		// const readout = new Float32Array( width * height * 4 );
@@ -497,7 +497,7 @@ class WebGLTextureUtils {
 		// const altType = gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE );
 
 		// gl.readPixels( 0, 0, width, height, altFormat, altType, readout );
-		// gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		// backend.state.bindFramebuffer( gl.FRAMEBUFFER, null );
 		// log( readout );
 
 	}
@@ -1183,7 +1183,7 @@ class WebGLTextureUtils {
 
 		const fb = gl.createFramebuffer();
 
-		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
+		backend.state.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
 
 		const target = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
 
@@ -1209,6 +1209,8 @@ class WebGLTextureUtils {
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, null );
+
+		backend.state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
 
 		gl.deleteFramebuffer( fb );
 
