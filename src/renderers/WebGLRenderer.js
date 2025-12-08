@@ -83,7 +83,7 @@ class WebGLRenderer {
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
 			reversedDepthBuffer = false,
-			colorBufferType = UnsignedByteType,
+			outputBufferType = UnsignedByteType,
 		} = parameters;
 
 		/**
@@ -113,7 +113,7 @@ class WebGLRenderer {
 
 		}
 
-		const _colorBufferType = colorBufferType;
+		const _outputBufferType = outputBufferType;
 
 		const INTEGER_FORMATS = new Set( [
 			RGBAIntegerFormat,
@@ -543,9 +543,9 @@ class WebGLRenderer {
 
 		// initialize internal render target for non-UnsignedByteType color buffer
 
-		if ( _colorBufferType !== UnsignedByteType ) {
+		if ( _outputBufferType !== UnsignedByteType ) {
 
-			outputBuffer = new WebGLOutputBuffer( _colorBufferType, canvas.width, canvas.height, depth, stencil );
+			outputBuffer = new WebGLOutputBuffer( _outputBufferType, canvas.width, canvas.height, depth, stencil );
 
 		}
 
@@ -729,7 +729,7 @@ class WebGLRenderer {
 
 			if ( outputBuffer === null ) {
 
-				outputBuffer = new WebGLOutputBuffer( _colorBufferType, canvas.width, canvas.height, depth, stencil );
+				outputBuffer = new WebGLOutputBuffer( _outputBufferType, canvas.width, canvas.height, depth, stencil );
 
 			}
 
@@ -3528,6 +3528,7 @@ class WebGLRenderer {
  * Note that this setting uses `gl_FragDepth` if available which disables the Early Fragment Test optimization and can cause a decrease in performance.
  * @property {boolean} [reversedDepthBuffer=false] Whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
  * This is a more faster and accurate version than logarithmic depth buffer.
+ * @property {number} [outputBufferType=UnsignedByteType] Defines the type of the output buffer. Use `HalfFloatType` for HDR rendering with tone mapping and post-processing support.
  **/
 
 /**
