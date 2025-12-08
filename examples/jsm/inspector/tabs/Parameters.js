@@ -13,6 +13,9 @@ class ParametersGroup {
 
 		this.paramList = new Item( name );
 
+		/** @type {Array<{ object:object, key:string, editor:object, subItem:Item }>} */
+		this.data = [];
+
 	}
 
 	close() {
@@ -60,6 +63,12 @@ class ParametersGroup {
 
 	}
 
+	/**
+	 * @param {Object} object
+	 * @param {string} property
+	 * @param {Object} editor
+	 * @param {Item} subItem
+	 */
 	_addParameter( object, property, editor, subItem ) {
 
 		editor.name = ( name ) => {
@@ -92,6 +101,12 @@ class ParametersGroup {
 			return editor;
 
 		};
+
+	}
+	
+	_registerParameter( object, property, editor, subItem ) {
+
+		this.data.push( { object: object, key: property, editor: editor, subItem: subItem } );
 
 	}
 
@@ -146,6 +161,8 @@ class ParametersGroup {
 
 		this._addParameter( object, property, editor, subItem );
 
+		this._registerParameter( object, property, editor, subItem );
+
 		return editor;
 
 	}
@@ -173,6 +190,8 @@ class ParametersGroup {
 		// extend object property
 
 		this._addParameter( object, property, editor, subItem );
+
+		this._registerParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -202,6 +221,8 @@ class ParametersGroup {
 
 		this._addParameter( object, property, editor, subItem );
 
+		this._registerParameter( object, property, editor, subItem );
+
 		return editor;
 
 	}
@@ -229,6 +250,8 @@ class ParametersGroup {
 		// extend object property
 
 		this._addParameter( object, property, editor, subItem );
+
+		this._registerParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -258,6 +281,8 @@ class ParametersGroup {
 		// extend object property
 
 		this._addParameter( object, property, editor, subItem );
+
+		this._registerParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -291,6 +316,8 @@ class ParametersGroup {
 
 		};
 
+		this._registerParameter( object, property, editor, subItem );
+
 		return editor;
 
 	}
@@ -313,8 +340,12 @@ class Parameters extends Tab {
 		scrollWrapper.appendChild( paramList.domElement );
 		this.content.appendChild( scrollWrapper );
 
+		/** @type {List} */
 		this.paramList = paramList;
 
+		/** @type {Array<ParametersGroup>} */
+		this.groups = new Array();
+		
 	}
 
 	createGroup( name ) {
@@ -322,6 +353,7 @@ class Parameters extends Tab {
 		const group = new ParametersGroup( this, name );
 
 		this.paramList.add( group.paramList );
+		this.groups.push( group );
 
 		return group;
 
