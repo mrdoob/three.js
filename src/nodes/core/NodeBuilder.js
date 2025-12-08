@@ -8,7 +8,7 @@ import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { getTypeFromLength } from './NodeUtils.js';
+import { getTypeFromLength, roundInstances } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -2888,9 +2888,7 @@ class NodeBuilder {
 
 	getCount() {
 
-		const count = this.instances.length;
-
-		return Math.ceil( count / 8 ) * 8;
+		return roundInstances( this.instances.length );
 
 	}
 

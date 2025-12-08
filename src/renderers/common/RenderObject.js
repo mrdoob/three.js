@@ -1,4 +1,4 @@
-import { hash } from '../../nodes/core/NodeUtils.js';
+import { hash, roundInstances } from '../../nodes/core/NodeUtils.js';
 import { getGeometryCacheKey, getProgramCacheKey } from './RenderObjectUtils.js';
 
 let _id = 0;
@@ -133,7 +133,7 @@ class RenderObject {
 		 *
 		 * @type {number}
 		 */
-		this.count = instances !== null ? instances.length : 1;
+		this.count = instances !== null ? roundInstances( instances.length ) : 1;
 
 		/**
 		 * The draw range of the geometry.
@@ -735,15 +735,19 @@ class RenderObject {
 
 		}
 
+		let count;
+
 		if ( this.instances !== null && this.instances.length > this.count ) {
 
-			const base = Math.ceil( this.instances.length / 8 );
+			count = roundInstances( this.instances.length );
 
-			cacheKey = hash( cacheKey, base );
+		} else {
+
+			count = this.count;
 
 		}
 
-		cacheKey = hash( cacheKey, this.camera.id, this.renderer.contextNode.id, this.renderer.contextNode.version );
+		cacheKey = hash( cacheKey, count, this.camera.id, this.renderer.contextNode.id, this.renderer.contextNode.version );
 
 		return cacheKey;
 

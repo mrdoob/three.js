@@ -345,6 +345,12 @@ export function getValueFromType( type, ...params ) {
 
 }
 
+export function roundInstances( count ) {
+
+	return Math.ceil( count / 32 ) * 32;
+
+}
+
 /**
  * Gets the object data that can be shared between different rendering steps.
  *

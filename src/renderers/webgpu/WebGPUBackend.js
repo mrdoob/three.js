@@ -1621,7 +1621,7 @@ class WebGPUBackend extends Backend {
 
 			} else {
 
-				const { vertexCount, instanceCount, firstVertex } = drawParams;
+				const { vertexCount, instanceCount, firstVertex, firstInstance } = drawParams;
 
 				const indirect = renderObject.getIndirect();
 
@@ -1640,7 +1640,7 @@ class WebGPUBackend extends Backend {
 
 				} else {
 
-					passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+					passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, firstInstance );
 
 				}
 
