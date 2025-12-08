@@ -1097,12 +1097,12 @@ class Renderer {
 	/**
 	 * Returns the output buffer type.
 	 *
-	 * @deprecated Use `.getOutputBufferType()` instead.
+	 * @deprecated since r182. Use `.getOutputBufferType()` instead.
 	 * @return {number} The output buffer type.
 	 */
-	getColorBufferType() {
+	getColorBufferType() { // @deprecated, r182
 
-		warnOnce( 'Renderer: ".getColorBufferType()" has been renamed to ".getOutputBufferType()".' ); // r182
+		warnOnce( 'Renderer: ".getColorBufferType()" has been renamed to ".getOutputBufferType()".' );
 
 		return this.getOutputBufferType();
 
