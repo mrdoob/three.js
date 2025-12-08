@@ -234,6 +234,16 @@ class Matrix4 {
 	 */
 	extractBasis( xAxis, yAxis, zAxis ) {
 
+		if ( this.determinant() === 0 ) {
+
+			xAxis.set( 1, 0, 0 );
+			yAxis.set( 0, 1, 0 );
+			zAxis.set( 0, 0, 1 );
+
+			return this;
+
+		}
+
 		xAxis.setFromMatrixColumn( this, 0 );
 		yAxis.setFromMatrixColumn( this, 1 );
 		zAxis.setFromMatrixColumn( this, 2 );
@@ -273,6 +283,12 @@ class Matrix4 {
 	 * @return {Matrix4} A reference to this matrix.
 	 */
 	extractRotation( m ) {
+
+		if ( m.determinant() === 0 ) {
+
+			return this.identity();
+
+		}
 
 		const te = this.elements;
 		const me = m.elements;
@@ -1026,6 +1042,19 @@ class Matrix4 {
 
 		const te = this.elements;
 
+		position.x = te[ 12 ];
+		position.y = te[ 13 ];
+		position.z = te[ 14 ];
+
+		if ( this.determinant() === 0 ) {
+
+			scale.set( 1, 1, 1 );
+			quaternion.identity();
+
+			return this;
+
+		}
+
 		let sx = _v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
 		const sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
 		const sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
@@ -1033,10 +1062,6 @@ class Matrix4 {
 		// if determine is negative, we need to invert one scale
 		const det = this.determinant();
 		if ( det < 0 ) sx = - sx;
-
-		position.x = te[ 12 ];
-		position.y = te[ 13 ];
-		position.z = te[ 14 ];
 
 		// scale the rotation part
 		_m1.copy( this );
