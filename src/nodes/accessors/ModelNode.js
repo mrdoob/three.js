@@ -200,25 +200,46 @@ export const modelNormalMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	//
 
+	function updateObject( object, index ) {
+
+		matrix.getNormalMatrix( object.matrixWorld );
+
+		matrixArray[ index * offset + 0 ] = matrix.elements[ 0 ];
+		matrixArray[ index * offset + 1 ] = matrix.elements[ 1 ];
+		matrixArray[ index * offset + 2 ] = matrix.elements[ 2 ];
+		matrixArray[ index * offset + 3 ] = 0;
+		matrixArray[ index * offset + 4 ] = matrix.elements[ 3 ];
+		matrixArray[ index * offset + 5 ] = matrix.elements[ 4 ];
+		matrixArray[ index * offset + 6 ] = matrix.elements[ 5 ];
+		matrixArray[ index * offset + 7 ] = 0;
+		matrixArray[ index * offset + 8 ] = matrix.elements[ 6 ];
+		matrixArray[ index * offset + 9 ] = matrix.elements[ 7 ];
+		matrixArray[ index * offset + 10 ] = matrix.elements[ 8 ];
+		matrixArray[ index * offset + 11 ] = 0;
+
+	}
+
 	OnObjectUpdate( ( frame ) => {
 
 		const objects = frame.instances;
 
 		if ( objects ) {
 
-			for ( let i = 0; i < objects.length; i ++ ) {
+			for ( let index = 0; index < objects.length; index ++ ) {
 
-				const object = objects[ i ];
+				const object = objects[ index ];
 
 				matrix.getNormalMatrix( object.matrixWorld );
-				matrix.toArray( matrixArray, i * offset );
+
+				updateObject( object, index );
 
 			}
 
 		} else {
 
 			matrix.getNormalMatrix( frame.object.matrixWorld );
-			matrix.toArray( matrixArray, 0 );
+
+			updateObject( frame.object, 0 );
 
 		}
 
