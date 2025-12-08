@@ -84,10 +84,9 @@ export const modelWorldMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 	if ( ! builder.instances ) return mediumpModelWorldMatrix;
 
 	const count = builder.getCount();
+	const matrixArray = new Float32Array( count * 16 );
 
 	let worldMatrix;
-
-	const matrixArray = new Float32Array( count * 16 );
 
 	if ( count < 1000 ) {
 
@@ -99,18 +98,6 @@ export const modelWorldMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 		worldMatrix.value.setUsage( DynamicDrawUsage );
 
 	}
-
-	const updateObjects = ( objects ) => {
-
-		for ( let i = 0; i < objects.length; i ++ ) {
-
-			const object = objects[ i ];
-
-			object.matrixWorld.toArray( matrixArray, i * 16 );
-
-		}
-
-	};
 
 	//
 
@@ -133,7 +120,6 @@ export const modelWorldMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 			frame.object.matrixWorld.toArray( matrixArray, 0 );
 
 		}
-
 
 	} );
 
@@ -181,7 +167,68 @@ export const modelRadius = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.RAD
  * @tsl
  * @type {UniformNode<mat3>}
  */
-export const modelNormalMatrix = /*@__PURE__*/ uniform( new Matrix3() ).onObjectUpdate( ( { object }, self ) => self.value.getNormalMatrix( object.matrixWorld ) );
+export const mediumpModelNormalMatrix = /*@__PURE__*/ uniform( new Matrix3() ).onObjectUpdate( ( { object }, self ) => self.value.getNormalMatrix( object.matrixWorld ) );
+
+/**
+ * TSL object that represents the object's normal matrix.
+ *
+ * @tsl
+ * @type {UniformNode<mat3>}
+ */
+export const modelNormalMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( ! builder.instances ) return mediumpModelNormalMatrix;
+
+	const matrix = new Matrix3();
+	const offset = 12;
+
+	const count = builder.getCount();
+	const matrixArray = new Float32Array( count * offset );
+
+	let normalMatrix;
+
+	if ( count < 1000 ) {
+
+		normalMatrix = buffer( matrixArray, 'mat3', count );
+
+	} else {
+
+		normalMatrix = instancedArray( matrixArray, 'mat3' );
+		normalMatrix.value.setUsage( DynamicDrawUsage );
+
+	}
+
+	//
+
+	OnObjectUpdate( ( frame ) => {
+
+		const objects = frame.instances;
+
+		if ( objects ) {
+
+			for ( let i = 0; i < objects.length; i ++ ) {
+
+				const object = objects[ i ];
+
+				matrix.getNormalMatrix( object.matrixWorld );
+				matrix.toArray( matrixArray, i * offset );
+
+			}
+
+		} else {
+
+			matrix.getNormalMatrix( frame.object.matrixWorld );
+			matrix.toArray( matrixArray, 0 );
+
+		}
+
+	} );
+
+	//
+
+	return normalMatrix.element( objectIndex );
+
+} ).once() )().toVar( 'modelNormalMatrix' );
 
 /**
  * TSL object that represents the object's inverse world matrix.
