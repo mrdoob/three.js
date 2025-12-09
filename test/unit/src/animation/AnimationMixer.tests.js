@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';

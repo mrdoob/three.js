@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CatmullRomCurve3 } from '../../../../../src/extras/curves/CatmullRomCurve3.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';

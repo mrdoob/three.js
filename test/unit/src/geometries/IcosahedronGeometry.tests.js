@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { IcosahedronGeometry } from '../../../../src/geometries/IcosahedronGeometry.js';
 
 import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';

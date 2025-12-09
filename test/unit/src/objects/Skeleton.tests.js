@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Skeleton } from '../../../../src/objects/Skeleton.js';
 
 export default QUnit.module( 'Objects', () => {

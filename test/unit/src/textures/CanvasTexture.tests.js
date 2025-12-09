@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CanvasTexture } from '../../../../src/textures/CanvasTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';

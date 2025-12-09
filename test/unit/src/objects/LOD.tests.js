@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Raycaster } from '../../../../src/core/Raycaster.js';
 import { LOD } from '../../../../src/objects/LOD.js';

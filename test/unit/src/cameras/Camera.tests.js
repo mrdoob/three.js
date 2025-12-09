@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Camera } from '../../../../src/cameras/Camera.js';
 
 import { Vector3 } from '../../../../src/math/Vector3.js';

@@ -55,7 +55,6 @@
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm",
     "lint-examples": "eslint examples",
-    "lint-docs": "eslint docs",
     "lint-editor": "eslint editor",
     "lint-playground": "eslint playground",
     "lint-manual": "eslint manual",

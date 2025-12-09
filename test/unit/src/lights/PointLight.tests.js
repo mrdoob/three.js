@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PointLight } from '../../../../src/lights/PointLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';

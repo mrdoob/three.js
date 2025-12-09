@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { SplineCurve } from '../../../../../src/extras/curves/SplineCurve.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';

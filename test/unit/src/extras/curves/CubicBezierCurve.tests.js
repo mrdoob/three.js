@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CubicBezierCurve } from '../../../../../src/extras/curves/CubicBezierCurve.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';

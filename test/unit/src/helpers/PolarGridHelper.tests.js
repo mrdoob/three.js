@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PolarGridHelper } from '../../../../src/helpers/PolarGridHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';

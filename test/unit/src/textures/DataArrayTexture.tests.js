@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DataArrayTexture } from '../../../../src/textures/DataArrayTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';

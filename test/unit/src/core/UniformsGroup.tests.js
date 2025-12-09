@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { UniformsGroup } from '../../../../src/core/UniformsGroup.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';

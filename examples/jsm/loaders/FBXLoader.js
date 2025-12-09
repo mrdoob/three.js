@@ -1615,11 +1615,9 @@ class GeometryParser {
 
 			case 'Mesh':
 				return this.parseMeshGeometry( relationships, geoNode, deformers );
-				break;
 
 			case 'NurbsCurve':
 				return this.parseNurbsGeometry( geoNode );
-				break;
 
 		}
 

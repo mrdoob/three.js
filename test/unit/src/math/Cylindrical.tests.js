@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Cylindrical } from '../../../../src/math/Cylindrical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { eps } from '../../utils/math-constants.js';

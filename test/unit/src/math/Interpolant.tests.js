@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Interpolant } from '../../../../src/math/Interpolant.js';
 
 export default QUnit.module( 'Maths', () => {
