@@ -32,7 +32,6 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GCodeExporter } from 'three/addons/exporters/GCodeExporter.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, mesh;
@@ -114,16 +113,30 @@
 
 				try {
 
-					// Use the GCodeExporter
-					const exporter = new GCodeExporter();
-					const gcode = exporter.parse( mesh, {
-						printer: 'Ender3',
-						filament: 'GenericPLA',
+					// Check if Polyslice is loaded
+					if ( typeof Polyslice === 'undefined' ) {
+
+						alert( 'Polyslice library not loaded. Please check that the library is accessible.' );
+						return;
+
+					}
+
+					// Create printer and filament configurations using Polyslice
+					const printer = new Polyslice.Printer( 'Ender3' );
+					const filament = new Polyslice.Filament( 'GenericPLA' );
+
+					// Create the slicer instance with user-defined settings
+					const slicer = new Polyslice.Polyslice( {
+						printer: printer,
+						filament: filament,
 						layerHeight: params.layerHeight,
 						infillPattern: params.infillPattern,
 						infillDensity: params.infillDensity,
 						verbose: false
 					} );
+
+					// Slice the mesh and generate G-code
+					const gcode = slicer.slice( mesh );
 
 					// Download the G-code file
 					saveString( gcode, 'model.gcode' );
