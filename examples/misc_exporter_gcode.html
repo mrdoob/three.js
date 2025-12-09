@@ -64,7 +64,7 @@
 				// Use Z-up coordinate system
 				THREE.Object3D.DEFAULT_UP.set( 0, 0, 1 );
 				camera.up.set( 0, 0, 1 );
-				camera.position.set( 100, 100, 100 );
+				camera.position.set( 42, 42, 42 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
@@ -146,7 +146,7 @@
 						verbose: false
 					} );
 
-					// Slice the mesh and generate G-code
+					// Slice the current mesh directly
 					const gcode = slicer.slice( mesh );
 
 					// Download the G-code file
@@ -174,6 +174,25 @@
 
 			}
 
+			// Ensure the mesh sits on the XY plane with min Z = 0
+			function placeOnXYPlane( object ) {
+
+				// Update world matrix so bounding box reflects transforms
+				object.updateMatrixWorld( true );
+
+				const box = new THREE.Box3().setFromObject( object );
+				const minZ = box.min.z;
+
+				if ( isFinite( minZ ) ) {
+
+					// Shift object upward by -minZ so it rests on z=0
+					object.position.z -= minZ;
+					object.updateMatrixWorld( true );
+
+				}
+
+			}
+
 			function addCube() {
 
 				clearScene();
@@ -181,6 +200,7 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
 				mesh = new THREE.Mesh( geometry, material );
+				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
 			}
@@ -192,6 +212,7 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.SphereGeometry( 5, 32, 32 );
 				mesh = new THREE.Mesh( geometry, material );
+				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
 			}
@@ -204,6 +225,7 @@
 				const geometry = new THREE.CylinderGeometry( 5, 5, 10, 32 );
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = Math.PI / 2; // Align cylinder axis with Z-up
+				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
 			}
@@ -215,6 +237,7 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.TorusGeometry( 5, 2, 16, 100 );
 				mesh = new THREE.Mesh( geometry, material );
+				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
 			}
