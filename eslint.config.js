@@ -20,7 +20,8 @@ export default [
 			'**/3rdparty/**',
 			'**/shapefile.js',
 			'**/vendor/**',
-			'**/fuse/**'
+			'**/fuse/**',
+			'**/template/static/**',
 		]
 	},
 
