@@ -28,7 +28,7 @@ const toneMappingMap = {
 	[ CustomToneMapping ]: 'CUSTOM_TONE_MAPPING'
 };
 
-function WebGLOutputBuffer( type, width, height, depth, stencil ) {
+function WebGLOutput( type, width, height, depth, stencil ) {
 
 	// render targets for scene and post-processing
 	const renderTargetA = new WebGLRenderTarget( width, height, {
@@ -270,4 +270,4 @@ function WebGLOutputBuffer( type, width, height, depth, stencil ) {
 
 }
 
-export { WebGLOutputBuffer };
+export { WebGLOutput };

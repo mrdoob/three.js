@@ -39,7 +39,7 @@ import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.j
 import { WebGLInfo } from './webgl/WebGLInfo.js';
 import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
 import { WebGLObjects } from './webgl/WebGLObjects.js';
-import { WebGLOutputBuffer } from './webgl/WebGLOutputBuffer.js';
+import { WebGLOutput } from './webgl/WebGLOutput.js';
 import { WebGLPrograms } from './webgl/WebGLPrograms.js';
 import { WebGLProperties } from './webgl/WebGLProperties.js';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
@@ -144,7 +144,7 @@ class WebGLRenderer {
 
 		// internal render target for non-UnsignedByteType color buffer
 
-		let outputBuffer = null;
+		let output = null;
 
 		// public properties
 
@@ -545,7 +545,7 @@ class WebGLRenderer {
 
 		if ( _outputBufferType !== UnsignedByteType ) {
 
-			outputBuffer = new WebGLOutputBuffer( _outputBufferType, canvas.width, canvas.height, depth, stencil );
+			output = new WebGLOutput( _outputBufferType, canvas.width, canvas.height, depth, stencil );
 
 		}
 
@@ -671,9 +671,9 @@ class WebGLRenderer {
 
 			}
 
-			if ( outputBuffer !== null ) {
+			if ( output !== null ) {
 
-				outputBuffer.setSize( canvas.width, canvas.height );
+				output.setSize( canvas.width, canvas.height );
 
 			}
 
@@ -727,9 +727,9 @@ class WebGLRenderer {
 		 */
 		this.setEffects = function ( effects ) {
 
-			if ( outputBuffer === null ) {
+			if ( output === null ) {
 
-				outputBuffer = new WebGLOutputBuffer( _outputBufferType, canvas.width, canvas.height, depth, stencil );
+				output = new WebGLOutput( _outputBufferType, canvas.width, canvas.height, depth, stencil );
 
 			}
 
@@ -748,7 +748,7 @@ class WebGLRenderer {
 
 			}
 
-			outputBuffer.setPasses( effects || [] );
+			output.setPasses( effects || [] );
 
 		};
 
@@ -1605,11 +1605,11 @@ class WebGLRenderer {
 
 			const isXRPresenting = xr.enabled === true && xr.isPresenting === true;
 
-			let useOutputBuffer = outputBuffer !== null && ( _currentRenderTarget === null || isXRPresenting ) && outputBuffer.isCopying() === false;
+			let useOutputBuffer = output !== null && ( _currentRenderTarget === null || isXRPresenting ) && output.isCopying() === false;
 
-			if ( useOutputBuffer ) outputBuffer.setRenderTarget( _currentRenderTarget, isXRPresenting );
+			if ( useOutputBuffer ) output.setRenderTarget( _currentRenderTarget, isXRPresenting );
 
-			if ( useOutputBuffer && outputBuffer.activate( _this ) === false ) useOutputBuffer = false;
+			if ( useOutputBuffer && output.activate( _this ) === false ) useOutputBuffer = false;
 
 			// update scene graph
 
@@ -1619,7 +1619,7 @@ class WebGLRenderer {
 
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-			if ( xr.enabled === true && xr.isPresenting === true && ( outputBuffer === null || outputBuffer.isCopying() === false ) ) {
+			if ( xr.enabled === true && xr.isPresenting === true && ( output === null || output.isCopying() === false ) ) {
 
 				if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 
@@ -1693,7 +1693,7 @@ class WebGLRenderer {
 
 			// render scene (skip if first effect is a render pass - it will render the scene itself)
 
-			const skipSceneRender = useOutputBuffer && outputBuffer.hasRenderPass();
+			const skipSceneRender = useOutputBuffer && output.hasRenderPass();
 
 			if ( skipSceneRender === false ) {
 
@@ -1758,7 +1758,7 @@ class WebGLRenderer {
 
 			if ( useOutputBuffer ) {
 
-				outputBuffer.render( _this );
+				output.render( _this );
 
 			}
 
