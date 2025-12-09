@@ -74,4 +74,4 @@ export default UserDataNode;
  * @param {?Object} userData - A reference to the `userData` object. If not provided, the `userData` property of the 3D object that uses the node material is evaluated.
  * @returns {UserDataNode}
  */
-export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
+export const userData = ( name, inputType, userData ) => new UserDataNode( name, inputType, userData );

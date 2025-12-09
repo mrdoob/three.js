@@ -91,4 +91,4 @@ export default ParameterNode;
  * @param {?string} name - The name of the parameter in the shader.
  * @returns {ParameterNode}
  */
-export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );
+export const parameter = ( type, name ) => new ParameterNode( type, name );

@@ -185,7 +185,7 @@ class NodeLoader extends Loader {
 
 		}
 
-		return nodeObject( new this.nodes[ type ]() );
+		return new this.nodes[ type ]();
 
 	}
 

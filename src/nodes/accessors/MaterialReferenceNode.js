@@ -82,4 +82,4 @@ export default MaterialReferenceNode;
  * When no material is set, the node refers to the material of the current rendered object.
  * @returns {MaterialReferenceNode}
  */
-export const materialReference = ( name, type, material = null ) => nodeObject( new MaterialReferenceNode( name, type, material ) );
+export const materialReference = ( name, type, material = null ) => new MaterialReferenceNode( name, type, material );

@@ -253,6 +253,6 @@ export const uniform = ( value, type ) => {
 
 	}
 
-	return nodeObject( new UniformNode( value, nodeType ) );
+	return new UniformNode( value, nodeType );
 
 };

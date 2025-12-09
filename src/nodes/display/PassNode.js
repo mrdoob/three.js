@@ -623,7 +623,7 @@ class PassNode extends TempNode {
 
 		if ( textureNode === undefined ) {
 
-			textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+			textureNode = new PassMultipleTextureNode( this, name );
 			textureNode.updateTexture();
 			this._textureNodes[ name ] = textureNode;
 
@@ -647,7 +647,7 @@ class PassNode extends TempNode {
 
 			if ( this._textureNodes[ name ] === undefined ) this.getTextureNode( name );
 
-			textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
+			textureNode = new PassMultipleTextureNode( this, name, true );
 			textureNode.updateTexture();
 			this._previousTextureNodes[ name ] = textureNode;
 
@@ -990,7 +990,7 @@ export default PassNode;
  * @param {Object} options - Options for the internal render target.
  * @returns {PassNode}
  */
-export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
+export const pass = ( scene, camera, options ) => new PassNode( PassNode.COLOR, scene, camera, options );
 
 /**
  * TSL function for creating a pass texture node.
@@ -1001,7 +1001,7 @@ export const pass = ( scene, camera, options ) => nodeObject( new PassNode( Pass
  * @param {Texture} texture - The output texture.
  * @returns {PassTextureNode}
  */
-export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
+export const passTexture = ( pass, texture ) => new PassTextureNode( pass, texture );
 
 /**
  * TSL function for creating a depth pass node.
@@ -1013,4 +1013,4 @@ export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode(
  * @param {Object} options - Options for the internal render target.
  * @returns {PassNode}
  */
-export const depthPass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera, options ) );
+export const depthPass = ( scene, camera, options ) => new PassNode( PassNode.DEPTH, scene, camera, options );

@@ -76,4 +76,4 @@ export default RendererReferenceNode;
  * the node refers to the renderer of the current state.
  * @returns {RendererReferenceNode}
  */
-export const rendererReference = ( name, type, renderer = null ) => nodeObject( new RendererReferenceNode( name, type, renderer ) );
+export const rendererReference = ( name, type, renderer = null ) => new RendererReferenceNode( name, type, renderer );

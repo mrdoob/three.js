@@ -149,7 +149,7 @@ export default ComputeBuiltinNode;
  * @param {string} nodeType - The node type.
  * @returns {ComputeBuiltinNode}
  */
-const computeBuiltin = ( name, nodeType ) => nodeObject( new ComputeBuiltinNode( name, nodeType ) );
+const computeBuiltin = ( name, nodeType ) => new ComputeBuiltinNode( name, nodeType );
 
 /**
  * Represents the number of workgroups dispatched by the compute shader.

@@ -165,4 +165,4 @@ export default AttributeNode;
  * @param {?string} [nodeType=null] - The node type.
  * @returns {AttributeNode}
  */
-export const attribute = ( name, nodeType = null ) => nodeObject( new AttributeNode( name, nodeType ) );
+export const attribute = ( name, nodeType = null ) => new AttributeNode( name, nodeType );

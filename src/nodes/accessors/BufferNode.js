@@ -126,4 +126,4 @@ export default BufferNode;
  * @param {number} count - The count of buffer elements.
  * @returns {BufferNode}
  */
-export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );
+export const buffer = ( value, type, count ) => new BufferNode( value, type, count );

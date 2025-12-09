@@ -76,7 +76,7 @@ export default EventNode;
  * @param {Function} callback - The callback function.
  * @returns {EventNode}
  */
-const createEvent = ( type, callback ) => nodeObject( new EventNode( type, callback ) ).toStack();
+const createEvent = ( type, callback ) => new EventNode( type, callback ).toStack();
 
 /**
  * Creates an event that triggers a function every time an object (Mesh|Sprite) is rendered.

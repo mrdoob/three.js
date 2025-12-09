@@ -107,4 +107,4 @@ export default VertexColorNode;
  * @param {number} [index=0] - The attribute index.
  * @returns {VertexColorNode}
  */
-export const vertexColor = ( index = 0 ) => nodeObject( new VertexColorNode( index ) );
+export const vertexColor = ( index = 0 ) => new VertexColorNode( index );

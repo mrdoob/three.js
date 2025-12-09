@@ -108,7 +108,7 @@ export const struct = ( membersLayout, name = null ) => {
 
 		}
 
-		return nodeObject( new StructNode( structLayout, values ) );
+		return new StructNode( structLayout, values );
 
 	};
 

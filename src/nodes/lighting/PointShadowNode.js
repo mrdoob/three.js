@@ -310,4 +310,4 @@ export default PointShadowNode;
  * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
  * @return {PointShadowNode} The created point shadow node.
  */
-export const pointShadow = ( light, shadow ) => nodeObject( new PointShadowNode( light, shadow ) );
+export const pointShadow = ( light, shadow ) => new PointShadowNode( light, shadow );

@@ -842,4 +842,4 @@ export default ShadowNode;
  * @param {?LightShadow} [shadow] - The light shadow.
  * @return {ShadowNode} The created shadow node.
  */
-export const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
+export const shadow = ( light, shadow ) => new ShadowNode( light, shadow );
