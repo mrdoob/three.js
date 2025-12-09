@@ -239,7 +239,7 @@ self.addEventListener( 'install', async function () {
 
 			await cache.add( asset );
 
-		} catch {
+		} catch ( error ) { // eslint-disable-line no-unused-vars
 
 			console.warn( '[SW] Couldn\'t cache:', asset );
 
@@ -284,7 +284,7 @@ async function networkFirst( request ) {
 
 		return response;
 
-	} catch {
+	} catch ( error ) { // eslint-disable-line no-unused-vars
 
 		const cachedResponse = await caches.match( request );
 

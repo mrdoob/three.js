@@ -212,7 +212,7 @@ function Script( editor ) {
 
 						jsonlint.parse( string );
 
-					} catch ( error ) {
+					} catch ( error ) { // eslint-disable-line no-unused-vars
 
 						// ignore failed error recovery
 
@@ -486,7 +486,7 @@ function Script( editor ) {
 
 	} );
 
-	signals.materialChanged.add( function ( object, slot ) {
+	signals.materialChanged.add( function ( object/*, slot */ ) {
 
 		if ( object !== currentObject ) return;
 
