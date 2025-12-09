@@ -107,6 +107,9 @@ export default [
 			'getter-return': 'off',
 			'no-async-promise-executor': 'off',
 			'no-empty': 'off',
+			'no-fallthrough': 'off',
+			'no-prototype-builtins': 'off',
+			'no-loss-of-precision': 'off',
 
 			// 'jsdoc/check-types': 'error',
 			'jsdoc/require-returns': 'off',

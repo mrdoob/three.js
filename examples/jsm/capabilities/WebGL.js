@@ -18,7 +18,7 @@ class WebGL {
 			const canvas = document.createElement( 'canvas' );
 			return !! ( window.WebGL2RenderingContext && canvas.getContext( 'webgl2' ) );
 
-		} catch ( e ) {
+		} catch ( e ) { // eslint-disable-line no-unused-vars
 
 			return false;
 
@@ -42,7 +42,7 @@ class WebGL {
 			ctx.drawingBufferColorSpace = colorSpace;
 			return ctx.drawingBufferColorSpace === colorSpace; // deepscan-disable-line SAME_OPERAND_VALUE
 
-		} catch ( e ) {
+		} catch ( e ) { // eslint-disable-line no-unused-vars
 
 			return false;
 

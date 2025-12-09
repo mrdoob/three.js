@@ -424,7 +424,6 @@ class HDRLoader extends DataTextureLoader {
 			default:
 
 				throw new Error( 'THREE.HDRLoader: Unsupported type: ' + this.type );
-				break;
 
 		}
 
