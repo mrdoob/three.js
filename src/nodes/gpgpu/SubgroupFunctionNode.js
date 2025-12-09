@@ -35,7 +35,7 @@ class SubgroupFunctionNode extends TempNode {
 		/**
 		 * The subgroup/wave intrinsic method to construct.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.method = method;
 

@@ -131,7 +131,7 @@ process.on( 'SIGINT', async () => {
 
 			await browser.close();
 
-		} catch ( e ) {} // eslint-disable-line no-unused-vars
+		} catch ( e ) {}
 
 	}
 
@@ -148,13 +148,13 @@ async function main() {
 
 		await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } );
 
-	} catch ( e ) {} // eslint-disable-line no-unused-vars
+	} catch ( e ) {}
 
 	try {
 
 		await fs.mkdir( 'test/e2e/output-screenshots' );
 
-	} catch ( e ) {} // eslint-disable-line no-unused-vars
+	} catch ( e ) {}
 
 	/* Find files */
 
@@ -320,7 +320,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 				return await arg.executionContext().evaluate( arg => arg instanceof Error ? arg.message : arg, arg );
 
-			} catch ( e ) { // eslint-disable-line no-unused-vars
+			} catch ( e ) {
 
 				// Execution context might have been already destroyed
 
@@ -377,7 +377,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 			}
 
-		} catch ( e ) {} // eslint-disable-line no-unused-vars
+		} catch ( e ) {}
 
 	} );
 
@@ -511,7 +511,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 				expected = ( await Jimp.read( `examples/screenshots/${ file }.jpg`, { quality: jpgQuality } ) );
 
-			} catch ( e ) { // eslint-disable-line no-unused-vars
+			} catch ( e ) {
 
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
@@ -530,7 +530,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 					alpha: 0.2
 				} );
 
-			} catch ( e ) { // eslint-disable-line no-unused-vars
+			} catch ( e ) {
 
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg` );

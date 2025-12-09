@@ -111,8 +111,10 @@ export default [
 			'no-fallthrough': 'off',
 			'no-prototype-builtins': 'off',
 			'no-loss-of-precision': 'off',
-
-			// 'jsdoc/check-types': 'error',
+			'no-unused-vars': [ 'error', {
+				caughtErrors: 'none',
+			} ],
+			'jsdoc/check-types': 'error',
 			'jsdoc/require-returns': 'off',
 			'jsdoc/require-returns-type': 'error',
 			'jsdoc/require-param-description': 'off',

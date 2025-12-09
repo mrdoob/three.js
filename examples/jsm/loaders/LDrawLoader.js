@@ -636,7 +636,7 @@ class LDrawParsedCache {
 				const text = await fileLoader.loadAsync( subobjectURL );
 				return text;
 
-			} catch ( _ ) { // eslint-disable-line no-unused-vars
+			} catch ( _ ) {
 
 				continue;
 

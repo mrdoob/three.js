@@ -27,7 +27,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			&& ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
 
 
-	} catch ( err ) { // eslint-disable-line no-unused-vars
+	} catch ( err ) {
 
 		// Ignore any errors
 

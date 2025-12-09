@@ -791,7 +791,7 @@ class WebGPUTextureUtils {
 
 			// try/catch has been added to fix bad video frame data on certain devices, see #32391
 
-		} catch ( _ ) {} // eslint-disable-line no-unused-vars
+		} catch ( _ ) {}
 
 	}
 

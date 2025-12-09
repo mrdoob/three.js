@@ -76,13 +76,13 @@
 
 				document.getElementsByTagName( 'html' )[ 0 ].className = 'iframe';
 
-			} catch ( e ) { } // eslint-disable-line no-unused-vars
+			} catch ( e ) { }
 
 			try {
 
 				document.body.className = 'iframe';
 
-			} catch ( e ) { } // eslint-disable-line no-unused-vars
+			} catch ( e ) { }
 
 		}
 
@@ -368,7 +368,7 @@
 					// });
 					return matcher( lines[ lineNdx ] );
 
-				} catch ( e ) {} // eslint-disable-line no-unused-vars
+				} catch ( e ) {}
 
 			}
 

@@ -409,7 +409,7 @@ function SidebarMaterial( editor ) {
 			materialUserData.dom.classList.add( 'success' );
 			materialUserData.dom.classList.remove( 'fail' );
 
-		} catch ( error ) { // eslint-disable-line no-unused-vars
+		} catch ( error ) {
 
 			materialUserData.dom.classList.remove( 'success' );
 			materialUserData.dom.classList.add( 'fail' );
@@ -439,7 +439,7 @@ function SidebarMaterial( editor ) {
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		} catch ( error ) { // eslint-disable-line no-unused-vars
+		} catch ( error ) {
 
 			output = JSON.stringify( output );
 

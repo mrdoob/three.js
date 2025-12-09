@@ -271,7 +271,7 @@ class WebGPUPipelineUtils {
 
 					pipelineData.pipeline = await device.createRenderPipelineAsync( pipelineDescriptor );
 
-				} catch ( err ) { } // eslint-disable-line no-unused-vars
+				} catch ( err ) { }
 
 				const errorScope = await device.popErrorScope();
 
