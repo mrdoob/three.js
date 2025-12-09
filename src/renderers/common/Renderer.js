@@ -2478,7 +2478,7 @@ class Renderer {
 
 			}
 
-			if ( map.renderId !== renderId ) {
+			if ( map.renderId !== renderId || Array.isArray( renderItem.object.material ) ) {
 
 				map.renderId = renderId;
 				map.renderItem = renderItem;
