@@ -42,8 +42,9 @@ class UnrealBloomPass extends Pass {
 	 * @param {number} [strength=1] - The Bloom strength.
 	 * @param {number} radius - The Bloom radius.
 	 * @param {number} threshold - The luminance threshold limits which bright areas contribute to the Bloom effect.
+	 * @param {boolean} antiAlias - If the effect should use anti-aliasing.
 	 */
-	constructor( resolution, strength = 1, radius, threshold ) {
+	constructor( resolution, strength = 1, radius, threshold, antialias ) {
 
 		super();
 
@@ -101,21 +102,22 @@ class UnrealBloomPass extends Pass {
 		this.nMips = 5;
 		let resx = Math.round( this.resolution.x / 2 );
 		let resy = Math.round( this.resolution.y / 2 );
+		const renderTargetOptions = { type: HalfFloatType, samples: antialias ? 4 : 1, resolveDepthBuffer: false };
 
-		this.renderTargetBright = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
+		this.renderTargetBright = new WebGLRenderTarget( resx, resy, renderTargetOptions );
 		this.renderTargetBright.texture.name = 'UnrealBloomPass.bright';
 		this.renderTargetBright.texture.generateMipmaps = false;
 
 		for ( let i = 0; i < this.nMips; i ++ ) {
 
-			const renderTargetHorizontal = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
+			const renderTargetHorizontal = new WebGLRenderTarget( resx, resy, renderTargetOptions );
 
 			renderTargetHorizontal.texture.name = 'UnrealBloomPass.h' + i;
 			renderTargetHorizontal.texture.generateMipmaps = false;
 
 			this.renderTargetsHorizontal.push( renderTargetHorizontal );
 
-			const renderTargetVertical = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
+			const renderTargetVertical = new WebGLRenderTarget( resx, resy, renderTargetOptions );
 
 			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
 			renderTargetVertical.texture.generateMipmaps = false;

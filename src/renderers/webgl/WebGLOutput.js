@@ -43,7 +43,9 @@ function WebGLOutput( type, width, height, antialias, depth, stencil ) {
 	const targetB = new WebGLRenderTarget( width, height, {
 		type: HalfFloatType,
 		depthBuffer: false,
-		stencilBuffer: false
+		stencilBuffer: false,
+		samples: antialias ? 4 : 0,
+		resolveDepthBuffer: false
 	} );
 
 	// create fullscreen triangle geometry
