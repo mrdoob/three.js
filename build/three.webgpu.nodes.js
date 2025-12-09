@@ -2238,6 +2238,19 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 	}
 
+	/**
+	 * This method is overwritten since the member type is inferred from the array-like node.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} name - The member name.
+	 * @return {string} The member type.
+	 */
+	getMemberType( builder, name ) {
+
+		return this.node.getMemberType( builder, name );
+
+	}
+
 	generate( builder ) {
 
 		const indexType = this.indexNode.getNodeType( builder );
@@ -3669,7 +3682,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
-	return nodeObject( new NodeClass( ...nodeArray( params ) ) );
+	return new NodeClass( ...nodeArray( params ) );
 
 };
 
@@ -4101,7 +4114,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 				error( `TSL: Invalid parameter for the type "${ type }".` );
 
-				return nodeObject( new ConstNode( 0, type ) );
+				return new ConstNode( 0, type );
 
 			}
 
@@ -4393,8 +4406,8 @@ const mat2 = new ConvertType( 'mat2' );
 const mat3 = new ConvertType( 'mat3' );
 const mat4 = new ConvertType( 'mat4' );
 
-const string = ( value = '' ) => nodeObject( new ConstNode( value, 'string' ) );
-const arrayBuffer = ( value ) => nodeObject( new ConstNode( value, 'ArrayBuffer' ) );
+const string = ( value = '' ) => new ConstNode( value, 'string' );
+const arrayBuffer = ( value ) => new ConstNode( value, 'ArrayBuffer' );
 
 addMethodChaining( 'toColor', color );
 addMethodChaining( 'toFloat', float );
@@ -4559,7 +4572,7 @@ class PropertyNode extends Node {
  * @param {?string} [name=null] - The name of the property in the shader.
  * @returns {PropertyNode}
  */
-const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
+const property = ( type, name ) => new PropertyNode( type, name );
 
 /**
  * TSL function for creating a varying property node.
@@ -4570,7 +4583,7 @@ const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
  * @param {?string} [name=null] - The name of the varying in the shader.
  * @returns {PropertyNode}
  */
-const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
+const varyingProperty = ( type, name ) => new PropertyNode( type, name, true );
 
 /**
  * TSL object that represents the shader variable `DiffuseColor`.
@@ -5193,7 +5206,7 @@ const uniform = ( value, type ) => {
 
 	}
 
-	return nodeObject( new UniformNode( value, nodeType ) );
+	return new UniformNode( value, nodeType );
 
 };
 
@@ -5277,7 +5290,7 @@ class ArrayNode extends TempNode {
 
 		if ( this.nodeType === null ) {
 
-			this.nodeType = this.values[ 0 ].getNodeType( builder );
+			return this.values[ 0 ].getNodeType( builder );
 
 		}
 
@@ -5294,6 +5307,25 @@ class ArrayNode extends TempNode {
 	getElementType( builder ) {
 
 		return this.getNodeType( builder );
+
+	}
+
+	/**
+	 * Returns the type of a member variable.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} name - The name of the member variable.
+	 * @return {string} The type of the member variable.
+	 */
+	getMemberType( builder, name ) {
+
+		if ( this.nodeType === null ) {
+
+			return this.values[ 0 ].getMemberType( builder, name );
+
+		}
+
+		return super.getMemberType( builder, name );
 
 	}
 
@@ -9214,7 +9246,7 @@ class ReferenceBaseNode extends Node {
 	 */
 	element( indexNode ) {
 
-		return nodeObject( new ReferenceElementNode$1( this, nodeObject( indexNode ) ) );
+		return new ReferenceElementNode$1( this, nodeObject( indexNode ) );
 
 	}
 
@@ -9353,7 +9385,7 @@ class ReferenceBaseNode extends Node {
  * @param {Object} object - The object the property belongs to.
  * @returns {ReferenceBaseNode}
  */
-const reference$1 = ( name, type, object ) => nodeObject( new ReferenceBaseNode( name, type, object ) );
+const reference$1 = ( name, type, object ) => new ReferenceBaseNode( name, type, object );
 
 /**
  * This node is a special type of reference node which is intended
@@ -9427,7 +9459,7 @@ class RendererReferenceNode extends ReferenceBaseNode {
  * the node refers to the renderer of the current state.
  * @returns {RendererReferenceNode}
  */
-const rendererReference = ( name, type, renderer = null ) => nodeObject( new RendererReferenceNode( name, type, renderer ) );
+const rendererReference = ( name, type, renderer = null ) => new RendererReferenceNode( name, type, renderer );
 
 /**
  * This node represents a tone mapping operation.
@@ -11339,7 +11371,7 @@ class AttributeNode extends Node {
  * @param {?string} [nodeType=null] - The node type.
  * @returns {AttributeNode}
  */
-const attribute = ( name, nodeType = null ) => nodeObject( new AttributeNode( name, nodeType ) );
+const attribute = ( name, nodeType = null ) => new AttributeNode( name, nodeType );
 
 /**
  * TSL function for creating an uv attribute node with the given index.
@@ -12557,7 +12589,7 @@ class BufferNode extends UniformNode {
  * @param {number} count - The count of buffer elements.
  * @returns {BufferNode}
  */
-const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );
+const buffer = ( value, type, count ) => new BufferNode( value, type, count );
 
 /**
  * Represents the element access on uniform array nodes.
@@ -12883,7 +12915,7 @@ class UniformArrayNode extends BufferNode {
 	 */
 	element( indexNode ) {
 
-		return nodeObject( new UniformArrayElementNode( this, nodeObject( indexNode ) ) );
+		return new UniformArrayElementNode( this, nodeObject( indexNode ) );
 
 	}
 
@@ -12898,7 +12930,7 @@ class UniformArrayNode extends BufferNode {
  * @param {?string} [nodeType] - The data type of the array elements.
  * @returns {UniformArrayNode}
  */
-const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
+const uniformArray = ( values, nodeType ) => new UniformArrayNode( values, nodeType );
 
 /**
  * The node allows to set values for built-in shader variables. That is
@@ -14844,7 +14876,7 @@ class ReferenceNode extends Node {
 	 */
 	element( indexNode ) {
 
-		return nodeObject( new ReferenceElementNode( this, nodeObject( indexNode ) ) );
+		return new ReferenceElementNode( this, nodeObject( indexNode ) );
 
 	}
 
@@ -15051,7 +15083,7 @@ class ReferenceNode extends Node {
  * @param {?Object} [object] - The object the property belongs to.
  * @returns {ReferenceNode}
  */
-const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
+const reference = ( name, type, object ) => new ReferenceNode( name, type, object );
 
 /**
  * TSL function for creating a reference node. Use this function if you want need a reference
@@ -15065,7 +15097,7 @@ const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name,
  * @param {Object} object - An array-like object the property belongs to.
  * @returns {ReferenceNode}
  */
-const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceNode( name, type, object, count ) );
+const referenceBuffer = ( name, type, count, object ) => new ReferenceNode( name, type, object, count );
 
 /**
  * This node is a special type of reference node which is intended
@@ -15146,7 +15178,7 @@ class MaterialReferenceNode extends ReferenceNode {
  * When no material is set, the node refers to the material of the current rendered object.
  * @returns {MaterialReferenceNode}
  */
-const materialReference = ( name, type, material = null ) => nodeObject( new MaterialReferenceNode( name, type, material ) );
+const materialReference = ( name, type, material = null ) => new MaterialReferenceNode( name, type, material );
 
 // Normal Mapping Without Precomputed Tangents
 // http://www.thetenthplanet.de/archives/1180
@@ -16959,7 +16991,7 @@ class StorageBufferNode extends BufferNode {
  * @param {number} [count=0] - The buffer count.
  * @returns {StorageBufferNode}
  */
-const storage = ( value, type = null, count = 0 ) => nodeObject( new StorageBufferNode( value, type, count ) );
+const storage = ( value, type = null, count = 0 ) => new StorageBufferNode( value, type, count );
 
 /**
  * @tsl
@@ -17902,7 +17934,7 @@ class SkinningNode extends Node {
  * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
  * @returns {SkinningNode}
  */
-const skinning = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh ) );
+const skinning = ( skinnedMesh ) => new SkinningNode( skinnedMesh );
 
 /**
  * TSL function for computing skinning.
@@ -19579,7 +19611,7 @@ ClippingNode.HARDWARE = 'hardware';
  * @function
  * @returns {ClippingNode}
  */
-const clipping = () => nodeObject( new ClippingNode() );
+const clipping = () => new ClippingNode();
 
 /**
  * TSL function for setting up alpha to coverage.
@@ -19588,7 +19620,7 @@ const clipping = () => nodeObject( new ClippingNode() );
  * @function
  * @returns {ClippingNode}
  */
-const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.ALPHA_TO_COVERAGE ) );
+const clippingAlpha = () => new ClippingNode( ClippingNode.ALPHA_TO_COVERAGE );
 
 /**
  * TSL function for setting up hardware-based clipping.
@@ -19597,7 +19629,7 @@ const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.ALPHA_TO_
  * @function
  * @returns {ClippingNode}
  */
-const hardwareClipping = () => nodeObject( new ClippingNode( ClippingNode.HARDWARE ) );
+const hardwareClipping = () => new ClippingNode( ClippingNode.HARDWARE );
 
 // See: https://casual-effects.com/research/Wyman2017Hashed/index.html
 
@@ -19767,7 +19799,7 @@ class VertexColorNode extends AttributeNode {
  * @param {number} [index=0] - The attribute index.
  * @returns {VertexColorNode}
  */
-const vertexColor = ( index = 0 ) => nodeObject( new VertexColorNode( index ) );
+const vertexColor = ( index = 0 ) => new VertexColorNode( index );
 
 /**
  * Represents a "Color Burn" blend mode.
@@ -33146,7 +33178,7 @@ class ParameterNode extends PropertyNode {
  * @param {?string} name - The name of the parameter in the shader.
  * @returns {ParameterNode}
  */
-const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );
+const parameter = ( type, name ) => new ParameterNode( type, name );
 
 /**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
@@ -33814,7 +33846,7 @@ const struct = ( membersLayout, name = null ) => {
 
 		}
 
-		return nodeObject( new StructNode( structLayout, values ) );
+		return new StructNode( structLayout, values );
 
 	};
 
@@ -36107,7 +36139,7 @@ class ReflectorBaseNode extends Node {
  * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
  * @returns {ReflectorNode}
  */
-const reflector = ( parameters ) => nodeObject( new ReflectorNode( parameters ) );
+const reflector = ( parameters ) => new ReflectorNode( parameters );
 
 const _camera = /*@__PURE__*/ new OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 
@@ -36724,7 +36756,7 @@ class SampleNode extends Node {
  * @param {?Node<vec2>} [uv=null] - The UV node to be used in the texture sampling.
  * @returns {SampleNode} The created SampleNode instance wrapped as a node object.
  */
-const sample = ( callback, uv = null ) => nodeObject( new SampleNode( callback, nodeObject( uv ) ) );
+const sample = ( callback, uv = null ) => new SampleNode( callback, nodeObject( uv ) );
 
 /**
  * EventNode is a node that executes a callback during specific update phases.
@@ -36798,7 +36830,7 @@ EventNode.BEFORE_MATERIAL = 'beforeMaterial';
  * @param {Function} callback - The callback function.
  * @returns {EventNode}
  */
-const createEvent = ( type, callback ) => nodeObject( new EventNode( type, callback ) ).toStack();
+const createEvent = ( type, callback ) => new EventNode( type, callback ).toStack();
 
 /**
  * Creates an event that triggers a function every time an object (Mesh|Sprite) is rendered.
@@ -37725,7 +37757,7 @@ class UserDataNode extends ReferenceNode {
  * @param {?Object} userData - A reference to the `userData` object. If not provided, the `userData` property of the 3D object that uses the node material is evaluated.
  * @returns {UserDataNode}
  */
-const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
+const userData = ( name, inputType, userData ) => new UserDataNode( name, inputType, userData );
 
 const _objectData = new WeakMap();
 
@@ -38746,7 +38778,7 @@ class PassNode extends TempNode {
 
 		if ( textureNode === undefined ) {
 
-			textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+			textureNode = new PassMultipleTextureNode( this, name );
 			textureNode.updateTexture();
 			this._textureNodes[ name ] = textureNode;
 
@@ -38770,7 +38802,7 @@ class PassNode extends TempNode {
 
 			if ( this._textureNodes[ name ] === undefined ) this.getTextureNode( name );
 
-			textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
+			textureNode = new PassMultipleTextureNode( this, name, true );
 			textureNode.updateTexture();
 			this._previousTextureNodes[ name ] = textureNode;
 
@@ -39111,7 +39143,7 @@ PassNode.DEPTH = 'depth';
  * @param {Object} options - Options for the internal render target.
  * @returns {PassNode}
  */
-const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
+const pass = ( scene, camera, options ) => new PassNode( PassNode.COLOR, scene, camera, options );
 
 /**
  * TSL function for creating a pass texture node.
@@ -39122,7 +39154,7 @@ const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.CO
  * @param {Texture} texture - The output texture.
  * @returns {PassTextureNode}
  */
-const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
+const passTexture = ( pass, texture ) => new PassTextureNode( pass, texture );
 
 /**
  * TSL function for creating a depth pass node.
@@ -39134,7 +39166,7 @@ const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, 
  * @param {Object} options - Options for the internal render target.
  * @returns {PassNode}
  */
-const depthPass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera, options ) );
+const depthPass = ( scene, camera, options ) => new PassNode( PassNode.DEPTH, scene, camera, options );
 
 /**
  * Represents a render pass for producing a toon outline effect on compatible objects.
@@ -39898,7 +39930,7 @@ const nativeFn = ( code, includes = [], language = '' ) => {
 
 	}
 
-	const functionNode = nodeObject( new FunctionNode( code, includes, language ) );
+	const functionNode = new FunctionNode( code, includes, language );
 
 	const fn = ( ...params ) => functionNode.call( ...params );
 	fn.functionNode = functionNode;
@@ -41327,7 +41359,7 @@ class ComputeBuiltinNode extends Node {
  * @param {string} nodeType - The node type.
  * @returns {ComputeBuiltinNode}
  */
-const computeBuiltin = ( name, nodeType ) => nodeObject( new ComputeBuiltinNode( name, nodeType ) );
+const computeBuiltin = ( name, nodeType ) => new ComputeBuiltinNode( name, nodeType );
 
 /**
  * Represents the number of workgroups dispatched by the compute shader.
@@ -41688,7 +41720,7 @@ class WorkgroupInfoNode extends Node {
 	 */
 	element( indexNode ) {
 
-		return nodeObject( new WorkgroupInfoElementNode( this, indexNode ) );
+		return new WorkgroupInfoElementNode( this, indexNode );
 
 	}
 
@@ -41712,7 +41744,7 @@ class WorkgroupInfoNode extends Node {
  * @param {number} [count=0] - The number of elements in the buffer.
  * @returns {WorkgroupInfoNode}
  */
-const workgroupArray = ( type, count ) => nodeObject( new WorkgroupInfoNode( 'Workgroup', type, count ) );
+const workgroupArray = ( type, count ) => new WorkgroupInfoNode( 'Workgroup', type, count );
 
 /**
  * `AtomicFunctionNode` represents any function that can operate on atomic variable types
@@ -42016,7 +42048,7 @@ class SubgroupFunctionNode extends TempNode {
 		/**
 		 * The subgroup/wave intrinsic method to construct.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.method = method;
 
@@ -42798,7 +42830,7 @@ class LightsNode extends Node {
 
 					if ( ! _lightsNodeRef.has( light ) ) {
 
-						lightNode = nodeObject( new lightNodeClass( light ) );
+						lightNode = new lightNodeClass( light );
 						_lightsNodeRef.set( light, lightNode );
 
 					} else {
@@ -43012,7 +43044,7 @@ class LightsNode extends Node {
  * @param {Array<Light>} lights - An array of lights.
  * @return {LightsNode} The created lights node.
  */
-const lights = ( lights = [] ) => nodeObject( new LightsNode() ).setLights( lights );
+const lights = ( lights = [] ) => new LightsNode().setLights( lights );
 
 /**
  * Base class for all shadow nodes.
@@ -44399,7 +44431,7 @@ class ShadowNode extends ShadowBaseNode {
  * @param {?LightShadow} [shadow] - The light shadow.
  * @return {ShadowNode} The created shadow node.
  */
-const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
+const shadow = ( light, shadow ) => new ShadowNode( light, shadow );
 
 const _clearColor$1 = /*@__PURE__*/ new Color();
 const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
@@ -44696,7 +44728,7 @@ class PointShadowNode extends ShadowNode {
  * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
  * @return {PointShadowNode} The created point shadow node.
  */
-const pointShadow = ( light, shadow ) => nodeObject( new PointShadowNode( light, shadow ) );
+const pointShadow = ( light, shadow ) => new PointShadowNode( light, shadow );
 
 /**
  * Base class for analytic light nodes.
@@ -72219,7 +72251,9 @@ class WebGPUTextureUtils {
 				}
 			);
 
-		} catch ( _ ) {} // try/catch has been added to fix bad video frame data on certain devices, see #32391
+			// try/catch has been added to fix bad video frame data on certain devices, see #32391
+
+		} catch ( _ ) {}
 
 	}
 
@@ -75047,9 +75081,7 @@ ${ flowData.code }
 
 		}
 
-		let code = bindingSnippets.join( '\n' );
-		code += bufferSnippets.join( '\n' );
-		code += structSnippets.join( '\n' );
+		const code = [ ...bindingSnippets, ...bufferSnippets, ...structSnippets ].join( '\n' );
 
 		return code;
 
@@ -81225,7 +81257,7 @@ class NodeLoader extends Loader {
 
 		}
 
-		return nodeObject( new this.nodes[ type ]() );
+		return new this.nodes[ type ]();
 
 	}
 

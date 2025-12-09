@@ -20407,7 +20407,7 @@ class Mesh extends Object3D {
 		 * morph targets name, the value its attribute index. This member is `undefined`
 		 * by default and only set when morph targets are detected in the geometry.
 		 *
-		 * @type {Object<String,number>|undefined}
+		 * @type {Object<string,number>|undefined}
 		 * @default undefined
 		 */
 		this.morphTargetDictionary = undefined;
@@ -28910,7 +28910,7 @@ class Line extends Object3D {
 		 * morph targets name, the value its attribute index. This member is `undefined`
 		 * by default and only set when morph targets are detected in the geometry.
 		 *
-		 * @type {Object<String,number>|undefined}
+		 * @type {Object<string,number>|undefined}
 		 * @default undefined
 		 */
 		this.morphTargetDictionary = undefined;
@@ -29445,7 +29445,7 @@ class Points extends Object3D {
 		 * morph targets name, the value its attribute index. This member is `undefined`
 		 * by default and only set when morph targets are detected in the geometry.
 		 *
-		 * @type {Object<String,number>|undefined}
+		 * @type {Object<string,number>|undefined}
 		 * @default undefined
 		 */
 		this.morphTargetDictionary = undefined;
@@ -42699,7 +42699,7 @@ class KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default ''
  */
 KeyframeTrack.prototype.ValueTypeName = '';
@@ -42756,7 +42756,7 @@ class BooleanKeyframeTrack extends KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default 'bool'
  */
 BooleanKeyframeTrack.prototype.ValueTypeName = 'bool';
@@ -42805,7 +42805,7 @@ class ColorKeyframeTrack extends KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default 'color'
  */
 ColorKeyframeTrack.prototype.ValueTypeName = 'color';
@@ -42836,7 +42836,7 @@ class NumberKeyframeTrack extends KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default 'number'
  */
 NumberKeyframeTrack.prototype.ValueTypeName = 'number';
@@ -42923,7 +42923,7 @@ class QuaternionKeyframeTrack extends KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default 'quaternion'
  */
 QuaternionKeyframeTrack.prototype.ValueTypeName = 'quaternion';
@@ -42959,7 +42959,7 @@ class StringKeyframeTrack extends KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default 'string'
  */
 StringKeyframeTrack.prototype.ValueTypeName = 'string';
@@ -43008,7 +43008,7 @@ class VectorKeyframeTrack extends KeyframeTrack {
 /**
  * The value type name.
  *
- * @type {String}
+ * @type {string}
  * @default 'vector'
  */
 VectorKeyframeTrack.prototype.ValueTypeName = 'vector';
