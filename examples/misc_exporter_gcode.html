@@ -46,10 +46,16 @@
 				addSphere: addSphere,
 				addTorus: addTorus,
 				exportToGCode: exportToGCode,
+				printer: 'Ender3',
+				filament: 'GenericPLA',
 				layerHeight: 0.2,
 				infillDensity: 20,
 				infillPattern: 'grid'
 			};
+
+			// Dropdown options (extend as supported by Polyslice profiles)
+			const PRINTER_OPTIONS = [ 'Ender3', 'PrusaMK3S', 'BambuP1P' ];
+			const FILAMENT_OPTIONS = [ 'GenericPLA', 'GenericPETG', 'GenericABS' ];
 
 			init();
 
@@ -84,17 +90,21 @@
 
 				const gui = new GUI();
 
-				let h = gui.addFolder( 'Geometry Selection' );
-				h.add( params, 'addCube' ).name( 'Cube' );
-				h.add( params, 'addCylinder' ).name( 'Cylinder' );
-				h.add( params, 'addCone' ).name( 'Cone' );
-				h.add( params, 'addSphere' ).name( 'Sphere' );
-				h.add( params, 'addTorus' ).name( 'Torus' );
+				let h = gui.addFolder( 'Printer & Filament' );
+				h.add( params, 'printer', PRINTER_OPTIONS ).name( 'Printer' );
+				h.add( params, 'filament', FILAMENT_OPTIONS ).name( 'Filament' );
 
 				h = gui.addFolder( 'Slicer Settings' );
 				h.add( params, 'layerHeight', 0.1, 0.4, 0.05 ).name( 'Layer Height (mm)' );
 				h.add( params, 'infillDensity', 0, 100, 5 ).name( 'Infill Density (%)' );
 				h.add( params, 'infillPattern', [ 'grid', 'triangles', 'hexagons' ] ).name( 'Infill Pattern' );
+
+				h = gui.addFolder( 'Geometry Selection' );
+				h.add( params, 'addCube' ).name( 'Cube' );
+				h.add( params, 'addCylinder' ).name( 'Cylinder' );
+				h.add( params, 'addCone' ).name( 'Cone' );
+				h.add( params, 'addSphere' ).name( 'Sphere' );
+				h.add( params, 'addTorus' ).name( 'Torus' );
 
 				h = gui.addFolder( 'Export' );
 				h.add( params, 'exportToGCode' ).name( 'Export G-code' );
@@ -135,8 +145,8 @@
 					}
 
 					// Create printer and filament configurations using Polyslice
-					const printer = new Polyslice.Printer( 'Ender3' );
-					const filament = new Polyslice.Filament( 'GenericPLA' );
+					const printer = new Polyslice.Printer( params.printer || 'Ender3' );
+					const filament = new Polyslice.Filament( params.filament || 'GenericPLA' );
 
 					// Create the slicer instance with user-defined settings
 					const slicer = new Polyslice.Polyslice( {
