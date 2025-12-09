@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
+import { nodeImmutable } from '../tsl/TSLCore.js';
 import { hashString } from './NodeUtils.js';
 
 /**
