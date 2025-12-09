@@ -789,7 +789,9 @@ class WebGPUTextureUtils {
 				}
 			);
 
-		} catch ( _ ) {} // try/catch has been added to fix bad video frame data on certain devices, see #32391
+			// try/catch has been added to fix bad video frame data on certain devices, see #32391
+
+		} catch ( _ ) {} // eslint-disable-line no-unused-vars
 
 	}
 
