@@ -1590,9 +1590,11 @@ class WebGLRenderer {
 
 			const isXRPresenting = xr.enabled === true && xr.isPresenting === true;
 
-			if ( outputBuffer !== null ) outputBuffer.setRenderTarget( _currentRenderTarget, isXRPresenting );
+			let useOutputBuffer = outputBuffer !== null && ( _currentRenderTarget === null || isXRPresenting ) && outputBuffer.isCopying() === false;
 
-			const useOutputBuffer = outputBuffer !== null && ( _currentRenderTarget === null || isXRPresenting ) && outputBuffer.isCopying() === false && outputBuffer.activate( _this );
+			if ( useOutputBuffer ) outputBuffer.setRenderTarget( _currentRenderTarget, isXRPresenting );
+
+			if ( useOutputBuffer && outputBuffer.activate( _this ) === false ) useOutputBuffer = false;
 
 			// update scene graph
 
