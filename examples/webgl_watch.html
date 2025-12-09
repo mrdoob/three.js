@@ -51,7 +51,7 @@
 				metalness: 1.0,
 				opacity: 0.4,
 				threshold: 0,
-				strength: 0.08,
+				strength: 0.007,
 				radius: 0.0,
 				postProcess: false
 			};
@@ -248,7 +248,7 @@
 
 				gui.add( setting, 'postProcess' ).onChange( postProcess );
 				gui.add( setting, 'threshold', 0, 1, 0.01 ).onChange( upBloom );
-				gui.add( setting, 'strength', 0, 3, 0.01 ).onChange( upBloom );
+				gui.add( setting, 'strength', 0, 0.1, 0.001 ).onChange( upBloom );
 				gui.add( setting, 'radius', 0, 1, 0.01 ).onChange( upBloom );
 
 			}
