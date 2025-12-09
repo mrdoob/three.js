@@ -97,13 +97,7 @@ class ArrayNode extends TempNode {
 	 */
 	getElementType( builder ) {
 
-		if ( this.nodeType === null ) {
-
-			return this.values[ 0 ].getElementType( builder );
-
-		}
-
-		return super.getElementType( builder );
+		return this.getNodeType( builder );
 
 	}
 
