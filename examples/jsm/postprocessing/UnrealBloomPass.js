@@ -1,8 +1,9 @@
 import {
-	AdditiveBlending,
 	Color,
+	CustomBlending,
 	HalfFloatType,
 	MeshBasicMaterial,
+	OneFactor,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector2,
@@ -187,7 +188,11 @@ class UnrealBloomPass extends Pass {
 			uniforms: this.copyUniforms,
 			vertexShader: CopyShader.vertexShader,
 			fragmentShader: CopyShader.fragmentShader,
-			blending: AdditiveBlending,
+			blending: CustomBlending,
+			blendSrc: OneFactor,
+			blendDst: OneFactor,
+			blendSrcAlpha: OneFactor,
+			blendDstAlpha: OneFactor,
 			depthTest: false,
 			depthWrite: false,
 			transparent: true
@@ -476,11 +481,14 @@ class UnrealBloomPass extends Pass {
 				}
 
 				void main() {
-					gl_FragColor = bloomStrength * ( lerpBloomFactor(bloomFactors[0]) * vec4(bloomTintColors[0], 1.0) * texture2D(blurTexture1, vUv) +
-						lerpBloomFactor(bloomFactors[1]) * vec4(bloomTintColors[1], 1.0) * texture2D(blurTexture2, vUv) +
-						lerpBloomFactor(bloomFactors[2]) * vec4(bloomTintColors[2], 1.0) * texture2D(blurTexture3, vUv) +
-						lerpBloomFactor(bloomFactors[3]) * vec4(bloomTintColors[3], 1.0) * texture2D(blurTexture4, vUv) +
-						lerpBloomFactor(bloomFactors[4]) * vec4(bloomTintColors[4], 1.0) * texture2D(blurTexture5, vUv) );
+					// 3.0 for backwards compatibility with previous alpha-based intensity
+					vec3 bloom = 3.0 * bloomStrength * ( lerpBloomFactor(bloomFactors[0]) * bloomTintColors[0] * texture2D(blurTexture1, vUv).rgb +
+						lerpBloomFactor(bloomFactors[1]) * bloomTintColors[1] * texture2D(blurTexture2, vUv).rgb +
+						lerpBloomFactor(bloomFactors[2]) * bloomTintColors[2] * texture2D(blurTexture3, vUv).rgb +
+						lerpBloomFactor(bloomFactors[3]) * bloomTintColors[3] * texture2D(blurTexture4, vUv).rgb +
+						lerpBloomFactor(bloomFactors[4]) * bloomTintColors[4] * texture2D(blurTexture5, vUv).rgb );
+					float bloomAlpha = max( bloom.r, max( bloom.g, bloom.b ) );
+					gl_FragColor = vec4( bloom, bloomAlpha );
 				}`
 		} );
 
