@@ -727,9 +727,10 @@ class WebGLRenderer {
 		 */
 		this.setEffects = function ( effects ) {
 
-			if ( output === null ) {
+			if ( _outputBufferType === UnsignedByteType ) {
 
-				output = new WebGLOutput( _outputBufferType, canvas.width, canvas.height, depth, stencil );
+				console.error( 'THREE.WebGLRenderer: setEffects() requires outputBufferType set to HalfFloatType or FloatType.' );
+				return;
 
 			}
 
