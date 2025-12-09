@@ -41,8 +41,9 @@
 
 			const params = {
 				addCube: addCube,
-				addSphere: addSphere,
 				addCylinder: addCylinder,
+				addCone: addCone,
+				addSphere: addSphere,
 				addTorus: addTorus,
 				exportToGCode: exportToGCode,
 				layerHeight: 0.2,
@@ -77,7 +78,7 @@
 				scene.add( directionalLight );
 
 				// Add ground plane for reference (XY plane when Z is up)
-				const gridHelper = new THREE.GridHelper( 200, 10 );
+				const gridHelper = new THREE.GridHelper( 220, 10 );
 				gridHelper.rotation.x = - Math.PI / 2; // rotate from XZ to XY
 				scene.add( gridHelper );
 
@@ -85,8 +86,9 @@
 
 				let h = gui.addFolder( 'Geometry Selection' );
 				h.add( params, 'addCube' ).name( 'Cube' );
-				h.add( params, 'addSphere' ).name( 'Sphere' );
 				h.add( params, 'addCylinder' ).name( 'Cylinder' );
+				h.add( params, 'addCone' ).name( 'Cone' );
+				h.add( params, 'addSphere' ).name( 'Sphere' );
 				h.add( params, 'addTorus' ).name( 'Torus' );
 
 				h = gui.addFolder( 'Slicer Settings' );
@@ -143,7 +145,7 @@
 						layerHeight: params.layerHeight,
 						infillPattern: params.infillPattern,
 						infillDensity: params.infillDensity,
-						verbose: false
+						verbose: true
 					} );
 
 					// Slice the current mesh directly
@@ -205,18 +207,6 @@
 
 			}
 
-			function addSphere() {
-
-				clearScene();
-
-				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-				const geometry = new THREE.SphereGeometry( 5, 32, 32 );
-				mesh = new THREE.Mesh( geometry, material );
-				placeOnXYPlane( mesh );
-				scene.add( mesh );
-
-			}
-
 			function addCylinder() {
 
 				clearScene();
@@ -224,7 +214,32 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.CylinderGeometry( 5, 5, 10, 32 );
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.rotation.x = Math.PI / 2; // Align cylinder axis with Z-up
+				mesh.rotation.x = Math.PI / 2;
+				placeOnXYPlane( mesh );
+				scene.add( mesh );
+
+			}
+
+			function addCone() {
+
+				clearScene();
+
+				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+				const geometry = new THREE.ConeGeometry( 5, 10, 32 );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.x = Math.PI / 2;
+				placeOnXYPlane( mesh );
+				scene.add( mesh );
+
+			}
+
+			function addSphere() {
+
+				clearScene();
+
+				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+				const geometry = new THREE.SphereGeometry( 5, 32, 32 );
+				mesh = new THREE.Mesh( geometry, material );
 				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
