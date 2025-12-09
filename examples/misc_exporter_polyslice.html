@@ -11,6 +11,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - <a href="https://github.com/jgphilpott/polyslice" target="_blank" rel="noopener">Polyslice</a>
 			<br>Slice 3D models to G-code for 3D printing
 			<br><a href="https://www.youtube.com/watch?v=V2h3SiafXRc" target="_blank" rel="noopener">Watch Demo Video</a>
+			<br><em>Note: This example requires loading Polyslice from unpkg.com. Disable ad blockers if needed.</em>
 		</div>
 
 		<script type="importmap">
@@ -23,7 +24,7 @@
 		</script>
 
 		<!-- Include Polyslice from CDN -->
-		<script src="https://unpkg.com/@jgphilpott/polyslice/dist/index.browser.min.js" integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb" crossorigin="anonymous"></script>
+		<script src="https://unpkg.com/@jgphilpott/polyslice/dist/index.browser.min.js" crossorigin="anonymous"></script>
 
 		<script type="module">
 
@@ -92,6 +93,17 @@
 
 				gui.open();
 
+				// Check if Polyslice loaded successfully
+				if ( typeof Polyslice !== 'undefined' ) {
+
+					console.log( '✓ Polyslice library loaded successfully' );
+
+				} else {
+
+					console.warn( '✗ Polyslice library failed to load. Export will not work.' );
+
+				}
+
 				addCube();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -116,7 +128,7 @@
 					// Check if Polyslice is loaded
 					if ( typeof Polyslice === 'undefined' ) {
 
-						alert( 'Polyslice library not loaded. Please check that the library is accessible.' );
+						alert( 'Polyslice library failed to load from CDN.\n\nPossible solutions:\n1. Disable ad blockers or browser extensions\n2. Check your network connection\n3. Ensure unpkg.com is not blocked by your firewall' );
 						return;
 
 					}
