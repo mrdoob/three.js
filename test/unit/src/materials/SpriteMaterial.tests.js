@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { SpriteMaterial } from '../../../../src/materials/SpriteMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

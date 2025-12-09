@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { InstancedBufferAttribute } from '../../../../src/core/InstancedBufferAttribute.js';
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';

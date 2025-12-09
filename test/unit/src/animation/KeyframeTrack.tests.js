@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
 
 import { KeyframeTrack } from '../../../../src/animation/KeyframeTrack.js';

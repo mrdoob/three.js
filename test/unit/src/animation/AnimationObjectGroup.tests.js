@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { AnimationObjectGroup } from '../../../../src/animation/AnimationObjectGroup.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
@@ -50,14 +48,14 @@ export default QUnit.module( 'Animation', () => {
 
 				var rootNodes = [], pathsOk = true, nodesOk = true;
 
-				for ( var i = group.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+				for ( let i = group.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 					if ( bindings[ i ].path !== path ) pathsOk = false;
 					rootNodes.push( bindings[ i ].rootNode );
 
 				}
 
-				for ( var i = 0, n = roots.length; i !== n; ++ i ) {
+				for ( let i = 0, n = roots.length; i !== n; ++ i ) {
 
 					if ( rootNodes.indexOf( roots[ i ] ) === - 1 ) nodesOk = false;
 

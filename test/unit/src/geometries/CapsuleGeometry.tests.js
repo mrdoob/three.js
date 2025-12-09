@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CapsuleGeometry } from '../../../../src/geometries/CapsuleGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';

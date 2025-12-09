@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Texture } from '../../../../src/textures/Texture.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';

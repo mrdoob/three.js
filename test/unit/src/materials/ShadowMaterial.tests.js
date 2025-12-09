@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ShadowMaterial } from '../../../../src/materials/ShadowMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

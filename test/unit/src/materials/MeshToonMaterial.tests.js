@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { MeshToonMaterial } from '../../../../src/materials/MeshToonMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

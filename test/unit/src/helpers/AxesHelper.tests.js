@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { AxesHelper } from '../../../../src/helpers/AxesHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';

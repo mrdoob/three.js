@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { TubeGeometry } from '../../../../src/geometries/TubeGeometry.js';
 
 import { LineCurve3 } from '../../../../src/extras/curves/LineCurve3.js';

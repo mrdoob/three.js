@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists.js';
 import { Scene } from '../../../../../src/scenes/Scene.js';
 

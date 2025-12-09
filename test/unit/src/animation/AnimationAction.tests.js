@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { AnimationAction } from '../../../../src/animation/AnimationAction.js';
 
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ArrayCamera } from '../../../../src/cameras/ArrayCamera.js';
 
 import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';

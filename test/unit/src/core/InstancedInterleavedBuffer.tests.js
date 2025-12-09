@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { InstancedInterleavedBuffer } from '../../../../src/core/InstancedInterleavedBuffer.js';
 
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';

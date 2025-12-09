@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 
 export default QUnit.module( 'Maths', () => {

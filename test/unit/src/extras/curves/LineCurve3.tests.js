@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LineCurve3 } from '../../../../../src/extras/curves/LineCurve3.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';

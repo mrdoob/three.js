@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { RectAreaLight } from '../../../../src/lights/RectAreaLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';

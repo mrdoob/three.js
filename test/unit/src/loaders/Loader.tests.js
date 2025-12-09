@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Loader } from '../../../../src/loaders/Loader.js';
 
 import { LoadingManager } from '../../../../src/loaders/LoadingManager.js';

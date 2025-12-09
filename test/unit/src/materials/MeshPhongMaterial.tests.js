@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { MeshPhongMaterial } from '../../../../src/materials/MeshPhongMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

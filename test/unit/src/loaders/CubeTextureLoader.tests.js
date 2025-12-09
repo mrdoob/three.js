@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CubeTextureLoader } from '../../../../src/loaders/CubeTextureLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';

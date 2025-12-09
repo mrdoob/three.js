@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { EllipseCurve } from '../../../../../src/extras/curves/EllipseCurve.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';

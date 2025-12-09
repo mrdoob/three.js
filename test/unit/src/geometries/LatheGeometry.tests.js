@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LatheGeometry } from '../../../../src/geometries/LatheGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
