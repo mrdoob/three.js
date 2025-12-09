@@ -114,7 +114,7 @@ export default [
 			'no-unused-vars': [ 'error', {
 				caughtErrors: 'none',
 			} ],
-			// 'jsdoc/check-types': 'error',
+			'jsdoc/check-types': 'error',
 			'jsdoc/require-returns': 'off',
 			'jsdoc/require-returns-type': 'error',
 			'jsdoc/require-param-description': 'off',
