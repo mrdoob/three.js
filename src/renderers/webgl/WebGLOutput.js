@@ -28,19 +28,23 @@ const toneMappingMap = {
 	[ CustomToneMapping ]: 'CUSTOM_TONE_MAPPING'
 };
 
-function WebGLOutput( type, width, height, depth, stencil ) {
+function WebGLOutput( type, width, height, depth, stencil, antialias ) {
 
 	// render targets for scene and post-processing
 	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
-		stencilBuffer: stencil
+		stencilBuffer: stencil,
+		samples: antialias ? 4 : 1,
+		resolveDepthBuffer: false
 	} );
 
 	const targetB = new WebGLRenderTarget( width, height, {
 		type: HalfFloatType,
 		depthBuffer: false,
-		stencilBuffer: false
+		stencilBuffer: false,
+		samples: antialias ? 4 : 1,
+		resolveDepthBuffer: false
 	} );
 
 	// create fullscreen triangle geometry
