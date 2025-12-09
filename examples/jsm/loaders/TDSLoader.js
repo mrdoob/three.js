@@ -778,7 +778,7 @@ class Chunk {
 			this.position += next.size;
 			return next;
 
-		}	catch ( e ) { // eslint-disable-line no-unused-vars
+		}	catch ( e ) {
 
 			this.debugMessage( 'Unable to read chunk at ' + this.position );
 			return null;

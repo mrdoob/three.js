@@ -378,7 +378,7 @@ class ViewHelper extends Object3D {
 
 				result = typeof OffscreenCanvas !== 'undefined' && ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
 
-			} catch ( err ) { // eslint-disable-line no-unused-vars
+			} catch ( err ) {
 
 				// Ignore any errors
 

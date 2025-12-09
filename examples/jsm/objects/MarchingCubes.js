@@ -560,7 +560,7 @@ class MarchingCubes extends Mesh {
 							  )
 								: new Color( colors );
 
-				} catch ( err ) { // eslint-disable-line no-unused-vars
+				} catch ( err ) {
 
 					ballColor = new Color( ballx, bally, ballz );
 

@@ -212,7 +212,7 @@ function Script( editor ) {
 
 						jsonlint.parse( string );
 
-					} catch ( error ) { // eslint-disable-line no-unused-vars
+					} catch ( error ) {
 
 						// ignore failed error recovery
 
