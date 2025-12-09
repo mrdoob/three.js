@@ -2787,7 +2787,6 @@ class WebGLRenderer {
 			_currentActiveCubeFace = activeCubeFace;
 			_currentActiveMipmapLevel = activeMipmapLevel;
 
-			const useDefaultFramebuffer = true;
 			let framebuffer = null;
 			let isCube = false;
 			let isRenderTarget3D = false;
@@ -2911,7 +2910,7 @@ class WebGLRenderer {
 
 			const framebufferBound = state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
-			if ( framebufferBound && useDefaultFramebuffer ) {
+			if ( framebufferBound ) {
 
 				state.drawBuffers( renderTarget, framebuffer );
 

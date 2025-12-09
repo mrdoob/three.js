@@ -116,8 +116,6 @@ function WebGLOutputBuffer( type, width, height, depth, stencil ) {
 	let _passes = [];
 	let _hasRenderPass = false;
 
-	this.enabled = true;
-
 	this.setSize = function ( width, height ) {
 
 		renderTargetA.setSize( width, height );
@@ -176,7 +174,6 @@ function WebGLOutputBuffer( type, width, height, depth, stencil ) {
 
 	this.activate = function ( renderer ) {
 
-		if ( this.enabled === false ) return false;
 		if ( renderer.toneMapping === NoToneMapping && _passes.length === 0 ) return false;
 
 		// if first pass is a render pass, it will set its own render target
