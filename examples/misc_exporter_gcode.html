@@ -61,6 +61,9 @@
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				// Use Z-up coordinate system
+				THREE.Object3D.DEFAULT_UP.set( 0, 0, 1 );
+				camera.up.set( 0, 0, 1 );
 				camera.position.set( 100, 100, 100 );
 
 				scene = new THREE.Scene();
@@ -73,8 +76,9 @@
 				directionalLight.position.set( 0, 200, 100 );
 				scene.add( directionalLight );
 
-				// Add ground plane for reference
+				// Add ground plane for reference (XY plane when Z is up)
 				const gridHelper = new THREE.GridHelper( 200, 10 );
+				gridHelper.rotation.x = - Math.PI / 2; // rotate from XZ to XY
 				scene.add( gridHelper );
 
 				const gui = new GUI();
@@ -177,7 +181,6 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = 5; // Position on ground
 				scene.add( mesh );
 
 			}
@@ -189,7 +192,6 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.SphereGeometry( 5, 32, 32 );
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = 5; // Position on ground
 				scene.add( mesh );
 
 			}
@@ -201,7 +203,7 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.CylinderGeometry( 5, 5, 10, 32 );
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = 5; // Position on ground
+				mesh.rotation.x = Math.PI / 2; // Align cylinder axis with Z-up
 				scene.add( mesh );
 
 			}
@@ -213,7 +215,6 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.TorusGeometry( 5, 2, 16, 100 );
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = 5; // Position on ground
 				scene.add( mesh );
 
 			}
