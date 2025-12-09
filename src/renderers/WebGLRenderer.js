@@ -1605,11 +1605,7 @@ class WebGLRenderer {
 
 			const isXRPresenting = xr.enabled === true && xr.isPresenting === true;
 
-			let useOutputBuffer = output !== null && ( _currentRenderTarget === null || isXRPresenting ) && output.isCopying() === false;
-
-			if ( useOutputBuffer ) output.setRenderTarget( _currentRenderTarget, isXRPresenting );
-
-			if ( useOutputBuffer && output.activate( _this ) === false ) useOutputBuffer = false;
+			const useOutput = output !== null && ( _currentRenderTarget === null || isXRPresenting ) && output.begin( _this, _currentRenderTarget );
 
 			// update scene graph
 
@@ -1693,7 +1689,7 @@ class WebGLRenderer {
 
 			// render scene (skip if first effect is a render pass - it will render the scene itself)
 
-			const skipSceneRender = useOutputBuffer && output.hasRenderPass();
+			const skipSceneRender = useOutput && output.hasRenderPass();
 
 			if ( skipSceneRender === false ) {
 
@@ -1756,9 +1752,9 @@ class WebGLRenderer {
 
 			// copy from internal render target to canvas using fullscreen quad
 
-			if ( useOutputBuffer ) {
+			if ( useOutput ) {
 
-				output.render( _this );
+				output.end( _this );
 
 			}
 

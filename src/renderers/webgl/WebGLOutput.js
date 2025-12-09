@@ -147,17 +147,17 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 	};
 
-	this.setRenderTarget = function ( renderTarget, isXRPresenting ) {
+	this.begin = function ( renderer, renderTarget ) {
 
-		// Don't update saved render target during copying phase
-		// (post-processing passes call render() which would overwrite this)
-		if ( _copyingToCanvas ) return;
+		// Don't activate during copying phase (post-processing passes call render())
+		if ( _copyingToCanvas ) return false;
+
+		if ( renderer.toneMapping === NoToneMapping && _passes.length === 0 ) return false;
 
 		_savedRenderTarget = renderTarget;
 
 		// resize internal buffers to match render target (e.g. XR resolution)
-		// Only resize when entering XR, not on every frame
-		if ( isXRPresenting && renderTarget !== null ) {
+		if ( renderTarget !== null ) {
 
 			const width = renderTarget.width;
 			const height = renderTarget.height;
@@ -169,12 +169,6 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 			}
 
 		}
-
-	};
-
-	this.activate = function ( renderer ) {
-
-		if ( renderer.toneMapping === NoToneMapping && _passes.length === 0 ) return false;
 
 		// if first pass is a render pass, it will set its own render target
 		if ( _hasRenderPass === false ) {
@@ -197,7 +191,7 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 	};
 
-	this.render = function ( renderer, deltaTime ) {
+	this.end = function ( renderer, deltaTime ) {
 
 		// restore tone mapping
 		renderer.toneMapping = _savedToneMapping;
