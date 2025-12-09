@@ -31,13 +31,13 @@ const toneMappingMap = {
 function WebGLOutput( type, width, height, depth, stencil ) {
 
 	// render targets for scene and post-processing
-	const renderTargetA = new WebGLRenderTarget( width, height, {
+	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
 		stencilBuffer: stencil
 	} );
 
-	const renderTargetB = new WebGLRenderTarget( width, height, {
+	const targetB = new WebGLRenderTarget( width, height, {
 		type: HalfFloatType,
 		depthBuffer: false,
 		stencilBuffer: false
@@ -49,7 +49,7 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 	geometry.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
 
 	// create output material with tone mapping support
-	const outputMaterial = new RawShaderMaterial( {
+	const material = new RawShaderMaterial( {
 		uniforms: {
 			tDiffuse: { value: null }
 		},
@@ -105,8 +105,8 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 		depthWrite: false
 	} );
 
-	const outputMesh = new Mesh( geometry, outputMaterial );
-	const outputCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	const mesh = new Mesh( geometry, material );
+	const camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 	let _outputColorSpace = null;
 	let _outputToneMapping = null;
@@ -118,8 +118,8 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 	this.setSize = function ( width, height ) {
 
-		renderTargetA.setSize( width, height );
-		renderTargetB.setSize( width, height );
+		targetA.setSize( width, height );
+		targetB.setSize( width, height );
 
 		for ( let i = 0; i < _passes.length; i ++ ) {
 
@@ -135,8 +135,8 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 		_passes = passes;
 		_hasRenderPass = _passes.length > 0 && _passes[ 0 ].isRenderPass === true;
 
-		const width = renderTargetA.width;
-		const height = renderTargetA.height;
+		const width = targetA.width;
+		const height = targetA.height;
 
 		for ( let i = 0; i < _passes.length; i ++ ) {
 
@@ -162,7 +162,7 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 			const width = renderTarget.width;
 			const height = renderTarget.height;
 
-			if ( renderTargetA.width !== width || renderTargetA.height !== height ) {
+			if ( targetA.width !== width || targetA.height !== height ) {
 
 				this.setSize( width, height );
 
@@ -173,7 +173,7 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 		// if first pass is a render pass, it will set its own render target
 		if ( _hasRenderPass === false ) {
 
-			renderer.setRenderTarget( renderTargetA );
+			renderer.setRenderTarget( targetA );
 
 		}
 
@@ -199,8 +199,8 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 		_copyingToCanvas = true;
 
 		// run post-processing passes
-		let readBuffer = renderTargetA;
-		let writeBuffer = renderTargetB;
+		let readBuffer = targetA;
+		let writeBuffer = targetB;
 
 		for ( let i = 0; i < _passes.length; i ++ ) {
 
@@ -226,21 +226,21 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 			_outputColorSpace = renderer.outputColorSpace;
 			_outputToneMapping = renderer.toneMapping;
 
-			outputMaterial.defines = {};
+			material.defines = {};
 
-			if ( ColorManagement.getTransfer( _outputColorSpace ) === SRGBTransfer ) outputMaterial.defines.SRGB_TRANSFER = '';
+			if ( ColorManagement.getTransfer( _outputColorSpace ) === SRGBTransfer ) material.defines.SRGB_TRANSFER = '';
 
 			const toneMapping = toneMappingMap[ _outputToneMapping ];
-			if ( toneMapping ) outputMaterial.defines[ toneMapping ] = '';
+			if ( toneMapping ) material.defines[ toneMapping ] = '';
 
-			outputMaterial.needsUpdate = true;
+			material.needsUpdate = true;
 
 		}
 
 		// final output to canvas (or XR render target)
-		outputMaterial.uniforms.tDiffuse.value = readBuffer.texture;
+		material.uniforms.tDiffuse.value = readBuffer.texture;
 		renderer.setRenderTarget( _savedRenderTarget );
-		renderer.render( outputMesh, outputCamera );
+		renderer.render( mesh, camera );
 
 		_savedRenderTarget = null;
 		_copyingToCanvas = false;
@@ -255,10 +255,10 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 	this.dispose = function () {
 
-		renderTargetA.dispose();
-		renderTargetB.dispose();
+		targetA.dispose();
+		targetB.dispose();
 		geometry.dispose();
-		outputMaterial.dispose();
+		material.dispose();
 
 	};
 
