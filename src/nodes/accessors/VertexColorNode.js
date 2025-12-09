@@ -1,5 +1,4 @@
 import AttributeNode from '../core/AttributeNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 import { Vector4 } from '../../math/Vector4.js';
 
 /**

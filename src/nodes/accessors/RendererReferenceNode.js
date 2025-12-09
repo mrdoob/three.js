@@ -1,5 +1,4 @@
 import ReferenceBaseNode from './ReferenceBaseNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 
 /**

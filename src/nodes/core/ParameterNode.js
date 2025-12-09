@@ -1,4 +1,3 @@
-import { nodeObject } from '../tsl/TSLBase.js';
 import { error } from '../../utils.js';
 import PropertyNode from './PropertyNode.js';
 

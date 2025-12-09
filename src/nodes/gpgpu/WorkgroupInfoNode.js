@@ -1,5 +1,4 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
 import Node from '../core/Node.js';
 import { warn } from '../../utils.js';
 

@@ -1,5 +1,4 @@
 import Node from '../core/Node.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 import { warn } from '../../utils.js';
 
 /**

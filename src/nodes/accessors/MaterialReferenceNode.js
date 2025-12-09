@@ -1,5 +1,4 @@
 import ReferenceNode from './ReferenceNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 
 /**
  * This node is a special type of reference node which is intended

@@ -1,6 +1,5 @@
 import Node from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
 
 /**
  * StructNode allows to create custom structures with multiple members.

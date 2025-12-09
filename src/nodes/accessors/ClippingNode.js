@@ -1,6 +1,6 @@
 
 import Node from '../core/Node.js';
-import { nodeObject, Fn, bool, float } from '../tsl/TSLBase.js';
+import { Fn, bool, float } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { Loop } from '../utils/LoopNode.js';

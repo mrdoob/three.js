@@ -1,6 +1,5 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeObject } from '../tsl/TSLCore.js';
 
 /**
  * EventNode is a node that executes a callback during specific update phases.

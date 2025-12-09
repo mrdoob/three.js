@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { nodeObject, varying } from '../tsl/TSLBase.js';
+import { varying } from '../tsl/TSLBase.js';
 import { warn } from '../../utils.js';
 
 /**

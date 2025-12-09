@@ -1,5 +1,4 @@
 import UniformNode from '../core/UniformNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 
 /**
  * A special type of uniform node which represents array-like data

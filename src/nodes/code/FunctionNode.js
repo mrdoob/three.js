@@ -1,5 +1,4 @@
 import CodeNode from './CodeNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 
 /**
  * This class represents a native shader function. It can be used to implement

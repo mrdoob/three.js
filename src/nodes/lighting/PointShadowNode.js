@@ -1,6 +1,6 @@
 import ShadowNode from './ShadowNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { float, vec3, If, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec3, If, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
