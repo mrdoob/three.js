@@ -8,9 +8,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - <a href="https://github.com/jgphilpott/polyslice" target="_blank" rel="noopener">Polyslice</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - <a href="https://github.com/jgphilpott/polyslice" target="_blank" rel="noopener">GCode</a>
 			<br>Slice 3D models to G-code for 3D printing
-			<br><a href="https://www.youtube.com/watch?v=V2h3SiafXRc" target="_blank" rel="noopener">Watch Demo Video</a>
+			<br><a href="https://www.youtube.com/watch?v=V2h3SiafXRc" target="_blank" rel="noopener">Watch the Demo Video</a>
 		</div>
 
 		<script type="importmap">
@@ -61,7 +61,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 0, 150, 300 );
+				camera.position.set( 100, 100, 100 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
@@ -80,9 +80,9 @@
 				const gui = new GUI();
 
 				let h = gui.addFolder( 'Geometry Selection' );
-				h.add( params, 'addCube' ).name( 'Cube (10mm)' );
-				h.add( params, 'addSphere' ).name( 'Sphere (10mm)' );
-				h.add( params, 'addCylinder' ).name( 'Cylinder (10mm)' );
+				h.add( params, 'addCube' ).name( 'Cube' );
+				h.add( params, 'addSphere' ).name( 'Sphere' );
+				h.add( params, 'addCylinder' ).name( 'Cylinder' );
 				h.add( params, 'addTorus' ).name( 'Torus' );
 
 				h = gui.addFolder( 'Slicer Settings' );
@@ -111,19 +111,12 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 50, 0 );
+				controls.target.set( 0, 0, 0 );
 				controls.update();
 
 			}
 
 			function exportToGCode() {
-
-				if ( ! mesh ) {
-
-					alert( 'Please add a geometry first!' );
-					return;
-
-				}
 
 				try {
 
