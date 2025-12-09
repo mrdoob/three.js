@@ -28602,11 +28602,35 @@ class ChainMap {
 	constructor() {
 
 		/**
-		 * The root Weak Map.
+		 * A map of Weak Maps by their key length.
 		 *
-		 * @type {WeakMap<Object, WeakMap>}
+		 * @type {Object<number, WeakMap>}
 		 */
-		this.weakMap = new WeakMap();
+		this.weakMaps = {};
+
+
+	}
+
+	/**
+	 * Returns the Weak Map for the given keys.
+	 *
+	 * @param {Array<Object>} keys - List of keys.
+	 * @return {WeakMap} The weak map.
+	 */
+	_getWeakMap( keys ) {
+
+		const length = keys.length;
+
+		let weakMap = this.weakMaps[ length ];
+
+		if ( weakMap === undefined ) {
+
+			weakMap = new WeakMap();
+			this.weakMaps[ length ] = weakMap;
+
+		}
+
+		return weakMap;
 
 	}
 
@@ -28618,7 +28642,7 @@ class ChainMap {
 	 */
 	get( keys ) {
 
-		let map = this.weakMap;
+		let map = this._getWeakMap( keys );
 
 		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
@@ -28641,7 +28665,7 @@ class ChainMap {
 	 */
 	set( keys, value ) {
 
-		let map = this.weakMap;
+		let map = this._getWeakMap( keys );
 
 		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
@@ -28667,7 +28691,7 @@ class ChainMap {
 	 */
 	delete( keys ) {
 
-		let map = this.weakMap;
+		let map = this._getWeakMap( keys );
 
 		for ( let i = 0; i < keys.length - 1; i ++ ) {
 
@@ -32346,19 +32370,14 @@ class RenderContexts {
 	 */
 	get( scene, camera, renderTarget = null, mrt = null ) {
 
-		let index = 0;
+		_chainKeys$3[ 0 ] = scene;
+		_chainKeys$3[ 1 ] = camera;
 
 		if ( mrt !== null ) {
 
-			// TODO: Improve ChainMap so that it only matches submaps corresponding to the key lengths.
-			// For we use: if ( mrt !== null ) _chainKeys[ 2 ] = mrt;
-
-			_chainKeys$3[ index ++ ] = mrt;
+			_chainKeys$3[ 2 ] = mrt;
 
 		}
-
-		_chainKeys$3[ index ++ ] = scene;
-		_chainKeys$3[ index ++ ] = camera;
 
 		let attachmentState;
 
@@ -38840,7 +38859,7 @@ class PassNode extends TempNode {
 
 		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
 
-		this.renderTarget.texture.type = renderer.getColorBufferType();
+		this.renderTarget.texture.type = renderer.getOutputBufferType();
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
@@ -50160,9 +50179,16 @@ class NodeBuilder {
 	 */
 	getSharedContext() {
 
-		({ ...this.context });
+		const context = { ...this.context };
 
-		return this.context;
+		delete context.material;
+		delete context.getUV;
+		delete context.getOutput;
+		delete context.getTextureLevel;
+		delete context.getAO;
+		delete context.getShadow;
+
+		return context;
 
 	}
 
@@ -57120,7 +57146,7 @@ class Renderer {
 	 * @property {number} [samples=0] - When `antialias` is `true`, `4` samples are used by default. This parameter can set to any other integer value than 0
 	 * to overwrite the default.
 	 * @property {?Function} [getFallback=null] - This callback function can be used to provide a fallback backend, if the primary backend can't be targeted.
-	 * @property {number} [colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
+	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if supported.
 	 */
@@ -57153,7 +57179,7 @@ class Renderer {
 			antialias = false,
 			samples = 0,
 			getFallback = null,
-			colorBufferType = HalfFloatType,
+			outputBufferType = HalfFloatType,
 			multiview = false
 		} = parameters;
 
@@ -57640,7 +57666,7 @@ class Renderer {
 		this.onDeviceLost = this._onDeviceLost;
 
 		/**
-		 * Defines the type of color buffers. The default `HalfFloatType` is recommend for
+		 * Defines the type of output buffers. The default `HalfFloatType` is recommend for
 		 * best quality. To save memory and bandwidth, `UnsignedByteType` might be used.
 		 * This will reduce rendering quality though.
 		 *
@@ -57648,7 +57674,7 @@ class Renderer {
 		 * @type {number}
 		 * @default HalfFloatType
 		 */
-		this._colorBufferType = colorBufferType;
+		this._outputBufferType = outputBufferType;
 
 		/**
 		 * A cache for shadow nodes per material
@@ -58140,13 +58166,27 @@ class Renderer {
 	}
 
 	/**
-	 * Returns the color buffer type.
+	 * Returns the output buffer type.
 	 *
-	 * @return {number} The color buffer type.
+	 * @return {number} The output buffer type.
 	 */
-	getColorBufferType() {
+	getOutputBufferType() {
 
-		return this._colorBufferType;
+		return this._outputBufferType;
+
+	}
+
+	/**
+	 * Returns the output buffer type.
+	 *
+	 * @deprecated since r182. Use `.getOutputBufferType()` instead.
+	 * @return {number} The output buffer type.
+	 */
+	getColorBufferType() { // @deprecated, r182
+
+		warnOnce( 'Renderer: ".getColorBufferType()" has been renamed to ".getOutputBufferType()".' );
+
+		return this.getOutputBufferType();
 
 	}
 
@@ -58322,7 +58362,7 @@ class Renderer {
 			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
 				stencilBuffer: stencil,
-				type: this._colorBufferType,
+				type: this._outputBufferType,
 				format: RGBAFormat,
 				colorSpace: ColorManagement.workingColorSpace,
 				generateMipmaps: false,
@@ -64872,11 +64912,11 @@ class WebGLState {
 
 		if ( boolean ) {
 
-			gl.enable( gl.SCISSOR_TEST );
+			this.enable( gl.SCISSOR_TEST );
 
 		} else {
 
-			gl.disable( gl.SCISSOR_TEST );
+			this.disable( gl.SCISSOR_TEST );
 
 		}
 
@@ -66201,7 +66241,7 @@ class WebGLTextureUtils {
 		backend.state.unbindTexture();
 		// debug
 		// const framebuffer = gl.createFramebuffer();
-		// gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
+		// backend.state.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
 		// gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, glTextureType, textureGPU, 0 );
 
 		// const readout = new Float32Array( width * height * 4 );
@@ -66210,7 +66250,7 @@ class WebGLTextureUtils {
 		// const altType = gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE );
 
 		// gl.readPixels( 0, 0, width, height, altFormat, altType, readout );
-		// gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		// backend.state.bindFramebuffer( gl.FRAMEBUFFER, null );
 		// log( readout );
 
 	}
@@ -66896,7 +66936,7 @@ class WebGLTextureUtils {
 
 		const fb = gl.createFramebuffer();
 
-		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
+		backend.state.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
 
 		const target = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
 
@@ -66922,6 +66962,8 @@ class WebGLTextureUtils {
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, null );
+
+		backend.state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
 
 		gl.deleteFramebuffer( fb );
 
@@ -68666,7 +68708,7 @@ class WebGLBackend extends Backend {
 		if ( this.discard === false ) {
 
 			// required here to handle async behaviour of render.compute()
-			gl.enable( gl.RASTERIZER_DISCARD );
+			state.enable( gl.RASTERIZER_DISCARD );
 			this.discard = true;
 
 		}
@@ -68752,11 +68794,11 @@ class WebGLBackend extends Backend {
 	 */
 	finishCompute( computeGroup ) {
 
-		const gl = this.gl;
+		const { state, gl } = this;
 
 		this.discard = false;
 
-		gl.disable( gl.RASTERIZER_DISCARD );
+		state.disable( gl.RASTERIZER_DISCARD );
 
 		this.prepareTimestampBuffer( TimestampQuery.COMPUTE, this.getTimestampUID( computeGroup ) );
 
@@ -75672,23 +75714,25 @@ class WebGPUUtils {
 	 */
 	getPreferredCanvasFormat() {
 
-		const outputType = this.backend.parameters.outputType;
+		const parameters = this.backend.parameters;
 
-		if ( outputType === undefined ) {
+		const bufferType = parameters.outputType;
+
+		if ( bufferType === undefined ) {
 
 			return navigator.gpu.getPreferredCanvasFormat();
 
-		} else if ( outputType === UnsignedByteType ) {
+		} else if ( bufferType === UnsignedByteType ) {
 
 			return GPUTextureFormat.BGRA8Unorm;
 
-		} else if ( outputType === HalfFloatType ) {
+		} else if ( bufferType === HalfFloatType ) {
 
 			return GPUTextureFormat.RGBA16Float;
 
 		} else {
 
-			throw new Error( 'Unsupported outputType' );
+			throw new Error( 'Unsupported output buffer type.' );
 
 		}
 
@@ -80575,7 +80619,7 @@ class WebGPURenderer extends Renderer {
 	 * @property {boolean} [forceWebGL=false] - If set to `true`, the renderer uses a WebGL 2 backend no matter if WebGPU is supported or not.
 	 * @property {boolean} [multiview=false] - If set to `true`, the renderer will use multiview during WebXR rendering if supported.
 	 * @property {number} [outputType=undefined] - Texture type for output to canvas. By default, device's preferred format is used; other formats may incur overhead.
-	 * @property {number} [colorBufferType=HalfFloatType] - Defines the type of color buffers. The default `HalfFloatType` is recommend for best
+	 * @property {number} [outputBufferType=HalfFloatType] - Defines the type of output buffers. The default `HalfFloatType` is recommend for best
 	 * quality. To save memory and bandwidth, `UnsignedByteType` might be used. This will reduce rendering quality though.
 	 */
 
