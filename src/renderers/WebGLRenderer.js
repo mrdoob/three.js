@@ -733,6 +733,21 @@ class WebGLRenderer {
 
 			}
 
+			if ( effects ) {
+
+				for ( let i = 0; i < effects.length; i ++ ) {
+
+					if ( effects[ i ].isOutputPass === true ) {
+
+						console.warn( 'THREE.WebGLRenderer: OutputPass is not needed in setEffects(). Tone mapping and color space conversion are applied automatically.' );
+						break;
+
+					}
+
+				}
+
+			}
+
 			outputBuffer.setPasses( effects || [] );
 
 		};
