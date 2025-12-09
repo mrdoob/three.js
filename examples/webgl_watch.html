@@ -77,6 +77,14 @@
 				renderer.shadowMap.type = THREE.VSMShadowMap;
 				container.appendChild( renderer.domElement );
 
+				taaPass = new TAARenderPass( scene, camera );
+				taaPass.sampleLevel = 2;
+
+				bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+				bloomPass.threshold = setting.threshold;
+				bloomPass.strength = setting.strength;
+				bloomPass.radius = setting.radius;
+
 				new HDRLoader()
 					.setPath( 'textures/equirectangular/' )
 					.load( 'lobe.hdr', function ( texture ) {
@@ -211,25 +219,9 @@
 
 				if ( b ) {
 
-					if ( bloomPass ) return;
-
-					taaPass = new TAARenderPass( scene, camera );
-					taaPass.sampleLevel = 2;
-
-					bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-					bloomPass.threshold = setting.threshold;
-					bloomPass.strength = setting.strength;
-					bloomPass.radius = setting.radius;
-
 					renderer.setEffects( [ taaPass, bloomPass ] );
 
 				} else {
-
-					if ( ! bloomPass ) return;
-					taaPass.dispose();
-					taaPass = null;
-					bloomPass.dispose();
-					bloomPass = null;
 
 					renderer.setEffects( null );
 
