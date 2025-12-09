@@ -110,10 +110,10 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 	let _outputColorSpace = null;
 	let _outputToneMapping = null;
-	let _copyingToCanvas = false;
+	let _isCompositing = false;
 	let _savedToneMapping;
 	let _savedRenderTarget = null;
-	let _passes = [];
+	let _effects = [];
 	let _hasRenderPass = false;
 
 	this.setSize = function ( width, height ) {
@@ -121,27 +121,27 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 		targetA.setSize( width, height );
 		targetB.setSize( width, height );
 
-		for ( let i = 0; i < _passes.length; i ++ ) {
+		for ( let i = 0; i < _effects.length; i ++ ) {
 
-			const pass = _passes[ i ];
-			if ( pass.setSize ) pass.setSize( width, height );
+			const effect = _effects[ i ];
+			if ( effect.setSize ) effect.setSize( width, height );
 
 		}
 
 	};
 
-	this.setPasses = function ( passes ) {
+	this.setEffects = function ( effects ) {
 
-		_passes = passes;
-		_hasRenderPass = _passes.length > 0 && _passes[ 0 ].isRenderPass === true;
+		_effects = effects;
+		_hasRenderPass = _effects.length > 0 && _effects[ 0 ].isRenderPass === true;
 
 		const width = targetA.width;
 		const height = targetA.height;
 
-		for ( let i = 0; i < _passes.length; i ++ ) {
+		for ( let i = 0; i < _effects.length; i ++ ) {
 
-			const pass = _passes[ i ];
-			if ( pass.setSize ) pass.setSize( width, height );
+			const effect = _effects[ i ];
+			if ( effect.setSize ) effect.setSize( width, height );
 
 		}
 
@@ -149,10 +149,10 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 	this.begin = function ( renderer, renderTarget ) {
 
-		// Don't activate during copying phase (post-processing passes call render())
-		if ( _copyingToCanvas ) return false;
+		// Don't begin during compositing phase (post-processing effects call render())
+		if ( _isCompositing ) return false;
 
-		if ( renderer.toneMapping === NoToneMapping && _passes.length === 0 ) return false;
+		if ( renderer.toneMapping === NoToneMapping && _effects.length === 0 ) return false;
 
 		_savedRenderTarget = renderTarget;
 
@@ -170,14 +170,14 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 
 		}
 
-		// if first pass is a render pass, it will set its own render target
+		// if first effect is a RenderPass, it will set its own render target
 		if ( _hasRenderPass === false ) {
 
 			renderer.setRenderTarget( targetA );
 
 		}
 
-		// disable tone mapping during render - it will be applied when copying to canvas
+		// disable tone mapping during render - it will be applied in end()
 		_savedToneMapping = renderer.toneMapping;
 		renderer.toneMapping = NoToneMapping;
 
@@ -196,21 +196,21 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 		// restore tone mapping
 		renderer.toneMapping = _savedToneMapping;
 
-		_copyingToCanvas = true;
+		_isCompositing = true;
 
-		// run post-processing passes
+		// run post-processing effects
 		let readBuffer = targetA;
 		let writeBuffer = targetB;
 
-		for ( let i = 0; i < _passes.length; i ++ ) {
+		for ( let i = 0; i < _effects.length; i ++ ) {
 
-			const pass = _passes[ i ];
+			const effect = _effects[ i ];
 
-			if ( pass.enabled === false ) continue;
+			if ( effect.enabled === false ) continue;
 
-			pass.render( renderer, writeBuffer, readBuffer, deltaTime );
+			effect.render( renderer, writeBuffer, readBuffer, deltaTime );
 
-			if ( pass.needsSwap !== false ) {
+			if ( effect.needsSwap !== false ) {
 
 				const temp = readBuffer;
 				readBuffer = writeBuffer;
@@ -243,13 +243,13 @@ function WebGLOutput( type, width, height, depth, stencil ) {
 		renderer.render( mesh, camera );
 
 		_savedRenderTarget = null;
-		_copyingToCanvas = false;
+		_isCompositing = false;
 
 	};
 
-	this.isCopying = function () {
+	this.isCompositing = function () {
 
-		return _copyingToCanvas;
+		return _isCompositing;
 
 	};
 

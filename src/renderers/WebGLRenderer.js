@@ -749,7 +749,7 @@ class WebGLRenderer {
 
 			}
 
-			output.setPasses( effects || [] );
+			output.setEffects( effects || [] );
 
 		};
 
@@ -1616,7 +1616,7 @@ class WebGLRenderer {
 
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-			if ( xr.enabled === true && xr.isPresenting === true && ( output === null || output.isCopying() === false ) ) {
+			if ( xr.enabled === true && xr.isPresenting === true && ( output === null || output.isCompositing() === false ) ) {
 
 				if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 
