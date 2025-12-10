@@ -101,7 +101,7 @@ class UnrealBloomPass extends Pass {
 		this.nMips = 5;
 		let resx = Math.round( this.resolution.x / 2 );
 		let resy = Math.round( this.resolution.y / 2 );
-		const renderTargetOptions = { type: HalfFloatType, resolveDepthBuffer: false };
+		const renderTargetOptions = { type: HalfFloatType, depthBuffer: false, resolveDepthBuffer: false };
 
 		this.renderTargetBright = new WebGLRenderTarget( resx, resy, renderTargetOptions );
 		this.renderTargetBright.texture.name = 'UnrealBloomPass.bright';
