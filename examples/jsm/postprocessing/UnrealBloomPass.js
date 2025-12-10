@@ -42,9 +42,8 @@ class UnrealBloomPass extends Pass {
 	 * @param {number} [strength=1] - The Bloom strength.
 	 * @param {number} radius - The Bloom radius.
 	 * @param {number} threshold - The luminance threshold limits which bright areas contribute to the Bloom effect.
-	 * @param {boolean} antiAlias - If the effect should use anti-aliasing.
 	 */
-	constructor( resolution, strength = 1, radius, threshold, antialias ) {
+	constructor( resolution, strength = 1, radius, threshold ) {
 
 		super();
 
@@ -102,7 +101,7 @@ class UnrealBloomPass extends Pass {
 		this.nMips = 5;
 		let resx = Math.round( this.resolution.x / 2 );
 		let resy = Math.round( this.resolution.y / 2 );
-		const renderTargetOptions = { type: HalfFloatType, samples: antialias ? 4 : 1, resolveDepthBuffer: false };
+		const renderTargetOptions = { type: HalfFloatType, resolveDepthBuffer: false };
 
 		this.renderTargetBright = new WebGLRenderTarget( resx, resy, renderTargetOptions );
 		this.renderTargetBright.texture.name = 'UnrealBloomPass.bright';
@@ -282,6 +281,20 @@ class UnrealBloomPass extends Pass {
 	 * @param {boolean} maskActive - Whether masking is active or not.
 	 */
 	render( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+
+		if ( this._currentSamples !== readBuffer.samples ) {
+
+			this._currentSamples = readBuffer.samples;
+
+			this.renderTargetBright.setSamples( readBuffer.samples );
+			for ( let i = 0; i < this.nMips; i ++ ) {
+
+				this.renderTargetsHorizontal[ i ].setSamples( readBuffer.samples );
+				this.renderTargetsVertical[ i ].setSamples( readBuffer.samples );
+
+			}
+
+		}
 
 		renderer.getClearColor( this._oldClearColor );
 		this._oldClearAlpha = renderer.getClearAlpha();
