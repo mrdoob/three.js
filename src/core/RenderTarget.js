@@ -316,18 +316,6 @@ class RenderTarget extends EventDispatcher {
 
 	}
 
-	setSamples( samples ) {
-
-		if (this.samples !== samples) {
-
-			this.samples = samples;
-
-			this.dispose();
-
-		}
-
-	}
-
 	/**
 	 * Returns a new render target with copied values from this instance.
 	 *
