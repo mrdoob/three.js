@@ -107,8 +107,7 @@ class Background extends DataMap {
 				// compute vertex position
 				const modifiedPosition = isOrtho.select( positionLocal.mul( orthoScale ), positionLocal );
 
-				// By using a w component of 0, the skybox will rotate and scale with the camera's orientation
-				// but it will translate when the camera moves through the scene
+				// By using a w component of 0, the skybox will not translate when the camera moves through the scene
 				let viewProj = cameraProjectionMatrix.mul( modelViewMatrix.mul( vec4( modifiedPosition, 0.0 ) ) );
 
 				// force background to far plane so it does not occlude objects
