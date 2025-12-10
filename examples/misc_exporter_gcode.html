@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Polyslice, Printer, Filament } from '@jgphilpott/polyslice';
+			import * as Polyslice from '@jgphilpott/polyslice';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -124,11 +124,11 @@
 				try {
 
 					// Create printer and filament configurations using Polyslice
-					const printer = new Printer( params.printer || 'Ender3' );
-					const filament = new Filament( params.filament || 'GenericPLA' );
+					const printer = new Polyslice.Printer( params.printer || 'Ender3' );
+					const filament = new Polyslice.Filament( params.filament || 'GenericPLA' );
 
 					// Create the slicer instance with user-defined settings
-					const slicer = new Polyslice( {
+					const slicer = new Polyslice.Polyslice( {
 						printer: printer,
 						filament: filament,
 						layerHeight: params.layerHeight,
