@@ -2206,6 +2206,7 @@ class WebGLRenderer {
 				uniforms.rectAreaLights.value = lights.state.rectArea;
 				uniforms.ltc_1.value = lights.state.rectAreaLTC1;
 				uniforms.ltc_2.value = lights.state.rectAreaLTC2;
+				uniforms.rectAreaLightMap.value = lights.state.rectAreaLightMap;
 				uniforms.pointLights.value = lights.state.point;
 				uniforms.pointLightShadows.value = lights.state.pointShadow;
 				uniforms.hemisphereLights.value = lights.state.hemi;

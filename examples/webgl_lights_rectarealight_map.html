@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - rect area light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - RectAreaLight with texture map<br/>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+			import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+
+			let renderer, scene, camera, controls;
+			let stats, carModel, bodyMaterial, glassMaterial;
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animation );
+				renderer.toneMapping = THREE.NeutralTonemapping;
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( - 15, 5, - 5 );
+
+				scene = new THREE.Scene();
+
+				RectAreaLightUniformsLib.init();
+
+				// Create video element for center light
+				const video = document.createElement( 'video' );
+				video.crossOrigin = 'anonymous';
+				video.src = 'textures/veo-oledtv.mp4';
+				video.loop = true;
+				video.muted = true;
+				video.playsInline = true;
+				video.autoplay = true;
+				video.play();
+
+				const videoTexture = new THREE.VideoTexture( video );
+				videoTexture.colorSpace = THREE.SRGBColorSpace;
+
+				const rectLight = new THREE.RectAreaLight( 0xffffff, 5, 12, 8 );
+				rectLight.map = videoTexture;
+				// rectLight.map = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+				rectLight.map.generateMipmaps = true;
+				rectLight.map.minFilter = THREE.LinearMipmapLinearFilter;
+				rectLight.position.set( 0, 5, 5 );
+				scene.add( rectLight );
+
+				scene.add( new RectAreaLightHelper( rectLight ) );
+
+				const geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
+				const matStdFloor = new THREE.MeshStandardMaterial( { color: 0x444444 } );
+				matStdFloor.roughnessMap = createCheckerTexture( 400 );
+				const mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
+				scene.add( mshStdFloor );
+
+				// Car shadow (AO plane)
+				const aoTexture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao_.png' );
+				const shadowPlane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 256, 512 ),
+					new THREE.MeshBasicMaterial( {
+						color: 0x000000,
+						// map: aoTexture,
+						alphaMap: aoTexture,
+						// blending: THREE.SubstractiveBlending,
+						depthWrite: false,
+						transparent: true
+					} )
+				);
+				shadowPlane.rotation.x = - Math.PI / 2;
+				shadowPlane.rotation.z = Math.PI / 2;
+				shadowPlane.position.y = 0.06;
+				shadowPlane.scale.setScalar( 0.031 );
+				scene.add( shadowPlane );
+
+				// Load car model
+				bodyMaterial = new THREE.MeshStandardMaterial( {
+					color: 0xff4400,
+					roughness: 0.2,
+					metalness: 0
+				} );
+				glassMaterial = new THREE.MeshStandardMaterial( {
+					color: 0xffffff,
+					roughness: 0,
+					metalness: 0,
+					transparent: true,
+					premultipliedAlpha: true,
+					opacity: 0.3
+				} );
+
+				const dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
+
+				const loader = new GLTFLoader();
+				loader.setDRACOLoader( dracoLoader );
+				loader.load( 'models/gltf/ferrari.glb', function ( gltf ) {
+
+					carModel = gltf.scene;
+					carModel.rotation.y = Math.PI / 2;
+					carModel.scale.setScalar( 3 );
+					carModel.position.set( 0, 0, 0 );
+
+					carModel.traverse( function ( child ) {
+
+						if ( child.isMesh ) {
+
+							// Replace car body material
+							if ( child.name === 'body' ) {
+
+								child.material = bodyMaterial;
+
+							}
+
+							// Replace glass material with transmissive material
+							if ( child.name === 'glass' ) {
+
+								child.material = glassMaterial;
+
+							}
+
+						}
+
+					} );
+
+					scene.add( carModel );
+
+				} );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 3 );
+				controls.enableDamping = true;
+				controls.update();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				const gui = new GUI();
+				gui.add( rectLight, 'intensity', 0, 20 ).name( 'Light Intensity' );
+				gui.add( matStdFloor, 'roughness', 0, 1 ).name( 'Floor Roughness' );
+				gui.add( matStdFloor, 'metalness', 0, 1 ).name( 'Floor Metalness' );
+				gui.add( bodyMaterial, 'roughness', 0, 1 ).name( 'Car Roughness' );
+				gui.add( bodyMaterial, 'metalness', 0, 1 ).name( 'Car Metalness' );
+				gui.add( glassMaterial, 'opacity', 0, 1 ).name( 'Glass Opacity' );
+				gui.add( glassMaterial, 'roughness', 0, 1 ).name( 'Glass Roughness' );
+
+			}
+
+			function createCheckerTexture( repeat = 1 ) {
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 2;
+				canvas.height = 2;
+
+				const ctx = canvas.getContext( '2d' );
+				ctx.fillStyle = '#000';
+				ctx.fillRect( 0, 0, 2, 2 );
+				ctx.fillStyle = '#fff';
+				ctx.fillRect( 0, 0, 1, 1 );
+				ctx.fillRect( 1, 1, 1, 1 );
+
+				const texture = new THREE.CanvasTexture( canvas );
+				texture.repeat.set( repeat, repeat );
+				texture.magFilter = THREE.NearestFilter;
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+
+				return texture;
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = ( window.innerWidth / window.innerHeight );
+				camera.updateProjectionMatrix();
+
+			}
+
+			function animation() {
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>

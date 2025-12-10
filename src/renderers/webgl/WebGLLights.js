@@ -175,6 +175,7 @@ function WebGLLights( extensions ) {
 			numPointShadows: - 1,
 			numSpotShadows: - 1,
 			numSpotMaps: - 1,
+			numRectAreaMaps: - 1,
 
 			numLightProbes: - 1
 		},
@@ -193,6 +194,7 @@ function WebGLLights( extensions ) {
 		rectArea: [],
 		rectAreaLTC1: null,
 		rectAreaLTC2: null,
+		rectAreaLightMap: [],
 		point: [],
 		pointShadow: [],
 		pointShadowMap: [],
@@ -226,6 +228,7 @@ function WebGLLights( extensions ) {
 		let numSpotShadows = 0;
 		let numSpotMaps = 0;
 		let numSpotShadowsWithMaps = 0;
+		let numRectAreaMaps = 0;
 
 		let numLightProbes = 0;
 
@@ -364,6 +367,13 @@ function WebGLLights( extensions ) {
 				uniforms.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
 				uniforms.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
 
+				if ( light.map ) {
+
+					state.rectAreaLightMap[ numRectAreaMaps ] = light.map;
+					numRectAreaMaps ++;
+
+				}
+
 				state.rectArea[ rectAreaLength ] = uniforms;
 
 				rectAreaLength ++;
@@ -448,6 +458,7 @@ function WebGLLights( extensions ) {
 			hash.numPointShadows !== numPointShadows ||
 			hash.numSpotShadows !== numSpotShadows ||
 			hash.numSpotMaps !== numSpotMaps ||
+			hash.numRectAreaMaps !== numRectAreaMaps ||
 			hash.numLightProbes !== numLightProbes ) {
 
 			state.directional.length = directionalLength;
@@ -466,6 +477,7 @@ function WebGLLights( extensions ) {
 			state.pointShadowMatrix.length = numPointShadows;
 			state.spotLightMatrix.length = numSpotShadows + numSpotMaps - numSpotShadowsWithMaps;
 			state.spotLightMap.length = numSpotMaps;
+			state.rectAreaLightMap.length = numRectAreaMaps;
 			state.numSpotLightShadowsWithMaps = numSpotShadowsWithMaps;
 			state.numLightProbes = numLightProbes;
 
@@ -479,6 +491,7 @@ function WebGLLights( extensions ) {
 			hash.numPointShadows = numPointShadows;
 			hash.numSpotShadows = numSpotShadows;
 			hash.numSpotMaps = numSpotMaps;
+			hash.numRectAreaMaps = numRectAreaMaps;
 
 			hash.numLightProbes = numLightProbes;
 

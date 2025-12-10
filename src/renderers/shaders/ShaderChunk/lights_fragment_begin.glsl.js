@@ -163,7 +163,12 @@ IncidentLight directLight;
 	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
 
 		rectAreaLight = rectAreaLights[ i ];
-		RE_Direct_RectArea( rectAreaLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );
+
+		#if ( NUM_RECT_AREA_LIGHT_MAPS > 0 ) && ( UNROLLED_LOOP_INDEX < NUM_RECT_AREA_LIGHT_MAPS )
+			RE_Direct_RectArea( rectAreaLight, rectAreaLightMap[ UNROLLED_LOOP_INDEX ], geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );
+		#else
+			RE_Direct_RectArea( rectAreaLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );
+		#endif
 
 	}
 	#pragma unroll_loop_end
