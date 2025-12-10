@@ -46,6 +46,7 @@
 				addSphere: addSphere,
 				addTorus: addTorus,
 				exportToGCode: exportToGCode,
+				geometryName: 'cube',
 				printer: 'Ender3',
 				filament: 'GenericPLA',
 				layerHeight: 0.2,
@@ -161,8 +162,9 @@
 					// Slice the current mesh directly
 					const gcode = slicer.slice( mesh );
 
-					// Download the G-code file
-					saveString( gcode, 'model.gcode' );
+					// Download the G-code file (include geometry name)
+					const name = params.geometryName || 'model';
+					saveString( gcode, `${ name }-geometry.gcode` );
 
 				} catch ( error ) {
 
@@ -212,6 +214,7 @@
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
 				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
 				mesh = new THREE.Mesh( geometry, material );
+				params.geometryName = 'cube';
 				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
@@ -222,9 +225,10 @@
 				clearScene();
 
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-				const geometry = new THREE.CylinderGeometry( 5, 5, 10, 32 );
+				const geometry = new THREE.CylinderGeometry( 5, 5, 10, 42 );
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = Math.PI / 2;
+				params.geometryName = 'cylinder';
 				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
@@ -235,9 +239,10 @@
 				clearScene();
 
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-				const geometry = new THREE.ConeGeometry( 5, 10, 32 );
+				const geometry = new THREE.ConeGeometry( 5, 10, 42 );
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = Math.PI / 2;
+				params.geometryName = 'cone';
 				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
@@ -248,8 +253,9 @@
 				clearScene();
 
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-				const geometry = new THREE.SphereGeometry( 5, 32, 32 );
+				const geometry = new THREE.SphereGeometry( 5, 42, 42 );
 				mesh = new THREE.Mesh( geometry, material );
+				params.geometryName = 'sphere';
 				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
@@ -260,8 +266,9 @@
 				clearScene();
 
 				const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-				const geometry = new THREE.TorusGeometry( 5, 2, 16, 100 );
+				const geometry = new THREE.TorusGeometry( 5, 2, 24, 100 );
 				mesh = new THREE.Mesh( geometry, material );
+				params.geometryName = 'torus';
 				placeOnXYPlane( mesh );
 				scene.add( mesh );
 
