@@ -70,7 +70,7 @@
 			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
 			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, .2, 100 );
-			camera.position.set( -3, 2, 6 );
+			camera.position.set( - 3, 2, 6 );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
@@ -90,9 +90,11 @@
 			loader.setDRACOLoader( dracoLoader );
 			loader.setKTX2Loader( ktx2Loader );
 
-			loader.register(p => {
-				return new GLTFAnimationPointerExtension(p);
-			});
+			loader.register( p => {
+
+				return new GLTFAnimationPointerExtension( p );
+
+			} );
 
 			loader.load( 'https://cloud.needle.tools/-/assets/Z23hmXB27L6Db-optimized/file', function ( gltf ) {
 

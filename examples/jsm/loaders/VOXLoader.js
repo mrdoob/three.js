@@ -4,8 +4,10 @@ import {
 	Data3DTexture,
 	FileLoader,
 	Float32BufferAttribute,
+	Group,
 	Loader,
 	LinearFilter,
+	Matrix4,
 	Mesh,
 	MeshStandardMaterial,
 	NearestFilter,
@@ -13,21 +15,228 @@ import {
 	SRGBColorSpace
 } from 'three';
 
+// Helper function to read a STRING from the data view
+function readString( data, offset ) {
+
+	const size = data.getUint32( offset, true );
+	offset += 4;
+
+	let str = '';
+	for ( let i = 0; i < size; i ++ ) {
+
+		str += String.fromCharCode( data.getUint8( offset ++ ) );
+
+	}
+
+	return { value: str, size: 4 + size };
+
+}
+
+// Helper function to read a DICT from the data view
+function readDict( data, offset ) {
+
+	const dict = {};
+	const count = data.getUint32( offset, true );
+	offset += 4;
+
+	let totalSize = 4;
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		const key = readString( data, offset );
+		offset += key.size;
+		totalSize += key.size;
+
+		const value = readString( data, offset );
+		offset += value.size;
+		totalSize += value.size;
+
+		dict[ key.value ] = value.value;
+
+	}
+
+	return { value: dict, size: totalSize };
+
+}
+
+// Helper function to decode ROTATION byte into a rotation matrix
+function decodeRotation( byte ) {
+
+	// The rotation is stored as a row-major 3x3 matrix encoded in a single byte
+	// Bits 0-1: index of the non-zero entry in the first row
+	// Bits 2-3: index of the non-zero entry in the second row
+	// Bit 4: sign of the first row entry (0 = positive, 1 = negative)
+	// Bit 5: sign of the second row entry
+	// Bit 6: sign of the third row entry
+	// The third row index is determined by the remaining column
+
+	const index1 = byte & 0x3;
+	const index2 = ( byte >> 2 ) & 0x3;
+	const sign1 = ( byte >> 4 ) & 0x1 ? - 1 : 1;
+	const sign2 = ( byte >> 5 ) & 0x1 ? - 1 : 1;
+	const sign3 = ( byte >> 6 ) & 0x1 ? - 1 : 1;
+
+	// Find the third row index (the one not used by row 0 or row 1)
+	const index3 = 3 - index1 - index2;
+
+	// Build the VOX rotation matrix (row-major 3x3)
+	// r[row][col] - each row has one non-zero entry
+	const r = [
+		[ 0, 0, 0 ],
+		[ 0, 0, 0 ],
+		[ 0, 0, 0 ]
+	];
+
+	r[ 0 ][ index1 ] = sign1;
+	r[ 1 ][ index2 ] = sign2;
+	r[ 2 ][ index3 ] = sign3;
+
+	// Convert from VOX coordinate system (Z-up) to Three.js (Y-up)
+	// VOX: X-right, Y-forward, Z-up
+	// Three.js: X-right, Y-up, Z-backward
+	// Transformation: x' = x, y' = z, z' = -y
+	//
+	// To convert rotation matrix R_vox to R_three:
+	// R_three = C * R_vox * C^-1
+	// where C converts VOX coords to Three.js coords
+
+	// Apply coordinate change: swap Y and Z, negate new Z
+	// This is equivalent to: C * R * C^-1
+	const m = new Matrix4();
+	m.set(
+		r[ 0 ][ 0 ], r[ 0 ][ 2 ], - r[ 0 ][ 1 ], 0,
+		r[ 2 ][ 0 ], r[ 2 ][ 2 ], - r[ 2 ][ 1 ], 0,
+		- r[ 1 ][ 0 ], - r[ 1 ][ 2 ], r[ 1 ][ 1 ], 0,
+		0, 0, 0, 1
+	);
+
+	return m;
+
+}
+
+// Apply VOX transform to a Three.js object
+function applyTransform( object, node ) {
+
+	if ( node.attributes._name ) {
+
+		object.name = node.attributes._name;
+
+	}
+
+	if ( node.frames.length > 0 ) {
+
+		const frame = node.frames[ 0 ];
+
+		if ( frame.rotation ) {
+
+			object.applyMatrix4( frame.rotation );
+
+		}
+
+		if ( frame.translation ) {
+
+			// VOX uses Z-up, Three.js uses Y-up
+			object.position.set(
+				frame.translation.x,
+				frame.translation.z,
+				- frame.translation.y
+			);
+
+		}
+
+	}
+
+}
+
+// Recursively build Three.js object graph from VOX nodes
+function buildObject( nodeId, nodes, chunks ) {
+
+	const node = nodes[ nodeId ];
+
+	if ( node.type === 'transform' ) {
+
+		const childNode = nodes[ node.childNodeId ];
+
+		// Check if this transform has actual transformation data
+		const frame = node.frames[ 0 ];
+		const hasTransform = frame && ( frame.rotation || frame.translation );
+
+		// Flatten: if child is a single-model shape, apply transform directly to mesh
+		if ( childNode.type === 'shape' && childNode.models.length === 1 ) {
+
+			const chunk = chunks[ childNode.models[ 0 ].modelId ];
+			const mesh = buildMesh( chunk );
+			applyTransform( mesh, node );
+			return mesh;
+
+		}
+
+		// If no transform, just return the child directly (avoid unnecessary group)
+		if ( ! hasTransform ) {
+
+			const child = buildObject( node.childNodeId, nodes, chunks );
+			if ( child && node.attributes._name ) child.name = node.attributes._name;
+			return child;
+
+		}
+
+		// Otherwise create a group
+		const group = new Group();
+		applyTransform( group, node );
+
+		const child = buildObject( node.childNodeId, nodes, chunks );
+		if ( child ) group.add( child );
+
+		return group;
+
+	} else if ( node.type === 'group' ) {
+
+		const group = new Group();
+
+		for ( const childId of node.childIds ) {
+
+			const child = buildObject( childId, nodes, chunks );
+			if ( child ) group.add( child );
+
+		}
+
+		return group;
+
+	} else if ( node.type === 'shape' ) {
+
+		// Shape reached directly (shouldn't happen in well-formed files, but handle it)
+		if ( node.models.length === 1 ) {
+
+			const chunk = chunks[ node.models[ 0 ].modelId ];
+			return buildMesh( chunk );
+
+		}
+
+		const group = new Group();
+
+		for ( const model of node.models ) {
+
+			const chunk = chunks[ model.modelId ];
+			group.add( buildMesh( chunk ) );
+
+		}
+
+		return group;
+
+	}
+
+	return null;
+
+}
+
 /**
  * A loader for the VOX format.
  *
  * ```js
  * const loader = new VOXLoader();
- * const chunks = await loader.loadAsync( 'models/vox/monu10.vox' );
+ * const result = await loader.loadAsync( 'models/vox/monu10.vox' );
  *
- * for ( let i = 0; i < chunks.length; i ++ ) {
- *
- * 	const chunk = chunks[ i ];
- * 	const mesh = new VOXMesh( chunk );
- * 	mesh.scale.setScalar( 0.0015 );
- * 	scene.add( mesh );
- *
- * }
+ * scene.add( result.scene.children[ 0 ] );
  * ```
  * @augments Loader
  * @three_import import { VOXLoader } from 'three/addons/loaders/VOXLoader.js';
@@ -39,7 +248,7 @@ class VOXLoader extends Loader {
 	 * to the `onLoad()` callback.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {function(Array<Object>)} onLoad - Executed when the loading process has been finished.
+	 * @param {function(Object)} onLoad - Executed when the loading process has been finished.
 	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @param {onErrorCallback} onError - Executed when errors occur.
 	 */
@@ -78,10 +287,10 @@ class VOXLoader extends Loader {
 	}
 
 	/**
-	 * Parses the given VOX data and returns the resulting chunks.
+	 * Parses the given VOX data and returns the result object.
 	 *
 	 * @param {ArrayBuffer} buffer - The raw VOX data as an array buffer.
-	 * @return {Array<Object>} The parsed chunks.
+	 * @return {Object} The parsed VOX data with properties: chunks, scene.
 	 */
 	parse( buffer ) {
 
@@ -97,7 +306,7 @@ class VOXLoader extends Loader {
 
 		}
 
-		if ( version !== 150 ) {
+		if ( version !== 150 && version !== 200 ) {
 
 			console.error( 'THREE.VOXLoader: Invalid VOX file. Unsupported version:', version );
 			return;
@@ -144,6 +353,10 @@ class VOXLoader extends Loader {
 		let chunk;
 		const chunks = [];
 
+		// Extension data
+		const nodes = {};
+		let palette = DEFAULT_PALETTE;
+
 		while ( i < data.byteLength ) {
 
 			let id = '';
@@ -181,7 +394,7 @@ class VOXLoader extends Loader {
 
 			} else if ( id === 'RGBA' ) {
 
-				const palette = [ 0 ];
+				palette = [ 0 ];
 
 				for ( let j = 0; j < 256; j ++ ) {
 
@@ -191,186 +404,516 @@ class VOXLoader extends Loader {
 
 				chunk.palette = palette;
 
+			} else if ( id === 'nTRN' ) {
+
+				// Transform Node
+				const nodeId = data.getUint32( i, true ); i += 4;
+				const attributes = readDict( data, i );
+				i += attributes.size;
+
+				const childNodeId = data.getUint32( i, true ); i += 4;
+				i += 4; // reserved (-1)
+				const layerId = data.getInt32( i, true ); i += 4;
+				const numFrames = data.getUint32( i, true ); i += 4;
+
+				const frames = [];
+
+				for ( let f = 0; f < numFrames; f ++ ) {
+
+					const frameDict = readDict( data, i );
+					i += frameDict.size;
+
+					const frame = { rotation: null, translation: null };
+
+					if ( frameDict.value._r !== undefined ) {
+
+						frame.rotation = decodeRotation( parseInt( frameDict.value._r ) );
+
+					}
+
+					if ( frameDict.value._t !== undefined ) {
+
+						const parts = frameDict.value._t.split( ' ' ).map( Number );
+						frame.translation = { x: parts[ 0 ], y: parts[ 1 ], z: parts[ 2 ] };
+
+					}
+
+					frames.push( frame );
+
+				}
+
+				nodes[ nodeId ] = {
+					type: 'transform',
+					id: nodeId,
+					attributes: attributes.value,
+					childNodeId: childNodeId,
+					layerId: layerId,
+					frames: frames
+				};
+
+			} else if ( id === 'nGRP' ) {
+
+				// Group Node
+				const nodeId = data.getUint32( i, true ); i += 4;
+				const attributes = readDict( data, i );
+				i += attributes.size;
+
+				const numChildren = data.getUint32( i, true ); i += 4;
+				const childIds = [];
+
+				for ( let c = 0; c < numChildren; c ++ ) {
+
+					childIds.push( data.getUint32( i, true ) ); i += 4;
+
+				}
+
+				nodes[ nodeId ] = {
+					type: 'group',
+					id: nodeId,
+					attributes: attributes.value,
+					childIds: childIds
+				};
+
+			} else if ( id === 'nSHP' ) {
+
+				// Shape Node
+				const nodeId = data.getUint32( i, true ); i += 4;
+				const attributes = readDict( data, i );
+				i += attributes.size;
+
+				const numModels = data.getUint32( i, true ); i += 4;
+				const models = [];
+
+				for ( let m = 0; m < numModels; m ++ ) {
+
+					const modelId = data.getUint32( i, true ); i += 4;
+					const modelAttributes = readDict( data, i );
+					i += modelAttributes.size;
+
+					models.push( {
+						modelId: modelId,
+						attributes: modelAttributes.value
+					} );
+
+				}
+
+				nodes[ nodeId ] = {
+					type: 'shape',
+					id: nodeId,
+					attributes: attributes.value,
+					models: models
+				};
+
 			} else {
 
-				// console.log( id, chunkSize, childChunks );
-
+				// Skip unknown chunks
 				i += chunkSize;
 
 			}
 
 		}
 
-		return chunks;
+		// Apply palette to all chunks
+		for ( let c = 0; c < chunks.length; c ++ ) {
+
+			chunks[ c ].palette = palette;
+
+		}
+
+		// Build Three.js scene graph from nodes
+		let scene = null;
+
+		if ( Object.keys( nodes ).length > 0 ) {
+
+			scene = buildObject( 0, nodes, chunks );
+
+		}
+
+		// Build result object
+		const result = {
+			chunks: chunks,
+			scene: scene
+		};
+
+		// @deprecated, r182
+		// Proxy for backwards compatibility with array-like access
+		let warned = false;
+
+		return new Proxy( result, {
+
+			get( target, prop ) {
+
+				// Handle numeric indices
+				if ( typeof prop === 'string' && /^\d+$/.test( prop ) ) {
+
+					if ( ! warned ) {
+
+						console.warn( 'THREE.VOXLoader: Accessing result as an array is deprecated. Use result.chunks[] instead.' );
+						warned = true;
+
+					}
+
+					return target.chunks[ parseInt( prop ) ];
+
+				}
+
+				// Handle array properties/methods
+				if ( prop === 'length' ) {
+
+					if ( ! warned ) {
+
+						console.warn( 'THREE.VOXLoader: Accessing result as an array is deprecated. Use result.chunks instead.' );
+						warned = true;
+
+					}
+
+					return target.chunks.length;
+
+				}
+
+				// Handle iteration
+				if ( prop === Symbol.iterator ) {
+
+					if ( ! warned ) {
+
+						console.warn( 'THREE.VOXLoader: Iterating result as an array is deprecated. Use result.chunks instead.' );
+						warned = true;
+
+					}
+
+					return target.chunks[ Symbol.iterator ].bind( target.chunks );
+
+				}
+
+				return target[ prop ];
+
+			}
+
+		} );
 
 	}
 
 }
 
 /**
- * A VOX mesh.
+ * Builds a mesh from a VOX chunk.
  *
- * Instances of this class are created from the loaded chunks of {@link VOXLoader}.
- *
- * @augments Mesh
+ * @param {Object} chunk - A VOX chunk loaded via {@link VOXLoader}.
+ * @return {Mesh} The generated mesh.
  */
-class VOXMesh extends Mesh {
+function buildMesh( chunk ) {
 
-	/**
-	 * Constructs a new VOX mesh.
-	 *
-	 * @param {Object} chunk - A VOX chunk loaded via {@link VOXLoader}.
-	 */
-	constructor( chunk ) {
+	const data = chunk.data;
+	const size = chunk.size;
+	const palette = chunk.palette;
 
-		const data = chunk.data;
-		const size = chunk.size;
-		const palette = chunk.palette;
+	const sx = size.x;
+	const sy = size.y;
+	const sz = size.z;
 
-		//
+	// Build volume with color indices
 
-		const vertices = [];
-		const colors = [];
+	const volume = new Uint8Array( sx * sy * sz );
 
-		const nx = [ 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1 ];
-		const px = [ 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0 ];
-		const py = [ 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1 ];
-		const ny = [ 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0 ];
-		const nz = [ 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0 ];
-		const pz = [ 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 ];
+	for ( let j = 0; j < data.length; j += 4 ) {
 
-		const _color = new Color();
+		const x = data[ j + 0 ];
+		const y = data[ j + 1 ];
+		const z = data[ j + 2 ];
+		const c = data[ j + 3 ];
 
-		function add( tile, x, y, z, r, g, b ) {
+		volume[ x + y * sx + z * sx * sy ] = c;
 
-			x -= size.x / 2;
-			y -= size.z / 2;
-			z += size.y / 2;
+	}
 
-			for ( let i = 0; i < 18; i += 3 ) {
+	// Greedy meshing
 
-				_color.setRGB( r, g, b, SRGBColorSpace );
+	const vertices = [];
+	const indices = [];
+	const colors = [];
 
-				vertices.push( tile[ i + 0 ] + x, tile[ i + 1 ] + y, tile[ i + 2 ] + z );
-				colors.push( _color.r, _color.g, _color.b );
+	const _color = new Color();
+	let hasColors = false;
+
+	// Process each of the 6 face directions
+	// dims: the 3 axis sizes, d: which axis is normal to the face
+	const dims = [ sx, sy, sz ];
+
+	for ( let d = 0; d < 3; d ++ ) {
+
+		const u = ( d + 1 ) % 3;
+		const v = ( d + 2 ) % 3;
+
+		const dimsD = dims[ d ];
+		const dimsU = dims[ u ];
+		const dimsV = dims[ v ];
+
+		const q = [ 0, 0, 0 ];
+		const mask = new Int16Array( dimsU * dimsV );
+
+		q[ d ] = 1;
+
+		// Sweep through slices
+		for ( let slice = 0; slice <= dimsD; slice ++ ) {
+
+			// Build mask for this slice
+			let n = 0;
+
+			for ( let vv = 0; vv < dimsV; vv ++ ) {
+
+				for ( let uu = 0; uu < dimsU; uu ++ ) {
+
+					const pos = [ 0, 0, 0 ];
+					pos[ d ] = slice;
+					pos[ u ] = uu;
+					pos[ v ] = vv;
+
+					const x0 = pos[ 0 ], y0 = pos[ 1 ], z0 = pos[ 2 ];
+
+					// Get voxel behind and in front of this face
+					const behind = ( slice > 0 ) ? volume[ ( x0 - q[ 0 ] ) + ( y0 - q[ 1 ] ) * sx + ( z0 - q[ 2 ] ) * sx * sy ] : 0;
+					const infront = ( slice < dimsD ) ? volume[ x0 + y0 * sx + z0 * sx * sy ] : 0;
+
+					// Face exists if exactly one side is solid
+					if ( behind > 0 && infront === 0 ) {
+
+						mask[ n ] = behind; // positive face
+
+					} else if ( infront > 0 && behind === 0 ) {
+
+						mask[ n ] = - infront; // negative face
+
+					} else {
+
+						mask[ n ] = 0;
+
+					}
+
+					n ++;
+
+				}
+
+			}
+
+			// Greedy merge mask into quads
+			n = 0;
+
+			for ( let vv = 0; vv < dimsV; vv ++ ) {
+
+				for ( let uu = 0; uu < dimsU; ) {
+
+					const c = mask[ n ];
+
+					if ( c !== 0 ) {
+
+						// Find width
+						let w = 1;
+
+						while ( uu + w < dimsU && mask[ n + w ] === c ) {
+
+							w ++;
+
+						}
+
+						// Find height
+						let h = 1;
+						let done = false;
+
+						while ( vv + h < dimsV && ! done ) {
+
+							for ( let k = 0; k < w; k ++ ) {
+
+								if ( mask[ n + k + h * dimsU ] !== c ) {
+
+									done = true;
+									break;
+
+								}
+
+							}
+
+							if ( ! done ) h ++;
+
+						}
+
+						// Add quad
+						const pos = [ 0, 0, 0 ];
+						pos[ d ] = slice;
+						pos[ u ] = uu;
+						pos[ v ] = vv;
+
+						const du = [ 0, 0, 0 ];
+						const dv = [ 0, 0, 0 ];
+						du[ u ] = w;
+						dv[ v ] = h;
+
+						// Get color
+						const colorIndex = Math.abs( c );
+						const hex = palette[ colorIndex ];
+						const r = ( hex >> 0 & 0xff ) / 0xff;
+						const g = ( hex >> 8 & 0xff ) / 0xff;
+						const b = ( hex >> 16 & 0xff ) / 0xff;
+
+						if ( r > 0 || g > 0 || b > 0 ) hasColors = true;
+
+						_color.setRGB( r, g, b, SRGBColorSpace );
+
+						// Convert VOX coords to Three.js coords (Y-up)
+						// VOX: X right, Y forward, Z up -> Three.js: X right, Y up, Z back
+						const toThree = ( p ) => [
+							p[ 0 ] - sx / 2,
+							p[ 2 ] - sz / 2,
+							- p[ 1 ] + sy / 2
+						];
+
+						const v0 = toThree( pos );
+						const v1 = toThree( [ pos[ 0 ] + du[ 0 ], pos[ 1 ] + du[ 1 ], pos[ 2 ] + du[ 2 ] ] );
+						const v2 = toThree( [ pos[ 0 ] + du[ 0 ] + dv[ 0 ], pos[ 1 ] + du[ 1 ] + dv[ 1 ], pos[ 2 ] + du[ 2 ] + dv[ 2 ] ] );
+						const v3 = toThree( [ pos[ 0 ] + dv[ 0 ], pos[ 1 ] + dv[ 1 ], pos[ 2 ] + dv[ 2 ] ] );
+
+						const idx = vertices.length / 3;
+
+						// Winding order depends on face direction
+						if ( c > 0 ) {
+
+							vertices.push( ...v0, ...v1, ...v2, ...v3 );
+							indices.push( idx, idx + 1, idx + 2, idx, idx + 2, idx + 3 );
+
+						} else {
+
+							vertices.push( ...v0, ...v3, ...v2, ...v1 );
+							indices.push( idx, idx + 1, idx + 2, idx, idx + 2, idx + 3 );
+
+						}
+
+						colors.push(
+							_color.r, _color.g, _color.b,
+							_color.r, _color.g, _color.b,
+							_color.r, _color.g, _color.b,
+							_color.r, _color.g, _color.b
+						);
+
+						// Clear mask
+						for ( let hh = 0; hh < h; hh ++ ) {
+
+							for ( let ww = 0; ww < w; ww ++ ) {
+
+								mask[ n + ww + hh * dimsU ] = 0;
+
+							}
+
+						}
+
+						uu += w;
+						n += w;
+
+					} else {
+
+						uu ++;
+						n ++;
+
+					}
+
+				}
 
 			}
 
 		}
 
-		// Store data in a volume for sampling
+	}
 
-		const offsety = size.x;
-		const offsetz = size.x * size.y;
+	const geometry = new BufferGeometry();
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setIndex( indices );
+	geometry.computeVertexNormals();
 
-		const array = new Uint8Array( size.x * size.y * size.z );
+	const material = new MeshStandardMaterial();
 
-		for ( let j = 0; j < data.length; j += 4 ) {
+	if ( hasColors ) {
 
-			const x = data[ j + 0 ];
-			const y = data[ j + 1 ];
-			const z = data[ j + 2 ];
+		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+		material.vertexColors = true;
 
-			const index = x + ( y * offsety ) + ( z * offsetz );
+	}
 
-			array[ index ] = 255;
+	return new Mesh( geometry, material );
 
-		}
+}
 
-		// Construct geometry
+/**
+ * Builds a 3D texture from a VOX chunk.
+ *
+ * @param {Object} chunk - A VOX chunk loaded via {@link VOXLoader}.
+ * @return {Data3DTexture} The generated 3D texture.
+ */
+function buildData3DTexture( chunk ) {
 
-		let hasColors = false;
+	const data = chunk.data;
+	const size = chunk.size;
 
-		for ( let j = 0; j < data.length; j += 4 ) {
+	const offsety = size.x;
+	const offsetz = size.x * size.y;
 
-			const x = data[ j + 0 ];
-			const y = data[ j + 1 ];
-			const z = data[ j + 2 ];
-			const c = data[ j + 3 ];
+	const array = new Uint8Array( size.x * size.y * size.z );
 
-			const hex = palette[ c ];
-			const r = ( hex >> 0 & 0xff ) / 0xff;
-			const g = ( hex >> 8 & 0xff ) / 0xff;
-			const b = ( hex >> 16 & 0xff ) / 0xff;
+	for ( let j = 0; j < data.length; j += 4 ) {
 
-			if ( r > 0 || g > 0 || b > 0 ) hasColors = true;
+		const x = data[ j + 0 ];
+		const y = data[ j + 1 ];
+		const z = data[ j + 2 ];
 
-			const index = x + ( y * offsety ) + ( z * offsetz );
+		const index = x + ( y * offsety ) + ( z * offsetz );
 
-			if ( array[ index + 1 ] === 0 || x === size.x - 1 ) add( px, x, z, - y, r, g, b );
-			if ( array[ index - 1 ] === 0 || x === 0 ) add( nx, x, z, - y, r, g, b );
-			if ( array[ index + offsety ] === 0 || y === size.y - 1 ) add( ny, x, z, - y, r, g, b );
-			if ( array[ index - offsety ] === 0 || y === 0 ) add( py, x, z, - y, r, g, b );
-			if ( array[ index + offsetz ] === 0 || z === size.z - 1 ) add( pz, x, z, - y, r, g, b );
-			if ( array[ index - offsetz ] === 0 || z === 0 ) add( nz, x, z, - y, r, g, b );
+		array[ index ] = 255;
 
-		}
+	}
 
-		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-		geometry.computeVertexNormals();
+	const texture = new Data3DTexture( array, size.x, size.y, size.z );
 
-		const material = new MeshStandardMaterial();
+	texture.format = RedFormat;
+	texture.minFilter = NearestFilter;
+	texture.magFilter = LinearFilter;
+	texture.unpackAlignment = 1;
+	texture.needsUpdate = true;
 
-		if ( hasColors ) {
+	return texture;
 
-			geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
-			material.vertexColors = true;
+}
 
-		}
+// @deprecated, r182
 
-		super( geometry, material );
+class VOXMesh extends Mesh {
+
+	constructor( chunk ) {
+
+		console.warn( 'VOXMesh has been deprecated. Use buildMesh() instead.' );
+
+		const mesh = buildMesh( chunk );
+
+		super( mesh.geometry, mesh.material );
 
 	}
 
 }
 
-/**
- * A VOX 3D texture.
- *
- * Instances of this class are created from the loaded chunks of {@link VOXLoader}.
- *
- * @augments Data3DTexture
- */
 class VOXData3DTexture extends Data3DTexture {
 
-	/**
-	 * Constructs a new VOX 3D texture.
-	 *
-	 * @param {Object} chunk - A VOX chunk loaded via {@link VOXLoader}.
-	 */
 	constructor( chunk ) {
 
-		const data = chunk.data;
-		const size = chunk.size;
+		console.warn( 'VOXData3DTexture has been deprecated. Use buildData3DTexture() instead.' );
 
-		const offsety = size.x;
-		const offsetz = size.x * size.y;
+		const texture = buildData3DTexture( chunk );
 
-		const array = new Uint8Array( size.x * size.y * size.z );
+		super( texture.image.data, texture.image.width, texture.image.height, texture.image.depth );
 
-		for ( let j = 0; j < data.length; j += 4 ) {
-
-			const x = data[ j + 0 ];
-			const y = data[ j + 1 ];
-			const z = data[ j + 2 ];
-
-			const index = x + ( y * offsety ) + ( z * offsetz );
-
-			array[ index ] = 255;
-
-		}
-
-		super( array, size.x, size.y, size.z );
-
-		this.format = RedFormat;
-		this.minFilter = NearestFilter;
-		this.magFilter = LinearFilter;
-		this.unpackAlignment = 1;
+		this.format = texture.format;
+		this.minFilter = texture.minFilter;
+		this.magFilter = texture.magFilter;
+		this.unpackAlignment = texture.unpackAlignment;
 		this.needsUpdate = true;
 
 	}
 
 }
 
-export { VOXLoader, VOXMesh, VOXData3DTexture };
+export { VOXLoader, buildMesh, buildData3DTexture, VOXMesh, VOXData3DTexture };

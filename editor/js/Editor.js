@@ -396,6 +396,32 @@ Editor.prototype = {
 
 					helper = new THREE.PointLightHelper( object, 1 );
 
+					helper.matrix = new THREE.Matrix4();
+					helper.matrixAutoUpdate = true;
+
+					const light = object;
+					const editor = this;
+
+					helper.updateMatrixWorld = function () {
+
+						light.getWorldPosition( this.position );
+
+						const distance = editor.viewportCamera.position.distanceTo( this.position );
+						this.scale.setScalar( distance / 30 );
+
+						this.updateMatrix();
+						this.matrixWorld.copy( this.matrix );
+
+						const children = this.children;
+
+						for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+							children[ i ].updateMatrixWorld();
+
+						}
+
+					};
+
 				} else if ( object.isDirectionalLight ) {
 
 					helper = new THREE.DirectionalLightHelper( object, 1 );
@@ -647,6 +673,12 @@ Editor.prototype = {
 		delete this.cameras[ existingUuid ]; // remove old entry [existingUuid, this.camera]
 		this.cameras[ incomingUuid ] = this.camera; // add new entry [incomingUuid, this.camera]
 
+		if ( json.controls !== undefined ) {
+
+			this.controls.fromJSON( json.controls );
+
+		}
+
 		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
@@ -705,6 +737,7 @@ Editor.prototype = {
 				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
 			camera: this.viewportCamera.toJSON(),
+			controls: this.controls.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON(),

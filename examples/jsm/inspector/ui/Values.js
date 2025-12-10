@@ -157,6 +157,14 @@ class ValueNumber extends Value {
 
 	}
 
+	setValue( val ) {
+
+		this.input.value = val;
+
+		return super.setValue( val );
+
+	}
+
 	getValue() {
 
 		return parseFloat( this.input.value );
@@ -194,6 +202,14 @@ class ValueCheckbox extends Value {
 
 	}
 
+	setValue( val ) {
+
+		this.checkbox.value = val;
+
+		return super.setValue( val );
+
+	}
+
 	getValue() {
 
 		return this.checkbox.checked;
@@ -216,7 +232,7 @@ class ValueSlider extends Value {
 
 		const numberValue = new ValueNumber( { value, min, max, step } );
 		this.numberInput = numberValue.input;
-		this.numberInput.style.width = '60px';
+		this.numberInput.style.flexBasis = '80px';
 		this.numberInput.style.flexShrink = '0';
 
 		this.slider.value = value;

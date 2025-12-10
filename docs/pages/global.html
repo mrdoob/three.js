@@ -93,7 +93,7 @@ each other to build complex performances from smaller re-usable assets.</p>
 				<div class="member">
 					<h3 class="name" id="BasicDepthPacking" translate="no">.<a href="#BasicDepthPacking">BasicDepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>Basic depth packing.</p>
+						<p>The depth value is inverted (1.0 - z) for visualization purposes.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -191,7 +191,7 @@ each other to build complex performances from smaller re-usable assets.</p>
 					<h3 class="name" id="DATA" translate="no">.<a href="#DATA">DATA</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Precomputed DFG LUT for Image-Based Lighting
-Resolution: 32x32
+Resolution: 16x16
 Samples: 4096 per texel
 Format: RG16F (2 half floats per texel: scale, bias)</p>
 					</div>
@@ -647,6 +647,12 @@ alpha transparency.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="NoNormalPacking" translate="no">.<a href="#NoNormalPacking">NoNormalPacking</a><span class="type-signature"> : string</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>No normal map packing.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="NoToneMapping" translate="no">.<a href="#NoToneMapping">NoToneMapping</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>No tone mapping is applied.</p>
@@ -885,6 +891,18 @@ alpha transparency.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="NormalGAPacking" translate="no">.<a href="#NormalGAPacking">NormalGAPacking</a><span class="type-signature"> : string</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Normal GA packing.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="NormalRGPacking" translate="no">.<a href="#NormalRGPacking">NormalRGPacking</a><span class="type-signature"> : string</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Normal RG packing.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="NotEqualCompare" translate="no">.<a href="#NotEqualCompare">NotEqualCompare</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Pass if the incoming value is not equal to the texture value.</p>
@@ -992,6 +1010,12 @@ better soft shadows especially when using low-resolution shadow maps.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="R11_EAC_Format" translate="no">.<a href="#R11_EAC_Format">R11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>EAC R11 UNORM format.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="RED_GREEN_RGTC2_Format" translate="no">.<a href="#RED_GREEN_RGTC2_Format">RED_GREEN_RGTC2_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>RGTC2 Red Green format.</p>
@@ -1004,9 +1028,15 @@ better soft shadows especially when using low-resolution shadow maps.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="RG11_EAC_Format" translate="no">.<a href="#RG11_EAC_Format">RG11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>EAC RG11 UNORM format.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="RGBADepthPacking" translate="no">.<a href="#RGBADepthPacking">RGBADepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>A depth value is packed into 32 bit RGBA.</p>
+						<p>The depth value is packed into 32 bit RGBA.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1151,7 +1181,7 @@ compression in how the alpha compression is done.</p>
 				<div class="member">
 					<h3 class="name" id="RGBDepthPacking" translate="no">.<a href="#RGBDepthPacking">RGBDepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>A depth value is packed into 24 bit RGB.</p>
+						<p>The depth value is packed into 24 bit RGB.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1211,7 +1241,7 @@ compression in how the alpha compression is done.</p>
 				<div class="member">
 					<h3 class="name" id="RGDepthPacking" translate="no">.<a href="#RGDepthPacking">RGDepthPacking</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>A depth value is packed into 16 bit RG.</p>
+						<p>The depth value is packed into 16 bit RG.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1263,6 +1293,12 @@ compression in how the alpha compression is done.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="SIGNED_R11_EAC_Format" translate="no">.<a href="#SIGNED_R11_EAC_Format">SIGNED_R11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>EAC R11 SNORM format.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="SIGNED_RED_GREEN_RGTC2_Format" translate="no">.<a href="#SIGNED_RED_GREEN_RGTC2_Format">SIGNED_RED_GREEN_RGTC2_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>RGTC2 Signed Red Green format.</p>
@@ -1272,6 +1308,12 @@ compression in how the alpha compression is done.</p>
 					<h3 class="name" id="SIGNED_RED_RGTC1_Format" translate="no">.<a href="#SIGNED_RED_RGTC1_Format">SIGNED_RED_RGTC1_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>RGTC1 Signed Red format.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="SIGNED_RG11_EAC_Format" translate="no">.<a href="#SIGNED_RG11_EAC_Format">SIGNED_RG11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>EAC RG11 SNORM format.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1538,6 +1580,12 @@ When using VSMShadowMap all shadow receivers will also cast shadows.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="disposeShadowMaterial" translate="no">.<a href="#disposeShadowMaterial">disposeShadowMaterial</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Disposes the shadow material for the given light source.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="viewportResolution" translate="no">.<a href="#viewportResolution">viewportResolution</a> <span class="type-signature">(constant) </span></h3>
 						<dl class="details">
 							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r169. Use <a href="TSL.html#screenSize">screenSize</a> instead.</dt>
@@ -1589,7 +1637,10 @@ with a binary <code>[0,1]</code> result.</p>
 					<h3 class="name name-method" id="PCFShadowFilter" translate="no">.<a href="#PCFShadowFilter">PCFShadowFilter</a><span class="signature">( inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>A shadow filtering function performing PCF filtering.</p>
+							<p>A shadow filtering function performing PCF filtering with Vogel disk sampling and IGN.</p>
+<p>Uses 5 samples distributed via Vogel disk pattern, rotated per-pixel using Interleaved
+Gradient Noise (IGN) to break up banding artifacts. Combined with hardware PCF (4-tap
+filtering per sample), this effectively provides 20 filtered taps with better distribution.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -1684,6 +1735,65 @@ with a binary <code>[0,1]</code> result.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The filtering result.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="PointShadowFilter" translate="no">.<a href="#PointShadowFilter">PointShadowFilter</a><span class="signature">( inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>A shadow filtering function for point lights using Vogel disk sampling and IGN.</p>
+<p>Uses 5 samples distributed via Vogel disk pattern in tangent space around the
+sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>inputs</strong>
+									</td>
+									<td class="description last">
+										<p>The input parameter object.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>depthTexture</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the shadow cube map.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>bd3D</strong>
+									</td>
+									<td class="description last">
+										<p>The normalized direction from light to fragment.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>dp</strong>
+									</td>
+									<td class="description last">
+										<p>The depth value to compare against.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>shadow</strong>
+									</td>
+									<td class="description last">
+										<p>The light shadow.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The filtering result.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="Stack" translate="no">.<a href="#Stack">Stack</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -1703,120 +1813,6 @@ with a binary <code>[0,1]</code> result.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The node that was added to the stack.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="VSMPassHorizontal" translate="no">.<a href="#VSMPassHorizontal">VSMPassHorizontal</a><span class="signature">( inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Represents the shader code for the second VSM render pass.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>inputs</strong>
-									</td>
-									<td class="description last">
-										<p>The input parameter object.</p>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>samples</strong>
-									</td>
-									<td class="description last">
-										<p>The number of samples</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>radius</strong>
-									</td>
-									<td class="description last">
-										<p>The radius.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>size</strong>
-									</td>
-									<td class="description last">
-										<p>The size.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>shadowPass</strong>
-									</td>
-									<td class="description last">
-										<p>The result of the first VSM render pass.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The VSM output.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="VSMPassVertical" translate="no">.<a href="#VSMPassVertical">VSMPassVertical</a><span class="signature">( inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Represents the shader code for the first VSM render pass.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>inputs</strong>
-									</td>
-									<td class="description last">
-										<p>The input parameter object.</p>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong>samples</strong>
-									</td>
-									<td class="description last">
-										<p>The number of samples</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>radius</strong>
-									</td>
-									<td class="description last">
-										<p>The radius.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>size</strong>
-									</td>
-									<td class="description last">
-										<p>The size.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong>shadowPass</strong>
-									</td>
-									<td class="description last">
-										<p>A reference to the render target's depth data.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The VSM output.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="VSMShadowFilter" translate="no">.<a href="#VSMShadowFilter">VSMShadowFilter</a><span class="signature">( inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
@@ -1858,6 +1854,48 @@ with a binary <code>[0,1]</code> result.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The filtering result.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="buildData3DTexture" translate="no">.<a href="#buildData3DTexture">buildData3DTexture</a><span class="signature">( chunk : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Data3DTexture.html">Data3DTexture</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Builds a 3D texture from a VOX chunk.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>chunk</strong>
+									</td>
+									<td class="description last">
+										<p>A VOX chunk loaded via <a href="VOXLoader.html">VOXLoader</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated 3D texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="buildMesh" translate="no">.<a href="#buildMesh">buildMesh</a><span class="signature">( chunk : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Builds a mesh from a VOX chunk.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>chunk</strong>
+									</td>
+									<td class="description last">
+										<p>A VOX chunk loaded via <a href="VOXLoader.html">VOXLoader</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The generated mesh.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="ceilPowerOfTwo" translate="no">.<a href="#ceilPowerOfTwo">ceilPowerOfTwo</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
@@ -2723,7 +2761,7 @@ between the start and end point.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the given number is a power of two or not.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="isTypedArray" translate="no">.<a href="#isTypedArray">isTypedArray</a><span class="signature">( object : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="isTypedArray" translate="no">.<a href="#isTypedArray">isTypedArray</a><span class="signature">( array : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given object is a typed array.</p>
@@ -2732,7 +2770,7 @@ between the start and end point.</p>
 							<tbody>
 								<tr>
 									<td class="name">
-										<strong>object</strong>
+										<strong>array</strong>
 									</td>
 									<td class="description last">
 										<p>The object to check.</p>
@@ -3179,6 +3217,72 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 									</td>
 									<td class="description last">
 										<p>A string specifying the axes order.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="shadowRenderObjectFunction" translate="no">.<a href="#shadowRenderObjectFunction">shadowRenderObjectFunction</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, _camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type"><a href="Group.html">Group</a></span>, &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Shadow Render Object Function.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene containing the object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>_camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera used for rendering.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry of the object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>material</strong>
+									</td>
+									<td class="description last">
+										<p>The material of the object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>group</strong>
+									</td>
+									<td class="description last">
+										<p>The group the object belongs to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>params</strong>
+									</td>
+									<td class="description last">
+										<p>Additional parameters for rendering.</p>
 									</td>
 								</tr>
 							</tbody>

@@ -16,13 +16,8 @@
 				<div class="class-description"><p>A loader for the VOX format.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const loader = new VOXLoader();
-const chunks = await loader.loadAsync( 'models/vox/monu10.vox' );
-for ( let i = 0; i &lt; chunks.length; i ++ ) {
-	const chunk = chunks[ i ];
-	const mesh = new VOXMesh( chunk );
-	mesh.scale.setScalar( 0.0015 );
-	scene.add( mesh );
-}
+const result = await loader.loadAsync( 'models/vox/monu10.vox' );
+scene.add( result.scene.children[ 0 ] );
 </code></pre></div>
 			</header>
 			<article>
@@ -82,10 +77,10 @@ to the <code>onLoad()</code> callback.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Parses the given VOX data and returns the resulting chunks.</p>
+							<p>Parses the given VOX data and returns the result object.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -103,7 +98,7 @@ to the <code>onLoad()</code> callback.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
 						</dl>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The parsed chunks.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The parsed VOX data with properties: chunks, scene.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

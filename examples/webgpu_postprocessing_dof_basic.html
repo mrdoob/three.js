@@ -90,7 +90,6 @@
 				//
 
 				const hdrLoader = new UltraHDRLoader();
-				hdrLoader.setDataType( THREE.HalfFloatType );
 				const envMap = await hdrLoader.loadAsync( 'textures/equirectangular/spruit_sunrise_2k.hdr.jpg' );
 				envMap.mapping = THREE.EquirectangularReflectionMapping;
 				scene.environmentRotation.y = Math.PI * 0.5;

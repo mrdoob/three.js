@@ -3,7 +3,6 @@
 /* global shapefile */
 
 /* eslint no-console: off */
-/* eslint no-unused-vars: off */
 
 async function main() {
 

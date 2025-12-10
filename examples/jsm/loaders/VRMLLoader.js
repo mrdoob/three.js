@@ -3167,8 +3167,8 @@ class VRMLLoader extends Loader {
 		 *
 		 * @param {BufferGeometry} geometry
 		 * @param {number} radius
-		 * @param {array} angles
-		 * @param {array} colors
+		 * @param {Array} angles
+		 * @param {Array} colors
 		 * @param {boolean} topDown - Whether to work top down or bottom up.
 		 */
 		function paintFaces( geometry, radius, angles, colors, topDown ) {

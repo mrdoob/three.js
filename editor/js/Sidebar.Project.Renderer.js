@@ -37,8 +37,7 @@ function SidebarProjectRenderer( editor ) {
 	const shadowTypeSelect = new UISelect().setOptions( {
 		0: 'Basic',
 		1: 'PCF',
-		2: 'PCF Soft',
-		//	3: 'VSM'
+		3: 'VSM'
 	} ).setWidth( '125px' ).onChange( updateShadows );
 	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
 	shadowsRow.add( shadowTypeSelect );

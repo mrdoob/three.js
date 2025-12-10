@@ -122,9 +122,9 @@
 					const chromaticAberrationOffset = normalView.z.pow( - .9 ).mul( .004 );
 
 					const causticProjection = vec3(
-						texture( causticMap, textureUV.add( vec2( chromaticAberrationOffset.x.negate(), 0 ) ) ).r,
-						texture( causticMap, textureUV.add( vec2( 0, chromaticAberrationOffset.y.negate() ) ) ).g,
-						texture( causticMap, textureUV.add( vec2( chromaticAberrationOffset.x, chromaticAberrationOffset.y ) ) ).b
+						texture( causticMap, textureUV.add( vec2( chromaticAberrationOffset.negate(), 0 ) ) ).r,
+						texture( causticMap, textureUV.add( vec2( 0, chromaticAberrationOffset.negate() ) ) ).g,
+						texture( causticMap, textureUV.add( vec2( chromaticAberrationOffset, chromaticAberrationOffset ) ) ).b
 					);
 
 					return causticProjection.mul( viewZ.mul( 60 ) ).add( viewZ ).mul( causticColor );

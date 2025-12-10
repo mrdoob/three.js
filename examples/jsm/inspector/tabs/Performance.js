@@ -6,9 +6,9 @@ import { createValueSpan, setText } from '../ui/utils.js';
 
 class Performance extends Tab {
 
-	constructor() {
+	constructor( options = {} ) {
 
-		super( 'Performance' );
+		super( 'Performance', options );
 
 		const perfList = new List( 'Name', 'CPU', 'GPU', 'Total' );
 		perfList.setGridStyle( 'minmax(200px, 2fr) 80px 80px 80px' );

@@ -209,7 +209,7 @@
 
 		function createLink( file, tags ) {
 
-			const external = Array.isArray( tags ) && tags.includes( 'external' ) ? ' <span class="tag">external</span>' : '';
+			const community = Array.isArray( tags ) && tags.includes( 'community' ) ? '<span class="tag">community</span>' : '';
 
 			let href = file + '.html';
 
@@ -224,8 +224,9 @@
 					<a href="${ href }" target="viewer">
 						<div class="cover">
 							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
+							${ community }
 						</div>
-						<div class="title">${ getName( file ) }${ external }</div>
+						<div class="title">${ getName( file ) }</div>
 					</a>
 				</div>
 			`;
