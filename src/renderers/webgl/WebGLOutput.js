@@ -28,14 +28,13 @@ const toneMappingMap = {
 	[ CustomToneMapping ]: 'CUSTOM_TONE_MAPPING'
 };
 
-function WebGLOutput( type, width, height, depth, stencil, antialias ) {
+function WebGLOutput( type, width, height, depth, stencil ) {
 
 	// render targets for scene and post-processing
 	const targetA = new WebGLRenderTarget( width, height, {
 		type: type,
 		depthBuffer: depth,
 		stencilBuffer: stencil,
-		samples: antialias ? 4 : 1,
 		resolveDepthBuffer: false
 	} );
 
@@ -43,7 +42,6 @@ function WebGLOutput( type, width, height, depth, stencil, antialias ) {
 		type: HalfFloatType,
 		depthBuffer: false,
 		stencilBuffer: false,
-		samples: antialias ? 4 : 1,
 		resolveDepthBuffer: false
 	} );
 
