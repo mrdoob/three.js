@@ -17,25 +17,19 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"@jgphilpott/polyslice": "https://unpkg.com/@jgphilpott/polyslice/dist/index.esm.js"
 				}
 			}
 		</script>
 
-		<!-- Include Polyslice from CDN -->
-		<script src="https://unpkg.com/@jgphilpott/polyslice/dist/index.browser.min.js" crossorigin="anonymous"></script>
-
 		<script type="module">
 
-			/* global Polyslice */
-
 			import * as THREE from 'three';
+			import { Polyslice, Printer, Filament } from '@jgphilpott/polyslice';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			// Make THREE available globally for Polyslice
-			window.THREE = THREE;
 
 			let camera, scene, renderer, mesh;
 
@@ -112,16 +106,8 @@
 
 				gui.open();
 
-				// Check if Polyslice loaded successfully
-				if ( typeof Polyslice !== 'undefined' ) {
-
-					console.log( '✓ Polyslice library loaded successfully' );
-
-				} else {
-
-					console.warn( '✗ Polyslice library failed to load. Export will not work.' );
-
-				}
+				// Log that Polyslice is loaded via ES module
+				console.log( '✓ Polyslice library loaded via ES module' );
 
 				addCube();
 
@@ -137,20 +123,12 @@
 
 				try {
 
-					// Check if Polyslice is loaded
-					if ( typeof Polyslice === 'undefined' ) {
-
-						alert( 'Polyslice library failed to load from CDN.\n\nPossible solutions:\n1. Disable ad blockers or browser extensions\n2. Check your network connection\n3. Ensure unpkg.com is not blocked by your firewall' );
-						return;
-
-					}
-
 					// Create printer and filament configurations using Polyslice
-					const printer = new Polyslice.Printer( params.printer || 'Ender3' );
-					const filament = new Polyslice.Filament( params.filament || 'GenericPLA' );
+					const printer = new Printer( params.printer || 'Ender3' );
+					const filament = new Filament( params.filament || 'GenericPLA' );
 
 					// Create the slicer instance with user-defined settings
-					const slicer = new Polyslice.Polyslice( {
+					const slicer = new Polyslice( {
 						printer: printer,
 						filament: filament,
 						layerHeight: params.layerHeight,
@@ -169,8 +147,7 @@
 				} catch ( error ) {
 
 					console.error( 'Error exporting to G-code:', error );
-					alert( 'Error exporting to G-code. Check console for details.' );
-					alert( 'Note: Polyslice is an external library. Please ensure it is loaded correctly.' );
+					alert( 'Error exporting to G-code:\n\n' + error.message + '\n\nCheck console for details.' );
 
 				}
 
