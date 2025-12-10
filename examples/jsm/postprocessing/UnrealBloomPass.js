@@ -282,20 +282,6 @@ class UnrealBloomPass extends Pass {
 	 */
 	render( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
-		if ( this._currentSamples !== readBuffer.samples ) {
-
-			this._currentSamples = readBuffer.samples;
-
-			this.renderTargetBright.setSamples( readBuffer.samples );
-			for ( let i = 0; i < this.nMips; i ++ ) {
-
-				this.renderTargetsHorizontal[ i ].setSamples( readBuffer.samples );
-				this.renderTargetsVertical[ i ].setSamples( readBuffer.samples );
-
-			}
-
-		}
-
 		renderer.getClearColor( this._oldClearColor );
 		this._oldClearAlpha = renderer.getClearAlpha();
 		const oldAutoClear = renderer.autoClear;
