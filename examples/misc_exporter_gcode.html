@@ -17,24 +17,25 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"@jgphilpott/polyslice": "https://unpkg.com/@jgphilpott/polyslice/dist/index.esm.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
+		<!-- Include Polyslice from CDN -->
+		<script src="https://unpkg.com/@jgphilpott/polyslice/dist/index.browser.min.js" crossorigin="anonymous"></script>
+
 		<script type="module">
 
+			/* global Polyslice */
+
 			import * as THREE from 'three';
-			import * as Polyslice from '@jgphilpott/polyslice';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			// Note: Polyslice ESM build currently bundles THREE.js internally,
-			// which causes a "Multiple instances of Three.js" warning.
-			// This is a known limitation and does not affect functionality.
-			// See: https://github.com/jgphilpott/polyslice/issues
+			// Make THREE available globally for Polyslice
+			window.THREE = THREE;
 
 			let camera, scene, renderer, mesh;
 
@@ -54,7 +55,7 @@
 			};
 
 			// Dropdown options (extend as supported by Polyslice profiles)
-			const PRINTER_OPTIONS = [ 'Ender3', 'PrusaMK3S', 'BambuP1P' ];
+			const PRINTER_OPTIONS = [ 'Ender3', 'UltimakerS5', 'PrusaI3MK3S', 'AnycubicI3Mega', 'BambuLabP1P' ];
 			const FILAMENT_OPTIONS = [ 'GenericPLA', 'GenericPETG', 'GenericABS' ];
 
 			init();
@@ -111,8 +112,16 @@
 
 				gui.open();
 
-				// Log that Polyslice is loaded via ES module
-				console.log( '✓ Polyslice library loaded via ES module' );
+				// Check if Polyslice loaded successfully
+				if ( typeof Polyslice !== 'undefined' ) {
+
+					console.log( '✓ Polyslice library loaded successfully' );
+
+				} else {
+
+					console.warn( '✗ Polyslice library failed to load. Export will not work.' );
+
+				}
 
 				addCube();
 
@@ -127,6 +136,14 @@
 			function exportToGCode() {
 
 				try {
+
+					// Check if Polyslice is loaded
+					if ( typeof Polyslice === 'undefined' ) {
+
+						alert( 'Polyslice library failed to load from CDN.\n\nPossible solutions:\n1. Disable ad blockers or browser extensions\n2. Check your network connection\n3. Ensure unpkg.com is not blocked by your firewall' );
+						return;
+
+					}
 
 					// Create printer and filament configurations using Polyslice
 					const printer = new Polyslice.Printer( params.printer || 'Ender3' );
@@ -152,7 +169,8 @@
 				} catch ( error ) {
 
 					console.error( 'Error exporting to G-code:', error );
-					alert( 'Error exporting to G-code:\n\n' + error.message + '\n\nCheck console for details.' );
+					alert( 'Error exporting to G-code. Check console for details.' );
+					alert( 'Note: Polyslice is an external library. Please ensure it is loaded correctly.' );
 
 				}
 
