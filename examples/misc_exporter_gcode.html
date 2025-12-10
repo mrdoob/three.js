@@ -31,6 +31,11 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			// Note: Polyslice ESM build currently bundles THREE.js internally,
+			// which causes a "Multiple instances of Three.js" warning.
+			// This is a known limitation and does not affect functionality.
+			// See: https://github.com/jgphilpott/polyslice/issues
+
 			let camera, scene, renderer, mesh;
 
 			const params = {
