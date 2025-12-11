@@ -22,14 +22,10 @@
 			}
 		</script>
 
-		<!-- Include Polyslice from CDN -->
-		<script src="https://unpkg.com/@jgphilpott/polyslice/dist/index.browser.min.js" crossorigin="anonymous"></script>
-
 		<script type="module">
 
-			/* global Polyslice */
-
 			import * as THREE from 'three';
+			import Polyslice from 'https://unpkg.com/@jgphilpott/polyslice@25.12.8/dist/index.browser.esm.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -111,17 +107,6 @@
 				h.add( params, 'exportToGCode' ).name( 'Export G-code' );
 
 				gui.open();
-
-				// Check if Polyslice loaded successfully
-				if ( typeof Polyslice !== 'undefined' ) {
-
-					console.log( '✓ Polyslice library loaded successfully' );
-
-				} else {
-
-					console.warn( '✗ Polyslice library failed to load. Export will not work.' );
-
-				}
 
 				addCube();
 
