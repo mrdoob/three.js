@@ -999,7 +999,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				uniformGPU = buffer;
 
-				uniformNode.name = name ? name : 'NodeBuffer_' + uniformNode.id;
+				uniformNode.name = name ? name : 'NodeBuffer_' + buffer.bufferId;
 
 			} else {
 

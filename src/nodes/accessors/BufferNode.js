@@ -64,6 +64,15 @@ class BufferNode extends UniformNode {
 		 */
 		this.updateRanges = [];
 
+		/**
+		 * Within a build every buffer node needs a unique id which is stored in bufferId.
+		 * Additionally the buffer id should be stable for repeated builds of unchanged materials.
+		 *
+		 * @type {number}
+		 * @default -1
+		 */
+		this.bufferId = -1;
+
 	}
 
 	/**
@@ -110,7 +119,18 @@ class BufferNode extends UniformNode {
 		return 'buffer';
 
 	}
+	/**
+	 * Updates this.bufferId and calls the default implementation.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {?Node} The output node.
+	 */
+	setup( builder ) {
+		super.setup( builder );
 
+		builder.context.bufferNodeId = builder.context.bufferNodeId ? builder.context.bufferNodeId + 1 : 1;
+		this.bufferId = builder.context.bufferNodeId;
+	}
 }
 
 export default BufferNode;
