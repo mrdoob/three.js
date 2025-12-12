@@ -313,7 +313,7 @@ export default SkinningNode;
  * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
  * @returns {SkinningNode}
  */
-export const skinning = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh ) );
+export const skinning = ( skinnedMesh ) => new SkinningNode( skinnedMesh );
 
 /**
  * TSL function for computing skinning.

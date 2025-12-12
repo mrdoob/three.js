@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LineDashedMaterial } from '../../../../src/materials/LineDashedMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

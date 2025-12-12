@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { SphericalHarmonics3 } from '../../../../src/math/SphericalHarmonics3.js';
 
 export default QUnit.module( 'Maths', () => {

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ExtrudeGeometry } from '../../../../src/geometries/ExtrudeGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';

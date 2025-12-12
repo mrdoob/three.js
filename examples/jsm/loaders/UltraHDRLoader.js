@@ -109,8 +109,6 @@ class UltraHDRLoader extends Loader {
 	 */
 	parse( buffer, onLoad ) {
 
-		console.time( 'UltraHDRLoader' );
-
 		const xmpMetadata = {
 			version: null,
 			baseRenditionIsHDR: null,
@@ -292,8 +290,6 @@ class UltraHDRLoader extends Loader {
 				primaryImage,
 				gainmapImage,
 				( hdrBuffer, width, height ) => {
-
-					console.timeEnd( 'UltraHDRLoader' );
 
 					onLoad( {
 						width,

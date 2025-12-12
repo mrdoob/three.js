@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import * as Constants from '../../../src/constants.js';
 
 export default QUnit.module( 'Constants', () => {

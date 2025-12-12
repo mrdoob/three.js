@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { HemisphereLight } from '../../../../src/lights/HemisphereLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';

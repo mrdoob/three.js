@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Raycaster } from '../../../../src/core/Raycaster.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';

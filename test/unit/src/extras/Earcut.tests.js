@@ -1,5 +1,3 @@
-/* global QUnit */
-
 // import { Earcut } from '../../../../src/extras/Earcut.js';
 
 export default QUnit.module( 'Extras', () => {

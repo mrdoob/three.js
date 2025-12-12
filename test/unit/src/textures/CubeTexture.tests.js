@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CubeTexture } from '../../../../src/textures/CubeTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';

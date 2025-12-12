@@ -1,5 +1,3 @@
-/* global QUnit */
-
 // import { WebGLShader } from '../../../../../src/renderers/webgl/WebGLShader.js';
 
 export default QUnit.module( 'Renderers', () => {

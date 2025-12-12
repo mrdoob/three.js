@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ConeGeometry } from '../../../../src/geometries/ConeGeometry.js';
 
 import { CylinderGeometry } from '../../../../src/geometries/CylinderGeometry.js';

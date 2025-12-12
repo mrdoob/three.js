@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { TextureLoader } from '../../../../src/loaders/TextureLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';

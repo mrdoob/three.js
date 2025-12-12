@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { AmbientLight } from '../../../../src/lights/AmbientLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';

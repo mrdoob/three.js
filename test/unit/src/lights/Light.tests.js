@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Light } from '../../../../src/lights/Light.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';

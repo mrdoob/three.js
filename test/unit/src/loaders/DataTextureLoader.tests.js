@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DataTextureLoader } from '../../../../src/loaders/DataTextureLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';

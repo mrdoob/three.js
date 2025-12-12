@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ArrowHelper } from '../../../../src/helpers/ArrowHelper.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { FramebufferTexture } from '../../../../src/textures/FramebufferTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';

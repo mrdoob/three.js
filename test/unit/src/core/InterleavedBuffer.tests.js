@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';
 
 import { DynamicDrawUsage } from '../../../../src/constants.js';

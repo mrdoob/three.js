@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Box3Helper } from '../../../../src/helpers/Box3Helper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';

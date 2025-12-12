@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { RingGeometry } from '../../../../src/geometries/RingGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';

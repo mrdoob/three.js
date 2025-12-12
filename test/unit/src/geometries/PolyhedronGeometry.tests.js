@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';

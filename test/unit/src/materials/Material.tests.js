@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Material } from '../../../../src/materials/Material.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';

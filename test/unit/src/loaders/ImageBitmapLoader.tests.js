@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ImageBitmapLoader } from '../../../../src/loaders/ImageBitmapLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';

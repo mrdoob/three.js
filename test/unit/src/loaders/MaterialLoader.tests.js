@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { MaterialLoader } from '../../../../src/loaders/MaterialLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';

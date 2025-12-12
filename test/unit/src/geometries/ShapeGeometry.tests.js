@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ShapeGeometry } from '../../../../src/geometries/ShapeGeometry.js';
 
 import { Shape } from '../../../../src/extras/core/Shape.js';

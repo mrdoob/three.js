@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BufferGeometryLoader } from '../../../../src/loaders/BufferGeometryLoader.js';
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { UniformsUtils } from '../../../../../src/renderers/shaders/UniformsUtils.js';
 import { Color } from '../../../../../src/math/Color.js';
 import { Vector2 } from '../../../../../src/math/Vector2.js';

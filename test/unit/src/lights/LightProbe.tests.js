@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LightProbe } from '../../../../src/lights/LightProbe.js';
 
 import { Light } from '../../../../src/lights/Light.js';

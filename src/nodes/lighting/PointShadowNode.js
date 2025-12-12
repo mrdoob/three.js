@@ -1,6 +1,6 @@
 import ShadowNode from './ShadowNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { float, vec3, If, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec3, If, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
@@ -310,4 +310,4 @@ export default PointShadowNode;
  * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
  * @return {PointShadowNode} The created point shadow node.
  */
-export const pointShadow = ( light, shadow ) => nodeObject( new PointShadowNode( light, shadow ) );
+export const pointShadow = ( light, shadow ) => new PointShadowNode( light, shadow );

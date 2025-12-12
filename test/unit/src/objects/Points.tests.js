@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Material } from '../../../../src/materials/Material.js';
 import { Points } from '../../../../src/objects/Points.js';

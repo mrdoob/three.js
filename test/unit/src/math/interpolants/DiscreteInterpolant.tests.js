@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DiscreteInterpolant } from '../../../../../src/math/interpolants/DiscreteInterpolant.js';
 
 import { Interpolant } from '../../../../../src/math/Interpolant.js';

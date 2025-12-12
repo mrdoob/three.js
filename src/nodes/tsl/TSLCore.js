@@ -441,7 +441,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
-	return nodeObject( new NodeClass( ...nodeArray( params ) ) );
+	return new NodeClass( ...nodeArray( params ) );
 
 };
 
@@ -873,7 +873,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 				error( `TSL: Invalid parameter for the type "${ type }".` );
 
-				return nodeObject( new ConstNode( 0, type ) );
+				return new ConstNode( 0, type );
 
 			}
 
@@ -1171,8 +1171,8 @@ export const mat2 = new ConvertType( 'mat2' );
 export const mat3 = new ConvertType( 'mat3' );
 export const mat4 = new ConvertType( 'mat4' );
 
-export const string = ( value = '' ) => nodeObject( new ConstNode( value, 'string' ) );
-export const arrayBuffer = ( value ) => nodeObject( new ConstNode( value, 'ArrayBuffer' ) );
+export const string = ( value = '' ) => new ConstNode( value, 'string' );
+export const arrayBuffer = ( value ) => new ConstNode( value, 'ArrayBuffer' );
 
 addMethodChaining( 'toColor', color );
 addMethodChaining( 'toFloat', float );
