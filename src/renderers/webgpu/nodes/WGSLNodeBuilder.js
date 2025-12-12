@@ -1003,24 +1003,42 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else {
 
-				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
-
-				let uniformsGroup = uniformsStage[ groupName ];
+				let uniformsGroup = this.uniformGroups[ groupName ];
 
 				if ( uniformsGroup === undefined ) {
 
 					uniformsGroup = new NodeUniformsGroup( groupName, group );
 					uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-					uniformsStage[ groupName ] = uniformsGroup;
+					this.uniformGroups[ groupName ] = uniformsGroup;
 
 					bindings.push( uniformsGroup );
+
+				} else {
+
+					// Update visibility to include this shader stage (bitwise OR)
+					uniformsGroup.setVisibility( uniformsGroup.getVisibility() | gpuShaderStageLib[ shaderStage ] );
+
+					// Add to bindings for this stage if not already present
+					if ( bindings.indexOf( uniformsGroup ) === - 1 ) {
+
+						bindings.push( uniformsGroup );
+
+					}
 
 				}
 
 				uniformGPU = this.getNodeUniform( uniformNode, type );
 
-				uniformsGroup.addUniform( uniformGPU );
+				// Only add uniform if not already present in the group (check by name to avoid duplicates across stages)
+				const uniformName = uniformGPU.name;
+				const alreadyExists = uniformsGroup.uniforms.some( u => u.name === uniformName );
+
+				if ( ! alreadyExists ) {
+
+					uniformsGroup.addUniform( uniformGPU );
+
+				}
 
 			}
 
@@ -1817,16 +1835,36 @@ ${ flowData.code }
 
 			} else {
 
-				const vectorType = this.getType( this.getVectorType( uniform.type ) );
 				const groupName = uniform.groupNode.name;
 
-				const group = uniformGroups[ groupName ] || ( uniformGroups[ groupName ] = {
-					index: uniformIndexes.binding ++,
-					id: uniformIndexes.group,
-					snippets: []
-				} );
+				// Check if this group has already been processed
+				if ( uniformGroups[ groupName ] === undefined ) {
 
-				group.snippets.push( `\t${ uniform.name } : ${ vectorType }` );
+					// Get the shared uniform group that contains uniforms from all stages
+					const sharedUniformGroup = this.uniformGroups[ groupName ];
+
+					if ( sharedUniformGroup !== undefined ) {
+
+						// Generate snippets for ALL uniforms in this shared group
+						const snippets = [];
+
+						for ( const sharedUniform of sharedUniformGroup.uniforms ) {
+
+							const type = sharedUniform.getType();
+							const vectorType = this.getType( this.getVectorType( type ) );
+							snippets.push( `\t${ sharedUniform.name } : ${ vectorType }` );
+
+						}
+
+						uniformGroups[ groupName ] = {
+							index: uniformIndexes.binding ++,
+							id: uniformIndexes.group,
+							snippets: snippets
+						};
+
+					}
+
+				}
 
 			}
 
