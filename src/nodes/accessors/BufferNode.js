@@ -71,7 +71,7 @@ class BufferNode extends UniformNode {
 		 * @type {number}
 		 * @default -1
 		 */
-		this.bufferId = -1;
+		this.bufferId = - 1;
 
 	}
 
@@ -126,11 +126,14 @@ class BufferNode extends UniformNode {
 	 * @return {?Node} The output node.
 	 */
 	setup( builder ) {
+
 		super.setup( builder );
 
 		builder.context.bufferNodeId = builder.context.bufferNodeId ? builder.context.bufferNodeId + 1 : 1;
 		this.bufferId = builder.context.bufferNodeId;
+
 	}
+
 }
 
 export default BufferNode;
