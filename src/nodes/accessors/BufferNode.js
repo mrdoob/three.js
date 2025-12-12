@@ -129,8 +129,8 @@ class BufferNode extends UniformNode {
 
 		super.setup( builder );
 
-		builder.context.bufferNodeId = builder.context.bufferNodeId ? builder.context.bufferNodeId + 1 : 1;
-		this.bufferId = builder.context.bufferNodeId;
+		const index = builder.uniforms.index ++;
+		this.bufferId = index;
 
 	}
 
