@@ -748,7 +748,7 @@ function getProxyParameters( params ) {
 
 						}
 
-					} else if ( params[ 0 ] instanceof Node ) {
+					} else if ( params[ 0 ].isNode ) {
 
 						if ( params[ property ] === undefined ) {
 
