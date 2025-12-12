@@ -1,5 +1,5 @@
 import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
-import { float, vec2, vec3, int, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec2, vec3, int, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture, textureLoad } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
@@ -842,4 +842,4 @@ export default ShadowNode;
  * @param {?LightShadow} [shadow] - The light shadow.
  * @return {ShadowNode} The created shadow node.
  */
-export const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
+export const shadow = ( light, shadow ) => new ShadowNode( light, shadow );

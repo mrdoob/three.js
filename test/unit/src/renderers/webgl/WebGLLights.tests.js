@@ -1,5 +1,3 @@
-/* global QUnit */
-
 // import { WebGLLights } from '../../../../../src/renderers/webgl/WebGLLights.js';
 
 export default QUnit.module( 'Renderers', () => {

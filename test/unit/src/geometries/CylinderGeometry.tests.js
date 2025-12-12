@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CylinderGeometry } from '../../../../src/geometries/CylinderGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';

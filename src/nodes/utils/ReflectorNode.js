@@ -625,6 +625,6 @@ class ReflectorBaseNode extends Node {
  * @param {ReflectorBaseNode} [parameters.reflector] - The reflector base node.
  * @returns {ReflectorNode}
  */
-export const reflector = ( parameters ) => nodeObject( new ReflectorNode( parameters ) );
+export const reflector = ( parameters ) => new ReflectorNode( parameters );
 
 export default ReflectorNode;

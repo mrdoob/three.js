@@ -1,5 +1,3 @@
-/* global QUnit */
-
 // import { WebGLShadowMap } from '../../../../../src/renderers/webgl/WebGLShadowMap.js';
 
 export default QUnit.module( 'Renderers', () => {

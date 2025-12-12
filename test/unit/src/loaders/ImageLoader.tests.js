@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ImageLoader } from '../../../../src/loaders/ImageLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';

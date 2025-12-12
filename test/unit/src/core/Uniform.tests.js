@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Uniform } from '../../../../src/core/Uniform.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import {

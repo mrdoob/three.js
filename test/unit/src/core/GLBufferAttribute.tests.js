@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { GLBufferAttribute } from '../../../../src/core/GLBufferAttribute.js';
 
 export default QUnit.module( 'Core', () => {

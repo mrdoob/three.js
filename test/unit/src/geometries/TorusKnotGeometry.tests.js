@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { TorusKnotGeometry } from '../../../../src/geometries/TorusKnotGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
 
 import { Camera } from '../../../../src/cameras/Camera.js';

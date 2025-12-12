@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { MeshMatcapMaterial } from '../../../../src/materials/MeshMatcapMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

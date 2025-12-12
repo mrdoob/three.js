@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { HemisphereLightHelper } from '../../../../src/helpers/HemisphereLightHelper.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';

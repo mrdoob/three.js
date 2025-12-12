@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Vector4 } from '../../../../src/math/Vector4.js';
 import { Matrix3 } from '../../../../src/math/Matrix3.js';

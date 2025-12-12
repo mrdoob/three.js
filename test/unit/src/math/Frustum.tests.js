@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Frustum } from '../../../../src/math/Frustum.js';
 
 import { Sphere } from '../../../../src/math/Sphere.js';

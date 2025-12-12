@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { MeshDistanceMaterial } from '../../../../src/materials/MeshDistanceMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

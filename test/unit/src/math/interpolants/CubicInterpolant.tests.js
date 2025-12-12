@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CubicInterpolant } from '../../../../../src/math/interpolants/CubicInterpolant.js';
 
 import { Interpolant } from '../../../../../src/math/Interpolant.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PointsMaterial } from '../../../../src/materials/PointsMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

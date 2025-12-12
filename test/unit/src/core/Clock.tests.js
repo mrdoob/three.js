@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Clock } from '../../../../src/core/Clock.js';
 
 export default QUnit.module( 'Core', () => {

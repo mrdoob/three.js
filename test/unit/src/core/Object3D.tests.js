@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Object3D } from '../../../../src/core/Object3D.js';
 
 import { Vector3 } from '../../../../src/math/Vector3.js';

@@ -1,4 +1,3 @@
-/* global QUnit */
 import {
 	BufferAttribute,
 	Int8BufferAttribute,

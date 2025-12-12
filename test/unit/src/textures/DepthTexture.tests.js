@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DepthTexture } from '../../../../src/textures/DepthTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';

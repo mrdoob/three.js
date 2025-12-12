@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
 
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';

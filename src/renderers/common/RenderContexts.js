@@ -40,19 +40,14 @@ class RenderContexts {
 	 */
 	get( scene, camera, renderTarget = null, mrt = null ) {
 
-		let index = 0;
+		_chainKeys[ 0 ] = scene;
+		_chainKeys[ 1 ] = camera;
 
 		if ( mrt !== null ) {
 
-			// TODO: Improve ChainMap so that it only matches submaps corresponding to the key lengths.
-			// For we use: if ( mrt !== null ) _chainKeys[ 2 ] = mrt;
-
-			_chainKeys[ index ++ ] = mrt;
+			_chainKeys[ 2 ] = mrt;
 
 		}
-
-		_chainKeys[ index ++ ] = scene;
-		_chainKeys[ index ++ ] = camera;
 
 		let attachmentState;
 

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PropertyBinding } from '../../../../src/animation/PropertyBinding.js';
 
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';

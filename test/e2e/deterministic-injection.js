@@ -16,7 +16,6 @@
 
 	window.performance._now = performance.now;
 
-	let frameId = 0;
 	const now = () => 0; // frameId * 16;
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
@@ -29,7 +28,7 @@
 
 	window.requestAnimationFrame = function ( cb ) {
 
-		if ( window._renderFinished === true ) return
+		if ( window._renderFinished === true ) return;
 
 		if ( window._renderStarted === false ) {
 
@@ -63,11 +62,11 @@
 
 			this.load();
 			play.call( this );
-			RAF( renew );
+			RAF( renew ); // eslint-disable-line no-undef
 
 		}
 
-		RAF( renew );
+		RAF( renew ); // eslint-disable-line no-undef
 
 	};
 

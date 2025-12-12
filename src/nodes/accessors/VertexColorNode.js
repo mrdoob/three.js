@@ -1,5 +1,4 @@
 import AttributeNode from '../core/AttributeNode.js';
-import { nodeObject } from '../tsl/TSLBase.js';
 import { Vector4 } from '../../math/Vector4.js';
 
 /**
@@ -107,4 +106,4 @@ export default VertexColorNode;
  * @param {number} [index=0] - The attribute index.
  * @returns {VertexColorNode}
  */
-export const vertexColor = ( index = 0 ) => nodeObject( new VertexColorNode( index ) );
+export const vertexColor = ( index = 0 ) => new VertexColorNode( index );

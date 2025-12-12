@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DirectionalLightHelper } from '../../../../src/helpers/DirectionalLightHelper.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';

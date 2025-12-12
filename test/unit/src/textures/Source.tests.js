@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Source } from '../../../../src/textures/Source.js';
 
 export default QUnit.module( 'Textures', () => {

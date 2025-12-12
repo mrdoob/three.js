@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';

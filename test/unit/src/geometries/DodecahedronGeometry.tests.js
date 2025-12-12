@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DodecahedronGeometry } from '../../../../src/geometries/DodecahedronGeometry.js';
 
 import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';

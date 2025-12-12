@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';

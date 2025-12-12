@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { USDZExporter } from '../../../../examples/jsm/exporters/USDZExporter.js';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
 import {
