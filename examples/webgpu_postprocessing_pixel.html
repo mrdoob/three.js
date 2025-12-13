@@ -122,7 +122,7 @@
 			directionalLight.shadow.bias = - 0.0001;
 			scene.add( directionalLight );
 
-			const spotLight = new THREE.SpotLight( 0xffc100, 10, 10, Math.PI / 16, .02, 2 );
+			const spotLight = new THREE.SpotLight( 0xffc100, 10, 0, Math.PI / 16, .02, 2 );
 			spotLight.position.set( 2, 2, 0 );
 			const target = spotLight.target;
 			scene.add( target );

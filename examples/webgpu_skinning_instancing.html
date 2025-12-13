@@ -58,13 +58,13 @@
 
 				// lights
 
-				const centerLight = new THREE.PointLight( 0xff9900, 1, 100 );
+				const centerLight = new THREE.PointLight( 0xff9900, 1 );
 				centerLight.position.y = 4.5;
 				centerLight.position.z = - 2;
 				centerLight.power = 400;
 				scene.add( centerLight );
 
-				const cameraLight = new THREE.PointLight( 0x0099ff, 1, 100 );
+				const cameraLight = new THREE.PointLight( 0x0099ff, 1 );
 				cameraLight.power = 400;
 				camera.add( cameraLight );
 				scene.add( camera );

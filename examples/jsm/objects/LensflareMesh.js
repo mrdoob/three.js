@@ -25,7 +25,7 @@ import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, referenc
  * When using {@link WebGLRenderer}, use {@link Lensflare}.
  *
  * ```js
- * const light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+ * const light = new THREE.PointLight( 0xffffff, 1.5 );
  *
  * const lensflare = new LensflareMesh();
  * lensflare.addElement( new LensflareElement( textureFlare0, 512, 0 ) );

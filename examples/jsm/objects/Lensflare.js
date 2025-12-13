@@ -22,7 +22,7 @@ import {
  * When using {@link WebGPURenderer}, use {@link LensflareMesh}.
  *
  * ```js
- * const light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+ * const light = new THREE.PointLight( 0xffffff, 1.5 );
  *
  * const lensflare = new Lensflare();
  * lensflare.addElement( new LensflareElement( textureFlare0, 512, 0 ) );

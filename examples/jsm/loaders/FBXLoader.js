@@ -1206,28 +1206,13 @@ class FBXTreeParser {
 
 			}
 
-			let distance = 0;
-			if ( lightAttribute.FarAttenuationEnd !== undefined ) {
-
-				if ( lightAttribute.EnableFarAttenuation !== undefined && lightAttribute.EnableFarAttenuation.value === 0 ) {
-
-					distance = 0;
-
-				} else {
-
-					distance = lightAttribute.FarAttenuationEnd.value;
-
-				}
-
-			}
-
 			// TODO: could this be calculated linearly from FarAttenuationStart to FarAttenuationEnd?
 			const decay = 1;
 
 			switch ( type ) {
 
 				case 0: // Point
-					model = new PointLight( color, intensity, distance, decay );
+					model = new PointLight( color, intensity, 0, decay );
 					break;
 
 				case 1: // Directional
@@ -1254,7 +1239,7 @@ class FBXTreeParser {
 
 					}
 
-					model = new SpotLight( color, intensity, distance, angle, penumbra, decay );
+					model = new SpotLight( color, intensity, 0, angle, penumbra, decay );
 					break;
 
 				default:

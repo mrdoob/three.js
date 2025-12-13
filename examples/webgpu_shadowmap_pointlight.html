@@ -47,7 +47,7 @@
 
 					const intensity = 200;
 
-					const light = new THREE.PointLight( color, intensity, 20 );
+					const light = new THREE.PointLight( color, intensity );
 					light.castShadow = true;
 					light.shadow.bias = - 0.005; // reduces self-shadowing on double-sided objects
 					light.shadow.mapSize.width = 128;
