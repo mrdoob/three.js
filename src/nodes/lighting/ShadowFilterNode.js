@@ -32,8 +32,7 @@ export const BasicShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord
 
 	}
 
-	// Manual depth comparison for better precision on mobile GPUs (especially Adreno)
-	return step( shadowCoord.z, basic.r );
+	return basic.compare( shadowCoord.z );
 
 } );
 
@@ -63,8 +62,7 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 
 		}
 
-		// Manual depth comparison for better precision on mobile GPUs (especially Adreno)
-		return step( compare, depth.r );
+		return depth.compare( compare );
 
 	};
 
@@ -110,8 +108,7 @@ export const PCFSoftShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoo
 
 		}
 
-		// Manual depth comparison for better precision on mobile GPUs (especially Adreno)
-		return step( compare, depth.r );
+		return depth.compare( compare );
 
 	};
 
