@@ -500,7 +500,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			}
 
 			// Depth textures require integer level, regular textures use float
-			const levelType = texture.isDepthTexture ? 'u32' : 'f32';
+			const levelType = texture.isDepthTexture ? 'u32' : 'f32'; 1;
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelType }( ${ levelSnippet } ) )`;
 
@@ -972,29 +972,31 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-			texture.store = node.isStorageTextureNode === true;
-			texture.mipLevel = texture.store ? node.mipLevel : 0;
-			texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
+				texture.store = node.isStorageTextureNode === true;
+				texture.mipLevel = texture.store ? node.mipLevel : 0;
+				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-			// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-			const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false );
+				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
+				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false );
 
-			if ( needsSampler ) {
+				if ( needsSampler ) {
 
-				const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, group );
-				sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
+					const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, group );
+					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-				bindings.push( sampler, texture );
+					bindings.push( sampler, texture );
 
-				uniformGPU = [ sampler, texture ];
+					uniformGPU = [ sampler, texture ];
 
-			} else {
+				} else {
 
-				bindings.push( texture );
+					bindings.push( texture );
 
-				uniformGPU = [ texture ];
+					uniformGPU = [ texture ];
 
-			}			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
+				}
+
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
 				const sharedData = this.getSharedDataFromNode( node );
 
@@ -1731,26 +1733,28 @@ ${ flowData.code }
 			const groupName = uniform.groupNode.name;
 			const uniformIndexes = this.bindingsIndexes[ groupName ];
 
-		if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'cubeDepthTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
+			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'cubeDepthTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
-			const texture = uniform.node.value;
+				const texture = uniform.node.value;
 
-			// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-			const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true );
+				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
+				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true );
 
-			if ( needsSampler ) {
+				if ( needsSampler ) {
 
-				if ( this.isSampleCompare( texture ) ) {
+					if ( this.isSampleCompare( texture ) ) {
 
-					bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
+						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
-				} else {
+					} else {
 
-					bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler;` );
+						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler;` );
+
+					}
 
 				}
 
-			}				let textureType;
+				let textureType;
 
 				let multisampled = '';
 
