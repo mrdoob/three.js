@@ -85,16 +85,15 @@
 				scene.add( mshStdFloor );
 
 				// Car shadow (AO plane)
-				const aoTexture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao_.png' );
+				const aoTexture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
 				const shadowPlane = new THREE.Mesh(
 					new THREE.PlaneGeometry( 256, 512 ),
 					new THREE.MeshBasicMaterial( {
-						color: 0x000000,
-						// map: aoTexture,
-						alphaMap: aoTexture,
-						// blending: THREE.SubstractiveBlending,
+						map: aoTexture,
+						blending: THREE.MultiplyBlending,
 						depthWrite: false,
-						transparent: true
+						transparent: true,
+						premultipliedAlpha: true
 					} )
 				);
 				shadowPlane.rotation.x = - Math.PI / 2;
