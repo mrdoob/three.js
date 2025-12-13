@@ -500,7 +500,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			}
 
 			// Depth textures require integer level, regular textures use float
-			const levelType = texture.isDepthTexture ? 'u32' : 'f32'; 1;
+			const levelType = texture.isDepthTexture ? 'u32' : 'f32';
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelType }( ${ levelSnippet } ) )`;
 
