@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '182';
+const REVISION = '183dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -3667,7 +3667,7 @@ class Quaternion {
 	 * @param {number} srcOffset0 - An offset into the first source array.
 	 * @param {Array<number>} src1 -  The source array of the second quaternion.
 	 * @param {number} srcOffset1 - An offset into the second source array.
-	 * @param {number} t - The interpolation factor in the range `[0,1]`.
+	 * @param {number} t - The interpolation factor. A value in the range `[0,1]` will interpolate. A value outside the range `[0,1]` will extrapolate.
 	 * @see {@link Quaternion#slerp}
 	 */
 	static slerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
@@ -3681,28 +3681,6 @@ class Quaternion {
 			y1 = src1[ srcOffset1 + 1 ],
 			z1 = src1[ srcOffset1 + 2 ],
 			w1 = src1[ srcOffset1 + 3 ];
-
-		if ( t <= 0 ) {
-
-			dst[ dstOffset + 0 ] = x0;
-			dst[ dstOffset + 1 ] = y0;
-			dst[ dstOffset + 2 ] = z0;
-			dst[ dstOffset + 3 ] = w0;
-
-			return;
-
-		}
-
-		if ( t >= 1 ) {
-
-			dst[ dstOffset + 0 ] = x1;
-			dst[ dstOffset + 1 ] = y1;
-			dst[ dstOffset + 2 ] = z1;
-			dst[ dstOffset + 3 ] = w1;
-
-			return;
-
-		}
 
 		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
 
@@ -4345,17 +4323,13 @@ class Quaternion {
 	}
 
 	/**
-	 * Performs a spherical linear interpolation between quaternions.
+	 * Performs a spherical linear interpolation between this quaternion and the target quaternion.
 	 *
 	 * @param {Quaternion} qb - The target quaternion.
-	 * @param {number} t - The interpolation factor in the closed interval `[0, 1]`.
+	 * @param {number} t - The interpolation factor. A value in the range `[0,1]` will interpolate. A value outside the range `[0,1]` will extrapolate.
 	 * @return {Quaternion} A reference to this quaternion.
 	 */
 	slerp( qb, t ) {
-
-		if ( t <= 0 ) return this;
-
-		if ( t >= 1 ) return this.copy( qb ); // copy calls _onChangeCallback()
 
 		let x = qb._x, y = qb._y, z = qb._z, w = qb._w;
 

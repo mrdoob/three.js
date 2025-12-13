@@ -47814,8 +47814,11 @@ class Background extends DataMap {
 				// compute vertex position
 				const modifiedPosition = isOrtho.select( positionLocal.mul( orthoScale ), positionLocal );
 
-				// By using a w component of 0, the skybox will not translate when the camera moves through the scene
-				let viewProj = cameraProjectionMatrix.mul( modelViewMatrix.mul( vec4( modifiedPosition, 0.0 ) ) );
+				// by using a w component of 0, the skybox will not translate when the camera moves through the scene
+				const viewPosition = modelViewMatrix.mul( vec4( modifiedPosition, 0.0 ) );
+
+				// we force w=1.0 here to prevent the w_clip=0 divide-by-zero error for ortho cameras.
+				let viewProj = cameraProjectionMatrix.mul( vec4( viewPosition.xyz, 1.0 ) );
 
 				// force background to far plane so it does not occlude objects
 				viewProj = viewProj.setZ( viewProj.w );
@@ -57670,8 +57673,7 @@ class Renderer {
 		 * and pipeline updates.
 		 *
 		 * @private
-		 * @type {?Function}
-		 * @default null
+		 * @type {Function}
 		 */
 		this._handleObjectFunction = this._renderObjectDirect;
 
@@ -57957,6 +57959,7 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
+		const previousHandleObjectFunction = this._handleObjectFunction;
 		const previousCompilationPromises = this._compilationPromises;
 
 		//
@@ -58040,7 +58043,15 @@ class Renderer {
 
 		//
 
-		this._background.update( sceneRef, renderList, renderContext );
+		if ( targetScene !== scene ) {
+
+			this._background.update( targetScene, renderList, renderContext );
+
+		} else {
+
+			this._background.update( sceneRef, renderList, renderContext );
+
+		}
 
 		// process render lists
 
@@ -58058,9 +58069,8 @@ class Renderer {
 
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
+		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
-
-		this._handleObjectFunction = this._renderObjectDirect;
 
 		// wait for all promises setup by backends awaiting compilation/linking/pipeline creation to complete
 
@@ -58458,6 +58468,7 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
+		const previousHandleObjectFunction = this._handleObjectFunction;
 
 		//
 
@@ -58490,6 +58501,7 @@ class Renderer {
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
+		this._handleObjectFunction = this._renderObjectDirect;
 
 		//
 
@@ -58689,6 +58701,7 @@ class Renderer {
 
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
+		this._handleObjectFunction = previousHandleObjectFunction;
 
 		//
 
@@ -70604,7 +70617,7 @@ const GPUPrimitiveTopology = {
 	TriangleStrip: 'triangle-strip',
 };
 
-const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+const GPUShaderStage = ( typeof self !== 'undefined' && self.GPUShaderStage ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
 
 const GPUCompareFunction = {
 	Never: 'never',
