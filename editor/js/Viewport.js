@@ -412,6 +412,20 @@ function Viewport( editor ) {
 		selectionBox.visible = false;
 		transformControls.detach();
 
+		// Hide range on all PointLightHelpers, then show for selected
+
+		for ( const id in editor.helpers ) {
+
+			const helper = editor.helpers[ id ];
+
+			if ( helper.isPointLightHelper ) {
+
+				helper.showRange = ( helper.light === object );
+
+			}
+
+		}
+
 		if ( object !== null && object !== scene && object !== camera ) {
 
 			box.setFromObject( object, true );

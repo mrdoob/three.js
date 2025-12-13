@@ -396,32 +396,6 @@ Editor.prototype = {
 
 					helper = new THREE.PointLightHelper( object, 1 );
 
-					helper.matrix = new THREE.Matrix4();
-					helper.matrixAutoUpdate = true;
-
-					const light = object;
-					const editor = this;
-
-					helper.updateMatrixWorld = function () {
-
-						light.getWorldPosition( this.position );
-
-						const distance = editor.viewportCamera.position.distanceTo( this.position );
-						this.scale.setScalar( distance / 30 );
-
-						this.updateMatrix();
-						this.matrixWorld.copy( this.matrix );
-
-						const children = this.children;
-
-						for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-							children[ i ].updateMatrixWorld();
-
-						}
-
-					};
-
 				} else if ( object.isDirectionalLight ) {
 
 					helper = new THREE.DirectionalLightHelper( object, 1 );
