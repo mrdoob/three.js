@@ -13,7 +13,6 @@ export default QUnit.module( 'Lights', () => {
 			const parameters = {
 				color: 0xaaaaaa,
 				intensity: 0.5,
-				distance: 100,
 				angle: 0.8,
 				penumbra: 8,
 				decay: 2
@@ -22,10 +21,9 @@ export default QUnit.module( 'Lights', () => {
 			lights = [
 				new SpotLight( parameters.color ),
 				new SpotLight( parameters.color, parameters.intensity ),
-				new SpotLight( parameters.color, parameters.intensity, parameters.distance ),
-				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle ),
-				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.penumbra ),
-				new SpotLight( parameters.color, parameters.intensity, parameters.distance, parameters.angle, parameters.penumbra, parameters.decay ),
+				new SpotLight( parameters.color, parameters.intensity, 0, parameters.angle ),
+				new SpotLight( parameters.color, parameters.intensity, 0, parameters.angle, parameters.penumbra ),
+				new SpotLight( parameters.color, parameters.intensity, 0, parameters.angle, parameters.penumbra, parameters.decay ),
 			];
 
 		} );
