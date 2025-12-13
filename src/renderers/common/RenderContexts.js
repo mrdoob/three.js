@@ -1,11 +1,9 @@
 import ChainMap from './ChainMap.js';
 import RenderContext from './RenderContext.js';
 import { Scene } from '../../scenes/Scene.js';
-import { Camera } from '../../cameras/Camera.js';
 
 const _chainKeys = [];
 const _defaultScene = /*@__PURE__*/ new Scene();
-const _defaultCamera = /*@__PURE__*/ new Camera();
 
 /**
  * This module manages the render contexts of the renderer.
@@ -30,22 +28,20 @@ class RenderContexts {
 	}
 
 	/**
-	 * Returns a render context for the given scene, camera and render target.
+	 * Returns a render context for the given scene, render target and MRT config.
 	 *
 	 * @param {Scene} scene - The scene.
-	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {?RenderTarget} [renderTarget=null] - The active render target.
-	 * @param {?MRT} [mrt=null] - The active multiple render target.
+	 * @param {?MRTNode} [mrt=null] - The MRT configuration.
 	 * @return {RenderContext} The render context.
 	 */
-	get( scene, camera, renderTarget = null, mrt = null ) {
+	get( scene, renderTarget = null, mrt = null ) {
 
 		_chainKeys[ 0 ] = scene;
-		_chainKeys[ 1 ] = camera;
 
 		if ( mrt !== null ) {
 
-			_chainKeys[ 2 ] = mrt;
+			_chainKeys[ 1 ] = mrt;
 
 		}
 
@@ -92,7 +88,7 @@ class RenderContexts {
 	 */
 	getForClear( renderTarget = null ) {
 
-		return this.get( _defaultScene, _defaultCamera, renderTarget );
+		return this.get( _defaultScene, renderTarget );
 
 	}
 
