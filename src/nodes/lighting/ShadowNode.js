@@ -401,7 +401,8 @@ class ShadowNode extends ShadowBaseNode {
 
 		const depthTexture = new DepthTexture( shadow.mapSize.width, shadow.mapSize.height );
 		depthTexture.name = 'ShadowDepthTexture';
-		depthTexture.compareFunction = LessCompare;
+		// Don't use compareFunction - manual comparison is more reliable on mobile GPUs (especially Adreno)
+		// depthTexture.compareFunction = LessCompare;
 
 		const shadowMap = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 		shadowMap.texture.name = 'ShadowMap';

@@ -44,7 +44,8 @@ const _cubeUpsWebGL = [
 
 export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp } ) => {
 
-	return cubeTexture( depthTexture, bd3D ).compare( dp );
+	// Manual depth comparison for better precision on mobile GPUs (especially Adreno)
+	return step( dp, cubeTexture( depthTexture, bd3D ).r );
 
 } );
 
@@ -84,12 +85,16 @@ export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, s
 	const sample3 = vogelDiskSample( 3, 5, phi );
 	const sample4 = vogelDiskSample( 4, 5, phi );
 
-	return cubeTexture( depthTexture, bd3D.add( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ) ).compare( dp )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.mul( 1.0 / 5.0 );
+	// Manual depth comparison for better precision on mobile GPUs (especially Adreno)
+	const sampleAndCompare = ( offset ) => step( dp, cubeTexture( depthTexture, bd3D.add( offset ) ).r );
+
+	return add(
+		sampleAndCompare( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ),
+		sampleAndCompare( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ),
+		sampleAndCompare( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ),
+		sampleAndCompare( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ),
+		sampleAndCompare( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) )
+	).mul( 1.0 / 5.0 );
 
 } );
 
@@ -109,7 +114,7 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	If( lightToPositionLength.sub( cameraFarLocal ).lessThanEqual( 0.0 ).and( lightToPositionLength.sub( cameraNearLocal ).greaterThanEqual( 0.0 ) ), () => {
 
 		// dp = normalized distance from light to fragment position
-		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar(); // need to clamp?
+		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar();
 		dp.addAssign( bias );
 
 		// bd3D = base direction 3D (direction from light to fragment)
@@ -205,7 +210,8 @@ class PointShadowNode extends ShadowNode {
 
 		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
 		depthTexture.name = 'PointShadowDepthTexture';
-		depthTexture.compareFunction = LessCompare;
+		// Don't use compareFunction - manual comparison is more reliable on mobile GPUs (especially Adreno)
+		// depthTexture.compareFunction = LessCompare;
 
 		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
 		shadowMap.texture.name = 'PointShadowMap';
