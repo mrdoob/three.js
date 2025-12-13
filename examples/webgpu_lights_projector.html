@@ -108,7 +108,7 @@
 				projectorLight.position.set( 2.5, 5, 2.5 );
 				projectorLight.angle = Math.PI / 6;
 				projectorLight.penumbra = 1;
-				projectorLight.decay = 0;
+				projectorLight.decay = 2;
 
 				projectorLight.castShadow = true;
 				projectorLight.shadow.mapSize.width = 1024;
@@ -161,7 +161,6 @@
 					type: 'procedural',
 					color: projectorLight.color.getHex(),
 					intensity: projectorLight.intensity,
-					distance: projectorLight.distance,
 					angle: projectorLight.angle,
 					penumbra: projectorLight.penumbra,
 					decay: projectorLight.decay,
@@ -223,13 +222,6 @@
 				gui.add( params, 'intensity', 0, 500 ).onChange( function ( val ) {
 
 					projectorLight.intensity = val;
-
-				} );
-
-
-				gui.add( params, 'distance', 0, 20 ).onChange( function ( val ) {
-
-					projectorLight.distance = val;
 
 				} );
 
