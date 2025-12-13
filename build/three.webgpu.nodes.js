@@ -31137,7 +31137,7 @@ class Pipelines extends DataMap {
 	 * @param {ProgrammableStage} stageFragment - The programmable stage representing the fragment shader.
 	 * @param {string} cacheKey - The cache key.
 	 * @param {?Array<Promise>} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
-	 * @return {ComputePipeline} The compute pipeline.
+	 * @return {RenderPipeline} The render pipeline.
 	 */
 	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises ) {
 
@@ -43968,7 +43968,7 @@ class ShadowNode extends ShadowBaseNode {
 		shadowCoord = vec3(
 			shadowCoord.x,
 			shadowCoord.y.oneMinus(), // follow webgpu standards
-			coordZ.add( bias )
+			coordZ.add( bias ).saturate() // clamp to [0,1] for consistent depth comparison across GPUs
 		);
 
 		return shadowCoord;
@@ -44529,8 +44529,9 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	If( lightToPositionLength.sub( cameraFarLocal ).lessThanEqual( 0.0 ).and( lightToPositionLength.sub( cameraNearLocal ).greaterThanEqual( 0.0 ) ), () => {
 
 		// dp = normalized distance from light to fragment position
-		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar(); // need to clamp?
+		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar();
 		dp.addAssign( bias );
+		dp.assign( dp.saturate() ); // clamp to [0,1] for consistent depth comparison across GPUs
 
 		// bd3D = base direction 3D (direction from light to fragment)
 		const bd3D = lightToPosition.normalize();
