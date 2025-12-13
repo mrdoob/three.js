@@ -11,7 +11,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { Compatibility, IntType, LessCompare, NearestFilter, UnsignedIntType } from '../../constants.js';
 
 import { Texture } from '../../textures/Texture.js';
-import { warn } from '../../utils.js';
+import { warn, warnOnce } from '../../utils.js';
 
 const EmptyTexture = /*@__PURE__*/ new Texture();
 
@@ -403,7 +403,7 @@ class TextureNode extends UniformNode {
 
 			} else {
 
-				if ( this.value.compareFunction !== LessCompare ) {
+				if ( this.value.compareFunction !== null && this.value.compareFunction !== LessCompare ) {
 
 					warnOnce( 'TSL: Only "LessCompare" is supported for depth texture comparison fallback.' );
 
