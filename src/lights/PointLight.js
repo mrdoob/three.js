@@ -9,7 +9,7 @@ import { PointLightShadow } from './PointLightShadow.js';
  * This light can cast shadows - see the {@link PointLightShadow} for details.
  *
  * ```js
- * const light = new THREE.PointLight( 0xff0000, 1, 100 );
+ * const light = new THREE.PointLight( 0xff0000, 1 );
  * light.position.set( 50, 50, 50 );
  * scene.add( light );
  * ```
@@ -23,7 +23,7 @@ class PointLight extends Light {
 	 *
 	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
 	 * @param {number} [intensity=1] - The light's strength/intensity measured in candela (cd).
-	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
+	 * @param {number} [distance=0] - Deprecated. Distance is now computed from intensity and decay.
 	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
 	 */
 	constructor( color, intensity, distance = 0, decay = 2 ) {
@@ -41,17 +41,11 @@ class PointLight extends Light {
 
 		this.type = 'PointLight';
 
-		/**
-		 * When distance is zero, light will attenuate according to inverse-square
-		 * law to infinite distance. When distance is non-zero, light will attenuate
-		 * according to inverse-square law until near the distance cutoff, where it
-		 * will then attenuate quickly and smoothly to 0. Inherently, cutoffs are not
-		 * physically correct.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.distance = distance;
+		if ( distance > 0 ) {
+
+			console.warn( 'THREE.PointLight: "distance" is now computed from "intensity" and "decay".' );
+
+		}
 
 		/**
 		 * The amount the light dims along the distance of the light. In context of
@@ -92,6 +86,35 @@ class PointLight extends Light {
 
 	}
 
+	/**
+	 * The maximum range of the light, computed from intensity and decay.
+	 *
+	 * @type {number}
+	 */
+	get distance() {
+
+		// Compute effective distance from intensity and decay
+		// Distance where intensity drops to 1% (threshold = 0.01)
+		if ( this.decay > 0 ) {
+
+			return Math.pow( this.intensity / 0.01, 1 / this.decay );
+
+		}
+
+		return 0;
+
+	}
+
+	set distance( value ) {
+
+		if ( value > 0 ) {
+
+			console.warn( 'THREE.PointLight: "distance" is now computed from "intensity" and "decay".' );
+
+		}
+
+	}
+
 	dispose() {
 
 		super.dispose();
@@ -104,7 +127,6 @@ class PointLight extends Light {
 
 		super.copy( source, recursive );
 
-		this.distance = source.distance;
 		this.decay = source.decay;
 
 		this.shadow = source.shadow.clone();
@@ -117,7 +139,6 @@ class PointLight extends Light {
 
 		const data = super.toJSON( meta );
 
-		data.object.distance = this.distance;
 		data.object.decay = this.decay;
 
 		data.object.shadow = this.shadow.toJSON();

@@ -896,7 +896,7 @@ class ObjectLoader extends Loader {
 
 			case 'PointLight':
 
-				object = new PointLight( data.color, data.intensity, data.distance, data.decay );
+				object = new PointLight( data.color, data.intensity, 0, data.decay );
 
 				break;
 
@@ -908,7 +908,7 @@ class ObjectLoader extends Loader {
 
 			case 'SpotLight':
 
-				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
+				object = new SpotLight( data.color, data.intensity, 0, data.angle, data.penumbra, data.decay );
 				object.target = data.target || '';
 
 				break;

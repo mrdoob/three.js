@@ -31,7 +31,7 @@ class SpotLight extends Light {
 	 *
 	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
 	 * @param {number} [intensity=1] - The light's strength/intensity measured in candela (cd).
-	 * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
+	 * @param {number} [distance=0] - Deprecated. Distance is now computed from intensity and decay.
 	 * @param {number} [angle=Math.PI/3] - Maximum angle of light dispersion from its direction whose upper bound is `Math.PI/2`.
 	 * @param {number} [penumbra=0] - Percent of the spotlight cone that is attenuated due to penumbra. Value range is `[0,1]`.
 	 * @param {number} [decay=2] - The amount the light dims along the distance of the light.
@@ -68,13 +68,11 @@ class SpotLight extends Light {
 		 */
 		this.target = new Object3D();
 
-		/**
-		 * Maximum range of the light. `0` means no limit.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.distance = distance;
+		if ( distance > 0 ) {
+
+			console.warn( 'THREE.SpotLight: "distance" is now computed from "intensity" and "decay".' );
+
+		}
 
 		/**
 		 * Maximum angle of light dispersion from its direction whose upper bound is `Math.PI/2`.
@@ -145,6 +143,35 @@ class SpotLight extends Light {
 
 	}
 
+	/**
+	 * The maximum range of the light, computed from intensity and decay.
+	 *
+	 * @type {number}
+	 */
+	get distance() {
+
+		// Compute effective distance from intensity and decay
+		// Distance where intensity drops to 1% (threshold = 0.01)
+		if ( this.decay > 0 ) {
+
+			return Math.pow( this.intensity / 0.01, 1 / this.decay );
+
+		}
+
+		return 0;
+
+	}
+
+	set distance( value ) {
+
+		if ( value > 0 ) {
+
+			console.warn( 'THREE.SpotLight: "distance" is now computed from "intensity" and "decay".' );
+
+		}
+
+	}
+
 	dispose() {
 
 		super.dispose();
@@ -157,7 +184,6 @@ class SpotLight extends Light {
 
 		super.copy( source, recursive );
 
-		this.distance = source.distance;
 		this.angle = source.angle;
 		this.penumbra = source.penumbra;
 		this.decay = source.decay;
@@ -174,7 +200,6 @@ class SpotLight extends Light {
 
 		const data = super.toJSON( meta );
 
-		data.object.distance = this.distance;
 		data.object.angle = this.angle;
 		data.object.decay = this.decay;
 		data.object.penumbra = this.penumbra;
