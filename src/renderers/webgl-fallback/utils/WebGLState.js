@@ -377,11 +377,11 @@ class WebGLState {
 							break;
 
 						case SubtractiveBlending:
-							error( 'WebGLState: SubtractiveBlending requires material.premultipliedAlpha = true' );
+							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
 							break;
 
 						case MultiplyBlending:
-							error( 'WebGLState: MultiplyBlending requires material.premultipliedAlpha = true' );
+							gl.blendFuncSeparate( gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
 							break;
 
 						default:

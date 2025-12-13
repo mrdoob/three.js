@@ -448,11 +448,11 @@ class WebGPUPipelineUtils {
 						break;
 
 					case SubtractiveBlending:
-						error( 'WebGPURenderer: SubtractiveBlending requires material.premultipliedAlpha = true' );
+						setBlend( GPUBlendFactor.Zero, GPUBlendFactor.OneMinusSrc, GPUBlendFactor.Zero, GPUBlendFactor.One );
 						break;
 
 					case MultiplyBlending:
-						error( 'WebGPURenderer: MultiplyBlending requires material.premultipliedAlpha = true' );
+						setBlend( GPUBlendFactor.Dst, GPUBlendFactor.OneMinusSrcAlpha, GPUBlendFactor.Zero, GPUBlendFactor.One );
 						break;
 
 				}
