@@ -139,7 +139,7 @@ class WebGPUBackend extends Backend {
 
 		// compatibility checks
 
-		const compatibilityDepthTextureCompare = typeof navigator === 'undefined' ? true : /Android/.test( navigator.userAgent ) === false;
+		const compatibilityTextureCompare = typeof navigator === 'undefined' ? true : /Android/.test( navigator.userAgent ) === false;
 
 		/**
 		 * A map of compatibility checks.
@@ -147,7 +147,7 @@ class WebGPUBackend extends Backend {
 		 * @type {Object}
 		 */
 		this._compatibility = {
-			[ Compatibility.TEXTURE_COMPARE ]: compatibilityDepthTextureCompare
+			[ Compatibility.TEXTURE_COMPARE ]: compatibilityTextureCompare
 		};
 
 	}
