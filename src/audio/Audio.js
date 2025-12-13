@@ -736,6 +736,35 @@ class Audio extends Object3D {
 
 	}
 
+	/**
+	 * Fades the audio in by increasing volume gradually from `volumeNow` to `volumeThen`,
+	 * within the passed time interval.
+	 *
+	 * @param {number} duration - The duration of the fade.
+	 * @param {number} [volumeNow=0] - The volume at the start of the fade.
+	 * @param {number} [volumeThen=1] - The volume at the end of the fade.
+	 * @return {Audio} A reference to this instance.
+	 */
+	fadeIn( duration, volumeNow = 0, volumeThen = 1 ) {
+
+		return this._scheduleFading( duration, volumeNow, volumeThen );
+
+	}
+
+	/**
+	 * Fades the audio out by decreasing volume gradually from the current volume to `volumeThen`,
+	 * within the passed time interval.
+	 *
+	 * @param {number} duration - The duration of the fade.
+	 * @param {number} [volumeThen=0] - The volume at the end of the fade.
+	 * @return {Audio} A reference to this instance.
+	 */
+	fadeOut( duration, volumeThen = 0 ) {
+
+		return this._scheduleFading( duration, this.getVolume(), volumeThen );
+
+	}
+
 	copy( source, recursive ) {
 
 		super.copy( source, recursive );
@@ -770,6 +799,25 @@ class Audio extends Object3D {
 	clone( recursive ) {
 
 		return new this.constructor( this.listener ).copy( this, recursive );
+
+	}
+
+	_scheduleFading( duration, volumeNow, volumeThen ) {
+
+		const currentTime = this.listener.context.currentTime;
+		/**
+		 * 95% of the duration.
+		 *
+		 * Reference: {@link https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/setTargetAtTime#choosing_a_good_timeconstant}
+		 */
+		const timeConstant = duration / 3;
+
+		this.gain.gain
+			.cancelScheduledValues( currentTime )
+			.setValueAtTime( volumeNow, currentTime )
+			.setTargetAtTime( volumeThen, currentTime, timeConstant );
+
+		return this;
 
 	}
 
