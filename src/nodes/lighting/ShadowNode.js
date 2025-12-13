@@ -377,7 +377,7 @@ class ShadowNode extends ShadowBaseNode {
 		shadowCoord = vec3(
 			shadowCoord.x,
 			shadowCoord.y.oneMinus(), // follow webgpu standards
-			coordZ.add( bias )
+			coordZ.add( bias ).saturate() // clamp to [0,1] for consistent depth comparison across GPUs
 		);
 
 		return shadowCoord;

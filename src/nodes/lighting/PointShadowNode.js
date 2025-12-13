@@ -109,8 +109,9 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	If( lightToPositionLength.sub( cameraFarLocal ).lessThanEqual( 0.0 ).and( lightToPositionLength.sub( cameraNearLocal ).greaterThanEqual( 0.0 ) ), () => {
 
 		// dp = normalized distance from light to fragment position
-		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar(); // need to clamp?
+		const dp = lightToPositionLength.sub( cameraNearLocal ).div( cameraFarLocal.sub( cameraNearLocal ) ).toVar();
 		dp.addAssign( bias );
+		dp.assign( dp.saturate() ); // clamp to [0,1] for consistent depth comparison across GPUs
 
 		// bd3D = base direction 3D (direction from light to fragment)
 		const bd3D = lightToPosition.normalize();
