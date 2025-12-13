@@ -45,7 +45,7 @@
 
 				function createLight( color ) {
 
-					const intensity = 200;
+					const intensity = 4;
 
 					const light = new THREE.PointLight( color, intensity );
 					light.castShadow = true;
@@ -55,7 +55,7 @@
 
 					let geometry = new THREE.SphereGeometry( 0.3, 12, 6 );
 					let material = new THREE.MeshBasicMaterial( { color: color } );
-					material.color.multiplyScalar( intensity );
+					material.color.multiplyScalar( 50 );
 					let sphere = new THREE.Mesh( geometry, material );
 					light.add( sphere );
 
