@@ -1687,7 +1687,7 @@ export const InterpolationSamplingMode = {
  * @constant
  */
 export const Compatibility = {
-	DEPTH_TEXTURE_COMPARE: 'depthTextureCompare'
+	TEXTURE_COMPARE: 'depthTextureCompare'
 };
 
 /**

@@ -602,7 +602,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	isSampleCompare( texture ) {
 
-		return texture.isDepthTexture === true && texture.compareFunction !== null && this.renderer.hasCompatibility( Compatibility.DEPTH_TEXTURE_COMPARE );
+		return texture.isDepthTexture === true && texture.compareFunction !== null && this.renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE );
 
 	}
 

@@ -397,7 +397,7 @@ class TextureNode extends UniformNode {
 
 		if ( this.compareNode !== null ) {
 
-			if ( builder.renderer.hasCompatibility( Compatibility.DEPTH_TEXTURE_COMPARE ) ) {
+			if ( builder.renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 				compareNode = this.compareNode;
 

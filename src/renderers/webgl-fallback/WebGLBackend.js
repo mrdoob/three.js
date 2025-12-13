@@ -2005,7 +2005,7 @@ class WebGLBackend extends Backend {
 	 */
 	hasCompatibility( name ) {
 
-		if ( name === Compatibility.DEPTH_TEXTURE_COMPARE ) return true;
+		if ( name === Compatibility.TEXTURE_COMPARE ) return true;
 
 		return super.hasCompatibility( name );
 

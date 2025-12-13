@@ -147,7 +147,7 @@ class WebGPUBackend extends Backend {
 		 * @type {Object}
 		 */
 		this._compatibility = {
-			[ Compatibility.DEPTH_TEXTURE_COMPARE ]: compatibilityDepthTextureCompare
+			[ Compatibility.TEXTURE_COMPARE ]: compatibilityDepthTextureCompare
 		};
 
 	}
@@ -2520,9 +2520,9 @@ class WebGPUBackend extends Backend {
 	 */
 	hasCompatibility( name ) {
 
-		if ( this._compatibility[ Compatibility.DEPTH_TEXTURE_COMPARE ] !== undefined ) {
+		if ( this._compatibility[ Compatibility.TEXTURE_COMPARE ] !== undefined ) {
 
-			return this._compatibility[ Compatibility.DEPTH_TEXTURE_COMPARE ];
+			return this._compatibility[ Compatibility.TEXTURE_COMPARE ];
 
 		}
 
