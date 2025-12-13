@@ -250,26 +250,12 @@ scene.add(helper);
 }
 -updateLight();
 </pre>
-<p><a href="/docs/#api/zh/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> 不是一个点，而是在光源的位置绘制了一个小小的线框宝石体来代表点光源。也可以使用其他形状来表示点光源，只要给点光源添加一个自定义的 <a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 子节点即可。</p>
-<p>点光源（<a href="/docs/#api/zh/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>）有额外的一个范围（<a href="/docs/#api/zh/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>）属性。
-如果 <code class="notranslate" translate="no">distance</code> 设为 0，则光线可以照射到无限远处。如果大于 0，则只可以照射到指定的范围，光照强度在这个过程中逐渐衰减，在光源位置时，<code class="notranslate" translate="no">intensity</code> 是设定的大小，在距离光源 <code class="notranslate" translate="no">distance</code> 位置的时候，<code class="notranslate" translate="no">intensity</code> 为 0。</p>
-<p>下面是添加对 distance 参数控制的代码：</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'intensity', 0, 250, 1);
-+gui.add(light, 'distance', 0, 40).onChange(updateLight);
-
-makeXYZGUI(gui, light.position, 'position', updateLight);
--makeXYZGUI(gui, light.target.position, 'target', updateLight);
-</pre>
-<p>效果如下：</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/lights-point.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
-<p>注意 <code class="notranslate" translate="no">distance</code> &gt; 0 时光照强度的衰减现象。</p>
 <h2 id="-spotlight-">聚光灯（<a href="/docs/#api/zh/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>）</h2>
 <p>聚光灯可以看成是一个点光源被一个圆锥体限制住了光照的范围。实际上有两个圆锥，内圆锥和外圆锥。光照强度在两个锥体之间从设定的强度递减到 0（具体可以看下方 <a href="/docs/#api/zh/lights/SpotLight#penumbra"><code class="notranslate" translate="no">penumbra</code></a> 参数）。</p>
 <p>聚光灯（<a href="/docs/#api/zh/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>）类似方向光（<a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>）一样需要一个目标点，光源的位置是圆锥的顶点，目标点处于圆锥的中轴线上。</p>
@@ -299,7 +285,7 @@ scene.add(helper);
 
 <p></p>
 <p>注意观察，当 <code class="notranslate" translate="no">penumbra</code> 为默认值 0 的时候，聚光灯会有非常清晰的边缘，而当把 <code class="notranslate" translate="no">penumbra</code> 向 1 调节的时候，边缘会开始模糊。</p>
-<p>示例中有点难以看到聚光灯的整个圆锥体，因为圆锥底部在平面下方。将 <code class="notranslate" translate="no">distance</code> 减小到 5 左右，就可以看到圆锥的底部。</p>
+<p>示例中有点难以看到聚光灯的整个圆锥体，因为圆锥底部在平面下方。</p>
 <h2 id="-rectarealight-">矩形区域光（<a href="/docs/#api/zh/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>）</h2>
 <p>Three.js 中还有一种类型的光照，矩形区域光（<a href="/docs/#api/zh/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>）, 顾名思义，表示一个矩形区域的发射出来的光照，例如长条的日光灯或者天花板上磨砂玻璃透进来的自然光。</p>
 <p><a href="/docs/#api/zh/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> 只能影响 <a href="/docs/#api/zh/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a> 和 <a href="/docs/#api/zh/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>，所以我们把所有的材质都改为 <a href="/docs/#api/zh/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>。</p>

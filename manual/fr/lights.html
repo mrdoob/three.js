@@ -308,31 +308,12 @@ scene.add(helper);
 }
 -updateLight();
 </pre>
-<p>Notez qu'à un certain niveau, un <a href="/docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">Helper de Lumière Ponctuelle</code></a> n'a pas de... point.
-Il dessine simplement un petit losange en fil de fer. Cela pourrait tout aussi facilement
-être n'importe quelle forme que vous souhaitez, il suffit d'ajouter un maillage à la lumière elle-même.</p>
-<p>Une <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">Lumière Ponctuelle</code></a> a la propriété supplémentaire de <a href="/docs/#api/en/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>.
-Si la <code class="notranslate" translate="no">distance</code> est 0, alors la <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">Lumière Ponctuelle</code></a> brille à
-l'infini. Si la <code class="notranslate" translate="no">distance</code> est supérieure à 0, alors la lumière brille
-à pleine intensité au niveau de la lumière et s'estompe jusqu'à ne plus avoir d'influence à
-<code class="notranslate" translate="no">distance</code> unités de distance de la lumière.</p>
-<p>Configurons l'interface GUI pour que nous puissions ajuster la distance.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('couleur');
-gui.add(light, 'intensity', 0, 250, 1);
-+gui.add(light, 'distance', 0, 40).onChange(updateLight);
-
-makeXYZGUI(gui, light.position, 'position', updateLight);
--makeXYZGUI(gui, light.target.position, 'target', updateLight);
-</pre>
-<p>Et maintenant, essayez.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/lights-point.html" target="_blank">cliquez ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>Remarquez quand <code class="notranslate" translate="no">distance</code> est > 0 comment la lumière s'estompe.</p>
 <h2 id="-spotlight-"><a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a></h2>
 <p>Les projecteurs sont effectivement une lumière ponctuelle avec un cône
 attaché où la lumière ne brille qu'à l'intérieur du cône.
@@ -378,8 +359,7 @@ le centre du cône extérieur.</p>
 <p>Remarquez qu'avec la <code class="notranslate" translate="no">penumbra</code> par défaut de 0, le projecteur a un bord très net,
 tandis que lorsque vous ajustez la <code class="notranslate" translate="no">penumbra</code> vers 1, le bord devient flou.</p>
 <p>Il peut être difficile de voir le <em>cône</em> du projecteur. La raison est qu'il est
-en dessous du sol. Raccourcissez la distance à environ 5 et vous verrez l'extrémité ouverte
-du cône.</p>
+en dessous du sol.</p>
 <h2 id="-rectarealight-"><a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a></h2>
 <p>Il existe un autre type de lumière, la <a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">Lumière Rectangulaire</code></a>, qui représente
 exactement ce à quoi cela ressemble : une zone rectangulaire de lumière, comme un long
