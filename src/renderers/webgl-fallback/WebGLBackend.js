@@ -1597,7 +1597,7 @@ class WebGLBackend extends Backend {
 	 */
 	createComputePipeline( computePipeline, bindings, promises = null ) {
 
-		const { state, gl } = this;
+		const { gl } = this;
 
 		// Program
 
