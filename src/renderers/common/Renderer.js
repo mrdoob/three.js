@@ -1025,7 +1025,7 @@ class Renderer {
 	 * Compile compute programs. This can be useful to avoid a
 	 * phenomenon which is called "shader compilation stutter", which occurs when
 	 * rendering an object with a new shader for the first time.
-	 * 
+	 *
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
 	 * @param {Function} onProgress - A callback that is called when the compile has been finished.

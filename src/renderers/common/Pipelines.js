@@ -312,7 +312,7 @@ class Pipelines extends DataMap {
 	 * @param {ProgrammableStage} stageCompute - The programmable stage representing the compute shader.
 	 * @param {string} cacheKey - The cache key.
 	 * @param {Array<BindGroup>} bindings - The bindings.
-	 * @param {Promise[]} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`. 
+	 * @param {Promise[]} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
 	 * @return {ComputePipeline} The compute pipeline.
 	 */
 	_getComputePipeline( computeNode, stageCompute, cacheKey, bindings, promises ) {

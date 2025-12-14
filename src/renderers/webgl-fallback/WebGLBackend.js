@@ -1713,7 +1713,7 @@ class WebGLBackend extends Backend {
 
 	/**
 	 * Completes the compute pipeline setup for the given compute pipeline.
-	 * 
+	 *
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
 	 */
