@@ -15,7 +15,7 @@ import {
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
 
-import { error } from '../../../utils.js';
+import { error, warnOnce } from '../../../utils.js';
 
 /**
  * A WebGPU backend utility module for managing pipelines.
@@ -448,10 +448,12 @@ class WebGPUPipelineUtils {
 						break;
 
 					case SubtractiveBlending:
+						warnOnce( 'WebGPURenderer: SubtractiveBlending works best with material.premultipliedAlpha = true.' );
 						setBlend( GPUBlendFactor.Zero, GPUBlendFactor.OneMinusSrc, GPUBlendFactor.Zero, GPUBlendFactor.One );
 						break;
 
 					case MultiplyBlending:
+						warnOnce( 'WebGPURenderer: MultiplyBlending works best with material.premultipliedAlpha = true.' );
 						setBlend( GPUBlendFactor.Dst, GPUBlendFactor.OneMinusSrcAlpha, GPUBlendFactor.Zero, GPUBlendFactor.One );
 						break;
 

@@ -7,7 +7,7 @@ import {
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth
 } from '../../../constants.js';
 import { Vector4 } from '../../../math/Vector4.js';
-import { error } from '../../../utils.js';
+import { error, warnOnce } from '../../../utils.js';
 
 let equationToGL, factorToGL;
 
@@ -377,10 +377,12 @@ class WebGLState {
 							break;
 
 						case SubtractiveBlending:
+							warnOnce( 'WebGLState: SubtractiveBlending works best with material.premultipliedAlpha = true.' );
 							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
 							break;
 
 						case MultiplyBlending:
+							warnOnce( 'WebGLState: MultiplyBlending works best with material.premultipliedAlpha = true.' );
 							gl.blendFuncSeparate( gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
 							break;
 
