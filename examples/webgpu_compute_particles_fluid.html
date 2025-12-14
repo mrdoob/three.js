@@ -136,14 +136,8 @@
 				} );
 
 				await renderer.init()
-				let startTime = performance.now();
-				await renderer.compileCompute([ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ], (progress) => {
-					const compileTime = (performance.now() - startTime).toFixed(5);
-					console.log(`Compute compilation time: ${compileTime} ms`, `${progress}%`)
-				})
-
+				await renderer.compileCompute([ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ])
 				await renderer.compile(scene, camera)
-				
 
 				window.addEventListener( 'resize', onWindowResize );
 				controls.update();
