@@ -831,9 +831,10 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
+	 * @param {?Function} onProgress - A callback that is called when the compile has been finished.
 	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
-	async compileAsync( scene, camera, targetScene = null ) {
+	async compileAsync( scene, camera, targetScene = null, onProgress = null ) {
 
 		if ( this._isDeviceLost === true ) return;
 
@@ -860,6 +861,61 @@ class Renderer {
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		const compilationPromises = [];
+
+		let compilationTotal = 0;
+		let compilationDone = 0;
+
+		function reportProgress() {
+
+			if ( onProgress !== null ) onProgress( compilationDone / compilationTotal * 100 );
+
+		}
+
+		const originalPush = compilationPromises.push;
+
+		compilationPromises.push = function () {
+
+			for ( let i = 0; i < arguments.length; i ++ ) {
+
+				let promise = arguments[ i ];
+
+				if ( promise && promise.then ) {
+
+					// ok
+
+				} else {
+
+					promise = Promise.resolve( promise );
+
+				}
+
+				compilationTotal ++;
+
+				if ( onProgress !== null ) {
+
+					promise.then( function () {
+
+						compilationDone ++;
+						reportProgress();
+
+					}, function () {
+
+						compilationDone ++;
+						reportProgress();
+
+					} );
+
+				}
+
+				originalPush.call( compilationPromises, promise );
+
+			}
+
+			return compilationPromises.length;
+
+		};
+
+		//
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this.renderObject;
@@ -962,6 +1018,140 @@ class Renderer {
 		// wait for all promises setup by backends awaiting compilation/linking/pipeline creation to complete
 
 		await Promise.all( compilationPromises );
+
+	}
+
+	/**
+	 * Compile compute programs. This can be useful to avoid a
+	 * phenomenon which is called "shader compilation stutter", which occurs when
+	 * rendering an object with a new shader for the first time.
+	 * 
+	 * @async
+	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
+	 * @param {Function} onProgress - A callback that is called when the compile has been finished.
+	 * @return {Promise} A Promise that resolves when the compile has been finished.
+	 */
+	async compileCompute( computeNodes, onProgress = null ) {
+
+		if ( this._isDeviceLost === true ) return;
+
+		if ( this._initialized === false ) await this.init();
+
+		const previousCompilationPromises = this._compilationPromises;
+
+		const compilationPromises = [];
+
+		let compilationTotal = 0;
+		let compilationDone = 0;
+
+		function reportProgress() {
+
+			if ( onProgress === null ) return;
+
+			const ratio = ( compilationTotal === 0 ) ? 0 : ( compilationDone / compilationTotal );
+
+			onProgress( ratio * 100 );
+
+		}
+
+		const originalPush = compilationPromises.push;
+
+		compilationPromises.push = function () {
+
+			for ( let i = 0; i < arguments.length; i ++ ) {
+
+				let promise = arguments[ i ];
+
+				if ( promise && promise.then ) {
+
+					// ok
+
+				} else {
+
+					promise = Promise.resolve( promise );
+
+				}
+
+				compilationTotal ++;
+
+				if ( onProgress !== null ) {
+
+					promise.then( function () {
+
+						compilationDone ++;
+						reportProgress();
+
+					}, function () {
+
+						compilationDone ++;
+						reportProgress();
+
+					} );
+
+				}
+
+				originalPush.call( compilationPromises, promise );
+
+			}
+
+			return compilationPromises.length;
+
+		};
+
+		this._compilationPromises = compilationPromises;
+
+		//
+
+		const pipelines = this._pipelines;
+		const bindings = this._bindings;
+		const nodes = this._nodes;
+
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
+
+			throw new Error( 'THREE.Renderer: .compileCompute() expects a ComputeNode.' );
+
+		}
+
+		for ( const computeNode of computeList ) {
+
+			if ( pipelines.has( computeNode ) === false ) {
+
+				const dispose = () => {
+
+					computeNode.removeEventListener( 'dispose', dispose );
+
+					pipelines.delete( computeNode );
+					bindings.deleteForCompute( computeNode );
+					nodes.delete( computeNode );
+
+				};
+
+				computeNode.addEventListener( 'dispose', dispose );
+
+				const onInitFn = computeNode.onInitFunction;
+
+				if ( onInitFn !== null ) {
+
+					onInitFn.call( computeNode, { renderer: this } );
+
+				}
+
+			}
+
+			nodes.updateForCompute( computeNode );
+			bindings.updateForCompute( computeNode );
+
+			const computeBindings = bindings.getForCompute( computeNode );
+
+			pipelines.getForCompute( computeNode, computeBindings, compilationPromises );
+
+		}
+
+		await Promise.all( compilationPromises );
+
+		this._compilationPromises = previousCompilationPromises;
 
 	}
 
@@ -3297,6 +3487,7 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
+	 * @param {?Function} onProgress - A callback that is called when the compile has been finished.
 	 * @return {function(Object3D, Camera, ?Scene): Promise|undefined} A Promise that resolves when the compile has been finished.
 	 */
 	get compile() {

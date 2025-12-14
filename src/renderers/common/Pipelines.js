@@ -73,9 +73,10 @@ class Pipelines extends DataMap {
 	 *
 	 * @param {Node} computeNode - The compute node.
 	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {Promise[]} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`.
 	 * @return {ComputePipeline} The compute pipeline.
 	 */
-	getForCompute( computeNode, bindings ) {
+	getForCompute( computeNode, bindings, promises = null ) {
 
 		const { backend } = this;
 
@@ -121,7 +122,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
 
-				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey, bindings );
+				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey, bindings, promises );
 
 			}
 
@@ -311,9 +312,10 @@ class Pipelines extends DataMap {
 	 * @param {ProgrammableStage} stageCompute - The programmable stage representing the compute shader.
 	 * @param {string} cacheKey - The cache key.
 	 * @param {Array<BindGroup>} bindings - The bindings.
+	 * @param {Promise[]} promises - An array of compilation promises which is only relevant in context of `Renderer.compileAsync()`. 
 	 * @return {ComputePipeline} The compute pipeline.
 	 */
-	_getComputePipeline( computeNode, stageCompute, cacheKey, bindings ) {
+	_getComputePipeline( computeNode, stageCompute, cacheKey, bindings, promises ) {
 
 		// check for existing pipeline
 
@@ -327,7 +329,7 @@ class Pipelines extends DataMap {
 
 			this.caches.set( cacheKey, pipeline );
 
-			this.backend.createComputePipeline( pipeline, bindings );
+			this.backend.createComputePipeline( pipeline, bindings, promises );
 
 		}
 
