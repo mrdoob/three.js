@@ -3190,6 +3190,19 @@ class Renderer {
 	}
 
 	/**
+	 * Checks if the given compatibility is supported by the selected backend. If the
+	 * renderer has not been initialized, this method always returns `false`.
+	 *
+	 * @param {string} name - The compatibility's name.
+	 * @return {boolean} Whether the compatibility is supported or not.
+	 */
+	hasCompatibility( name ) {
+
+		return this.backend.hasCompatibility( name );
+
+	}
+
+	/**
 	 * This method represents the default `_handleObjectFunction` implementation which creates
 	 * a render object from the given data and performs the draw command with the selected backend.
 	 *
