@@ -110,6 +110,12 @@ class RenderObjects {
 
 		} else {
 
+			// update references
+
+			renderObject.camera = camera;
+
+			//
+
 			renderObject.updateClipping( clippingContext );
 
 			if ( renderObject.needsGeometryUpdate ) {
@@ -142,10 +148,6 @@ class RenderObjects {
 		_chainKeys[ 1 ] = null;
 		_chainKeys[ 2 ] = null;
 		_chainKeys[ 3 ] = null;
-
-		// update references
-
-		renderObject.camera = camera;
 
 		//
 
