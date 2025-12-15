@@ -80,14 +80,15 @@ function WebGLBindingStates( gl, attributes ) {
 
 		}
 
-		const stateId = object.getBindingStateId();
+		// Each InstancedMesh requires unique binding states because it contains instanced attributes.
+		const objectId = ( object.isInstancedMesh === true ) ? object.id : 0;
 
-		let programMap = objectMap[ stateId ];
+		let programMap = objectMap[ objectId ];
 
 		if ( programMap === undefined ) {
 
 			programMap = {};
-			objectMap[ stateId ] = programMap;
+			objectMap[ objectId ] = programMap;
 
 		}
 

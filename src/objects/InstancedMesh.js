@@ -179,15 +179,6 @@ class InstancedMesh extends Mesh {
 
 	}
 
-	/**
-	 * Override to get a unique binding state ID, so that instanceMatrix and instanceColor are cached properly.
-	 * */
-	getBindingStateId() {
-
-		return this.id;
-
-	}
-
 	copy( source, recursive ) {
 
 		super.copy( source, recursive );
