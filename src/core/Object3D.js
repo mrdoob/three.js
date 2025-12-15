@@ -414,6 +414,19 @@ class Object3D extends EventDispatcher {
 	 */
 	onAfterRender( /* renderer, scene, camera, geometry, material, group */ ) {}
 
+
+	/**
+	 * Returns an identifier used for binding state management. Some objects, such as InstancedMesh, require unique binding states.
+	 * Subclasses can override this method to provide a unique binding state ID.
+	 *
+	 * @returns {number} The binding state ID for this object.
+	 * */
+	getBindingStateId() {
+
+		return 0;
+
+	}
+
 	/**
 	 * Applies the given transformation matrix to the object and updates the object's position,
 	 * rotation and scale.
