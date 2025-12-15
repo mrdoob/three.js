@@ -1031,7 +1031,7 @@ class Renderer {
 	 * @param {Function} onProgress - A callback that is called when the compile has been finished.
 	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
-	async compileCompute( computeNodes, onProgress = null ) {
+	async compileComputeAsync( computeNodes, onProgress = null ) {
 
 		if ( this._isDeviceLost === true ) return;
 
