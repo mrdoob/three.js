@@ -1,5 +1,3 @@
-/* global QUnit */
-
 // import { WebGLAttributes } from '../../../../../src/renderers/webgl/WebGLAttributes.js';
 
 export default QUnit.module( 'Renderers', () => {

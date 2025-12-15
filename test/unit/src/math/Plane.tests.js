@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Plane } from '../../../../src/math/Plane.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Line3 } from '../../../../src/math/Line3.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { LinearInterpolant } from '../../../../../src/math/interpolants/LinearInterpolant.js';
 
 import { Interpolant } from '../../../../../src/math/Interpolant.js';

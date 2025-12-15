@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BatchedMesh } from '../../../../src/objects/BatchedMesh.js';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 
 import {

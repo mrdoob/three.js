@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Triangle } from '../../../../src/math/Triangle.js';
 import { Box3 } from '../../../../src/math/Box3.js';

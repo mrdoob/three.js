@@ -401,6 +401,10 @@
 			"kind": "class"
 		},
 		{
+			"title": "ArrayElementNode#getMemberType",
+			"kind": "function"
+		},
+		{
 			"title": "ArrayElementNode#getNodeType",
 			"kind": "function"
 		},
@@ -434,6 +438,10 @@
 		},
 		{
 			"title": "ArrayNode#getElementType",
+			"kind": "function"
+		},
+		{
+			"title": "ArrayNode#getMemberType",
 			"kind": "function"
 		},
 		{
@@ -11569,6 +11577,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Renderer#getOutputBufferType",
+			"kind": "function"
+		},
+		{
 			"title": "Renderer#getOutputRenderTarget",
 			"kind": "function"
 		},
@@ -16165,6 +16177,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "WebGLRenderer#setEffects",
+			"kind": "function"
+		},
+		{
 			"title": "WebGLRenderer#setOpaqueSort",
 			"kind": "function"
 		},
@@ -20695,6 +20711,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "OutputPass#isOutputPass",
+			"kind": "member"
+		},
+		{
 			"title": "OutputPass#material",
 			"kind": "member"
 		},
@@ -21192,6 +21212,10 @@
 		},
 		{
 			"title": "RenderPass#clearDepth",
+			"kind": "member"
+		},
+		{
+			"title": "RenderPass#isRenderPass",
 			"kind": "member"
 		},
 		{

@@ -1664,7 +1664,7 @@ function createObject( loader, elements, elementSize, isConditionalSegments = fa
 
 	if ( numGroupVerts > 0 ) {
 
-		bufferGeometry.addGroup( index0, Infinity, materials.length - 1 );
+		bufferGeometry.addGroup( index0, numGroupVerts, materials.length - 1 );
 
 	}
 
@@ -2400,7 +2400,6 @@ class LDrawLoader extends Loader {
 
 		material.color.setStyle( fillColor, COLOR_SPACE_LDRAW );
 		material.transparent = isTransparent;
-		material.premultipliedAlpha = true;
 		material.opacity = alpha;
 		material.depthWrite = ! isTransparent;
 

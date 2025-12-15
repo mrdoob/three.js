@@ -13,7 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
-import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType } from '../../constants.js';
+import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility } from '../../constants.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { warnOnce, error } from '../../utils.js';
 
@@ -136,6 +136,19 @@ class WebGPUBackend extends Backend {
 		 * @type {Map<number,GPUBuffer>}
 		 */
 		this.occludedResolveCache = new Map();
+
+		// compatibility checks
+
+		const compatibilityTextureCompare = typeof navigator === 'undefined' ? true : /Android/.test( navigator.userAgent ) === false;
+
+		/**
+		 * A map of compatibility checks.
+		 *
+		 * @type {Object}
+		 */
+		this._compatibility = {
+			[ Compatibility.TEXTURE_COMPARE ]: compatibilityTextureCompare
+		};
 
 	}
 
@@ -2509,6 +2522,24 @@ class WebGPUBackend extends Backend {
 			this.device.queue.submit( [ encoder.finish() ] );
 
 		}
+
+	}
+
+	/**
+	 * Checks if the given compatibility is supported by the backend.
+	 *
+	 * @param {string} name - The compatibility name.
+	 * @return {boolean} Whether the compatibility is supported or not.
+	 */
+	hasCompatibility( name ) {
+
+		if ( this._compatibility[ Compatibility.TEXTURE_COMPARE ] !== undefined ) {
+
+			return this._compatibility[ Compatibility.TEXTURE_COMPARE ];
+
+		}
+
+		return super.hasCompatibility( name );
 
 	}
 

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { SkeletonHelper } from '../../../../src/helpers/SkeletonHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';

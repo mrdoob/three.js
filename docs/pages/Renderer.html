@@ -807,10 +807,13 @@ from the GPU to the CPU in context of compute shaders.</p>
 					<h3 class="name name-method" id="getColorBufferType" translate="no">.<a href="#getColorBufferType">getColorBufferType</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns the color buffer type.</p>
+							<p>Returns the output buffer type.</p>
 						</div>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The color buffer type.</dt>
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r182. Use `.getOutputBufferType()` instead.</dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output buffer type.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getContext" translate="no">.<a href="#getContext">getContext</a><span class="signature">()</span><span class="type-signature"> : GPUCanvasContext | WebGL2RenderingContext</span> </h3>
@@ -859,6 +862,15 @@ from the GPU to the CPU in context of compute shaders.</p>
 						</div>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The maximum available anisotropy.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getOutputBufferType" translate="no">.<a href="#getOutputBufferType">getOutputBufferType</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the output buffer type.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output buffer type.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getOutputRenderTarget" translate="no">.<a href="#getOutputRenderTarget">getOutputRenderTarget</a><span class="signature">()</span><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a></span> </h3>
@@ -1898,12 +1910,12 @@ to overwrite the default.</p>
 		</tr>
 		<tr>
 				<td class="name">
-					<strong>colorBufferType</strong>
+					<strong>outputBufferType</strong>
 						<br>
 <span class="param-type">number</span>
 				</td>
 			<td class="description last">
-				<p>Defines the type of color buffers. The default <code>HalfFloatType</code> is recommend for best
+				<p>Defines the type of output buffers. The default <code>HalfFloatType</code> is recommend for best
 quality. To save memory and bandwidth, <code>UnsignedByteType</code> might be used. This will reduce rendering quality though.</p>
 						<p>Default is <code>HalfFloatType</code>.</p>
 			</td>

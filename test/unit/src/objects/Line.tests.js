@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Line } from '../../../../src/objects/Line.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';

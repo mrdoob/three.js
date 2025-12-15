@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PlaneHelper } from '../../../../src/helpers/PlaneHelper.js';
 
 import { Line } from '../../../../src/objects/Line.js';

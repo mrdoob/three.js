@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Box3 } from '../../../../src/math/Box3.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
 import { Triangle } from '../../../../src/math/Triangle.js';

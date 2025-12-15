@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

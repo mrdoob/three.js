@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { InstancedMesh } from '../../../../src/objects/InstancedMesh.js';
 
 import { Mesh } from '../../../../src/objects/Mesh.js';

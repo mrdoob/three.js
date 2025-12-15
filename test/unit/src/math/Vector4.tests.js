@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Vector4 } from '../../../../src/math/Vector4.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';

@@ -5,6 +5,7 @@
 	"misc_controls_orbit": [ "rotation" ],
 	"misc_controls_trackball": [ "rotation" ],
 	"misc_controls_transform": [ "scale", "rotate", "translate" ],
+	"misc_exporter_gcode": [ "community" ],
 	"misc_raycaster_helper": [ "community" ],
 	"physics_ammo_break": [ "community" ],
 	"physics_ammo_cloth": [ "integration", "community" ],

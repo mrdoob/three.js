@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 
 import { Matrix4 } from '../../../../src/math/Matrix4.js';

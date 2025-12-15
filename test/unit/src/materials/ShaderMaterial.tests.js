@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ShaderMaterial } from '../../../../src/materials/ShaderMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';

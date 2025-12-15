@@ -360,7 +360,7 @@ ${ flowData.code }
 
 		if ( node.isNodeUniform && node.node.isTextureNode !== true && node.node.isBufferNode !== true ) {
 
-			return shaderStage.charAt( 0 ) + '_' + node.name;
+			return node.name;
 
 		}
 
@@ -765,32 +765,56 @@ ${ flowData.code }
 
 			} else {
 
-				const vectorType = this.getVectorType( uniform.type );
+				const groupName = uniform.groupNode.name;
 
-				snippet = `${ vectorType } ${ this.getPropertyName( uniform, shaderStage ) };`;
+				// Check if this group has already been processed
+				if ( uniformGroups[ groupName ] === undefined ) {
+
+					// Get the shared uniform group that contains uniforms from all stages
+					const sharedUniformGroup = this.uniformGroups[ groupName ];
+
+					if ( sharedUniformGroup !== undefined ) {
+
+						// Generate snippets for ALL uniforms in this shared group
+						const snippets = [];
+
+						for ( const sharedUniform of sharedUniformGroup.uniforms ) {
+
+							const type = sharedUniform.getType();
+							const vectorType = this.getVectorType( type );
+							const precision = sharedUniform.nodeUniform.node.precision;
+
+							let uniformSnippet = `${ vectorType } ${ sharedUniform.name };`;
+
+							if ( precision !== null ) {
+
+								uniformSnippet = precisionLib[ precision ] + ' ' + uniformSnippet;
+
+							}
+
+							snippets.push( '\t' + uniformSnippet );
+
+						}
+
+						uniformGroups[ groupName ] = snippets;
+
+					}
+
+				}
 
 				group = true;
 
 			}
 
-			const precision = uniform.node.precision;
+			if ( ! group ) {
 
-			if ( precision !== null ) {
+				const precision = uniform.node.precision;
 
-				snippet = precisionLib[ precision ] + ' ' + snippet;
+				if ( precision !== null ) {
 
-			}
+					snippet = precisionLib[ precision ] + ' ' + snippet;
 
-			if ( group ) {
-
-				snippet = '\t' + snippet;
-
-				const groupName = uniform.groupNode.name;
-				const groupSnippets = uniformGroups[ groupName ] || ( uniformGroups[ groupName ] = [] );
-
-				groupSnippets.push( snippet );
-
-			} else {
+				}
 
 				snippet = 'uniform ' + snippet;
 
@@ -806,7 +830,7 @@ ${ flowData.code }
 
 			const groupSnippets = uniformGroups[ name ];
 
-			output += this._getGLSLUniformStruct( shaderStage + '_' + name, groupSnippets.join( '\n' ) ) + '\n';
+			output += this._getGLSLUniformStruct( name, groupSnippets.join( '\n' ) ) + '\n';
 
 		}
 
@@ -1595,24 +1619,38 @@ void main() {
 
 			} else {
 
-				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
-
-				let uniformsGroup = uniformsStage[ groupName ];
+				let uniformsGroup = this.uniformGroups[ groupName ];
 
 				if ( uniformsGroup === undefined ) {
 
-					uniformsGroup = new NodeUniformsGroup( shaderStage + '_' + groupName, group );
-					//uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
+					uniformsGroup = new NodeUniformsGroup( groupName, group );
 
-					uniformsStage[ groupName ] = uniformsGroup;
+					this.uniformGroups[ groupName ] = uniformsGroup;
 
 					bindings.push( uniformsGroup );
+
+				} else {
+
+					// Add to bindings for this stage if not already present
+					if ( bindings.indexOf( uniformsGroup ) === - 1 ) {
+
+						bindings.push( uniformsGroup );
+
+					}
 
 				}
 
 				uniformGPU = this.getNodeUniform( uniformNode, type );
 
-				uniformsGroup.addUniform( uniformGPU );
+				// Only add uniform if not already present in the group (check by name to avoid duplicates across stages)
+				const uniformName = uniformGPU.name;
+				const alreadyExists = uniformsGroup.uniforms.some( u => u.name === uniformName );
+
+				if ( ! alreadyExists ) {
+
+					uniformsGroup.addUniform( uniformGPU );
+
+				}
 
 			}
 

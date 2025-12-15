@@ -215,6 +215,14 @@ class RenderContext {
 		this.clippingContext = null;
 
 		/**
+		 * The current camera.
+		 *
+		 * @type {?Camera}
+		 * @default null
+		 */
+		this.camera = null;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}

@@ -526,7 +526,7 @@
 
 		const errorFunc = options.errorFunc || function ( err, functionName, args ) {
 
-			console.error( `WebGL error ${glEnumToString( err )} in ${functionName}(${glFunctionArgsToString( functionName, args )})` ); /* eslint-disable-line no-console */
+			console.error( `WebGL error ${glEnumToString( err )} in ${functionName}(${glFunctionArgsToString( functionName, args )})` );
 
 		};
 

@@ -3,8 +3,8 @@
  * Copyright 2010-2025 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Matrix3, Vector2, Color, mergeUniforms, Vector3, CubeUVReflectionMapping, Mesh, BoxGeometry, ShaderMaterial, BackSide, cloneUniforms, Euler, Matrix4, ColorManagement, SRGBTransfer, PlaneGeometry, FrontSide, getUnlitUniformColorSpace, IntType, warn, HalfFloatType, UnsignedByteType, FloatType, RGBAFormat, Plane, EquirectangularReflectionMapping, EquirectangularRefractionMapping, WebGLCubeRenderTarget, CubeReflectionMapping, CubeRefractionMapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, NoToneMapping, MeshBasicMaterial, error, NoBlending, WebGLRenderTarget, BufferAttribute, LinearSRGBColorSpace, LinearFilter, warnOnce, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Vector4, DataArrayTexture, CubeTexture, Data3DTexture, GreaterEqualCompare, LessEqualCompare, DepthTexture, Texture, GLSL3, PCFShadowMap, VSMShadowMap, CustomToneMapping, NeutralToneMapping, AgXToneMapping, ACESFilmicToneMapping, CineonToneMapping, ReinhardToneMapping, LinearToneMapping, LinearTransfer, AddOperation, MixOperation, MultiplyOperation, UniformsUtils, DoubleSide, NormalBlending, TangentSpaceNormalMap, ObjectSpaceNormalMap, Layers, RGFormat, Frustum, MeshDepthMaterial, MeshDistanceMaterial, PCFSoftShadowMap, DepthFormat, NearestFilter, CubeDepthTexture, UnsignedIntType, LessEqualDepth, ReverseSubtractEquation, SubtractEquation, AddEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, ZeroFactor, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, MinEquation, MaxEquation, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, EqualCompare, LessCompare, AlwaysCompare, NeverCompare, NoColorSpace, DepthStencilFormat, getByteLength, UnsignedInt248Type, UnsignedShortType, createElementNS, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, ByteType, ShortType, AlphaFormat, RGBFormat, RedFormat, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, RG11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, ExternalTexture, EventDispatcher, ArrayCamera, WebXRController, RAD2DEG, DataTexture, createCanvasElement, SRGBColorSpace, REVISION, log, WebGLCoordinateSystem, probeAsync } from './three.core.js';
-export { AdditiveAnimationBlendMode, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BasicShadowMap, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeCamera, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CylinderGeometry, Cylindrical, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualStencilFunc, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, Fog, FogExp2, FramebufferTexture, FrustumArray, GLBufferAttribute, GLSL1, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialLoader, MathUtils, Matrix2, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NeverStencilFunc, NoNormalPacking, NormalAnimationBlendMode, NormalGAPacking, NormalRGPacking, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, OctahedronGeometry, Path, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGBIntegerFormat, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RenderTarget, RenderTarget3D, ReplaceStencilOp, RingGeometry, Scene, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGPUCoordinateSystem, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, ZeroStencilOp, getConsoleFunction, setConsoleFunction } from './three.core.js';
+import { Matrix3, Vector2, Color, mergeUniforms, Vector3, CubeUVReflectionMapping, Mesh, BoxGeometry, ShaderMaterial, BackSide, cloneUniforms, Euler, Matrix4, ColorManagement, SRGBTransfer, PlaneGeometry, FrontSide, getUnlitUniformColorSpace, IntType, warn, HalfFloatType, UnsignedByteType, FloatType, RGBAFormat, Plane, EquirectangularReflectionMapping, EquirectangularRefractionMapping, WebGLCubeRenderTarget, CubeReflectionMapping, CubeRefractionMapping, BufferGeometry, OrthographicCamera, PerspectiveCamera, NoToneMapping, MeshBasicMaterial, error, NoBlending, WebGLRenderTarget, BufferAttribute, LinearSRGBColorSpace, LinearFilter, warnOnce, Uint32BufferAttribute, Uint16BufferAttribute, arrayNeedsUint32, Vector4, DataArrayTexture, Float32BufferAttribute, RawShaderMaterial, CustomToneMapping, NeutralToneMapping, AgXToneMapping, ACESFilmicToneMapping, CineonToneMapping, ReinhardToneMapping, LinearToneMapping, CubeTexture, Data3DTexture, GreaterEqualCompare, LessEqualCompare, DepthTexture, Texture, GLSL3, VSMShadowMap, PCFShadowMap, AddOperation, MixOperation, MultiplyOperation, LinearTransfer, UniformsUtils, DoubleSide, NormalBlending, TangentSpaceNormalMap, ObjectSpaceNormalMap, Layers, RGFormat, Frustum, MeshDepthMaterial, MeshDistanceMaterial, PCFSoftShadowMap, DepthFormat, NearestFilter, CubeDepthTexture, UnsignedIntType, LessEqualDepth, ReverseSubtractEquation, SubtractEquation, AddEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, ZeroFactor, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceNone, CullFaceBack, CullFaceFront, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, MinEquation, MaxEquation, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NotEqualCompare, GreaterCompare, EqualCompare, LessCompare, AlwaysCompare, NeverCompare, NoColorSpace, DepthStencilFormat, getByteLength, UnsignedInt248Type, UnsignedShortType, createElementNS, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt5999Type, UnsignedInt101111Type, ByteType, ShortType, AlphaFormat, RGBFormat, RedFormat, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, RG11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, ExternalTexture, EventDispatcher, ArrayCamera, WebXRController, RAD2DEG, DataTexture, createCanvasElement, SRGBColorSpace, REVISION, log, WebGLCoordinateSystem, probeAsync } from './three.core.js';
+export { AdditiveAnimationBlendMode, AlwaysStencilFunc, AmbientLight, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BasicShadowMap, BatchedMesh, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, Compatibility, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeCamera, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CylinderGeometry, Cylindrical, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualStencilFunc, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Fog, FogExp2, FramebufferTexture, FrustumArray, GLBufferAttribute, GLSL1, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HemisphereLight, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, Material, MaterialLoader, MathUtils, Matrix2, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NeverStencilFunc, NoNormalPacking, NormalAnimationBlendMode, NormalGAPacking, NormalRGPacking, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, OctahedronGeometry, Path, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGBIntegerFormat, RGDepthPacking, Ray, Raycaster, RectAreaLight, RenderTarget, RenderTarget3D, ReplaceStencilOp, RingGeometry, Scene, ShadowMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureUtils, Timer, TimestampQuery, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGPUCoordinateSystem, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, ZeroStencilOp, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 function WebGLAnimation() {
 
@@ -569,7 +569,7 @@ const fragment$3 = "uniform vec3 diffuse;\nuniform float opacity;\n#include <com
 
 const vertex$2 = "#include <common>\n#include <batching_pars_vertex>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphinstance_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
-const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <logdepthbuf_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n}";
+const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <logdepthbuf_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n}";
 
 const vertex$1 = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix[ 3 ];\n\tvec2 scale = vec2( length( modelMatrix[ 0 ].xyz ), length( modelMatrix[ 1 ].xyz ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = isPerspectiveMatrix( projectionMatrix );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}";
 
@@ -4591,6 +4591,252 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 }
 
+const toneMappingMap = {
+	[ LinearToneMapping ]: 'LINEAR_TONE_MAPPING',
+	[ ReinhardToneMapping ]: 'REINHARD_TONE_MAPPING',
+	[ CineonToneMapping ]: 'CINEON_TONE_MAPPING',
+	[ ACESFilmicToneMapping ]: 'ACES_FILMIC_TONE_MAPPING',
+	[ AgXToneMapping ]: 'AGX_TONE_MAPPING',
+	[ NeutralToneMapping ]: 'NEUTRAL_TONE_MAPPING',
+	[ CustomToneMapping ]: 'CUSTOM_TONE_MAPPING'
+};
+
+function WebGLOutput( type, width, height, depth, stencil ) {
+
+	// render targets for scene and post-processing
+	const targetA = new WebGLRenderTarget( width, height, {
+		type: type,
+		depthBuffer: depth,
+		stencilBuffer: stencil
+	} );
+
+	const targetB = new WebGLRenderTarget( width, height, {
+		type: HalfFloatType,
+		depthBuffer: false,
+		stencilBuffer: false
+	} );
+
+	// create fullscreen triangle geometry
+	const geometry = new BufferGeometry();
+	geometry.setAttribute( 'position', new Float32BufferAttribute( [ -1, 3, 0, -1, -1, 0, 3, -1, 0 ], 3 ) );
+	geometry.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
+
+	// create output material with tone mapping support
+	const material = new RawShaderMaterial( {
+		uniforms: {
+			tDiffuse: { value: null }
+		},
+		vertexShader: /* glsl */`
+			precision highp float;
+
+			uniform mat4 modelViewMatrix;
+			uniform mat4 projectionMatrix;
+
+			attribute vec3 position;
+			attribute vec2 uv;
+
+			varying vec2 vUv;
+
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			}`,
+		fragmentShader: /* glsl */`
+			precision highp float;
+
+			uniform sampler2D tDiffuse;
+
+			varying vec2 vUv;
+
+			#include <tonemapping_pars_fragment>
+			#include <colorspace_pars_fragment>
+
+			void main() {
+				gl_FragColor = texture2D( tDiffuse, vUv );
+
+				#ifdef LINEAR_TONE_MAPPING
+					gl_FragColor.rgb = LinearToneMapping( gl_FragColor.rgb );
+				#elif defined( REINHARD_TONE_MAPPING )
+					gl_FragColor.rgb = ReinhardToneMapping( gl_FragColor.rgb );
+				#elif defined( CINEON_TONE_MAPPING )
+					gl_FragColor.rgb = CineonToneMapping( gl_FragColor.rgb );
+				#elif defined( ACES_FILMIC_TONE_MAPPING )
+					gl_FragColor.rgb = ACESFilmicToneMapping( gl_FragColor.rgb );
+				#elif defined( AGX_TONE_MAPPING )
+					gl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );
+				#elif defined( NEUTRAL_TONE_MAPPING )
+					gl_FragColor.rgb = NeutralToneMapping( gl_FragColor.rgb );
+				#elif defined( CUSTOM_TONE_MAPPING )
+					gl_FragColor.rgb = CustomToneMapping( gl_FragColor.rgb );
+				#endif
+
+				#ifdef SRGB_TRANSFER
+					gl_FragColor = sRGBTransferOETF( gl_FragColor );
+				#endif
+			}`,
+		depthTest: false,
+		depthWrite: false
+	} );
+
+	const mesh = new Mesh( geometry, material );
+	const camera = new OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+
+	let _outputColorSpace = null;
+	let _outputToneMapping = null;
+	let _isCompositing = false;
+	let _savedToneMapping;
+	let _savedRenderTarget = null;
+	let _effects = [];
+	let _hasRenderPass = false;
+
+	this.setSize = function ( width, height ) {
+
+		targetA.setSize( width, height );
+		targetB.setSize( width, height );
+
+		for ( let i = 0; i < _effects.length; i ++ ) {
+
+			const effect = _effects[ i ];
+			if ( effect.setSize ) effect.setSize( width, height );
+
+		}
+
+	};
+
+	this.setEffects = function ( effects ) {
+
+		_effects = effects;
+		_hasRenderPass = _effects.length > 0 && _effects[ 0 ].isRenderPass === true;
+
+		const width = targetA.width;
+		const height = targetA.height;
+
+		for ( let i = 0; i < _effects.length; i ++ ) {
+
+			const effect = _effects[ i ];
+			if ( effect.setSize ) effect.setSize( width, height );
+
+		}
+
+	};
+
+	this.begin = function ( renderer, renderTarget ) {
+
+		// Don't begin during compositing phase (post-processing effects call render())
+		if ( _isCompositing ) return false;
+
+		if ( renderer.toneMapping === NoToneMapping && _effects.length === 0 ) return false;
+
+		_savedRenderTarget = renderTarget;
+
+		// resize internal buffers to match render target (e.g. XR resolution)
+		if ( renderTarget !== null ) {
+
+			const width = renderTarget.width;
+			const height = renderTarget.height;
+
+			if ( targetA.width !== width || targetA.height !== height ) {
+
+				this.setSize( width, height );
+
+			}
+
+		}
+
+		// if first effect is a RenderPass, it will set its own render target
+		if ( _hasRenderPass === false ) {
+
+			renderer.setRenderTarget( targetA );
+
+		}
+
+		// disable tone mapping during render - it will be applied in end()
+		_savedToneMapping = renderer.toneMapping;
+		renderer.toneMapping = NoToneMapping;
+
+		return true;
+
+	};
+
+	this.hasRenderPass = function () {
+
+		return _hasRenderPass;
+
+	};
+
+	this.end = function ( renderer, deltaTime ) {
+
+		// restore tone mapping
+		renderer.toneMapping = _savedToneMapping;
+
+		_isCompositing = true;
+
+		// run post-processing effects
+		let readBuffer = targetA;
+		let writeBuffer = targetB;
+
+		for ( let i = 0; i < _effects.length; i ++ ) {
+
+			const effect = _effects[ i ];
+
+			if ( effect.enabled === false ) continue;
+
+			effect.render( renderer, writeBuffer, readBuffer, deltaTime );
+
+			if ( effect.needsSwap !== false ) {
+
+				const temp = readBuffer;
+				readBuffer = writeBuffer;
+				writeBuffer = temp;
+
+			}
+
+		}
+
+		// update output material defines if settings changed
+		if ( _outputColorSpace !== renderer.outputColorSpace || _outputToneMapping !== renderer.toneMapping ) {
+
+			_outputColorSpace = renderer.outputColorSpace;
+			_outputToneMapping = renderer.toneMapping;
+
+			material.defines = {};
+
+			if ( ColorManagement.getTransfer( _outputColorSpace ) === SRGBTransfer ) material.defines.SRGB_TRANSFER = '';
+
+			const toneMapping = toneMappingMap[ _outputToneMapping ];
+			if ( toneMapping ) material.defines[ toneMapping ] = '';
+
+			material.needsUpdate = true;
+
+		}
+
+		// final output to canvas (or XR render target)
+		material.uniforms.tDiffuse.value = readBuffer.texture;
+		renderer.setRenderTarget( _savedRenderTarget );
+		renderer.render( mesh, camera );
+
+		_savedRenderTarget = null;
+		_isCompositing = false;
+
+	};
+
+	this.isCompositing = function () {
+
+		return _isCompositing;
+
+	};
+
+	this.dispose = function () {
+
+		targetA.dispose();
+		targetB.dispose();
+		geometry.dispose();
+		material.dispose();
+
+	};
+
+}
+
 /**
  * Uniforms of a program.
  * Those form a tree structure with a special top-level container for the root,
@@ -5888,43 +6134,24 @@ function getTexelEncodingFunction( functionName, colorSpace ) {
 
 }
 
+const toneMappingFunctions = {
+	[ LinearToneMapping ]: 'Linear',
+	[ ReinhardToneMapping ]: 'Reinhard',
+	[ CineonToneMapping ]: 'Cineon',
+	[ ACESFilmicToneMapping ]: 'ACESFilmic',
+	[ AgXToneMapping ]: 'AgX',
+	[ NeutralToneMapping ]: 'Neutral',
+	[ CustomToneMapping ]: 'Custom'
+};
+
 function getToneMappingFunction( functionName, toneMapping ) {
 
-	let toneMappingName;
+	const toneMappingName = toneMappingFunctions[ toneMapping ];
 
-	switch ( toneMapping ) {
+	if ( toneMappingName === undefined ) {
 
-		case LinearToneMapping:
-			toneMappingName = 'Linear';
-			break;
-
-		case ReinhardToneMapping:
-			toneMappingName = 'Reinhard';
-			break;
-
-		case CineonToneMapping:
-			toneMappingName = 'Cineon';
-			break;
-
-		case ACESFilmicToneMapping:
-			toneMappingName = 'ACESFilmic';
-			break;
-
-		case AgXToneMapping:
-			toneMappingName = 'AgX';
-			break;
-
-		case NeutralToneMapping:
-			toneMappingName = 'Neutral';
-			break;
-
-		case CustomToneMapping:
-			toneMappingName = 'Custom';
-			break;
-
-		default:
-			warn( 'WebGLProgram: Unsupported toneMapping:', toneMapping );
-			toneMappingName = 'Linear';
+		warn( 'WebGLProgram: Unsupported toneMapping:', toneMapping );
+		return 'vec3 ' + functionName + '( vec3 color ) { return LinearToneMapping( color ); }';
 
 	}
 
@@ -6152,95 +6379,54 @@ function generatePrecision( parameters ) {
 
 }
 
+const shadowMapTypeDefines = {
+	[ PCFShadowMap ]: 'SHADOWMAP_TYPE_PCF',
+	[ VSMShadowMap ]: 'SHADOWMAP_TYPE_VSM'
+};
+
 function generateShadowMapTypeDefine( parameters ) {
 
-	let shadowMapTypeDefine = 'SHADOWMAP_TYPE_BASIC';
-
-	if ( parameters.shadowMapType === PCFShadowMap ) {
-
-		shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF';
-
-	} else if ( parameters.shadowMapType === VSMShadowMap ) {
-
-		shadowMapTypeDefine = 'SHADOWMAP_TYPE_VSM';
-
-	}
-
-	return shadowMapTypeDefine;
+	return shadowMapTypeDefines[ parameters.shadowMapType ] || 'SHADOWMAP_TYPE_BASIC';
 
 }
+
+const envMapTypeDefines = {
+	[ CubeReflectionMapping ]: 'ENVMAP_TYPE_CUBE',
+	[ CubeRefractionMapping ]: 'ENVMAP_TYPE_CUBE',
+	[ CubeUVReflectionMapping ]: 'ENVMAP_TYPE_CUBE_UV'
+};
 
 function generateEnvMapTypeDefine( parameters ) {
 
-	let envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
+	if ( parameters.envMap === false ) return 'ENVMAP_TYPE_CUBE';
 
-	if ( parameters.envMap ) {
-
-		switch ( parameters.envMapMode ) {
-
-			case CubeReflectionMapping:
-			case CubeRefractionMapping:
-				envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
-				break;
-
-			case CubeUVReflectionMapping:
-				envMapTypeDefine = 'ENVMAP_TYPE_CUBE_UV';
-				break;
-
-		}
-
-	}
-
-	return envMapTypeDefine;
+	return envMapTypeDefines[ parameters.envMapMode ] || 'ENVMAP_TYPE_CUBE';
 
 }
+
+const envMapModeDefines = {
+	[ CubeRefractionMapping ]: 'ENVMAP_MODE_REFRACTION'
+};
 
 function generateEnvMapModeDefine( parameters ) {
 
-	let envMapModeDefine = 'ENVMAP_MODE_REFLECTION';
+	if ( parameters.envMap === false ) return 'ENVMAP_MODE_REFLECTION';
 
-	if ( parameters.envMap ) {
-
-		switch ( parameters.envMapMode ) {
-
-			case CubeRefractionMapping:
-
-				envMapModeDefine = 'ENVMAP_MODE_REFRACTION';
-				break;
-
-		}
-
-	}
-
-	return envMapModeDefine;
+	return envMapModeDefines[ parameters.envMapMode ] || 'ENVMAP_MODE_REFLECTION';
 
 }
 
+const envMapBlendingDefines = {
+	[ MultiplyOperation ]: 'ENVMAP_BLENDING_MULTIPLY',
+	[ MixOperation ]: 'ENVMAP_BLENDING_MIX',
+	[ AddOperation ]: 'ENVMAP_BLENDING_ADD'
+};
+
 function generateEnvMapBlendingDefine( parameters ) {
 
-	let envMapBlendingDefine = 'ENVMAP_BLENDING_NONE';
+	if ( parameters.envMap === false ) return 'ENVMAP_BLENDING_NONE';
 
-	if ( parameters.envMap ) {
-
-		switch ( parameters.combine ) {
-
-			case MultiplyOperation:
-				envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
-				break;
-
-			case MixOperation:
-				envMapBlendingDefine = 'ENVMAP_BLENDING_MIX';
-				break;
-
-			case AddOperation:
-				envMapBlendingDefine = 'ENVMAP_BLENDING_ADD';
-				break;
-
-		}
-
-	}
-
-	return envMapBlendingDefine;
+	return envMapBlendingDefines[ parameters.combine ] || 'ENVMAP_BLENDING_NONE';
 
 }
 
@@ -10545,8 +10731,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	try {
 
 		useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
-			// eslint-disable-next-line compat/compat
 			&& ( new OffscreenCanvas( 1, 1 ).getContext( '2d' ) ) !== null;
+
 
 	} catch ( err ) {
 
@@ -10559,7 +10745,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		// Use OffscreenCanvas when available. Specially needed in web workers
 
 		return useOffscreenCanvas ?
-			// eslint-disable-next-line compat/compat
 			new OffscreenCanvas( width, height ) : createElementNS( 'canvas' );
 
 	}
@@ -15418,6 +15603,7 @@ class WebGLRenderer {
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
 			reversedDepthBuffer = false,
+			outputBufferType = UnsignedByteType,
 		} = parameters;
 
 		/**
@@ -15447,6 +15633,8 @@ class WebGLRenderer {
 
 		}
 
+		const _outputBufferType = outputBufferType;
+
 		const INTEGER_FORMATS = new Set( [
 			RGBAIntegerFormat,
 			RGIntegerFormat,
@@ -15473,6 +15661,10 @@ class WebGLRenderer {
 
 		const renderListStack = [];
 		const renderStateStack = [];
+
+		// internal render target for non-UnsignedByteType color buffer
+
+		let output = null;
 
 		// public properties
 
@@ -15869,6 +16061,14 @@ class WebGLRenderer {
 
 		initGLContext();
 
+		// initialize internal render target for non-UnsignedByteType color buffer
+
+		if ( _outputBufferType !== UnsignedByteType ) {
+
+			output = new WebGLOutput( _outputBufferType, canvas.width, canvas.height, depth, stencil );
+
+		}
+
 		// xr
 
 		const xr = new WebXRManager( _this, _gl );
@@ -15991,6 +16191,12 @@ class WebGLRenderer {
 
 			}
 
+			if ( output !== null ) {
+
+				output.setSize( canvas.width, canvas.height );
+
+			}
+
 			this.setViewport( 0, 0, width, height );
 
 		};
@@ -16031,6 +16237,39 @@ class WebGLRenderer {
 			canvas.height = Math.floor( height * pixelRatio );
 
 			this.setViewport( 0, 0, width, height );
+
+		};
+
+		/**
+		 * Sets the post-processing effects to be applied after rendering.
+		 *
+		 * @param {Array} effects - An array of post-processing effects.
+		 */
+		this.setEffects = function ( effects ) {
+
+			if ( _outputBufferType === UnsignedByteType ) {
+
+				console.error( 'THREE.WebGLRenderer: setEffects() requires outputBufferType set to HalfFloatType or FloatType.' );
+				return;
+
+			}
+
+			if ( effects ) {
+
+				for ( let i = 0; i < effects.length; i ++ ) {
+
+					if ( effects[ i ].isOutputPass === true ) {
+
+						console.warn( 'THREE.WebGLRenderer: OutputPass is not needed in setEffects(). Tone mapping and color space conversion are applied automatically.' );
+						break;
+
+					}
+
+				}
+
+			}
+
+			output.setEffects( effects || [] );
 
 		};
 
@@ -16883,6 +17122,12 @@ class WebGLRenderer {
 
 			if ( _isContextLost === true ) return;
 
+			// use internal render target for HalfFloatType color buffer (only when tone mapping is enabled)
+
+			const isXRPresenting = xr.enabled === true && xr.isPresenting === true;
+
+			const useOutput = output !== null && ( _currentRenderTarget === null || isXRPresenting ) && output.begin( _this, _currentRenderTarget );
+
 			// update scene graph
 
 			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
@@ -16891,7 +17136,7 @@ class WebGLRenderer {
 
 			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-			if ( xr.enabled === true && xr.isPresenting === true ) {
+			if ( xr.enabled === true && xr.isPresenting === true && ( output === null || output.isCompositing() === false ) ) {
 
 				if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 
@@ -16963,46 +17208,52 @@ class WebGLRenderer {
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
-			// render scene
+			// render scene (skip if first effect is a render pass - it will render the scene itself)
 
-			const opaqueObjects = currentRenderList.opaque;
-			const transmissiveObjects = currentRenderList.transmissive;
+			const skipSceneRender = useOutput && output.hasRenderPass();
 
-			currentRenderState.setupLights();
+			if ( skipSceneRender === false ) {
 
-			if ( camera.isArrayCamera ) {
+				const opaqueObjects = currentRenderList.opaque;
+				const transmissiveObjects = currentRenderList.transmissive;
 
-				const cameras = camera.cameras;
+				currentRenderState.setupLights();
 
-				if ( transmissiveObjects.length > 0 ) {
+				if ( camera.isArrayCamera ) {
+
+					const cameras = camera.cameras;
+
+					if ( transmissiveObjects.length > 0 ) {
+
+						for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+
+							const camera2 = cameras[ i ];
+
+							renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera2 );
+
+						}
+
+					}
+
+					if ( _renderBackground ) background.render( scene );
 
 					for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
 						const camera2 = cameras[ i ];
 
-						renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera2 );
+						renderScene( currentRenderList, scene, camera2, camera2.viewport );
 
 					}
 
-				}
+				} else {
 
-				if ( _renderBackground ) background.render( scene );
+					if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
 
-				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+					if ( _renderBackground ) background.render( scene );
 
-					const camera2 = cameras[ i ];
-
-					renderScene( currentRenderList, scene, camera2, camera2.viewport );
+					renderScene( currentRenderList, scene, camera );
 
 				}
-
-			} else {
-
-				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
-
-				if ( _renderBackground ) background.render( scene );
-
-				renderScene( currentRenderList, scene, camera );
 
 			}
 
@@ -17017,6 +17268,14 @@ class WebGLRenderer {
 				// Generate mipmap if we're using any kind of mipmap filtering
 
 				textures.updateRenderTargetMipmap( _currentRenderTarget );
+
+			}
+
+			// copy from internal render target to canvas using fullscreen quad
+
+			if ( useOutput ) {
+
+				output.end( _this );
 
 			}
 
@@ -17208,9 +17467,11 @@ class WebGLRenderer {
 
 			if ( currentRenderState.state.transmissionRenderTarget[ camera.id ] === undefined ) {
 
+				const hasHalfFloatSupport = extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' );
+
 				currentRenderState.state.transmissionRenderTarget[ camera.id ] = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
-					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
+					type: hasHalfFloatSupport ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: capabilities.samples,
 					stencilBuffer: stencil,
@@ -18058,7 +18319,6 @@ class WebGLRenderer {
 			_currentActiveCubeFace = activeCubeFace;
 			_currentActiveMipmapLevel = activeMipmapLevel;
 
-			let useDefaultFramebuffer = true;
 			let framebuffer = null;
 			let isCube = false;
 			let isRenderTarget3D = false;
@@ -18069,9 +18329,21 @@ class WebGLRenderer {
 
 				if ( renderTargetProperties.__useDefaultFramebuffer !== undefined ) {
 
-					// We need to make sure to rebind the framebuffer.
-					state.bindFramebuffer( _gl.FRAMEBUFFER, null );
-					useDefaultFramebuffer = false;
+					// Externally-managed framebuffer (e.g. XR)
+					// Bind to the stored framebuffer (may be null for default, or a WebGLFramebuffer)
+					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+
+					_currentViewport.copy( renderTarget.viewport );
+					_currentScissor.copy( renderTarget.scissor );
+					_currentScissorTest = renderTarget.scissorTest;
+
+					state.viewport( _currentViewport );
+					state.scissor( _currentScissor );
+					state.setScissorTest( _currentScissorTest );
+
+					_currentMaterialId = -1;
+
+					return;
 
 				} else if ( renderTargetProperties.__webglFramebuffer === undefined ) {
 
@@ -18170,7 +18442,7 @@ class WebGLRenderer {
 
 			const framebufferBound = state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
-			if ( framebufferBound && useDefaultFramebuffer ) {
+			if ( framebufferBound ) {
 
 				state.drawBuffers( renderTarget, framebuffer );
 
@@ -18784,4 +19056,4 @@ class WebGLRenderer {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, ArrayCamera, BackSide, BoxGeometry, BufferAttribute, BufferGeometry, ByteType, CineonToneMapping, ClampToEdgeWrapping, Color, ColorManagement, ConstantAlphaFactor, ConstantColorFactor, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CustomToneMapping, Data3DTexture, DataArrayTexture, DataTexture, DepthFormat, DepthStencilFormat, DepthTexture, DoubleSide, DstAlphaFactor, DstColorFactor, EqualCompare, EqualDepth, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExternalTexture, FloatType, FrontSide, Frustum, GLSL3, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, HalfFloatType, IntType, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NoBlending, NoColorSpace, NoToneMapping, NormalBlending, NotEqualCompare, NotEqualDepth, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PerspectiveCamera, Plane, PlaneGeometry, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReverseSubtractEquation, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, ShaderChunk, ShaderLib, ShaderMaterial, ShortType, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, SubtractEquation, SubtractiveBlending, TangentSpaceNormalMap, Texture, Uint16BufferAttribute, Uint32BufferAttribute, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGLRenderTarget, WebGLRenderer, WebGLUtils, WebXRController, ZeroFactor, createCanvasElement, error, log, warn, warnOnce };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, ArrayCamera, BackSide, BoxGeometry, BufferAttribute, BufferGeometry, ByteType, CineonToneMapping, ClampToEdgeWrapping, Color, ColorManagement, ConstantAlphaFactor, ConstantColorFactor, CubeDepthTexture, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeUVReflectionMapping, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CustomToneMapping, Data3DTexture, DataArrayTexture, DataTexture, DepthFormat, DepthStencilFormat, DepthTexture, DoubleSide, DstAlphaFactor, DstColorFactor, EqualCompare, EqualDepth, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExternalTexture, Float32BufferAttribute, FloatType, FrontSide, Frustum, GLSL3, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, HalfFloatType, IntType, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NoBlending, NoColorSpace, NoToneMapping, NormalBlending, NotEqualCompare, NotEqualDepth, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PerspectiveCamera, Plane, PlaneGeometry, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReverseSubtractEquation, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, ShaderChunk, ShaderLib, ShaderMaterial, ShortType, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, SubtractEquation, SubtractiveBlending, TangentSpaceNormalMap, Texture, Uint16BufferAttribute, Uint32BufferAttribute, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGLRenderTarget, WebGLRenderer, WebGLUtils, WebXRController, ZeroFactor, createCanvasElement, error, log, warn, warnOnce };
