@@ -1,5 +1,4 @@
 import { LightsNode } from '../../nodes/Nodes.js';
-import ChainMap from './ChainMap.js';
 
 const _defaultLights = /*@__PURE__*/ new LightsNode();
 const _weakMap = /*@__PURE__*/ new WeakMap();
