@@ -64,34 +64,18 @@ class UniformsGroup extends UniformBuffer {
 	 */
 	addUniformUpdateRange( uniform ) {
 
-		const start = uniform.offset;
-		const count = uniform.itemSize;
 		const index = uniform.index;
 
 		if ( this._updateRangeCache.has( index ) !== true ) {
 
 			const updateRanges = this.updateRanges;
-			const previousRange = this._updateRangeCache.get( index );
 
-			let range;
+			const start = uniform.offset;
+			const count = uniform.itemSize;
 
-			if ( previousRange !== undefined ) {
+			const range = { start, count };
 
-				// Merge with previous range
-
-				range = previousRange;
-
-				previousRange.count = ( start - previousRange.start ) + count;
-
-			} else {
-
-				// Add new range
-
-				range = { start, count };
-
-				updateRanges.push( range );
-
-			}
+			updateRanges.push( range );
 
 			this._updateRangeCache.set( index, range );
 
