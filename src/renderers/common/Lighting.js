@@ -11,7 +11,6 @@ const _weakMap = /*@__PURE__*/ new WeakMap();
  * with the actual lights from the scene.
  *
  * @private
- * @augments ChainMap
  */
 class Lighting {
 
