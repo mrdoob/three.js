@@ -96,7 +96,7 @@ class RenderObjects {
 
 		// TODO: revisit if geometry was changed
 
-		_chainKeys[ 0 ] = instances !== null ? object.geometry : object;
+		_chainKeys[ 0 ] = object.geometry;
 		_chainKeys[ 1 ] = material;
 		_chainKeys[ 2 ] = renderContext;
 		_chainKeys[ 3 ] = lightsNode;
