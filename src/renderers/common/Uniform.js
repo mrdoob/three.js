@@ -61,6 +61,14 @@ class Uniform {
 		 */
 		this.offset = 0;
 
+		/**
+		 * This property is set by {@link UniformsGroup} and marks
+		 * the index position in the uniform array.
+		 *
+		 * @type {number}
+		 */
+		this.index = - 1;
+		
 	}
 
 	/**
