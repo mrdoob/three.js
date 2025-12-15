@@ -135,6 +135,10 @@ class RenderObjects {
 
 		_chainKeys.length = 0;
 
+		//
+
+		renderObject.camera = camera;
+
 		return renderObject;
 
 	}
