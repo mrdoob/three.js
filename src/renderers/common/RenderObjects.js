@@ -92,11 +92,14 @@ class RenderObjects {
 
 		const chainMap = this.getChainMap( passId );
 
-		// reuse chainArray
+		// set chain keys
+
 		_chainKeys[ 0 ] = instances !== null ? object.geometry : object;
 		_chainKeys[ 1 ] = material;
 		_chainKeys[ 2 ] = renderContext;
 		_chainKeys[ 3 ] = lightsNode;
+
+		//
 
 		let renderObject = chainMap.get( _chainKeys );
 
@@ -107,6 +110,14 @@ class RenderObjects {
 			chainMap.set( _chainKeys, renderObject );
 
 		} else {
+
+			// update references
+
+			renderObject.camera = camera;
+			renderObject.object = object;
+			renderObject.instances = instances;
+
+			//
 
 			renderObject.updateClipping( clippingContext );
 
@@ -134,14 +145,14 @@ class RenderObjects {
 
 		}
 
+		// reset chain array
+
+		_chainKeys[ 0 ] = null;
+		_chainKeys[ 1 ] = null;
+		_chainKeys[ 2 ] = null;
+		_chainKeys[ 3 ] = null;
+
 		//
-
-		renderObject.object = object;
-		renderObject.instances = instances;
-
-		//
-
-		_chainKeys.length = 0;
 
 		return renderObject;
 

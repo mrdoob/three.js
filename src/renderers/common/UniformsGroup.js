@@ -235,6 +235,8 @@ class UniformsGroup extends UniformBuffer {
 			b[ offset ] = a[ offset ] = v;
 			updated = true;
 
+			this.addUpdateRange( offset, 1 );
+
 		}
 
 		return updated;
@@ -264,6 +266,8 @@ class UniformsGroup extends UniformBuffer {
 			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
 
 			updated = true;
+
+			this.addUpdateRange( offset, 2 );
 
 		}
 
@@ -295,6 +299,8 @@ class UniformsGroup extends UniformBuffer {
 			b[ offset + 2 ] = a[ offset + 2 ] = v.z;
 
 			updated = true;
+
+			this.addUpdateRange( offset, 3 );
 
 		}
 
@@ -328,6 +334,8 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
+			this.addUpdateRange( offset, 4 );
+
 		}
 
 		return updated;
@@ -357,6 +365,8 @@ class UniformsGroup extends UniformBuffer {
 			b[ offset + 2 ] = a[ offset + 2 ] = c.b;
 
 			updated = true;
+
+			this.addUpdateRange( offset, 3 );
 
 		}
 
@@ -396,6 +406,8 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
+			this.addUpdateRange( offset, 12 );
+
 		}
 
 		return updated;
@@ -422,6 +434,8 @@ class UniformsGroup extends UniformBuffer {
 			b.set( e, offset );
 			setArray( a, e, offset );
 			updated = true;
+
+			this.addUpdateRange( offset, 16 );
 
 		}
 
