@@ -68,7 +68,7 @@ class Uniform {
 		 * @type {number}
 		 */
 		this.index = - 1;
-		
+
 	}
 
 	/**
