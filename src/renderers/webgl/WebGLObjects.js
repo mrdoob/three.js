@@ -1,4 +1,4 @@
-function WebGLObjects( gl, geometries, attributes, info ) {
+function WebGLObjects( gl, geometries, attributes, bindingStates, info ) {
 
 	let updateMap = new WeakMap();
 
@@ -72,6 +72,8 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 		const instancedMesh = event.target;
 
 		instancedMesh.removeEventListener( 'dispose', onInstancedMeshDispose );
+
+		bindingStates.releaseStatesOfObject( instancedMesh );
 
 		attributes.remove( instancedMesh.instanceMatrix );
 

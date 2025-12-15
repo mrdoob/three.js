@@ -581,6 +581,47 @@ function WebGLBindingStates( gl, attributes ) {
 
 	}
 
+	function releaseStatesOfObject( object ) {
+
+		for ( const geometryId in bindingStates ) {
+
+			const objectMap = bindingStates[ geometryId ];
+
+			const objectId = ( object.isInstancedMesh === true ) ? object.id : 0;
+
+			const programMap = objectMap[ objectId ];
+
+			if ( programMap === undefined ) continue;
+
+			for ( const programId in programMap ) {
+
+				const stateMap = programMap[ programId ];
+
+				for ( const wireframe in stateMap ) {
+
+					deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+					delete stateMap[ wireframe ];
+
+				}
+
+				delete programMap[ programId ];
+
+			}
+
+			delete objectMap[ objectId ];
+
+			if ( Object.keys( objectMap ).length === 0 ) {
+
+				delete bindingStates[ geometryId ];
+
+			}
+
+		}
+
+	}
+
+
 	function reset() {
 
 		resetDefaultState();
@@ -610,6 +651,7 @@ function WebGLBindingStates( gl, attributes ) {
 		resetDefaultState: resetDefaultState,
 		dispose: dispose,
 		releaseStatesOfGeometry: releaseStatesOfGeometry,
+		releaseStatesOfObject: releaseStatesOfObject,
 		releaseStatesOfProgram: releaseStatesOfProgram,
 
 		initAttributes: initAttributes,
