@@ -47,6 +47,45 @@ class UniformsGroup extends UniformBuffer {
 		 */
 		this.uniforms = [];
 
+		/**
+		 * A map to cache update ranges.
+		 *
+		 * @private
+		 * @type {Map<string, {offset: number, count: number}>}
+		 */
+		this._updateRangeCache = new Map();
+
+	}
+
+	/**
+	 * Adds an update range to this buffer.
+	 *
+	 * @param {number} offset - The offset in number of elements.
+	 * @param {number} count - The number of elements.
+	 */
+	addUpdateRange( offset, count ) {
+
+		const key = `${ offset }_${ count }`;
+
+		if ( this._updateRangeCache.has( key ) === false ) {
+
+			this._updateRangeCache.set( key, true );
+
+			super.addUpdateRange( offset, count );
+
+		}
+
+	}
+
+	/**
+	 * Clears all update ranges of this buffer.
+	 */
+	clearUpdateRanges() {
+
+		this._updateRangeCache.clear();
+
+		super.clearUpdateRanges();
+
 	}
 
 	/**
