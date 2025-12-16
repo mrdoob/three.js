@@ -1772,8 +1772,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				const disposeEvent = () => {
 
-					delete renderTargetProperties.__boundDepthTexture;
-					delete renderTargetProperties.__depthDisposeCallback;
+					renderTargetProperties.__boundDepthTexture = undefined;
+					renderTargetProperties.__depthDisposeCallback = undefined;
 					depthTexture.removeEventListener( 'dispose', disposeEvent );
 
 				};

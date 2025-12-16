@@ -44,7 +44,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		_depthMaterial = new MeshDepthMaterial(),
 		_distanceMaterial = new MeshDistanceMaterial(),
 
-		_materialCache = {},
+		_materialCache = new Map(),
 
 		_maxTextureSize = capabilities.maxTextureSize;
 
@@ -439,21 +439,21 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 				const keyA = result.uuid, keyB = material.uuid;
 
-				let materialsForVariant = _materialCache[ keyA ];
+				let materialsForVariant = _materialCache.get( keyA );
 
 				if ( materialsForVariant === undefined ) {
 
-					materialsForVariant = {};
-					_materialCache[ keyA ] = materialsForVariant;
+					materialsForVariant = new Map();
+					_materialCache.set( keyA, materialsForVariant );
 
 				}
 
-				let cachedMaterial = materialsForVariant[ keyB ];
+				let cachedMaterial = materialsForVariant.get( keyB );
 
 				if ( cachedMaterial === undefined ) {
 
 					cachedMaterial = result.clone();
-					materialsForVariant[ keyB ] = cachedMaterial;
+					materialsForVariant.set( keyB, cachedMaterial );
 					material.addEventListener( 'dispose', onMaterialDispose );
 
 				}
@@ -575,17 +575,15 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		// make sure to remove the unique distance/depth materials used for shadow map rendering
 
-		for ( const id in _materialCache ) {
-
-			const cache = _materialCache[ id ];
+		for ( const cache of _materialCache.values() ) {
 
 			const uuid = event.target.uuid;
 
-			if ( uuid in cache ) {
+			if ( cache.has( uuid ) ) {
 
-				const shadowMaterial = cache[ uuid ];
+				const shadowMaterial = cache.get( uuid );
 				shadowMaterial.dispose();
-				delete cache[ uuid ];
+				cache.delete( uuid );
 
 			}
 
