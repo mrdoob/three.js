@@ -66,7 +66,7 @@ import {
 	InstancedBufferAttribute
 } from 'three';
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
-import { clone as cloneSkinnedMesh } from '../utils/SkeletonUtils.js';
+import { clone } from '../utils/SkeletonUtils.js';
 
 /**
  * A loader for the glTF 2.0 format.
@@ -4518,7 +4518,7 @@ class GLTFParser {
 				// See: https://github.com/mrdoob/three.js/issues/27993
 				if ( node.parent !== null ) {
 
-					scene.add( cloneSkinnedMesh( node ) );
+					scene.add( clone( node ) );
 
 				} else {
 
