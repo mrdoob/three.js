@@ -1,7 +1,4 @@
 
-//addons/loaders
-import './addons/loaders/GLTFLoader.tests.js';
-
 //addons/utils
 import './addons/utils/BufferGeometryUtils.tests.js';
 import './addons/math/ColorSpaces.tests.js';
