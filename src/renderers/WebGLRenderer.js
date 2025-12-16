@@ -446,7 +446,7 @@ class WebGLRenderer {
 			attributes = new WebGLAttributes( _gl );
 			bindingStates = new WebGLBindingStates( _gl, attributes );
 			geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
-			objects = new WebGLObjects( _gl, geometries, attributes, info );
+			objects = new WebGLObjects( _gl, geometries, attributes, bindingStates, info );
 			morphtargets = new WebGLMorphtargets( _gl, capabilities, textures );
 			clipping = new WebGLClipping( properties );
 			programCache = new WebGLPrograms( _this, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping );
