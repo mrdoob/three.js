@@ -14,7 +14,7 @@
 		<section>
 			<header>
 				<div class="class-description"><p>Post processing node for applying Ground Truth Ambient Occlusion (GTAO) to a scene.</p>
-<p>Reference: <a href="https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%2520VERSION_COLOR.pdf">https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf</a>.</p></div>
+<p>Reference: <a href="https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf" target="_blank" rel="noopener">Practical Real-Time Strategies for Accurate Indirect Occlusion</a>.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const postProcessing = new THREE.PostProcessing( renderer );
 const scenePass = pass( scene, camera );
@@ -31,7 +31,7 @@ postProcessing.outputNod = aoPass.getTextureNode().mul( scenePassColor );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">GTAONode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">GTAONode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { ao } from 'three/addons/tsl/display/GTAONode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -71,12 +71,6 @@ postProcessing.outputNod = aoPass.getTextureNode().mul( scenePassColor );
 					</div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
-				<div class="member">
-					<h3 class="name" id="_temporalDirection" translate="no">.<a href="#_temporalDirection">_temporalDirection</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
-					<div class="description">
-						<p>Temporal direction that influences the rotation angle for each slice.</p>
-					</div>
-				</div>
 				<div class="member">
 					<h3 class="name" id="depthNode" translate="no">.<a href="#depthNode">depthNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
@@ -260,7 +254,7 @@ when the effect is no longer required.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/GTAONode.js" target="_blank" rel="noopener" translate="no">examples/jsm/tsl/display/GTAONode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/display/GTAONode.js" translate="no" target="_blank" rel="noopener">examples/jsm/tsl/display/GTAONode.js</a>
 				</p>
 			</article>
 		</section>

@@ -77,7 +77,7 @@ class BloomNode extends TempNode {
 		this.strength = uniform( strength );
 
 		/**
-		 * The radius of the bloom.
+		 * The radius of the bloom. Must be in the range `[0,1]`.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -443,11 +443,21 @@ class BloomNode extends TempNode {
 
 		this._renderTargetBright.dispose();
 
+		if ( this._highPassFilterMaterial !== null ) this._highPassFilterMaterial.dispose();
+		if ( this._compositeMaterial !== null ) this._compositeMaterial.dispose();
+
+		for ( let i = 0; i < this._separableBlurMaterials.length; i ++ ) {
+
+			this._separableBlurMaterials[ i ].dispose();
+
+		}
+
 	}
 
 	/**
 	 * Create a separable blur material for the given kernel radius.
 	 *
+	 * @private
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {number} kernelRadius - The kernel radius.
 	 * @return {NodeMaterial}

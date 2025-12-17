@@ -1664,7 +1664,7 @@ function createObject( loader, elements, elementSize, isConditionalSegments = fa
 
 	if ( numGroupVerts > 0 ) {
 
-		bufferGeometry.addGroup( index0, Infinity, materials.length - 1 );
+		bufferGeometry.addGroup( index0, numGroupVerts, materials.length - 1 );
 
 	}
 
@@ -1749,7 +1749,7 @@ function createObject( loader, elements, elementSize, isConditionalSegments = fa
 /**
  * A loader for the LDraw format.
  *
- * [LDraw](https://ldraw.org/} (LEGO Draw) is an [open format specification]{@link https://ldraw.org/article/218.html)
+ * [LDraw](https://ldraw.org/} (LEGO Draw) is an [open format specification](https://ldraw.org/article/218.html)
  * for describing LEGO and other construction set 3D models.
  *
  * An LDraw asset (a text file usually with extension .ldr, .dat or .txt) can describe just a single construction
@@ -2400,7 +2400,6 @@ class LDrawLoader extends Loader {
 
 		material.color.setStyle( fillColor, COLOR_SPACE_LDRAW );
 		material.transparent = isTransparent;
-		material.premultipliedAlpha = true;
 		material.opacity = alpha;
 		material.depthWrite = ! isTransparent;
 

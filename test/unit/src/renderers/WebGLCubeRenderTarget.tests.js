@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { NearestFilter } from '../../../../src/constants.js';
 import { WebGLCubeRenderTarget } from '../../../../src/renderers/WebGLCubeRenderTarget.js';
 
@@ -28,33 +26,6 @@ export default QUnit.module( 'Renderers', () => {
 
 			const object = new WebGLCubeRenderTarget();
 			assert.ok( object, 'Can instantiate a WebGLCubeRenderTarget.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'texture', ( assert ) => {
-
-			// doc update needed, this needs to be a CubeTexture unlike parent class
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'isWebGLCubeRenderTarget', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'fromEquirectangularTexture', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clear', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

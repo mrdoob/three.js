@@ -20,8 +20,11 @@ export * from './core/MRTNode.js';
 
 // math
 export * from './math/BitcastNode.js';
+export * from './math/BitcountNode.js';
 export * from './math/Hash.js';
 export * from './math/MathUtils.js';
+export * from './math/PackFloatNode.js';
+export * from './math/UnpackFloatNode.js';
 export * from './math/TriNoise3D.js';
 
 // utils
@@ -160,7 +163,7 @@ export * from './materialx/MaterialXNodes.js';
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
-export { default as DFGApprox } from './functions/BSDF/DFGApprox.js';
+export { default as DFGLUT } from './functions/BSDF/DFGLUT.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';

@@ -486,7 +486,7 @@ function Script( editor ) {
 
 	} );
 
-	signals.materialChanged.add( function ( object, slot ) {
+	signals.materialChanged.add( function ( object/*, slot */ ) {
 
 		if ( object !== currentObject ) return;
 

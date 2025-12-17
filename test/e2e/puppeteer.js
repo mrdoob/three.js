@@ -23,6 +23,7 @@ const exceptionList = [
 	'physics_rapier_instancing',
 	'webgl_shadowmap',
 	'webgl_postprocessing_dof2',
+	'webgl_postprocessing_glitch',
 	'webgl_video_kinect',
 	'webgl_worker_offscreencanvas',
 	'webgpu_backdrop_water',
@@ -34,6 +35,7 @@ const exceptionList = [
 	'webgpu_postprocessing_sss',
 	'webgpu_postprocessing_traa',
 	'webgpu_reflection',
+	'webgpu_test_memory',
 	'webgpu_texturegrad',
 	'webgpu_tsl_vfx_flames',
 
@@ -119,14 +121,40 @@ const app = express();
 app.use( express.static( path.resolve() ) );
 const server = app.listen( port, main );
 
-process.on( 'SIGINT', () => close() );
+process.on( 'SIGINT', async () => {
+
+	console.log( '\nInterrupted, cleaning up...' );
+
+	if ( browser ) {
+
+		try {
+
+			await browser.close();
+
+		} catch ( e ) {}
+
+	}
+
+	server.close();
+	process.exit( 1 );
+
+} );
 
 async function main() {
 
 	/* Create output directory */
 
-	try { await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } ); } catch {}
-	try { await fs.mkdir( 'test/e2e/output-screenshots' ); } catch {}
+	try {
+
+		await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } );
+
+	} catch ( e ) {}
+
+	try {
+
+		await fs.mkdir( 'test/e2e/output-screenshots' );
+
+	} catch ( e ) {}
 
 	/* Find files */
 
@@ -287,11 +315,19 @@ async function preparePage( page, injection, builds, errorMessages ) {
 		}
 
 		const args = await Promise.all( msg.args().map( async arg => {
+
 			try {
+
 				return await arg.executionContext().evaluate( arg => arg instanceof Error ? arg.message : arg, arg );
-			} catch ( e ) { // Execution context might have been already destroyed
+
+			} catch ( e ) {
+
+				// Execution context might have been already destroyed
+
 				return arg;
+
 			}
+
 		} ) );
 
 		let text = args.join( ' ' ); // https://github.com/puppeteer/puppeteer/issues/3397#issuecomment-434970058
@@ -341,7 +377,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 			}
 
-		} catch {}
+		} catch ( e ) {}
 
 	} );
 
@@ -475,7 +511,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 				expected = ( await Jimp.read( `examples/screenshots/${ file }.jpg`, { quality: jpgQuality } ) );
 
-			} catch {
+			} catch ( e ) {
 
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
@@ -494,7 +530,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 					alpha: 0.2
 				} );
 
-			} catch {
+			} catch ( e ) {
 
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg` );

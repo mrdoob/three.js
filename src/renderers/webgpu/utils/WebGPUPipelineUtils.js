@@ -106,8 +106,9 @@ class WebGPUPipelineUtils {
 		for ( const bindGroup of renderObject.getBindings() ) {
 
 			const bindingsData = backend.get( bindGroup );
+			const { layoutGPU } = bindingsData.layout;
 
-			bindGroupLayouts.push( bindingsData.layout );
+			bindGroupLayouts.push( layoutGPU );
 
 		}
 
@@ -152,11 +153,22 @@ class WebGPUPipelineUtils {
 
 				const colorFormat = utils.getTextureFormatGPU( textures[ i ] );
 
-				targets.push( {
-					format: colorFormat,
-					blend: blending,
-					writeMask: colorWriteMask
-				} );
+				if ( i === 0 ) {
+
+					targets.push( {
+						format: colorFormat,
+						blend: blending,
+						writeMask: colorWriteMask
+					} );
+
+				} else {
+
+					targets.push( {
+						format: colorFormat,
+						writeMask: colorWriteMask
+					} );
+
+				}
 
 			}
 
@@ -330,8 +342,9 @@ class WebGPUPipelineUtils {
 		for ( const bindingsGroup of bindings ) {
 
 			const bindingsData = backend.get( bindingsGroup );
+			const { layoutGPU } = bindingsData.layout;
 
-			bindGroupLayouts.push( bindingsData.layout );
+			bindGroupLayouts.push( layoutGPU );
 
 		}
 

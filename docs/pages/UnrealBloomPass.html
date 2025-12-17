@@ -20,7 +20,7 @@ higher mips, this effect provides good quality and performance.</p>
 <p>When using this pass, tone mapping must be enabled in the renderer settings.</p>
 <p>Reference:</p>
 <ul>
-<li><a href="https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/">Bloom in Unreal Engine</a></li>
+<li><a href="https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/" target="_blank" rel="noopener">Bloom in Unreal Engine</a></li>
 </ul></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
@@ -30,7 +30,7 @@ composer.addPass( bloomPass );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">UnrealBloomPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">UnrealBloomPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -99,7 +99,7 @@ composer.addPass( bloomPass );
 				<div class="member">
 					<h3 class="name" id="radius" translate="no">.<a href="#radius">radius</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The Bloom radius.</p>
+						<p>The Bloom radius. Must be in the range <code>[0,1]</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -219,7 +219,7 @@ previous pass from this buffer.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/UnrealBloomPass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/UnrealBloomPass.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/UnrealBloomPass.js" translate="no" target="_blank" rel="noopener">examples/jsm/postprocessing/UnrealBloomPass.js</a>
 				</p>
 			</article>
 		</section>

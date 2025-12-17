@@ -1,6 +1,6 @@
 import InputNode from './InputNode.js';
 import { objectGroup } from './UniformGroupNode.js';
-import { nodeObject, getConstNodeType } from '../tsl/TSLCore.js';
+import { getConstNodeType } from '../tsl/TSLCore.js';
 import { getValueFromType } from './NodeUtils.js';
 import { warn } from '../../utils.js';
 
@@ -235,9 +235,24 @@ export const uniform = ( value, type ) => {
 
 	}
 
-	// @TODO: get ConstNode from .traverse() in the future
-	value = ( value && value.isNode === true ) ? ( value.node && value.node.value ) || value.value : value;
+	if ( value && value.isNode === true ) {
 
-	return nodeObject( new UniformNode( value, nodeType ) );
+		let v = value.value;
+
+		value.traverse( n => {
+
+			if ( n.isConstNode === true ) {
+
+				v = n.value;
+
+			}
+
+		} );
+
+		value = v;
+
+	}
+
+	return new UniformNode( value, nodeType );
 
 };

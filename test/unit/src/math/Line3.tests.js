@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Line3 } from '../../../../src/math/Line3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Vector4 } from '../../../../src/math/Vector4.js';

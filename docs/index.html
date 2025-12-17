@@ -293,6 +293,7 @@
 						<li><a href="BasicLightingModel.html">BasicLightingModel</a></li>
 						<li><a href="BatchNode.html">BatchNode</a></li>
 						<li><a href="BitcastNode.html">BitcastNode</a></li>
+						<li><a href="BitcountNode.html">BitcountNode</a></li>
 						<li><a href="BufferAttributeNode.html">BufferAttributeNode</a></li>
 						<li><a href="BufferNode.html">BufferNode</a></li>
 						<li><a href="BuiltinNode.html">BuiltinNode</a></li>
@@ -361,6 +362,7 @@
 						<li><a href="OperatorNode.html">OperatorNode</a></li>
 						<li><a href="OutputStructNode.html">OutputStructNode</a></li>
 						<li><a href="PMREMNode.html">PMREMNode</a></li>
+						<li><a href="PackFloatNode.html">PackFloatNode</a></li>
 						<li><a href="ParameterNode.html">ParameterNode</a></li>
 						<li><a href="PassMultipleTextureNode.html">PassMultipleTextureNode</a></li>
 						<li><a href="PassNode.html">PassNode</a></li>
@@ -417,6 +419,7 @@
 						<li><a href="UniformArrayNode.html">UniformArrayNode</a></li>
 						<li><a href="UniformGroupNode.html">UniformGroupNode</a></li>
 						<li><a href="UniformNode.html">UniformNode</a></li>
+						<li><a href="UnpackFloatNode.html">UnpackFloatNode</a></li>
 						<li><a href="UserDataNode.html">UserDataNode</a></li>
 						<li><a href="VarNode.html">VarNode</a></li>
 						<li><a href="VaryingNode.html">VaryingNode</a></li>
@@ -493,6 +496,7 @@
 						<li><a href="CompressedArrayTexture.html">CompressedArrayTexture</a></li>
 						<li><a href="CompressedCubeTexture.html">CompressedCubeTexture</a></li>
 						<li><a href="CompressedTexture.html">CompressedTexture</a></li>
+						<li><a href="CubeDepthTexture.html">CubeDepthTexture</a></li>
 						<li><a href="CubeTexture.html">CubeTexture</a></li>
 						<li><a href="Data3DTexture.html">Data3DTexture</a></li>
 						<li><a href="DataArrayTexture.html">DataArrayTexture</a></li>
@@ -609,6 +613,10 @@
 						<li><a href="VertexTangentsHelper.html">VertexTangentsHelper</a></li>
 						<li><a href="ViewHelper.html">ViewHelper</a></li>
 					</ul>
+					<h3>Inspector</h3>
+					<ul>
+						<li><a href="Tab.html">Tab</a></li>
+					</ul>
 					<h3>Interactive</h3>
 					<ul>
 						<li><a href="HTMLMesh.html">HTMLMesh</a></li>
@@ -681,9 +689,7 @@
 						<li><a href="ThreeMFLoader.html">ThreeMFLoader</a></li>
 						<li><a href="USDLoader.html">USDLoader</a></li>
 						<li><a href="UltraHDRLoader.html">UltraHDRLoader</a></li>
-						<li><a href="VOXData3DTexture.html">VOXData3DTexture</a></li>
 						<li><a href="VOXLoader.html">VOXLoader</a></li>
-						<li><a href="VOXMesh.html">VOXMesh</a></li>
 						<li><a href="VRMLLoader.html">VRMLLoader</a></li>
 						<li><a href="VTKLoader.html">VTKLoader</a></li>
 						<li><a href="XYZLoader.html">XYZLoader</a></li>
@@ -1019,6 +1025,8 @@
 						<li><a href="TSL.html#buffer">buffer</a></li>
 						<li><a href="TSL.html#bufferAttribute">bufferAttribute</a></li>
 						<li><a href="TSL.html#builtin">builtin</a></li>
+						<li><a href="TSL.html#builtinAOContext">builtinAOContext</a></li>
+						<li><a href="TSL.html#builtinShadowContext">builtinShadowContext</a></li>
 						<li><a href="TSL.html#bumpMap">bumpMap</a></li>
 						<li><a href="TSL.html#burn">burn</a></li>
 						<li><a href="TSL.html#bypass">bypass</a></li>
@@ -1057,6 +1065,9 @@
 						<li><a href="TSL.html#convertColorSpace">convertColorSpace</a></li>
 						<li><a href="TSL.html#convertToTexture">convertToTexture</a></li>
 						<li><a href="TSL.html#cos">cos</a></li>
+						<li><a href="TSL.html#countLeadingZeros">countLeadingZeros</a></li>
+						<li><a href="TSL.html#countOneBits">countOneBits</a></li>
+						<li><a href="TSL.html#countTrailingZeros">countTrailingZeros</a></li>
 						<li><a href="TSL.html#createVar">createVar</a></li>
 						<li><a href="TSL.html#cross">cross</a></li>
 						<li><a href="TSL.html#cubeMapNode">cubeMapNode</a></li>
@@ -1079,6 +1090,7 @@
 						<li><a href="TSL.html#determinant">determinant</a></li>
 						<li><a href="TSL.html#difference">difference</a></li>
 						<li><a href="TSL.html#diffuseColor">diffuseColor</a></li>
+						<li><a href="TSL.html#diffuseContribution">diffuseContribution</a></li>
 						<li><a href="TSL.html#directionToColor">directionToColor</a></li>
 						<li><a href="TSL.html#directionToFaceDirection">directionToFaceDirection</a></li>
 						<li><a href="TSL.html#dispersion">dispersion</a></li>
@@ -1271,6 +1283,9 @@
 						<li><a href="TSL.html#outputStruct">outputStruct</a></li>
 						<li><a href="TSL.html#overlay">overlay</a></li>
 						<li><a href="TSL.html#overloadingFn">overloadingFn</a></li>
+						<li><a href="TSL.html#packHalf2x16">packHalf2x16</a></li>
+						<li><a href="TSL.html#packSnorm2x16">packSnorm2x16</a></li>
+						<li><a href="TSL.html#packUnorm2x16">packUnorm2x16</a></li>
 						<li><a href="TSL.html#parabola">parabola</a></li>
 						<li><a href="TSL.html#parallaxBarrierPass">parallaxBarrierPass</a></li>
 						<li><a href="TSL.html#parallaxDirection">parallaxDirection</a></li>
@@ -1304,6 +1319,7 @@
 						<li><a href="TSL.html#quadSwapDiagonal">quadSwapDiagonal</a></li>
 						<li><a href="TSL.html#quadSwapX">quadSwapX</a></li>
 						<li><a href="TSL.html#quadSwapY">quadSwapY</a></li>
+						<li><a href="TSL.html#radialBlur">radialBlur</a></li>
 						<li><a href="TSL.html#radians">radians</a></li>
 						<li><a href="TSL.html#rand">rand</a></li>
 						<li><a href="TSL.html#range">range</a></li>
@@ -1325,6 +1341,7 @@
 						<li><a href="TSL.html#renderGroup">renderGroup</a></li>
 						<li><a href="TSL.html#renderOutput">renderOutput</a></li>
 						<li><a href="TSL.html#rendererReference">rendererReference</a></li>
+						<li><a href="TSL.html#replaceDefaultUV">replaceDefaultUV</a></li>
 						<li><a href="TSL.html#rgbShift">rgbShift</a></li>
 						<li><a href="TSL.html#rotate">rotate</a></li>
 						<li><a href="TSL.html#rotateUV">rotateUV</a></li>
@@ -1365,6 +1382,7 @@
 						<li><a href="TSL.html#smoothstepElement">smoothstepElement</a></li>
 						<li><a href="TSL.html#sobel">sobel</a></li>
 						<li><a href="TSL.html#specularColor">specularColor</a></li>
+						<li><a href="TSL.html#specularColorBlended">specularColorBlended</a></li>
 						<li><a href="TSL.html#specularF90">specularF90</a></li>
 						<li><a href="TSL.html#spherizeUV">spherizeUV</a></li>
 						<li><a href="TSL.html#spritesheetUV">spritesheetUV</a></li>
@@ -1416,6 +1434,8 @@
 						<li><a href="TSL.html#tangentWorld">tangentWorld</a></li>
 						<li><a href="TSL.html#texture">texture</a></li>
 						<li><a href="TSL.html#texture3D">texture3D</a></li>
+						<li><a href="TSL.html#texture3DLevel">texture3DLevel</a></li>
+						<li><a href="TSL.html#texture3DLoad">texture3DLoad</a></li>
 						<li><a href="TSL.html#textureBarrier">textureBarrier</a></li>
 						<li><a href="TSL.html#textureBase">textureBase</a></li>
 						<li><a href="TSL.html#textureBicubic">textureBicubic</a></li>
@@ -1450,6 +1470,10 @@
 						<li><a href="TSL.html#uniformFlow">uniformFlow</a></li>
 						<li><a href="TSL.html#uniformGroup">uniformGroup</a></li>
 						<li><a href="TSL.html#uniformTexture">uniformTexture</a></li>
+						<li><a href="TSL.html#unpackHalf2x16">unpackHalf2x16</a></li>
+						<li><a href="TSL.html#unpackNormal">unpackNormal</a></li>
+						<li><a href="TSL.html#unpackSnorm2x16">unpackSnorm2x16</a></li>
+						<li><a href="TSL.html#unpackUnorm2x16">unpackUnorm2x16</a></li>
 						<li><a href="TSL.html#unpremultiplyAlpha">unpremultiplyAlpha</a></li>
 						<li><a href="TSL.html#userData">userData</a></li>
 						<li><a href="TSL.html#uv">uv</a></li>
@@ -1473,6 +1497,7 @@
 						<li><a href="TSL.html#viewportSize">viewportSize</a></li>
 						<li><a href="TSL.html#viewportTexture">viewportTexture</a></li>
 						<li><a href="TSL.html#viewportUV">viewportUV</a></li>
+						<li><a href="TSL.html#vogelDiskSample">vogelDiskSample</a></li>
 						<li><a href="TSL.html#wgsl">wgsl</a></li>
 						<li><a href="TSL.html#workgroupArray">workgroupArray</a></li>
 						<li><a href="TSL.html#workgroupBarrier">workgroupBarrier</a></li>
@@ -1582,6 +1607,7 @@
 						<li><a href="global.html#NeverStencilFunc">NeverStencilFunc</a></li>
 						<li><a href="global.html#NoBlending">NoBlending</a></li>
 						<li><a href="global.html#NoColorSpace">NoColorSpace</a></li>
+						<li><a href="global.html#NoNormalPacking">NoNormalPacking</a></li>
 						<li><a href="global.html#NoToneMapping">NoToneMapping</a></li>
 						<li><a href="global.html#NodeAccess">NodeAccess</a></li>
 						<li><a href="global.html#NodeShaderStage">NodeShaderStage</a></li>
@@ -1589,6 +1615,8 @@
 						<li><a href="global.html#NodeUpdateType">NodeUpdateType</a></li>
 						<li><a href="global.html#NormalAnimationBlendMode">NormalAnimationBlendMode</a></li>
 						<li><a href="global.html#NormalBlending">NormalBlending</a></li>
+						<li><a href="global.html#NormalGAPacking">NormalGAPacking</a></li>
+						<li><a href="global.html#NormalRGPacking">NormalRGPacking</a></li>
 						<li><a href="global.html#NotEqualCompare">NotEqualCompare</a></li>
 						<li><a href="global.html#NotEqualDepth">NotEqualDepth</a></li>
 						<li><a href="global.html#NotEqualStencilFunc">NotEqualStencilFunc</a></li>
@@ -1608,8 +1636,11 @@
 						<li><a href="global.html#PCFShadowMap">PCFShadowMap</a></li>
 						<li><a href="global.html#PCFSoftShadowFilter">PCFSoftShadowFilter</a></li>
 						<li><a href="global.html#PCFSoftShadowMap">PCFSoftShadowMap</a></li>
+						<li><a href="global.html#PointShadowFilter">PointShadowFilter</a></li>
+						<li><a href="global.html#R11_EAC_Format">R11_EAC_Format</a></li>
 						<li><a href="global.html#RED_GREEN_RGTC2_Format">RED_GREEN_RGTC2_Format</a></li>
 						<li><a href="global.html#RED_RGTC1_Format">RED_RGTC1_Format</a></li>
+						<li><a href="global.html#RG11_EAC_Format">RG11_EAC_Format</a></li>
 						<li><a href="global.html#RGBADepthPacking">RGBADepthPacking</a></li>
 						<li><a href="global.html#RGBAFormat">RGBAFormat</a></li>
 						<li><a href="global.html#RGBAIntegerFormat">RGBAIntegerFormat</a></li>
@@ -1653,8 +1684,10 @@
 						<li><a href="global.html#RepeatWrapping">RepeatWrapping</a></li>
 						<li><a href="global.html#ReplaceStencilOp">ReplaceStencilOp</a></li>
 						<li><a href="global.html#ReverseSubtractEquation">ReverseSubtractEquation</a></li>
+						<li><a href="global.html#SIGNED_R11_EAC_Format">SIGNED_R11_EAC_Format</a></li>
 						<li><a href="global.html#SIGNED_RED_GREEN_RGTC2_Format">SIGNED_RED_GREEN_RGTC2_Format</a></li>
 						<li><a href="global.html#SIGNED_RED_RGTC1_Format">SIGNED_RED_RGTC1_Format</a></li>
+						<li><a href="global.html#SIGNED_RG11_EAC_Format">SIGNED_RG11_EAC_Format</a></li>
 						<li><a href="global.html#SRGBColorSpace">SRGBColorSpace</a></li>
 						<li><a href="global.html#SRGBTransfer">SRGBTransfer</a></li>
 						<li><a href="global.html#SRGB_TO_LINEAR">SRGB_TO_LINEAR</a></li>
@@ -1688,8 +1721,6 @@
 						<li><a href="global.html#UnsignedShort5551Type">UnsignedShort5551Type</a></li>
 						<li><a href="global.html#UnsignedShortType">UnsignedShortType</a></li>
 						<li><a href="global.html#VK_FORMAT_MAP">VK_FORMAT_MAP</a></li>
-						<li><a href="global.html#VSMPassHorizontal">VSMPassHorizontal</a></li>
-						<li><a href="global.html#VSMPassVertical">VSMPassVertical</a></li>
 						<li><a href="global.html#VSMShadowFilter">VSMShadowFilter</a></li>
 						<li><a href="global.html#VSMShadowMap">VSMShadowMap</a></li>
 						<li><a href="global.html#WebGLCoordinateSystem">WebGLCoordinateSystem</a></li>
@@ -1699,6 +1730,8 @@
 						<li><a href="global.html#ZeroFactor">ZeroFactor</a></li>
 						<li><a href="global.html#ZeroSlopeEnding">ZeroSlopeEnding</a></li>
 						<li><a href="global.html#ZeroStencilOp">ZeroStencilOp</a></li>
+						<li><a href="global.html#buildData3DTexture">buildData3DTexture</a></li>
+						<li><a href="global.html#buildMesh">buildMesh</a></li>
 						<li><a href="global.html#ceilPowerOfTwo">ceilPowerOfTwo</a></li>
 						<li><a href="global.html#contain">contain</a></li>
 						<li><a href="global.html#convertArray">convertArray</a></li>
@@ -1707,6 +1740,7 @@
 						<li><a href="global.html#damp">damp</a></li>
 						<li><a href="global.html#degToRad">degToRad</a></li>
 						<li><a href="global.html#denormalize">denormalize</a></li>
+						<li><a href="global.html#disposeShadowMaterial">disposeShadowMaterial</a></li>
 						<li><a href="global.html#euclideanModulo">euclideanModulo</a></li>
 						<li><a href="global.html#fill">fill</a></li>
 						<li><a href="global.html#flattenJSON">flattenJSON</a></li>
@@ -1742,6 +1776,7 @@
 						<li><a href="global.html#seededRandom">seededRandom</a></li>
 						<li><a href="global.html#setProjectionFromUnion">setProjectionFromUnion</a></li>
 						<li><a href="global.html#setQuaternionFromProperEuler">setQuaternionFromProperEuler</a></li>
+						<li><a href="global.html#shadowRenderObjectFunction">shadowRenderObjectFunction</a></li>
 						<li><a href="global.html#smootherstep">smootherstep</a></li>
 						<li><a href="global.html#sortedArray">sortedArray</a></li>
 						<li><a href="global.html#subclip">subclip</a></li>
@@ -1902,6 +1937,12 @@
 
 			const selectedPage = window.location.hash.substring( 1 );
 
+			if ( selectedPage === '' ) {
+
+				panel.classList.add( 'open' );
+
+			}
+
 			const links = navigation.querySelectorAll( 'a' );
 
 			links.forEach( link => {
@@ -2029,7 +2070,9 @@
 				}
 
 				const regExp = new RegExp( escapeRegExp( v ), 'gi' );
-				const highlightRegExp = new RegExp( v.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ), 'gi' );
+				// Create highlight regex that matches any of the search words
+				const words = v.split( ' ' ).map( word => word.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ) ).join( '|' );
+				const highlightRegExp = new RegExp( words, 'gi' );
 
 				// Search through all categories
 				const results = [];
@@ -2038,7 +2081,9 @@
 					const items = searchData[ category ];
 					for ( const item of items ) {
 
-						if ( item.title.match( regExp ) ) {
+						// Match against combined category and title for multi-word searches
+						const searchText = category + ' ' + item.title;
+						if ( searchText.match( regExp ) ) {
 
 							results.push( { ...item, category } );
 
@@ -2128,7 +2173,8 @@
 
 						if ( ! byCategory[ category ] ) continue;
 
-						html += `<h2>${category}</h2>`;
+						const highlightedCategory = highlightMatch( category, highlightRegExp );
+						html += `<h2>${highlightedCategory}</h2>`;
 
 						for ( const className in byCategory[ category ] ) {
 

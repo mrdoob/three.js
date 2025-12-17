@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';
 
 import { DynamicDrawUsage } from '../../../../src/constants.js';
@@ -32,54 +30,6 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'array', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'stride', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'count', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'usage', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'updateRanges', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'version', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'uuid', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'onUploadCallback', ( assert ) => {
-
-			// onUploadCallback() {} declared but used as property, refactor req
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
 
 		QUnit.test( 'needsUpdate', ( assert ) => {
 
@@ -143,12 +93,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'onUpload', ( assert ) => {
 
 			const a = new InterleavedBuffer();
@@ -157,12 +101,6 @@ export default QUnit.module( 'Core', () => {
 			a.onUpload( func );
 
 			assert.strictEqual( a.onUploadCallback, func, 'Check callback was set properly' );
-
-		} );
-
-		QUnit.todo( 'toJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

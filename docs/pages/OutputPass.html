@@ -25,7 +25,7 @@ composer.addPass( outputPass );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">OutputPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">OutputPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -37,6 +37,13 @@ composer.addPass( outputPass );
 					</div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isOutputPass" translate="no">.<a href="#isOutputPass">isOutputPass</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag indicates that this is an output pass.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
 				<div class="member">
 					<h3 class="name" id="material" translate="no">.<a href="#material">material</a><span class="type-signature"> : <a href="RawShaderMaterial.html">RawShaderMaterial</a></span> </h3>
 					<div class="description">
@@ -117,7 +124,7 @@ previous pass from this buffer.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/OutputPass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/OutputPass.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/OutputPass.js" translate="no" target="_blank" rel="noopener">examples/jsm/postprocessing/OutputPass.js</a>
 				</p>
 			</article>
 		</section>

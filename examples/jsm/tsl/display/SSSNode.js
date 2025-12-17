@@ -90,9 +90,9 @@ class SSSNode extends TempNode {
 		 * Shadow intensity. Must be in the range `[0, 1]`.
 		 *
 		 * @type {UniformNode<float>}
-		 * @default 0.5
+		 * @default 1.0
 		 */
-		this.shadowIntensity = uniform( 0.5, 'float' );
+		this.shadowIntensity = uniform( 1.0, 'float' );
 
 		/**
 		 * This parameter controls how detailed the raymarching process works.
@@ -192,6 +192,7 @@ class SSSNode extends TempNode {
 		/**
 		 * Temporal offset added to the initial ray step.
 		 *
+		 * @private
 		 * @type {UniformNode<float>}
 		 */
 		this._temporalOffset = uniform( 0 );
@@ -199,6 +200,7 @@ class SSSNode extends TempNode {
 		/**
 		 * The frame ID use when temporal filtering is enabled.
 		 *
+		 * @private
 		 * @type {UniformNode<uint>}
 		 */
 		this._frameId = uniform( 0 );

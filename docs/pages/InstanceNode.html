@@ -21,7 +21,7 @@ data.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="InstanceNode" translate="no">new <a href="#InstanceNode">InstanceNode</a><span class="signature">( count : <span class="param-type">number</span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span>, instanceColor : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a></span> )</span> </h3>
+					<h3 class="name name-method" id="InstanceNode" translate="no">new <a href="#InstanceNode">InstanceNode</a><span class="signature">( count : <span class="param-type">number</span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, instanceColor : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new instance node.</p>
@@ -102,6 +102,18 @@ data.</p></div>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="isStorageColor" translate="no">.<a href="#isStorageColor">isStorageColor</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Tracks whether the color data is provided via a storage buffer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isStorageMatrix" translate="no">.<a href="#isStorageMatrix">isStorageMatrix</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Tracks whether the matrix data is provided via a storage buffer.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="updateType" translate="no">.<a href="#updateType">updateType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The update type is set to <code>frame</code> since an update
@@ -139,7 +151,7 @@ like with morph and skinning nodes.</p>
 					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Checks if the internal buffers required an update.</p>
+							<p>Checks if the internal buffers require an update.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -159,7 +171,7 @@ like with morph and skinning nodes.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/InstanceNode.js" target="_blank" rel="noopener" translate="no">src/nodes/accessors/InstanceNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/InstanceNode.js" translate="no" target="_blank" rel="noopener">src/nodes/accessors/InstanceNode.js</a>
 				</p>
 			</article>
 		</section>

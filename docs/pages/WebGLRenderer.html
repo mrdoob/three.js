@@ -1022,6 +1022,24 @@ size.y = height * pixelRatio;
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="setEffects" translate="no">.<a href="#setEffects">setEffects</a><span class="signature">( effects : <span class="param-type">Array</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the post-processing effects to be applied after rendering.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>effects</strong>
+									</td>
+									<td class="description last">
+										<p>An array of post-processing effects.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="setOpaqueSort" translate="no">.<a href="#setOpaqueSort">setOpaqueSort</a><span class="signature">( method : <span class="param-type">function</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -1408,16 +1426,6 @@ Or alternatively a four-component vector specifying all the parameters of the vi
 and the rendering context supports <code>EXT_clip_control</code>.</p>
 			</td>
 		</tr>
-		<tr>
-				<td class="name">
-					<strong>vertexTextures</strong>
-						<br>
-<span class="param-type">boolean</span>
-				</td>
-			<td class="description last">
-				<p><code>true</code> if vertex textures can be used.</p>
-			</td>
-		</tr>
 	</tbody>
 </table>
 				</div>
@@ -1734,6 +1742,17 @@ This is a more faster and accurate version than logarithmic depth buffer.</p>
 						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>
+		<tr>
+				<td class="name">
+					<strong>outputBufferType</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Defines the type of the output buffer. Use <code>HalfFloatType</code> for HDR rendering with tone mapping and post-processing support.</p>
+						<p>Default is <code>UnsignedByteType</code>.</p>
+			</td>
+		</tr>
 	</tbody>
 </table>
 				</div>
@@ -1787,8 +1806,6 @@ will be updated in the next <code>render</code> call.</p>
 |
 <span class="param-type"><a href="global.html#PCFShadowMap">PCFShadowMap</a></span>
 |
-<span class="param-type"><a href="global.html#PCFSoftShadowMap">PCFSoftShadowMap</a></span>
-|
 <span class="param-type"><a href="global.html#VSMShadowMap">VSMShadowMap</a></span>
 				</td>
 			<td class="description last">
@@ -1801,7 +1818,7 @@ will be updated in the next <code>render</code> call.</p>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js" target="_blank" rel="noopener" translate="no">src/renderers/WebGLRenderer.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js" translate="no" target="_blank" rel="noopener">src/renderers/WebGLRenderer.js</a>
 				</p>
 			</article>
 		</section>

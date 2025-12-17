@@ -1,5 +1,31 @@
 import { Fn, vec2 } from '../tsl/TSLBase.js';
 import { rotate } from './RotateNode.js';
+import { context } from '../core/ContextNode.js';
+
+/**
+ * Replaces the default UV coordinates used in texture lookups.
+ *
+ * ```js
+ *material.contextNode = replaceDefaultUV( ( textureNode ) => {
+ *
+ *	// ...
+ *	return customUVCoordinates;
+ *
+ *} );
+ *```
+ *
+ * @tsl
+ * @function
+ * @param {function(Node):Node<vec2>} callback - A callback that receives the texture node
+ * and must return the new uv coordinates.
+ * @param {Node} [node=null] - An optional node to which the context will be applied.
+ * @return {ContextNode} A context node that replaces the default UV coordinates.
+ */
+export function replaceDefaultUV( callback, node = null ) {
+
+	return context( node, { getUV: callback } );
+
+}
 
 /**
  * Rotates the given uv coordinates around a center point

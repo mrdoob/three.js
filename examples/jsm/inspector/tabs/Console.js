@@ -2,9 +2,9 @@ import { Tab } from '../ui/Tab.js';
 
 class Console extends Tab {
 
-	constructor() {
+	constructor( options = {} ) {
 
-		super( 'Console' );
+		super( 'Console', options );
 
 		this.filters = { info: true, warn: true, error: true };
 		this.filterText = '';

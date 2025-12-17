@@ -76,6 +76,12 @@ postProcessing.outputNode = scenePass;
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="contextNode" translate="no">.<a href="#contextNode">contextNode</a><span class="type-signature"> : <a href="ContextNode.html">ContextNode</a> | null</span> </h3>
+					<div class="description">
+						<p>An optional global context for the pass.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="global" translate="no">.<a href="#global">global</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>This flag is used for global cache.</p>
@@ -93,9 +99,22 @@ postProcessing.outputNode = scenePass;
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="opaque" translate="no">.<a href="#opaque">opaque</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the pass is opaque.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="options" translate="no">.<a href="#options">options</a><span class="type-signature"> : Object</span> </h3>
 					<div class="description">
 						<p>Options for the internal render target.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="overrideMaterial" translate="no">.<a href="#overrideMaterial">overrideMaterial</a><span class="type-signature"> : <a href="Material.html">Material</a> | null</span> </h3>
+					<div class="description">
+						<p>An optional override material for the pass.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -114,6 +133,13 @@ postProcessing.outputNode = scenePass;
 					<h3 class="name" id="scope" translate="no">.<a href="#scope">scope</a><span class="type-signature"> : 'color' | 'depth'</span> </h3>
 					<div class="description">
 						<p>The scope of the pass. The scope determines whether the node outputs color or depth.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="transparent" translate="no">.<a href="#transparent">transparent</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the pass is transparent.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -585,7 +611,7 @@ with <code>null</code> as the single argument.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/display/PassNode.js" target="_blank" rel="noopener" translate="no">src/nodes/display/PassNode.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/display/PassNode.js" translate="no" target="_blank" rel="noopener">src/nodes/display/PassNode.js</a>
 				</p>
 			</article>
 		</section>

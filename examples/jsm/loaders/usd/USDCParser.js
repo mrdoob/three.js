@@ -4,7 +4,7 @@ import {
 
 class USDCParser {
 
-	parse( buffer ) {
+	parse( /* buffer */ ) {
 
 		// TODO
 

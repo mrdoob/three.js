@@ -111,6 +111,14 @@ now defines indirect draw calls.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="indirectOffset" translate="no">.<a href="#indirectOffset">indirectOffset</a><span class="type-signature"> : number | Array.&lt;number></span> </h3>
+					<div class="description">
+						<p>The offset, in bytes, into the indirect drawing buffer where the value data begins. If an array is provided, multiple indirect draw calls will be made for each offset.</p>
+<p>Can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a> and a WebGPU backend.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="isBufferGeometry" translate="no">.<a href="#isBufferGeometry">isBufferGeometry</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
@@ -122,7 +130,7 @@ now defines indirect draw calls.</p>
 					<div class="description">
 						<p>This dictionary holds the morph targets of the geometry.</p>
 <p>Note: Once the geometry has been rendered, the morph attribute data cannot
-be changed. You will have to call `dispose()?, and create a new geometry instance.</p>
+be changed. You will have to call <code>dispose()</code>, and create a new geometry instance.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -644,7 +652,7 @@ data from the array. The length of the array must match the vertex count.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setIndirect" translate="no">.<a href="#setIndirect">setIndirect</a><span class="signature">( indirect : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<h3 class="name name-method" id="setIndirect" translate="no">.<a href="#setIndirect">setIndirect</a><span class="signature">( indirect : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, indirectOffset : <span class="param-type">number | Array.&lt;number></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Sets the given indirect attribute to this geometry.</p>
@@ -657,6 +665,15 @@ data from the array. The length of the array must match the vertex count.</p>
 									</td>
 									<td class="description last">
 										<p>The attribute holding indirect draw calls.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong>indirectOffset</strong>
+									</td>
+									<td class="description last">
+										<p>The offset, in bytes, into the indirect drawing buffer where the value data begins. If an array is provided, multiple indirect draw calls will be made for each offset.</p>
+										<p>Default is <code>0</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -725,7 +742,7 @@ real-time mesh rotation.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js" target="_blank" rel="noopener" translate="no">src/core/BufferGeometry.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js" translate="no" target="_blank" rel="noopener">src/core/BufferGeometry.js</a>
 				</p>
 			</article>
 		</section>

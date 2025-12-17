@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
+import { nodeImmutable } from '../tsl/TSLCore.js';
 import { hashString } from './NodeUtils.js';
 
 /**
@@ -113,7 +113,7 @@ export default PropertyNode;
  * @param {?string} [name=null] - The name of the property in the shader.
  * @returns {PropertyNode}
  */
-export const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
+export const property = ( type, name ) => new PropertyNode( type, name );
 
 /**
  * TSL function for creating a varying property node.
@@ -124,7 +124,7 @@ export const property = ( type, name ) => nodeObject( new PropertyNode( type, na
  * @param {?string} [name=null] - The name of the varying in the shader.
  * @returns {PropertyNode}
  */
-export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
+export const varyingProperty = ( type, name ) => new PropertyNode( type, name, true );
 
 /**
  * TSL object that represents the shader variable `DiffuseColor`.
@@ -133,6 +133,14 @@ export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( t
  * @type {PropertyNode<vec4>}
  */
 export const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
+
+/**
+ * TSL object that represents the shader variable `DiffuseContribution`.
+ *
+ * @tsl
+ * @type {PropertyNode<vec3>}
+ */
+export const diffuseContribution = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'DiffuseContribution' );
 
 /**
  * TSL object that represents the shader variable `EmissiveColor`.
@@ -253,6 +261,14 @@ export const anisotropyB = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'A
  * @type {PropertyNode<color>}
  */
 export const specularColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
+
+/**
+ * TSL object that represents the shader variable `SpecularColorBlended`.
+ *
+ * @tsl
+ * @type {PropertyNode<color>}
+ */
+export const specularColorBlended = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColorBlended' );
 
 /**
  * TSL object that represents the shader variable `SpecularF90`.

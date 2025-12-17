@@ -25,7 +25,7 @@ you don't want that, use <a href="RawShaderMaterial.html">RawShaderMaterial</a> 
 in order to unroll a <code>for</code> loop in GLSL by the shader preprocessor. The directive has
 to be placed right above the loop. The loop formatting has to correspond to a defined standard.
 <ul>
-<li>The loop has to be <a href="https://en.wikipedia.org/wiki/Normalized_loop">normalized</a>.</li>
+<li>The loop has to be <a href="https://en.wikipedia.org/wiki/Normalized_loop" target="_blank" rel="noopener">normalized</a>.</li>
 <li>The loop variable has to be <em>i</em>.</li>
 <li>The value <code>UNROLLED_LOOP_INDEX</code> will be replaced with the explicitly
 value of <em>i</em> for the given iteration and can be used in preprocessor
@@ -122,8 +122,18 @@ yields another directive.</p>
 				<div class="member">
 					<h3 class="name" id="fog" translate="no">.<a href="#fog">fog</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Define whether the material color is affected by global fog settings; <code>true</code>
+						<p>Defines whether the material color is affected by global fog settings; <code>true</code>
 to pass fog uniforms to the shader.</p>
+<p>Setting this property to <code>true</code> requires the definition of fog uniforms. It is
+recommended to use <code>UniformsUtils.merge()</code> to combine the custom shader uniforms
+with predefined fog uniforms.</p>
+<pre><code class="language-js">const material = new ShaderMaterial( {
+    uniforms: UniformsUtils.merge( [ UniformsLib[ 'fog' ], shaderUniforms ] );
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    fog: true
+} );
+</code></pre>
 						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
@@ -153,7 +163,7 @@ to pass fog uniforms to the shader.</p>
 				<div class="member">
 					<h3 class="name" id="index0AttributeName" translate="no">.<a href="#index0AttributeName">index0AttributeName</a><span class="type-signature"> : string | undefined</span> </h3>
 					<div class="description">
-						<p>If set, this calls <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation">gl.bindAttribLocation</a>
+						<p>If set, this calls <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation" target="_blank" rel="noopener">gl.bindAttribLocation</a>
 to bind a generic vertex index to an attribute variable.</p>
 						<p>Default is <code>undefined</code>.</p>
 					</div>
@@ -302,7 +312,7 @@ update the value available to the GLSL code.</p>
 				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/ShaderMaterial.js" target="_blank" rel="noopener" translate="no">src/materials/ShaderMaterial.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/materials/ShaderMaterial.js" translate="no" target="_blank" rel="noopener">src/materials/ShaderMaterial.js</a>
 				</p>
 			</article>
 		</section>

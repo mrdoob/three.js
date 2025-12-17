@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ArrayCamera } from '../../../../src/cameras/ArrayCamera.js';
 
 import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
@@ -24,14 +22,6 @@ export default QUnit.module( 'Cameras', () => {
 
 			const object = new ArrayCamera();
 			assert.ok( object, 'Can instantiate an ArrayCamera.' );
-
-		} );
-
-		// PROPERTIES
-		QUnit.todo( 'cameras', ( assert ) => {
-
-			// array
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

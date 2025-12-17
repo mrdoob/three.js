@@ -22,7 +22,7 @@ composer.addPass( renderPass );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">RenderPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank">Installation#Addons</a>.</p>
+				<p><span translate="no">RenderPass</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -120,6 +120,13 @@ for all objects in the scene.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="isRenderPass" translate="no">.<a href="#isRenderPass">isRenderPass</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag indicates that this pass renders the scene itself.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="needsSwap" translate="no">.<a href="#needsSwap">needsSwap</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Overwritten to disable the swap.</p>
@@ -201,7 +208,7 @@ previous pass from this buffer.</p>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
-					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/RenderPass.js" target="_blank" rel="noopener" translate="no">examples/jsm/postprocessing/RenderPass.js</a>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/RenderPass.js" translate="no" target="_blank" rel="noopener">examples/jsm/postprocessing/RenderPass.js</a>
 				</p>
 			</article>
 		</section>

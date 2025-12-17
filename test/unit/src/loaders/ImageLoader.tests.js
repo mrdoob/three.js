@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { ImageLoader } from '../../../../src/loaders/ImageLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
@@ -24,13 +22,6 @@ export default QUnit.module( 'Loaders', () => {
 
 			const object = new ImageLoader();
 			assert.ok( object, 'Can instantiate an ImageLoader.' );
-
-		} );
-
-		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
