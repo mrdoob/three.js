@@ -120,6 +120,17 @@ class WebGPUPipelineUtils {
 
 		let blending;
 
+		if ( material.premultipliedAlpha === false ) {
+
+			if ( material.blending === MultiplyBlending || material.blending === SubtractiveBlending ) {
+
+				warnOnce( 'WebGPURenderer: Material premultipliedAlpha was set to true because MultiplyBlending and SubtractiveBlending require it.' );
+				material.premultipliedAlpha = true;
+
+			}
+
+		}
+
 		if ( material.blending !== NoBlending && ( material.blending !== NormalBlending || material.transparent !== false ) ) {
 
 			blending = this._getBlending( material );
@@ -445,16 +456,6 @@ class WebGPUPipelineUtils {
 
 					case AdditiveBlending:
 						setBlend( GPUBlendFactor.SrcAlpha, GPUBlendFactor.One, GPUBlendFactor.One, GPUBlendFactor.One );
-						break;
-
-					case SubtractiveBlending:
-						warnOnce( 'WebGPURenderer: SubtractiveBlending works best with material.premultipliedAlpha = true.' );
-						setBlend( GPUBlendFactor.Zero, GPUBlendFactor.OneMinusSrc, GPUBlendFactor.Zero, GPUBlendFactor.One );
-						break;
-
-					case MultiplyBlending:
-						warnOnce( 'WebGPURenderer: MultiplyBlending works best with material.premultipliedAlpha = true.' );
-						setBlend( GPUBlendFactor.Dst, GPUBlendFactor.OneMinusSrcAlpha, GPUBlendFactor.Zero, GPUBlendFactor.One );
 						break;
 
 				}

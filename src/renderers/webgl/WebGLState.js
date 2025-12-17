@@ -689,16 +689,6 @@ function WebGLState( gl, extensions ) {
 							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE );
 							break;
 
-						case SubtractiveBlending:
-							warnOnce( 'WebGLState: SubtractiveBlending works best with material.premultipliedAlpha = true.' );
-							gl.blendFuncSeparate( gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ZERO, gl.ONE );
-							break;
-
-						case MultiplyBlending:
-							warnOnce( 'WebGLState: MultiplyBlending works best with material.premultipliedAlpha = true.' );
-							gl.blendFuncSeparate( gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
-							break;
-
 						default:
 							error( 'WebGLState: Invalid blending: ', blending );
 							break;
@@ -773,6 +763,17 @@ function WebGLState( gl, extensions ) {
 		if ( frontFaceCW ) flipSided = ! flipSided;
 
 		setFlipSided( flipSided );
+
+		if ( material.premultipliedAlpha === false ) {
+
+			if ( material.blending === MultiplyBlending || material.blending === SubtractiveBlending ) {
+
+				warnOnce( 'WebGLState: Material premultipliedAlpha was set to true because MultiplyBlending and SubtractiveBlending require it.' );
+				material.premultipliedAlpha = true;
+
+			}
+
+		}
 
 		( material.blending === NormalBlending && material.transparent === false )
 			? setBlending( NoBlending )
