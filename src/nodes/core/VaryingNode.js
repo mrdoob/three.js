@@ -2,7 +2,6 @@ import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { subBuild } from './SubBuildNode.js';
-import { warn } from '../../utils.js';
 
 /**
  * Class for representing shader varyings as nodes. Varyings are create from
