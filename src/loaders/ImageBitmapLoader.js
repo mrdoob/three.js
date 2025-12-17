@@ -13,7 +13,7 @@ const _errorMap = new WeakMap();
  * These options need to be configured via {@link ImageBitmapLoader#setOptions} prior to loading,
  * unlike regular images which can be configured on the Texture to set these options on GPU upload instead.
  *
- * To match the default behaviour of {@link Texture}, the following options are needed
+ * To match the default behaviour of {@link Texture}, the following options are needed:
  *
  * ```js
  * { imageOrientation: 'flipY', premultiplyAlpha: 'none' }
