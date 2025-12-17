@@ -59,7 +59,8 @@ if ( typeof hljs !== 'undefined' ) {
 		if ( ! isSamePageLink ) return;
 
 		const hash = target.hash.substring( 1 );
-		const newHash = ( hash !== className ) ? `#${className}.${hash}` : `#${hash}`;
+		// For TSL and Global pages, don't add className prefix since the anchors are direct
+		const newHash = ( className === 'TSL' || className === 'Global' || hash === className ) ? `#${hash}` : `#${className}.${hash}`;
 		const targetWindow = ( window.parent !== window ) ? window.parent : window;
 
 		targetWindow.history.pushState( null, '', newHash );
