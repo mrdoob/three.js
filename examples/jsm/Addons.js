@@ -123,7 +123,6 @@ export * from './loaders/VRMLLoader.js';
 export * from './loaders/VTKLoader.js';
 export * from './loaders/XYZLoader.js';
 
-export * from './materials/MeshGouraudMaterial.js';
 export * from './materials/LDrawConditionalLineMaterial.js';
 export * from './materials/MeshPostProcessingMaterial.js';
 
