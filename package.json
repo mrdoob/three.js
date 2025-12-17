@@ -5,10 +5,11 @@
   "type": "module",
   "main": "./build/three.cjs",
   "module": "./build/three.module.js",
-  "engines": {
-    "node": ">=20"
-  },
   "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=20"
+    },
     "packageManager": {
       "name": "npm"
     }
