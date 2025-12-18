@@ -151,7 +151,28 @@ function buildSearchListForData() {
 		'TSL': []
 	};
 
+	// State flags that should appear in search (not type-checking properties)
+	const allowedIsProperties = new Set( [
+		'isPlaying',
+		'isDisposed',
+		'isPresenting'
+	] );
+
 	data().each( ( item ) => {
+
+		// Skip .is* type-checking properties (e.g., isCamera, isMesh)
+		// but keep state flags listed in allowedIsProperties
+		if ( item.name && item.kind === 'member' ) {
+
+			const name = item.name;
+
+			if ( name.startsWith( 'is' ) && ! allowedIsProperties.has( name ) ) {
+
+				return;
+
+			}
+
+		}
 
 		if ( item.kind !== 'package' && item.kind !== 'typedef' && ! item.inherited ) {
 
