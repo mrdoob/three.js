@@ -66,6 +66,7 @@ import {
 	InstancedBufferAttribute
 } from 'three';
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
+import { clone } from '../utils/SkeletonUtils.js';
 
 /**
  * A loader for the glTF 2.0 format.
@@ -4510,7 +4511,20 @@ class GLTFParser {
 
 			for ( let i = 0, il = nodes.length; i < il; i ++ ) {
 
-				scene.add( nodes[ i ] );
+				const node = nodes[ i ];
+
+				// If the node already has a parent, it means it's being reused across multiple scenes.
+				// Clone it to avoid the second scene's add() removing it from the first scene.
+				// See: https://github.com/mrdoob/three.js/issues/27993
+				if ( node.parent !== null ) {
+
+					scene.add( clone( node ) );
+
+				} else {
+
+					scene.add( node );
+
+				}
 
 			}
 
