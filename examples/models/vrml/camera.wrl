@@ -1,0 +1,51 @@
+#VRML V2.0 utf8
+
+DirectionalLight {
+  direction 1 0 -1
+}
+
+PerspectiveCamera {
+  position -8.6 2.1 5.6
+  orientation -0.14 -1 -0.12 1.142
+  focalDistance 10.84
+  heightAngle 0.785398
+}
+
+OrthographicCamera {
+  position 8.6 2.1 -5.6
+  orientation -0.14 -1 -0.12 -1.142
+  focalDistance 10.84
+  height 5
+}
+
+Transform {
+  translation 3 0 1
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {diffuseColor 0 0 1}
+      }
+      geometry Sphere {
+        radius 2.3
+      }
+    }
+  ]
+}
+
+Transform {
+  translation 2 2.5 1.25
+  children [
+    Anchor {
+      url "https://threejs.org/"
+      description "three.js"
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {emissiveColor 1 1 0}
+          }
+          geometry Box {}
+        }
+      ]
+    }
+  ]
+}
