@@ -46,6 +46,7 @@ class SSAOPass extends Pass {
 	/**
 	 * Constructs a new SSAO pass.
 	 *
+	 * @deprecated SSAO has been deprecated and will be removed with r193. Use GTAOPass instead.
 	 * @param {Scene} scene - The scene to compute the AO for.
 	 * @param {Camera} camera - The camera.
 	 * @param {number} [width=512] - The width of the effect.
@@ -240,6 +241,8 @@ class SSAOPass extends Pass {
 		this._fsQuad = new FullScreenQuad( null );
 
 		this._originalClearColor = new Color();
+
+		console.warn( 'THREE.SSAOPass: SSAO has been deprecated and will be removed with r193. Use GTAOPass instead.' ); // @deprecated, r183
 
 	}
 

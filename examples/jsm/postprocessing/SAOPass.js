@@ -40,6 +40,7 @@ class SAOPass extends Pass {
 	/**
 	 * Constructs a new SAO pass.
 	 *
+	 * @deprecated SAO has been deprecated and will be removed with r193. Use GTAOPass instead.
 	 * @param {Scene} scene - The scene to compute the AO for.
 	 * @param {Camera} camera - The camera.
 	 * @param {Vector2} [resolution] - The effect's resolution.
@@ -183,6 +184,8 @@ class SAOPass extends Pass {
 		this.materialCopy.blendEquationAlpha = AddEquation;
 
 		this.fsQuad = new FullScreenQuad( null );
+
+		console.warn( 'THREE.SAOPass: SAO has been deprecated and will be removed with r193. Use GTAOPass instead.' ); // @deprecated, r183
 
 	}
 
