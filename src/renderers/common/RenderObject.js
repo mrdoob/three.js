@@ -1,4 +1,4 @@
-import { hash, hashString } from '../../nodes/core/NodeUtils.js';
+import { hash, hashString, roundInstances } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
 
@@ -69,8 +69,9 @@ class RenderObject {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
+	 * @param {Array<Object3D>} [instances=null] - An array of instances for instanced rendering.
 	 */
-	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext ) {
+	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, instances = null ) {
 
 		this.id = _id ++;
 
@@ -152,6 +153,20 @@ class RenderObject {
 		 * @type {number}
 		 */
 		this.version = material.version;
+
+		/**
+		 * An array of instances for instanced rendering.
+		 *
+		 * @type {?Array<Object3D>}
+		 */
+		this.instances = instances;
+
+		/**
+		 * The count of instances.
+		 *
+		 * @type {number}
+		 */
+		this.count = instances !== null ? roundInstances( instances.length ) : 1;
 
 		/**
 		 * The draw range of the geometry.
@@ -369,6 +384,20 @@ class RenderObject {
 
 	}
 
+	getDrawInstances() {
+
+		const builderInstances = this.getNodeBuilderState().instances;
+
+		if ( builderInstances !== null && this.instances === null ) {
+
+			this.instances = [ this.object ];
+
+		}
+
+		return this.instances;
+
+	}
+
 	/**
 	 * Returns the node builder state of this render object.
 	 *
@@ -462,7 +491,7 @@ class RenderObject {
 	 */
 	getChainArray() {
 
-		return [ this.object, this.material, this.context, this.lightsNode ];
+		return [ this.object.geometry, this.material, this.context, this.lightsNode ];
 
 	}
 
@@ -882,7 +911,19 @@ class RenderObject {
 
 		}
 
-		cacheKey = hash( cacheKey, this.renderer.contextNode.id, this.renderer.contextNode.version );
+		let count;
+
+		if ( this.instances !== null && this.instances.length > this.count ) {
+
+			count = roundInstances( this.instances.length );
+
+		} else {
+
+			count = this.count;
+
+		}
+
+		cacheKey = hash( cacheKey, count, this.renderer.contextNode.id, this.renderer.contextNode.version );
 
 		return cacheKey;
 

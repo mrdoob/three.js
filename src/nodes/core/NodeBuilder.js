@@ -8,7 +8,7 @@ import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { getTypeFromLength } from './NodeUtils.js';
+import { getTypeFromLength, roundInstances } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -380,6 +380,13 @@ class NodeBuilder {
 		 * @default '\t'
 		 */
 		this.tab = '\t';
+
+		/**
+		 * Reference to the current instance data.
+		 *
+		 * @type {?Array}
+		 */
+		this.instances = null;
 
 		/**
 		 * Reference to the current function node.
@@ -2876,6 +2883,12 @@ class NodeBuilder {
 		}
 
 		return result;
+
+	}
+
+	getCount() {
+
+		return roundInstances( this.instances.length );
 
 	}
 

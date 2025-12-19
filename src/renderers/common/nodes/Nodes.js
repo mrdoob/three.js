@@ -198,6 +198,7 @@ class Nodes extends DataMap {
 				const createNodeBuilder = ( material ) => {
 
 					const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+					nodeBuilder.instances = renderObject.instances;
 					nodeBuilder.scene = renderObject.scene;
 					nodeBuilder.material = material;
 					nodeBuilder.camera = renderObject.camera;
@@ -318,7 +319,8 @@ class Nodes extends DataMap {
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
 			nodeBuilder.observer,
-			nodeBuilder.transforms
+			nodeBuilder.transforms,
+			nodeBuilder.instances
 		);
 
 	}
@@ -660,7 +662,7 @@ class Nodes extends DataMap {
 
 	}
 
-	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null ) {
+	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null, instances = null ) {
 
 		const nodeFrame = this.nodeFrame;
 		nodeFrame.renderer = renderer;
@@ -668,6 +670,7 @@ class Nodes extends DataMap {
 		nodeFrame.object = object;
 		nodeFrame.camera = camera;
 		nodeFrame.material = material;
+		nodeFrame.instances = instances;
 
 		return nodeFrame;
 
@@ -675,7 +678,7 @@ class Nodes extends DataMap {
 
 	getNodeFrameForRender( renderObject ) {
 
-		return this.getNodeFrame( renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material );
+		return this.getNodeFrame( renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material, renderObject.instances );
 
 	}
 

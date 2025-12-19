@@ -346,6 +346,20 @@ export function getValueFromType( type, ...params ) {
 }
 
 /**
+ * Rounds the given instance count.
+ *
+ * @private
+ * @method
+ * @param {number} count - The instance count.
+ * @return {number} The rounded instance count.
+ */
+export function roundInstances( count ) {
+
+	return Math.ceil( count / 32 ) * 32;
+
+}
+
+/**
  * Gets the object data that can be shared between different rendering steps.
  *
  * @private
