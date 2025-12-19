@@ -49104,11 +49104,16 @@ const _errorMap = new WeakMap();
  * textures for rendering.
  *
  * Note that {@link Texture#flipY} and {@link Texture#premultiplyAlpha} are ignored with image bitmaps.
- * They needs these configuration on bitmap creation unlike regular images need them on uploading to GPU.
+ * These options need to be configured via {@link ImageBitmapLoader#setOptions} prior to loading,
+ * unlike regular images which can be configured on the Texture to set these options on GPU upload instead.
  *
- * You need to set the equivalent options via {@link ImageBitmapLoader#setOptions} instead.
+ * To match the default behaviour of {@link Texture}, the following options are needed:
  *
- * Also note that unlike {@link FileLoader}, this loader avoids multiple concurrent requests to the same URL only if `Cache` is enabled.
+ * ```js
+ * { imageOrientation: 'flipY', premultiplyAlpha: 'none' }
+ * ```
+ *
+ * Also note that unlike {@link FileLoader}, this loader will only avoid multiple concurrent requests to the same URL if {@link Cache} is enabled.
  *
  * ```js
  * const loader = new THREE.ImageBitmapLoader();

@@ -446,7 +446,7 @@ class WebGLRenderer {
 			attributes = new WebGLAttributes( _gl );
 			bindingStates = new WebGLBindingStates( _gl, attributes );
 			geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
-			objects = new WebGLObjects( _gl, geometries, attributes, info );
+			objects = new WebGLObjects( _gl, geometries, attributes, bindingStates, info );
 			morphtargets = new WebGLMorphtargets( _gl, capabilities, textures );
 			clipping = new WebGLClipping( properties );
 			programCache = new WebGLPrograms( _this, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping );
@@ -2598,16 +2598,6 @@ class WebGLRenderer {
 
 			}
 
-			// https://github.com/mrdoob/three.js/pull/24467#issuecomment-1209031512
-
-			if ( material.isMeshGouraudMaterial && material.envMap !== null ) {
-
-				m_uniforms.envMap.value = envMap;
-
-				m_uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? - 1 : 1;
-
-			}
-
 			if ( material.isMeshStandardMaterial && material.envMap === null && scene.environment !== null ) {
 
 				m_uniforms.envMapIntensity.value = scene.environmentIntensity;
@@ -3172,27 +3162,9 @@ class WebGLRenderer {
 		 * @param {?(Box2|Box3)} [srcRegion=null] - A bounding box which describes the source region. Can be two or three-dimensional.
 		 * @param {?(Vector2|Vector3)} [dstPosition=null] - A vector that represents the origin of the destination region. Can be two or three-dimensional.
 		 * @param {number} [srcLevel=0] - The source mipmap level to copy.
-		 * @param {?number} [dstLevel=null] - The destination mipmap level.
+		 * @param {?number} [dstLevel=0] - The destination mipmap level.
 		 */
-		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = null ) {
-
-			// support the previous signature with just a single dst mipmap level
-			if ( dstLevel === null ) {
-
-				if ( srcLevel !== 0 ) {
-
-					// @deprecated, r171
-					warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed to support src and dst mipmap levels.' );
-					dstLevel = srcLevel;
-					srcLevel = 0;
-
-				} else {
-
-					dstLevel = 0;
-
-				}
-
-			}
+		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
 			// gather the necessary dimensions to copy
 			let width, height, depth, minX, minY, minZ;

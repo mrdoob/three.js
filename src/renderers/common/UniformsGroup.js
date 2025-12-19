@@ -47,6 +47,51 @@ class UniformsGroup extends UniformBuffer {
 		 */
 		this.uniforms = [];
 
+		/**
+		 * A cache for the uniform update ranges.
+		 *
+		 * @private
+		 * @type {Map<number, {start: number, count: number}>}
+		 */
+		this._updateRangeCache = new Map();
+
+	}
+
+	/**
+	 * Adds a uniform's update range to this buffer.
+	 *
+	 * @param {Uniform} uniform - The uniform.
+	 */
+	addUniformUpdateRange( uniform ) {
+
+		const index = uniform.index;
+
+		if ( this._updateRangeCache.has( index ) !== true ) {
+
+			const updateRanges = this.updateRanges;
+
+			const start = uniform.offset;
+			const count = uniform.itemSize;
+
+			const range = { start, count };
+
+			updateRanges.push( range );
+
+			this._updateRangeCache.set( index, range );
+
+		}
+
+	}
+
+	/**
+	 * Clears all update ranges of this buffer.
+	 */
+	clearUpdateRanges() {
+
+		this._updateRangeCache.clear();
+
+		super.clearUpdateRanges();
+
 	}
 
 	/**
@@ -156,6 +201,7 @@ class UniformsGroup extends UniformBuffer {
 			}
 
 			uniform.offset = offset / bytesPerElement;
+			uniform.index = i;
 
 			offset += itemSize;
 
@@ -235,7 +281,7 @@ class UniformsGroup extends UniformBuffer {
 			b[ offset ] = a[ offset ] = v;
 			updated = true;
 
-			this.addUpdateRange( offset, 1 );
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -267,7 +313,7 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
-			this.addUpdateRange( offset, 2 );
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -300,7 +346,7 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
-			this.addUpdateRange( offset, 3 );
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -334,7 +380,7 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
-			this.addUpdateRange( offset, 4 );
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -366,7 +412,7 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
-			this.addUpdateRange( offset, 3 );
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -406,7 +452,7 @@ class UniformsGroup extends UniformBuffer {
 
 			updated = true;
 
-			this.addUpdateRange( offset, 12 );
+			this.addUniformUpdateRange( uniform );
 
 		}
 
@@ -435,7 +481,7 @@ class UniformsGroup extends UniformBuffer {
 			setArray( a, e, offset );
 			updated = true;
 
-			this.addUpdateRange( offset, 16 );
+			this.addUniformUpdateRange( uniform );
 
 		}
 
