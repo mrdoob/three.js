@@ -738,15 +738,7 @@ class NodeMaterial extends Material {
 
 			} else if ( renderer.logarithmicDepthBuffer === true ) {
 
-				if ( camera.isPerspectiveCamera ) {
-
-					depthNode = viewZToLogarithmicDepth( viewZ, cameraNear, cameraFar );
-
-				} else {
-
-					depthNode = viewZToLogarithmicDepth( viewZ, cameraNear, cameraFar );
-
-				}
+				depthNode = viewZToLogarithmicDepth( viewZ, cameraNear, cameraFar );
 
 			}
 
