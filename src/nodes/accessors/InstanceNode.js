@@ -145,50 +145,21 @@ class InstanceNode extends Node {
 	 */
 	setup( builder ) {
 
-		const { instanceMatrix, instanceColor, isStorageMatrix, isStorageColor } = this;
-
-		const { count } = instanceMatrix;
-
 		let { instanceMatrixNode, instanceColorNode } = this;
+
+		// instance matrix
 
 		if ( instanceMatrixNode === null ) {
 
-			if ( isStorageMatrix ) {
-
-				instanceMatrixNode = storage( instanceMatrix, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
-
-			} else {
-
-				// Both backends have ~64kb UBO limit; fallback to attributes above 1000 matrices.
-
-				if ( count <= 1000 ) {
-
-					instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
-
-				} else {
-
-					const interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
-
-					this.buffer = interleaved;
-
-					const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-					const instanceBuffers = [
-						bufferFn( interleaved, 'vec4', 16, 0 ),
-						bufferFn( interleaved, 'vec4', 16, 4 ),
-						bufferFn( interleaved, 'vec4', 16, 8 ),
-						bufferFn( interleaved, 'vec4', 16, 12 )
-					];
-
-					instanceMatrixNode = mat4( ...instanceBuffers );
-
-				}
-
-			}
+			instanceMatrixNode = this._createInstanceMatrixNode( true );
 
 			this.instanceMatrixNode = instanceMatrixNode;
 
 		}
+
+		// instance color
+
+		const { instanceColor, isStorageColor } = this;
 
 		if ( instanceColor && instanceColorNode === null ) {
 
@@ -302,39 +273,7 @@ class InstanceNode extends Node {
 
 			instancedMesh.previousInstanceMatrix = this.instanceMatrix.clone();
 
-			const { instanceMatrix } = this;
-			const { count } = instanceMatrix;
-
-			if ( this.isStorageMatrix ) {
-
-				this.previousInstanceMatrixNode = storage( instanceMatrix, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
-
-			} else {
-
-				// Both backends have ~64kb UBO limit; fallback to attributes above 1000 matrices.
-
-				if ( count <= 1000 ) {
-
-					this.previousInstanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
-
-				} else {
-
-					const interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
-
-					const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-					const instanceBuffers = [
-						bufferFn( interleaved, 'vec4', 16, 0 ),
-						bufferFn( interleaved, 'vec4', 16, 4 ),
-						bufferFn( interleaved, 'vec4', 16, 8 ),
-						bufferFn( interleaved, 'vec4', 16, 12 )
-					];
-
-					this.previousInstanceMatrixNode = mat4( ...instanceBuffers );
-
-				}
-
-			}
+			this.previousInstanceMatrixNode = this._createInstanceMatrixNode( false );
 
 		}
 
@@ -354,6 +293,57 @@ class InstanceNode extends Node {
 		const mrt = builder.renderer.getMRT();
 
 		return ( mrt && mrt.has( 'velocity' ) ) || getDataFromObject( builder.object ).useVelocity === true;
+
+	}
+
+	/**
+	 * Creates a node representing the instance matrix data.
+	 *
+	 * @private
+	 * @param {boolean} assignBuffer - Whether the created interleaved buffer should be assigned to the `buffer` member or not.
+	 * @return {Node} The instance matrix node.
+	 */
+	_createInstanceMatrixNode( assignBuffer ) {
+
+		let instanceMatrixNode;
+
+		const { instanceMatrix } = this;
+		const { count } = instanceMatrix;
+
+		if ( this.isStorageMatrix ) {
+
+			instanceMatrixNode = storage( instanceMatrix, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
+
+		} else {
+
+			// Both backends have ~64kb UBO limit; fallback to attributes above 1000 matrices.
+
+			if ( count <= 1000 ) {
+
+				instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
+
+			} else {
+
+				const interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
+
+				if ( assignBuffer === true ) this.buffer = interleaved;
+
+				const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+
+				const instanceBuffers = [
+					bufferFn( interleaved, 'vec4', 16, 0 ),
+					bufferFn( interleaved, 'vec4', 16, 4 ),
+					bufferFn( interleaved, 'vec4', 16, 8 ),
+					bufferFn( interleaved, 'vec4', 16, 12 )
+				];
+
+				instanceMatrixNode = mat4( ...instanceBuffers );
+
+			}
+
+		}
+
+		return instanceMatrixNode;
 
 	}
 
