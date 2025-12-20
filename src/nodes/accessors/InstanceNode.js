@@ -8,7 +8,6 @@ import { NodeUpdateType } from '../core/constants.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { storage } from './StorageBufferNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
-import { getDataFromObject } from '../core/NodeUtils.js';
 
 import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
@@ -188,7 +187,7 @@ class InstanceNode extends Node {
 		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
 		positionLocal.assign( instancePosition );
 
-		if ( this.needsPreviousInstanceMatrices( builder ) ) {
+		if ( builder.needsPreviousData() ) {
 
 			positionPrevious.assign( this.getPreviousInstancedPosition( builder ) );
 
@@ -278,21 +277,6 @@ class InstanceNode extends Node {
 		}
 
 		return this.previousInstanceMatrixNode.mul( positionPrevious ).xyz;
-
-	}
-
-	/**
-	 * Returns `true` if instance matrices from the previous frame are required. Relevant
-	 * when computing motion vectors with {@link VelocityNode}.
-	 *
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether instance matrices from the previous frame are required or not.
-	 */
-	needsPreviousInstanceMatrices( builder ) {
-
-		const mrt = builder.renderer.getMRT();
-
-		return ( mrt && mrt.has( 'velocity' ) ) || getDataFromObject( builder.object ).useVelocity === true;
 
 	}
 
