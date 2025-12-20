@@ -82,23 +82,31 @@ export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
  * @tsl
  * @type {Node<float>}
  */
-export const viewZ = ( Fn( ( { camera } ) => {
+export const viewZ = ( Fn( ( builder ) => {
 
 	let node;
 
-	if ( camera.isPerspectiveCamera ) {
+	if ( builder.shaderStage === 'vertex' ) {
 
-		node = clipSpace.w.negate();
+		node = positionView.z;
 
 	} else {
 
-		node = orthographicDepthToViewZ( clipSpace.z.div( clipSpace.w ), cameraNear, cameraFar );
+		if ( builder.camera.isPerspectiveCamera ) {
+
+			node = clipSpace.w.negate();
+
+		} else {
+
+			node = orthographicDepthToViewZ( clipSpace.z.div( clipSpace.w ), cameraNear, cameraFar );
+
+		}
 
 	}
 
 	return node;
 
-} ).once( [ 'POSITION' ] ) )().toVar( 'viewZ' );
+} ).once( [ 'POSITION', 'VERTEX' ] ) )().toVar( 'viewZ' );
 
 /**
  * TSL object that represents the position view direction of the current rendered object.
