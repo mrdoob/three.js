@@ -722,7 +722,7 @@ class NodeMaterial extends Material {
 	 */
 	setupDepth( builder ) {
 
-		const { renderer, camera } = builder;
+		const { renderer } = builder;
 
 		// Depth
 
