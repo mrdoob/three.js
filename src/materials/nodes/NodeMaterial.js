@@ -16,7 +16,7 @@ import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
-import { depth, viewZToLogarithmicDepth } from '../../nodes/display/ViewportDepthNode.js';
+import { depth, viewZToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
 import { cameraFar, cameraNear, cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
@@ -722,7 +722,7 @@ class NodeMaterial extends Material {
 	 */
 	setupDepth( builder ) {
 
-		const { renderer } = builder;
+		const { renderer, camera } = builder;
 
 		// Depth
 
@@ -738,7 +738,15 @@ class NodeMaterial extends Material {
 
 			} else if ( renderer.logarithmicDepthBuffer === true ) {
 
-				depthNode = viewZToLogarithmicDepth( positionView.z, cameraNear, cameraFar );
+				if ( camera.isPerspectiveCamera ) {
+
+					depthNode = viewZToLogarithmicDepth( positionView.z, cameraNear, cameraFar );
+
+				} else {
+
+					depthNode = viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar );
+
+				}
 
 			}
 
