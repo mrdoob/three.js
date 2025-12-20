@@ -77,9 +77,9 @@ export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 		// Reconstruct view position from clip space
 
-		const viewPos4 = cameraProjectionMatrixInverse.mul( clipSpace );
+		const viewPos = cameraProjectionMatrixInverse.mul( clipSpace );
 		
-		node = viewPos4.xyz.div( viewPos4.w );
+		node = viewPos.xyz.div( viewPos.w );
 
 	} else {
 
