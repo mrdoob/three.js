@@ -7,32 +7,18 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebXRController } from '../webxr/WebXRController.js';
-import { AddEquation, BackSide, CustomBlending, DepthFormat, DepthStencilFormat, FrontSide, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, ZeroFactor } from '../../constants.js';
+import { BackSide, DepthFormat, DepthStencilFormat, FrontSide, RGBAFormat, UnsignedByteType, UnsignedInt248Type, UnsignedIntType } from '../../constants.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { XRRenderTarget } from './XRRenderTarget.js';
 import { CylinderGeometry } from '../../geometries/CylinderGeometry.js';
 import QuadMesh from './QuadMesh.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
-import { SphereGeometry } from '../../geometries/SphereGeometry.js';
-import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
-import { Mesh } from '../../objects/Mesh.js';
 import { Group } from '../../objects/Group.js';
 import { warn } from '../../utils.js';
+import { createMesh, createSphereMesh, createPlaneMesh, createBlendLayerMaterial, toggleBlendLayerRender, UVMapFactors, updateOrPrepend, positionQuad } from './XRLayerUtils.js';
 
 const _cameraLPos = /*@__PURE__*/ new Vector3();
 const _cameraRPos = /*@__PURE__*/ new Vector3();
-
-const UVMapFactors = {
-	'stereo-top-bottom': [
-		{ yMult: 0.5, yPhase: 0, xMult: 1.0, xPhase: 0 },
-		{ yMult: 0.5, yPhase: 0.5, xMult: 1.0, xPhase: 0 }
-	],
-	'stereo-left-right': [
-		{ yMult: 1.0, yPhase: 0, xMult: 0.5, xPhase: 0 },
-		{ yMult: 1.0, yPhase: 0, xMult: 0.5, xPhase: 0.5 }
-	]
-};
 
 /**
  * The XR manager is built on top of the WebXR Device API to
@@ -664,112 +650,109 @@ class XRManager extends EventDispatcher {
 
 	}
 
+	createQuadMediaLayer( texture, layout = 'mono', width = 1, height = 1, translation, quaternion, params = {}, updateAtIndex = - 1 ) {
+
+		return this.createMediaLayer( texture, layout, quaternion, false, params, 0, 0, 0, updateAtIndex, width, height, translation );
+
+	}
+
 	/**
 	 * Sets up params for an equirect native video layer.
 	 * Creates meshes for 2D layers in mono or stereo
 	 *
 	 * @param {VideoTexture} texture The video texture
 	 * @param {('default'|'mono'|'stereo'|'stereo-left-right'|'stereo-top-bottom')} [layout='stereo'] The layout to use either mono/steree/stereo-left-right/stereo-top-bottom. The default layout is stereo which creates a stereo-top-bottom layout.
-	 * @param {Object} [quaternion={}] A transform quaternion param for the layer.
-	 * @param {boolean} [is180=false] If it's a 180 video.
-	 * @param {Object} [params={}] Extra params for the layer to add but not needed.
+	 * @param {Object} [quaternion = {}] A transform quaternion param for the layer.
+	 * @param {boolean} [is180 = false] If it's a 180 video.
+	 * @param {Object} [params = {}] Extra params for the layer to add but not needed.
 	 * @param {number} [radius = 500] The SphereGeometry radius.
 	 * @param {number} [widthSegments = 60] The SphereGeometry width segments.
 	 * @param {number} [heightSegments = 40] The SphereGeometry height segments.
 	 * @param {number} [updateAtIndex = -1] If set update and replace the current layer in an XR session at the specified index.
+	 * @param {number} [quadWidth = 0] The width in meter units. Tf the width is set it will enable quad media layer creation.
+	 * @param {number} [quadHeight = 0] The quad layer height in meter units.
+	 * @param {Vector3} translation - The position/translation of the layer plane in world units. Native layer Z is 2 units more required than non layer planes.
 	 * @returns {Group} Returns a group of a mono or stereo mesh
 	 */
-	createMediaLayer( texture, layout = 'stereo', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40, updateAtIndex = - 1 ) {
-
-		const createMaterial = ( texture ) => new MeshBasicMaterial( { map: texture } );
-
-		//create blend layer material while in immersive-vr XR
-		const createLayerMaterial = ( ) => {
-
-			const material = createMaterial( null );
-			material.side = FrontSide;
-			material.blending = CustomBlending;
-			material.blendEquation = AddEquation;
-			material.blendSrc = ZeroFactor;
-			material.blendDst = ZeroFactor;
-			return material;
-
-		};
-
-		const createMesh = ( texture, eyeIndex = 0, geometry = null, material = null ) => {
-
-			//let geometry;
-
-			if ( ! geometry ) {
-
-				//if 180 video create a half sphere
-				if ( is180 ) {
-
-					geometry = new SphereGeometry( radius, widthSegments, heightSegments, Math.PI / 2, Math.PI, 0, Math.PI );
-
-				} else {
-
-					geometry = new SphereGeometry( radius, widthSegments, heightSegments );
-
-				}
-
-				geometry.scale( - 1, 1, 1 );
-
-			}
-
-			const mesh = new Mesh( geometry, material || createMaterial( texture ) );
-
-			mesh.layers.set( eyeIndex );
-
-			return mesh;
-
-		};
-
-		//creates a layer mesh for sphere geometries to poke through to the native media layers.
-		//this is important for immersive-vr mode or the projection layer blocks the native layer
-		const createLayerMesh = ( geometry, eyeIndex = 1 ) => {
-
-			const mesh = createMesh( null, eyeIndex, geometry, createLayerMaterial() );
-			//mesh.geometry = geometry;
-			mesh.layers.disableAll();
-			return mesh;
-
-		};
-
-		//set the uv mapping for each eye in a stereo video.
-		//uv factors for stereo-left-right and stereo-top-bottom layouts is applied.
-		const setUVMapping = ( eyeIndex, uvFactors, geometry ) => {
-
-			const eyeUvfactor = uvFactors[ eyeIndex - 1 ],
-				uvs = geometry.attributes.uv.array;
-
-			for ( let i = 0; i < uvs.length; i += 2 ) {
-
-				//x
-				uvs[ i ] *= eyeUvfactor.xMult;
-				uvs[ i ] += eyeUvfactor.xPhase;
-				//y
-				uvs[ i + 1 ] *= eyeUvfactor.yMult;
-				uvs[ i + 1 ] += eyeUvfactor.yPhase;
-
-			}
-
-		};
+	createMediaLayer( texture, layout = 'stereo', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40, updateAtIndex = - 1, quadWidth = 0, quadHeight = 0, translation = {} ) {
 
 		const group = new Group(),
-			layerGroup = new Group();
+			blendLayerGroup = new Group(),
+			isQuad = !! quadWidth;
 
-		layerGroup.name = 'sphere';
+		blendLayerGroup.name = 'media-blend-layer';
+
+		/**
+		 * Creates a sphere mesh for equirect layers.
+		 * @param {VideoTexture} texture The video texture
+		 * @param {number} [eyeIndex = 1] The mesh layer eye index for stereo rendering.
+		 * @param {number} [radius = 500] The SphereGeometry radius.
+		 * @param {number} [widthSegments = 60] The SphereGeometry width segments.
+		 * @param {number} [heightSegments = 40] The SphereGeometry height segments.
+		 * @param {Object} [uvFactors = null] If the UV factors is set this turns on stereo mesh transforms.
+		 * @param {boolean} [is180 = false] If it's a 180 video.
+		 * @returns { Mesh}  The mono/stereo sphere mesh.
+		 */
+		const createMediaSphere = ( texture, eyeIndex = 1, radius, widthSegments, heightSegments, uvFactors = null, is180 = false, material = null ) => {
+
+			const mesh = createSphereMesh( texture, eyeIndex, radius, widthSegments, heightSegments, uvFactors, is180, material );
+
+			return mesh;
+
+		};
+
+		/**
+		 * Creates a quad layer plane mesh.
+		 * @param {VideoTexture} texture The video texture
+		 * @param {number} [eyeIndex = 1] The mesh layer eye index for stereo rendering.
+		 * @param {number} [quadWidth = 0] The quad layer width in meter units.
+	 	 * @param {number} [quadHeight = 0] The quad layer height in meter units.
+		 * @param {Vector3} translation - The position/translation of the layer plane in world units. Native layer Z is 2 units more required than non layer planes.
+		 * @param {Object} [quaternion={}] A transform quaternion param for the layer.
+		 * @param {Object} [uvFactors = null] If the UV factors is set this turns on stereo mesh transforms.
+		 * @returns { Mesh}  The mono/stereo plane quad mesh.
+		 */
+		const createMediaPlane = ( texture, eyeIndex = 0, quadWidth = 1, quadHeight = 1, translation = {}, quaternion = {}, uvFactors = null, material = null ) => {
+
+			const mesh = createPlaneMesh( texture, eyeIndex, quadWidth, quadHeight, translation, quaternion, uvFactors, material ),
+				nonLayerZOffset = 2;
+
+			//Native quad layers requiures 2 units more than native layers so offset it back for non layers.
+			mesh.position.z += nonLayerZOffset;
+
+			return mesh;
+
+		};
+
+		/**
+		 * Creates a sphere mesh if quad layer widths isn't set. Or create a quad layer plane.
+		 * @param {number} [eyeIndex = 1] The mesh layer eye index for stereo rendering.
+		 * @param {Object} [uvFactors = null] If the UV factors is set this turns on stereo mesh transforms.
+		 * @returns { Mesh}  The mono/stereo plane quad or sphere mesh.
+		 */
+		const createMediaMesh = ( eyeIndex = 0, uvFactors = null, material = null ) => {
+
+			if ( ! isQuad ) {
+
+				return createMediaSphere( texture, eyeIndex, radius, widthSegments, heightSegments, uvFactors, is180, material );
+
+			} else {
+
+				return createMediaPlane( texture, eyeIndex, quadWidth, quadHeight, translation, quaternion, uvFactors, material );
+
+			}
+
+		};
 
 		let mesh;
 
 		switch ( layout ) {
 
 			case 'mono':
-				mesh = createMesh( texture );
+
+				mesh = createMediaMesh();
 				group.add( mesh );
-				//add blend sphere layer mesh using the same geometry
-				layerGroup.add( createLayerMesh( mesh.geometry ) );
+
 				break;
 			case 'stereo':
 			default:
@@ -779,61 +762,51 @@ class XRManager extends EventDispatcher {
 				//get the uv factors for the layout
 				const uvFactors = UVMapFactors[ layout ];
 
-				[ 1, 2 ].forEach( eyeIndex => {
+				mesh = createMediaMesh( 1, uvFactors );
+				group.add( mesh );
 
-					mesh = createMesh( texture, eyeIndex );
+				//for efficiency use the first material for the second eye material
+				mesh = createMediaMesh( 2, uvFactors, mesh.material );
+				group.add( mesh );
 
-					//set the uv mappingf for each eye index
-					setUVMapping( eyeIndex, uvFactors, mesh.geometry );
-
-					//add blend sphere layer mesh using the same geometry for each eye
-					const layerMesh = createLayerMesh( mesh.geometry, eyeIndex );
-
-					mesh.rotation.y = layerMesh.rotation.y = - Math.PI / 2;
-					group.add( mesh );
-					layerGroup.add( layerMesh );
-
-				} );
 				break;
 
 		}
 
 		if ( this._supportsLayers ) {
 
-			//update and replace the layer item at the specified index or prepend
-			const updateOrPrepend = ( index, layers, layer ) => {
+			//set the quad layer plane width and height.
+			params.width = quadWidth;
+			params.height = quadHeight;
 
-				if ( index > - 1 ) {
+			let centralHorizontalAngle = Math.PI * ( is180 ? 1 : 2 ),
+				mediaLayerMethod = 'createEquirectLayer';
 
-					layers.splice( index, 1, layer );
+			//change the media layer creation method to quad if set.
+			if ( isQuad ) {
 
-				} else {
+				centralHorizontalAngle = 0;
+				mediaLayerMethod = 'createQuadLayer';
 
-					layers.unshift( layer );
-
-				}
-
-			};
-
-			const angleFactor = is180 ? 1 : 2;
+			}
 
 			const layer = {
-				type: 'equirect',
+				type: 'media',
 				texture: texture,
 				group: group,
-				layerGroup: layerGroup,
+				blendMaterial: createBlendLayerMaterial(),
+				translation: translation,
 				quaternion: quaternion,
+				mediaLayerMethod: mediaLayerMethod,
 				params: {
 					layout: layout,
-					centralHorizontalAngle: Math.PI * angleFactor,
+					centralHorizontalAngle: centralHorizontalAngle,
 					...params
 				}
 
 			};
 
 			updateOrPrepend( updateAtIndex, this._mediaLayers, layer );
-
-			group.add( layerGroup );
 
 			if ( this._session !== null ) {
 
@@ -842,9 +815,7 @@ class XRManager extends EventDispatcher {
 				updateOrPrepend( updateAtIndex, this._createdMediaLayers, layer.xrlayer );
 
 				//enable current blend layer group
-				layerGroup.children.forEach( mesh => mesh.layers.enableAll() );
-				//disable current texture group
-				group.children.filter( layer => layer.name !== 'sphere' ).forEach( mesh => mesh.layers.disableAll() );
+				toggleBlendLayerRender( layer, true );
 
 				const xrlayers = [ ...this._session.renderState.layers ];
 
@@ -860,7 +831,7 @@ class XRManager extends EventDispatcher {
 
 	}
 
-	 /* This method can be used in XR applications to create a quadratic layer that presents a separate
+	/* This method can be used in XR applications to create a quadratic layer that presents a separate
 	 * rendered scene.
 	 *
 	 * @param {number} width - The width of the layer plane in world units.
@@ -876,7 +847,7 @@ class XRManager extends EventDispatcher {
 	 */
 	createQuadLayer( width, height, translation, quaternion, pixelwidth, pixelheight, rendercall, attributes = {} ) {
 
-		const geometry = new PlaneGeometry( width, height );
+		//const geometry = new PlaneGeometry( width, height );
 		const renderTarget = new XRRenderTarget(
 			pixelwidth,
 			pixelheight,
@@ -902,13 +873,9 @@ class XRManager extends EventDispatcher {
 
 		renderTarget._autoAllocateDepthBuffer = true;
 
-		const material = new MeshBasicMaterial( { color: 0xffffff, side: FrontSide } );
-		material.map = renderTarget.texture;
-		material.map.offset.y = 1;
-		material.map.repeat.y = - 1;
-		const plane = new Mesh( geometry, material );
-		plane.position.copy( translation );
-		plane.quaternion.copy( quaternion );
+		const plane = createPlaneMesh( renderTarget.texture, 1, width, height, translation, quaternion );
+		plane.material.map.offset.y = 1;
+		plane.material.map.repeat.y = - 1;
 
 		const layer = {
 			type: 'quad',
@@ -919,7 +886,8 @@ class XRManager extends EventDispatcher {
 			pixelwidth: pixelwidth,
 			pixelheight: pixelheight,
 			plane: plane,
-			material: material,
+			blendSide: FrontSide,
+			material: plane.material,
 			rendercall: rendercall,
 			renderTarget: renderTarget };
 
@@ -927,11 +895,7 @@ class XRManager extends EventDispatcher {
 
 		if ( this._session !== null ) {
 
-			layer.plane.material = new MeshBasicMaterial( { color: 0xffffff, side: FrontSide } );
-			layer.plane.material.blending = CustomBlending;
-			layer.plane.material.blendEquation = AddEquation;
-			layer.plane.material.blendSrc = ZeroFactor;
-			layer.plane.material.blendDst = ZeroFactor;
+			layer.plane.material = createBlendLayerMaterial();
 
 			layer.xrlayer = this._createXRLayer( layer );
 
@@ -993,13 +957,11 @@ class XRManager extends EventDispatcher {
 
 		renderTarget._autoAllocateDepthBuffer = true;
 
-		const material = new MeshBasicMaterial( { color: 0xffffff, side: BackSide } );
-		material.map = renderTarget.texture;
-		material.map.offset.y = 1;
-		material.map.repeat.y = - 1;
-		const plane = new Mesh( geometry, material );
-		plane.position.copy( translation );
-		plane.quaternion.copy( quaternion );
+		const plane = createMesh( renderTarget.texture, 1, geometry );
+		plane.material.side = BackSide;
+		plane.material.map.offset.y = 1;
+		plane.material.map.repeat.y = - 1;
+		positionQuad( plane, translation, quaternion );
 
 		const layer = {
 			type: 'cylinder',
@@ -1011,7 +973,8 @@ class XRManager extends EventDispatcher {
 			pixelwidth: pixelwidth,
 			pixelheight: pixelheight,
 			plane: plane,
-			material: material,
+			blendSide: BackSide,
+			material: plane.material,
 			rendercall: rendercall,
 			renderTarget: renderTarget };
 
@@ -1019,11 +982,7 @@ class XRManager extends EventDispatcher {
 
 		if ( this._session !== null ) {
 
-			layer.plane.material = new MeshBasicMaterial( { color: 0xffffff, side: BackSide } );
-			layer.plane.material.blending = CustomBlending;
-			layer.plane.material.blendEquation = AddEquation;
-			layer.plane.material.blendSrc = ZeroFactor;
-			layer.plane.material.blendDst = ZeroFactor;
+			layer.plane.material = createBlendLayerMaterial( layer.blendSide );
 
 			layer.xrlayer = this._createXRLayer( layer );
 
@@ -1245,11 +1204,7 @@ class XRManager extends EventDispatcher {
 					for ( const layer of this._layers ) {
 
 						// change material so it "punches" out a hole to show the XR Layer.
-						layer.plane.material = new MeshBasicMaterial( { color: 0xffffff, side: layer.type === 'cylinder' ? BackSide : FrontSide } );
-						layer.plane.material.blending = CustomBlending;
-						layer.plane.material.blendEquation = AddEquation;
-						layer.plane.material.blendSrc = ZeroFactor;
-						layer.plane.material.blendDst = ZeroFactor;
+						layer.plane.material = createBlendLayerMaterial( layer.blendSide );
 
 						layer.xrlayer = this._createXRLayer( layer );
 
@@ -1257,7 +1212,7 @@ class XRManager extends EventDispatcher {
 
 					}
 
-					//Creates the equirect media layers on session creation
+					//Creates the equirect or quad media layers on session creation
 					if ( this._mediaLayers.length ) {
 
 						this._createdMediaLayers = this._mediaLayers.map( layer => {
@@ -1270,10 +1225,7 @@ class XRManager extends EventDispatcher {
 						//disable 2D media mesh layers to be replaced with native media layers
 						for ( const mediaLayer of this._mediaLayers ) {
 
-							//enable the blend layer group
-							mediaLayer.layerGroup.children.forEach( mesh => mesh.layers.enableAll() );
-							//disable 2D texture render except the blend layer group
-							mediaLayer.group.children.filter( layer => layer.name !== 'sphere' ).forEach( mesh => mesh.layers.disableAll() );
+							toggleBlendLayerRender( mediaLayer, true );
 
 						}
 
@@ -1674,15 +1626,11 @@ function onSessionEnd() {
 		//reenable 2D media mesh layers on session end
 		for ( const mediaLayer of this._mediaLayers ) {
 
-			//disable the blend layer group
-			mediaLayer.layerGroup.children.forEach( mesh => mesh.layers.disableAll() );
-			mediaLayer.group.children.filter( layer => layer.name !== 'sphere' ).forEach( mesh => mesh.layers.enableAll() );
+			toggleBlendLayerRender( mediaLayer, false );
 
 		}
 
 	}
-
-	//
 
 	this.isPresenting = false;
 	this._useMultiview = false;
@@ -1783,16 +1731,16 @@ function createXRLayer( layer ) {
 			clearOnAccess: false
 		} );
 
-	} else if ( layer.type === 'equirect' ) {
+	} else if ( /media/.test( layer.type ) ) {
 
 		const mediaBinding = new XRMediaBinding( this._session );
 
-		return mediaBinding.createEquirectLayer(
+		return mediaBinding[ layer.mediaLayerMethod ](
 			layer.texture.image,
 			{
 				space: this._referenceSpace,
 				transform: new XRRigidTransform(
-					{},
+					layer.translation,
 					layer.quaternion
 				),
 				...layer.params
