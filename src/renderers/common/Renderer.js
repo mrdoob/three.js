@@ -831,7 +831,7 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {?Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
-	 * @param {?Function} onProgress - A callback that is called when the compile has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
 	async compileAsync( scene, camera, targetScene = null, onProgress = null ) {
@@ -862,12 +862,16 @@ class Renderer {
 
 		const compilationPromises = [];
 
-		let compilationTotal = 0;
-		let compilationDone = 0;
+		let total = 0;
+		let loaded = 0;
 
 		function reportProgress() {
 
-			if ( onProgress !== null ) onProgress( compilationDone / compilationTotal * 100 );
+			if ( onProgress === null ) return;
+
+			const event = new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } );
+
+			onProgress( event );
 
 		}
 
@@ -889,18 +893,18 @@ class Renderer {
 
 				}
 
-				compilationTotal ++;
+				total ++;
 
 				if ( onProgress !== null ) {
 
 					promise.then( function () {
 
-						compilationDone ++;
+						loaded ++;
 						reportProgress();
 
 					}, function () {
 
-						compilationDone ++;
+						loaded ++;
 						reportProgress();
 
 					} );
@@ -1028,7 +1032,7 @@ class Renderer {
 	 *
 	 * @async
 	 * @param {Node|Array<Node>} computeNodes - The compute node(s).
-	 * @param {Function} onProgress - A callback that is called when the compile has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
 	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
 	async compileComputeAsync( computeNodes, onProgress = null ) {
@@ -1041,16 +1045,16 @@ class Renderer {
 
 		const compilationPromises = [];
 
-		let compilationTotal = 0;
-		let compilationDone = 0;
+		let total = 0;
+		let loaded = 0;
 
 		function reportProgress() {
 
 			if ( onProgress === null ) return;
 
-			const ratio = ( compilationTotal === 0 ) ? 0 : ( compilationDone / compilationTotal );
+			const event = new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } );
 
-			onProgress( ratio * 100 );
+			onProgress( event );
 
 		}
 
@@ -1072,18 +1076,18 @@ class Renderer {
 
 				}
 
-				compilationTotal ++;
+				total ++;
 
 				if ( onProgress !== null ) {
 
 					promise.then( function () {
 
-						compilationDone ++;
+						loaded ++;
 						reportProgress();
 
 					}, function () {
 
-						compilationDone ++;
+						loaded ++;
 						reportProgress();
 
 					} );
@@ -3487,7 +3491,7 @@ class Renderer {
 	 * @param {Object3D} scene - The scene or 3D object to precompile.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {Scene} targetScene - If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
-	 * @param {?Function} onProgress - A callback that is called when the compile has been finished.
+	 * @param {?Function} onProgress - A callback that receives a ProgressEvent with `loaded` and `total` properties.
 	 * @return {function(Object3D, Camera, ?Scene): Promise|undefined} A Promise that resolves when the compile has been finished.
 	 */
 	get compile() {
