@@ -2,6 +2,8 @@ import { attribute } from '../core/AttributeNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { Fn, vec3 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
+import { orthographicDepthToViewZ } from '../../nodes/display/ViewportDepthNode.js';
+import { cameraFar, cameraNear } from './Camera.js';
 
 /**
  * TSL object that represents the clip space position of the current rendered object.
@@ -73,6 +75,30 @@ export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 	return builder.context.setupPositionView().toVarying( 'v_positionView' );
 
 }, 'vec3' ).once( [ 'POSITION' ] ) )();
+
+/**
+ * TSL object that represents the view space Z position of the current rendered object.
+ *
+ * @tsl
+ * @type {Node<float>}
+ */
+export const viewZ = ( Fn( ( { camera } ) => {
+
+	let node;
+
+	if ( camera.isPerspectiveCamera ) {
+
+		node = clipSpace.w.negate();
+
+	} else {
+
+		node = orthographicDepthToViewZ( clipSpace.z.div( clipSpace.w ), cameraNear, cameraFar );
+
+	}
+
+	return node;
+
+} ).once( [ 'POSITION' ] ) )().toVar( 'viewZ' );
 
 /**
  * TSL object that represents the position view direction of the current rendered object.
