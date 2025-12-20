@@ -1,6 +1,5 @@
 import { Fn, If, vec4 } from '../tsl/TSLBase.js';
 import { mix, min, step } from '../math/MathNode.js';
-import { warn } from '../../utils.js';
 
 /**
  * Represents a "Color Burn" blend mode.
@@ -170,66 +169,3 @@ export const unpremultiplyAlpha = /*@__PURE__*/ Fn( ( [ color ] ) => {
 	return vec4( color.rgb.div( color.a ), color.a );
 
 }, { color: 'vec4', return: 'vec4' } );
-
-
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r171. Use {@link blendBurn} instead.
- *
- * @param {...any} params
- * @returns {Function}
- */
-export const burn = ( ...params ) => { // @deprecated, r171
-
-	warn( 'TSL: "burn" has been renamed. Use "blendBurn" instead.' );
-	return blendBurn( params );
-
-};
-
-/**
- * @tsl
- * @function
- * @deprecated since r171. Use {@link blendDodge} instead.
- *
- * @param {...any} params
- * @returns {Function}
- */
-export const dodge = ( ...params ) => { // @deprecated, r171
-
-	warn( 'TSL: "dodge" has been renamed. Use "blendDodge" instead.' );
-	return blendDodge( params );
-
-};
-
-/**
- * @tsl
- * @function
- * @deprecated since r171. Use {@link blendScreen} instead.
- *
- * @param {...any} params
- * @returns {Function}
- */
-export const screen = ( ...params ) => { // @deprecated, r171
-
-	warn( 'TSL: "screen" has been renamed. Use "blendScreen" instead.' );
-	return blendScreen( params );
-
-};
-
-/**
- * @tsl
- * @function
- * @deprecated since r171. Use {@link blendOverlay} instead.
- *
- * @param {...any} params
- * @returns {Function}
- */
-export const overlay = ( ...params ) => { // @deprecated, r171
-
-	warn( 'TSL: "overlay" has been renamed. Use "blendOverlay" instead.' );
-	return blendOverlay( params );
-
-};

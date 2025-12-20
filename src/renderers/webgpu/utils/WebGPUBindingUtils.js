@@ -3,7 +3,7 @@ import {
 	GPUSamplerBindingType, GPUShaderStage
 } from './WebGPUConstants.js';
 
-import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
+import { FloatType, IntType, UnsignedIntType, Compatibility } from '../../../constants.js';
 import { NodeAccess } from '../../../nodes/core/constants.js';
 import { isTypedArray, error } from '../../../utils.js';
 
@@ -223,8 +223,6 @@ class WebGPUBindingUtils {
 				);
 
 			}
-
-			binding.clearUpdateRanges();
 
 		}
 
@@ -582,12 +580,13 @@ class WebGPUBindingUtils {
 
 				if ( binding.texture.isDepthTexture ) {
 
-					if ( binding.texture.compareFunction !== null ) {
+					if ( binding.texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 						sampler.type = GPUSamplerBindingType.Comparison;
 
-					} else if ( backend.compatibilityMode ) {
+					} else {
 
+						// Depth textures without compare must use non-filtering sampler
 						sampler.type = GPUSamplerBindingType.NonFiltering;
 
 					}

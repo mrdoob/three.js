@@ -364,6 +364,12 @@ class Bindings extends DataMap {
 
 			}
 
+			if ( binding.isBuffer && binding.updateRanges.length > 0 ) {
+
+				binding.clearUpdateRanges();
+
+			}
+
 		}
 
 		if ( needsBindingsUpdate === true ) {

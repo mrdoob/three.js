@@ -981,7 +981,6 @@
 						<li><a href="TSL.html#asin">asin</a></li>
 						<li><a href="TSL.html#assign">assign</a></li>
 						<li><a href="TSL.html#atan">atan</a></li>
-						<li><a href="TSL.html#atan2">atan2</a></li>
 						<li><a href="TSL.html#atomicAdd">atomicAdd</a></li>
 						<li><a href="TSL.html#atomicAnd">atomicAnd</a></li>
 						<li><a href="TSL.html#atomicFunc">atomicFunc</a></li>
@@ -1028,7 +1027,6 @@
 						<li><a href="TSL.html#builtinAOContext">builtinAOContext</a></li>
 						<li><a href="TSL.html#builtinShadowContext">builtinShadowContext</a></li>
 						<li><a href="TSL.html#bumpMap">bumpMap</a></li>
-						<li><a href="TSL.html#burn">burn</a></li>
 						<li><a href="TSL.html#bypass">bypass</a></li>
 						<li><a href="TSL.html#cache">cache</a></li>
 						<li><a href="TSL.html#cameraFar">cameraFar</a></li>
@@ -1082,7 +1080,6 @@
 						<li><a href="TSL.html#degrees">degrees</a></li>
 						<li><a href="TSL.html#deltaTime">deltaTime</a></li>
 						<li><a href="TSL.html#denoise">denoise</a></li>
-						<li><a href="TSL.html#densityFog">densityFog</a></li>
 						<li><a href="TSL.html#densityFogFactor">densityFogFactor</a></li>
 						<li><a href="TSL.html#depth">depth</a></li>
 						<li><a href="TSL.html#depthBase">depthBase</a></li>
@@ -1096,7 +1093,6 @@
 						<li><a href="TSL.html#dispersion">dispersion</a></li>
 						<li><a href="TSL.html#distance">distance</a></li>
 						<li><a href="TSL.html#div">div</a></li>
-						<li><a href="TSL.html#dodge">dodge</a></li>
 						<li><a href="TSL.html#dof">dof</a></li>
 						<li><a href="TSL.html#dot">dot</a></li>
 						<li><a href="TSL.html#dotScreen">dotScreen</a></li>
@@ -1104,7 +1100,6 @@
 						<li><a href="TSL.html#dynamicBufferAttribute">dynamicBufferAttribute</a></li>
 						<li><a href="TSL.html#emissive">emissive</a></li>
 						<li><a href="TSL.html#equal">equal</a></li>
-						<li><a href="TSL.html#equals">equals</a></li>
 						<li><a href="TSL.html#equirectUV">equirectUV</a></li>
 						<li><a href="TSL.html#exp">exp</a></li>
 						<li><a href="TSL.html#exp2">exp2</a></li>
@@ -1281,7 +1276,6 @@
 						<li><a href="TSL.html#outline">outline</a></li>
 						<li><a href="TSL.html#output">output</a></li>
 						<li><a href="TSL.html#outputStruct">outputStruct</a></li>
-						<li><a href="TSL.html#overlay">overlay</a></li>
 						<li><a href="TSL.html#overloadingFn">overloadingFn</a></li>
 						<li><a href="TSL.html#packHalf2x16">packHalf2x16</a></li>
 						<li><a href="TSL.html#packSnorm2x16">packSnorm2x16</a></li>
@@ -1323,7 +1317,6 @@
 						<li><a href="TSL.html#radians">radians</a></li>
 						<li><a href="TSL.html#rand">rand</a></li>
 						<li><a href="TSL.html#range">range</a></li>
-						<li><a href="TSL.html#rangeFog">rangeFog</a></li>
 						<li><a href="TSL.html#rangeFogFactor">rangeFogFactor</a></li>
 						<li><a href="TSL.html#reciprocal">reciprocal</a></li>
 						<li><a href="TSL.html#reference">reference</a></li>
@@ -1354,7 +1347,6 @@
 						<li><a href="TSL.html#samplerComparison">samplerComparison</a></li>
 						<li><a href="TSL.html#saturate">saturate</a></li>
 						<li><a href="TSL.html#saturation">saturation</a></li>
-						<li><a href="TSL.html#screen">screen</a></li>
 						<li><a href="TSL.html#screenCoordinate">screenCoordinate</a></li>
 						<li><a href="TSL.html#screenDPR">screenDPR</a></li>
 						<li><a href="TSL.html#screenSize">screenSize</a></li>
@@ -1398,7 +1390,6 @@
 						<li><a href="TSL.html#storage">storage</a></li>
 						<li><a href="TSL.html#storageBarrier">storageBarrier</a></li>
 						<li><a href="TSL.html#storageElement">storageElement</a></li>
-						<li><a href="TSL.html#storageObject">storageObject</a></li>
 						<li><a href="TSL.html#storageTexture">storageTexture</a></li>
 						<li><a href="TSL.html#struct">struct</a></li>
 						<li><a href="TSL.html#sub">sub</a></li>
@@ -1525,6 +1516,7 @@
 						<li><a href="global.html#ByteType">ByteType</a></li>
 						<li><a href="global.html#CineonToneMapping">CineonToneMapping</a></li>
 						<li><a href="global.html#ClampToEdgeWrapping">ClampToEdgeWrapping</a></li>
+						<li><a href="global.html#Compatibility">Compatibility</a></li>
 						<li><a href="global.html#ConstantAlphaFactor">ConstantAlphaFactor</a></li>
 						<li><a href="global.html#ConstantColorFactor">ConstantColorFactor</a></li>
 						<li><a href="global.html#CubeReflectionMapping">CubeReflectionMapping</a></li>
@@ -2092,6 +2084,38 @@
 					}
 
 				}
+
+				// Sort results: exact matches first, then classes before members
+				const searchLower = v.toLowerCase();
+				results.sort( ( a, b ) => {
+
+					const aName = a.title.split( /[#~]/ ).pop().toLowerCase();
+					const bName = b.title.split( /[#~]/ ).pop().toLowerCase();
+					const aIsClass = ! a.title.includes( '#' ) && ! a.title.includes( '~' );
+					const bIsClass = ! b.title.includes( '#' ) && ! b.title.includes( '~' );
+
+					// Exact match on class name (highest priority)
+					const aExactClass = aIsClass && aName === searchLower;
+					const bExactClass = bIsClass && bName === searchLower;
+					if ( aExactClass !== bExactClass ) return aExactClass ? - 1 : 1;
+
+					// Class starts with search term
+					const aStartsClass = aIsClass && aName.startsWith( searchLower );
+					const bStartsClass = bIsClass && bName.startsWith( searchLower );
+					if ( aStartsClass !== bStartsClass ) return aStartsClass ? - 1 : 1;
+
+					// Exact match on member name
+					const aExact = aName === searchLower;
+					const bExact = bName === searchLower;
+					if ( aExact !== bExact ) return aExact ? - 1 : 1;
+
+					// Classes before members
+					if ( aIsClass !== bIsClass ) return aIsClass ? - 1 : 1;
+
+					// Alphabetically
+					return a.title.localeCompare( b.title );
+
+				} );
 
 				// Display results
 				if ( results.length > 0 ) {

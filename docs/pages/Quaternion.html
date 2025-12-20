@@ -594,7 +594,7 @@ Euler angles.</p>
 					<h3 class="name name-method" id="slerp" translate="no">.<a href="#slerp">slerp</a><span class="signature">( qb : <span class="param-type"><a href="Quaternion.html">Quaternion</a></span>, t : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Quaternion.html">Quaternion</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Performs a spherical linear interpolation between quaternions.</p>
+							<p>Performs a spherical linear interpolation between this quaternion and the target quaternion.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -611,7 +611,7 @@ Euler angles.</p>
 										<strong>t</strong>
 									</td>
 									<td class="description last">
-										<p>The interpolation factor in the closed interval <code>[0, 1]</code>.</p>
+										<p>The interpolation factor. A value in the range <code>[0,1]</code> will interpolate. A value outside the range <code>[0,1]</code> will extrapolate.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -832,7 +832,7 @@ quaternion data are managed in flat arrays.</p>
 										<strong>t</strong>
 									</td>
 									<td class="description last">
-										<p>The interpolation factor in the range <code>[0,1]</code>.</p>
+										<p>The interpolation factor. A value in the range <code>[0,1]</code> will interpolate. A value outside the range <code>[0,1]</code> will extrapolate.</p>
 									</td>
 								</tr>
 							</tbody>

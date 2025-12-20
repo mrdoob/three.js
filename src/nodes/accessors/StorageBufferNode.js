@@ -4,7 +4,6 @@ import { varying } from '../tsl/TSLBase.js';
 import { storageElement } from '../utils/StorageArrayElementNode.js';
 import { NodeAccess } from '../core/constants.js';
 import { getTypeFromLength } from '../core/NodeUtils.js';
-import { warn } from '../../utils.js';
 
 /**
  * This node is used in context of compute shaders and allows to define a
@@ -398,21 +397,3 @@ export default StorageBufferNode;
  * @returns {StorageBufferNode}
  */
 export const storage = ( value, type = null, count = 0 ) => new StorageBufferNode( value, type, count );
-
-/**
- * @tsl
- * @function
- * @deprecated since r171. Use `storage().setPBO( true )` instead.
- *
- * @param {StorageBufferAttribute|StorageInstancedBufferAttribute|BufferAttribute} value - The buffer data.
- * @param {?string} type - The buffer type (e.g. `'vec3'`).
- * @param {number} count - The buffer count.
- * @returns {StorageBufferNode}
- */
-export const storageObject = ( value, type, count ) => { // @deprecated, r171
-
-	warn( 'TSL: "storageObject()" is deprecated. Use "storage().setPBO( true )" instead.' );
-
-	return storage( value, type, count ).setPBO( true );
-
-};

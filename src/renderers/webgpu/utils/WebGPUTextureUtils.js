@@ -16,6 +16,7 @@ import {
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, IntType, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat,
 	UnsignedInt101111Type, RGBA_BPTC_Format, RGB_ETC1_Format, RGB_S3TC_DXT1_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format,
 	R11_EAC_Format, SIGNED_R11_EAC_Format, RG11_EAC_Format, SIGNED_RG11_EAC_Format,
+	Compatibility
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
 import { Texture } from '../../../textures/Texture.js';
@@ -124,6 +125,15 @@ class WebGPUTextureUtils {
 				maxAnisotropy: 1
 			};
 
+			// Depth textures without compare function must use non-filtering (nearest) sampling
+			if ( texture.isDepthTexture && texture.compareFunction === null ) {
+
+				samplerDescriptorGPU.magFilter = GPUFilterMode.Nearest;
+				samplerDescriptorGPU.minFilter = GPUFilterMode.Nearest;
+				samplerDescriptorGPU.mipmapFilter = GPUFilterMode.Nearest;
+
+			}
+
 			// anisotropy can only be used when all filter modes are set to linear.
 
 			if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
@@ -132,7 +142,7 @@ class WebGPUTextureUtils {
 
 			}
 
-			if ( texture.isDepthTexture && texture.compareFunction !== null ) {
+			if ( texture.isDepthTexture && texture.compareFunction !== null && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ) {
 
 				samplerDescriptorGPU.compare = _compareToWebGPU[ texture.compareFunction ];
 

@@ -19,7 +19,6 @@ import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../
 import { getDataFromObject } from '../core/NodeUtils.js';
 import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
-import { warn } from '../../utils.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UV.js';
 
@@ -601,12 +600,6 @@ class ShadowNode extends ShadowBaseNode {
 
 				this._node = node = this.setupShadow( builder );
 				this._currentShadowType = currentShadowType;
-
-			}
-
-			if ( builder.material.shadowNode ) { // @deprecated, r171
-
-				warn( 'NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
 
 			}
 
