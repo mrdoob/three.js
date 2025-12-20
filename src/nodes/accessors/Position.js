@@ -2,8 +2,7 @@ import { attribute } from '../core/AttributeNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { Fn, vec3 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
-import { orthographicDepthToViewZ } from '../../nodes/display/ViewportDepthNode.js';
-import { cameraFar, cameraNear } from './Camera.js';
+import { cameraProjectionMatrixInverse } from './Camera.js';
 
 /**
  * TSL object that represents the clip space position of the current rendered object.
@@ -72,41 +71,25 @@ export const positionWorldDirection = /*@__PURE__*/ ( Fn( () => {
  */
 export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	return builder.context.setupPositionView().toVarying( 'v_positionView' );
-
-}, 'vec3' ).once( [ 'POSITION' ] ) )();
-
-/**
- * TSL object that represents the view space Z position of the current rendered object.
- *
- * @tsl
- * @type {Node<float>}
- */
-export const viewZ = ( Fn( ( builder ) => {
-
 	let node;
 
-	if ( builder.shaderStage === 'vertex' ) {
+	if ( builder.shaderStage === 'fragment' ) {
 
-		node = positionView.z;
+		// Reconstruct view position from clip space
+
+		const viewPos4 = cameraProjectionMatrixInverse.mul( clipSpace );
+		
+		node = viewPos4.xyz.div( viewPos4.w );
 
 	} else {
 
-		if ( builder.camera.isPerspectiveCamera ) {
-
-			node = clipSpace.w.negate();
-
-		} else {
-
-			node = orthographicDepthToViewZ( clipSpace.z.div( clipSpace.w ), cameraNear, cameraFar );
-
-		}
+		node = builder.context.setupPositionView();
 
 	}
 
 	return node;
 
-} ).once( [ 'POSITION', 'VERTEX' ] ) )().toVar( 'viewZ' );
+}, 'vec3' ).once( [ 'POSITION', 'VERTEX' ] ) )().toVar( 'positionView' );
 
 /**
  * TSL object that represents the position view direction of the current rendered object.
