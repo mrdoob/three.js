@@ -8,7 +8,7 @@ import { normalLocal } from '../../nodes/accessors/Normal.js';
 import { instancedMesh } from '../../nodes/accessors/InstancedMeshNode.js';
 import { batch } from '../../nodes/accessors/BatchNode.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
-import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
+import { clipSpace, positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
 import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
@@ -16,7 +16,7 @@ import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
-import { depth, viewZToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
+import { depth, orthographicDepthToViewZ, viewZToLogarithmicDepth } from '../../nodes/display/ViewportDepthNode.js';
 import { cameraFar, cameraNear, cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
@@ -531,6 +531,8 @@ class NodeMaterial extends Material {
 
 		const vertexNode = this.vertexNode || mvp;
 
+		clipSpace.assign( vertexNode );
+
 		builder.stack.outputNode = vertexNode;
 
 		this.setupHardwareClipping( builder );
@@ -738,11 +740,13 @@ class NodeMaterial extends Material {
 
 				if ( camera.isPerspectiveCamera ) {
 
-					depthNode = viewZToLogarithmicDepth( positionView.z, cameraNear, cameraFar );
+					depthNode = viewZToLogarithmicDepth( clipSpace.w.negate(), cameraNear, cameraFar );
 
 				} else {
 
-					depthNode = viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar );
+					const viewZ = orthographicDepthToViewZ( clipSpace.z.div( clipSpace.w ), cameraNear, cameraFar );
+
+					depthNode = viewZToLogarithmicDepth( viewZ, cameraNear, cameraFar );
 
 				}
 

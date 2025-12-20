@@ -1,6 +1,15 @@
 import { attribute } from '../core/AttributeNode.js';
+import { varyingProperty } from '../core/PropertyNode.js';
 import { Fn, vec3 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
+
+/**
+ * TSL object that represents the clip space position of the current rendered object.
+ *
+ * @tsl
+ * @type {VaryingNode<vec4>}
+ */
+export const clipSpace = /*@__PURE__*/ varyingProperty( 'vec4', 'clipSpace' );
 
 /**
  * TSL object that represents the position attribute of the current rendered object.
