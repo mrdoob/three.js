@@ -71,25 +71,19 @@ export const positionWorldDirection = /*@__PURE__*/ ( Fn( () => {
  */
 export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	let node;
+	if ( builder.shaderStage === 'fragment' && builder.material.vertexNode ) {
 
-	if ( builder.shaderStage === 'fragment' ) {
-
-		// Reconstruct view position from clip space
+		// reconstruct view position from clip space
 
 		const viewPos = cameraProjectionMatrixInverse.mul( clipSpace );
 
-		node = viewPos.xyz.div( viewPos.w );
-
-	} else {
-
-		node = builder.context.setupPositionView();
+		return viewPos.xyz.div( viewPos.w ).toVar( 'positionView' );
 
 	}
 
-	return node;
+	return builder.context.setupPositionView().toVarying( 'v_positionView' );
 
-}, 'vec3' ).once( [ 'POSITION', 'VERTEX' ] ) )().toVar( 'positionView' );
+}, 'vec3' ).once( [ 'POSITION' ] ) )();
 
 /**
  * TSL object that represents the position view direction of the current rendered object.
