@@ -8,7 +8,7 @@ import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { getTypeFromLength } from './NodeUtils.js';
+import { getDataFromObject, getTypeFromLength } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -3115,6 +3115,20 @@ class NodeBuilder {
 	getSignature() {
 
 		return `// Three.js r${ REVISION } - Node System\n`;
+
+	}
+
+	/**
+	 * Returns `true` if data from the previous frame are required. Relevant
+	 * when computing motion vectors with {@link VelocityNode}.
+	 *
+	 * @return {boolean} Whether data from the previous frame are required or not.
+	 */
+	needsPreviousData() {
+
+		const mrt = this.renderer.getMRT();
+
+		return ( mrt && mrt.has( 'velocity' ) ) || getDataFromObject( this.object ).useVelocity === true;
 
 	}
 

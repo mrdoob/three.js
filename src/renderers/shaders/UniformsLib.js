@@ -135,7 +135,6 @@ const UniformsLib = {
 			shadowMapSize: {}
 		} },
 
-		directionalShadowMap: { value: [] },
 		directionalShadowMatrix: { value: [] },
 
 		spotLights: { value: [], properties: {
@@ -157,7 +156,6 @@ const UniformsLib = {
 		} },
 
 		spotLightMap: { value: [] },
-		spotShadowMap: { value: [] },
 		spotLightMatrix: { value: [] },
 
 		pointLights: { value: [], properties: {
@@ -177,7 +175,6 @@ const UniformsLib = {
 			shadowCameraFar: {}
 		} },
 
-		pointShadowMap: { value: [] },
 		pointShadowMatrix: { value: [] },
 
 		hemisphereLights: { value: [], properties: {

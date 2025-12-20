@@ -1,4 +1,4 @@
-export const REVISION = '182';
+export const REVISION = '183dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -1678,6 +1678,16 @@ export const InterpolationSamplingMode = {
 	SAMPLE: 'sample',
 	FIRST: 'first',
 	EITHER: 'either'
+};
+
+/**
+ * Compatibility flags for features that may not be supported across all platforms.
+ *
+ * @type {Object}
+ * @constant
+ */
+export const Compatibility = {
+	TEXTURE_COMPARE: 'depthTextureCompare'
 };
 
 /**

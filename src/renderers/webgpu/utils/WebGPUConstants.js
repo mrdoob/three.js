@@ -6,7 +6,7 @@ export const GPUPrimitiveTopology = {
 	TriangleStrip: 'triangle-strip',
 };
 
-export const GPUShaderStage = ( typeof self !== 'undefined' ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+export const GPUShaderStage = ( typeof self !== 'undefined' && self.GPUShaderStage ) ? self.GPUShaderStage : { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
 
 export const GPUCompareFunction = {
 	Never: 'never',
