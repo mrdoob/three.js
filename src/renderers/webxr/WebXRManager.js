@@ -1,25 +1,18 @@
-import { ArrayCamera } from "../../cameras/ArrayCamera.js";
-import { EventDispatcher } from "../../core/EventDispatcher.js";
-import { PerspectiveCamera } from "../../cameras/PerspectiveCamera.js";
-import { Vector2 } from "../../math/Vector2.js";
-import { Vector3 } from "../../math/Vector3.js";
-import { Vector4 } from "../../math/Vector4.js";
-import { RAD2DEG } from "../../math/MathUtils.js";
-import { WebGLAnimation } from "../webgl/WebGLAnimation.js";
-import { WebGLRenderTarget } from "../WebGLRenderTarget.js";
-import { WebXRController } from "./WebXRController.js";
-import { DepthTexture } from "../../textures/DepthTexture.js";
-import { ExternalTexture } from "../../textures/ExternalTexture.js";
-import {
-	DepthFormat,
-	DepthStencilFormat,
-	RGBAFormat,
-	UnsignedByteType,
-	UnsignedIntType,
-	UnsignedInt248Type,
-} from "../../constants.js";
-import { WebXRDepthSensing } from "./WebXRDepthSensing.js";
-import { warn } from "../../utils.js";
+import { ArrayCamera } from '../../cameras/ArrayCamera.js';
+import { EventDispatcher } from '../../core/EventDispatcher.js';
+import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { Vector4 } from '../../math/Vector4.js';
+import { RAD2DEG } from '../../math/MathUtils.js';
+import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
+import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
+import { WebXRController } from './WebXRController.js';
+import { DepthTexture } from '../../textures/DepthTexture.js';
+import { ExternalTexture } from '../../textures/ExternalTexture.js';
+import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
+import { WebXRDepthSensing } from './WebXRDepthSensing.js';
+import { warn } from '../../utils.js';
 
 /**
  * This class represents an abstraction of the WebXR Device API and is
@@ -31,13 +24,15 @@ import { warn } from "../../utils.js";
  * @hideconstructor
  */
 class WebXRManager extends EventDispatcher {
+
 	/**
 	 * Constructs a new WebGL renderer.
 	 *
 	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {WebGL2RenderingContext} gl - The rendering context.
 	 */
-	constructor(renderer, gl) {
+	constructor( renderer, gl ) {
+
 		super();
 
 		const scope = this;
@@ -47,7 +42,7 @@ class WebXRManager extends EventDispatcher {
 		let framebufferScaleFactor = 1.0;
 
 		let referenceSpace = null;
-		let referenceSpaceType = "local-floor";
+		let referenceSpaceType = 'local-floor';
 		// Set default foveation to maximum.
 		let foveation = 1.0;
 		let customReferenceSpace = null;
@@ -58,7 +53,7 @@ class WebXRManager extends EventDispatcher {
 		let glBaseLayer = null;
 		let xrFrame = null;
 
-		const supportsGlBinding = typeof XRWebGLBinding !== "undefined";
+		const supportsGlBinding = typeof XRWebGLBinding !== 'undefined';
 
 		const depthSensing = new WebXRDepthSensing();
 		const cameraAccessTextures = {};
@@ -81,7 +76,7 @@ class WebXRManager extends EventDispatcher {
 		const cameraR = new PerspectiveCamera();
 		cameraR.viewport = new Vector4();
 
-		const cameras = [cameraL, cameraR];
+		const cameras = [ cameraL, cameraR ];
 
 		const cameraXR = new ArrayCamera();
 
@@ -124,15 +119,19 @@ class WebXRManager extends EventDispatcher {
 		 * @param {number} index - The index of the controller.
 		 * @return {Group} A group representing the `target ray` space.
 		 */
-		this.getController = function (index) {
-			let controller = controllers[index];
+		this.getController = function ( index ) {
 
-			if (controller === undefined) {
+			let controller = controllers[ index ];
+
+			if ( controller === undefined ) {
+
 				controller = new WebXRController();
-				controllers[index] = controller;
+				controllers[ index ] = controller;
+
 			}
 
 			return controller.getTargetRaySpace();
+
 		};
 
 		/**
@@ -150,15 +149,19 @@ class WebXRManager extends EventDispatcher {
 		 * @param {number} index - The index of the controller.
 		 * @return {Group} A group representing the `grip` space.
 		 */
-		this.getControllerGrip = function (index) {
-			let controller = controllers[index];
+		this.getControllerGrip = function ( index ) {
 
-			if (controller === undefined) {
+			let controller = controllers[ index ];
+
+			if ( controller === undefined ) {
+
 				controller = new WebXRController();
-				controllers[index] = controller;
+				controllers[ index ] = controller;
+
 			}
 
 			return controller.getGripSpace();
+
 		};
 
 		/**
@@ -169,69 +172,80 @@ class WebXRManager extends EventDispatcher {
 		 * @param {number} index - The index of the controller.
 		 * @return {Group} A group representing the `hand` space.
 		 */
-		this.getHand = function (index) {
-			let controller = controllers[index];
+		this.getHand = function ( index ) {
 
-			if (controller === undefined) {
+			let controller = controllers[ index ];
+
+			if ( controller === undefined ) {
+
 				controller = new WebXRController();
-				controllers[index] = controller;
+				controllers[ index ] = controller;
+
 			}
 
 			return controller.getHandSpace();
+
 		};
 
 		//
 
-		function onSessionEvent(event) {
-			const controllerIndex = controllerInputSources.indexOf(event.inputSource);
+		function onSessionEvent( event ) {
 
-			if (controllerIndex === -1) {
+			const controllerIndex = controllerInputSources.indexOf( event.inputSource );
+
+			if ( controllerIndex === - 1 ) {
+
 				return;
+
 			}
 
-			const controller = controllers[controllerIndex];
+			const controller = controllers[ controllerIndex ];
 
-			if (controller !== undefined) {
-				controller.update(
-					event.inputSource,
-					event.frame,
-					customReferenceSpace || referenceSpace
-				);
-				controller.dispatchEvent({ type: event.type, data: event.inputSource });
+			if ( controller !== undefined ) {
+
+				controller.update( event.inputSource, event.frame, customReferenceSpace || referenceSpace );
+				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
+
 			}
+
 		}
 
 		function onSessionEnd() {
-			session.removeEventListener("select", onSessionEvent);
-			session.removeEventListener("selectstart", onSessionEvent);
-			session.removeEventListener("selectend", onSessionEvent);
-			session.removeEventListener("squeeze", onSessionEvent);
-			session.removeEventListener("squeezestart", onSessionEvent);
-			session.removeEventListener("squeezeend", onSessionEvent);
-			session.removeEventListener("end", onSessionEnd);
-			session.removeEventListener("inputsourceschange", onInputSourcesChange);
 
-			for (let i = 0; i < controllers.length; i++) {
-				const inputSource = controllerInputSources[i];
+			session.removeEventListener( 'select', onSessionEvent );
+			session.removeEventListener( 'selectstart', onSessionEvent );
+			session.removeEventListener( 'selectend', onSessionEvent );
+			session.removeEventListener( 'squeeze', onSessionEvent );
+			session.removeEventListener( 'squeezestart', onSessionEvent );
+			session.removeEventListener( 'squeezeend', onSessionEvent );
+			session.removeEventListener( 'end', onSessionEnd );
+			session.removeEventListener( 'inputsourceschange', onInputSourcesChange );
 
-				if (inputSource === null) continue;
+			for ( let i = 0; i < controllers.length; i ++ ) {
 
-				controllerInputSources[i] = null;
+				const inputSource = controllerInputSources[ i ];
 
-				controllers[i].disconnect(inputSource);
+				if ( inputSource === null ) continue;
+
+				controllerInputSources[ i ] = null;
+
+				controllers[ i ].disconnect( inputSource );
+
 			}
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
 
 			depthSensing.reset();
-			for (const key in cameraAccessTextures) {
-				delete cameraAccessTextures[key];
+			for ( const key in cameraAccessTextures ) {
+
+				delete cameraAccessTextures[ key ];
+
 			}
 
 			// restore framebuffer/rendering state
 
-			renderer.setRenderTarget(initialRenderTarget);
+			renderer.setRenderTarget( initialRenderTarget );
 
 			glBaseLayer = null;
 			glProjLayer = null;
@@ -245,10 +259,11 @@ class WebXRManager extends EventDispatcher {
 
 			scope.isPresenting = false;
 
-			renderer.setPixelRatio(currentPixelRatio);
-			renderer.setSize(currentSize.width, currentSize.height, false);
+			renderer.setPixelRatio( currentPixelRatio );
+			renderer.setSize( currentSize.width, currentSize.height, false );
 
-			scope.dispatchEvent({ type: "sessionend" });
+			scope.dispatchEvent( { type: 'sessionend' } );
+
 		}
 
 		/**
@@ -258,12 +273,16 @@ class WebXRManager extends EventDispatcher {
 		 *
 		 * @param {number} value - The framebuffer scale factor.
 		 */
-		this.setFramebufferScaleFactor = function (value) {
+		this.setFramebufferScaleFactor = function ( value ) {
+
 			framebufferScaleFactor = value;
 
-			if (scope.isPresenting === true) {
-				warn("WebXRManager: Cannot change framebuffer scale while presenting.");
+			if ( scope.isPresenting === true ) {
+
+				warn( 'WebXRManager: Cannot change framebuffer scale while presenting.' );
+
 			}
+
 		};
 
 		/**
@@ -276,14 +295,16 @@ class WebXRManager extends EventDispatcher {
 		 *
 		 * @param {string} value - The reference space type.
 		 */
-		this.setReferenceSpaceType = function (value) {
+		this.setReferenceSpaceType = function ( value ) {
+
 			referenceSpaceType = value;
 
-			if (scope.isPresenting === true) {
-				warn(
-					"WebXRManager: Cannot change reference space type while presenting."
-				);
+			if ( scope.isPresenting === true ) {
+
+				warn( 'WebXRManager: Cannot change reference space type while presenting.' );
+
 			}
+
 		};
 
 		/**
@@ -292,7 +313,9 @@ class WebXRManager extends EventDispatcher {
 		 * @return {XRReferenceSpace} The XR reference space.
 		 */
 		this.getReferenceSpace = function () {
+
 			return customReferenceSpace || referenceSpace;
+
 		};
 
 		/**
@@ -300,8 +323,10 @@ class WebXRManager extends EventDispatcher {
 		 *
 		 * @param {XRReferenceSpace} space - The XR reference space.
 		 */
-		this.setReferenceSpace = function (space) {
+		this.setReferenceSpace = function ( space ) {
+
 			customReferenceSpace = space;
+
 		};
 
 		/**
@@ -313,7 +338,9 @@ class WebXRManager extends EventDispatcher {
 		 * @return {?(XRWebGLLayer|XRProjectionLayer)} The XR base layer.
 		 */
 		this.getBaseLayer = function () {
+
 			return glProjLayer !== null ? glProjLayer : glBaseLayer;
+
 		};
 
 		/**
@@ -325,11 +352,15 @@ class WebXRManager extends EventDispatcher {
 		 * @return {?XRWebGLBinding} The XR binding. Returns `null` if one cannot be created.
 		 */
 		this.getBinding = function () {
-			if (glBinding === null && supportsGlBinding) {
-				glBinding = new XRWebGLBinding(session, gl);
+
+			if ( glBinding === null && supportsGlBinding ) {
+
+				glBinding = new XRWebGLBinding( session, gl );
+
 			}
 
 			return glBinding;
+
 		};
 
 		/**
@@ -338,7 +369,9 @@ class WebXRManager extends EventDispatcher {
 		 * @return {?XRFrame} The XR frame. Returns `null` when used outside a XR session.
 		 */
 		this.getFrame = function () {
+
 			return xrFrame;
+
 		};
 
 		/**
@@ -347,7 +380,9 @@ class WebXRManager extends EventDispatcher {
 		 * @return {?XRSession} The XR session. Returns `null` when used outside a XR session.
 		 */
 		this.getSession = function () {
+
 			return session;
+
 		};
 
 		/**
@@ -359,55 +394,55 @@ class WebXRManager extends EventDispatcher {
 		 * @param {XRSession} value - The XR session to set.
 		 * @return {Promise} A Promise that resolves when the session has been set.
 		 */
-		this.setSession = async function (value) {
+		this.setSession = async function ( value ) {
+
 			session = value;
 
-			if (session !== null) {
+			if ( session !== null ) {
+
 				initialRenderTarget = renderer.getRenderTarget();
 
-				session.addEventListener("select", onSessionEvent);
-				session.addEventListener("selectstart", onSessionEvent);
-				session.addEventListener("selectend", onSessionEvent);
-				session.addEventListener("squeeze", onSessionEvent);
-				session.addEventListener("squeezestart", onSessionEvent);
-				session.addEventListener("squeezeend", onSessionEvent);
-				session.addEventListener("end", onSessionEnd);
-				session.addEventListener("inputsourceschange", onInputSourcesChange);
+				session.addEventListener( 'select', onSessionEvent );
+				session.addEventListener( 'selectstart', onSessionEvent );
+				session.addEventListener( 'selectend', onSessionEvent );
+				session.addEventListener( 'squeeze', onSessionEvent );
+				session.addEventListener( 'squeezestart', onSessionEvent );
+				session.addEventListener( 'squeezeend', onSessionEvent );
+				session.addEventListener( 'end', onSessionEnd );
+				session.addEventListener( 'inputsourceschange', onInputSourcesChange );
 
-				if (attributes.xrCompatible !== true) {
+				if ( attributes.xrCompatible !== true ) {
+
 					await gl.makeXRCompatible();
+
 				}
 
 				currentPixelRatio = renderer.getPixelRatio();
-				renderer.getSize(currentSize);
+				renderer.getSize( currentSize );
+
 
 				// Check that the browser implements the necessary APIs to use an
-				// XRProjectionLayer rather than an XRWebGLLayer
-				const supportsLayers =
-					supportsGlBinding &&
-					"createProjectionLayer" in XRWebGLBinding.prototype;
-				const sessionHasLayers =
-					session.enabledFeatures?.includes("layers") ?? false;
+				// XRProjectionLayer rather than an XRWebGLLayer, and that the
+				// session has the 'layers' feature enabled.
+				const supportsLayers = supportsGlBinding && 'createProjectionLayer' in XRWebGLBinding.prototype;
+				const sessionHasLayers = session.enabledFeatures?.includes( 'layers' ) ?? false;
 
-				if (!supportsLayers || !sessionHasLayers) {
+				if ( ! supportsLayers || ! sessionHasLayers ) {
+
 					const layerInit = {
 						antialias: attributes.antialias,
 						alpha: true,
 						depth: attributes.depth,
 						stencil: attributes.stencil,
-						framebufferScaleFactor: framebufferScaleFactor,
+						framebufferScaleFactor: framebufferScaleFactor
 					};
 
-					glBaseLayer = new XRWebGLLayer(session, gl, layerInit);
+					glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
 
-					session.updateRenderState({ baseLayer: glBaseLayer });
+					session.updateRenderState( { baseLayer: glBaseLayer } );
 
-					renderer.setPixelRatio(1);
-					renderer.setSize(
-						glBaseLayer.framebufferWidth,
-						glBaseLayer.framebufferHeight,
-						false
-					);
+					renderer.setPixelRatio( 1 );
+					renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
 
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
@@ -417,43 +452,40 @@ class WebXRManager extends EventDispatcher {
 							type: UnsignedByteType,
 							colorSpace: renderer.outputColorSpace,
 							stencilBuffer: attributes.stencil,
-							resolveDepthBuffer: glBaseLayer.ignoreDepthValues === false,
-							resolveStencilBuffer: glBaseLayer.ignoreDepthValues === false,
+							resolveDepthBuffer: ( glBaseLayer.ignoreDepthValues === false ),
+							resolveStencilBuffer: ( glBaseLayer.ignoreDepthValues === false )
+
 						}
 					);
+
 				} else {
+
 					let depthFormat = null;
 					let depthType = null;
 					let glDepthFormat = null;
 
-					if (attributes.depth) {
-						glDepthFormat = attributes.stencil
-							? gl.DEPTH24_STENCIL8
-							: gl.DEPTH_COMPONENT24;
+					if ( attributes.depth ) {
+
+						glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
 						depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
-						depthType = attributes.stencil
-							? UnsignedInt248Type
-							: UnsignedIntType;
+						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedIntType;
+
 					}
 
 					const projectionlayerInit = {
 						colorFormat: gl.RGBA8,
 						depthFormat: glDepthFormat,
-						scaleFactor: framebufferScaleFactor,
+						scaleFactor: framebufferScaleFactor
 					};
 
 					glBinding = this.getBinding();
 
-					glProjLayer = glBinding.createProjectionLayer(projectionlayerInit);
+					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
-					session.updateRenderState({ layers: [glProjLayer] });
+					session.updateRenderState( { layers: [ glProjLayer ] } );
 
-					renderer.setPixelRatio(1);
-					renderer.setSize(
-						glProjLayer.textureWidth,
-						glProjLayer.textureHeight,
-						false
-					);
+					renderer.setPixelRatio( 1 );
+					renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
 
 					newRenderTarget = new WebGLRenderTarget(
 						glProjLayer.textureWidth,
@@ -461,43 +493,32 @@ class WebXRManager extends EventDispatcher {
 						{
 							format: RGBAFormat,
 							type: UnsignedByteType,
-							depthTexture: new DepthTexture(
-								glProjLayer.textureWidth,
-								glProjLayer.textureHeight,
-								depthType,
-								undefined,
-								undefined,
-								undefined,
-								undefined,
-								undefined,
-								undefined,
-								depthFormat
-							),
+							depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 							stencilBuffer: attributes.stencil,
 							colorSpace: renderer.outputColorSpace,
 							samples: attributes.antialias ? 4 : 0,
-							resolveDepthBuffer: glProjLayer.ignoreDepthValues === false,
-							resolveStencilBuffer: glProjLayer.ignoreDepthValues === false,
-						}
-					);
+							resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false ),
+							resolveStencilBuffer: ( glProjLayer.ignoreDepthValues === false )
+						} );
+
 				}
 
 				newRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
 
-				this.setFoveation(foveation);
+				this.setFoveation( foveation );
 
 				customReferenceSpace = null;
-				referenceSpace = await session.requestReferenceSpace(
-					referenceSpaceType
-				);
+				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
-				animation.setContext(session);
+				animation.setContext( session );
 				animation.start();
 
 				scope.isPresenting = true;
 
-				scope.dispatchEvent({ type: "sessionstart" });
+				scope.dispatchEvent( { type: 'sessionstart' } );
+
 			}
+
 		};
 
 		/**
@@ -506,9 +527,13 @@ class WebXRManager extends EventDispatcher {
 		 * @return {'opaque'|'additive'|'alpha-blend'|undefined} The environment blend mode. Returns `undefined` when used outside of a XR session.
 		 */
 		this.getEnvironmentBlendMode = function () {
-			if (session !== null) {
+
+			if ( session !== null ) {
+
 				return session.environmentBlendMode;
+
 			}
+
 		};
 
 		/**
@@ -519,55 +544,75 @@ class WebXRManager extends EventDispatcher {
 		 * @return {?Texture} The depth texture.
 		 */
 		this.getDepthTexture = function () {
+
 			return depthSensing.getDepthTexture();
+
 		};
 
-		function onInputSourcesChange(event) {
+		function onInputSourcesChange( event ) {
+
 			// Notify disconnected
 
-			for (let i = 0; i < event.removed.length; i++) {
-				const inputSource = event.removed[i];
-				const index = controllerInputSources.indexOf(inputSource);
+			for ( let i = 0; i < event.removed.length; i ++ ) {
 
-				if (index >= 0) {
-					controllerInputSources[index] = null;
-					controllers[index].disconnect(inputSource);
+				const inputSource = event.removed[ i ];
+				const index = controllerInputSources.indexOf( inputSource );
+
+				if ( index >= 0 ) {
+
+					controllerInputSources[ index ] = null;
+					controllers[ index ].disconnect( inputSource );
+
 				}
+
 			}
 
 			// Notify connected
 
-			for (let i = 0; i < event.added.length; i++) {
-				const inputSource = event.added[i];
+			for ( let i = 0; i < event.added.length; i ++ ) {
 
-				let controllerIndex = controllerInputSources.indexOf(inputSource);
+				const inputSource = event.added[ i ];
 
-				if (controllerIndex === -1) {
+				let controllerIndex = controllerInputSources.indexOf( inputSource );
+
+				if ( controllerIndex === - 1 ) {
+
 					// Assign input source a controller that currently has no input source
 
-					for (let i = 0; i < controllers.length; i++) {
-						if (i >= controllerInputSources.length) {
-							controllerInputSources.push(inputSource);
+					for ( let i = 0; i < controllers.length; i ++ ) {
+
+						if ( i >= controllerInputSources.length ) {
+
+							controllerInputSources.push( inputSource );
 							controllerIndex = i;
 							break;
-						} else if (controllerInputSources[i] === null) {
-							controllerInputSources[i] = inputSource;
+
+						} else if ( controllerInputSources[ i ] === null ) {
+
+							controllerInputSources[ i ] = inputSource;
 							controllerIndex = i;
 							break;
+
 						}
+
 					}
 
 					// If all controllers do currently receive input we ignore new ones
 
-					if (controllerIndex === -1) break;
+					if ( controllerIndex === - 1 ) break;
+
 				}
 
-				const controller = controllers[controllerIndex];
+				const controller = controllers[ controllerIndex ];
 
-				if (controller) {
-					controller.connect(inputSource);
+				if ( controller ) {
+
+					controller.connect( inputSource );
+
 				}
+
 			}
+
 		}
 
 		//
@@ -585,11 +630,12 @@ class WebXRManager extends EventDispatcher {
 		 * @param {PerspectiveCamera} cameraL - The left camera.
 		 * @param {PerspectiveCamera} cameraR - The right camera.
 		 */
-		function setProjectionFromUnion(camera, cameraL, cameraR) {
-			cameraLPos.setFromMatrixPosition(cameraL.matrixWorld);
-			cameraRPos.setFromMatrixPosition(cameraR.matrixWorld);
+		function setProjectionFromUnion( camera, cameraL, cameraR ) {
 
-			const ipd = cameraLPos.distanceTo(cameraRPos);
+			cameraLPos.setFromMatrixPosition( cameraL.matrixWorld );
+			cameraRPos.setFromMatrixPosition( cameraR.matrixWorld );
+
+			const ipd = cameraLPos.distanceTo( cameraRPos );
 
 			const projL = cameraL.projectionMatrix.elements;
 			const projR = cameraR.projectionMatrix.elements;
@@ -597,74 +643,70 @@ class WebXRManager extends EventDispatcher {
 			// VR systems will have identical far and near planes, and
 			// most likely identical top and bottom frustum extents.
 			// Use the left camera for these values.
-			const near = projL[14] / (projL[10] - 1);
-			const far = projL[14] / (projL[10] + 1);
-			const topFov = (projL[9] + 1) / projL[5];
-			const bottomFov = (projL[9] - 1) / projL[5];
+			const near = projL[ 14 ] / ( projL[ 10 ] - 1 );
+			const far = projL[ 14 ] / ( projL[ 10 ] + 1 );
+			const topFov = ( projL[ 9 ] + 1 ) / projL[ 5 ];
+			const bottomFov = ( projL[ 9 ] - 1 ) / projL[ 5 ];
 
-			const leftFov = (projL[8] - 1) / projL[0];
-			const rightFov = (projR[8] + 1) / projR[0];
+			const leftFov = ( projL[ 8 ] - 1 ) / projL[ 0 ];
+			const rightFov = ( projR[ 8 ] + 1 ) / projR[ 0 ];
 			const left = near * leftFov;
 			const right = near * rightFov;
 
 			// Calculate the new camera's position offset from the
 			// left camera. xOffset should be roughly half `ipd`.
-			const zOffset = ipd / (-leftFov + rightFov);
-			const xOffset = zOffset * -leftFov;
+			const zOffset = ipd / ( - leftFov + rightFov );
+			const xOffset = zOffset * - leftFov;
 
 			// TODO: Better way to apply this offset?
-			cameraL.matrixWorld.decompose(
-				camera.position,
-				camera.quaternion,
-				camera.scale
-			);
-			camera.translateX(xOffset);
-			camera.translateZ(zOffset);
-			camera.matrixWorld.compose(
-				camera.position,
-				camera.quaternion,
-				camera.scale
-			);
-			camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+			cameraL.matrixWorld.decompose( camera.position, camera.quaternion, camera.scale );
+			camera.translateX( xOffset );
+			camera.translateZ( zOffset );
+			camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
+			camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
 
 			// Check if the projection uses an infinite far plane.
-			if (projL[10] === -1.0) {
+			if ( projL[ 10 ] === - 1.0 ) {
+
 				// Use the projection matrix from the left eye.
 				// The camera offset is sufficient to include the view volumes
 				// of both eyes (assuming symmetric projections).
-				camera.projectionMatrix.copy(cameraL.projectionMatrix);
-				camera.projectionMatrixInverse.copy(cameraL.projectionMatrixInverse);
+				camera.projectionMatrix.copy( cameraL.projectionMatrix );
+				camera.projectionMatrixInverse.copy( cameraL.projectionMatrixInverse );
+
 			} else {
+
 				// Find the union of the frustum values of the cameras and scale
 				// the values so that the near plane's position does not change in world space,
 				// although must now be relative to the new union camera.
 				const near2 = near + zOffset;
 				const far2 = far + zOffset;
 				const left2 = left - xOffset;
-				const right2 = right + (ipd - xOffset);
-				const top2 = ((topFov * far) / far2) * near2;
-				const bottom2 = ((bottomFov * far) / far2) * near2;
+				const right2 = right + ( ipd - xOffset );
+				const top2 = topFov * far / far2 * near2;
+				const bottom2 = bottomFov * far / far2 * near2;
 
-				camera.projectionMatrix.makePerspective(
-					left2,
-					right2,
-					top2,
-					bottom2,
-					near2,
-					far2
-				);
-				camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+				camera.projectionMatrix.makePerspective( left2, right2, top2, bottom2, near2, far2 );
+				camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+
 			}
+
 		}
 
-		function updateCamera(camera, parent) {
-			if (parent === null) {
-				camera.matrixWorld.copy(camera.matrix);
+		function updateCamera( camera, parent ) {
+
+			if ( parent === null ) {
+
+				camera.matrixWorld.copy( camera.matrix );
+
 			} else {
-				camera.matrixWorld.multiplyMatrices(parent.matrixWorld, camera.matrix);
+
+				camera.matrixWorld.multiplyMatrices( parent.matrixWorld, camera.matrix );
+
 			}
 
-			camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+			camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
+
 		}
 
 		/**
@@ -676,33 +718,35 @@ class WebXRManager extends EventDispatcher {
 		 *
 		 * @param {Camera} camera - The camera.
 		 */
-		this.updateCamera = function (camera) {
-			if (session === null) return;
+		this.updateCamera = function ( camera ) {
+
+			if ( session === null ) return;
 
 			let depthNear = camera.near;
 			let depthFar = camera.far;
 
-			if (depthSensing.texture !== null) {
-				if (depthSensing.depthNear > 0) depthNear = depthSensing.depthNear;
-				if (depthSensing.depthFar > 0) depthFar = depthSensing.depthFar;
+			if ( depthSensing.texture !== null ) {
+
+				if ( depthSensing.depthNear > 0 ) depthNear = depthSensing.depthNear;
+				if ( depthSensing.depthFar > 0 ) depthFar = depthSensing.depthFar;
+
 			}
 
 			cameraXR.near = cameraR.near = cameraL.near = depthNear;
 			cameraXR.far = cameraR.far = cameraL.far = depthFar;
 
-			if (
-				_currentDepthNear !== cameraXR.near ||
-				_currentDepthFar !== cameraXR.far
-			) {
+			if ( _currentDepthNear !== cameraXR.near || _currentDepthFar !== cameraXR.far ) {
+
 				// Note that the new renderState won't apply until the next frame. See #18320
 
-				session.updateRenderState({
+				session.updateRenderState( {
 					depthNear: cameraXR.near,
-					depthFar: cameraXR.far,
-				});
+					depthFar: cameraXR.far
+				} );
 
 				_currentDepthNear = cameraXR.near;
 				_currentDepthFar = cameraXR.far;
+
 			}
 
 			// inherit camera layers and enable eye layers (1 = left, 2 = right)
@@ -713,47 +757,61 @@ class WebXRManager extends EventDispatcher {
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;
 
-			updateCamera(cameraXR, parent);
+			updateCamera( cameraXR, parent );
 
-			for (let i = 0; i < cameras.length; i++) {
-				updateCamera(cameras[i], parent);
+			for ( let i = 0; i < cameras.length; i ++ ) {
+
+				updateCamera( cameras[ i ], parent );
+
 			}
 
 			// update projection matrix for proper view frustum culling
 
-			if (cameras.length === 2) {
-				setProjectionFromUnion(cameraXR, cameraL, cameraR);
+			if ( cameras.length === 2 ) {
+
+				setProjectionFromUnion( cameraXR, cameraL, cameraR );
+
 			} else {
+
 				// assume single camera setup (AR)
 
-				cameraXR.projectionMatrix.copy(cameraL.projectionMatrix);
+				cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
+
 			}
 
 			// update user camera and its children
 
-			updateUserCamera(camera, cameraXR, parent);
+			updateUserCamera( camera, cameraXR, parent );
+
 		};
 
-		function updateUserCamera(camera, cameraXR, parent) {
-			if (parent === null) {
-				camera.matrix.copy(cameraXR.matrixWorld);
+		function updateUserCamera( camera, cameraXR, parent ) {
+
+			if ( parent === null ) {
+
+				camera.matrix.copy( cameraXR.matrixWorld );
+
 			} else {
-				camera.matrix.copy(parent.matrixWorld);
+
+				camera.matrix.copy( parent.matrixWorld );
 				camera.matrix.invert();
-				camera.matrix.multiply(cameraXR.matrixWorld);
+				camera.matrix.multiply( cameraXR.matrixWorld );
+
 			}
 
-			camera.matrix.decompose(camera.position, camera.quaternion, camera.scale);
-			camera.updateMatrixWorld(true);
+			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+			camera.updateMatrixWorld( true );
 
-			camera.projectionMatrix.copy(cameraXR.projectionMatrix);
-			camera.projectionMatrixInverse.copy(cameraXR.projectionMatrixInverse);
+			camera.projectionMatrix.copy( cameraXR.projectionMatrix );
+			camera.projectionMatrixInverse.copy( cameraXR.projectionMatrixInverse );
 
-			if (camera.isPerspectiveCamera) {
-				camera.fov =
-					RAD2DEG * 2 * Math.atan(1 / camera.projectionMatrix.elements[5]);
+			if ( camera.isPerspectiveCamera ) {
+
+				camera.fov = RAD2DEG * 2 * Math.atan( 1 / camera.projectionMatrix.elements[ 5 ] );
 				camera.zoom = 1;
+
 			}
+
 		}
 
 		/**
@@ -767,7 +825,9 @@ class WebXRManager extends EventDispatcher {
 		 * @return {ArrayCamera} The XR camera.
 		 */
 		this.getCamera = function () {
+
 			return cameraXR;
+
 		};
 
 		/**
@@ -776,11 +836,15 @@ class WebXRManager extends EventDispatcher {
 		 * @return {number|undefined} The amount of foveation.
 		 */
 		this.getFoveation = function () {
-			if (glProjLayer === null && glBaseLayer === null) {
+
+			if ( glProjLayer === null && glBaseLayer === null ) {
+
 				return undefined;
+
 			}
 
 			return foveation;
+
 		};
 
 		/**
@@ -789,19 +853,25 @@ class WebXRManager extends EventDispatcher {
 		 * @param {number} value - A number in the range `[0,1]` where `0` means no foveation (full resolution)
 		 * and `1` means maximum foveation (the edges render at lower resolution).
 		 */
-		this.setFoveation = function (value) {
+		this.setFoveation = function ( value ) {
+
 			// 0 = no foveation = full resolution
 			// 1 = maximum foveation = the edges render at lower resolution
 
 			foveation = value;
 
-			if (glProjLayer !== null) {
+			if ( glProjLayer !== null ) {
+
 				glProjLayer.fixedFoveation = value;
+
 			}
 
-			if (glBaseLayer !== null && glBaseLayer.fixedFoveation !== undefined) {
+			if ( glBaseLayer !== null && glBaseLayer.fixedFoveation !== undefined ) {
+
 				glBaseLayer.fixedFoveation = value;
+
 			}
+
 		};
 
 		/**
@@ -810,7 +880,9 @@ class WebXRManager extends EventDispatcher {
 		 * @return {boolean} Whether depth sensing is supported or not.
 		 */
 		this.hasDepthSensing = function () {
+
 			return depthSensing.texture !== null;
+
 		};
 
 		/**
@@ -821,7 +893,9 @@ class WebXRManager extends EventDispatcher {
 		 * @return {Mesh} The depth sensing mesh.
 		 */
 		this.getDepthSensingMesh = function () {
-			return depthSensing.getMesh(cameraXR);
+
+			return depthSensing.getMesh( cameraXR );
+
 		};
 
 		/**
@@ -831,177 +905,201 @@ class WebXRManager extends EventDispatcher {
 		 * @param {XRCamera} xrCamera - The camera to query.
 		 * @return {?Texture} An opaque texture representing the current raw camera frame.
 		 */
-		this.getCameraTexture = function (xrCamera) {
-			return cameraAccessTextures[xrCamera];
+		this.getCameraTexture = function ( xrCamera ) {
+
+			return cameraAccessTextures[ xrCamera ];
+
 		};
 
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
 
-		function onAnimationFrame(time, frame) {
-			pose = frame.getViewerPose(customReferenceSpace || referenceSpace);
+		function onAnimationFrame( time, frame ) {
+
+			pose = frame.getViewerPose( customReferenceSpace || referenceSpace );
 			xrFrame = frame;
 
-			if (pose !== null) {
+			if ( pose !== null ) {
+
 				const views = pose.views;
 
-				if (glBaseLayer !== null) {
-					renderer.setRenderTargetFramebuffer(
-						newRenderTarget,
-						glBaseLayer.framebuffer
-					);
-					renderer.setRenderTarget(newRenderTarget);
+				if ( glBaseLayer !== null ) {
+
+					renderer.setRenderTargetFramebuffer( newRenderTarget, glBaseLayer.framebuffer );
+					renderer.setRenderTarget( newRenderTarget );
+
 				}
 
 				let cameraXRNeedsUpdate = false;
 
 				// check if it's necessary to rebuild cameraXR's camera list
 
-				if (views.length !== cameraXR.cameras.length) {
+				if ( views.length !== cameraXR.cameras.length ) {
+
 					cameraXR.cameras.length = 0;
 					cameraXRNeedsUpdate = true;
+
 				}
 
-				for (let i = 0; i < views.length; i++) {
-					const view = views[i];
+				for ( let i = 0; i < views.length; i ++ ) {
+
+					const view = views[ i ];
 
 					let viewport = null;
 
-					if (glBaseLayer !== null) {
-						viewport = glBaseLayer.getViewport(view);
+					if ( glBaseLayer !== null ) {
+
+						viewport = glBaseLayer.getViewport( view );
+
 					} else {
-						const glSubImage = glBinding.getViewSubImage(glProjLayer, view);
+
+						const glSubImage = glBinding.getViewSubImage( glProjLayer, view );
 						viewport = glSubImage.viewport;
 
 						// For side-by-side projection, we only produce a single texture for both eyes.
-						if (i === 0) {
+						if ( i === 0 ) {
+
 							renderer.setRenderTargetTextures(
 								newRenderTarget,
 								glSubImage.colorTexture,
-								glSubImage.depthStencilTexture
-							);
+								glSubImage.depthStencilTexture );
 
-							renderer.setRenderTarget(newRenderTarget);
+							renderer.setRenderTarget( newRenderTarget );
+
 						}
+
 					}
 
-					let camera = cameras[i];
+					let camera = cameras[ i ];
 
-					if (camera === undefined) {
+					if ( camera === undefined ) {
+
 						camera = new PerspectiveCamera();
-						camera.layers.enable(i);
+						camera.layers.enable( i );
 						camera.viewport = new Vector4();
-						cameras[i] = camera;
+						cameras[ i ] = camera;
+
 					}
 
-					camera.matrix.fromArray(view.transform.matrix);
-					camera.matrix.decompose(
-						camera.position,
-						camera.quaternion,
-						camera.scale
-					);
-					camera.projectionMatrix.fromArray(view.projectionMatrix);
-					camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
-					camera.viewport.set(
-						viewport.x,
-						viewport.y,
-						viewport.width,
-						viewport.height
-					);
+					camera.matrix.fromArray( view.transform.matrix );
+					camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+					camera.projectionMatrix.fromArray( view.projectionMatrix );
+					camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+					camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
-					if (i === 0) {
-						cameraXR.matrix.copy(camera.matrix);
-						cameraXR.matrix.decompose(
-							cameraXR.position,
-							cameraXR.quaternion,
-							cameraXR.scale
-						);
+					if ( i === 0 ) {
+
+						cameraXR.matrix.copy( camera.matrix );
+						cameraXR.matrix.decompose( cameraXR.position, cameraXR.quaternion, cameraXR.scale );
+
 					}
 
-					if (cameraXRNeedsUpdate === true) {
-						cameraXR.cameras.push(camera);
+					if ( cameraXRNeedsUpdate === true ) {
+
+						cameraXR.cameras.push( camera );
+
 					}
+
 				}
 
 				//
 
 				const enabledFeatures = session.enabledFeatures;
-				const gpuDepthSensingEnabled =
-					enabledFeatures &&
-					enabledFeatures.includes("depth-sensing") &&
-					session.depthUsage == "gpu-optimized";
+				const gpuDepthSensingEnabled = enabledFeatures &&
+					enabledFeatures.includes( 'depth-sensing' ) &&
+					session.depthUsage == 'gpu-optimized';
 
-				if (gpuDepthSensingEnabled && supportsGlBinding) {
+				if ( gpuDepthSensingEnabled && supportsGlBinding ) {
+
 					glBinding = scope.getBinding();
 
-					const depthData = glBinding.getDepthInformation(views[0]);
+					const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
-					if (depthData && depthData.isValid && depthData.texture) {
-						depthSensing.init(depthData, session.renderState);
+					if ( depthData && depthData.isValid && depthData.texture ) {
+
+						depthSensing.init( depthData, session.renderState );
+
 					}
+
 				}
 
-				const cameraAccessEnabled =
-					enabledFeatures && enabledFeatures.includes("camera-access");
+				const cameraAccessEnabled = enabledFeatures &&
+				    enabledFeatures.includes( 'camera-access' );
 
-				if (cameraAccessEnabled && supportsGlBinding) {
+				if ( cameraAccessEnabled && supportsGlBinding ) {
+
 					renderer.state.unbindTexture();
 
 					glBinding = scope.getBinding();
 
-					for (let i = 0; i < views.length; i++) {
-						const camera = views[i].camera;
+					for ( let i = 0; i < views.length; i ++ ) {
 
-						if (camera) {
-							let cameraTex = cameraAccessTextures[camera];
+						const camera = views[ i ].camera;
 
-							if (!cameraTex) {
+						if ( camera ) {
+
+							let cameraTex = cameraAccessTextures[ camera ];
+
+							if ( ! cameraTex ) {
+
 								cameraTex = new ExternalTexture();
-								cameraAccessTextures[camera] = cameraTex;
+								cameraAccessTextures[ camera ] = cameraTex;
+
 							}
 
-							const glTexture = glBinding.getCameraImage(camera);
+							const glTexture = glBinding.getCameraImage( camera );
 							cameraTex.sourceTexture = glTexture;
+
 						}
+
 					}
+
 				}
+
 			}
 
 			//
 
-			for (let i = 0; i < controllers.length; i++) {
-				const inputSource = controllerInputSources[i];
-				const controller = controllers[i];
+			for ( let i = 0; i < controllers.length; i ++ ) {
 
-				if (inputSource !== null && controller !== undefined) {
-					controller.update(
-						inputSource,
-						frame,
-						customReferenceSpace || referenceSpace
-					);
+				const inputSource = controllerInputSources[ i ];
+				const controller = controllers[ i ];
+
+				if ( inputSource !== null && controller !== undefined ) {
+
+					controller.update( inputSource, frame, customReferenceSpace || referenceSpace );
+
 				}
+
 			}
 
-			if (onAnimationFrameCallback) onAnimationFrameCallback(time, frame);
+			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
-			if (frame.detectedPlanes) {
-				scope.dispatchEvent({ type: "planesdetected", data: frame });
+			if ( frame.detectedPlanes ) {
+
+				scope.dispatchEvent( { type: 'planesdetected', data: frame } );
+
 			}
 
 			xrFrame = null;
+
 		}
 
 		const animation = new WebGLAnimation();
 
-		animation.setAnimationLoop(onAnimationFrame);
+		animation.setAnimationLoop( onAnimationFrame );
 
-		this.setAnimationLoop = function (callback) {
+		this.setAnimationLoop = function ( callback ) {
+
 			onAnimationFrameCallback = callback;
+
 		};
 
 		this.dispose = function () {};
+
 	}
+
 }
 
 export { WebXRManager };
