@@ -106,7 +106,7 @@ class ParametersGroup {
 		this._registerParameter( object, property, editor, subItem );
 
 	}
-	
+
 	_registerParameter( object, property, editor, subItem ) {
 
 		this.objects.push( { object: object, key: property, editor: editor, subItem: subItem } );
@@ -336,7 +336,7 @@ class Parameters extends Tab {
 		this.paramList = paramList;
 
 		this.groups = new Array();
-		
+
 	}
 
 	createGroup( name ) {
