@@ -549,7 +549,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		} else {
 
-			shadowOutput = mix( 1 , shadowNode, shadowIntensity ).toVar();
+			shadowOutput = mix( 1, shadowNode, shadowIntensity ).toVar();
 
 		}
 
