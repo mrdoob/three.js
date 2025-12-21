@@ -797,7 +797,7 @@ class NodeMaterial extends Material {
 
 		this.setupPosition( builder );
 
-		builder.context.vertex = builder.removeStack();
+		builder.context.position = builder.removeStack();
 
 		return modelViewProjection;
 
