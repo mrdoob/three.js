@@ -658,6 +658,7 @@ class Renderer {
 		 * Shadow map configuration
 		 * @typedef {Object} ShadowMapConfig
 		 * @property {boolean} enabled - Whether to globally enable shadows or not.
+		 * @property {boolean} color - Whether to include shadow color or not.
 		 * @property {number} type - The shadow map type.
 		 */
 
@@ -668,6 +669,7 @@ class Renderer {
 		 */
 		this.shadowMap = {
 			enabled: false,
+			color: false,
 			type: PCFShadowMap
 		};
 
@@ -3049,6 +3051,12 @@ class Renderer {
 
 					shadowRGB = material.castShadowNode.rgb;
 					shadowAlpha = material.castShadowNode.a;
+
+					if ( this.shadowMap.color !== true ) {
+
+						warnOnce( 'Renderer: `shadowMap.color` needs to be enabled when using `material.castShadowNode`.' );
+
+					}
 
 				} else {
 
