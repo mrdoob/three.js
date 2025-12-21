@@ -531,7 +531,7 @@ class NodeMaterial extends Material {
 
 		const vertexNode = this.vertexNode || mvp;
 
-		clipSpace.assign( vertexNode );
+		builder.context.clipSpace = vertexNode;
 
 		builder.stack.outputNode = vertexNode;
 

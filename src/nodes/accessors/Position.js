@@ -1,8 +1,8 @@
 import { attribute } from '../core/AttributeNode.js';
-import { varyingProperty } from '../core/PropertyNode.js';
 import { Fn, vec3 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
 import { cameraProjectionMatrixInverse, cameraWorldMatrix } from './Camera.js';
+import { warnOnce } from '../../utils.js';
 
 /**
  * TSL object that represents the clip space position of the current rendered object.
@@ -10,7 +10,19 @@ import { cameraProjectionMatrixInverse, cameraWorldMatrix } from './Camera.js';
  * @tsl
  * @type {VaryingNode<vec4>}
  */
-export const clipSpace = /*@__PURE__*/ varyingProperty( 'vec4', 'clipSpace' );
+export const clipSpace = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( builder.shaderStage === 'vertex' ) {
+
+		warnOnce( 'TSL: `clipSpace` is not available in vertex stage.' );
+
+		return vec3();
+
+	}
+
+	return builder.context.clipSpace.toVarying( 'v_clipSpace' );
+
+} ).once() )();
 
 /**
  * TSL object that represents the position attribute of the current rendered object.
