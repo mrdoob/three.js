@@ -242,7 +242,7 @@ class NodeMaterial extends Material {
 
 		/**
 		 * This node can be used to implement a shadow mask for the material.
-		 * 
+		 *
 		 * @type {?Node<bool>}
 		 * @default null
 		 */
