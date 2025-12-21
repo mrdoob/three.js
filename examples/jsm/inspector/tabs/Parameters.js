@@ -14,7 +14,7 @@ class ParametersGroup {
 		this.paramList = new Item( name );
 
 		/** @type {Array<{ object:object, key:string, editor:object, subItem:Item }>} */
-		this.data = [];
+		this.objects = [];
 
 	}
 
@@ -102,11 +102,14 @@ class ParametersGroup {
 
 		};
 
+
+		this._registerParameter( object, property, editor, subItem );
+
 	}
 	
 	_registerParameter( object, property, editor, subItem ) {
 
-		this.data.push( { object: object, key: property, editor: editor, subItem: subItem } );
+		this.objects.push( { object: object, key: property, editor: editor, subItem: subItem } );
 
 	}
 
@@ -161,8 +164,6 @@ class ParametersGroup {
 
 		this._addParameter( object, property, editor, subItem );
 
-		this._registerParameter( object, property, editor, subItem );
-
 		return editor;
 
 	}
@@ -190,8 +191,6 @@ class ParametersGroup {
 		// extend object property
 
 		this._addParameter( object, property, editor, subItem );
-
-		this._registerParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -221,8 +220,6 @@ class ParametersGroup {
 
 		this._addParameter( object, property, editor, subItem );
 
-		this._registerParameter( object, property, editor, subItem );
-
 		return editor;
 
 	}
@@ -250,8 +247,6 @@ class ParametersGroup {
 		// extend object property
 
 		this._addParameter( object, property, editor, subItem );
-
-		this._registerParameter( object, property, editor, subItem );
 
 		return editor;
 
@@ -281,8 +276,6 @@ class ParametersGroup {
 		// extend object property
 
 		this._addParameter( object, property, editor, subItem );
-
-		this._registerParameter( object, property, editor, subItem );
 
 		return editor;
 
