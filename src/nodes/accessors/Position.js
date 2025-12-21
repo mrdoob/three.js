@@ -12,9 +12,9 @@ import { warnOnce } from '../../utils.js';
  */
 export const clipSpace = /*@__PURE__*/ ( Fn( ( builder ) => {
 
-	if ( builder.shaderStage === 'vertex' ) {
+	if ( builder.shaderStage !== 'fragment' ) {
 
-		warnOnce( 'TSL: `clipSpace` is not available in vertex stage.' );
+		warnOnce( 'TSL: `clipSpace` is only available in fragment stage.' );
 
 		return vec3();
 
