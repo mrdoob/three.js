@@ -1,5 +1,5 @@
 import { attribute } from '../core/AttributeNode.js';
-import { Fn, vec3 } from '../tsl/TSLCore.js';
+import { Fn, vec3, vec4 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
 import { cameraProjectionMatrixInverse, cameraWorldMatrix } from './Camera.js';
 import { warnOnce } from '../../utils.js';
@@ -16,7 +16,7 @@ export const clipSpace = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 		warnOnce( 'TSL: `clipSpace` is only available in fragment stage.' );
 
-		return vec3();
+		return vec4();
 
 	}
 
