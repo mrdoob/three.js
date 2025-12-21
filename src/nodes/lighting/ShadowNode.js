@@ -560,17 +560,23 @@ class ShadowNode extends ShadowBaseNode {
 
 		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
 
-		return shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+		if ( shadowColor ) {
 
-			if ( this.shadowMap.texture.isCubeTexture ) {
+			shadowOutput.toInspector( `${ inspectName } / Color`, () => {
 
-				return cubeTexture( this.shadowMap.texture );
+				if ( this.shadowMap.texture.isCubeTexture ) {
 
-			}
+					return cubeTexture( this.shadowMap.texture );
 
-			return texture( this.shadowMap.texture );
+				}
 
-		} ).toInspector( `${ inspectName } / Depth`, () => {
+				return texture( this.shadowMap.texture );
+
+			} );
+
+		}
+
+		return shadowOutput.toInspector( `${ inspectName } / Depth`, () => {
 
 			// TODO: Use linear depth
 
