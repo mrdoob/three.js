@@ -186,6 +186,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.color = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
