@@ -8,7 +8,7 @@ import { normalLocal } from '../../nodes/accessors/Normal.js';
 import { instancedMesh } from '../../nodes/accessors/InstancedMeshNode.js';
 import { batch } from '../../nodes/accessors/BatchNode.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
-import { clipSpace, positionLocal, positionView } from '../../nodes/accessors/Position.js';
+import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
 import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
