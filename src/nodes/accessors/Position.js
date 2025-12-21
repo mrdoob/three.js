@@ -2,7 +2,7 @@ import { attribute } from '../core/AttributeNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { Fn, vec3 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
-import { cameraProjectionMatrixInverse } from './Camera.js';
+import { cameraProjectionMatrixInverse, cameraWorldMatrix } from './Camera.js';
 
 /**
  * TSL object that represents the clip space position of the current rendered object.
@@ -44,6 +44,14 @@ export const positionPrevious = /*@__PURE__*/ positionGeometry.toVarying( 'posit
  * @type {VaryingNode<vec3>}
  */
 export const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( builder.shaderStage === 'fragment' && builder.material.vertexNode ) {
+
+		// reconstruct world position from view position
+
+		return cameraWorldMatrix.mul( positionView ).xyz.toVar( 'positionWorld' );
+
+	}
 
 	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getSubBuildProperty( 'v_positionWorld' ) );
 
