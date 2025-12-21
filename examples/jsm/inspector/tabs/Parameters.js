@@ -340,10 +340,8 @@ class Parameters extends Tab {
 		scrollWrapper.appendChild( paramList.domElement );
 		this.content.appendChild( scrollWrapper );
 
-		/** @type {List} */
 		this.paramList = paramList;
 
-		/** @type {Array<ParametersGroup>} */
 		this.groups = new Array();
 		
 	}
