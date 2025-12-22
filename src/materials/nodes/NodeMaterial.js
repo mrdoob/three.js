@@ -539,6 +539,8 @@ class NodeMaterial extends Material {
 
 		const vertexNode = this.vertexNode || mvp;
 
+		builder.context.clipSpace = vertexNode;
+
 		builder.stack.outputNode = vertexNode;
 
 		this.setupHardwareClipping( builder );
@@ -803,7 +805,7 @@ class NodeMaterial extends Material {
 
 		this.setupPosition( builder );
 
-		builder.context.vertex = builder.removeStack();
+		builder.context.position = builder.removeStack();
 
 		return modelViewProjection;
 
