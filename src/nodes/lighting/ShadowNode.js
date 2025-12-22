@@ -518,7 +518,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		let shadowColor;
 
-		if ( renderer.shadowMap.color === true ) {
+		if ( renderer.shadowMap.colored === true ) {
 
 			if ( shadowMap.texture.isCubeTexture ) {
 
