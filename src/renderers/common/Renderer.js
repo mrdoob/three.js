@@ -3055,7 +3055,7 @@ class Renderer {
 
 					if ( this.shadowMap.colorEnabled !== true ) {
 
-						warnOnce( 'Renderer: `shadowMap.colorEnabled` needs to be enabled when using `material.castShadowNode`.' );
+						warnOnce( 'Renderer: `shadowMap.colorEnabled` needs to be set to `true` when using `material.castShadowNode`.' );
 
 					}
 
