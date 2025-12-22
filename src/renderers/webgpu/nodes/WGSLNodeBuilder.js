@@ -1019,8 +1019,20 @@ class WGSLNodeBuilder extends NodeBuilder {
 				uniformGPU = buffer;
 
 				const nodeName = uniformNode.name || uniformNode.id;
-				uniformNode.name = name ? name : ( String( nodeName ).startsWith( 'NodeBuffer_' ) ? nodeName : 'NodeBuffer_' + nodeName );
 
+				if ( name ) {
+
+					uniformNode.name = name;
+
+				} else if ( String( nodeName ).startsWith( 'NodeBuffer_' ) ) {
+
+					uniformNode.name = nodeName;
+
+				} else {
+
+					uniformNode.name = 'NodeBuffer_' + nodeName;
+
+				}
 			} else {
 
 				let uniformsGroup = this.uniformGroups[ groupName ];
