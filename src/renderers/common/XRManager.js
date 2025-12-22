@@ -784,6 +784,9 @@ class XRManager extends EventDispatcher {
 				centralHorizontalAngle = 0;
 				mediaLayerMethod = 'createQuadLayer';
 
+				//native quad layer units is double required than world units. Blend later transform is in set world units.
+				translation.z *= 2;
+
 			}
 
 			const layer = {
