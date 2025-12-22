@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Audio } from '../../../../src/audio/Audio.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';

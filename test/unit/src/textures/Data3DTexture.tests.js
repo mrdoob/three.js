@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { Data3DTexture } from '../../../../src/textures/Data3DTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';

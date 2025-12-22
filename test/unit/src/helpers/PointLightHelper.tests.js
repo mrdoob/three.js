@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PointLightHelper } from '../../../../src/helpers/PointLightHelper.js';
 
 import { Mesh } from '../../../../src/objects/Mesh.js';

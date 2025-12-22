@@ -1,5 +1,4 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
-import { nodeObject } from '../tsl/TSLCore.js';
 import Node from '../core/Node.js';
 import { warn } from '../../utils.js';
 
@@ -203,7 +202,7 @@ class WorkgroupInfoNode extends Node {
 	 */
 	element( indexNode ) {
 
-		return nodeObject( new WorkgroupInfoElementNode( this, indexNode ) );
+		return new WorkgroupInfoElementNode( this, indexNode );
 
 	}
 
@@ -229,6 +228,6 @@ export default WorkgroupInfoNode;
  * @param {number} [count=0] - The number of elements in the buffer.
  * @returns {WorkgroupInfoNode}
  */
-export const workgroupArray = ( type, count ) => nodeObject( new WorkgroupInfoNode( 'Workgroup', type, count ) );
+export const workgroupArray = ( type, count ) => new WorkgroupInfoNode( 'Workgroup', type, count );
 
 

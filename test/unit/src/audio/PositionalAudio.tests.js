@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { PositionalAudio } from '../../../../src/audio/PositionalAudio.js';
 
 import { Audio } from '../../../../src/audio/Audio.js';

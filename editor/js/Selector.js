@@ -42,7 +42,7 @@ class Selector {
 
 				// Cycle through objects if the first one is already selected
 
-				let index = objects.indexOf( editor.selected );
+				const index = objects.indexOf( editor.selected );
 
 				if ( index !== - 1 && index < objects.length - 1 ) {
 

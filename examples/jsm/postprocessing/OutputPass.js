@@ -40,6 +40,15 @@ class OutputPass extends Pass {
 		super();
 
 		/**
+		 * This flag indicates that this is an output pass.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isOutputPass = true;
+
+		/**
 		 * The pass uniforms.
 		 *
 		 * @type {Object}

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CameraHelper } from '../../../../src/helpers/CameraHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { StereoCamera } from '../../../../src/cameras/StereoCamera.js';
 
 export default QUnit.module( 'Cameras', () => {

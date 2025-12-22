@@ -199,7 +199,7 @@ class ReferenceBaseNode extends Node {
 	 */
 	element( indexNode ) {
 
-		return nodeObject( new ReferenceElementNode( this, nodeObject( indexNode ) ) );
+		return new ReferenceElementNode( this, nodeObject( indexNode ) );
 
 	}
 
@@ -340,7 +340,7 @@ export default ReferenceBaseNode;
  * @param {Object} object - The object the property belongs to.
  * @returns {ReferenceBaseNode}
  */
-export const reference = ( name, type, object ) => nodeObject( new ReferenceBaseNode( name, type, object ) );
+export const reference = ( name, type, object ) => new ReferenceBaseNode( name, type, object );
 
 /**
  * TSL function for creating a reference base node. Use this function if you want need a reference
@@ -354,4 +354,4 @@ export const reference = ( name, type, object ) => nodeObject( new ReferenceBase
  * @param {Object} [object] - An array-like object the property belongs to.
  * @returns {ReferenceBaseNode}
  */
-export const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceBaseNode( name, type, object, count ) );
+export const referenceBuffer = ( name, type, count, object ) => new ReferenceBaseNode( name, type, object, count );

@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CompressedTexture } from '../../../../src/textures/CompressedTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';

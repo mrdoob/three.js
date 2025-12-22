@@ -31,7 +31,7 @@ export function getTextureIndex( textures, name ) {
  * const mrtNode = mrt( {
  *   output: output,
  *   normal: normalView
- * } ) );
+ * } ) ;
  * ```
  * The MRT output is defined as a dictionary.
  *

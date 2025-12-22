@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CircleGeometry } from '../../../../src/geometries/CircleGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';

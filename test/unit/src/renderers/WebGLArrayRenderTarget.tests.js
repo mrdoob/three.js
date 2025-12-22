@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { NearestFilter } from '../../../../src/constants.js';
 import { WebGLArrayRenderTarget } from '../../../../src/renderers/WebGLArrayRenderTarget.js';
 

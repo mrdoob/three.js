@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
+import { nodeImmutable } from '../tsl/TSLCore.js';
 import { hashString } from './NodeUtils.js';
 
 /**
@@ -113,7 +113,7 @@ export default PropertyNode;
  * @param {?string} [name=null] - The name of the property in the shader.
  * @returns {PropertyNode}
  */
-export const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
+export const property = ( type, name ) => new PropertyNode( type, name );
 
 /**
  * TSL function for creating a varying property node.
@@ -124,7 +124,7 @@ export const property = ( type, name ) => nodeObject( new PropertyNode( type, na
  * @param {?string} [name=null] - The name of the varying in the shader.
  * @returns {PropertyNode}
  */
-export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
+export const varyingProperty = ( type, name ) => new PropertyNode( type, name, true );
 
 /**
  * TSL object that represents the shader variable `DiffuseColor`.

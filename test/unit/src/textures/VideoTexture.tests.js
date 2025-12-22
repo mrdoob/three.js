@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { VideoTexture } from '../../../../src/textures/VideoTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';

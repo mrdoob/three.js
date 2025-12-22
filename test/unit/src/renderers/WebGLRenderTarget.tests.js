@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { WebGLRenderTarget } from '../../../../src/renderers/WebGLRenderTarget.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';

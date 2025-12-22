@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';
