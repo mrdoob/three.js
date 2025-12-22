@@ -1033,6 +1033,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 					uniformNode.name = 'NodeBuffer_' + nodeName;
 
 				}
+
 			} else {
 
 				let uniformsGroup = this.uniformGroups[ groupName ];
