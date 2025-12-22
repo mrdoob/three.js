@@ -714,11 +714,7 @@ class XRManager extends EventDispatcher {
 		 */
 		const createMediaPlane = ( texture, eyeIndex = 0, quadWidth = 1, quadHeight = 1, translation = {}, quaternion = {}, uvFactors = null, material = null ) => {
 
-			const mesh = createPlaneMesh( texture, eyeIndex, quadWidth, quadHeight, translation, quaternion, uvFactors, material ),
-				nonLayerZOffset = 2;
-
-			//Native quad layers requiures 2 units more than native layers so offset it back for non layers.
-			mesh.position.z += nonLayerZOffset;
+			const mesh = createPlaneMesh( texture, eyeIndex, quadWidth, quadHeight, translation, quaternion, uvFactors, material );
 
 			return mesh;
 
