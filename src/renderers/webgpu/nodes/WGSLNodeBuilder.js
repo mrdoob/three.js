@@ -178,6 +178,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.uniformGroups = {};
 
 		/**
+		 * A dictionary that holds the assigned binding indices for each uniform group.
+		 * This ensures the same binding index is used across all shader stages.
+		 *
+		 * @type {Object<string,{index: number, id: number}>}
+		 */
+		this.uniformGroupsBindings = {};
+
+		/**
 		 * A dictionary that holds for each shader stage a Map of builtins.
 		 *
 		 * @type {Object<string,Map<string,Object>>}
@@ -1859,7 +1867,7 @@ ${ flowData.code }
 
 				const groupName = uniform.groupNode.name;
 
-				// Check if this group has already been processed
+				// Check if this group has already been processed in this shader stage
 				if ( uniformGroups[ groupName ] === undefined ) {
 
 					// Get the shared uniform group that contains uniforms from all stages
@@ -1878,9 +1886,24 @@ ${ flowData.code }
 
 						}
 
+						// Check if this group already has an assigned binding index (from another shader stage)
+						let groupBinding = this.uniformGroupsBindings[ groupName ];
+
+						if ( groupBinding === undefined ) {
+
+							// First time processing this group - assign a new binding index
+							groupBinding = {
+								index: uniformIndexes.binding ++,
+								id: uniformIndexes.group
+							};
+
+							this.uniformGroupsBindings[ groupName ] = groupBinding;
+
+						}
+
 						uniformGroups[ groupName ] = {
-							index: uniformIndexes.binding ++,
-							id: uniformIndexes.group,
+							index: groupBinding.index,
+							id: groupBinding.id,
 							snippets: snippets
 						};
 
