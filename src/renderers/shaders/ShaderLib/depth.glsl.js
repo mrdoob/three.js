@@ -94,7 +94,7 @@ void main() {
 
 	#if DEPTH_PACKING == 3200
 
-		gl_FragColor = vec2( 1.0 - fragCoordZ );
+		gl_FragColor.r = 1.0 - fragCoordZ;
 
 	#elif DEPTH_PACKING == 3201
 
