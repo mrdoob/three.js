@@ -241,6 +241,14 @@ class NodeMaterial extends Material {
 		this.maskNode = null;
 
 		/**
+		 * This node can be used to implement a shadow mask for the material.
+		 *
+		 * @type {?Node<bool>}
+		 * @default null
+		 */
+		this.maskShadowNode = null;
+
+		/**
 		 * The local vertex positions are computed based on multiple factors like the
 		 * attribute data, morphing or skinning. This node property allows to overwrite
 		 * the default and define local vertex positions with nodes instead.
@@ -531,6 +539,8 @@ class NodeMaterial extends Material {
 
 		const vertexNode = this.vertexNode || mvp;
 
+		builder.context.clipSpace = vertexNode;
+
 		builder.stack.outputNode = vertexNode;
 
 		this.setupHardwareClipping( builder );
@@ -795,7 +805,7 @@ class NodeMaterial extends Material {
 
 		this.setupPosition( builder );
 
-		builder.context.vertex = builder.removeStack();
+		builder.context.position = builder.removeStack();
 
 		return modelViewProjection;
 
@@ -1339,6 +1349,7 @@ class NodeMaterial extends Material {
 		this.backdropAlphaNode = source.backdropAlphaNode;
 		this.alphaTestNode = source.alphaTestNode;
 		this.maskNode = source.maskNode;
+		this.maskShadowNode = source.maskShadowNode;
 
 		this.positionNode = source.positionNode;
 		this.geometryNode = source.geometryNode;

@@ -1663,7 +1663,7 @@ ${ flowData.code }
 
 		if ( shaderStage === 'vertex' ) {
 
-			this.getBuiltin( 'position', 'Vertex', 'vec4<f32>', 'vertex' );
+			this.getBuiltin( 'position', 'builtinClipSpace', 'vec4<f32>', 'vertex' );
 
 		}
 
@@ -1961,7 +1961,7 @@ ${ flowData.code }
 
 					if ( shaderStage === 'vertex' ) {
 
-						flow += `varyings.Vertex = ${ flowSlotData.result };`;
+						flow += `varyings.builtinClipSpace = ${ flowSlotData.result };`;
 
 					} else if ( shaderStage === 'fragment' ) {
 
