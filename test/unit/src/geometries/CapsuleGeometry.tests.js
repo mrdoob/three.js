@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { CapsuleGeometry } from '../../../../src/geometries/CapsuleGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
@@ -58,19 +56,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'CapsuleGeometry',
 				'CapsuleGeometry.type should be CapsuleGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

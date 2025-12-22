@@ -17,15 +17,18 @@
 An <code>ImageBitmap</code> provides an asynchronous and resource efficient pathway to prepare
 textures for rendering.</p>
 <p>Note that <a href="Texture.html#flipY">Texture#flipY</a> and <a href="Texture.html#premultiplyAlpha">Texture#premultiplyAlpha</a> are ignored with image bitmaps.
-They needs these configuration on bitmap creation unlike regular images need them on uploading to GPU.</p>
-<p>You need to set the equivalent options via <a href="ImageBitmapLoader.html#setOptions">ImageBitmapLoader#setOptions</a> instead.</p>
-<p>Also note that unlike <a href="FileLoader.html">FileLoader</a>, this loader avoids multiple concurrent requests to the same URL only if <code>Cache</code> is enabled.</p></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const loader = new THREE.ImageBitmapLoader();
+These options need to be configured via <a href="ImageBitmapLoader.html#setOptions">ImageBitmapLoader#setOptions</a> prior to loading,
+unlike regular images which can be configured on the Texture to set these options on GPU upload instead.</p>
+<p>To match the default behaviour of <a href="Texture.html">Texture</a>, the following options are needed:</p>
+<p>Also note that unlike <a href="FileLoader.html">FileLoader</a>, this loader will only avoid multiple concurrent requests to the same URL if <a href="Cache.html">Cache</a> is enabled.</p>
+<pre><code class="language-js">const loader = new THREE.ImageBitmapLoader();
 loader.setOptions( { imageOrientation: 'flipY' } ); // set options if needed
 const imageBitmap = await loader.loadAsync( 'image.png' );
 const texture = new THREE.Texture( imageBitmap );
 texture.needsUpdate = true;
+</code></pre></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">{ imageOrientation: 'flipY', premultiplyAlpha: 'none' }
 </code></pre></div>
 			</header>
 			<article>

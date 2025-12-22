@@ -461,7 +461,7 @@ it is recommended to use this version of <code>compile()</code> whenever possibl
 									</td>
 									<td class="description last">
 										<p>The destination mipmap level.</p>
-										<p>Default is <code>null</code>.</p>
+										<p>Default is <code>0</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1022,6 +1022,24 @@ size.y = height * pixelRatio;
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="setEffects" translate="no">.<a href="#setEffects">setEffects</a><span class="signature">( effects : <span class="param-type">Array</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the post-processing effects to be applied after rendering.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong>effects</strong>
+									</td>
+									<td class="description last">
+										<p>An array of post-processing effects.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="setOpaqueSort" translate="no">.<a href="#setOpaqueSort">setOpaqueSort</a><span class="signature">( method : <span class="param-type">function</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -1408,16 +1426,6 @@ Or alternatively a four-component vector specifying all the parameters of the vi
 and the rendering context supports <code>EXT_clip_control</code>.</p>
 			</td>
 		</tr>
-		<tr>
-				<td class="name">
-					<strong>vertexTextures</strong>
-						<br>
-<span class="param-type">boolean</span>
-				</td>
-			<td class="description last">
-				<p><code>true</code> if vertex textures can be used.</p>
-			</td>
-		</tr>
 	</tbody>
 </table>
 				</div>
@@ -1732,6 +1740,17 @@ Note that this setting uses <code>gl_FragDepth</code> if available which disable
 				<p>Whether to use a reverse depth buffer. Requires the <code>EXT_clip_control</code> extension.
 This is a more faster and accurate version than logarithmic depth buffer.</p>
 						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>outputBufferType</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Defines the type of the output buffer. Use <code>HalfFloatType</code> for HDR rendering with tone mapping and post-processing support.</p>
+						<p>Default is <code>UnsignedByteType</code>.</p>
 			</td>
 		</tr>
 	</tbody>

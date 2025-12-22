@@ -9,7 +9,7 @@ import { uniformArray } from './UniformArrayNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import { warn } from '../../utils.js';
 
-// TODO: Avoid duplicated code and ues only ReferenceBaseNode or ReferenceNode
+// TODO: Avoid duplicated code and use only ReferenceBaseNode or ReferenceNode
 
 /**
  * This class is only relevant if the referenced property is array-like.
@@ -198,7 +198,7 @@ class ReferenceNode extends Node {
 	 */
 	element( indexNode ) {
 
-		return nodeObject( new ReferenceElementNode( this, nodeObject( indexNode ) ) );
+		return new ReferenceElementNode( this, nodeObject( indexNode ) );
 
 	}
 
@@ -407,7 +407,7 @@ export default ReferenceNode;
  * @param {?Object} [object] - The object the property belongs to.
  * @returns {ReferenceNode}
  */
-export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
+export const reference = ( name, type, object ) => new ReferenceNode( name, type, object );
 
 /**
  * TSL function for creating a reference node. Use this function if you want need a reference
@@ -421,4 +421,4 @@ export const reference = ( name, type, object ) => nodeObject( new ReferenceNode
  * @param {Object} object - An array-like object the property belongs to.
  * @returns {ReferenceNode}
  */
-export const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceNode( name, type, object, count ) );
+export const referenceBuffer = ( name, type, count, object ) => new ReferenceNode( name, type, object, count );

@@ -1,6 +1,28 @@
 import { attribute } from '../core/AttributeNode.js';
-import { Fn, vec3 } from '../tsl/TSLCore.js';
+import { Fn, vec3, vec4 } from '../tsl/TSLCore.js';
 import { modelWorldMatrix } from './ModelNode.js';
+import { cameraProjectionMatrixInverse, cameraWorldMatrix } from './Camera.js';
+import { warnOnce } from '../../utils.js';
+
+/**
+ * TSL object that represents the clip space position of the current rendered object.
+ *
+ * @tsl
+ * @type {VaryingNode<vec4>}
+ */
+export const clipSpace = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( builder.shaderStage !== 'fragment' ) {
+
+		warnOnce( 'TSL: `clipSpace` is only available in fragment stage.' );
+
+		return vec4();
+
+	}
+
+	return builder.context.clipSpace.toVarying( 'v_clipSpace' );
+
+} ).once() )();
 
 /**
  * TSL object that represents the position attribute of the current rendered object.
@@ -35,6 +57,14 @@ export const positionPrevious = /*@__PURE__*/ positionGeometry.toVarying( 'posit
  */
 export const positionWorld = /*@__PURE__*/ ( Fn( ( builder ) => {
 
+	if ( builder.shaderStage === 'fragment' && builder.material.vertexNode ) {
+
+		// reconstruct world position from view position
+
+		return cameraWorldMatrix.mul( positionView ).xyz.toVar( 'positionWorld' );
+
+	}
+
 	return modelWorldMatrix.mul( positionLocal ).xyz.toVarying( builder.getSubBuildProperty( 'v_positionWorld' ) );
 
 }, 'vec3' ).once( [ 'POSITION' ] ) )();
@@ -60,6 +90,16 @@ export const positionWorldDirection = /*@__PURE__*/ ( Fn( () => {
  * @type {VaryingNode<vec3>}
  */
 export const positionView = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	if ( builder.shaderStage === 'fragment' && builder.material.vertexNode ) {
+
+		// reconstruct view position from clip space
+
+		const viewPos = cameraProjectionMatrixInverse.mul( clipSpace );
+
+		return viewPos.xyz.div( viewPos.w ).toVar( 'positionView' );
+
+	}
 
 	return builder.context.setupPositionView().toVarying( 'v_positionView' );
 

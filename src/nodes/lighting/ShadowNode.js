@@ -1,5 +1,5 @@
 import ShadowBaseNode, { shadowPositionWorld } from './ShadowBaseNode.js';
-import { float, vec2, vec3, int, Fn, nodeObject } from '../tsl/TSLBase.js';
+import { float, vec2, vec3, int, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture, textureLoad } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
@@ -17,9 +17,8 @@ import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
 import { resetRendererAndSceneState, restoreRendererAndSceneState } from '../../renderers/common/RendererUtils.js';
 import { getDataFromObject } from '../core/NodeUtils.js';
-import { getShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
+import { getShadowMaterial, disposeShadowMaterial, BasicShadowFilter, PCFShadowFilter, PCFSoftShadowFilter, VSMShadowFilter } from './ShadowFilterNode.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
-import { warn } from '../../utils.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UV.js';
 
@@ -519,24 +518,40 @@ class ShadowNode extends ShadowBaseNode {
 
 		let shadowColor;
 
-		if ( shadowMap.texture.isCubeTexture ) {
+		if ( renderer.shadowMap.color === true ) {
 
-			// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
-			shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
+			if ( shadowMap.texture.isCubeTexture ) {
 
-		} else {
+				// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
+				shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
 
-			shadowColor = texture( shadowMap.texture, shadowCoord );
+			} else {
 
-			if ( depthTexture.isArrayTexture ) {
+				shadowColor = texture( shadowMap.texture, shadowCoord );
 
-				shadowColor = shadowColor.depth( this.depthLayer );
+				if ( depthTexture.isArrayTexture ) {
+
+					shadowColor = shadowColor.depth( this.depthLayer );
+
+				}
 
 			}
 
 		}
 
-		const shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+		//
+
+		let shadowOutput;
+
+		if ( shadowColor ) {
+
+			shadowOutput = mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar();
+
+		} else {
+
+			shadowOutput = mix( 1, shadowNode, shadowIntensity ).toVar();
+
+		}
 
 		this.shadowMap = shadowMap;
 		this.shadow.map = shadowMap;
@@ -545,19 +560,33 @@ class ShadowNode extends ShadowBaseNode {
 
 		const inspectName = `${ this.light.type } Shadow [ ${ this.light.name || 'ID: ' + this.light.id } ]`;
 
-		return shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+		if ( shadowColor ) {
+
+			shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+
+				if ( this.shadowMap.texture.isCubeTexture ) {
+
+					return cubeTexture( this.shadowMap.texture );
+
+				}
+
+				return texture( this.shadowMap.texture );
+
+			} );
+
+		}
+
+		return shadowOutput.toInspector( `${ inspectName } / Depth`, () => {
+
+			// TODO: Use linear depth
 
 			if ( this.shadowMap.texture.isCubeTexture ) {
 
-				return cubeTexture( this.shadowMap.texture );
+				return cubeTexture( this.shadowMap.texture ).r.oneMinus();
 
 			}
 
-			return texture( this.shadowMap.texture );
-
-		} ).toInspector( `${ inspectName } / Depth`, () => {
-
-			return textureLoad( this.shadowMap.depthTexture, uv().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).x.oneMinus();
+			return textureLoad( this.shadowMap.depthTexture, uv().mul( textureSize( texture( this.shadowMap.depthTexture ) ) ) ).r.oneMinus();
 
 		} );
 
@@ -593,12 +622,6 @@ class ShadowNode extends ShadowBaseNode {
 
 				this._node = node = this.setupShadow( builder );
 				this._currentShadowType = currentShadowType;
-
-			}
-
-			if ( builder.material.shadowNode ) { // @deprecated, r171
-
-				warn( 'NodeMaterial: ".shadowNode" is deprecated. Use ".castShadowNode" instead.' );
 
 			}
 
@@ -740,6 +763,8 @@ class ShadowNode extends ShadowBaseNode {
 
 		this._currentShadowType = null;
 
+		disposeShadowMaterial( this.light );
+
 		if ( this.shadowMap ) {
 
 			this.shadowMap.dispose();
@@ -832,4 +857,4 @@ export default ShadowNode;
  * @param {?LightShadow} [shadow] - The light shadow.
  * @return {ShadowNode} The created shadow node.
  */
-export const shadow = ( light, shadow ) => nodeObject( new ShadowNode( light, shadow ) );
+export const shadow = ( light, shadow ) => new ShadowNode( light, shadow );

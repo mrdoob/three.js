@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { VideoTexture } from '../../../../src/textures/VideoTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
@@ -29,25 +27,6 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( 'minFilter', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'magFilter', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'generateMipmaps', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		// PUBLIC STUFF
 		QUnit.test( 'isVideoTexture', ( assert ) => {
 
@@ -57,18 +36,6 @@ export default QUnit.module( 'Textures', () => {
 				object.isVideoTexture,
 				'VideoTexture.isVideoTexture should be true'
 			);
-
-		} );
-
-		QUnit.todo( 'clone', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'update', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

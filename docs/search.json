@@ -13,10 +13,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "AmbientLight#isAmbientLight",
-			"kind": "member"
-		},
-		{
 			"title": "AmbientLightNode",
 			"kind": "class"
 		},
@@ -37,12 +33,12 @@
 			"kind": "member"
 		},
 		{
-			"title": "AnalyticLightNode#getLightVector",
+			"title": "AnalyticLightNode#disposeShadow",
 			"kind": "function"
 		},
 		{
-			"title": "AnalyticLightNode#isAnalyticLightNode",
-			"kind": "member"
+			"title": "AnalyticLightNode#getLightVector",
+			"kind": "function"
 		},
 		{
 			"title": "AnalyticLightNode#light",
@@ -349,10 +345,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "AnimationObjectGroup#isAnimationObjectGroup",
-			"kind": "member"
-		},
-		{
 			"title": "AnimationObjectGroup#remove",
 			"kind": "function"
 		},
@@ -373,10 +365,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "ArcCurve#isArcCurve",
-			"kind": "member"
-		},
-		{
 			"title": "ArrayCamera",
 			"kind": "class"
 		},
@@ -385,16 +373,12 @@
 			"kind": "member"
 		},
 		{
-			"title": "ArrayCamera#isArrayCamera",
-			"kind": "member"
-		},
-		{
-			"title": "ArrayCamera#isMultiViewCamera",
-			"kind": "member"
-		},
-		{
 			"title": "ArrayElementNode",
 			"kind": "class"
+		},
+		{
+			"title": "ArrayElementNode#getMemberType",
+			"kind": "function"
 		},
 		{
 			"title": "ArrayElementNode#getNodeType",
@@ -402,10 +386,6 @@
 		},
 		{
 			"title": "ArrayElementNode#indexNode",
-			"kind": "member"
-		},
-		{
-			"title": "ArrayElementNode#isArrayElementNode",
 			"kind": "member"
 		},
 		{
@@ -433,12 +413,12 @@
 			"kind": "function"
 		},
 		{
-			"title": "ArrayNode#getNodeType",
+			"title": "ArrayNode#getMemberType",
 			"kind": "function"
 		},
 		{
-			"title": "ArrayNode#isArrayNode",
-			"kind": "member"
+			"title": "ArrayNode#getNodeType",
+			"kind": "function"
 		},
 		{
 			"title": "ArrayNode#values",
@@ -479,10 +459,6 @@
 		{
 			"title": "AssignNode#hasDependencies",
 			"kind": "function"
-		},
-		{
-			"title": "AssignNode#isAssignNode",
-			"kind": "member"
 		},
 		{
 			"title": "AssignNode#needsSplitAssign",
@@ -925,10 +901,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "BatchedMesh#isBatchedMesh",
-			"kind": "member"
-		},
-		{
 			"title": "BatchedMesh#maxInstanceCount",
 			"kind": "member"
 		},
@@ -1005,10 +977,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "BitcastNode#isBitcastNode",
-			"kind": "member"
-		},
-		{
 			"title": "BitcastNode#valueNode",
 			"kind": "member"
 		},
@@ -1017,16 +985,8 @@
 			"kind": "class"
 		},
 		{
-			"title": "BitcountNode#isBitcountNode",
-			"kind": "member"
-		},
-		{
 			"title": "Bone",
 			"kind": "class"
-		},
-		{
-			"title": "Bone#isBone",
-			"kind": "member"
 		},
 		{
 			"title": "BooleanKeyframeTrack",
@@ -1107,10 +1067,6 @@
 		{
 			"title": "Box2#intersectsBox",
 			"kind": "function"
-		},
-		{
-			"title": "Box2#isBox2",
-			"kind": "member"
 		},
 		{
 			"title": "Box2#isEmpty",
@@ -1239,10 +1195,6 @@
 		{
 			"title": "Box3#intersectsTriangle",
 			"kind": "function"
-		},
-		{
-			"title": "Box3#isBox3",
-			"kind": "member"
 		},
 		{
 			"title": "Box3#isEmpty",
@@ -1413,10 +1365,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "BufferAttribute#isBufferAttribute",
-			"kind": "member"
-		},
-		{
 			"title": "BufferAttribute#itemSize",
 			"kind": "member"
 		},
@@ -1545,10 +1493,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "BufferAttributeNode#isBufferNode",
-			"kind": "member"
-		},
-		{
 			"title": "BufferAttributeNode#setInstanced",
 			"kind": "function"
 		},
@@ -1669,7 +1613,7 @@
 			"kind": "member"
 		},
 		{
-			"title": "BufferGeometry#isBufferGeometry",
+			"title": "BufferGeometry#indirectOffset",
 			"kind": "member"
 		},
 		{
@@ -1789,10 +1733,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "BufferNode#isBufferNode",
-			"kind": "member"
-		},
-		{
 			"title": "BufferNode#updateRanges",
 			"kind": "member"
 		},
@@ -1803,10 +1743,6 @@
 		{
 			"title": "BuiltinNode#generate",
 			"kind": "function"
-		},
-		{
-			"title": "BuiltinNode#isBuiltinNode",
-			"kind": "member"
 		},
 		{
 			"title": "BuiltinNode#name",
@@ -1827,10 +1763,6 @@
 		{
 			"title": "BundleGroup",
 			"kind": "class"
-		},
-		{
-			"title": "BundleGroup#isBundleGroup",
-			"kind": "member"
 		},
 		{
 			"title": "BundleGroup#needsUpdate",
@@ -1857,10 +1789,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "BypassNode#isBypassNode",
-			"kind": "member"
-		},
-		{
 			"title": "BypassNode#outputNode",
 			"kind": "member"
 		},
@@ -1879,10 +1807,6 @@
 		{
 			"title": "Camera#getWorldDirection",
 			"kind": "function"
-		},
-		{
-			"title": "Camera#isCamera",
-			"kind": "member"
 		},
 		{
 			"title": "Camera#matrixWorldInverse",
@@ -1997,10 +1921,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "CanvasTexture#isCanvasTexture",
-			"kind": "member"
-		},
-		{
 			"title": "CapsuleGeometry",
 			"kind": "class"
 		},
@@ -2023,10 +1943,6 @@
 		{
 			"title": "CatmullRomCurve3#getPoint",
 			"kind": "function"
-		},
-		{
-			"title": "CatmullRomCurve3#isCatmullRomCurve3",
-			"kind": "member"
 		},
 		{
 			"title": "CatmullRomCurve3#points",
@@ -2062,10 +1978,6 @@
 		},
 		{
 			"title": "ClippingGroup#enabled",
-			"kind": "member"
-		},
-		{
-			"title": "ClippingGroup#isClippingGroup",
 			"kind": "member"
 		},
 		{
@@ -2150,10 +2062,6 @@
 		},
 		{
 			"title": "CodeNode#includes",
-			"kind": "member"
-		},
-		{
-			"title": "CodeNode#isCodeNode",
 			"kind": "member"
 		},
 		{
@@ -2247,10 +2155,6 @@
 		{
 			"title": "Color#getStyle",
 			"kind": "function"
-		},
-		{
-			"title": "Color#isColor",
-			"kind": "member"
 		},
 		{
 			"title": "Color#lerp",
@@ -2369,10 +2273,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "CompressedArrayTexture#isCompressedArrayTexture",
-			"kind": "member"
-		},
-		{
 			"title": "CompressedArrayTexture#layerUpdates",
 			"kind": "member"
 		},
@@ -2383,14 +2283,6 @@
 		{
 			"title": "CompressedCubeTexture",
 			"kind": "class"
-		},
-		{
-			"title": "CompressedCubeTexture#isCompressedCubeTexture",
-			"kind": "member"
-		},
-		{
-			"title": "CompressedCubeTexture#isCubeTexture",
-			"kind": "member"
 		},
 		{
 			"title": "CompressedTexture",
@@ -2406,10 +2298,6 @@
 		},
 		{
 			"title": "CompressedTexture#image",
-			"kind": "member"
-		},
-		{
-			"title": "CompressedTexture#isCompressedTexture",
 			"kind": "member"
 		},
 		{
@@ -2467,10 +2355,6 @@
 		{
 			"title": "ComputeNode#getCount",
 			"kind": "function"
-		},
-		{
-			"title": "ComputeNode#isComputeNode",
-			"kind": "member"
 		},
 		{
 			"title": "ComputeNode#label",
@@ -2549,10 +2433,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "ConstNode#isConstNode",
-			"kind": "member"
-		},
-		{
 			"title": "ContextNode",
 			"kind": "class"
 		},
@@ -2571,10 +2451,6 @@
 		{
 			"title": "ContextNode#getScope",
 			"kind": "function"
-		},
-		{
-			"title": "ContextNode#isContextNode",
-			"kind": "member"
 		},
 		{
 			"title": "ContextNode#node",
@@ -2681,14 +2557,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "CubeDepthTexture#isCubeDepthTexture",
-			"kind": "member"
-		},
-		{
-			"title": "CubeDepthTexture#isCubeTexture",
-			"kind": "member"
-		},
-		{
 			"title": "CubeMapNode",
 			"kind": "class"
 		},
@@ -2709,10 +2577,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "CubeRenderTarget#isCubeRenderTarget",
-			"kind": "member"
-		},
-		{
 			"title": "CubeTexture",
 			"kind": "class"
 		},
@@ -2722,10 +2586,6 @@
 		},
 		{
 			"title": "CubeTexture#images",
-			"kind": "member"
-		},
-		{
-			"title": "CubeTexture#isCubeTexture",
 			"kind": "member"
 		},
 		{
@@ -2753,10 +2613,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "CubeTextureNode#isCubeTextureNode",
-			"kind": "member"
-		},
-		{
 			"title": "CubeTextureNode#setUpdateMatrix",
 			"kind": "function"
 		},
@@ -2771,10 +2627,6 @@
 		{
 			"title": "CubicBezierCurve#getPoint",
 			"kind": "function"
-		},
-		{
-			"title": "CubicBezierCurve#isCubicBezierCurve",
-			"kind": "member"
 		},
 		{
 			"title": "CubicBezierCurve#v0",
@@ -2799,10 +2651,6 @@
 		{
 			"title": "CubicBezierCurve3#getPoint",
 			"kind": "function"
-		},
-		{
-			"title": "CubicBezierCurve3#isCubicBezierCurve3",
-			"kind": "member"
 		},
 		{
 			"title": "CubicBezierCurve3#v0",
@@ -2989,10 +2837,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Data3DTexture#isData3DTexture",
-			"kind": "member"
-		},
-		{
 			"title": "Data3DTexture#magFilter",
 			"kind": "member"
 		},
@@ -3033,10 +2877,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "DataArrayTexture#isDataArrayTexture",
-			"kind": "member"
-		},
-		{
 			"title": "DataArrayTexture#layerUpdates",
 			"kind": "member"
 		},
@@ -3073,10 +2913,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "DataTexture#isDataTexture",
-			"kind": "member"
-		},
-		{
 			"title": "DataTexture#unpackAlignment",
 			"kind": "member"
 		},
@@ -3109,16 +2945,8 @@
 			"kind": "member"
 		},
 		{
-			"title": "DepthTexture#isDepthTexture",
-			"kind": "member"
-		},
-		{
 			"title": "DirectionalLight",
 			"kind": "class"
-		},
-		{
-			"title": "DirectionalLight#isDirectionalLight",
-			"kind": "member"
 		},
 		{
 			"title": "DirectionalLight#shadow",
@@ -3163,10 +2991,6 @@
 		{
 			"title": "DirectionalLightShadow",
 			"kind": "class"
-		},
-		{
-			"title": "DirectionalLightShadow#isDirectionalLightShadow",
-			"kind": "member"
 		},
 		{
 			"title": "DiscreteInterpolant",
@@ -3225,10 +3049,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "EllipseCurve#isEllipseCurve",
-			"kind": "member"
-		},
-		{
 			"title": "EllipseCurve#xRadius",
 			"kind": "member"
 		},
@@ -3263,10 +3083,6 @@
 		{
 			"title": "Euler#fromArray",
 			"kind": "function"
-		},
-		{
-			"title": "Euler#isEuler",
-			"kind": "member"
 		},
 		{
 			"title": "Euler#order",
@@ -3343,10 +3159,6 @@
 		{
 			"title": "ExternalTexture",
 			"kind": "class"
-		},
-		{
-			"title": "ExternalTexture#isExternalTexture",
-			"kind": "member"
 		},
 		{
 			"title": "ExternalTexture#sourceTexture",
@@ -3429,10 +3241,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Fog#isFog",
-			"kind": "member"
-		},
-		{
 			"title": "Fog#name",
 			"kind": "member"
 		},
@@ -3461,10 +3269,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "FogExp2#isFogExp2",
-			"kind": "member"
-		},
-		{
 			"title": "FogExp2#name",
 			"kind": "member"
 		},
@@ -3481,10 +3285,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "FramebufferTexture#isFramebufferTexture",
-			"kind": "member"
-		},
-		{
 			"title": "FramebufferTexture#magFilter",
 			"kind": "member"
 		},
@@ -3495,10 +3295,6 @@
 		{
 			"title": "FrontFacingNode",
 			"kind": "class"
-		},
-		{
-			"title": "FrontFacingNode#isFrontFacingNode",
-			"kind": "member"
 		},
 		{
 			"title": "Frustum",
@@ -3666,10 +3462,6 @@
 		},
 		{
 			"title": "GLBufferAttribute#elementSize",
-			"kind": "member"
-		},
-		{
-			"title": "GLBufferAttribute#isGLBufferAttribute",
 			"kind": "member"
 		},
 		{
@@ -3941,19 +3733,11 @@
 			"kind": "class"
 		},
 		{
-			"title": "Group#isGroup",
-			"kind": "member"
-		},
-		{
 			"title": "HemisphereLight",
 			"kind": "class"
 		},
 		{
 			"title": "HemisphereLight#groundColor",
-			"kind": "member"
-		},
-		{
-			"title": "HemisphereLight#isHemisphereLight",
 			"kind": "member"
 		},
 		{
@@ -4029,10 +3813,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "ImageBitmapLoader#isImageBitmapLoader",
-			"kind": "member"
-		},
-		{
 			"title": "ImageBitmapLoader#load",
 			"kind": "function"
 		},
@@ -4061,20 +3841,12 @@
 			"kind": "class"
 		},
 		{
-			"title": "IndexNode#isIndexNode",
-			"kind": "member"
-		},
-		{
 			"title": "IndexNode#scope",
 			"kind": "member"
 		},
 		{
 			"title": "IndirectStorageBufferAttribute",
 			"kind": "class"
-		},
-		{
-			"title": "IndirectStorageBufferAttribute#isIndirectStorageBufferAttribute",
-			"kind": "member"
 		},
 		{
 			"title": "Info",
@@ -4123,10 +3895,6 @@
 		{
 			"title": "InputNode#getInputType",
 			"kind": "function"
-		},
-		{
-			"title": "InputNode#isInputNode",
-			"kind": "member"
 		},
 		{
 			"title": "InputNode#precision",
@@ -4261,14 +4029,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "InstanceNode#isStorageColor",
-			"kind": "member"
-		},
-		{
-			"title": "InstanceNode#isStorageMatrix",
-			"kind": "member"
-		},
-		{
 			"title": "InstanceNode#setup",
 			"kind": "function"
 		},
@@ -4285,10 +4045,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "InstancedBufferAttribute#isInstancedBufferAttribute",
-			"kind": "member"
-		},
-		{
 			"title": "InstancedBufferAttribute#meshPerAttribute",
 			"kind": "member"
 		},
@@ -4301,16 +4057,8 @@
 			"kind": "member"
 		},
 		{
-			"title": "InstancedBufferGeometry#isInstancedBufferGeometry",
-			"kind": "member"
-		},
-		{
 			"title": "InstancedInterleavedBuffer",
 			"kind": "class"
-		},
-		{
-			"title": "InstancedInterleavedBuffer#isInstancedInterleavedBuffer",
-			"kind": "member"
 		},
 		{
 			"title": "InstancedInterleavedBuffer#meshPerAttribute",
@@ -4362,10 +4110,6 @@
 		},
 		{
 			"title": "InstancedMesh#instanceMatrix",
-			"kind": "member"
-		},
-		{
-			"title": "InstancedMesh#isInstancedMesh",
 			"kind": "member"
 		},
 		{
@@ -4434,10 +4178,6 @@
 		},
 		{
 			"title": "InterleavedBuffer#count",
-			"kind": "member"
-		},
-		{
-			"title": "InterleavedBuffer#isInterleavedBuffer",
 			"kind": "member"
 		},
 		{
@@ -4531,10 +4271,6 @@
 		{
 			"title": "InterleavedBufferAttribute#getZ",
 			"kind": "function"
-		},
-		{
-			"title": "InterleavedBufferAttribute#isInterleavedBufferAttribute",
-			"kind": "member"
 		},
 		{
 			"title": "InterleavedBufferAttribute#itemSize",
@@ -4657,10 +4393,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "IsolateNode#isIsolateNode",
-			"kind": "member"
-		},
-		{
 			"title": "IsolateNode#node",
 			"kind": "member"
 		},
@@ -4781,10 +4513,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "LOD#isLOD",
-			"kind": "member"
-		},
-		{
 			"title": "LOD#levels",
 			"kind": "member"
 		},
@@ -4865,20 +4593,8 @@
 			"kind": "member"
 		},
 		{
-			"title": "Light#isLight",
-			"kind": "member"
-		},
-		{
 			"title": "LightProbe",
 			"kind": "class"
-		},
-		{
-			"title": "LightProbe#fromJSON",
-			"kind": "function"
-		},
-		{
-			"title": "LightProbe#isLightProbe",
-			"kind": "member"
 		},
 		{
 			"title": "LightProbe#sh",
@@ -5041,10 +4757,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "LightingNode#isLightingNode",
-			"kind": "member"
-		},
-		{
 			"title": "LightsNode",
 			"kind": "class"
 		},
@@ -5113,10 +4825,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Line#isLine",
-			"kind": "member"
-		},
-		{
 			"title": "Line#material",
 			"kind": "member"
 		},
@@ -5166,10 +4874,6 @@
 		},
 		{
 			"title": "Line2NodeMaterial#gapSizeNode",
-			"kind": "member"
-		},
-		{
-			"title": "Line2NodeMaterial#isLine2NodeMaterial",
 			"kind": "member"
 		},
 		{
@@ -5269,10 +4973,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "LineBasicMaterial#isLineBasicMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "LineBasicMaterial#linecap",
 			"kind": "member"
 		},
@@ -5293,20 +4993,12 @@
 			"kind": "class"
 		},
 		{
-			"title": "LineBasicNodeMaterial#isLineBasicNodeMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "LineCurve",
 			"kind": "class"
 		},
 		{
 			"title": "LineCurve#getPoint",
 			"kind": "function"
-		},
-		{
-			"title": "LineCurve#isLineCurve",
-			"kind": "member"
 		},
 		{
 			"title": "LineCurve#v1",
@@ -5323,10 +5015,6 @@
 		{
 			"title": "LineCurve3#getPoint",
 			"kind": "function"
-		},
-		{
-			"title": "LineCurve3#isLineCurve3",
-			"kind": "member"
 		},
 		{
 			"title": "LineCurve3#v1",
@@ -5346,10 +5034,6 @@
 		},
 		{
 			"title": "LineDashedMaterial#gapSize",
-			"kind": "member"
-		},
-		{
-			"title": "LineDashedMaterial#isLineDashedMaterial",
 			"kind": "member"
 		},
 		{
@@ -5377,10 +5061,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "LineDashedNodeMaterial#isLineDashedNodeMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "LineDashedNodeMaterial#offsetNode",
 			"kind": "member"
 		},
@@ -5393,16 +5073,8 @@
 			"kind": "class"
 		},
 		{
-			"title": "LineLoop#isLineLoop",
-			"kind": "member"
-		},
-		{
 			"title": "LineSegments",
 			"kind": "class"
-		},
-		{
-			"title": "LineSegments#isLineSegments",
-			"kind": "member"
 		},
 		{
 			"title": "LinearInterpolant",
@@ -5561,10 +5233,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "MRTNode#isMRTNode",
-			"kind": "member"
-		},
-		{
 			"title": "MRTNode#merge",
 			"kind": "function"
 		},
@@ -5686,10 +5354,6 @@
 		},
 		{
 			"title": "Material#id",
-			"kind": "member"
-		},
-		{
-			"title": "Material#isMaterial",
 			"kind": "member"
 		},
 		{
@@ -5869,10 +5533,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "MaterialReferenceNode#isMaterialReferenceNode",
-			"kind": "member"
-		},
-		{
 			"title": "MaterialReferenceNode#material",
 			"kind": "member"
 		},
@@ -5905,10 +5565,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "MathNode#isMathNode",
-			"kind": "member"
-		},
-		{
 			"title": "MathNode#method",
 			"kind": "member"
 		},
@@ -5931,10 +5587,6 @@
 		{
 			"title": "Matrix2#identity",
 			"kind": "function"
-		},
-		{
-			"title": "Matrix2#isMatrix2",
-			"kind": "member"
 		},
 		{
 			"title": "Matrix2#set",
@@ -5983,10 +5635,6 @@
 		{
 			"title": "Matrix3#invert",
 			"kind": "function"
-		},
-		{
-			"title": "Matrix3#isMatrix3",
-			"kind": "member"
 		},
 		{
 			"title": "Matrix3#makeRotation",
@@ -6113,10 +5761,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "Matrix4#isMatrix4",
-			"kind": "member"
-		},
-		{
 			"title": "Matrix4#lookAt",
 			"kind": "function"
 		},
@@ -6229,10 +5873,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "MemberNode#isMemberNode",
-			"kind": "member"
-		},
-		{
 			"title": "MemberNode#property",
 			"kind": "member"
 		},
@@ -6255,10 +5895,6 @@
 		{
 			"title": "Mesh#getVertexPosition",
 			"kind": "function"
-		},
-		{
-			"title": "Mesh#isMesh",
-			"kind": "member"
 		},
 		{
 			"title": "Mesh#material",
@@ -6317,10 +5953,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "MeshBasicMaterial#isMeshBasicMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshBasicMaterial#lightMap",
 			"kind": "member"
 		},
@@ -6363,10 +5995,6 @@
 		{
 			"title": "MeshBasicNodeMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "MeshBasicNodeMaterial#isMeshBasicNodeMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "MeshBasicNodeMaterial#lights",
@@ -6417,10 +6045,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "MeshDepthMaterial#isMeshDepthMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshDepthMaterial#map",
 			"kind": "member"
 		},
@@ -6450,10 +6074,6 @@
 		},
 		{
 			"title": "MeshDistanceMaterial#displacementScale",
-			"kind": "member"
-		},
-		{
-			"title": "MeshDistanceMaterial#isMeshDistanceMaterial",
 			"kind": "member"
 		},
 		{
@@ -6533,10 +6153,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "MeshLambertMaterial#isMeshLambertMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshLambertMaterial#lightMap",
 			"kind": "member"
 		},
@@ -6593,10 +6209,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "MeshLambertNodeMaterial#isMeshLambertNodeMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshLambertNodeMaterial#lights",
 			"kind": "member"
 		},
@@ -6649,10 +6261,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "MeshMatcapMaterial#isMeshMatcapMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshMatcapMaterial#map",
 			"kind": "member"
 		},
@@ -6683,10 +6291,6 @@
 		{
 			"title": "MeshMatcapNodeMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "MeshMatcapNodeMaterial#isMeshMatcapNodeMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "MeshMatcapNodeMaterial#setupVariants",
@@ -6721,10 +6325,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "MeshNormalMaterial#isMeshNormalMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshNormalMaterial#normalMap",
 			"kind": "member"
 		},
@@ -6747,10 +6347,6 @@
 		{
 			"title": "MeshNormalNodeMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "MeshNormalNodeMaterial#isMeshNormalNodeMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "MeshNormalNodeMaterial#setupDiffuseColor",
@@ -6829,10 +6425,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "MeshPhongMaterial#isMeshPhongMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshPhongMaterial#lightMap",
 			"kind": "member"
 		},
@@ -6895,10 +6487,6 @@
 		{
 			"title": "MeshPhongNodeMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "MeshPhongNodeMaterial#isMeshPhongNodeMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "MeshPhongNodeMaterial#lights",
@@ -6998,10 +6586,6 @@
 		},
 		{
 			"title": "MeshPhysicalMaterial#iridescenceThicknessRange",
-			"kind": "member"
-		},
-		{
-			"title": "MeshPhysicalMaterial#isMeshPhysicalMaterial",
 			"kind": "member"
 		},
 		{
@@ -7106,10 +6690,6 @@
 		},
 		{
 			"title": "MeshPhysicalNodeMaterial#iridescenceThicknessNode",
-			"kind": "member"
-		},
-		{
-			"title": "MeshPhysicalNodeMaterial#isMeshPhysicalNodeMaterial",
 			"kind": "member"
 		},
 		{
@@ -7285,10 +6865,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "MeshStandardMaterial#isMeshStandardMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshStandardMaterial#lightMap",
 			"kind": "member"
 		},
@@ -7350,10 +6926,6 @@
 		},
 		{
 			"title": "MeshStandardNodeMaterial#emissiveNode",
-			"kind": "member"
-		},
-		{
-			"title": "MeshStandardNodeMaterial#isMeshStandardNodeMaterial",
 			"kind": "member"
 		},
 		{
@@ -7445,10 +7017,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "MeshToonMaterial#isMeshToonMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "MeshToonMaterial#lightMap",
 			"kind": "member"
 		},
@@ -7491,10 +7059,6 @@
 		{
 			"title": "MeshToonNodeMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "MeshToonNodeMaterial#isMeshToonNodeMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "MeshToonNodeMaterial#lights",
@@ -7625,10 +7189,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "Node#isNode",
-			"kind": "member"
-		},
-		{
 			"title": "Node#name",
 			"kind": "member"
 		},
@@ -7723,10 +7283,6 @@
 		{
 			"title": "NodeAttribute",
 			"kind": "class"
-		},
-		{
-			"title": "NodeAttribute#isNodeAttribute",
-			"kind": "member"
 		},
 		{
 			"title": "NodeAttribute#name",
@@ -8569,10 +8125,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "NodeFunctionInput#isConst",
-			"kind": "member"
-		},
-		{
 			"title": "NodeFunctionInput#name",
 			"kind": "member"
 		},
@@ -8690,10 +8242,6 @@
 		},
 		{
 			"title": "NodeMaterial#hardwareClipping",
-			"kind": "member"
-		},
-		{
-			"title": "NodeMaterial#isNodeMaterial",
 			"kind": "member"
 		},
 		{
@@ -8981,10 +8529,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "NodeUniform#isNodeUniform",
-			"kind": "member"
-		},
-		{
 			"title": "NodeUniform#name",
 			"kind": "member"
 		},
@@ -9009,10 +8553,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "NodeVar#isNodeVar",
-			"kind": "member"
-		},
-		{
 			"title": "NodeVar#name",
 			"kind": "member"
 		},
@@ -9034,10 +8574,6 @@
 		},
 		{
 			"title": "NodeVarying#interpolationType",
-			"kind": "member"
-		},
-		{
-			"title": "NodeVarying#isNodeVarying",
 			"kind": "member"
 		},
 		{
@@ -9178,10 +8714,6 @@
 		},
 		{
 			"title": "Object3D#id",
-			"kind": "member"
-		},
-		{
-			"title": "Object3D#isObject3D",
 			"kind": "member"
 		},
 		{
@@ -9469,10 +9001,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "OperatorNode#isOperatorNode",
-			"kind": "member"
-		},
-		{
 			"title": "OperatorNode#op",
 			"kind": "member"
 		},
@@ -9490,10 +9018,6 @@
 		},
 		{
 			"title": "OrthographicCamera#far",
-			"kind": "member"
-		},
-		{
-			"title": "OrthographicCamera#isOrthographicCamera",
 			"kind": "member"
 		},
 		{
@@ -9531,10 +9055,6 @@
 		{
 			"title": "OutputStructNode",
 			"kind": "class"
-		},
-		{
-			"title": "OutputStructNode#isOutputStructNode",
-			"kind": "member"
 		},
 		{
 			"title": "OutputStructNode#members",
@@ -9601,10 +9121,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "PackFloatNode#isPackFloatNode",
-			"kind": "member"
-		},
-		{
 			"title": "PackFloatNode#vectorNode",
 			"kind": "member"
 		},
@@ -9615,10 +9131,6 @@
 		{
 			"title": "ParameterNode#getMemberType",
 			"kind": "function"
-		},
-		{
-			"title": "ParameterNode#isParameterNode",
-			"kind": "member"
 		},
 		{
 			"title": "PassMultipleTextureNode",
@@ -9698,10 +9210,6 @@
 		},
 		{
 			"title": "PassNode#global",
-			"kind": "member"
-		},
-		{
-			"title": "PassNode#isPassNode",
 			"kind": "member"
 		},
 		{
@@ -9883,10 +9391,6 @@
 		{
 			"title": "PerspectiveCamera#getViewSize",
 			"kind": "function"
-		},
-		{
-			"title": "PerspectiveCamera#isPerspectiveCamera",
-			"kind": "member"
 		},
 		{
 			"title": "PerspectiveCamera#near",
@@ -10077,10 +9581,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "Plane#isPlane",
-			"kind": "member"
-		},
-		{
 			"title": "Plane#negate",
 			"kind": "function"
 		},
@@ -10153,10 +9653,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "PointLight#isPointLight",
-			"kind": "member"
-		},
-		{
 			"title": "PointLight#power",
 			"kind": "member"
 		},
@@ -10209,14 +9705,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "PointLightShadow#isPointLightShadow",
-			"kind": "member"
-		},
-		{
-			"title": "PointLightShadow#updateMatrices",
-			"kind": "function"
-		},
-		{
 			"title": "PointShadowNode",
 			"kind": "class"
 		},
@@ -10226,6 +9714,10 @@
 		},
 		{
 			"title": "PointShadowNode#renderShadow",
+			"kind": "function"
+		},
+		{
+			"title": "PointShadowNode#setupRenderTarget",
 			"kind": "function"
 		},
 		{
@@ -10241,19 +9733,11 @@
 			"kind": "class"
 		},
 		{
-			"title": "PointUVNode#isPointUVNode",
-			"kind": "member"
-		},
-		{
 			"title": "Points",
 			"kind": "class"
 		},
 		{
 			"title": "Points#geometry",
-			"kind": "member"
-		},
-		{
-			"title": "Points#isPoints",
 			"kind": "member"
 		},
 		{
@@ -10293,10 +9777,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "PointsMaterial#isPointsMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "PointsMaterial#map",
 			"kind": "member"
 		},
@@ -10314,10 +9794,6 @@
 		},
 		{
 			"title": "PointsNodeMaterial#alphaToCoverage",
-			"kind": "member"
-		},
-		{
-			"title": "PointsNodeMaterial#isPointsNodeMaterial",
 			"kind": "member"
 		},
 		{
@@ -10533,10 +10009,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "PropertyNode#isPropertyNode",
-			"kind": "member"
-		},
-		{
 			"title": "PropertyNode#name",
 			"kind": "member"
 		},
@@ -10550,10 +10022,6 @@
 		},
 		{
 			"title": "QuadMesh#camera",
-			"kind": "member"
-		},
-		{
-			"title": "QuadMesh#isQuadMesh",
 			"kind": "member"
 		},
 		{
@@ -10571,10 +10039,6 @@
 		{
 			"title": "QuadraticBezierCurve#getPoint",
 			"kind": "function"
-		},
-		{
-			"title": "QuadraticBezierCurve#isQuadraticBezierCurve",
-			"kind": "member"
 		},
 		{
 			"title": "QuadraticBezierCurve#v0",
@@ -10595,10 +10059,6 @@
 		{
 			"title": "QuadraticBezierCurve3#getPoint",
 			"kind": "function"
-		},
-		{
-			"title": "QuadraticBezierCurve3#isQuadraticBezierCurve3",
-			"kind": "member"
 		},
 		{
 			"title": "QuadraticBezierCurve3#v0",
@@ -10655,10 +10115,6 @@
 		{
 			"title": "Quaternion#invert",
 			"kind": "function"
-		},
-		{
-			"title": "Quaternion#isQuaternion",
-			"kind": "member"
 		},
 		{
 			"title": "Quaternion#length",
@@ -10777,10 +10233,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "RTTNode#isRTTNode",
-			"kind": "member"
-		},
-		{
 			"title": "RTTNode#node",
 			"kind": "member"
 		},
@@ -10839,10 +10291,6 @@
 		{
 			"title": "RawShaderMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "RawShaderMaterial#isRawShaderMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "Ray",
@@ -10993,10 +10441,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "RectAreaLight#isRectAreaLight",
-			"kind": "member"
-		},
-		{
 			"title": "RectAreaLight#power",
 			"kind": "member"
 		},
@@ -11115,14 +10559,6 @@
 		{
 			"title": "ReferenceElementNode#getNodeType",
 			"kind": "function"
-		},
-		{
-			"title": "ReferenceElementNode#isReferenceElementNode",
-			"kind": "member"
-		},
-		{
-			"title": "ReferenceElementNode#isReferenceElementNode",
-			"kind": "member"
 		},
 		{
 			"title": "ReferenceElementNode#referenceNode",
@@ -11281,10 +10717,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "RenderOutputNode#isRenderOutputNode",
-			"kind": "member"
-		},
-		{
 			"title": "RenderOutputNode#outputColorSpace",
 			"kind": "member"
 		},
@@ -11322,10 +10754,6 @@
 		},
 		{
 			"title": "RenderTarget#height",
-			"kind": "member"
-		},
-		{
-			"title": "RenderTarget#isRenderTarget",
 			"kind": "member"
 		},
 		{
@@ -11379,10 +10807,6 @@
 		{
 			"title": "RenderTarget3D",
 			"kind": "class"
-		},
-		{
-			"title": "RenderTarget3D#isRenderTarget3D",
-			"kind": "member"
 		},
 		{
 			"title": "RenderTarget3D#texture",
@@ -11565,6 +10989,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Renderer#getOutputBufferType",
+			"kind": "function"
+		},
+		{
 			"title": "Renderer#getOutputRenderTarget",
 			"kind": "function"
 		},
@@ -11594,6 +11022,10 @@
 		},
 		{
 			"title": "Renderer#getViewport",
+			"kind": "function"
+		},
+		{
+			"title": "Renderer#hasCompatibility",
 			"kind": "function"
 		},
 		{
@@ -11643,14 +11075,6 @@
 		{
 			"title": "Renderer#isOccluded",
 			"kind": "function"
-		},
-		{
-			"title": "Renderer#isOutputTarget",
-			"kind": "member"
-		},
-		{
-			"title": "Renderer#isRenderer",
-			"kind": "member"
 		},
 		{
 			"title": "Renderer#library",
@@ -11861,10 +11285,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "SampleNode#isSampleNode",
-			"kind": "member"
-		},
-		{
 			"title": "SampleNode#sample",
 			"kind": "function"
 		},
@@ -11913,10 +11333,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Scene#isScene",
-			"kind": "member"
-		},
-		{
 			"title": "Scene#overrideMaterial",
 			"kind": "member"
 		},
@@ -11947,10 +11363,6 @@
 		{
 			"title": "ScreenNode#getUpdateType",
 			"kind": "function"
-		},
-		{
-			"title": "ScreenNode#isViewportNode",
-			"kind": "member"
 		},
 		{
 			"title": "ScreenNode#scope",
@@ -12037,10 +11449,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "ScriptableNode#isScriptableNode",
-			"kind": "member"
-		},
-		{
 			"title": "ScriptableNode#onRefresh",
 			"kind": "function"
 		},
@@ -12086,14 +11494,6 @@
 		},
 		{
 			"title": "ScriptableValueNode#inputType",
-			"kind": "member"
-		},
-		{
-			"title": "ScriptableValueNode#isScriptableOutputNode",
-			"kind": "member"
-		},
-		{
-			"title": "ScriptableValueNode#isScriptableValueNode",
 			"kind": "member"
 		},
 		{
@@ -12169,10 +11569,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "ShaderMaterial#isShaderMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "ShaderMaterial#lights",
 			"kind": "member"
 		},
@@ -12207,10 +11603,6 @@
 		{
 			"title": "ShadowBaseNode",
 			"kind": "class"
-		},
-		{
-			"title": "ShadowBaseNode#isShadowBaseNode",
-			"kind": "member"
 		},
 		{
 			"title": "ShadowBaseNode#light",
@@ -12253,10 +11645,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "ShadowMaterial#isShadowMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "ShadowMaterial#transparent",
 			"kind": "member"
 		},
@@ -12275,10 +11663,6 @@
 		{
 			"title": "ShadowNode#getShadowFilterFn",
 			"kind": "function"
-		},
-		{
-			"title": "ShadowNode#isShadowNode",
-			"kind": "member"
 		},
 		{
 			"title": "ShadowNode#renderShadow",
@@ -12339,10 +11723,6 @@
 		{
 			"title": "ShadowNodeMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "ShadowNodeMaterial#isShadowNodeMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "ShadowNodeMaterial#lights",
@@ -12481,6 +11861,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Skeleton#previousBoneMatrices",
+			"kind": "member"
+		},
+		{
 			"title": "Skeleton#toJSON",
 			"kind": "function"
 		},
@@ -12499,10 +11883,6 @@
 		{
 			"title": "SkeletonHelper#dispose",
 			"kind": "function"
-		},
-		{
-			"title": "SkeletonHelper#isSkeletonHelper",
-			"kind": "member"
 		},
 		{
 			"title": "SkeletonHelper#root",
@@ -12551,10 +11931,6 @@
 		{
 			"title": "SkinnedMesh#computeBoundingSphere",
 			"kind": "function"
-		},
-		{
-			"title": "SkinnedMesh#isSkinnedMesh",
-			"kind": "member"
 		},
 		{
 			"title": "SkinnedMesh#normalizeSkinWeights",
@@ -12657,10 +12033,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Source#isSource",
-			"kind": "member"
-		},
-		{
 			"title": "Source#needsUpdate",
 			"kind": "member"
 		},
@@ -12739,10 +12111,6 @@
 		{
 			"title": "Sphere#isEmpty",
 			"kind": "function"
-		},
-		{
-			"title": "Sphere#isSphere",
-			"kind": "member"
 		},
 		{
 			"title": "Sphere#makeEmpty",
@@ -12861,10 +12229,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "SphericalHarmonics3#isSphericalHarmonics3",
-			"kind": "member"
-		},
-		{
 			"title": "SphericalHarmonics3#lerp",
 			"kind": "function"
 		},
@@ -12891,10 +12255,6 @@
 		{
 			"title": "SplineCurve#getPoint",
 			"kind": "function"
-		},
-		{
-			"title": "SplineCurve#isSplineCurve",
-			"kind": "member"
 		},
 		{
 			"title": "SplineCurve#points",
@@ -12925,10 +12285,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "SplitNode#isSplitNode",
-			"kind": "member"
-		},
-		{
 			"title": "SplitNode#node",
 			"kind": "member"
 		},
@@ -12946,10 +12302,6 @@
 		},
 		{
 			"title": "SpotLight#distance",
-			"kind": "member"
-		},
-		{
-			"title": "SpotLight#isSpotLight",
 			"kind": "member"
 		},
 		{
@@ -13037,10 +12389,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "SpotLightShadow#isSpotLightShadow",
-			"kind": "member"
-		},
-		{
 			"title": "Sprite",
 			"kind": "class"
 		},
@@ -13054,10 +12402,6 @@
 		},
 		{
 			"title": "Sprite#geometry",
-			"kind": "member"
-		},
-		{
-			"title": "Sprite#isSprite",
 			"kind": "member"
 		},
 		{
@@ -13085,10 +12429,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "SpriteMaterial#isSpriteMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "SpriteMaterial#map",
 			"kind": "member"
 		},
@@ -13107,10 +12447,6 @@
 		{
 			"title": "SpriteNodeMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "SpriteNodeMaterial#isSpriteNodeMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "SpriteNodeMaterial#positionNode",
@@ -13185,8 +12521,8 @@
 			"kind": "function"
 		},
 		{
-			"title": "StackNode#isStackNode",
-			"kind": "member"
+			"title": "StackNode#addToStackBefore",
+			"kind": "function"
 		},
 		{
 			"title": "StackNode#nodes",
@@ -13237,14 +12573,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Storage3DTexture#is3DTexture",
-			"kind": "member"
-		},
-		{
-			"title": "Storage3DTexture#isStorageTexture",
-			"kind": "member"
-		},
-		{
 			"title": "Storage3DTexture#magFilter",
 			"kind": "member"
 		},
@@ -13265,10 +12593,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "StorageArrayElementNode#isStorageArrayElementNode",
-			"kind": "member"
-		},
-		{
 			"title": "StorageArrayElementNode#storageBufferNode",
 			"kind": "member"
 		},
@@ -13278,10 +12602,6 @@
 		},
 		{
 			"title": "StorageArrayTexture#image",
-			"kind": "member"
-		},
-		{
-			"title": "StorageArrayTexture#isStorageTexture",
 			"kind": "member"
 		},
 		{
@@ -13299,10 +12619,6 @@
 		{
 			"title": "StorageBufferAttribute",
 			"kind": "class"
-		},
-		{
-			"title": "StorageBufferAttribute#isStorageBufferAttribute",
-			"kind": "member"
 		},
 		{
 			"title": "StorageBufferNode",
@@ -13349,18 +12665,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "StorageBufferNode#isAtomic",
-			"kind": "member"
-		},
-		{
-			"title": "StorageBufferNode#isPBO",
-			"kind": "member"
-		},
-		{
-			"title": "StorageBufferNode#isStorageBufferNode",
-			"kind": "member"
-		},
-		{
 			"title": "StorageBufferNode#setAccess",
 			"kind": "function"
 		},
@@ -13389,19 +12693,11 @@
 			"kind": "class"
 		},
 		{
-			"title": "StorageInstancedBufferAttribute#isStorageInstancedBufferAttribute",
-			"kind": "member"
-		},
-		{
 			"title": "StorageTexture",
 			"kind": "class"
 		},
 		{
 			"title": "StorageTexture#image",
-			"kind": "member"
-		},
-		{
-			"title": "StorageTexture#isStorageTexture",
 			"kind": "member"
 		},
 		{
@@ -13439,10 +12735,6 @@
 		{
 			"title": "StorageTextureNode#getInputType",
 			"kind": "function"
-		},
-		{
-			"title": "StorageTextureNode#isStorageTextureNode",
-			"kind": "member"
 		},
 		{
 			"title": "StorageTextureNode#mipLevel",
@@ -13501,10 +12793,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "StructTypeNode#isStructLayoutNode",
-			"kind": "member"
-		},
-		{
 			"title": "StructTypeNode#membersLayout",
 			"kind": "member"
 		},
@@ -13515,10 +12803,6 @@
 		{
 			"title": "SubBuildNode",
 			"kind": "class"
-		},
-		{
-			"title": "SubBuildNode#isSubBuildNode",
-			"kind": "member"
 		},
 		{
 			"title": "SubBuildNode#name",
@@ -13551,10 +12835,6 @@
 		{
 			"title": "TempNode#hasDependencies",
 			"kind": "function"
-		},
-		{
-			"title": "TempNode#isTempNode",
-			"kind": "member"
 		},
 		{
 			"title": "TetrahedronGeometry",
@@ -13638,18 +12918,6 @@
 		},
 		{
 			"title": "Texture#internalFormat",
-			"kind": "member"
-		},
-		{
-			"title": "Texture#isArrayTexture",
-			"kind": "member"
-		},
-		{
-			"title": "Texture#isRenderTargetTexture",
-			"kind": "member"
-		},
-		{
-			"title": "Texture#isTexture",
 			"kind": "member"
 		},
 		{
@@ -13793,10 +13061,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "Texture3DNode#isTexture3DNode",
-			"kind": "member"
-		},
-		{
 			"title": "Texture3DNode#normal",
 			"kind": "function"
 		},
@@ -13905,10 +13169,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "TextureNode#isTextureNode",
-			"kind": "member"
-		},
-		{
 			"title": "TextureNode#level",
 			"kind": "function"
 		},
@@ -13977,10 +13237,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "TextureNode#uv",
-			"kind": "function"
-		},
-		{
 			"title": "TextureNode#uvNode",
 			"kind": "member"
 		},
@@ -13991,10 +13247,6 @@
 		{
 			"title": "TextureSizeNode",
 			"kind": "class"
-		},
-		{
-			"title": "TextureSizeNode#isTextureSizeNode",
-			"kind": "member"
 		},
 		{
 			"title": "TextureSizeNode#levelNode",
@@ -14305,6 +13557,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Uniform#index",
+			"kind": "member"
+		},
+		{
 			"title": "Uniform#itemSize",
 			"kind": "member"
 		},
@@ -14331,10 +13587,6 @@
 		{
 			"title": "UniformArrayElementNode",
 			"kind": "class"
-		},
-		{
-			"title": "UniformArrayElementNode#isArrayBufferElementNode",
-			"kind": "member"
 		},
 		{
 			"title": "UniformArrayNode",
@@ -14365,10 +13617,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "UniformArrayNode#isArrayBufferNode",
-			"kind": "member"
-		},
-		{
 			"title": "UniformArrayNode#paddedType",
 			"kind": "member"
 		},
@@ -14387,10 +13635,6 @@
 		{
 			"title": "UniformGroupNode",
 			"kind": "class"
-		},
-		{
-			"title": "UniformGroupNode#isUniformGroup",
-			"kind": "member"
 		},
 		{
 			"title": "UniformGroupNode#name",
@@ -14418,10 +13662,6 @@
 		},
 		{
 			"title": "UniformNode#groupNode",
-			"kind": "member"
-		},
-		{
-			"title": "UniformNode#isUniformNode",
 			"kind": "member"
 		},
 		{
@@ -14453,12 +13693,20 @@
 			"kind": "function"
 		},
 		{
+			"title": "UniformsGroup#addUniformUpdateRange",
+			"kind": "function"
+		},
+		{
 			"title": "UniformsGroup#buffer",
 			"kind": "member"
 		},
 		{
 			"title": "UniformsGroup#byteLength",
 			"kind": "member"
+		},
+		{
+			"title": "UniformsGroup#clearUpdateRanges",
+			"kind": "function"
 		},
 		{
 			"title": "UniformsGroup#clone",
@@ -14474,14 +13722,6 @@
 		},
 		{
 			"title": "UniformsGroup#id",
-			"kind": "member"
-		},
-		{
-			"title": "UniformsGroup#isUniformsGroup",
-			"kind": "member"
-		},
-		{
-			"title": "UniformsGroup#isUniformsGroup",
 			"kind": "member"
 		},
 		{
@@ -14565,10 +13805,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "UnpackFloatNode#isUnpackFloatNode",
-			"kind": "member"
-		},
-		{
 			"title": "UnpackFloatNode#uintNode",
 			"kind": "member"
 		},
@@ -14601,8 +13837,8 @@
 			"kind": "member"
 		},
 		{
-			"title": "VarNode#isVarNode",
-			"kind": "member"
+			"title": "VarNode#isIntent",
+			"kind": "function"
 		},
 		{
 			"title": "VarNode#name",
@@ -14638,10 +13874,6 @@
 		},
 		{
 			"title": "VaryingNode#interpolationType",
-			"kind": "member"
-		},
-		{
-			"title": "VaryingNode#isVaryingNode",
 			"kind": "member"
 		},
 		{
@@ -14762,10 +13994,6 @@
 		},
 		{
 			"title": "Vector2#height",
-			"kind": "member"
-		},
-		{
-			"title": "Vector2#isVector2",
 			"kind": "member"
 		},
 		{
@@ -15003,10 +14231,6 @@
 		{
 			"title": "Vector3#getComponent",
 			"kind": "function"
-		},
-		{
-			"title": "Vector3#isVector3",
-			"kind": "member"
 		},
 		{
 			"title": "Vector3#length",
@@ -15281,10 +14505,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Vector4#isVector4",
-			"kind": "member"
-		},
-		{
 			"title": "Vector4#length",
 			"kind": "function"
 		},
@@ -15485,16 +14705,8 @@
 			"kind": "member"
 		},
 		{
-			"title": "VertexColorNode#isVertexColorNode",
-			"kind": "member"
-		},
-		{
 			"title": "VideoFrameTexture",
 			"kind": "class"
-		},
-		{
-			"title": "VideoFrameTexture#isVideoFrameTexture",
-			"kind": "member"
 		},
 		{
 			"title": "VideoFrameTexture#setFrame",
@@ -15513,20 +14725,12 @@
 			"kind": "member"
 		},
 		{
-			"title": "VideoTexture#isVideoTexture",
-			"kind": "member"
-		},
-		{
 			"title": "VideoTexture#update",
 			"kind": "function"
 		},
 		{
 			"title": "ViewportDepthNode",
 			"kind": "class"
-		},
-		{
-			"title": "ViewportDepthNode#isViewportDepthNode",
-			"kind": "member"
 		},
 		{
 			"title": "ViewportDepthNode#scope",
@@ -15569,20 +14773,12 @@
 			"kind": "function"
 		},
 		{
-			"title": "ViewportTextureNode#isOutputTextureNode",
-			"kind": "member"
-		},
-		{
 			"title": "ViewportTextureNode#updateBeforeType",
 			"kind": "member"
 		},
 		{
 			"title": "VolumeNodeMaterial",
 			"kind": "class"
-		},
-		{
-			"title": "VolumeNodeMaterial#isVolumeNodeMaterial",
-			"kind": "member"
 		},
 		{
 			"title": "VolumeNodeMaterial#offsetNode",
@@ -15885,20 +15081,12 @@
 			"kind": "class"
 		},
 		{
-			"title": "WebGL3DRenderTarget#isWebGL3DRenderTarget",
-			"kind": "member"
-		},
-		{
 			"title": "WebGL3DRenderTarget#texture",
 			"kind": "member"
 		},
 		{
 			"title": "WebGLArrayRenderTarget",
 			"kind": "class"
-		},
-		{
-			"title": "WebGLArrayRenderTarget#isWebGLArrayRenderTarget",
-			"kind": "member"
 		},
 		{
 			"title": "WebGLArrayRenderTarget#texture",
@@ -15917,20 +15105,12 @@
 			"kind": "function"
 		},
 		{
-			"title": "WebGLCubeRenderTarget#isWebGLCubeRenderTarget",
-			"kind": "member"
-		},
-		{
 			"title": "WebGLCubeRenderTarget#texture",
 			"kind": "member"
 		},
 		{
 			"title": "WebGLRenderTarget",
 			"kind": "class"
-		},
-		{
-			"title": "WebGLRenderTarget#isWebGLRenderTarget",
-			"kind": "member"
 		},
 		{
 			"title": "WebGLRenderer",
@@ -16097,10 +15277,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "WebGLRenderer#isWebGLRenderer",
-			"kind": "member"
-		},
-		{
 			"title": "WebGLRenderer#localClippingEnabled",
 			"kind": "member"
 		},
@@ -16146,6 +15322,10 @@
 		},
 		{
 			"title": "WebGLRenderer#setDrawingBufferSize",
+			"kind": "function"
+		},
+		{
+			"title": "WebGLRenderer#setEffects",
 			"kind": "function"
 		},
 		{
@@ -16239,10 +15419,6 @@
 		{
 			"title": "WebGPURenderer",
 			"kind": "class"
-		},
-		{
-			"title": "WebGPURenderer#isWebGPURenderer",
-			"kind": "member"
 		},
 		{
 			"title": "WebGPURenderer#library",
@@ -16413,10 +15589,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "WorkgroupInfoElementNode#isWorkgroupInfoElementNode",
-			"kind": "member"
-		},
-		{
 			"title": "WorkgroupInfoNode",
 			"kind": "class"
 		},
@@ -16443,10 +15615,6 @@
 		{
 			"title": "WorkgroupInfoNode#getInputType",
 			"kind": "function"
-		},
-		{
-			"title": "WorkgroupInfoNode#isWorkgroupInfoNode",
-			"kind": "member"
 		},
 		{
 			"title": "WorkgroupInfoNode#label",
@@ -16713,10 +15881,6 @@
 		{
 			"title": "AnaglyphPassNode",
 			"kind": "class"
-		},
-		{
-			"title": "AnaglyphPassNode#isAnaglyphPassNode",
-			"kind": "member"
 		},
 		{
 			"title": "AnaglyphPassNode#setup",
@@ -17383,10 +16547,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "CSS2DObject#isCSS2DObject",
-			"kind": "member"
-		},
-		{
 			"title": "CSS2DRenderer",
 			"kind": "class"
 		},
@@ -17419,10 +16579,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "CSS3DObject#isCSS3DObject",
-			"kind": "member"
-		},
-		{
 			"title": "CSS3DRenderer",
 			"kind": "class"
 		},
@@ -17445,10 +16601,6 @@
 		{
 			"title": "CSS3DSprite",
 			"kind": "class"
-		},
-		{
-			"title": "CSS3DSprite#isCSS3DSprite",
-			"kind": "member"
 		},
 		{
 			"title": "CSS3DSprite#rotation2D",
@@ -18255,10 +17407,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "Font#isFont",
-			"kind": "member"
-		},
-		{
 			"title": "FontLoader",
 			"kind": "class"
 		},
@@ -18923,10 +18071,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "LDrawConditionalLineMaterial#isLDrawConditionalLineMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "LDrawConditionalLineMaterial#opacity",
 			"kind": "member"
 		},
@@ -19091,10 +18235,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "Lensflare#isLensflare",
-			"kind": "member"
-		},
-		{
 			"title": "Lensflare#renderOrder",
 			"kind": "member"
 		},
@@ -19132,10 +18272,6 @@
 		},
 		{
 			"title": "LensflareMesh#frustumCulled",
-			"kind": "member"
-		},
-		{
-			"title": "LensflareMesh#isLensflareMesh",
 			"kind": "member"
 		},
 		{
@@ -19223,20 +18359,12 @@
 			"kind": "class"
 		},
 		{
-			"title": "Line2#isLine2",
-			"kind": "member"
-		},
-		{
 			"title": "LineGeometry",
 			"kind": "class"
 		},
 		{
 			"title": "LineGeometry#fromLine",
 			"kind": "function"
-		},
-		{
-			"title": "LineGeometry#isLineGeometry",
-			"kind": "member"
 		},
 		{
 			"title": "LineGeometry#setColors",
@@ -19283,10 +18411,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "LineMaterial#isLineMaterial",
-			"kind": "member"
-		},
-		{
 			"title": "LineMaterial#linewidth",
 			"kind": "member"
 		},
@@ -19309,10 +18433,6 @@
 		{
 			"title": "LineSegments2#computeLineDistances",
 			"kind": "function"
-		},
-		{
-			"title": "LineSegments2#isLineSegments2",
-			"kind": "member"
 		},
 		{
 			"title": "LineSegments2#raycast",
@@ -19341,10 +18461,6 @@
 		{
 			"title": "LineSegmentsGeometry#fromWireframeGeometry",
 			"kind": "function"
-		},
-		{
-			"title": "LineSegmentsGeometry#isLineSegmentsGeometry",
-			"kind": "member"
 		},
 		{
 			"title": "LineSegmentsGeometry#setColors",
@@ -19385,10 +18501,6 @@
 		{
 			"title": "Lut#getColor",
 			"kind": "function"
-		},
-		{
-			"title": "Lut#isLut",
-			"kind": "member"
 		},
 		{
 			"title": "Lut#lut",
@@ -19745,10 +18857,6 @@
 		{
 			"title": "MarchingCubes#getCell",
 			"kind": "function"
-		},
-		{
-			"title": "MarchingCubes#isMarchingCubes",
-			"kind": "member"
 		},
 		{
 			"title": "MarchingCubes#reset",
@@ -20775,10 +19883,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "ParallaxBarrierPassNode#isParallaxBarrierPassNode",
-			"kind": "member"
-		},
-		{
 			"title": "ParallaxBarrierPassNode#setup",
 			"kind": "function"
 		},
@@ -20804,10 +19908,6 @@
 		},
 		{
 			"title": "Pass#enabled",
-			"kind": "member"
-		},
-		{
-			"title": "Pass#isPass",
 			"kind": "member"
 		},
 		{
@@ -20875,10 +19975,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "PixelationPassNode#isPixelationPassNode",
-			"kind": "member"
-		},
-		{
 			"title": "PixelationPassNode#normalEdgeStrength",
 			"kind": "member"
 		},
@@ -20913,10 +20009,6 @@
 		{
 			"title": "PointerLockControls#getDirection",
 			"kind": "function"
-		},
-		{
-			"title": "PointerLockControls#isLocked",
-			"kind": "member"
 		},
 		{
 			"title": "PointerLockControls#lock",
@@ -21119,10 +20211,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "Reflector#isReflector",
-			"kind": "member"
-		},
-		{
 			"title": "ReflectorForSSRPass",
 			"kind": "class"
 		},
@@ -21149,10 +20237,6 @@
 		{
 			"title": "Refractor#getRenderTarget",
 			"kind": "function"
-		},
-		{
-			"title": "Refractor#isRefractor",
-			"kind": "member"
 		},
 		{
 			"title": "RenderPass",
@@ -21453,10 +20537,6 @@
 		{
 			"title": "SSAAPassNode#dispose",
 			"kind": "function"
-		},
-		{
-			"title": "SSAAPassNode#isSSAAPassNode",
-			"kind": "member"
 		},
 		{
 			"title": "SSAAPassNode#sampleLevel",
@@ -21927,10 +21007,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "SVGObject#isSVGObject",
-			"kind": "member"
-		},
-		{
 			"title": "SVGObject#node",
 			"kind": "member"
 		},
@@ -22103,10 +21179,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "SelectionHelper#isDown",
-			"kind": "member"
-		},
-		{
 			"title": "SelectionHelper#renderer",
 			"kind": "member"
 		},
@@ -22171,10 +21243,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "ShadowMesh#isShadowMesh",
-			"kind": "member"
-		},
-		{
 			"title": "ShadowMesh#matrixAutoUpdate",
 			"kind": "member"
 		},
@@ -22215,24 +21283,12 @@
 			"kind": "class"
 		},
 		{
-			"title": "Sky#isSky",
-			"kind": "member"
-		},
-		{
 			"title": "SkyGeometry",
 			"kind": "class"
 		},
 		{
 			"title": "SkyMesh",
 			"kind": "class"
-		},
-		{
-			"title": "SkyMesh#isSky",
-			"kind": "member"
-		},
-		{
-			"title": "SkyMesh#isSkyMesh",
-			"kind": "member"
 		},
 		{
 			"title": "SkyMesh#mieCoefficient",
@@ -22287,10 +21343,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "StereoCompositePassNode#isStereoCompositePassNode",
-			"kind": "member"
-		},
-		{
 			"title": "StereoCompositePassNode#setSize",
 			"kind": "function"
 		},
@@ -22325,10 +21377,6 @@
 		{
 			"title": "StereoPassNode",
 			"kind": "class"
-		},
-		{
-			"title": "StereoPassNode#isStereoPassNode",
-			"kind": "member"
 		},
 		{
 			"title": "StereoPassNode#stereo",
@@ -22429,10 +21477,6 @@
 		{
 			"title": "TRAANode#getTextureNode",
 			"kind": "function"
-		},
-		{
-			"title": "TRAANode#isTRAANode",
-			"kind": "member"
 		},
 		{
 			"title": "TRAANode#maxVelocityLength",
@@ -23095,10 +22139,6 @@
 			"kind": "member"
 		},
 		{
-			"title": "VOXData3DTexture",
-			"kind": "class"
-		},
-		{
 			"title": "VOXLoader",
 			"kind": "class"
 		},
@@ -23109,10 +22149,6 @@
 		{
 			"title": "VOXLoader#parse",
 			"kind": "function"
-		},
-		{
-			"title": "VOXMesh",
-			"kind": "class"
 		},
 		{
 			"title": "VRButton",
@@ -23149,10 +22185,6 @@
 		{
 			"title": "VertexNormalsHelper#dispose",
 			"kind": "function"
-		},
-		{
-			"title": "VertexNormalsHelper#isVertexNormalsHelper",
-			"kind": "member"
 		},
 		{
 			"title": "VertexNormalsHelper#matrixAutoUpdate",
@@ -23213,10 +22245,6 @@
 		{
 			"title": "ViewHelper#handleClick",
 			"kind": "function"
-		},
-		{
-			"title": "ViewHelper#isViewHelper",
-			"kind": "member"
 		},
 		{
 			"title": "ViewHelper#render",
@@ -23403,10 +22431,6 @@
 			"kind": "class"
 		},
 		{
-			"title": "Water#isWater",
-			"kind": "member"
-		},
-		{
 			"title": "WaterMesh",
 			"kind": "class"
 		},
@@ -23416,10 +22440,6 @@
 		},
 		{
 			"title": "WaterMesh#distortionScale",
-			"kind": "member"
-		},
-		{
-			"title": "WaterMesh#isWaterMesh",
 			"kind": "member"
 		},
 		{
@@ -23463,16 +22483,8 @@
 			"kind": "function"
 		},
 		{
-			"title": "Wireframe#isWireframe",
-			"kind": "member"
-		},
-		{
 			"title": "WireframeGeometry2",
 			"kind": "class"
-		},
-		{
-			"title": "WireframeGeometry2#isWireframeGeometry2",
-			"kind": "member"
 		},
 		{
 			"title": "WoodNodeMaterial",
@@ -24645,6 +23657,10 @@
 			"kind": "function"
 		},
 		{
+			"title": "Compatibility",
+			"kind": "member"
+		},
+		{
 			"title": "ConeGeometry.fromJSON",
 			"kind": "function"
 		},
@@ -24847,10 +23863,6 @@
 		{
 			"title": "IcosahedronGeometry.fromJSON",
 			"kind": "function"
-		},
-		{
-			"title": "IdentityDepthPacking",
-			"kind": "member"
 		},
 		{
 			"title": "ImageUtils.getDataURL",
@@ -25298,6 +24310,10 @@
 		},
 		{
 			"title": "PlaneGeometry.fromJSON",
+			"kind": "function"
+		},
+		{
+			"title": "PointShadowFilter",
 			"kind": "function"
 		},
 		{
@@ -25885,6 +24901,14 @@
 			"kind": "member"
 		},
 		{
+			"title": "buildData3DTexture",
+			"kind": "function"
+		},
+		{
+			"title": "buildMesh",
+			"kind": "function"
+		},
+		{
 			"title": "ceilPowerOfTwo",
 			"kind": "function"
 		},
@@ -25919,6 +24943,10 @@
 		{
 			"title": "denormalize",
 			"kind": "function"
+		},
+		{
+			"title": "disposeShadowMaterial",
+			"kind": "member"
 		},
 		{
 			"title": "euclideanModulo",
@@ -26307,10 +25335,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "atan2",
-			"kind": "function"
-		},
-		{
 			"title": "atomicAdd",
 			"kind": "function"
 		},
@@ -26483,11 +25507,15 @@
 			"kind": "function"
 		},
 		{
-			"title": "bumpMap",
+			"title": "builtinAOContext",
 			"kind": "function"
 		},
 		{
-			"title": "burn",
+			"title": "builtinShadowContext",
+			"kind": "function"
+		},
+		{
+			"title": "bumpMap",
 			"kind": "function"
 		},
 		{
@@ -26703,10 +25731,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "densityFog",
-			"kind": "function"
-		},
-		{
 			"title": "densityFogFactor",
 			"kind": "function"
 		},
@@ -26759,10 +25783,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "dodge",
-			"kind": "function"
-		},
-		{
 			"title": "dof",
 			"kind": "function"
 		},
@@ -26788,10 +25808,6 @@
 		},
 		{
 			"title": "equal",
-			"kind": "function"
-		},
-		{
-			"title": "equals",
 			"kind": "function"
 		},
 		{
@@ -27507,10 +26523,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "overlay",
-			"kind": "function"
-		},
-		{
 			"title": "overloadingFn",
 			"kind": "function"
 		},
@@ -27675,10 +26687,6 @@
 			"kind": "function"
 		},
 		{
-			"title": "rangeFog",
-			"kind": "function"
-		},
-		{
 			"title": "rangeFogFactor",
 			"kind": "function"
 		},
@@ -27804,10 +26812,6 @@
 		},
 		{
 			"title": "saturation",
-			"kind": "function"
-		},
-		{
-			"title": "screen",
 			"kind": "function"
 		},
 		{
@@ -27980,10 +26984,6 @@
 		},
 		{
 			"title": "storageElement",
-			"kind": "function"
-		},
-		{
-			"title": "storageObject",
 			"kind": "function"
 		},
 		{
@@ -28377,6 +27377,10 @@
 		{
 			"title": "viewportUV",
 			"kind": "member"
+		},
+		{
+			"title": "vogelDiskSample",
+			"kind": "function"
 		},
 		{
 			"title": "wgsl",

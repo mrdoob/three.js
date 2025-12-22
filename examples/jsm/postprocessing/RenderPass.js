@@ -93,6 +93,16 @@ class RenderPass extends Pass {
 		 * @default false
 		 */
 		this.needsSwap = false;
+
+		/**
+		 * This flag indicates that this pass renders the scene itself.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isRenderPass = true;
+
 		this._oldClearColor = new Color();
 
 	}

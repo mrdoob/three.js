@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
@@ -45,19 +43,6 @@ export default QUnit.module( 'Geometries', () => {
 				object.type === 'WireframeGeometry',
 				'WireframeGeometry.type should be WireframeGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'parameters', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		// OTHERS
-		QUnit.todo( 'Standard geometry tests', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

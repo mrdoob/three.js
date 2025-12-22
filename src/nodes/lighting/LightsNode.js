@@ -234,7 +234,7 @@ class LightsNode extends Node {
 
 					if ( ! _lightsNodeRef.has( light ) ) {
 
-						lightNode = nodeObject( new lightNodeClass( light ) );
+						lightNode = new lightNodeClass( light );
 						_lightsNodeRef.set( light, lightNode );
 
 					} else {
@@ -450,4 +450,4 @@ export default LightsNode;
  * @param {Array<Light>} lights - An array of lights.
  * @return {LightsNode} The created lights node.
  */
-export const lights = ( lights = [] ) => nodeObject( new LightsNode() ).setLights( lights );
+export const lights = ( lights = [] ) => new LightsNode().setLights( lights );

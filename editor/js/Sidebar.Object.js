@@ -415,7 +415,7 @@ function SidebarObject( editor ) {
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		} catch ( e ) {
+		} catch ( error ) {
 
 			output = JSON.stringify( output );
 

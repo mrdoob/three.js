@@ -1,4 +1,4 @@
-export const REVISION = '182dev';
+export const REVISION = '183dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -1255,14 +1255,6 @@ export const RGBDepthPacking = 3202;
 export const RGDepthPacking = 3203;
 
 /**
- * The depth value is not packed.
- *
- * @type {number}
- * @constant
- */
-export const IdentityDepthPacking = 3204;
-
-/**
  * Normal information is relative to the underlying surface.
  *
  * @type {number}
@@ -1686,6 +1678,16 @@ export const InterpolationSamplingMode = {
 	SAMPLE: 'sample',
 	FIRST: 'first',
 	EITHER: 'either'
+};
+
+/**
+ * Compatibility flags for features that may not be supported across all platforms.
+ *
+ * @type {Object}
+ * @constant
+ */
+export const Compatibility = {
+	TEXTURE_COMPARE: 'depthTextureCompare'
 };
 
 /**

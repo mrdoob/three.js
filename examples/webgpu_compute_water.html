@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView, globalId } from 'three/tsl';
+			import { instanceIndex, struct, If, uint, int, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, instancedArray, min, max, positionLocal, transformNormalToView, select, globalId } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -83,7 +83,9 @@
 			let waterMesh;
 			let poolBorder;
 			let meshRay;
-			let computeHeight, computeDucks;
+			let computeHeightAtoB, computeHeightBtoA, computeDucks;
+			let pingPong = 0;
+			const readFromA = uniform( 1 );
 			let duckModel = null;
 
 			const NUM_DUCKS = 100;
@@ -159,7 +161,9 @@
 
 				}
 
-				const heightStorage = instancedArray( heightArray ).setName( 'Height' );
+				// Ping-pong height storage buffers
+				const heightStorageA = instancedArray( heightArray ).setName( 'HeightA' );
+				const heightStorageB = instancedArray( new Float32Array( heightArray ) ).setName( 'HeightB' );
 				const prevHeightStorage = instancedArray( prevHeightArray ).setName( 'PrevHeight' );
 
 				// Get Indices of Neighbor Values of an Index in the Simulation Grid
@@ -209,26 +213,15 @@
 
 				};
 
-				// Get new normals of simulation area.
-				const getNormalsFromHeightTSL = ( index, store ) => {
-
-					const { north, south, east, west } = getNeighborValuesTSL( index, store );
-
-					const normalX = ( west.sub( east ) ).mul( WIDTH / BOUNDS );
-					const normalY = ( south.sub( north ) ).mul( WIDTH / BOUNDS );
-
-					return { normalX, normalY };
-
-				};
-
-				computeHeight = Fn( () => {
+				// Create compute shader for height simulation with explicit read/write buffers
+				const createComputeHeight = ( readBuffer, writeBuffer ) => Fn( () => {
 
 					const { viscosity, mousePos, mouseSize, mouseDeep, mouseSpeed } = effectController;
 
-					const height = heightStorage.element( instanceIndex ).toVar();
+					const height = readBuffer.element( instanceIndex ).toVar();
 					const prevHeight = prevHeightStorage.element( instanceIndex ).toVar();
 
-					const { north, south, east, west } = getNeighborValuesTSL( instanceIndex, heightStorage );
+					const { north, south, east, west } = getNeighborValuesTSL( instanceIndex, readBuffer );
 
 					const neighborHeight = north.add( south ).add( east ).add( west );
 					neighborHeight.mulAssign( 0.5 );
@@ -251,9 +244,13 @@
 					newHeight.addAssign( cos( mousePhase ).add( 1.0 ).mul( mouseDeep ).mul( mouseSpeed.length() ) );
 
 					prevHeightStorage.element( instanceIndex ).assign( height );
-					heightStorage.element( instanceIndex ).assign( newHeight );
+					writeBuffer.element( instanceIndex ).assign( newHeight );
 
-				} )().compute( WIDTH * WIDTH, [ 16, 16 ] ).setName( 'Update Height' );
+				} )().compute( WIDTH * WIDTH, [ 16, 16 ] );
+
+				// Create both ping-pong compute shaders
+				computeHeightAtoB = createComputeHeight( heightStorageA, heightStorageB ).setName( 'Update Height A→B' );
+				computeHeightBtoA = createComputeHeight( heightStorageB, heightStorageA ).setName( 'Update Height B→A' );
 
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
@@ -267,10 +264,34 @@
  					side: THREE.DoubleSide
 				} );
 
+				// Helper to get height from the current read buffer
+				const getCurrentHeight = ( index ) => {
+
+					return select( readFromA, heightStorageA.element( index ), heightStorageB.element( index ) );
+
+				};
+
+				// Helper to get normals from the current read buffer
+				const getCurrentNormals = ( index ) => {
+
+					const { northIndex, southIndex, eastIndex, westIndex } = getNeighborIndicesTSL( index );
+
+					const north = getCurrentHeight( northIndex );
+					const south = getCurrentHeight( southIndex );
+					const east = getCurrentHeight( eastIndex );
+					const west = getCurrentHeight( westIndex );
+
+					const normalX = ( west.sub( east ) ).mul( WIDTH / BOUNDS );
+					const normalY = ( south.sub( north ) ).mul( WIDTH / BOUNDS );
+
+					return { normalX, normalY };
+
+				};
+
 				waterMaterial.normalNode = Fn( () => {
 
 					// To correct the lighting as our mesh undulates, we have to reassign the normals in the normal shader.
-					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightStorage );
+					const { normalX, normalY } = getCurrentNormals( vertexIndex );
 
 					return transformNormalToView( vec3( normalX, normalY.negate(), 1.0 ) ).toVertexStage();
 
@@ -278,7 +299,7 @@
 
 				waterMaterial.positionNode = Fn( () => {
 
-					return vec3( positionLocal.x, positionLocal.y, heightStorage.element( vertexIndex ) );
+					return vec3( positionLocal.x, positionLocal.y, getCurrentHeight( vertexIndex ) );
 
 				} )();
 
@@ -351,9 +372,9 @@
 					const zCoord = uint( clamp( floor( gridCoordZ ), 0, WIDTH - 1 ) );
 					const heightInstanceIndex = zCoord.mul( WIDTH ).add( xCoord );
 
-					// Get height of water at the duck's position
-					const waterHeight = heightStorage.element( heightInstanceIndex );
-					const { normalX, normalY } = getNormalsFromHeightTSL( heightInstanceIndex, heightStorage );
+					// Get height of water at the duck's position (use current read buffer)
+					const waterHeight = getCurrentHeight( heightInstanceIndex );
+					const { normalX, normalY } = getCurrentNormals( heightInstanceIndex );
 
 					// Calculate the target Y position based on the water height and the duck's vertical offset
 					const targetY = waterHeight.add( yOffset );
@@ -448,8 +469,6 @@
 				document.body.appendChild( renderer.inspector.domElement );
 
 				controls = new OrbitControls( camera, container );
-
-				container.style.touchAction = 'none';
 
 				//
 
@@ -586,7 +605,20 @@
 
 				if ( frame >= 7 - effectController.speed ) {
 
-					renderer.compute( computeHeight, [ 8, 8, 1 ] );
+					// Ping-pong: alternate which buffer we read from and write to
+					if ( pingPong === 0 ) {
+
+						renderer.compute( computeHeightAtoB, [ 8, 8, 1 ] );
+						readFromA.value = 0; // Material now reads from B (just written)
+
+					} else {
+
+						renderer.compute( computeHeightBtoA, [ 8, 8, 1 ] );
+						readFromA.value = 1; // Material now reads from A (just written)
+
+					}
+
+					pingPong = 1 - pingPong;
 
 					if ( effectController.ducksEnabled ) {
 

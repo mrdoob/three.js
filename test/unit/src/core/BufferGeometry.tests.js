@@ -1,5 +1,3 @@
-/* global QUnit */
-
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 
 import {
@@ -103,23 +101,6 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'id', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'uuid', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'name', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
 
 		QUnit.test( 'type', ( assert ) => {
 
@@ -128,60 +109,6 @@ export default QUnit.module( 'Core', () => {
 				object.type === 'BufferGeometry',
 				'BufferGeometry.type should be BufferGeometry'
 			);
-
-		} );
-
-		QUnit.todo( 'index', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'attributes', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'morphAttributes', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'morphTargetsRelative', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'groups', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'boundingBox', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'boundingSphere', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'drawRange', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'userData', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -213,12 +140,6 @@ export default QUnit.module( 'Core', () => {
 
 			a.setIndex( str );
 			assert.strictEqual( a.getIndex(), str, 'Weird index gets stored correctly' );
-
-		} );
-
-		QUnit.todo( 'getAttribute', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -262,11 +183,6 @@ export default QUnit.module( 'Core', () => {
 
 			a.clearGroups();
 			assert.strictEqual( a.groups.length, 0, 'Check groups were deleted correctly' );
-
-		} );
-		QUnit.todo( 'clearGroups', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -427,12 +343,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'setFromPoints', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'computeBoundingBox', ( assert ) => {
 
 			let bb = getBBForVertices( [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ] );
@@ -513,12 +423,6 @@ export default QUnit.module( 'Core', () => {
 
 			assert.ok( bs.radius === radius, 'radius is equal to directionLength' );
 			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
-
-		} );
-
-		QUnit.todo( 'computeTangents', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -609,12 +513,6 @@ export default QUnit.module( 'Core', () => {
 			a.setIndex( index );
 			a.computeVertexNormals();
 			assert.ok( bufferAttributeEquals( flippedNormals, a.getAttribute( 'normal' ) ), 'Indexed geometry: computed normals are correct' );
-
-		} );
-
-		QUnit.todo( 'normalizeNormals', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

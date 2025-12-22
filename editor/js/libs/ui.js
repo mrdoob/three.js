@@ -572,7 +572,7 @@ class UINumber extends UIElement {
 		const pointer = { x: 0, y: 0 };
 		const prevPointer = { x: 0, y: 0 };
 
-		function onMouseDown( event ) {
+		function onPointerDown( event ) {
 
 			if ( document.activeElement === scope.dom ) return;
 
@@ -585,12 +585,14 @@ class UINumber extends UIElement {
 			prevPointer.x = event.clientX;
 			prevPointer.y = event.clientY;
 
-			document.addEventListener( 'mousemove', onMouseMove );
-			document.addEventListener( 'mouseup', onMouseUp );
+			scope.dom.setPointerCapture( event.pointerId );
+
+			scope.dom.addEventListener( 'pointermove', onPointerMove );
+			scope.dom.addEventListener( 'pointerup', onPointerUp );
 
 		}
 
-		function onMouseMove( event ) {
+		function onPointerMove( event ) {
 
 			const currentValue = scope.value;
 
@@ -614,70 +616,17 @@ class UINumber extends UIElement {
 
 		}
 
-		function onMouseUp() {
+		function onPointerUp( event ) {
 
-			document.removeEventListener( 'mousemove', onMouseMove );
-			document.removeEventListener( 'mouseup', onMouseUp );
+			scope.dom.releasePointerCapture( event.pointerId );
+
+			scope.dom.removeEventListener( 'pointermove', onPointerMove );
+			scope.dom.removeEventListener( 'pointerup', onPointerUp );
 
 			if ( Math.abs( distance ) < 2 ) {
 
 				scope.dom.focus();
 				scope.dom.select();
-
-			}
-
-		}
-
-		function onTouchStart( event ) {
-
-			if ( event.touches.length === 1 ) {
-
-				distance = 0;
-
-				onMouseDownValue = scope.value;
-
-				prevPointer.x = event.touches[ 0 ].pageX;
-				prevPointer.y = event.touches[ 0 ].pageY;
-
-				document.addEventListener( 'touchmove', onTouchMove, { passive: false } );
-				document.addEventListener( 'touchend', onTouchEnd );
-
-			}
-
-		}
-
-		function onTouchMove( event ) {
-
-			event.preventDefault();
-
-			const currentValue = scope.value;
-
-			pointer.x = event.touches[ 0 ].pageX;
-			pointer.y = event.touches[ 0 ].pageY;
-
-			distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
-
-			let value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
-			value = Math.min( scope.max, Math.max( scope.min, value ) );
-
-			if ( currentValue !== value ) {
-
-				scope.setValue( value );
-				scope.dom.dispatchEvent( changeEvent );
-
-			}
-
-			prevPointer.x = event.touches[ 0 ].pageX;
-			prevPointer.y = event.touches[ 0 ].pageY;
-
-		}
-
-		function onTouchEnd( event ) {
-
-			if ( event.touches.length === 0 ) {
-
-				document.removeEventListener( 'touchmove', onTouchMove );
-				document.removeEventListener( 'touchend', onTouchEnd );
 
 			}
 
@@ -732,8 +681,7 @@ class UINumber extends UIElement {
 		onBlur();
 
 		this.dom.addEventListener( 'keydown', onKeyDown );
-		this.dom.addEventListener( 'mousedown', onMouseDown );
-		this.dom.addEventListener( 'touchstart', onTouchStart, { passive: false } );
+		this.dom.addEventListener( 'pointerdown', onPointerDown );
 		this.dom.addEventListener( 'change', onChange );
 		this.dom.addEventListener( 'focus', onFocus );
 		this.dom.addEventListener( 'blur', onBlur );
@@ -843,7 +791,7 @@ class UIInteger extends UIElement {
 		const pointer = { x: 0, y: 0 };
 		const prevPointer = { x: 0, y: 0 };
 
-		function onMouseDown( event ) {
+		function onPointerDown( event ) {
 
 			if ( document.activeElement === scope.dom ) return;
 
@@ -856,12 +804,14 @@ class UIInteger extends UIElement {
 			prevPointer.x = event.clientX;
 			prevPointer.y = event.clientY;
 
-			document.addEventListener( 'mousemove', onMouseMove );
-			document.addEventListener( 'mouseup', onMouseUp );
+			scope.dom.setPointerCapture( event.pointerId );
+
+			scope.dom.addEventListener( 'pointermove', onPointerMove );
+			scope.dom.addEventListener( 'pointerup', onPointerUp );
 
 		}
 
-		function onMouseMove( event ) {
+		function onPointerMove( event ) {
 
 			const currentValue = scope.value;
 
@@ -885,10 +835,12 @@ class UIInteger extends UIElement {
 
 		}
 
-		function onMouseUp() {
+		function onPointerUp( event ) {
 
-			document.removeEventListener( 'mousemove', onMouseMove );
-			document.removeEventListener( 'mouseup', onMouseUp );
+			scope.dom.releasePointerCapture( event.pointerId );
+
+			scope.dom.removeEventListener( 'pointermove', onPointerMove );
+			scope.dom.removeEventListener( 'pointerup', onPointerUp );
 
 			if ( Math.abs( distance ) < 2 ) {
 
@@ -948,7 +900,7 @@ class UIInteger extends UIElement {
 		onBlur();
 
 		this.dom.addEventListener( 'keydown', onKeyDown );
-		this.dom.addEventListener( 'mousedown', onMouseDown );
+		this.dom.addEventListener( 'pointerdown', onPointerDown );
 		this.dom.addEventListener( 'change', onChange );
 		this.dom.addEventListener( 'focus', onFocus );
 		this.dom.addEventListener( 'blur', onBlur );

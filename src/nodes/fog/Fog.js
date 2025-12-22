@@ -1,7 +1,6 @@
 import { positionView } from '../accessors/Position.js';
 import { smoothstep } from '../math/MathNode.js';
 import { Fn, output, vec4 } from '../tsl/TSLBase.js';
-import { warn } from '../../utils.js';
 
 /**
  * Returns a node that represents the `z` coordinate in view space
@@ -77,38 +76,3 @@ export const fog = Fn( ( [ color, factor ] ) => {
 	return vec4( factor.toFloat().mix( output.rgb, color.toVec3() ), output.a );
 
 } );
-
-// Deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r171. Use `fog( color, rangeFogFactor( near, far ) )` instead.
- *
- * @param {Node} color
- * @param {Node} near
- * @param {Node} far
- * @returns {Function}
- */
-export function rangeFog( color, near, far ) { // @deprecated, r171
-
-	warn( 'TSL: "rangeFog( color, near, far )" is deprecated. Use "fog( color, rangeFogFactor( near, far ) )" instead.' );
-	return fog( color, rangeFogFactor( near, far ) );
-
-}
-
-/**
- * @tsl
- * @function
- * @deprecated since r171. Use `fog( color, densityFogFactor( density ) )` instead.
- *
- * @param {Node} color
- * @param {Node} density
- * @returns {Function}
- */
-export function densityFog( color, density ) { // @deprecated, r171
-
-	warn( 'TSL: "densityFog( color, density )" is deprecated. Use "fog( color, densityFogFactor( density ) )" instead.' );
-	return fog( color, densityFogFactor( density ) );
-
-}

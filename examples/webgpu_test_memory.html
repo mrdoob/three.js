@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - memory test I</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+
+	<body>
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>WebGPU Memory Test I</span>
+			</div>
+
+			<small>
+				This example tests memory management with WebGPU renderer.
+				<br /> Spheres are created, rendered, and disposed in each frame.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, directionToColor, normalView, screenUV, context, sample, colorToDirection } from 'three/tsl';
+			import { outline } from 'three/addons/tsl/display/OutlineNode.js';
+			import { ao } from 'three/addons/tsl/display/GTAONode.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, light;
+			let generateMeshes = true;
+			let mesh;
+			let postProcessing;
+			let aoNode, outlineNode, scenePass, prePass;
+			const selectedObjects = [];
+
+			const params = {
+				castShadow: true,
+				enablePP: false,
+				enableOutline: true,
+				enableAO: true,
+				recreateLight: () => {
+
+					// Remove existing light
+					if ( light ) {
+
+						scene.remove( light );
+						light.dispose();
+						light = null;
+
+					}
+
+					// Create new directional light
+					light = new THREE.DirectionalLight( 0xffffff, 1 );
+					light.position.set( Math.random() * 200 - 100, 100, Math.random() * 200 - 100 );
+					light.castShadow = params.castShadow;
+					scene.add( light );
+
+				},
+				start: () => {
+
+					generateMeshes = true;
+
+				},
+				stop: () => {
+
+					generateMeshes = false;
+
+				}
+			};
+
+			init();
+
+			async function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 200;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.shadowMap.enabled = true;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				container.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( 0, 100, 0 );
+				light.castShadow = true;
+				scene.add( light );
+
+				const planeGeometry = new THREE.PlaneGeometry( 1000, 1000 );
+				const planeMaterial = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
+				const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				plane.rotation.x = - Math.PI / 2;
+				plane.position.y = - 100;
+				plane.receiveShadow = true;
+				scene.add( plane );
+
+				// Inspector UI
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( params, 'castShadow' ).name( 'Cast Shadow' ).onChange( ( value ) => {
+
+					if ( light ) light.castShadow = value;
+
+				} );
+
+				const ppFolder = gui.addFolder( 'Post Processing' );
+				ppFolder.add( params, 'enablePP' ).name( 'Enable' ).onChange( updatePostProcessing );
+				ppFolder.add( params, 'enableOutline' ).name( 'Outline' ).onChange( updatePostProcessing );
+				ppFolder.add( params, 'enableAO' ).name( 'AO' ).onChange( updatePostProcessing );
+
+				gui.add( params, 'recreateLight' ).name( 'Recreate Directional Light' );
+				gui.add( params, 'start' ).name( 'Start Creating Meshes' );
+				gui.add( params, 'stop' ).name( 'Stop Creating Meshes' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function updatePostProcessing() {
+
+				if ( postProcessing ) {
+
+					postProcessing.dispose();
+					postProcessing = null;
+
+				}
+
+				if ( scenePass ) {
+
+					scenePass.dispose();
+					scenePass = null;
+
+				}
+
+				if ( prePass ) {
+
+					prePass.dispose();
+					prePass = null;
+
+				}
+
+				if ( aoNode ) {
+
+					aoNode.dispose();
+					aoNode = null;
+
+				}
+
+				if ( outlineNode ) {
+
+					outlineNode.dispose();
+					outlineNode = null;
+
+				}
+
+				if ( params.enablePP ) {
+
+					postProcessing = new THREE.PostProcessing( renderer );
+
+					scenePass = pass( scene, camera );
+					let colorNode = scenePass;
+
+					if ( params.enableAO ) {
+
+						prePass = pass( scene, camera );
+						prePass.setMRT( mrt( {
+							output: directionToColor( normalView )
+						} ) );
+
+						const prePassNormal = sample( ( uv ) => {
+
+							return colorToDirection( prePass.getTextureNode().sample( uv ) );
+
+						} );
+						const prePassDepth = prePass.getTextureNode( 'depth' );
+
+						aoNode = ao( prePassDepth, prePassNormal, camera );
+
+						scenePass.contextNode = context( {
+							ao: aoNode.getTextureNode().sample( screenUV ).r
+						} );
+
+					}
+
+					if ( params.enableOutline ) {
+
+						outlineNode = outline( scene, camera, {
+							selectedObjects: selectedObjects
+						} );
+						colorNode = colorNode.add( outlineNode );
+
+					}
+
+					postProcessing.outputNode = colorNode;
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function createImage() {
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 256;
+				canvas.height = 256;
+
+				const canvas2DContext = canvas.getContext( '2d' );
+				canvas2DContext.fillStyle = 'rgb(' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ')';
+				canvas2DContext.fillRect( 0, 0, 256, 256 );
+
+				return canvas;
+
+			}
+
+			//
+
+			function animate() {
+
+				if ( generateMeshes ) {
+
+					if ( mesh ) {
+
+						scene.remove( mesh );
+
+						mesh.geometry.dispose();
+						mesh.material.map.dispose();
+						mesh.material.dispose();
+
+					}
+
+					const geometry = new THREE.SphereGeometry( 50, Math.random() * 64, Math.random() * 32 );
+
+					const texture = new THREE.CanvasTexture( createImage() );
+
+					const material = new THREE.MeshLambertMaterial( { map: texture } );
+
+					mesh = new THREE.Mesh( geometry, material );
+					mesh.castShadow = true;
+
+					scene.add( mesh );
+
+					if ( outlineNode ) {
+
+						selectedObjects[ 0 ] = mesh;
+
+					}
+
+				}
+
+				if ( postProcessing ) {
+
+					postProcessing.render();
+
+				} else {
+
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>
