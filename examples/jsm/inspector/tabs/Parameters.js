@@ -335,7 +335,7 @@ class Parameters extends Tab {
 
 		this.paramList = paramList;
 
-		this.groups = new Array();
+		this.groups = [];
 
 	}
 
