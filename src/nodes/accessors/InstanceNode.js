@@ -150,7 +150,7 @@ class InstanceNode extends Node {
 
 		if ( instanceMatrixNode === null ) {
 
-			instanceMatrixNode = this._createInstanceMatrixNode( true );
+			instanceMatrixNode = this._createInstanceMatrixNode( true, builder );
 
 			this.instanceMatrixNode = instanceMatrixNode;
 
@@ -229,7 +229,7 @@ class InstanceNode extends Node {
 
 			// update version if necessary
 
-			if ( this.instanceMatrix.usage !== DynamicDrawUsage && this.instanceMatrix.version !== this.buffer.version ) {
+			if ( this.instanceMatrix.version !== this.buffer.version ) {
 
 				this.buffer.version = this.instanceMatrix.version;
 
@@ -242,7 +242,7 @@ class InstanceNode extends Node {
 			this.bufferColor.clearUpdateRanges();
 			this.bufferColor.updateRanges.push( ... this.instanceColor.updateRanges );
 
-			if ( this.instanceColor.usage !== DynamicDrawUsage && this.instanceColor.version !== this.bufferColor.version ) {
+			if ( this.instanceColor.version !== this.bufferColor.version ) {
 
 				this.bufferColor.version = this.instanceColor.version;
 
@@ -272,7 +272,7 @@ class InstanceNode extends Node {
 
 			instancedMesh.previousInstanceMatrix = this.instanceMatrix.clone();
 
-			this.previousInstanceMatrixNode = this._createInstanceMatrixNode( false );
+			this.previousInstanceMatrixNode = this._createInstanceMatrixNode( false, builder );
 
 		}
 
@@ -285,9 +285,10 @@ class InstanceNode extends Node {
 	 *
 	 * @private
 	 * @param {boolean} assignBuffer - Whether the created interleaved buffer should be assigned to the `buffer` member or not.
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
 	 * @return {Node} The instance matrix node.
 	 */
-	_createInstanceMatrixNode( assignBuffer ) {
+	_createInstanceMatrixNode( assignBuffer, builder ) {
 
 		let instanceMatrixNode;
 
@@ -300,9 +301,11 @@ class InstanceNode extends Node {
 
 		} else {
 
-			// Both backends have ~64kb UBO limit; fallback to attributes above 1000 matrices.
+			// WebGPU has a 64kb UBO limit, WebGL 2 ensures only 16KB; fallback to attributes if a certain count is exceeded
 
-			if ( count <= 1000 ) {
+			const limit = ( builder.renderer.backend.isWebGPUBackend === true ) ? 1000 : 250;
+
+			if ( count <= limit ) {
 
 				instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', Math.max( count, 1 ) ).element( instanceIndex );
 
