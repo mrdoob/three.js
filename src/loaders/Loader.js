@@ -66,6 +66,7 @@ class Loader {
 			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
 
 		}
+
 	}
 
 	/**
