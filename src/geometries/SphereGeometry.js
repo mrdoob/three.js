@@ -29,7 +29,7 @@ class SphereGeometry extends BufferGeometry {
 	 * @param {number} [thetaLength=Math.PI] - The vertical sweep angle size.
 	 * @param {Object} [attributes={}] - Attribute precision specifiers.
 	 */
-	constructor(radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI, precision = { position: Float32BufferAttribute, uv: Float32BufferAttribute, normal: Float32BufferAttribute } ) {
+	constructor( radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI, precision = { position: Float32BufferAttribute, uv: Float32BufferAttribute, normal: Float32BufferAttribute } ) {
 
 		super();
 
