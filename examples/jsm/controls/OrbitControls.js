@@ -54,6 +54,8 @@ const _STATE = {
 };
 const _EPS = 0.000001;
 
+const _targetMap = new WeakMap();
+const _target0Map = new WeakMap();
 
 /**
  * Orbit controls allow the camera to orbit around a target.
@@ -98,14 +100,6 @@ class OrbitControls extends Controls {
 		super( object, domElement );
 
 		this.state = _STATE.NONE;
-
-		/**
-		 * The focus point of the controls, the `object` orbits around this.
-		 * It can be updated manually at any point to change the focus of the controls.
-		 *
-		 * @type {Vector3}
-		 */
-		this.target = new Vector3();
 
 		/**
 		 * The focus point of the `minTargetRadius` and `maxTargetRadius` limits.
@@ -375,13 +369,6 @@ class OrbitControls extends Controls {
 		 *
 		 * @type {Vector3}
 		 */
-		this.target0 = this.target.clone();
-
-		/**
-		 * Used internally by `saveState()` and `reset()`.
-		 *
-		 * @type {Vector3}
-		 */
 		this.position0 = this.object.position.clone();
 
 		/**
@@ -505,6 +492,61 @@ class OrbitControls extends Controls {
 	}
 
 	/**
+	 * The focus point of the controls, the `object` orbits around this.
+	 * It can be updated manually at any point to change the focus of the controls.
+	 *
+	 * @type {Vector3}
+	 */
+	get target() {
+
+		if ( _targetMap.has( this.object ) ) {
+
+			return _targetMap.get( this.object )
+
+		} else {
+
+			const target = new Vector3()
+			_targetMap.set( this.object, target )
+			return target
+
+		}
+
+	}
+
+	set target( value ) {
+
+		_targetMap.set( this.object, value )
+
+	}
+
+	/**
+	 * Used internally by `saveState()` and `reset()`.
+	 *
+	 * @type {Vector3}
+	 */
+	get target0() {
+
+		if ( _target0Map.has( this.object ) ) {
+
+			return _target0Map.get( this.object )
+
+		} else {
+
+			const target0 = this.target.clone()
+			_target0Map.set( this.object, target0 )
+			return target0
+
+		}
+
+	}
+
+	set target0( value ) {
+
+		_target0Map.set( this.object, value )
+
+	}
+
+  /**
 	 * Get the current vertical rotation, in radians.
 	 *
 	 * @return {number} The current vertical rotation, in radians.
