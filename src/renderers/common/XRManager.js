@@ -677,10 +677,7 @@ class XRManager extends EventDispatcher {
 	createMediaLayer( texture, layout = 'stereo', quaternion = {}, is180 = false, params = {}, radius = 500, widthSegments = 60, heightSegments = 40, updateAtIndex = - 1, quadWidth = 0, quadHeight = 0, translation = {} ) {
 
 		const group = new Group(),
-			blendLayerGroup = new Group(),
 			isQuad = !! quadWidth;
-
-		blendLayerGroup.name = 'media-blend-layer';
 
 		/**
 		 * Creates a sphere mesh for equirect layers.
