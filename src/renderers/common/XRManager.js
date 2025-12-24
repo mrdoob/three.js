@@ -771,21 +771,19 @@ class XRManager extends EventDispatcher {
 
 		if ( this._supportsLayers ) {
 
-			//set the quad layer plane width and height.
-			params.width = quadWidth;
-			params.height = quadHeight;
-
 			let centralHorizontalAngle = Math.PI * ( is180 ? 1 : 2 ),
 				mediaLayerMethod = 'createEquirectLayer';
 
 			//change the media layer creation method to quad if set.
 			if ( isQuad ) {
 
+				//set the quad layer plane width and height.
+				//diovide the units of the quad native layer by half to match world units.
+				params.width = quadWidth / 2;
+				params.height = quadHeight / 2;
+
 				centralHorizontalAngle = 0;
 				mediaLayerMethod = 'createQuadLayer';
-
-				//native quad layer units is double required than world units. Blend later transform is in set world units.
-				translation.z *= 2;
 
 			}
 
