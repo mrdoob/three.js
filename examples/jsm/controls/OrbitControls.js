@@ -55,7 +55,6 @@ const _STATE = {
 const _EPS = 0.000001;
 
 const _targetMap = new WeakMap();
-const _target0Map = new WeakMap();
 
 /**
  * Orbit controls allow the camera to orbit around a target.
@@ -369,6 +368,13 @@ class OrbitControls extends Controls {
 		 *
 		 * @type {Vector3}
 		 */
+		this.target0 = this.target.clone();
+
+		/**
+		 * Used internally by `saveState()` and `reset()`.
+		 *
+		 * @type {Vector3}
+		 */
 		this.position0 = this.object.position.clone();
 
 		/**
@@ -516,33 +522,6 @@ class OrbitControls extends Controls {
 	set target( value ) {
 
 		_targetMap.set( this.object, value )
-
-	}
-
-	/**
-	 * Used internally by `saveState()` and `reset()`.
-	 *
-	 * @type {Vector3}
-	 */
-	get target0() {
-
-		if ( _target0Map.has( this.object ) ) {
-
-			return _target0Map.get( this.object )
-
-		} else {
-
-			const target0 = this.target.clone()
-			_target0Map.set( this.object, target0 )
-			return target0
-
-		}
-
-	}
-
-	set target0( value ) {
-
-		_target0Map.set( this.object, value )
 
 	}
 
