@@ -94,6 +94,7 @@ void main() {
 
 	#if DEPTH_PACKING == 3200
 
+		// Need to use swizzle because VSM uses RGFormat and PCF uses RGBAFormat
 		gl_FragColor.r = 1.0 - fragCoordZ;
 
 	#elif DEPTH_PACKING == 3201
