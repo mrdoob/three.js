@@ -164,9 +164,11 @@
 
 					shader.uniforms.darkness = depthMaterial.userData.darkness;
 					shader.fragmentShader = /* glsl */`
+						layout( location = 0 ) out lowp vec4 out_FragData0;
+						#define gl_FragColor out_FragData0
 						uniform float darkness;
 						${shader.fragmentShader.replace(
-					'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
+					'gl_FragColor.r = 1.0 - fragCoordZ;',
 					'gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * darkness );'
 				)}
 					`;
